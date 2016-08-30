@@ -1,0 +1,20 @@
+# initilization of wemos
+# set base password, adapt main file and add basic config
+# shield info
+# we use here mpfshell as it supports a copy via serial, later we need to use 
+# webrepl as this is not supported in this enaymore
+
+open ttyUSB0
+# TODO: check about changes in boot.py, make sure webrepl always gets started
+put boot.py
+put main.py
+# make sure password is defined
+put port_config.py
+put ulno_shield01.py
+# remove wifi config
+rm wifi_config.py
+# show all is there
+ls
+# reset
+exec import machine
+exec machine.reset()

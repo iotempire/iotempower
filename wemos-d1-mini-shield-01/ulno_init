@@ -1,0 +1,4 @@
+#!/bin/bash
+# basic ulno-specific initialization after deploying firmware
+# copy everything important
+mpfshell -s ulno_init.mpfshell

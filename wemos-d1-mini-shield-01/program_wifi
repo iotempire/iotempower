@@ -1,0 +1,34 @@
+#!/bin/bash
+# Program the fixed wifi network
+# author: ulno
+
+# TODO: the following should eentually later be done with webrepl_cli and not mpfshell
+# so far  webrepl_cli does not allow to specify the password for the repl connection
+
+wifi_if=$(iwconfig 2>/dev/null|grep IEEE|cut -d\  -f1)
+echo "Local wifi interface seems to be: $wifi_if."
+echo
+echo "The following wifi networks are visible, enter a name to which"
+echo "the iot computer should connect."
+
+# TODO get list from device
+iwlist "$wifi_if" scanning 2>/dev/null |grep "ESSID:"|cut -d\: -f2|cut -b2-| while read -r line
+do
+       echo "${line%?}"
+done
+echo
+echo -n "Name/essid: "
+read wifi_name
+echo -n "Enter its password: "
+read wifi_password
+
+wifi_config="wifi_config.py"
+cat > "$wifi_config" << EOF
+wifi_name="$wifi_name"
+wifi_pw="$wifi_password"
+EOF
+
+echo "$wifi_config" is now copied to the iot computer.
+cat "$wifi_config"
+
+mpfshell -s program_wifi.mpfshell
