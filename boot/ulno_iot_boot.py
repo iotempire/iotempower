@@ -1,17 +1,35 @@
 # ulno_iot boot-script
 # Try to load display and give some instructions
 
-from ulno_iot_display import display
+import network
+import ulno_iot_display as display
 
-if display.present:
+if display.present: # needs to also be predsent for reset to work
 	# TODO: test if reset is requested
-	if Pin(16,Pin.IN).value() == 0:
+	from machine import Pin
+	p = Pin(12,Pin.IN)
+	if p.value() == 0:
 		# TODO show dialog
-		print("Reset (lower button) is pressed.")
-		import os
-		os.remove("wifi_config.py")
-		import machine
-		machine.reset()
+		print("Reset (right button) is pressed - keep pressed to reset.")
+		from ulno_iot_devel import red,yellow,blue
+		# turn on all leds
+		red.high()
+		yellow.high()
+		blue.low()
+		import time
+		time.sleep(3)
+		if p.value() == 0:
+			print("Reset (right button) is still pressed - reseting.")
+			red.low()
+			yellow.low()
+			blue.high()
+			import os
+			try:
+				os.remove("wifi_config.py")
+			except OSError:
+				pass
+			import machine
+			machine.reset()
 
 print("Network setup...")
 
@@ -49,8 +67,8 @@ else:
 		print("%s. waiting for connection"%count)
 		# TODO: update on display
 		count += 1
-	print("connected")
 	if sta_if.isconnected():
+		print("connected")
 		print('network config:', sta_if.ifconfig())
 		if display.present: # display network config
 			display.text("WIFI connected.",0,16)

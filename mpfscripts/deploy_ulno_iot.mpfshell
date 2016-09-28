@@ -11,6 +11,7 @@ put boot/boot.py boot.py
 put boot/main.py main.py
 # make sure password is defined
 put boot/port_config.py port_config.py
+put boot/ulno_iot_boot.py ulno_iot_boot.py
 put shields/display/ulno_iot_display.py ulno_iot_display.py
 put shields/devel/ulno_iot_devel.py ulno_iot_devel.py
 put shields/mpr121/ulno_iot_mpr121.py ulno_iot_mpr121.py

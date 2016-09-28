@@ -2,7 +2,6 @@
 
 from machine import Pin, I2C
 import ssd1306
-import network
 
 present = False
 
@@ -20,5 +19,8 @@ except OSError:
 else:
 	# shield is present
 	present = True
+	text = display.text
+	show = display.show
+	fill = display.fill
 
 # TODO: define easier output functions which can scroll

@@ -1,6 +1,8 @@
 # ulno_iot developer testing shield
 # also useful in eduction to get started
-	
+
+from machine import Pin
+
 # configure leds
 d4=Pin(2,Pin.OUT)
 blue=d4 # TODO:reverse
