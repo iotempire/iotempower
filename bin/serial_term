@@ -1,0 +1,4 @@
+#!/bin/bash
+# open a repl terminal on the given IP
+
+mpfshell -c "open ttyUSB0; repl"

@@ -1,44 +1,11 @@
-# ulno shield01 
+# ulno_iot boot-script
+# Try to load display and give some instructions
 
-from machine import Pin, I2C
-import ssd1306
-import network
+from ulno_iot_display import display
 
-present = False
-
-# test if lcd is responding
-i2c = I2C(sda=Pin(4), scl=Pin(5))
-try:
-	display = ssd1306.SSD1306_I2C(128,64,i2c)
-	display.fill(0)
-	display.text("iot.ulno.net",16,4)
-	display.show()
-	
-except OSError:
-	# shield seems not to be here
-	print("Ulno Shield 01 not found")
-else:
-	# shield is present
-	present = True
-	# configure leds
-	d4=Pin(2,Pin.OUT)
-	blue=d4 # TODO:reverse
-	blue.high() # switch off, too bright
-	d7=Pin(13,Pin.OUT)
-	red=d7
-	d8=Pin(15,Pin.OUT)
-	yellow=d8
-	# configure buttons
-	d5=Pin(14,Pin.IN,Pin.PULL_UP)
-	lower_button=d5
-	d6=Pin(12,Pin.IN,Pin.PULL_UP)
-	right_button=d6
-	d3=Pin(0,Pin.IN,Pin.PULL_UP)
-	left_button=d3
-	#flash_button=d3
-
+if display.present:
 	# TODO: test if reset is requested
-	if lower_button.value() == 0:
+	if Pin(16,Pin.IN).value() == 0:
 		# TODO show dialog
 		print("Reset (lower button) is pressed.")
 		import os
@@ -48,7 +15,7 @@ else:
 
 print("Network setup...")
 
-# try network setup
+# try network setup (also without display)
 try:
 	import wifi_config
 except ImportError:
@@ -57,7 +24,7 @@ except ImportError:
 	ap.active(True) # enable Accesspoint
 	print("No wifi config, in ap mode.")
 	print("Essid: "+ap.config('essid'))
-	if present:
+	if display.present:
 		display.text("To configure,",0,16)
 		display.text("connect to:",0,24)
 		display.text(ap.config("essid")[0:11],0,32)
@@ -85,7 +52,7 @@ else:
 	print("connected")
 	if sta_if.isconnected():
 		print('network config:', sta_if.ifconfig())
-		if present: # display network config
+		if display.present: # display network config
 			display.text("WIFI connected.",0,16)
 			display.text("IP:",0,32)
 			display.text(sta_if.ifconfig()[0],0,40)
@@ -94,7 +61,7 @@ else:
 			display.show()
 	else:
 		print("network connection unsuccessful")
-		if present: # display network config
+		if display.present: # display network config
 			display.text("WIFI not",0,16)
 			display.text("connected.",0,32)
 			display.text("Reconfig/reset!",0,48)

@@ -2,7 +2,7 @@
 # author: ulno
 
 open ws:192.168.4.1,iot.ulno
-put wifi_config.py
+put tmp/wifi_config.py
 ls
 exec import machine
 exec machine.reset()

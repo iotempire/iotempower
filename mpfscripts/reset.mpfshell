@@ -1,0 +1,4 @@
+# execute hard-reset
+open ttyUSB0
+exec import machine
+exec machine.reset()

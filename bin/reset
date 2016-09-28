@@ -1,0 +1,9 @@
+#!/bin/bash
+# basic ulno-specific initialization after deploying firmware
+# copy everything important
+
+# find directory
+dir=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
+cd "$dir/.."
+
+mpfshell -s mpfscripts/reset.mpfshell

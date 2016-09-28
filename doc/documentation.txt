@@ -2,14 +2,15 @@ ulno-shield 1
 
 assumption lcd screen up
 
+d0: 16 lower button
+d1:  5 temp/humidity or relay (doesn't work at the same time)
+d2:  4 i2c/sda (lcd)
 d3:  0 flash and left button
+d4:  2 on board led (reversed low: on, high: off)
+d5: 14 i2c/scl (lcd)
 d6: 12 right button
-d5: 14 lower button
-d8: 15 yellow led
 d7: 13 red led
-d4:  2 on boad led (reversed low: on, high: off)
-d1:  5 scl (lcd), lcd is upside down
-d2:  4 sda (lcd)
+d8: 15 yellow led
 
 Example for buttons and leds:
 from machine import Pin
@@ -40,3 +41,10 @@ wlan = network.WLAN(network.STA_IF) # create station interface
 wlan.active(True)
 wlan.connect('iotempire', 'internetofthings')
 wlan.ifconfig()
+
+DHT (temperature,humidity):
+from machine import Pin
+import dht
+d=dht.DHT11(Pin(5))
+d.measure()
+d.temperature()

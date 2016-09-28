@@ -3,14 +3,17 @@
 # shield info
 # we use here mpfshell as it supports a copy via serial, later we need to use 
 # webrepl as this is not supported in this enaymore
+# assume, we are in main directory
 
 open ttyUSB0
 # TODO: check about changes in boot.py, make sure webrepl always gets started
-put boot.py
-put main.py
+put boot/boot.py boot.py
+put boot/main.py main.py
 # make sure password is defined
-put port_config.py
-put ulno_shield01.py
+put boot/port_config.py port_config.py
+put shields/display/ulno_iot_display.py ulno_iot_display.py
+put shields/devel/ulno_iot_devel.py ulno_iot_devel.py
+put shields/mpr121/ulno_iot_mpr121.py ulno_iot_mpr121.py
 # remove wifi config
 rm wifi_config.py
 # show all is there
