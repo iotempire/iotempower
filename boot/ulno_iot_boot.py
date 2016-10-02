@@ -30,6 +30,7 @@ if display.present: # needs to also be present for reset to work
 				os.remove("wifi_config.py")
 			except OSError:
 				pass
+			time.sleep(2)
 			import machine
 			machine.reset()
 

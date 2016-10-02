@@ -3,6 +3,12 @@
 
 import machine
 machine.freq(160000000) # be fast by default
+
+# convenient reset
+import machine
+def reset():
+	machine.reset()
+
 # the next sets up wifi or shows some boot instructions
 # on a potentially attached screen
 # also resets (clears wifi_config when lower button
