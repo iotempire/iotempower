@@ -28,7 +28,7 @@ devel.d6() # button can also be accessed via it's pin name
 ```
 
 Here some images of the shield:
+
 ![top](../../doc/pics/devel_t.jpg)
 
-![https://github.com/ulno/micropython-extra-ulno/blob/master/doc/pics/devel_t.jpg?raw=true]
-
+![button](../../doc/pics/devel_b.jpg)

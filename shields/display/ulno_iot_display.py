@@ -102,7 +102,7 @@ def print(text="",newline=False):
 		line_feed(show=False)
 	display.show()
 	
-def println(text):
+def println(text=""):
 	print(text,newline=True)
 
 
