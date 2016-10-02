@@ -27,3 +27,5 @@ devel.right_button()
 devel.d6() # button can also be accessed via it's pin name
 ```
 
+Here soem images of the shield:
+[[/doc/pics/devel_t.jpg|alt=top]]
