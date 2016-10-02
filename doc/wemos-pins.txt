@@ -1,6 +1,4 @@
-ulno-shield 1
-
-assumption lcd screen up
+# pin mappings for all supported wemos d1 mini shields
 
 d0: 16 lower button
 d1:  5 temp/humidity or relay (doesn't work at the same time)
@@ -21,30 +19,3 @@ d7.low()
 
 d5=Pin(14,Pin.IN,Pin.PULL_UP)
 d5.value()
-
-For lcd screen:
-import ssd1306
-from machine import I2C, Pin
-i2c = I2C(sda=Pin(4), scl=Pin(5))
-display = ssd1306.SSD1306_I2C(128,64,i2c)
-display.fill(1)
-display.show()
-
-display.text("awesome",24,0)
-for y in range(56): display.scroll(0,1); display.show()
-for y in range(56): display.scroll(0,-1); display.show()
-
-
-Connect to wifi:
-import network
-wlan = network.WLAN(network.STA_IF) # create station interface
-wlan.active(True)
-wlan.connect('iotempire', 'internetofthings')
-wlan.ifconfig()
-
-DHT (temperature,humidity):
-from machine import Pin
-import dht
-d=dht.DHT11(Pin(5))
-d.measure()
-d.temperature()
