@@ -11,8 +11,8 @@ To use this shield execute:
 import ulno_net_display as display
 ```
 
-All devices can now be accessed by their name or pin name.
-Examples:
+Here are some examples, how to use the display module
+(after doing the import as described above):
 ```python
 display.clear() # clear the display
 display.println("Hello world! The text will be wrapped.")
