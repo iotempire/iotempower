@@ -9,7 +9,9 @@ version="1.8.4"
 flash_size=32
 tty=/dev/ttyUSB0
 # 115200 seems safer and prevents problems with lesser quality ttl converters
-baudrate=115200
+#baudrate=115200
+#baudrate=230400
+baudrate=460800
 
 # find directory
 dir=$(cd -P -- "$(dirname -- "$0")" && pwd -P)

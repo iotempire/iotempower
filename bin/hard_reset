@@ -1,0 +1,5 @@
+#!/bin/bash
+# hard reset
+
+mpfshell -n -c "open ttyUSB0" --reset
+

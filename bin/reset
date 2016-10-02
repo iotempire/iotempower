@@ -1,6 +1,5 @@
 #!/bin/bash
-# basic ulno-specific initialization after deploying firmware
-# copy everything important
+# do reset
 
 # find directory
 dir=$(cd -P -- "$(dirname -- "$0")" && pwd -P)

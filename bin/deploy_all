@@ -1,0 +1,11 @@
+#!/bin/bash
+# deploy esp8266 micropython
+# this needs to be called from the download directory
+
+# find directory
+dir=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
+cd "$dir"
+
+./deploy_firmware
+./hard_reset
+./deploy_ulno_iot
