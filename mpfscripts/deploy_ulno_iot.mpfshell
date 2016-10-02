@@ -15,6 +15,7 @@ put boot/ulno_iot_boot.py ulno_iot_boot.py
 put shields/display/ulno_iot_display.py ulno_iot_display.py
 put shields/devel/ulno_iot_devel.py ulno_iot_devel.py
 put shields/mpr121/ulno_iot_mpr121.py ulno_iot_mpr121.py
+put shields/ht/ulno_iot_ht.py ulno_iot_ht.py
 # remove wifi config
 rm wifi_config.py
 # show all is there

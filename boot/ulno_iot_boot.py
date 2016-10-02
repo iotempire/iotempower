@@ -4,12 +4,14 @@
 import network
 import ulno_iot_display as display
 
-if display.present: # needs to also be predsent for reset to work
-	# TODO: test if reset is requested
+wifi_configured = False
+
+if display.present: # needs to also be present for reset to work
+	# test if reset is requested
 	from machine import Pin
-	p = Pin(12,Pin.IN)
+	p = Pin(12,Pin.IN) # TODO: make some kind of Pin configuration file for different platforms
 	if p.value() == 0:
-		# TODO show dialog
+		# TODO: show dialog on screen
 		print("Reset (right button) is pressed - keep pressed to reset.")
 		from ulno_iot_devel import red,yellow,blue
 		# turn on all leds
@@ -48,7 +50,7 @@ except ImportError:
 		display.text(ap.config("essid")[0:11],0,32)
 		display.text(ap.config("essid")[11:],0,40)
 		display.text("pw: micropythoN",0,48)
-		display.text("Then run setup.",0,55)
+		display.text("copy wifi_cfg.py",0,55)
 		display.show()
 else:
 	import time
