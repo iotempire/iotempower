@@ -12,7 +12,7 @@ The mapping to GPIO-ports is like the following:
 
 To use this shield execute:
 ```python
-import ulno_net_devel as devel
+import ulno_iot_devel as devel
 ```
 
 All devices can now be accessed by their name or pin name.
