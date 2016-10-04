@@ -17,7 +17,7 @@ To setup wifi connect to the wireless network of the esp8266, when in access mod
 [webrepl](http://micropython.org/webrepl/) or your own local copy of it from https://github.com/micropython/webrepl.
 The webrepl password is hardcoded to "iot.ulno". You can change it later in the 
 [port_config.py](/boot/port_config.py) file (just re-upload the file with a different password and reconnect.
-Attention, th epassword can't be too complex, so stick with somethign around 8 cahracters and not too many 
+Attention, the password can't be too complex, so stick with something around 8 cahracters and not too many 
 special things in it. Haven't figured out why, seems to be a webrepl thing - or just stick with iot.ulno.
 Adapt [wifi_config.py](/examples/wifi_config.py) and copy it through webrepl. If you have mpfshell installed and run
 Linux, you can also run the [setup script](bin/program_wifi).
@@ -27,3 +27,6 @@ when the system boots.
 
 To use interrupts and other advanced features, take a look at the
 [micropython reference](https://docs.micropython.org/en/latest/esp8266/esp8266/quickref.html).
+
+For a very light introduction in general python, take a look at 
+[this](https://docs.python.org/3/tutorial/introduction.html).

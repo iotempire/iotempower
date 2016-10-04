@@ -8,7 +8,7 @@ The mapping to GPIO-ports is like the following:
 
 To use this shield execute:
 ```python
-import ulno_net_display as display
+import ulno_iot_display as display
 ```
 
 Here are some examples, how to use the display module
