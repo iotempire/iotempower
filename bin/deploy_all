@@ -9,3 +9,4 @@ cd "$dir"
 ./deploy_firmware
 ./hard_reset
 ./deploy_ulno_iot
+./hard_reset
