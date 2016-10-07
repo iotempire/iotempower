@@ -2,7 +2,8 @@
 import time
 import ujson
 from urllib import urequest
-from ulno_shield01 import display,left_button,right_button,lower_button
+import ulno_iot_display as display
+from ulno_iot_devel import left_button,right_button,lower_button
 # attention: create a file weather_config.py
 # in that file have a line appid="yourid"
 from weather_config import appid
