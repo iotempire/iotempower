@@ -73,6 +73,7 @@ else:
 	if sta_if.isconnected():
 		print("connected")
 		print('network config:', sta_if.ifconfig())
+		wifi_configured = True
 		if display.present: # display network config
 			display.text("WIFI connected.",0,16)
 			display.text("IP:",0,32)

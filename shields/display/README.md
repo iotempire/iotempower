@@ -33,7 +33,15 @@ display.pixel(7,7,True) # put a dot right next to it
 display.show() # you always need to call show for the direct access to see anything
 ```
 
-Here some images of the shield:
+Here are prototyping view and schematics
+(made in [fritzing](http://fritzing.org)):
+
+![prototyping view](display_bb.jpg)
+![schematic view](display_schem.jpg)
+
+
+If you want to solder thsi shield yourself, check out 
+[this video](https://youtu.be/-qlh_xMKBXg) and the following images:
 
 ![top](../../doc/pics/display_t.jpg)
 
