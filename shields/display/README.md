@@ -32,17 +32,18 @@ display.text("hello",8,8) # no scrolling or wrapping here
 display.pixel(7,7,True) # put a dot right next to it
 display.show() # you always need to call show for the direct access to see anything
 ```
+If you want to solder this shield yourself, check out 
+[this video](https://youtu.be/-qlh_xMKBXg) and the following images
 
 Here are prototyping view and schematics
 (made in [fritzing](http://fritzing.org)):
 
-![prototyping view](display_bb.jpg)
-![schematic view](display_schem.jpg)
+![prototyping view](display_bb.png)
+![schematic view](display_schem.png)
 
 
-If you want to solder thsi shield yourself, check out 
-[this video](https://youtu.be/-qlh_xMKBXg) and the following images:
+The top and buttom of the shield.
 
 ![top](../../doc/pics/display_t.jpg)
 
-![button](../../doc/pics/display_b.jpg)
+![bottom](../../doc/pics/display_b.jpg)
