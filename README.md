@@ -25,6 +25,9 @@ Linux, you can also run the [setup script](bin/program_wifi).
 If you create a user_boot.py file with your own context, this will be started automatically,
 when the system boots.
 
+I have slightly modified the micropython firmware, 
+please find the current version referenced [here](firmware/Readme.md).
+
 To use interrupts and other advanced features, take a look at the
 [micropython reference](https://docs.micropython.org/en/latest/esp8266/esp8266/quickref.html).
 
