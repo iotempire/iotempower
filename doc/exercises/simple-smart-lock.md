@@ -31,11 +31,13 @@ wifi network as well as toyed and understood at least the
    the display, then the relay on top).
 2. Power the wemos and login into your wemos via webrepl.
 3. Try the following at the repl command prompt:
-```
-import ulno_iot_relay as relay
-relay.right()
-relay.left()
-```
+
+   ```
+   import ulno_iot_relay as relay
+   relay.right()
+   relay.left()
+   ```
+
 4. You should have heard two clicks.
    In default (off at the beginning and later after executing relay.left) mode, 
    when the little red led on the shield
