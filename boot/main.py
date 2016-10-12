@@ -19,4 +19,4 @@ import ulno_iot_boot
 #	from ulno_shield01 import d3,d4,d5,d6,d7,left_button,right_button,lower_button,red,yellow,blue,display
 # if wifi configured and present, start user specific boot
 if ulno_iot_boot.wifi_configured:
-	import user_boot.py
+	import user_boot

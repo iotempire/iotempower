@@ -48,7 +48,7 @@ wifi network as well as toyed and understood at least the
    not sure about the connections, use a voltmeter to confirm the directions.
 5. Unplug the wemos and wire the electric lock in connecting one cable of your
    lock power supply to the center contact of the relay, one cable to the lock
-   and one othe rcable from the right contact to the lock (we assume that the
+   and one other cable from the right contact to the lock (we assume that the
    lock is open, when it is powered, check this in advance else you can just
    use the left connector).
 6. Plug in the lock power adapter and repeat step 3. Check after the right and

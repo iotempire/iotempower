@@ -7,6 +7,7 @@ dir=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
 cd "$dir"
 
 ./deploy_firmware
+sleep 5
 ./hard_reset
 ./deploy_ulno_iot
 ./reset
