@@ -1,11 +1,19 @@
-# micropython-extra-ulno
-Ulno's (http://ulno.net) extensions to [micropython](http://www.micropython.org/)
+# IoT devkit
+
+Here, your find extensions to [micropython](http://www.micropython.org/)
 enabling IoT classes and easy getting started using [micropython](http://www.micropython.org/).
+To support this start, we are using our own development kits.
+
+For a start, the original author Ulno (http://ulno.net) has desigened some
+shields (little electronic parts you can just plug together) to plug into
+a Wemos D1 mini. You can also find manuals to build different parts of the 
+devkit and th elinks to youtube videos using and soldering them on ulno's\
+[youtube channel](https://www.youtube.com/channel/UCaDpsG87Q99Ja2q3UoiXRVA).
 
 The tools here make heavily use of [mpfshell](https://github.com/wendlers/mpfshell).
 
 The tools allow an easy way to deploy the firmware and the small libraries supporting
-the follwing shields:
+the following shields of the first iot-devkit:
 - [devel](shields/devel/README.md): a shield with two leds and 3 buttons, pressing the right one when booting up, will
   delete the wifi configuration file and prevent the user_boot.py to be started
 - [display](shields/display/README.md): supports using an i2c-based 128x64 LCD (ssd1306) on d5 and d2
