@@ -7,7 +7,7 @@ To support this start, we are using our own development kits.
 For a start, the original author Ulno (http://ulno.net) has desigened some
 shields (little electronic parts you can just plug together) to plug into
 a Wemos D1 mini. You can also find manuals to build different parts of the 
-devkit and th elinks to youtube videos using and soldering them on ulno's\
+devkit and th elinks to youtube videos using and soldering them on ulno's
 [youtube channel](https://www.youtube.com/channel/UCaDpsG87Q99Ja2q3UoiXRVA).
 
 The tools here make heavily use of [mpfshell](https://github.com/wendlers/mpfshell).
