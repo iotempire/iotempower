@@ -43,6 +43,8 @@ except ImportError:
 	# not yet configured
 	ap = network.WLAN(network.AP_IF)
 	ap.active(True) # enable Accesspoint
+	sta_if = network.WLAN(network.STA_IF)
+	sta_if.active(False)
 	print("No wifi config, in ap mode.")
 	print("Essid: "+ap.config('essid'))
 	if display.present:

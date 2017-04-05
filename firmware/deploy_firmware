@@ -6,19 +6,22 @@
 version="1.8.4"
 # wemos has 32m-bit=4m-byte flash
 # seems to have 4m-byte: http://www.wemos.cc/Products/d1_mini.html
-flash_size=32
+flash_size=32 # wemos d1 mini
+#flash_size=16 # olimex
+#flash_size=8 # sonoff flash is only 1m-byte
 tty=/dev/ttyUSB0
 # 115200 seems safer and prevents problems with lesser quality ttl converters
-#baudrate=115200
+baudrate=115200
 #baudrate=230400
-baudrate=460800
+#baudrate=460800
 
 # find directory
 dir=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
 cd "$dir/../firmware"
 
 #firmware="esp8266-*$version.bin"
-firmware=firmware-combined.bin
+firmware=esp8266-20170108-v1.8.7.bin
+#firmware=firmware-combined.bin
 
 # TODO: think about an autodownload
 

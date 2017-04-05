@@ -1,0 +1,22 @@
+#!/bin/bash
+# find directory
+# $1 destination (can be usb0-usb9 or acm0-acm9 or address
+dir=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
+#cd "$dir/.."
+
+if [[ "x$1" == "x" ]]; then
+  dest=ttyUSB0
+elif [[ "$1" =~ ^[Uu][Ss][Bb][0-9]$ ]]; then
+  dest=ttyUSB${1:3:1}
+elif [[ "$1" =~ ^[Aa][Cc][Mm][0-9]$ ]]; then
+  dest=ttyACM${1:3:1}
+else
+  dest="ws:$1,iot.ulno"
+fi
+
+echo "Trying to connect with mpfshell to $dest."
+echo "If this was not your intention give usb0-usb9 or acm0-acm9 or an address as parameter."
+echo
+echo "Launching mpfshell..."
+
+mpfshell -c "open $dest; mput .*\\.py; lcd ../../lib; mput .*\.py; ls"
