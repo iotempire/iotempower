@@ -1,0 +1,5 @@
+mqtt_broker = "192.168.10.254"
+mqtt_client_id =  b"esp_entrance_lock"
+mqtt_topic = b"entrance/lock"
+mqtt_user = "homeassistant"
+mqtt_password = "internetofthings"
