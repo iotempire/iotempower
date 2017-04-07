@@ -1,5 +1,16 @@
 #!/bin/bash
-# hard reset
+# hard reset a connected esp device
+#
+# $1 device (if not given reset first found)
 
-mpfshell -n -c "open ttyUSB0" --reset
+# find directory
+dir=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
+"$dir/check_dependencies" || exit 1
+EXTERNAL="$dir/../external"
+VPYTHON="$EXTERNAL/ulnoiot_vp/"
+source "$VPYTHON/bin/activate"
+
+port=$("$dir/find_esp_port" "$1")
+
+mpfshell -n -c "open tty$port" --reset
 
