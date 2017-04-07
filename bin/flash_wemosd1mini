@@ -1,0 +1,52 @@
+#!/bin/bash
+# flash esp8266 micropython
+#
+# $1 can give a tty port as destination parameter (for example: USB0)
+#
+
+board_name="Wemos D1 mini"
+flash_size=32 # wemos d1 mini 32m-bit=4m-byte flash http://www.wemos.cc/Products/d1_mini.html
+#flash_size=16 # olimex
+#flash_size=8 # sonoff flash is only 1m-byte
+# 115200 seems safer and prevents problems with lesser quality ttl converters
+baudrate=115200
+#baudrate=230400
+#baudrate=460800
+
+# find directory
+dir=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
+"$dir/check_dependencies" || exit 1
+EXTERNAL="$dir/../external"
+VPYTHON="$EXTERNAL/ulnoiot_vp/"
+source "$VPYTHON/bin/activate"
+
+pushd . &> /dev/null
+
+port=$("$dir/find_esp_port" "$1")
+tty="/dev/tty$port"
+echo "Port: $tty"
+
+# find firmware
+cd "$EXTERNAL/firmware"
+firmware="$(ls esp*.bin|sort|tail -n1)"
+echo "Firmware: $firmware"
+
+echo Performing erase flash.
+esptool-ulno --port "$tty" erase_flash
+sleep 1
+echo Performing firmware flash.
+esptool \
+    --after soft_reset \
+    --port "$tty" \
+    --baud "$baudrate" \
+    write_flash --flash_size="$flash_size"m --verify \
+    0 "$firmware"
+
+sleep 1
+echo "Do hardreset via mpfshell..."
+mpfshell -c "open tty$port" -n --reset
+sleep 4
+echo "Reset should be done now."
+
+popd &> /dev/null
+

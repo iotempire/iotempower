@@ -1,0 +1,4 @@
+#!/bin/bash
+wget "http://micropython.org/resources/firmware/esp8266-20170108-v1.8.7.bin"
+# TODO: deal with LoPy (pycomupdatr)
+

@@ -1,0 +1,19 @@
+#!/bin/bash
+# flash esp8266 micropython
+#
+# $1 can give a tty port as destination parameter (for example: USB0)
+#
+
+# find directory
+dir=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
+"$dir/check_dependencies" || exit 1
+EXTERNAL="$dir/../external"
+VPYTHON="$EXTERNAL/ulnoiot_vp/"
+source "$VPYTHON/bin/activate"
+
+port=$("$dir/find_esp_port" "$1")
+
+# copy all relevant files
+mpfshell -c "open tty$port; mput .*\\.py; lcd ../../lib; mput .*\.py; ls"
+
+

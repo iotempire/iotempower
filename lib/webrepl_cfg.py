@@ -1,1 +1,1 @@
-PASS = 'iot.ulno'
+PASS = 'ulnoiot'

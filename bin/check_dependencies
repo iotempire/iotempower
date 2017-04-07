@@ -1,0 +1,68 @@
+#!/bin/bash
+# check dependencies
+# author: ulno creation date
+#
+# check if everything from external is downloaded and accessable
+# if not asks to install it
+#
+# if called as check_install clean, it will delete content of external and
+# redownload everything
+
+# find directory
+dir=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
+EXTERNAL="$dir/../external"
+VPYTHON="$EXTERNAL/ulnoiot_vp/"
+
+if [[ "$1" == clean ]]; then
+  echo "Deleting external cache."
+  rm -rf "$EXTERNAL"
+fi
+
+# check if virtualenv is configured
+if [[ -e "$VPYTHON/bin/activate" ]]; then # check for existing venv
+    source "$VPYTHON/bin/activate"
+else
+    echo "No external environment found."
+    echo -n "Do you want to try to set it up? (Y/n) "
+    read answer
+    if [[ ${answer,,} == "y" || ${answer,,} == "" ]]; then
+        if [[ $(which virtualenv) == "" ]]; then
+            echo "You need to install virtualenv. Exiting."
+            exit 1
+        fi
+        if [[ $(which git) == "" ]]; then
+            echo "You need to install git. Exiting."
+            exit 1
+        fi
+    else
+        echo "Can't continue, exiting now."
+        exit 1
+    fi
+    # install virtualenv
+    mkdir -p "$VPYTHON"
+    virtualenv -p "$(which python3)" "$VPYTHON"
+    source "$VPYTHON/bin/activate"
+    pip install --upgrade pip
+    # dependencies
+    pip install pyserial
+    pip install colorama
+    pip install websocket_client
+    pushd . &> /dev/null
+    # esptool
+    git clone https://github.com/espressif/esptool "$EXTERNAL/esptool.git"
+    cd "$EXTERNAL/esptool.git"
+    python setup.py install
+    ln -s "$EXTERNAL/esptool.git/esptool.py" "$VPYTHON/bin/esptool"
+    # mpfshell
+    git clone https://github.com/wendlers/mpfshell "$EXTERNAL/mpfshell.git"
+    cd "$EXTERNAL/mpfshell.git"
+    python setup.py install
+    # download firmware
+    mkdir -p "$EXTERNAL/firmware"
+    cd "$EXTERNAL/firmware"
+    "$dir/download_allfirmware_here"
+    popd  &> /dev/null
+fi
+
+exit 0
+
