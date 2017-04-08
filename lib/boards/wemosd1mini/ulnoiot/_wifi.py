@@ -66,7 +66,7 @@ class SCAN:
         nets = _wlan.scan()
         l=""
         for n in nets:
-            l=l+n[0].decode()+" %dDB\n"%n[3]
+            l=l+n[0].decode()+" %ddB\n"%n[3]
         return l
     def __call__(self):
         return self.__repr__()
