@@ -44,6 +44,6 @@ print(clear())
 print(help())
 
 try:
-    import user_boot
+    import user
 except ImportError:
-    print("Create a file user_boot.py,\nif you want to start a project automatically.")
+    print("Create a file user.py,\nif you want to start a project automatically.")

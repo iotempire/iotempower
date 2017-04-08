@@ -26,6 +26,8 @@ class WIP:
         return self.__repr__()
 wip = WIP()
 
+gc.collect()
+
 from ulnoiot.devices import *
 
 gc.collect()

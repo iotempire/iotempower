@@ -1,40 +1,42 @@
-from machine import Pin
+# humidity temperature
+# author: ulno
+# created: 2017-04-08
+#
+
 import time
-import dht
+from ulnoiot.device import Device
 
-# minimum ms between two reads
-MEASURE_DELAY = 1000
+####### HT temperature/humidity with
+class HT(Device):
+    # minimum ms between two reads
+    MEASURE_DELAY = 1000
 
-# normal dht commands:
-#d.measure()
-#d.temperature()
+    # Handle humidity and temperature from DS11
+    def __init__(self, name, pin):
+        Device.__init__(self, name, pin)
+        import dht
+        self.dht = dht.DHT11(pin)
+        self.lasttime = time.ticks_ms()
+        self.dht.measure()
 
-d=None
-_lasttime=none
+    def time_controlled_measure(self):
+        newtime = time.ticks_ms()
+        if newtime - self.lasttime < 0 or newtime - self.lasttime > HT.MEASURE_DELAY:
+            self.dht.measure()
+            self.lasttime = newtime
 
-def init(p):
-    d=dht.DHT11(p)
-    _lasttime = time.ticks_ms()
-    d.measure()
+    def temperature(self):
+        self.time_controlled_measure()
+        return self.dht.temperature()
 
-def time_controlled_measure():
-	global _lasttime, d
-	
-	newtime = time.ticks_ms()
-	if newtime - _lasttime < 0 or newtime - _lasttime > MEASURE_DELAY:
-		d.measure()
-		_lasttime = newtime
+    def humidity(self):
+        self.time_controlled_measure()
+        return self.dht.humidity()
 
-def temperature():
-    global d
-    time_controlled_measure()
-    return d.temperature()
+    def value(self):
+        return { "humidity": self.humidity(),
+                 "temperature": self.temperature() }
 
-def humidity():
-    global d
-    time_controlled_measure()
-    return d.humidity()
-
-# shortcuts
-h=humidity
-t=temperature
+    def _update(self):
+        # trigger reading show eventually changed values
+        self.time_controlled_measure()

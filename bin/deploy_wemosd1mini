@@ -26,5 +26,5 @@ mpfshell -n -c "
   cd /;"
 
 echo "Sending reset."
-"$dir/reset" $port
+"$dir/board_reset" $port
 

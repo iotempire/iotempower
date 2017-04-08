@@ -7,11 +7,12 @@
 
 import gc
 import machine
-from machine import Pin
 import ulnoiot._wifi as _wifi
 import time
 import ubinascii
 from umqtt.simple import MQTTClient
+from ulnoiot.device import Device
+gc.collect()
 
 _devlist = {}
 
@@ -23,182 +24,57 @@ _user = None
 _password = None
 client = None
 
-
-class Device(object):
-    def __init__(self, name, pin, value_map=None,
-                 settable=False, ignore_command_case=True):
-        global _topic
-        self.topic = _topic + "/" + name
-        self.name = name
-        self.pin = pin
-        self.command_topic = None
-        self.ignore_case = ignore_command_case
-        if settable:
-            self.command_topic = self.topic + "/set"
-            self.commands = {}
-        self.value_map = value_map
-
-    def is_settable(self):
-        return self.command_topic is not None
-
-    def add_command(self, command_name, callback):
-        if self.ignore_case: command_name = command_name.lower()
-        self.commands[command_name] = callback
-
-    def delete_command(self, command_name):
-        if self.ignore_case: command_name = command_name.lower()
-        self.commands.pop(command_name)
-
-    def command(self, command_str):
-        if self.ignore_case:
-            command_str = command_str.lower()
-        command_run = self.commands.get(command_str)
-        if command_run is not None:
-            command_run()
-        else:
-            print("Device %s cannot run command %s." % (self.name, command_str))
-
-    def value(self):
-        return None
-
-    def mapped_value(self):
-        v = self.value()
-        if v == None:
-            return None
-        else:
-            return self.value_map[v]
-
-    def _update(self):
-        pass  # usually does nothing, can be overrriden to actualy update values, called by update
-
-    def update(self):
-        # returns True if the update caused a change in value
-        oldval = self.value()
-        self._update()
-        return oldval != self.value()
-
-
-class Contact(Device):
-    # Handle contact or button like devices
-    def __init__(self, name, pin, *args,
-                 report_high="on", report_low="off",
-                 pullup=True, threshold=0):
-        if len(args) > 0:
-            report_high = args[0]
-            if len(args) > 1:
-                report_low = args[1]
-        Device.__init__(self, name, pin,
-                        value_map={True: report_high.encode(), False: report_low.encode()})
-        pin.init(Pin.IN);
-        if pullup:
-            pin.init(Pin.PULL_UP)
-        else:
-            pin.init(Pin.OPEN_DRAIN)
-        self.debouncer = 0
-        self.threshold = threshold + 1
-
-    def value(self):
-        return self.debouncer >= self.threshold
-
-    def _update(self):
-        # Needs to be read in a polling scenario on a regular basis (very frequent)
-        if self.pin() == 1:
-            self.debouncer += 1
-            if self.debouncer > self.threshold * 2:
-                self.debouncer = self.threshold * 2
-        else:
-            self.debouncer -= 1
-            if self.debouncer < 0:
-                self.debouncer = 0
-
-
-Button = Contact
-
-
+####### simple Input, contact devices/push buttons
 def contact(name, pin, *args, report_high="on", report_low="off",
             pullup=True,threshold=0):
     if len(args) > 0:
         report_high = args[0]
         if len(args) > 1:
             report_low = args[1]
+    gc.collect()
+    from ulnoiot._contact import Contact
     _devlist[name] = Contact(name, pin,
                             report_high=report_high,
                             report_low=report_low,
                             pullup=pullup,
                             threshold=threshold)
+    gc.collect()
+    return _devlist[name]
 button = contact
 
 
-class Output(Device):
-    # Handle output devices
-    def __init__(self, name, pin, *args, high_command='on', low_command='off', ignore_case=True):
-        if len(args) > 0:
-            high_command = args[0]
-            if len(args) > 1:
-                low_command = args[1]
-        Device.__init__(self, name, pin,
-                        settable=True, ignore_command_case=ignore_case,
-                        value_map={1: high_command.encode(), 0: low_command.encode()})
-        pin.init(Pin.OUT)
-        self.add_command(high_command, self.high)
-        self.add_command(low_command, self.low)
-
-    def high(self):
-        self.pin.high()
-
-    def low(self):
-        self.pin.low()
-
-    on = high
-    off = low
-
-    def value(self):
-        return self.pin()
-
-
+####### simple LEDs, other Output (switches)
 def out(name, pin, *args, high_command='on', low_command='off', ignore_case=True):
     if len(args) > 0:
         high_command = args[0]
         if len(args) > 1:
             low_command = args[1]
+    gc.collect()
+    from ulnoiot._output import Output
     _devlist[name] = Output(name, pin, high_command=high_command, low_command=low_command, ignore_case=ignore_case)
+    gc.collect()
+    return _devlist[name]
 led = out
+switch = out
 
 
-class HT(Device):
-    # Handle humidity and temperature from DS11
-    def __init__(self, name, pin, *args,
-                 report_high="on", report_low="off",
-                 pullup=True, threshold=0):
-        if len(args) > 0:
-            report_high = args[0]
-            if len(args) > 1:
-                report_low = args[1]
-        Device.__init__(self, name, pin,
-                        value_map={True: report_high.encode(), False: report_low.encode()})
-        pin.init(Pin.IN);
-        if pullup:
-            pin.init(Pin.PULL_UP)
-        else:
-            pin.init(Pin.OPEN_DRAIN)
-        self.debouncer = 0
-        self.threshold = threshold + 1
+####### HT temperature/humidity with
+def ht(name, pin):
+    gc.collect()
+    from ulnoiot._ht import HT
+    _devlist[name] = HT(name, pin)
+    gc.collect()
+    return _devlist[name]
 
-    def value(self):
-        return self.debouncer >= self.threshold
+####### display
+def display(name, sda, scl, ignore_case=False):
+    gc.collect()
+    from ulnoiot._display import Display
+    _devlist[name] = Display(name, sda, scl, ignore_case=ignore_case)
+    gc.collect()
+    return _devlist[name]
 
-    def _update(self):
-        # Needs to be read in a polling scenario on a regular basis (very frequent)
-        if self.pin() == 1:
-            self.debouncer += 1
-            if self.debouncer > self.threshold * 2:
-                self.debouncer = self.threshold * 2
-        else:
-            self.debouncer -= 1
-            if self.debouncer < 0:
-                self.debouncer = 0
-
-
+######## Devices End
 
 
 def delete(name):
@@ -210,11 +86,24 @@ def publish_status():
 
     try:
         for d in _devlist.values():
-            v = d.mapped_value()
-            print('Publish status', d.topic, v)
-            client.publish(d.topic, d.mapped_value())
-    except:
+            v = d.value()
+            if v is not None:
+                t = (_topic + "/" + d.topic).encode()
+                if isinstance(v, dict): # several values to publish
+                    print('Publish status', t, v)
+                    for k in v:
+                        t_extra = t + b"/" + k.encode()
+                        client.publish(t_extra, str(v[k]).encode())
+                else:
+                    v_map = d.mapped_value()  # try to map
+                    if v_map is None:  # not mappable, try to send what we have
+                        v_map = str(v).encode()
+
+                    print('Publish status:', t, v_map)
+                    client.publish(t, v_map)
+    except Exception as e:
         print('Trouble publishing, re-init network.')
+        print(e)
         init_client()
 
 
@@ -239,21 +128,11 @@ def callback(topic, msg):
     topic = topic.decode();
     msg = msg.decode();
     for d in _devlist.values():
-        if topic == d.command_topic:
-            print("Received \"%s\" for topic %s"%(msg, topic))
-            d.command(msg)
-
-# display
-#    elif config.display and topic == text_command_topic:
-#      print("Received text in callback:", msg)
-#      try:
-#        msg = msg.decode()
-#        if msg == "&&clear":
-#          dp.clear()
-#        else:
-#          dp.println( msg )
-#      except:
-#        pass
+        if d.command_topic is not None:
+            t = _topic + "/" + d.command_topic
+            if topic == t:
+                print("Received \"%s\" for topic %s"%(msg, topic))
+                d.command(msg)
 
 
 def init_client():
@@ -296,7 +175,7 @@ def run(updates=5, sleepms=1, poll_rate_inputs=4, poll_rate_network=10):
         overflow = updates * 1000
     overflow *= poll_rate_network * poll_rate_inputs / sleepms
     overflow = int(overflow)
-    print("Overflow:",overflow)
+#    print("Overflow:",overflow)
     counter = 0
 
     while True:
