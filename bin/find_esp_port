@@ -28,8 +28,7 @@ else
             break
         fi
     done
-   
+    sleep 1 # let the scan settle
 fi
 
 echo $port
-

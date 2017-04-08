@@ -1,0 +1,27 @@
+#!/bin/bash
+# push files to the wemos
+# $1 file $2 destination $3 port (optional)
+#
+
+# find directory
+dir=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
+"$dir/check_dependencies" || exit 1
+EXTERNAL="$dir/../external"
+VPYTHON="$EXTERNAL/ulnoiot_vp/"
+source "$VPYTHON/bin/activate"
+
+port=$("$dir/find_esp_port" "$3")
+
+srcpath=$(dirname "$1")
+srcname=$(basename "$1")
+
+destpath=$(dirname "$2")
+destname=$(basename "$2")
+
+echo "Pushing $1 to $2."
+cd "$srcpath"
+mpfshell -n -c "
+  open tty$port;
+  cd "$destpath";
+  put "\""$srcname"\"" "\""$destname"\""
+  "

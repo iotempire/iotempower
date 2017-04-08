@@ -1,0 +1,15 @@
+#!/bin/bash
+# do reset
+#
+# $1 device (if not given reset first found)
+
+# find directory
+dir=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
+"$dir/check_dependencies" || exit 1
+EXTERNAL="$dir/../external"
+VPYTHON="$EXTERNAL/ulnoiot_vp/"
+source "$VPYTHON/bin/activate"
+
+port=$("$dir/find_esp_port" "$1")
+mpfshell -n -c "open tty$port;exec import machine;exec machine.reset()"
+

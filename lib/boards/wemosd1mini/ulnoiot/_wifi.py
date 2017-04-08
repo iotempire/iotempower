@@ -56,16 +56,21 @@ def delete():
     os.remove("wifi_config.py")
     # TODO: clear internal wifi assignment
     accesspoint()
-    
+
 def remove():
     delete()
-    
-def scan():
-    nets = _wlan.scan()
-    l=[]
-    for n in nets:
-        l.append( n.ssid )
-    return l
+
+class SCAN:
+    def __repr__(self):
+        global _wlan
+        nets = _wlan.scan()
+        l=""
+        for n in nets:
+            l=l+n[0].decode()+" %dDB\n"%n[3]
+        return l
+    def __call__(self):
+        return self.__repr__()
+scan = SCAN()
 
 
 # write config and connect
@@ -78,7 +83,7 @@ def setup( name,  password ):
     wifi_config.name = name
     wifi_config.password = password
     connect()
-    
+
 # Try to find wifi_config
 try:
     import wifi_config

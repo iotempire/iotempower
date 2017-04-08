@@ -1,6 +1,9 @@
 *~
 *.bin
-examples/private/
+*.pyc
 
+examples/private/
 tmp/
 external/
+.idea/
+

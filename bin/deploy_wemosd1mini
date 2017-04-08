@@ -1,5 +1,5 @@
 #!/bin/bash
-# flash esp8266 micropython
+# deploy ulnoiot software on wemos d1 mini
 #
 # $1 can give a tty port as destination parameter (for example: USB0)
 #
@@ -13,7 +13,18 @@ source "$VPYTHON/bin/activate"
 
 port=$("$dir/find_esp_port" "$1")
 
-# copy all relevant files
-mpfshell -c "open tty$port; mput .*\\.py; lcd ../../lib; mput .*\.py; ls"
+cd "$dir/../lib/boards/wemosd1mini"
 
+echo "Copying all files."
+mpfshell -n -c "
+  open tty$port;
+  mput .*\\.py\$;
+  md ulnoiot;
+  lcd ulnoiot;
+  cd ulnoiot;
+  mput .*\.py\$;
+  cd /;"
+
+echo "Sending reset."
+"$dir/reset" $port
 
