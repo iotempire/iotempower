@@ -43,7 +43,6 @@ _helplist = {}
 for i in dir():
     if i not in _excludes:
         t=eval(i)
-        print (i,type(t))
         if t is not None and \
                 type(t) != type(machine) and \
                 not isinstance(t, Pin) and \
