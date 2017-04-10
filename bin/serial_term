@@ -10,4 +10,6 @@ source "$VPYTHON/bin/activate" &>/dev/null
 
 port=$(find_esp_port "$1")
 
-mpfshell -c "open tty$port; repl"
+#minicom -D "/dev/tty$port" -b 115000
+#miniterm.py --raw "/dev/tty$port" 115000
+mpfshell -n -c "open tty$port; repl"

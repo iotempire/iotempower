@@ -1,14 +1,20 @@
 #!/bin/bash
 # Program the fixed wifi network
 # author: ulno
+#
+# suggested port or wifi
 
 # TODO: the following should eventually later be done with webrepl_cli and not mpfshell
 # so far webrepl_cli does not allow to specify the password for the repl connection
 
 # find directory
 dir=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
-cd "$dir/.."
+"$dir/check_dependencies" || exit 1
+EXTERNAL="$dir/../external"
+VPYTHON="$EXTERNAL/ulnoiot_vp/"
+source "$VPYTHON/bin/activate" &>/dev/null
 
+port=
 wifi_if=$(iwconfig 2>/dev/null|grep IEEE|cut -d\  -f1)
 echo "Local wifi interface seems to be: $wifi_if."
 echo
