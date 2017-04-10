@@ -43,7 +43,7 @@ so stick with something around 8 characters and not too many
 special things in it. I haven't figured out why, seems to be a 
 webrepl thing - or just stick with the default.
 
-Try typing help and chekc the small manual.
+Try typing help and check the small manual.
 You can setup the wifi with wifi( "network-name", "password" ). You can scan
 the existing wifi networks with wscan and when the wifi is configured, you can
 see the current ip with typing wip.
