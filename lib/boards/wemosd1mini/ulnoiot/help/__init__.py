@@ -39,9 +39,9 @@ class Man():
 
     def __repr__(self):
         return _helpcontent("man")
-    def __call__(selfself,*args):
+    def __call__(self,*args):
         if len(args) == 0:
-            print( __repr__() )
+            print( self.__repr__() )
         else:
             help(*args)
 
