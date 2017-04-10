@@ -2,13 +2,13 @@ def contact(name, pin, report_high="on", report_low="off",
             pullup=True,threshold=0):
 other names: button
 
-Create a new input port for a comtact or a button.
+Create a new input port for a contact or a button.
 name will be appended to the mqtt topic and corresponding
 value will be published there.
 
 Parameters:
 - name: the name it can be addressed under
-- pin: the gpiopin
+- pin: the gpio pin
 - report_high: what to send when respective port high
 - report_low: what to send when respective port low
 - pullup: enable internal pullup (default)
@@ -16,7 +16,7 @@ Parameters:
   measurements)
 
 Example:
-mqtt("mymqtthost",""living room/leds1")
+mqtt("mymqtthost","living room/leds1")
 button("lower", d2, "depressed", "pressed")
 
 Now the status button is published as "living room/leds1/lower"

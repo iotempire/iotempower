@@ -1,0 +1,23 @@
+def trigger(name, pin,
+            rising=False, falling=False,
+            pullup=True):
+
+Create a new input port for a trigger,
+measuring either a falling or rising edge on the
+respective input port.
+name will be appended to the mqtt topic and
+a trigger count will be published there.
+
+Parameters:
+- name: the name it can be addressed under
+- pin: the gpio pin
+- rising: if True, trigger on rising edge
+- falling: if True, trigger on falling edge
+  if both, rising and falling are False, only rising is measured
+- pullup: enable internal pullup (default)
+
+Example:
+mqtt("mymqtthost","living room/leds1")
+trigger("left", d3)
+
+Now, the number of triggers is published as "living room/leds1/left"

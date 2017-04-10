@@ -14,7 +14,7 @@ Parameters:
 
 Example:
 
-mqtt("mymqtthost",""living room/leds1")
+mqtt("mymqtthost","living room/leds1")
 out("yellow", d7, "turn on", "turn off")
 
 Now the LED can be switched on via sending to the mqtt-broker

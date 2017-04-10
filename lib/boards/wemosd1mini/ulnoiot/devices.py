@@ -42,6 +42,17 @@ def contact(name, pin, *args, report_high="on", report_low="off",
     return _devlist[name]
 button = contact
 
+####### simple Input, contact devices/push buttons
+def trigger(name, pin, rising=False, falling=False,
+            pullup=True):
+    gc.collect()
+    from ulnoiot._trigger import Trigger
+    _devlist[name] = Trigger(name, pin,
+                            rising=rising, falling=falling,
+                            pullup=pullup)
+    gc.collect()
+    return _devlist[name]
+
 
 ####### simple LEDs, other Output (switches)
 def out(name, pin, *args, high_command='on', low_command='off', ignore_case=True):

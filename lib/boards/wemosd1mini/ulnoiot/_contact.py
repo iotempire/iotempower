@@ -17,11 +17,10 @@ class Contact(Device):
                 report_low = args[1]
         Device.__init__(self, name, pin,
                         value_map={True: report_high.encode(), False: report_low.encode()})
-        pin.init(Pin.IN);
         if pullup:
-            pin.init(Pin.PULL_UP)
+            pin.init(Pin.IN,Pin.PULL_UP)
         else:
-            pin.init(Pin.OPEN_DRAIN)
+            pin.init(Pin.IN,Pin.OPEN_DRAIN)
         self.debouncer = 0
         self.threshold = threshold + 1
 
