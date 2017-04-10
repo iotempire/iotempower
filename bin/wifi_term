@@ -1,4 +1,11 @@
 #!/bin/bash
 # open a repl terminal on the given IP
 
-mpfshell -c "open ws:$1,iot.ulno; repl"
+# find directory
+dir=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
+"$dir/check_dependencies" || exit 1
+EXTERNAL="$dir/../external"
+VPYTHON="$EXTERNAL/ulnoiot_vp/"
+source "$VPYTHON/bin/activate" &>/dev/null
+
+mpfshell -c "open ws:$1,ulnoiot; repl"

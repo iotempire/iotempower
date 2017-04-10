@@ -10,7 +10,7 @@ import machine
 import ulnoiot._wifi as _wifi
 import time
 import ubinascii
-from umqtt.simple import MQTTClient
+from umqtt.simple import MQTTClient as _MQTTClient
 gc.collect()
 
 _devlist = {}
@@ -81,7 +81,7 @@ def delete(name):
     _devlist.pop(name)
 
 
-def publish_status():
+def _publish_status():
     global _client
 
     try:
@@ -101,9 +101,9 @@ def publish_status():
 
                     print('Publish status:', t, v_map)
                     _client.publish(t, v_map)
-        if _report_ip:
-            t = (_topic + "/ip").encode()
-            _client.publish(t, str(_wifi.config()[0]))
+#        if _report_ip:
+#            t = (_topic + "/ip").encode()
+#            _client.publish(t, str(_wifi.config()[0]), retain=True)
     except Exception as e:
         print('Trouble publishing, re-init network.')
         print(e)
@@ -147,7 +147,7 @@ def _init_mqtt():
     print("Trying to connect to mqtt broker.")
     _wifi.connect()
     try:
-        _client = MQTTClient(_client_id, _broker, user=_user,
+        _client = _MQTTClient(_client_id, _broker, user=_user,
                              password=_password)
         _client.set_callback(_subscription_cb)
         _client.connect()
@@ -155,6 +155,9 @@ def _init_mqtt():
         t = _topic.encode() + b"/#"
         _client.subscribe(t)
         print("Subscribed to topic and subtopics of", _topic)
+        if _report_ip:
+            t = (_topic + "/ip").encode()
+            _client.publish(t, str(_wifi.config()[0]), retain=True)
     except Exception as e:
         print("Trouble to init mqtt:", e)
 
@@ -192,10 +195,10 @@ def run(updates=5, sleepms=1, poll_rate_inputs=4, poll_rate_network=10):
                 if d.update():
                     change_happened = True
             if change_happened:
-                publish_status()
+                _publish_status()
         if updates != 0 and counter % (updates * 1000) == 0:
             print("Publishing.")
-            publish_status()
+            _publish_status()
 
         time.sleep_ms(sleepms)
         counter += 1
