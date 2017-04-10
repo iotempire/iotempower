@@ -12,10 +12,10 @@ For a start, the original author Ulno (http://ulno.net) has desigened some
 shields (little electronic parts you can just plug together) to plug into
 a Wemos D1 mini. This is now called the devkit1.
 You can also find manuals to build different parts of the 
-devkit and th elinks to youtube videos using and soldering them on ulno's
+devkit and the links to youtube videos using and soldering them on ulno's
 [youtube channel](https://www.youtube.com/channel/UCaDpsG87Q99Ja2q3UoiXRVA).
 
-devkit1 envisions teh following shields:
+devkit1 envisions the following shields:
 - [devel](shields/devel/README.md): a shield with two leds and 3 buttons, pressing the right one when booting up, will
   delete the wifi configuration file and prevent the user_boot.py to be started
 - [display](shields/display/README.md): supports using an i2c-based 128x64 LCD (ssd1306) on d5 and d2

@@ -1,0 +1,16 @@
+run(updates=5, sleepms=1, poll_rate_inputs=4, poll_rate_network=10)
+also available as transmit
+
+Start transmitting and receiving mqtt status and commands.
+Usually called after setting up all input and output devices.
+Parameters:
+- updates: send every updates seconds a status update.
+  If updates=0 send never status updates.
+- sleepms: interval for the mainloop
+  (sleeps sleepms milliseconds after each loop)
+- poll_rate_inputs: poll input ports each poll_rate_inputs times
+- poll_rate_network: check incoming network commands each
+  poll_rate_network times
+
+example:
+transmit()

@@ -27,17 +27,19 @@ class Trigger(Device):
             trigger = Pin.IRQ_RISING
         pin.irq(trigger=trigger, handler=self.callback)
         self.counter = 0
+        self.report_counter = 0
         self.triggered = False
 
     def callback(self,p):
         self.triggered = True
+        self.counter += 1
+        if self.counter >= Trigger.OVERFLOW:
+            self.counter = 0
 
     def value(self):
-        return self.counter
+        return self.report_counter
 
     def _update(self):
         if self.triggered:
-            self.counter += 1
-            if self.counter >= Trigger.OVERFLOW:
-                self.counter = 0
+            self.report_counter = self.counter
             self.triggered = False

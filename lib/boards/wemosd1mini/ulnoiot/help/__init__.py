@@ -12,9 +12,11 @@ def _helpcontent(name):
 
 class HELP:
     def __repr__(self):
+        l=_helplist.values()
+        l.sort()
         return _helpcontent("_general") \
                + "\n\nFor more help, try to inquire with help(command_name)\nabout the following commands:\n" \
-               + ", ".join(_helplist.values())
+               + ", ".join(l)
 
     def __call__(self,*args):
         if len(args)>0:

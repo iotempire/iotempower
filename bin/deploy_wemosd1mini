@@ -23,6 +23,12 @@ mpfshell -n -c "
   lcd ulnoiot;
   cd ulnoiot;
   mput .*\\.py\$;
+  md shield;
+  lcd shield;
+  cd shield;
+  mput .*\\.py\$;
+  lcd ..;
+  cd ..;
   md help;
   lcd help;
   cd help;
