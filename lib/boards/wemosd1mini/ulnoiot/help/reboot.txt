@@ -1,0 +1,3 @@
+Reset the board and reload everything.
+
+Call like reset() or reboot()

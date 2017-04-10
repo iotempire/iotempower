@@ -22,8 +22,13 @@ mpfshell -n -c "
   md ulnoiot;
   lcd ulnoiot;
   cd ulnoiot;
-  mput .*\.py\$;
-  cd /;"
+  mput .*\\.py\$;
+  md help;
+  lcd help;
+  cd help;
+  mput .*\\.py\$;
+  mput .*\\.txt\$;
+  cd /;" 2>&1 | grep -v "Invalid directory"
 
 echo "Sending reset."
 "$dir/board_reset" $port

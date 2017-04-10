@@ -1,0 +1,12 @@
+Welcome to the ulnoiot environment.
+
+Try the following commands:
+- wifi("name","pw") connects to wifi, wscan scans, wip shows address
+- man to see file operation commands
+- reset or reboot to reset the board
+- help or help() shows this again
+
+Also make sure to make use of tab-completion (just hit the tab  key
+once or twice to see possible commands).
+
+Go to http://iot.ulno.net for more information.

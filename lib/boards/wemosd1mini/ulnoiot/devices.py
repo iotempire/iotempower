@@ -11,7 +11,6 @@ import ulnoiot._wifi as _wifi
 import time
 import ubinascii
 from umqtt.simple import MQTTClient
-from ulnoiot.device import Device
 gc.collect()
 
 _devlist = {}
@@ -22,7 +21,8 @@ _broker = None
 _topic = None
 _user = None
 _password = None
-client = None
+_client = None
+_report_ip = True
 
 ####### simple Input, contact devices/push buttons
 def contact(name, pin, *args, report_high="on", report_low="off",
@@ -82,7 +82,7 @@ def delete(name):
 
 
 def publish_status():
-    global client
+    global _client
 
     try:
         for d in _devlist.values():
@@ -93,23 +93,27 @@ def publish_status():
                     print('Publish status', t, v)
                     for k in v:
                         t_extra = t + b"/" + k.encode()
-                        client.publish(t_extra, str(v[k]).encode())
+                        _client.publish(t_extra, str(v[k]).encode())
                 else:
                     v_map = d.mapped_value()  # try to map
                     if v_map is None:  # not mappable, try to send what we have
                         v_map = str(v).encode()
 
                     print('Publish status:', t, v_map)
-                    client.publish(t, v_map)
+                    _client.publish(t, v_map)
+        if _report_ip:
+            t = (_topic + "/ip").encode()
+            _client.publish(t, str(_wifi.config()[0]))
     except Exception as e:
         print('Trouble publishing, re-init network.')
         print(e)
-        init_client()
+        _init_mqtt()
 
 
 #### Setup and execution
-def mqtt(broker_host, topic, *args, user=None, password=None, client_id=None):
-    global _broker, _topic, _user, _password, _client_id
+def mqtt(broker_host, topic, *args, user=None, password=None,
+         client_id=None, report_ip=True):
+    global _broker, _topic, _user, _password, _client_id, _report_ip
 
     if len(args) > 0:
         user = args[0]
@@ -122,9 +126,10 @@ def mqtt(broker_host, topic, *args, user=None, password=None, client_id=None):
         _client_id = client_id.encode() + b"_" + _client_id;
     _user = user
     _password = password
+    _report_ip = report_ip
 
 
-def callback(topic, msg):
+def _subscription_cb(topic, msg):
     topic = topic.decode();
     msg = msg.decode();
     for d in _devlist.values():
@@ -135,29 +140,29 @@ def callback(topic, msg):
                 d.command(msg)
 
 
-def init_client():
-    global client
+def _init_mqtt():
+    global _client
     global _broker, _topic, _user, _password, _client_id
 
     print("Trying to connect to mqtt broker.")
     _wifi.connect()
     try:
-        client = MQTTClient(_client_id, _broker, user=_user,
-                            password=_password)
-        client.set_callback(callback)
-        client.connect()
+        _client = MQTTClient(_client_id, _broker, user=_user,
+                             password=_password)
+        _client.set_callback(_subscription_cb)
+        _client.connect()
         print("Connected to",_broker)
         t = _topic.encode() + b"/#"
-        client.subscribe(t)
+        _client.subscribe(t)
         print("Subscribed to topic and subtopics of", _topic)
     except Exception as e:
         print("Trouble to init mqtt:", e)
 
 
-def receive_sub():
-    global client
+def _poll_subscripton():
+    global _client
     try:
-        client.check_msg()  # non blocking
+        _client.check_msg()  # non blocking
     except:
         print("Trouble to receive from mqtt.")
 
@@ -168,7 +173,7 @@ def run(updates=5, sleepms=1, poll_rate_inputs=4, poll_rate_network=10):
     # sleepms: going o sleep for how long between each loop run
     # poll_rate_network: how often to evaluate incoming network commands
     # poll_rate_inputs: how often to evaluate inputs
-    init_client()
+    _init_mqtt()
     if updates == 0:
         overflow = 1000
     else:
@@ -180,7 +185,7 @@ def run(updates=5, sleepms=1, poll_rate_inputs=4, poll_rate_network=10):
 
     while True:
         if counter % poll_rate_network == 0:
-            receive_sub()
+            _poll_subscripton()
         if counter % poll_rate_inputs == 0:
             change_happened = False
             for d in _devlist.values():

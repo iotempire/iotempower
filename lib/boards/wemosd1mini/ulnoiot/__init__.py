@@ -1,5 +1,6 @@
 import gc
 import machine
+from machine import ADC, PWM
 
 Pin=machine.Pin
 
@@ -18,16 +19,38 @@ a0=machine.ADC(0)
 from . import _wifi
 wifi=_wifi.setup
 wscan = _wifi.scan
+wip = _wifi.wip
 
-class WIP:
-    def __repr__(self):
-        return _wifi.config()[0]
-    def __call__(self):
-        return self.__repr__()
-wip = WIP()
+# convenient reset
+def reset():
+    machine.reset()
+reboot=reset
+
+from upysh import ls,rm,cd,clear,pwd,mkdir,head,cat,mv,rmdir,newfile
+# overwrite man
 
 gc.collect()
 
+
 from ulnoiot.devices import *
+
+# build help-dictionary file for all visible things
+_excludes=["_excludes", "_helplist", "i",
+           "__name__", "__path__",
+           "HELP", "WIP",
+           "gc", "machine"]
+_helplist = {}
+for i in dir():
+    if i not in _excludes:
+        t=eval(i)
+        print (i,type(t))
+        if t is not None and \
+                type(t) != type(machine) and \
+                not isinstance(t, Pin) and \
+                not isinstance(t, PWM) and \
+                not isinstance(t, ADC): # not a module or weird classes
+            _helplist[t]=i
+
+from ulnoiot.help import help, man
 
 gc.collect()

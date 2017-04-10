@@ -2,7 +2,6 @@
 # author: ulno
 # created: 2017-04-08
 
-import machine
 from machine import Pin
 from ulnoiot.device import Device
 

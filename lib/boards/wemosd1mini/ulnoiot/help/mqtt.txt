@@ -1,0 +1,12 @@
+mqtt(broker_host, topic, user=None, password=None,
+     client_id=None, report_ip=True)
+
+Set up mqtt parameters for later mqtt communication in transfer/run:
+- broker_host: the host running the mqtt broker
+- topic, the root topic under which all connected devices are published
+- user: username to login to mqtt (can be omitted if acccess is public)
+- password: respective password (can be omitted if access is public)
+- client_id: client_id to report. Will be generated from machine id
+  if omitted
+- report_ip: usually there will be subtopic ip, which lists the assigned
+  ip of the device , turn off by setting this to false

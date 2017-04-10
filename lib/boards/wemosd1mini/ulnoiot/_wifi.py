@@ -63,15 +63,25 @@ def remove():
 class SCAN:
     def __repr__(self):
         global _wlan
+        state = _wlan.active()
+        if not state:
+            _wlan.active(True)
         nets = _wlan.scan()
         l=""
         for n in nets:
             l=l+n[0].decode()+" %ddB\n"%n[3]
+        _wlan.active(state)
         return l
     def __call__(self):
         return self.__repr__()
 scan = SCAN()
 
+class WIP:
+    def __repr__(self):
+        return config()[0]
+    def __call__(self):
+        return self.__repr__()
+wip = WIP()
 
 # write config and connect
 def setup( name,  password ):
