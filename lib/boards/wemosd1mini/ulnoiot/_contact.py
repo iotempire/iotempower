@@ -20,7 +20,11 @@ class Contact(Device):
         if pullup:
             pin.init(Pin.IN,Pin.PULL_UP)
         else:
-            pin.init(Pin.IN,Pin.OPEN_DRAIN)
+            pin.init(Pin.IN)
+            try:
+                Pin.init(Pin.OPEN_DRAIN)
+            except:
+                pass
         self.debouncer = 0
         self.threshold = threshold + 1
 

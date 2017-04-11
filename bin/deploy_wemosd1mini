@@ -29,34 +29,10 @@ python "$dir/create_upload_list.py" "$port" "$hashfile" "$mpfscript"
 echo
 echo "Executing changes (ignore weird mpfshell prompts):"
 
-mpfshell -s "$mpfscript"
+mpfshell -s "$mpfscript" | grep -v "Invalid directory"
 rm "$hashfile"
 rm "$mpfscript"
 
 echo
 echo "Done."
-
-#echo "Copying all files."
-#mpfshell -n -c "
-#  open $port;
-#  mput .*\\.py\$;
-#  md ulnoiot;
-#  lcd ulnoiot;
-#  cd ulnoiot;
-#  mput .*\\.py\$;
-#  md shield;
-#  lcd shield;
-#  cd shield;
-#  mput .*\\.py\$;
-#  lcd ..;
-#  cd ..;
-#  md help;
-#  lcd help;
-#  cd help;
-#  mput .*\\.py\$;
-#  mput .*\\.txt\$;
-#  cd /;" 2>&1 | grep -v "Invalid directory"
-#
-#echo "Sending reset."
-#"$dir/board_reset" "$port"
 

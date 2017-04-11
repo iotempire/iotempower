@@ -87,6 +87,14 @@ def display(name, sda, scl, ignore_case=False):
 
 ######## Devices End
 
+##### utils
+def linecat(filename,frm=1,to=0):
+    from ulnoiot import _line_edit
+    _line_edit.linecat(filename,frm=frm,to=to)
+
+def lineedit(filename,linenr):
+    from ulnoiot import _line_edit
+    _line_edit.lineedit(filename,linenr)
 
 def delete(name):
     _devlist.pop(name)

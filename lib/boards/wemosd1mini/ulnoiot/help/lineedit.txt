@@ -1,0 +1,6 @@
+lineedit(filename,linenr)
+
+Edit one line (the one in linenr) in a text file.
+If linenr is one line after last line, add the line to the file.
+
+Use linecat to list file contents with line numbers.
