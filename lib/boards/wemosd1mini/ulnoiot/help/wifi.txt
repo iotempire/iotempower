@@ -1,0 +1,8 @@
+wifi( network_name,  password, reset=True )
+
+Rewrite wifi configuration and reset to re-connect.
+Reset can be prevented with specifying reset=False.
+
+Other related commands:
+wip shows the current ip (if 0.0.00 system is in AP mode).
+wscan shows available networks.

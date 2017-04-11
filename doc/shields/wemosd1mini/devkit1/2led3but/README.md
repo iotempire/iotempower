@@ -12,19 +12,7 @@ The mapping to GPIO-ports is like the following:
 
 To use this shield execute:
 ```python
-import ulno_iot_devel as devel
-```
-
-All devices can now be accessed by their name or pin name.
-Examples:
-```python
-devel.red.high()
-devel.yellow.high()
-devel.blue.low() # The on board led lights up when set to low
-devel.lower_button() # will be 1 when not pressed and 0 when presssed
-devel.left_button()
-devel.right_button()
-devel.d6() # button can also be accessed via it's pin name
+from ulnoiot.shield import devkit_2led3but
 ```
 
 Here some images of the shield:

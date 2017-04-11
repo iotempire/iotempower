@@ -5,7 +5,7 @@
 #
 # $1 can be a usb0-usb9 or acm0-acm9 as suggestion
 # $2 can be a webrepl password
-port=USB0
+port=ttyUSB0
 
 # find directory
 dir=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
@@ -14,10 +14,12 @@ EXTERNAL="$dir/../external"
 VPYTHON="$EXTERNAL/ulnoiot_vp/"
 source "$VPYTHON/bin/activate" &>/dev/null
 
-if [[ "$1" =~ ^[Uu][Ss][Bb][0-9]$ ]]; then
-  port=USB${1:3:1}
+if [[ "$1" = ws* || "$1" = tty* ]]; then # already found, no conversion necessary
+  port="$1"
+elif [[ "$1" =~ ^[Uu][Ss][Bb][0-9]$ ]]; then
+  port=ttyUSB${1:3:1}
 elif [[ "$1" =~ ^[Aa][Cc][Mm][0-9]$ ]]; then
-  port=ACM${1:3:1}
+  port=ttyACM${1:3:1}
 elif ping -c 2 -i 0.5 "$1" -W 2 &> /dev/null; then
   port="ws:$1,$2"
 else
@@ -25,9 +27,9 @@ else
     for p in USB0 USB1 USB2 USB3 USB4 USB5 USB6 USB7 USB8 USB9 \
              ACM0 ACM1 ACM2 ACM3 ACM4 ACM5 ACM6 ACM7 ACM8 ACM9; do
         # probe=$(esptool --port "/dev/tty$port" chip_id 2>/dev/null | grep "Chip ID:") # probe with reset
-        probe=$(ls "/dev/tty$port") # softprobe -> no reset
+        probe=$(ls "/dev/tty$p") # softprobe -> no reset
         if [[ "$probe" ]]; then
-            port=$p
+            port="tty$p"
             break
         fi
     done

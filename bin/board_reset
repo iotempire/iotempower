@@ -2,6 +2,9 @@
 # do reset
 #
 # $1 device (if not given reset first found)
+# $2 eventual webpassword
+password="$2"
+test "$password" || password="ulnoiot"
 
 # find directory
 dir=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
@@ -10,6 +13,6 @@ EXTERNAL="$dir/../external"
 VPYTHON="$EXTERNAL/ulnoiot_vp/"
 source "$VPYTHON/bin/activate"
 
-port=$("$dir/find_esp_port" "$1")
-mpfshell -n -c "open tty$port;exec import machine;exec machine.reset()"
+port=$("$dir/find_esp_port" "$1" "$password")
+mpfshell -n -c "open $port;exec import machine;exec machine.reset()"
 

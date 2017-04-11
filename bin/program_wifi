@@ -2,7 +2,12 @@
 # Program the fixed wifi network
 # author: ulno
 #
-# suggested port or wifi
+# $1: suggested port or host
+# $2: webrepl password
+port="$1"
+test "$1" || port="192.168.4.1"
+password="$2"
+test "$password" || password="ulnoiot"
 
 # TODO: the following should eventually later be done with webrepl_cli and not mpfshell
 # so far webrepl_cli does not allow to specify the password for the repl connection
@@ -14,31 +19,41 @@ EXTERNAL="$dir/../external"
 VPYTHON="$EXTERNAL/ulnoiot_vp/"
 source "$VPYTHON/bin/activate" &>/dev/null
 
-port=
+port=$("$dir/find_esp_port" "$port" "$password")
+
+## Show locally visible
 wifi_if=$(iwconfig 2>/dev/null|grep IEEE|cut -d\  -f1)
 echo "Local wifi interface seems to be: $wifi_if."
 echo
-echo "The following wifi networks are visible, enter a name to which"
-echo "the iot computer should connect."
-
-# TODO get list from device
+echo "The following wifi networks are visible locally"
 iwlist "$wifi_if" scanning 2>/dev/null |grep "ESSID:"|cut -d\: -f2|cut -b2-| while read -r line
 do
        echo "${line%?}"
 done
 echo
+
+### Show device visible
+#echo "The device sees the following wifi networks."
+#mpfshell -n -c "open $port;exec from ulnoiot._wifi import scan; exec print(scan())"
+
+echo
+echo "Enter a name to which"
+echo "the iot computer should connect."
 echo -n "Name/essid: "
 read wifi_name
 echo -n "Enter its password: "
 read wifi_password
 
-wifi_config="tmp/wifi_config.py"
-cat > "$wifi_config" << EOF
-wifi_name="$wifi_name"
-wifi_pw="$wifi_password"
-EOF
+#wifi_config="tmp/wifi_config.py"
+#cat > "$wifi_config" << EOF
+#wifi_name="$wifi_name"
+#wifi_pw="$wifi_password"
+#EOF
 
-echo "$wifi_config" is now copied to the iot computer.
-cat "$wifi_config"
+#echo "$wifi_config" is now copied to the iot computer.
+#cat "$wifi_config"
 
-mpfshell -s mpfscripts/program_wifi.mpfshell
+#mpfshell -s mpfscripts/program_wifi.mpfshell
+echo Programming wifi.
+mpfshell -n -c "open $port;exec wifi("\""$wifi_name"\"","\""$wifi_password"\"")"
+

@@ -1,0 +1,6 @@
+ls
+
+List files in current directory.
+
+Example call:
+ls

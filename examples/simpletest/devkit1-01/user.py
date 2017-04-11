@@ -1,7 +1,7 @@
 from ulnoiot import *
 
 # general init
-w=wifi( "ehdemo-iotempire","internetofthings" )
+w=wifi( "ehdemo-iotempire","internetofthings", reset=False )
 mqtt( "192.168.10.254","testfloor/devkit1-01",user="homeassistant",password="internetofthings",client_id="devkit1-01")
 
 # devkit1 button/led shield

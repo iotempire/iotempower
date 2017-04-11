@@ -2,7 +2,9 @@
 # deploy ulnoiot software on wemos d1 mini
 #
 # $1 can give a tty port as destination parameter (for example: USB0)
-#
+# $2 can be a webrepl password
+password="$2"
+test "$password" || password="ulnoiot"
 
 # find directory
 dir=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
@@ -11,31 +13,50 @@ EXTERNAL="$dir/../external"
 VPYTHON="$EXTERNAL/ulnoiot_vp/"
 source "$VPYTHON/bin/activate"
 
-port=$("$dir/find_esp_port" "$1")
+port=$("$dir/find_esp_port" "$1" "$password")
 
 cd "$dir/../lib/boards/wemosd1mini"
 
-echo "Copying all files."
-mpfshell -n -c "
-  open tty$port;
-  mput .*\\.py\$;
-  md ulnoiot;
-  lcd ulnoiot;
-  cd ulnoiot;
-  mput .*\\.py\$;
-  md shield;
-  lcd shield;
-  cd shield;
-  mput .*\\.py\$;
-  lcd ..;
-  cd ..;
-  md help;
-  lcd help;
-  cd help;
-  mput .*\\.py\$;
-  mput .*\\.txt\$;
-  cd /;" 2>&1 | grep -v "Invalid directory"
+hashfile=$(tempfile)
+echo "Getting file digests."
+mpfshell -n -c "open $port; exec from ulnoiot.util import file_hashs; exec file_hashs()" \
+    | tail -n+2 > "$hashfile"
 
-echo "Sending reset."
-"$dir/board_reset" $port
+mpfscript=$(tempfile)
+echo "Detecting file changes."
+echo
+python "$dir/create_upload_list.py" "$port" "$hashfile" "$mpfscript"
+echo
+echo "Executing changes (ignore weird mpfshell prompts):"
+
+mpfshell -s "$mpfscript"
+rm "$hashfile"
+rm "$mpfscript"
+
+echo
+echo "Done."
+
+#echo "Copying all files."
+#mpfshell -n -c "
+#  open $port;
+#  mput .*\\.py\$;
+#  md ulnoiot;
+#  lcd ulnoiot;
+#  cd ulnoiot;
+#  mput .*\\.py\$;
+#  md shield;
+#  lcd shield;
+#  cd shield;
+#  mput .*\\.py\$;
+#  lcd ..;
+#  cd ..;
+#  md help;
+#  lcd help;
+#  cd help;
+#  mput .*\\.py\$;
+#  mput .*\\.txt\$;
+#  cd /;" 2>&1 | grep -v "Invalid directory"
+#
+#echo "Sending reset."
+#"$dir/board_reset" "$port"
 

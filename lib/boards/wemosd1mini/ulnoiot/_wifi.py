@@ -3,6 +3,7 @@
 import machine
 import network
 import time
+import webrepl
 
 _ap = network.WLAN(network.AP_IF)
 _ap.active(False)
@@ -28,14 +29,15 @@ def connect():
                 print("%d/%d. Trying to connect." %(i+1, tries))
                 machine.idle()
                 time.sleep(1)
-                if _wlan.isconnected(): break
+#                if _wlan.isconnected(): break
+                if _wlan.status() == network.STAT_GOT_IP: break
             break
 
-    if _wlan.isconnected():
+    if _wlan.isconnected() and _wlan.status() == network.STAT_GOT_IP:
         print('Wifi: connection succeeded!')
         print(_wlan.ifconfig())
     else:
-        print('Wifi: connection failed!')
+        print('Wifi: connection failed, starting accesspoint!')
         accesspoint()
 
 def accesspoint():
@@ -84,15 +86,24 @@ class WIP:
 wip = WIP()
 
 # write config and connect
-def setup( name,  password ):
+def setup( name,  password, reset=True ):
     global wifi_config
 
-    f=open("wifi_config.py", "w")
-    f.write("name=\"%s\"\npassword=\"%s\"" % (name,password))
-    f.close()
-    wifi_config.name = name
-    wifi_config.password = password
-    connect()
+    if name != wifi_config.name or password != wifi_config.password:
+        f=open("wifi_config.py", "w")
+        f.write("name=\"%s\"\npassword=\"%s\"" % (name,password))
+        f.close()
+        print("Updated wifi_config.")
+        wifi_config.name = name
+        wifi_config.password = password
+        if reset:
+            print("Resetting system in 3 seconds.")
+            time.sleep(1)
+            webrepl.stop()
+            time.sleep(2)
+            machine.reset()
+        else:
+            connect()
 
 # Try to find wifi_config
 try:
