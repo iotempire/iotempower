@@ -23,7 +23,7 @@ source "$VPYTHON/bin/activate"
 pushd . &> /dev/null
 
 port=$("$dir/find_esp_port" "$1")
-tty="/dev/tty$port"
+tty="/dev/$port"
 echo "Port: $tty"
 
 # find firmware
@@ -44,7 +44,7 @@ esptool \
 
 sleep 1
 echo "Do hardreset via mpfshell..."
-mpfshell -c "open tty$port" -n --reset
+mpfshell -c "open $port" -n --reset
 sleep 4
 echo "Reset should be done now."
 
