@@ -89,7 +89,8 @@ wip = WIP()
 def setup( name,  password, reset=True ):
     global wifi_config
 
-    if name != wifi_config.name or password != wifi_config.password:
+    if name != wifi_config.name or \
+          password != wifi_config.password:
         f=open("wifi_config.py", "w")
         f.write("name=\"%s\"\npassword=\"%s\"" % (name,password))
         f.close()
@@ -112,3 +113,5 @@ try:
 except ImportError:
     class wifi_config():
         pass
+    wifi_config.name=""
+    wifi_config.password=""
