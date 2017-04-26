@@ -23,7 +23,7 @@ How to get started with ulnoiot on the Wemos D1 mini
 
 5. Install or update the ulnoiot software with deploy_wemosd1mini
 
-6. Access the command prompt with console (if only a wemos is connected
+6. Access the command prompt with ``console`` (if only a wemos is connected
    the serial port will be dicovered automatically else supply it or
    an IP address and password as paramaters).
 
