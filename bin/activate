@@ -3,6 +3,7 @@
 #
 
 export PATH="$(pwd)/bin:$PATH"
+check_dependencies
 source external/ulnoiot_vp/bin/activate
 export ULNOIOT_ROOT=$(pwd)
 
