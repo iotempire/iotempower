@@ -8,8 +8,7 @@ from ulnoiot import *
 gc.collect()
 
 print(clear())
-print(open("/ulnoiot/help/_general.txt").read())
-print()
+help()
 
 try:
     import user

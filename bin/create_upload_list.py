@@ -18,9 +18,9 @@ def main(argv):
         hashs[l[41:]] = l[0:40]
     output=open(argv[2],"wb")
     output.write(b"open %b\n"%argv[0].encode())
-    output.write(b"md ulnoiot\n")
-    output.write(b"md ulnoiot/help\n")
-    output.write(b"md ulnoiot/shield\n")
+    output.write(b"md /ulnoiot\n")
+    output.write(b"md /ulnoiot/help\n")
+    output.write(b"md /ulnoiot/shield\n")
     for filename in hashs:
         try:
             f=open(filename,"rb")
@@ -37,8 +37,8 @@ def main(argv):
             if h.hexdigest() == hashs[filename]:
                 print("#", filename, "matches")
             else:
-                print("put %s %s"%(filename,filename))
-                output.write(b"put %b %b\n"%(filename.encode(),filename.encode()))
+                print("put %s /%s"%(filename,filename))
+                output.write(b"put %b /%b\n"%(filename.encode(),filename.encode()))
             f.close()
     print("# Missing files")
     # now check which files are missing
@@ -47,8 +47,8 @@ def main(argv):
             path=(root+"/"+filename)[2:] # skip ./
             if path not in hashs:
                 print("put %s %s" % (path, path))
-                output.write(b"put %b %b\n"%(path.encode(),path.encode()))
-    output.write(b"\nexec import machine\nexec machine.reset()\n")
+                output.write(b"put %b /%b\n"%(path.encode(),path.encode()))
+    output.write(b"\nexec import machine\nexec machine.reset()\nclose")
     output.close()
 
 

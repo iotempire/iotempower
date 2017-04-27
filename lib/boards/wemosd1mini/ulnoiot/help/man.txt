@@ -1,4 +1,4 @@
-FIle manipulation commands (importedfrom upysh):
+File manipulation commands (imported from upysh):
 pwd, cd("new_dir"), ls, ls(...), head(...), cat(...)
 newfile(...), mv("old", "new"), rm(...), mkdir(...), rmdir(...),
 clear

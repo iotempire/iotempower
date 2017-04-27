@@ -3,6 +3,10 @@
 #
 # $1 can give a tty port as destination parameter (for example: USB0)
 # $2 can be a webrepl password
+
+# uncomment for debugging
+#DEBUG=yes
+
 password="$2"
 test "$password" || password="ulnoiot"
 
@@ -17,21 +21,46 @@ port=$("$dir/find_esp_port" "$1" "$password")
 
 cd "$dir/../lib/boards/wemosd1mini"
 
-hashfile=$(tempfile)
+hashfile="$(tempfile).hashfile"
 echo "Getting file digests."
-mpfshell -n -c "open $port; exec from ulnoiot.util import file_hashs; exec file_hashs()" \
+mpfshell -n -c \
+    "open $port; exec from ulnoiot.util import file_hashs; exec file_hashs()" \
     | tail -n+2 > "$hashfile"
 
-mpfscript=$(tempfile)
+if [[ "$DEBUG" = yes ]]; then
+    less "$hashfile"
+fi
+
+mpfscript="$(tempfile).mpfscript"
 echo "Detecting file changes."
 echo
 python "$dir/create_upload_list.py" "$port" "$hashfile" "$mpfscript"
 echo
-echo "Executing changes (ignore weird mpfshell prompts):"
+echo "Executing changes:"
 
-mpfshell -s "$mpfscript" | grep -v "Invalid directory"
-rm "$hashfile"
-rm "$mpfscript"
+
+if [[ "$DEBUG" = yes ]]; then
+    less "$mpfscript"
+fi
+
+logfile="$(tempfile).mpfshell.log"
+touch "$logfile" # create so tail doesn't fail
+
+mpfshell --loglevel INFO --logfile "$logfile" -s "$mpfscript" \
+    | grep -v "Invalid directory" | grep -v mpfs \
+    | sed -e 's/^/mpfshell processing... /' - &
+mpfid=$!
+
+
+tail -f "$logfile" &>/dev/null &
+tailid=$!
+
+wait $mpfid
+kill $tailid &>/dev/null
+wait $tailid &>/dev/null
+
+# cleanup
+rm "$hashfile" "$mpfscript" "$logfile"
 
 echo
 echo "Done."

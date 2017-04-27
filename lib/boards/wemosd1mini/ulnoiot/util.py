@@ -8,15 +8,24 @@ import gc
 import machine
 
 
-def file_hashs(root=""):
+def file_hashs():
+    p=os.getcwd()
+    if p == "":
+        p = "/"
+    os.chdir("/")
+    _file_hashs("")
+    os.chdir(p)
+
+
+def _file_hashs(root):
     speed=machine.freq()
     machine.freq(160000000) # we want to be fast for this
-    l = os.listdir("/"+root)
+    l = os.listdir(root)
     for f in l:
         gc.collect()
         st = os.stat("%s/%s" % (root, f))
         if st[0] & 0x4000:  # stat.S_IFDIR
-            file_hashs(root+"/"+f)
+            _file_hashs(root+"/"+f)
         else:
             file=root+"/"+f
             h=sha1()
