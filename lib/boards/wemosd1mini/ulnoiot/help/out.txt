@@ -10,7 +10,7 @@ Parameters:
 - pin: the gpiopin
 - high_command: what needs to be sent to turn the respective port high
 - low_command: what needs to be sent to turn the respective port low
-- ignore_case: should case in teh command detection be ignored
+- ignore_case: should case in the command detection be ignored
 
 Example:
 
