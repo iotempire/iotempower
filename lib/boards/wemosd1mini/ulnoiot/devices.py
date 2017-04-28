@@ -94,9 +94,9 @@ def linecat(filename,frm=1,to=0):
     from ulnoiot import _line_edit
     _line_edit.linecat(filename,frm=frm,to=to)
 
-def lineedit(filename,linenr):
+def lineedit(filename,linenr,insert=False):
     from ulnoiot import _line_edit
-    _line_edit.lineedit(filename,linenr)
+    _line_edit.lineedit(filename,linenr,insert)
 
 def delete(name):
     _devlist.pop(name)
