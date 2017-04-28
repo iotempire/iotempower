@@ -1,0 +1,10 @@
+# connect to mqtt server mymqttgateway (can also be an IP address),
+# and report all local devices under the topic myroom/test1.
+# If not set on your mqtt server, you can skip user and password.
+mqtt("mymqttgateway", "myroom/test1")
+
+# use some shields
+from ulnoiot.shield import onboardled as onboard
+onboard.blue.high() # make sure it's off
+
+# add some other devices

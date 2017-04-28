@@ -41,6 +41,7 @@ def contact(name, pin, *args, report_high="on", report_low="off",
     gc.collect()
     return _devlist[name]
 button = contact
+input = contact
 
 ####### simple Input, contact devices/push buttons
 def trigger(name, pin, rising=False, falling=False,
@@ -67,6 +68,7 @@ def out(name, pin, *args, high_command='on', low_command='off', ignore_case=True
     return _devlist[name]
 led = out
 switch = out
+output = out
 
 
 ####### HT temperature/humidity with

@@ -13,4 +13,4 @@ help()
 try:
     import user
 except ImportError:
-    print("Create a file user.py,\nif you want to start a project automatically.\n")
+    help("user.py")

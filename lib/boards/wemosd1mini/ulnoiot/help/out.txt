@@ -1,5 +1,5 @@
 out(name, pin, high_command='on', low_command='off', ignore_case=True)
-other names: led
+other names: led, output, switch
 
 Create a new output port for a simple LED or a relay switch.
 name will be appended to the mqtt topic and a set appended to
@@ -10,7 +10,7 @@ Parameters:
 - pin: the gpiopin
 - high_command: what needs to be sent to turn the respective port high
 - low_command: what needs to be sent to turn the respective port low
-- ignore_case: should case in teh commadn detection be ignored
+- ignore_case: should case in teh command detection be ignored
 
 Example:
 

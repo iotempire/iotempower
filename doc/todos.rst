@@ -4,7 +4,7 @@
 
 - where input, output, switch
 
-- help für out, led, switch broken
+- help for out, led, switch broken
 
 - mqtt example
 

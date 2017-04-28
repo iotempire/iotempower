@@ -32,5 +32,7 @@ from upysh import ls,rm,cd,clear,pwd,mkdir,head,cat,mv,rmdir,newfile
 gc.collect()
 from ulnoiot.devices import *
 gc.collect()
-from ulnoiot.help import help, man
+import ulnoiot.help as _help
+help=_help.help
+man=_help.man
 gc.collect()

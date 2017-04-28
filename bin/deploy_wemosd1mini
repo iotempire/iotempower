@@ -47,12 +47,12 @@ logfile="$(tempfile).mpfshell.log"
 touch "$logfile" # create so tail doesn't fail
 
 mpfshell --loglevel INFO --logfile "$logfile" -s "$mpfscript" \
-    | grep -v "Invalid directory" | grep -v mpfs \
-    | sed -e 's/^/mpfshell processing... /' - &
+    | grep -v "Invalid directory" \
+    | sed -e 's/mpfs.*>/processing /' - | sed -e 's/^/processing /' &
 mpfid=$!
 
 
-tail -f "$logfile" &>/dev/null &
+tail -f "$logfile" 2>/dev/null &
 tailid=$!
 
 wait $mpfid

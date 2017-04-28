@@ -1,6 +1,6 @@
 def contact(name, pin, report_high="on", report_low="off",
             pullup=True,threshold=0):
-other names: button
+other names: button, input
 
 Create a new input port for a contact or a button.
 name will be appended to the mqtt topic and corresponding

@@ -1,0 +1,11 @@
+Available shield drivers:
+!!help_list_print(dir_content("/ulnoiot/shield"))
+
+To use shieldname, enter:
+from ulnoiot.shield import shieldname
+
+Show this list again with help("shields") or help("shield").
+
+Try this example:
+from ulnoiot.shield import onboardled as led
+led.blue.high()
