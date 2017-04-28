@@ -41,6 +41,7 @@ copy=cp
 
 gc.collect()
 from ulnoiot.devices import *
+from ulnoiot.devices import _devlist as devices
 gc.collect()
 import ulnoiot.help as _help
 help=_help.help

@@ -1,0 +1,13 @@
+devices
+
+In devices, you can access the list of installed devices.
+It is a Python dictionary, mapping device names to device objects.
+
+Example:
+>>> led("blue",onboardled,high_command='off',low_command='on')
+<Output object at 3fff1390>
+>>> devices
+{'blue': <Output object at 3fff1390>}
+>>> myblue=devices["blue"]
+>>> myblue.low()
+>>>
