@@ -8,6 +8,8 @@ import sys
 import os
 from hashlib import sha1
 
+onlycreate=["webrepl_cfg.py","user.py"]
+
 def main(argv):
     if len(argv)<3:
         print("Need port, hash source file, and update file as parameters.")
@@ -31,14 +33,15 @@ def main(argv):
             #print("rm %f"%f) delete nothing local
             print("#", filename,"is not existing locally.")
         else:
-            h=sha1()
-            for l in f:
-                h.update(l)
-            if h.hexdigest() == hashs[filename]:
-                print("#", filename, "matches")
-            else:
-                print("put %s /%s"%(filename,filename))
-                output.write(b"put %b /%b\n"%(filename.encode(),filename.encode()))
+            if filename not in onlycreate:
+                h=sha1()
+                for l in f:
+                    h.update(l)
+                if h.hexdigest() == hashs[filename]:
+                    print("#", filename, "matches")
+                else:
+                    print("put %s /%s"%(filename,filename))
+                    output.write(b"put %b /%b\n"%(filename.encode(),filename.encode()))
             f.close()
     print("# Missing files")
     # now check which files are missing

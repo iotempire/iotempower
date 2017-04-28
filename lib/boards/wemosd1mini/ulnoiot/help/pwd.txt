@@ -1,0 +1,9 @@
+pwd
+
+List current work directory.
+
+Example:
+>>> cd("/ulnoiot")
+>>> pwd
+/ulnoiot
+>>>

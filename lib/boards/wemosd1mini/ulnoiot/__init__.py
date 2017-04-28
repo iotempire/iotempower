@@ -29,6 +29,16 @@ reboot=reset
 from upysh import ls,rm,cd,clear,pwd,mkdir,head,cat,mv,rmdir,newfile
 # overwrite man
 
+# copy helper
+def cp(from_file,to_file):
+    print("Copying %s to %s."%(from_file,to_file))
+    ff=open(from_file,"rb")
+    tf=open(to_file,"wb")
+    tf.write(ff.read())
+    tf.close()
+    ff.close()
+copy=cp
+
 gc.collect()
 from ulnoiot.devices import *
 gc.collect()

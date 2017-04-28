@@ -11,16 +11,20 @@ def linecat(filename,frm=1,to=0):
             print(line,l,end="")
         line += 1
 
-def lineedit(filename,linenr):
-    print("You want to edit line",linenr)
+def lineedit(filename,linenr,insert=False):
+    if insert:
+        action="insert before"
+    else:
+        action="replace"
+    print("You want to",action,"line",linenr)
     linecat(filename,frm=linenr-2,to=linenr+2)
-    print("Input new value for line %d:",linenr)
+    print("Input new content for line %d:"%linenr)
     newl=input()
-    print("Replace")
+    print("You want to",action,"line",linenr)
     linecat(filename,frm=linenr,to=linenr)
-    print("with")
+    print("with the following content")
     print(linenr,newl)
-    print("Really replace? N/y")
+    print("Really? N/y")
     answer=input()
     answer=answer.lower()
     if answer=="y":
@@ -30,6 +34,8 @@ def lineedit(filename,linenr):
         for l in open(filename):
             if line == linenr:
                 output.write(newl+"\n")
+                if insert:
+                    output.write(l)
             else:
                 output.write(l)
             line+=1

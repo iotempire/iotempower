@@ -1,0 +1,11 @@
+cat(filename)
+
+Show contents of file.
+
+Example:
+>>> cat("/ulnoiot/help/cat.txt")
+cat(filename)
+
+Show contents of file.
+[... more of this same file ...]
+>>>

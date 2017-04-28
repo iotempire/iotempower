@@ -1,6 +1,7 @@
 ls
 
-List files in current directory.
+List files in current (or a given) directory.
 
 Example call:
 ls
+ls("/ulnoiot")

@@ -1,0 +1,16 @@
+wscan
+
+Show available wifi networks,
+
+Example:
+>>> wscan
+AI-THINKER_2BC41C -78dB
+iotempire -42dB
+
+>>> wifi("iotempire", "internetofthings")
+Updated wifi_config.
+Resetting system in 3 seconds.
+>>>
+ ets Jan  8 2013,rst cause:2, boot mode:(3,0)
+...
+

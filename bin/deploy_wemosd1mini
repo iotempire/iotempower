@@ -48,7 +48,7 @@ touch "$logfile" # create so tail doesn't fail
 
 mpfshell --loglevel INFO --logfile "$logfile" -s "$mpfscript" \
     | grep -v "Invalid directory" \
-    | sed -e 's/mpfs.*>/processing /' - | sed -e 's/^/processing /' &
+    | sed -u -e 's/mpfs.*>/processing /' - | sed -u -e 's/^/processing /' &
 mpfid=$!
 
 

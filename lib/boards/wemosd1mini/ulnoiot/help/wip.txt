@@ -1,0 +1,12 @@
+wip
+ip=wip()
+
+Show current ip address.
+
+Example:
+>>> wip
+192.168.12.57
+>>> myip=wip()
+>>> print("IP-address:", myip)
+IP-address: 192.168.12.57
+>>>
