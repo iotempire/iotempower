@@ -23,10 +23,11 @@ mkdir -p "$APTEMP"
 
 # create mosquitto config
 cat << EOF > "$APTEMP/mosquitto.conf"
-pid_file "$APTEMP/pid"
+pid_file $APTEMP/pid
 persistence true
-persistence_location "$APTEMP"
-log_dest stdout
+persistence_location $APTEMP
+log_dest none
+#log_type none
 bind_address 127.0.0.1
 listener 1883 192.168.12.1
 EOF

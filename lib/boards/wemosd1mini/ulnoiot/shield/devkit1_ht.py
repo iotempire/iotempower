@@ -4,5 +4,5 @@
 from ulnoiot import *
 
 # devkit1 humidity temperature sensor
-ht("ht1",d1)
+dht11("ht1",d1)
 

@@ -43,6 +43,14 @@ def contact(name, pin, *args, report_high="on", report_low="off",
 button = contact
 input = contact
 
+####### Analog input
+def analog(name,precision=1):
+    gc.collect()
+    from ulnoiot._analog import Analog
+    _devlist[name] = Analog(name,precision)
+    gc.collect()
+    return _devlist[name]
+
 ####### simple Input, contact devices/push buttons
 def trigger(name, pin, rising=False, falling=False,
             pullup=True):
@@ -70,12 +78,26 @@ led = out
 switch = out
 output = out
 
-
 ####### HT temperature/humidity with
-def ht(name, pin):
+# TODO think about calibration
+def dht11(name, pin):
     gc.collect()
-    from ulnoiot._ht import HT
-    _devlist[name] = HT(name, pin)
+    from ulnoiot._ht import DHT11
+    _devlist[name] = DHT11(name, pin)
+    gc.collect()
+    return _devlist[name]
+
+def dht22(name, pin):
+    gc.collect()
+    from ulnoiot._ht import DHT22
+    _devlist[name] = DHT22(name, pin)
+    gc.collect()
+    return _devlist[name]
+
+def ds18x20(name, pin):
+    gc.collect()
+    from ulnoiot._ht import DS18X20
+    _devlist[name] = DS18X20(name, pin)
     gc.collect()
     return _devlist[name]
 
