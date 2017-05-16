@@ -19,13 +19,14 @@ VPYTHON="$EXTERNAL/ulnoiot_vp/"
 source "$VPYTHON/bin/activate"
 
 APTEMP="$dir/../tmp/mosquitto"
+rm -rf "$APTEMP" &> /dev/null
 mkdir -p "$APTEMP"
 
 # create mosquitto config
 cat << EOF > "$APTEMP/mosquitto.conf"
 pid_file $APTEMP/pid
-persistence true
-persistence_location $APTEMP
+persistence false
+persistence_location $APTEMP/mosquitto.db
 log_dest none
 #log_type none
 bind_address 127.0.0.1
