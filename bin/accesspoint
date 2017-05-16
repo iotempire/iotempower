@@ -41,12 +41,12 @@ while true; do
     sudo pkill create_ap
     sleep 1
     echo "Starting accesspoint with name $AP_NAME"
-    systemd-inhibit \
-    	--who "accesspoint" \
-	    --why "accesspoint will fail if sleep happens" \
-	    sudo "$ULNOIOT_EXTERNAL/create_ap/create_ap" \
-	    -c "$CHANNEL" \
-	    -g "$IP" \
-	    "$OUTPUT_WIFI" "$INPUT_DEVICE" "$AP_NAME" "$PASSWORD"
+    sudo systemd-inhibit \
+        --who "accesspoint" \
+        --why "accesspoint will fail if sleep happens" \
+        "$ULNOIOT_EXTERNAL/create_ap/create_ap" \
+        -c "$CHANNEL" \
+        -g "$IP" \
+        "$OUTPUT_WIFI" "$INPUT_DEVICE" "$AP_NAME" "$PASSWORD"
     sleep 2 # let ap start up
 done
