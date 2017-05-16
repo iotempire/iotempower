@@ -1,0 +1,7 @@
+#!/bin/bash
+# Get all ips of registered devices
+#
+
+# find directory
+dir=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
+"$dir/getip"

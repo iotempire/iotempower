@@ -1,0 +1,40 @@
+#!/bin/bash
+# Get ips of registered devices
+#
+# $1: topic to match against (if empty, matches all)
+
+MQTTHOST="192.168.12.1"
+
+# find directory
+dir=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
+"$dir/check_dependencies" || exit 1
+EXTERNAL="$dir/../external"
+VPYTHON="$EXTERNAL/ulnoiot_vp/"
+source "$VPYTHON/bin/activate"
+
+if [[ "$1" ]]; then
+  topic="$1/#"
+else
+  topic="#"
+fi
+
+iplog=$(tempfile --suffix .ulnoiot.getip)
+iplogall=$(tempfile --suffix .ulnoiot.getip)
+echo -n "Scanning for ips"
+filter=""
+while true; do
+    echo -n "."
+    timeout --foreground 2 mosquitto_sub -C 1 $filter -v \
+        -h "$MQTTHOST" -t "$topic" | grep "/ip " > "$iplog"
+    t=$(cat "$iplog"|cut -d\   -f1)
+    ip=$(cat "$iplog"|cut -d\  -f2)
+    if [[ ! "$t" ]]; then
+        break
+    fi
+    echo "${t:0:-3}: $ip" >> "$iplogall"
+    filter="$filter -T $t"
+done
+echo " done."
+
+cat "$iplogall"
+rm "$iplog" "$iplogall"
