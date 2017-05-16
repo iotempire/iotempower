@@ -1,0 +1,27 @@
+# Configuration options to be sourced by shells and available
+# in environment
+
+# Root directory of teh ulnoiot installation
+# if not defined will try to detect from call directory
+ULNOIOT_ROOT="$HOME/devel/ulnoiot"
+
+# potential devices for wifi sharing (if not defined, will be all)
+#ULNOIOT_AP_DEVICES="wlxf8d1110c9230 wlxe84e0619a4f8"
+
+# Name of accesspoint to create
+ULNOIOT_AP_NAME="iotempire"
+# Its pw
+ULNOIOT_AP_PASSWORD="internetofthings"
+# Channel to tun on
+ULNOIOT_AP_CHANNEL=9
+# IP to pick
+ULNOIOT_AP_IP="192.168.12.1"
+
+# Connect data for local MQTT broker
+ULNOIOT_MQTT_HOST="$ULNOIOT_AP_IP"
+
+# Data to configure an mqtt bridge
+ULNOIOT_MQTT_BRIDGE_HOST="ulno.net"
+ULNOIOT_MQTT_BRIDGE_PORT="18883"
+ULNOIOT_MQTT_BRIDGE_CERTPATH="/etc/ssl/certs"
+
