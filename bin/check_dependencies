@@ -59,6 +59,9 @@ else
     git clone https://github.com/ulno/mpfshell "$ULNOIOT_EXTERNAL/mpfshell.git"
     cd "$ULNOIOT_EXTERNAL/mpfshell.git"
     python setup.py install
+    # accesspoint
+    git clone https://github.com/oblique/create_ap "$ULNOIOT_EXTERNAL/create_ap"
+    #cd "$ULNOIOT_EXTERNAL/create_ap"
     # download firmware
     mkdir -p "$ULNOIOT_EXTERNAL/firmware"
     cd "$ULNOIOT_EXTERNAL/firmware"

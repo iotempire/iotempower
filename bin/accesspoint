@@ -44,7 +44,7 @@ while true; do
     systemd-inhibit \
     	--who "accesspoint" \
 	    --why "accesspoint will fail if sleep happens" \
-	    sudo create_ap \
+	    sudo "$ULNOIOT_EXTERNAL/create_ap/create_ap" \
 	    -c "$CHANNEL" \
 	    -g "$IP" \
 	    "$OUTPUT_WIFI" "$INPUT_DEVICE" "$AP_NAME" "$PASSWORD"
