@@ -3,12 +3,11 @@
 # $1 file $2 destination $3 port (optional)
 #
 
-# find directory
+# find directory and read config
 dir=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
-"$dir/check_dependencies" || exit 1
-EXTERNAL="$dir/../external"
-VPYTHON="$EXTERNAL/ulnoiot_vp/"
-source "$VPYTHON/bin/activate"
+ULNOIOT_ROOT="$dir/.."
+source "$ULNOIOT_ROOT/bin/read_config"
+
 
 port=$("$dir/find_esp_port" "$3")
 

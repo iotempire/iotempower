@@ -1,6 +1,6 @@
 # needs to be sourced from main ulnoiot directory
 source "$HOME/.bashrc"
-source "bin/activate"
+source "bin/read_config"
 
 PSGREEN="\[$(tput setaf 2)\]"
 PSLBLUE="\[$(tput setaf 14)\]"
@@ -20,3 +20,5 @@ ulnoiot_cd() {
 }
 
 alias cd=ulnoiot_cd
+
+cd

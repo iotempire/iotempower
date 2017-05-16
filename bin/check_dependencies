@@ -2,27 +2,29 @@
 # check dependencies
 # author: ulno creation date
 #
-# check if everything from external is downloaded and accessable
+# check if everything from ULNOIOT_EXTERNAL is downloaded and accessable
 # if not asks to install it
 #
-# if called as check_install clean, it will delete content of external and
+# if called as check_install clean, it will delete content of ULNOIOT_EXTERNAL and
 # redownload everything
 
-# find directory
+# find directory and read config
 dir=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
-EXTERNAL="$dir/../external"
-VPYTHON="$EXTERNAL/ulnoiot_vp/"
+if [ ! "$ULNOIOT_ROOT" ]; then # break potential recursion
+    ULNOIOT_ROOT="$dir/.."
+    source "$ULNOIOT_ROOT/bin/read_config"
+fi
 
 if [[ "$1" == clean ]]; then
   echo "Deleting external cache."
-  rm -rf "$EXTERNAL"
+  rm -rf "$ULNOIOT_EXTERNAL"
 fi
 
 # check if virtualenv is configured
-if [[ -e "$VPYTHON/bin/activate" ]]; then # check for existing venv
-    source "$VPYTHON/bin/activate"
+if [[ -e "$ULNOIOT_VPYTHON/bin/activate" ]]; then # check for existing venv
+    source "$ULNOIOT_VPYTHON/bin/activate"
 else
-    echo "No external environment found."
+    echo "No external environment found in $ULNOIOT_EXTERNAL."
     echo -n "Do you want to try to set it up? (Y/n) "
     read answer
     if [[ ${answer,,} == "y" || ${answer,,} == "" ]]; then
@@ -39,9 +41,9 @@ else
         exit 1
     fi
     # install virtualenv
-    mkdir -p "$VPYTHON"
-    virtualenv -p "$(which python3)" "$VPYTHON"
-    source "$VPYTHON/bin/activate"
+    mkdir -p "$ULNOIOT_VPYTHON"
+    virtualenv -p "$(which python3)" "$ULNOIOT_VPYTHON"
+    source "$ULNOIOT_VPYTHON/bin/activate"
     pip install --upgrade pip
     # dependencies
     pip install pyserial
@@ -49,17 +51,17 @@ else
     pip install websocket_client
     pushd . &> /dev/null
     # esptool
-    git clone https://github.com/espressif/esptool "$EXTERNAL/esptool.git"
-    cd "$EXTERNAL/esptool.git"
+    git clone https://github.com/espressif/esptool "$ULNOIOT_EXTERNAL/esptool.git"
+    cd "$ULNOIOT_EXTERNAL/esptool.git"
     python setup.py install
-    ln -s "$EXTERNAL/esptool.git/esptool.py" "$VPYTHON/bin/esptool"
+    ln -s "$ULNOIOT_EXTERNAL/esptool.git/esptool.py" "$ULNOIOT_VPYTHON/bin/esptool"
     # mpfshell
-    git clone https://github.com/ulno/mpfshell "$EXTERNAL/mpfshell.git"
-    cd "$EXTERNAL/mpfshell.git"
+    git clone https://github.com/ulno/mpfshell "$ULNOIOT_EXTERNAL/mpfshell.git"
+    cd "$ULNOIOT_EXTERNAL/mpfshell.git"
     python setup.py install
     # download firmware
-    mkdir -p "$EXTERNAL/firmware"
-    cd "$EXTERNAL/firmware"
+    mkdir -p "$ULNOIOT_EXTERNAL/firmware"
+    cd "$ULNOIOT_EXTERNAL/firmware"
     "$dir/download_allfirmware_here"
     popd  &> /dev/null
 fi

@@ -1,5 +1,5 @@
 mqtt(broker_host, topic, user=None, password=None,
-     client_id=None, report_ip=True)
+     client_id=None, report_ip=True, port=1883)
 
 Set up mqtt parameters for later mqtt communication in transfer/run:
 - broker_host: the host running the mqtt broker
@@ -10,3 +10,7 @@ Set up mqtt parameters for later mqtt communication in transfer/run:
   if omitted
 - report_ip: usually there will be subtopic ip, which lists the assigned
   ip of the device , turn off by setting this to false
+- port to cummunicate on
+
+Example:
+mqtt("192.168.12.1","test1/mysensor")

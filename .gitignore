@@ -7,3 +7,4 @@ tmp/
 external/
 .idea/
 
+etc/ulnoiot.conf

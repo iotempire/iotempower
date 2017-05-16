@@ -1,53 +1,50 @@
 #!/bin/bash
 # create accesspoint on a wifi interface
 
-# input network device
-INPUT_DEVICE=wlp1s0
-
-# output network device
-OUTPUT_WIFI=wlxf8d1110c9230
-
-AP_NAME="iotempire"
-PASSWORD="internetofthings"
-CHANNEL=9
-
-# find directory
+# find directory and read config
 dir=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
-"$dir/check_dependencies" || exit 1
-EXTERNAL="$dir/../external"
-VPYTHON="$EXTERNAL/ulnoiot_vp/"
-source "$VPYTHON/bin/activate"
+ULNOIOT_ROOT="$dir/.."
+source "$ULNOIOT_ROOT/bin/read_config"
 
 APTEMP="$dir/../tmp/mosquitto"
 rm -rf "$APTEMP" &> /dev/null
 mkdir -p "$APTEMP"
 
-# create mosquitto config
-cat << EOF > "$APTEMP/mosquitto.conf"
-pid_file $APTEMP/pid
-persistence false
-persistence_location $APTEMP/mosquitto.db
-log_dest none
-#log_type none
-bind_address 127.0.0.1
-listener 1883 192.168.12.1
-EOF
+# find input network device
+INPUT_DEVICE=$(ip route ls|grep default|head -n1|cut -d\  -f5)
+if [ ! "$INPUT_DEVICE" ]; then
+  INPUT_DEVICE=lo
+fi
+
+OUTPUT_WIFI=""
+# detect output network device
+for dev in $(ip link show|cut -d: -f2|grep " wl"|cut -b2-); do
+    if [ ! "$dev" = "$INPUT_DEVICE" ]; then
+        for possible in $(echo "$ULNOIOT_AP_DEVICES"); do
+            if [ "$possible" = "$dev" ]; then
+                OUTPUT_WIFI="$dev"
+            fi
+        done
+        if [ "$OUTPUT_WIFI" ]; then
+            break
+        fi
+    fi
+done
+
+AP_NAME="$ULNOIOT_AP_NAME"
+PASSWORD="$ULNOIOT_AP_PASSWORD"
+CHANNEL="$ULNOIOT_AP_CHANNEL"
 
 while true; do
     echo "Stopping all existing services."
     sudo pkill create_ap
-    sudo pkill mosquitto
     sleep 1
-    echo "Starting mosquitto and accesspoint with name $AP_NAME"
-    echo "and password $PASSWORD"
+    echo "Starting accesspoint with name $AP_NAME"
     systemd-inhibit \
-	--who "accesspoint" \
-	--why "accesspoint will fail if sleep happens" \
-	sudo create_ap \
-	-c "$CHANNEL" \
-	"$OUTPUT_WIFI" "$INPUT_DEVICE" "$AP_NAME" "$PASSWORD" &
-    ap_id=$!
-    sleep 10 # let ap start up
-    mosquitto -v -c "$APTEMP/mosquitto.conf" &
-    wait $ap_id
+    	--who "accesspoint" \
+	    --why "accesspoint will fail if sleep happens" \
+	    sudo create_ap \
+	    -c "$CHANNEL" \
+	    "$OUTPUT_WIFI" "$INPUT_DEVICE" "$AP_NAME" "$PASSWORD" &
+    sleep 2 # let ap start up
 done

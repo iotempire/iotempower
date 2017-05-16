@@ -13,12 +13,10 @@ baudrate=115200
 #baudrate=230400
 #baudrate=460800
 
-# find directory
+# find directory and read config
 dir=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
-"$dir/check_dependencies" || exit 1
-EXTERNAL="$dir/../external"
-VPYTHON="$EXTERNAL/ulnoiot_vp/"
-source "$VPYTHON/bin/activate"
+ULNOIOT_ROOT="$dir/.."
+source "$ULNOIOT_ROOT/bin/read_config"
 
 pushd . &> /dev/null
 
@@ -27,7 +25,7 @@ tty="/dev/$port"
 echo "Port: $tty"
 
 # find firmware
-cd "$EXTERNAL/firmware"
+cd "$ULNOIOT_EXTERNAL/firmware"
 firmware="$(ls esp*.bin|sort|tail -n1)"
 echo "Firmware: $firmware"
 

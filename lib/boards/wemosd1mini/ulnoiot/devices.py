@@ -6,11 +6,15 @@
 # sending or reacting to mqtt
 
 import gc
+#import ussl - no decent ssl possible on micropython esp8266
+#gc.collect
+from umqtt.simple import MQTTClient as _MQTTClient
+gc.collect()
 import machine
-import ulnoiot._wifi as _wifi
 import time
 import ubinascii
-from umqtt.simple import MQTTClient as _MQTTClient
+gc.collect()
+import ulnoiot._wifi as _wifi
 gc.collect()
 
 _devlist = {}
@@ -23,6 +27,8 @@ _user = None
 _password = None
 _client = None
 _report_ip = True
+_port = None
+#_ssl = False
 
 ####### simple Input, contact devices/push buttons
 def contact(name, pin, *args, report_high="on", report_low="off",
@@ -155,8 +161,12 @@ def _publish_status():
 
 #### Setup and execution
 def mqtt(broker_host, topic, *args, user=None, password=None,
-         client_id=None, report_ip=True):
+         client_id=None, report_ip=True, 
+         port=None):
+# ssl not really possible    ,ssl=False):
     global _broker, _topic, _user, _password, _client_id, _report_ip
+    global _port
+#    global_ssl
 
     if len(args) > 0:
         user = args[0]
@@ -170,6 +180,14 @@ def mqtt(broker_host, topic, *args, user=None, password=None,
     _user = user
     _password = password
     _report_ip = report_ip
+    if port is None:
+        port = 1883
+#        if ssl == True:
+#            port = 8883
+#        else:
+#            port = 1883
+    _port = port
+#    _ssl = ssl
 
 
 def _subscription_cb(topic, msg):
@@ -184,14 +202,16 @@ def _subscription_cb(topic, msg):
 
 
 def _init_mqtt():
-    global _client
+    global _client, _port
+#    global _ssl
     global _broker, _topic, _user, _password, _client_id
 
     print("Trying to connect to mqtt broker.")
     _wifi.connect()
+    gc.collect()
     try:
         _client = _MQTTClient(_client_id, _broker, user=_user,
-                             password=_password)
+                             password=_password,port=_port,ssl=_ssl)
         _client.set_callback(_subscription_cb)
         _client.connect()
         print("Connected to",_broker)

@@ -7,12 +7,11 @@
 # $2 can be a webrepl password
 port=ttyUSB0
 
-# find directory
+# find directory and read config
 dir=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
-"$dir/check_dependencies" || exit 1
-EXTERNAL="$dir/../external"
-VPYTHON="$EXTERNAL/ulnoiot_vp/"
-source "$VPYTHON/bin/activate" &>/dev/null
+ULNOIOT_ROOT="$dir/.."
+source "$ULNOIOT_ROOT/bin/read_config"
+
 
 if [[ "$1" = ws* || "$1" = tty* ]]; then # already found, no conversion necessary
   port="$1"

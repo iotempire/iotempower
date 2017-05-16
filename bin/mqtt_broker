@@ -1,0 +1,33 @@
+#!/bin/bash
+# create accesspoint on a wifi interface
+
+# find directory and read config
+dir=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
+ULNOIOT_ROOT="$dir/.."
+source "$ULNOIOT_ROOT/bin/read_config"
+
+APTEMP="$dir/../tmp/mosquitto"
+rm -rf "$APTEMP" &> /dev/null
+mkdir -p "$APTEMP"
+
+# create mosquitto config
+cat << EOF > "$APTEMP/mosquitto.conf"
+pid_file $APTEMP/pid
+persistence false
+persistence_location $APTEMP/mosquitto.db
+log_dest none
+#log_type none
+bind_address 127.0.0.1
+listener 1883 192.168.12.1
+EOF
+
+# TODO: add bridge
+
+
+while true; do
+    echo "Stopping all existing services."
+    sudo pkill mosquitto
+    sleep 1
+    echo "Starting mosquitto."
+    mosquitto -v -c "$APTEMP/mosquitto.conf"
+done

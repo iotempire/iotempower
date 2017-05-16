@@ -3,14 +3,12 @@
 #
 # $1: topic to match against (if empty, matches all)
 
-MQTTHOST="192.168.12.1"
-
-# find directory
+# find directory and read config
 dir=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
-"$dir/check_dependencies" || exit 1
-EXTERNAL="$dir/../external"
-VPYTHON="$EXTERNAL/ulnoiot_vp/"
-source "$VPYTHON/bin/activate"
+ULNOIOT_ROOT="$dir/.."
+source "$ULNOIOT_ROOT/bin/read_config"
+
+MQTTHOST="$ULNOIOT_MQTT_HOST"
 
 if [[ "$1" ]]; then
   topic="$1/#"

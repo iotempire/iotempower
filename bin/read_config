@@ -1,0 +1,48 @@
+# enable local bin and python environment
+# needs to be called from the main directory (one higher than this)
+#
+# This should only be sourced by a bash like shell,
+# when in ulnoiot-root directory or in ulnoiot/bin
+
+ULNOIOT_ROOT="/tmp"
+
+if [ -e "read_config" ]; then
+    export ULNOIOT_ROOT="$(pwd)/.."
+elif [ -e "bin/read_config" ]; then
+    export ULNOIOT_ROOT="$(pwd)"
+fi
+
+if [ -e "$ULNOIOT_ROOT/bin/read_config" ]; then
+    export PATH="$ULNOIOT_ROOT/bin:$PATH"
+fi
+
+# set some defaults
+ULNOIOT_AP_DEVICES=$(ip link show|cut -d: -f2|grep " wl"|cut -b2-)
+ULNOIOT_MQTT_BRIDGE_HOST=""
+ULNOIOT_MQTT_BRIDGE_PORT="8883"
+ULNOIOT_MQTT_BRIDGE_CERTPATH="/etc/ssl/certs"
+ULNOIOT_AP_NAME="iotempire"
+ULNOIOT_AP_PASSWORD="internetofthings"
+ULNOIOT_AP_CHANNEL=9
+ULNOIOT_MQTT_HOST="192.168.12.1"
+
+if [ -e "$ULNOIOT_ROOT/etc/ulnoiot.conf" ]; then
+    source "$ULNOIOT_ROOT/etc/ulnoiot.conf"
+    export ULNOIOT_EXTERNAL="$ULNOIOT_ROOT/external"
+    export ULNOIOT_VPYTHON="$ULNOIOT_EXTERNAL/ulnoiot_vp"
+    check_dependencies
+    source "$ULNOIOT_ROOT/external/ulnoiot_vp/bin/activate" &> /dev/null
+fi
+
+export ULNOIOT_EXTERNAL="$ULNOIOT_ROOT/external"
+export ULNOIOT_VPYTHON="$ULNOIOT_EXTERNAL/ulnoiot_vp"
+export ULNOIOT_ROOT
+export ULNOIOT_MQTT_HOST
+export ULNOIOT_AP_DEVICES
+export ULNOIOT_MQTT_BRIDGE_HOST
+export ULNOIOT_MQTT_BRIDGE_PORT
+export ULNOIOT_MQTT_BRIDGE_CERTPATH
+export ULNOIOT_AP_NAME
+export ULNOIOT_AP_PASSWORD
+export ULNOIOT_AP_CHANNEL
+
