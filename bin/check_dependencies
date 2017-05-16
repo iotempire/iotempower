@@ -54,7 +54,7 @@ else
     python setup.py install
     ln -s "$EXTERNAL/esptool.git/esptool.py" "$VPYTHON/bin/esptool"
     # mpfshell
-    git clone https://github.com/wendlers/mpfshell "$EXTERNAL/mpfshell.git"
+    git clone https://github.com/ulno/mpfshell "$EXTERNAL/mpfshell.git"
     cd "$EXTERNAL/mpfshell.git"
     python setup.py install
     # download firmware
