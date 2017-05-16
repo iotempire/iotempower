@@ -1,27 +1,11 @@
 # enable local bin and python environment
 # needs to be called from the main directory (one higher than this)
 #
+# This shoudl only be sourced, when in ulnoiot-root directory
 
-export PATH="$(pwd)/bin:$PATH"
+export ULNOIOT_ROOT="$(pwd)"
+
+export PATH="$ULNOIOT_ROOT/bin:$PATH"
 check_dependencies
-source external/ulnoiot_vp/bin/activate
-export ULNOIOT_ROOT=$(pwd)
+source "$ULNOIOT_ROOT/external/ulnoiot_vp/bin/activate"
 
-PSGREEN="\[$(tput setaf 2)\]"
-PSLBLUE="\[$(tput setaf 14)\]"
-PSBLACK="\[$(tput setaf 16)\]"
-PSDRED="\[$(tput setaf 88)\]"
-
-PS1="\[\033[01;32m\]\u${PSDRED}#${PSBLACK}ul${PSDRED}no${PSBLACK}iot${PSDRED}:\[\033[01;34m\]"
-PS1="$PS1\$(pwd|cut -b$(( ${#ULNOIOT_ROOT} + 2 ))-)\[\033[00m\]\$ "
-
-# if you type cd you go to ulnoiot-root
-ulnoiot_cd() {
-    ULNOIOT_HOMEBACK="$HOME"
-    HOME="$ULNOIOT_ROOT"
-    cd "$@"
-    HOME="$ULNOIOT_HOMEBACK"
-    unset ULNOIOT_HOMEBACK
-}
-
-alias cd=ulnoiot_cd
