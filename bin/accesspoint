@@ -34,6 +34,7 @@ done
 AP_NAME="$ULNOIOT_AP_NAME"
 PASSWORD="$ULNOIOT_AP_PASSWORD"
 CHANNEL="$ULNOIOT_AP_CHANNEL"
+IP="$ULNOIOT_AP_IP"
 
 while true; do
     echo "Stopping all existing services."
@@ -45,6 +46,7 @@ while true; do
 	    --why "accesspoint will fail if sleep happens" \
 	    sudo create_ap \
 	    -c "$CHANNEL" \
-	    "$OUTPUT_WIFI" "$INPUT_DEVICE" "$AP_NAME" "$PASSWORD" &
+	    -g "$IP" \
+	    "$OUTPUT_WIFI" "$INPUT_DEVICE" "$AP_NAME" "$PASSWORD"
     sleep 2 # let ap start up
 done

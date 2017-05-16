@@ -211,7 +211,7 @@ def _init_mqtt():
     gc.collect()
     try:
         _client = _MQTTClient(_client_id, _broker, user=_user,
-                             password=_password,port=_port,ssl=_ssl)
+                             password=_password,port=_port,ssl=False)
         _client.set_callback(_subscription_cb)
         _client.connect()
         print("Connected to",_broker)

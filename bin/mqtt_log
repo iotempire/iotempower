@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+# find directory and read config
+dir=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
+ULNOIOT_ROOT="$dir/.."
+source "$ULNOIOT_ROOT/bin/read_config"
+
+topic="$1"
+outfile="../log/${topic//\//_}.log"
+echo "Logging to $outfile."
+mosquitto_sub  -h "$ULNOIOT_MQTT_HOST" -t "$topic" | \
+    ts "%.s" | tee -a "$outfile"

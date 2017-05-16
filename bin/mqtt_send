@@ -1,0 +1,8 @@
+#!/bin/bash
+# find directory and read config
+dir=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
+ULNOIOT_ROOT="$dir/.."
+source "$ULNOIOT_ROOT/bin/read_config"
+
+exec mosquitto_pub -h "$ULNOIOT_MQTT_HOST" -t "$1" -m "$2"
+
