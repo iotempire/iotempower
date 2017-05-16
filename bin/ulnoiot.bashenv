@@ -1,4 +1,6 @@
+# needs to be sourced from main ulnoiot directory
 source "$HOME/.bashrc"
+source "bin/activate"
 
 PSGREEN="\[$(tput setaf 2)\]"
 PSLBLUE="\[$(tput setaf 14)\]"
@@ -7,8 +9,6 @@ PSDRED="\[$(tput setaf 88)\]"
 
 PS1="\[\033[01;32m\]\u${PSDRED}#${PSBLACK}ul${PSDRED}no${PSBLACK}iot${PSDRED}:\[\033[01;34m\]"
 PS1="$PS1\$(pwd|cut -b$(( ${#ULNOIOT_ROOT} + 2 ))-)\[\033[00m\]\$ "
-
-export PS1
 
 # if you type cd you go to ulnoiot-root
 ulnoiot_cd() {
