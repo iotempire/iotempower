@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+#
+# execute another switch when a given command is received
+# $1: topic to listen to
+# $2: trigger type (each, anychange, onechange, payload)
+# $3: trigger data
+# $4-: command to execute (gets as last param the payload other params first)
+
+[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+
+topic="$1"
+trigger_type="$2"
+trigger_data="$3"
+shift 3
+last_data="123ulno.net321"
+
+echo "Listening to $topic with trigger $trigger_type for $trigger_data."
+mosquitto_sub  -h "$ULNOIOT_MQTT_HOST" -t "$topic" \
+|   while read data; do
+        echo "Received: $data"
+        changed=""
+        if [ "$data" != "$last_data" ]; then # change happened
+            changed="yes"
+            last_data="$data"
+        fi
+        trigger=""
+        case "$trigger_type" in
+            "each")
+                trigger="yes"
+                ;;
+            "anychange")
+                if [ "$changed" ]; then
+                    trigger="yes"
+                fi
+                ;;
+            "onechange")
+                if [ "$changed" ]; then
+                    if [ "$data" = "$trigger_data" ]; then
+                        trigger="yes"
+                    fi
+                fi
+                ;;
+            "payload")
+                if [ "$data" = "$trigger_data" ]; then
+                    trigger="yes"
+                fi
+                ;;
+            *)
+                echo "Wrong trigger type $trigger_type."
+                echo " Allowed: each, anychange, onechange, payload"
+                exit 1
+        esac
+        if [ "$trigger" ]; then
+            "$@" "$data"
+        fi
+    done
