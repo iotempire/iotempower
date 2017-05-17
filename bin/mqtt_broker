@@ -4,7 +4,7 @@
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
 
-APTEMP="$dir/../tmp/mosquitto"
+APTEMP="$ULNOIOT_LOCAL/tmp/mosquitto"
 rm -rf "$APTEMP" &> /dev/null
 mkdir -p "$APTEMP"
 
@@ -16,7 +16,7 @@ persistence_location $APTEMP/mosquitto.db
 log_dest none
 #log_type none
 bind_address 127.0.0.1
-listener 1883 192.168.12.1
+listener 1883 $ULNOIOT_MQTT_HOST
 EOF
 
 # TODO: add bridge
