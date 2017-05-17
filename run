@@ -55,10 +55,7 @@ function check_root() {
 function check_install() {
     # Check if all local directories and paths have been set up
     check_files .local/bin/shebang_run .local/vp/bin/activate
-    if [ $? ]; then
-        return 1
-    fi
-    return 0
+    return $?
 }
 
 function install() {
@@ -85,11 +82,11 @@ if check_root; then
     source "$ULNOIOT_ROOT/bin/read_config" \
         || { echo "Can't read configuration. Aborting."; exit 1; }
     check_install
-    if [ $? -ne 0 ]; then
+    if [ $? -eq 0 ]; then
+        run "$@"
+    else
         if install; then
             run "$@"
         fi
-    else
-        run "$@"
     fi
 fi
