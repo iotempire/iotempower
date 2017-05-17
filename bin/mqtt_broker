@@ -24,7 +24,7 @@ EOF
 
 while true; do
     echo "Stopping all existing services."
-    sudo pkill mosquitto
+    pkill mosquitto
     sleep 1
     echo "Starting mosquitto."
     mosquitto -v -c "$APTEMP/mosquitto.conf"
