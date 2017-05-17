@@ -1,10 +1,6 @@
 # Configuration options to be sourced by shells and available
 # in environment
 
-# Root directory of teh ulnoiot installation
-# if not defined will try to detect from call directory
-ULNOIOT_ROOT="$HOME/devel/ulnoiot"
-
 # potential devices for wifi sharing (if not defined, will be all)
 #ULNOIOT_AP_DEVICES="wlxf8d1110c9230 wlxe84e0619a4f8"
 
