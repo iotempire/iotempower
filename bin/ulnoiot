@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
 # enable local bin and python environment in modified shell
-# needs to be called from the main directory (one higher than this)
 #
 
-dir=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
-cd "$dir/.."
+[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
-exec bash run
+ulnoiot=""
+if [ "$1" ]; then
+    ulnoiot="ulnoiot"
+fi
+exec bash "$ULNOIOT_ROOT/run" $ulnoiot "$@"
+

@@ -1,0 +1,11 @@
+#!/data/data/com.termux/files/usr/bin/bash
+
+dir=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
+cd "$dir"
+
+ulnoiot mqtt_broker &
+mqttid=$!
+
+
+
+
