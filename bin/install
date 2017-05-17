@@ -1,22 +1,38 @@
-#!/bin/bash
-# check dependencies
-# author: ulno creation date
+#!/usr/bin/env bash
+# if not available, install all dependencies
+# and also allow to fix shebangs in local bin folder
 #
 # check if everything from ULNOIOT_EXTERNAL is downloaded and accessable
 # if not asks to install it
 #
 # if called as check_install clean, it will delete content of ULNOIOT_EXTERNAL and
-# redownload everything
+# re-download everything
+#
+# Author: ulno
+# Create date: 2017-05-17
+#
 
-# find directory and read config
-dir=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
-if [ ! "$ULNOIOT_ROOT" ]; then # break potential recursion
-    ULNOIOT_ROOT="$dir/.."
-    source "$ULNOIOT_ROOT/bin/read_config"
-fi
+[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+
+
+function welcome() {
+cat << EOF
+ulnoiot installer
+=================
+
+Welcome to the ulnoiot environment installer. You are just a couple of steps
+from setting up a very simple and accessible system to deploy your own
+Internet of Things (IoT).
+
+Do you want to set it up? (Y/n)
+EOF
+}
+
 
 if [[ "$1" == clean ]]; then
   echo "Deleting external cache."
+  echo
+  rm -rf "$ULNOIOT_VPYTHON"
   rm -rf "$ULNOIOT_EXTERNAL"
 fi
 
@@ -24,8 +40,7 @@ fi
 if [[ -e "$ULNOIOT_VPYTHON/bin/activate" ]]; then # check for existing venv
     source "$ULNOIOT_VPYTHON/bin/activate"
 else
-    echo "No external environment found in $ULNOIOT_EXTERNAL."
-    echo -n "Do you want to try to set it up? (Y/n) "
+    welcome
     read answer
     if [[ ${answer,,} == "y" || ${answer,,} == "" ]]; then
         if [[ $(which virtualenv) == "" ]]; then
@@ -65,8 +80,30 @@ else
     # download firmware
     mkdir -p "$ULNOIOT_EXTERNAL/firmware"
     cd "$ULNOIOT_EXTERNAL/firmware"
-    "$dir/download_allfirmware_here"
+    "$ULNOIOT_ROOT/bin/download_allfirmware_here"
     popd  &> /dev/null
+    #### create the fixed binary directory
+    MYBIN="$ULNOIOT_LOCAL/bin"
+    mkdir -p "$MYBIN"
+    # create the fixed runner
+    SBRUN="$MYBIN/shebang_run"
+    rm "$SBRUN" &> /dev/null
+    echo "#!$(which bash)" > "$SBRUN"
+    tail -n+2 "$ULNOIOT_ROOT/bin/shebang_run" >> "$SBRUN"
+    chmod a+x "$SBRUN"
+    # create representative links for all files from the bin drectory
+    find "$ULNOIOT_ROOT/bin" -print0 | while read -d $'\0' file; do
+        b=$(basename "$file")
+        # if executable and not the shebang_run itself
+        if [ "$b" != "shebang_run" \
+                -a "$b" != "ulnoiot" \
+                -a -x "$file" ]; then
+            dest="$MYBIN/$b"
+            rm "$dest" &> /dev/null
+            ln -s "shebang_run" "$dest"
+        fi
+    done
+
 fi
 
 exit 0

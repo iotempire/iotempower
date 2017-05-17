@@ -1,6 +1,7 @@
 # needs to be sourced from main ulnoiot directory
 source "$HOME/.bashrc"
-source "bin/read_config"
+source "$ULNOIOT_ROOT/bin/read_config" \
+        || echo "trouble initializing, environment might not work." 1>&2
 
 PSGREEN="\[$(tput setaf 2)\]"
 PSLBLUE="\[$(tput setaf 14)\]"

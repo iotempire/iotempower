@@ -1,23 +1,24 @@
 # enable local bin and python environment
-# needs to be called from the main directory (one higher than this)
+# set all values based on a given ULNOIOT_ROOT
 #
-# This should only be sourced by a bash like shell,
-# when in ulnoiot-root directory or in ulnoiot/bin
+# This should only be sourced by a bash like shell.
 
+### check if configuration has been read
+if [ "$ULNOIOT_ACTIVE" != "yes" ]; then
+export ULNOIOT_ACTIVE=yes
+
+# ULNOIOT_ROOT needs to be set
 if [ ! "$ULNOIOT_ROOT" ]; then
-    ULNOIOT_ROOT="/tmp"
-
-    if [ -e "read_config" ]; then
-        ULNOIOT_ROOT="$(pwd)/.."
-    elif [ -e "bin/read_config" ]; then
-        ULNOIOT_ROOT="$(pwd)"
-    fi
+    echo "ULNOIOT_ROOT not set. Aborting." 1>&2
+    exit 1
 fi
 
-if [ -e "$ULNOIOT_ROOT/bin/read_config" ]; then
-    # TODO check if it's already in there
-    export PATH="$ULNOIOT_ROOT/bin:$PATH"
-fi
+# derived variables
+export ULNOIOT_LOCAL="$ULNOIOT_ROOT/.local"
+export PATH="$ULNOIOT_LOCAL/bin:$PATH"
+export ULNOIOT_EXTERNAL="$ULNOIOT_LOCAL/external"
+export ULNOIOT_VPYTHON="$ULNOIOT_LOCAL/vp"
+export ULNOIOT_ROOT
 
 # set some defaults
 ULNOIOT_AP_DEVICES=$(ip link show|cut -d: -f2|grep " wl"|cut -b2-)
@@ -32,16 +33,9 @@ ULNOIOT_MQTT_HOST="$ULNOIOT_AP_IP"
 
 if [ -e "$ULNOIOT_ROOT/etc/ulnoiot.conf" ]; then
     source "$ULNOIOT_ROOT/etc/ulnoiot.conf"
-    export ULNOIOT_EXTERNAL="$ULNOIOT_ROOT/external"
-    export ULNOIOT_VPYTHON="$ULNOIOT_EXTERNAL/ulnoiot_vp"
-    export ULNOIOT_ROOT
-    check_dependencies
-    source "$ULNOIOT_ROOT/external/ulnoiot_vp/bin/activate" &> /dev/null
 fi
 
-export ULNOIOT_EXTERNAL="$ULNOIOT_ROOT/external"
-export ULNOIOT_VPYTHON="$ULNOIOT_EXTERNAL/ulnoiot_vp"
-export ULNOIOT_ROOT
+# export all
 export ULNOIOT_MQTT_HOST
 export ULNOIOT_MQTT_BRIDGE_HOST
 export ULNOIOT_MQTT_BRIDGE_PORT
@@ -52,3 +46,8 @@ export ULNOIOT_AP_PASSWORD
 export ULNOIOT_AP_CHANNEL
 export ULNOIOT_AP_IP
 
+# activate the virtual python environment
+source "$ULNOIOT_VPYTHON/bin/activate" &> /dev/null
+true # ignore result of this
+
+fi ### ULNOIOT_ACTIVE

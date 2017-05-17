@@ -1,0 +1,95 @@
+#!/usr/bin/env bash
+# This file might be not executable as is (for example when run in Termux on
+# Android). This file is best run as: bash run
+# (after changing into this ulnoiot directory)
+#
+# At first start it installs the local ulniot-environment
+#
+# Author: ulno
+# Create date: 2017-05-17
+#
+
+function welcome() {
+cat << EOF
+ulnoiot
+=======
+
+Your friendly and affordable Internet of Things environment.
+More at http://iot.ulno.net
+
+EOF
+}
+
+function check_files() {
+    for file in "$@"; do
+        if [ ! -e "$file" ]; then
+            echo "Can't find $file."
+            return 1
+        fi
+    done
+    return 0
+}
+
+
+function check_root() {
+    if [ -e "$ULNOIOT_ROOT/bin/ulnoiot.bashenv" ]; then
+        cd "$ULNOIOT_ROOT"
+    fi
+    echo -n "Checking now that we are in the ulnoiot root directory. "
+    check_files "bin/ulnoiot.bashenv" \
+        "bin/shebang_run" \
+        "etc/ulnoiot.conf.example"
+    if [ $? -ne 0 ]; then
+        echo "No."
+        echo
+        echo "Make sure you run or source this from the ulnoiot root directory."
+        echo "Stopping now."
+        return 1
+    fi
+
+    echo "Yes."
+    echo
+    return 0
+}
+
+function check_install() {
+    # Check if all local directories and paths have been set up
+    check_files .local/bin/shebang_run .local/vp/bin/activate
+    if [ $? ]; then
+        return 1
+    fi
+    return 0
+}
+
+function install() {
+    echo "Installing now."
+    echo
+    bash "$ULNOIOT_ROOT/bin/install"
+}
+
+
+function run() {
+    if [ "$1" = "ulnoiot" ]; then
+        shift
+        exec bash --rcfile "$ULNOIOT_ROOT/bin/ulnoiot.bashenv" "$@"
+    else
+        exec bash --rcfile "$ULNOIOT_ROOT/bin/ulnoiot.bashenv"
+    fi
+}
+
+
+######## Main #########
+welcome
+if check_root; then
+    export ULNOIOT_ROOT=$(realpath "$(pwd)")
+    source "$ULNOIOT_ROOT/bin/read_config" \
+        || { echo "Can't read configuration. Aborting."; exit 1; }
+    check_install
+    if [ $? -ne 0 ]; then
+        if install; then
+            run "$@"
+        fi
+    else
+        run "$@"
+    fi
+fi

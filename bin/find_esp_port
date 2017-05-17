@@ -7,11 +7,7 @@
 # $2 can be a webrepl password
 port=ttyUSB0
 
-# find directory and read config
-dir=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
-ULNOIOT_ROOT="$dir/.."
-source "$ULNOIOT_ROOT/bin/read_config"
-
+[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
 if [[ "$1" = ws* || "$1" = tty* ]]; then # already found, no conversion necessary
   port="$1"

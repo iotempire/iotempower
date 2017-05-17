@@ -8,3 +8,4 @@ external/
 .idea/
 
 etc/ulnoiot.conf
+.local

@@ -6,4 +6,4 @@
 dir=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
 cd "$dir/.."
 
-exec bash --rcfile "$dir/ulnoiot.bashenv"
+exec bash run

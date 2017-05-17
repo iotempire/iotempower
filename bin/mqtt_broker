@@ -1,10 +1,8 @@
 #!/bin/bash
 # create accesspoint on a wifi interface
 
-# find directory and read config
-dir=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
-ULNOIOT_ROOT="$dir/.."
-source "$ULNOIOT_ROOT/bin/read_config"
+[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+
 
 APTEMP="$dir/../tmp/mosquitto"
 rm -rf "$APTEMP" &> /dev/null

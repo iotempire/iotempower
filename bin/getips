@@ -2,6 +2,6 @@
 # Get all ips of registered devices
 #
 
-# find directory
-dir=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
-"$dir/getip"
+[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+
+exec "$ULNOIOT_LOCAL/bin/getip"

@@ -1,9 +1,6 @@
 #!/bin/bash
 
-# find directory and read config
-dir=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
-ULNOIOT_ROOT="$dir/.."
-source "$ULNOIOT_ROOT/bin/read_config"
+[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
 exec mosquitto_sub -v -h "$ULNOIOT_MQTT_HOST" -t "#"
 

@@ -3,13 +3,9 @@
 # $1 file $2 destination $3 port (optional)
 #
 
-# find directory and read config
-dir=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
-ULNOIOT_ROOT="$dir/.."
-source "$ULNOIOT_ROOT/bin/read_config"
+[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
-
-port=$("$dir/find_esp_port" "$3")
+port=$(find_esp_port "$3")
 
 srcpath=$(dirname "$1")
 srcname=$(basename "$1")
