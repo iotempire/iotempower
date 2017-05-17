@@ -65,6 +65,8 @@ else
     pip install colorama
     pip install websocket_client
     pushd . &> /dev/null
+    # TODO: fix more dependencies
+    # Termux needs: ncurses-utils
     # esptool
     git clone https://github.com/espressif/esptool "$ULNOIOT_EXTERNAL/esptool.git"
     cd "$ULNOIOT_EXTERNAL/esptool.git"

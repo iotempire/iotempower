@@ -22,7 +22,7 @@ else
     for p in USB0 USB1 USB2 USB3 USB4 USB5 USB6 USB7 USB8 USB9 \
              ACM0 ACM1 ACM2 ACM3 ACM4 ACM5 ACM6 ACM7 ACM8 ACM9; do
         # probe=$(esptool --port "/dev/tty$port" chip_id 2>/dev/null | grep "Chip ID:") # probe with reset
-        probe=$(ls "/dev/tty$p") # softprobe -> no reset
+        probe=$(ls "/dev/tty$p" 2>/dev/null) # softprobe -> no reset
         if [[ "$probe" ]]; then
             port="tty$p"
             break
