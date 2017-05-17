@@ -6,11 +6,15 @@ cd "$dir"
 ulnoiot mqtt_broker &
 mqttid=$!
 
+# let mqtt start
+sleep 3
+
 mqtt_action pipe07/wsens01/water onechange 1 do_alarm &
-qctionid=$!
+actionid=$!
 
 echo "Press return to continue."
 read tmp
 
 kill $mqttid $actionid
+pkill -f mqtt_broker
 pkill mosquitto
