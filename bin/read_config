@@ -21,7 +21,7 @@ export ULNOIOT_VPYTHON="$ULNOIOT_LOCAL/vp"
 export ULNOIOT_ROOT
 
 # set some defaults
-ULNOIOT_AP_DEVICES=$(ip link show|cut -d: -f2|grep " wl"|cut -b2-)
+ULNOIOT_AP_DEVICES=$(ip link|cut -d: -f2|grep " wl"|cut -b2-)
 ULNOIOT_MQTT_BRIDGE_HOST=""
 ULNOIOT_MQTT_BRIDGE_PORT="8883"
 ULNOIOT_MQTT_BRIDGE_CERTPATH="/etc/ssl/certs"
