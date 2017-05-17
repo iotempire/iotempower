@@ -7,5 +7,5 @@ from ulnoiot.shield import shieldname
 Show this list again with help("shields") or help("shield").
 
 Try this example:
-from ulnoiot.shield import onboardled as led
-led.blue.high()
+from ulnoiot.shield.onboardled import blue
+blue.high()

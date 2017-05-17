@@ -9,8 +9,8 @@ def main():
     ## use some shields
     # the onboard-led is always available, will report under myroom/test1/blue
     # and can be set via sending off or on to myroom/test1/blue/test
-    from ulnoiot.shield import onboardled as onboard
-    onboard.blue.high() # make sure it's off
+    from ulnoiot.shield import blue
+    blue.high() # make sure it's off
 
     ## add some other devices
     # add a button with a slightlyhigher debounce rate, which will report

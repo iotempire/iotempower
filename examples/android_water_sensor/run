@@ -6,6 +6,11 @@ cd "$dir"
 ulnoiot mqtt_broker &
 mqttid=$!
 
+mqtt_action pipe07/wsens01/water onechange 1 do_alarm &
+qctionid=$!
 
+echo "Press return to continue."
+read tmp
 
-
+kill $mqttid $actionid
+pkill mosquitto
