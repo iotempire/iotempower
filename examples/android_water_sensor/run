@@ -9,7 +9,7 @@ mqttid=$!
 # let mqtt start
 sleep 3
 
-mqtt_action pipe07/wsens01/water onechange 1 do_alarm &
+ulnoiot mqtt_action pipe07/wsens01/water onechange 1 do_alarm &
 actionid=$!
 
 echo "Press return to continue."
