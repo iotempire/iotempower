@@ -27,7 +27,7 @@ firmware="$(ls esp*.bin|sort|tail -n1)"
 echo "Firmware: $firmware"
 
 echo Performing erase flash.
-esptool-ulno --port "$tty" erase_flash
+esptool --port "$tty" erase_flash
 sleep 1
 echo Performing firmware flash.
 esptool \
