@@ -264,11 +264,12 @@ def run(updates=5, sleepms=1, poll_rate_inputs=4, poll_rate_network=10):
         if counter % poll_rate_inputs == 0:
             device_list = []
             for d in _devlist.values():
-                device_list.append(d)
+                if d.update():
+                    device_list.append(d)
             if len(device_list)>0:
                 _publish_status(device_list)
         if updates != 0 and counter % (updates * 1000) == 0:
-            print("Publishing update.")
+            print("Publishing full update.")
             _publish_status()
 
         time.sleep_ms(sleepms)
