@@ -4,7 +4,7 @@
 #
 # If you run in termux, apply termux-fix shebang onto this script
 
-export ULNOIOT_ROOT="$HOME/devel/ulnoiot"
+export ULNOIOT_ROOT="$HOME/ulnoiot"
 ulnoiot=""
 if [ "$1" ]; then
     ulnoiot="ulnoiot"
