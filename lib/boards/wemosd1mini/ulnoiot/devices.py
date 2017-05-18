@@ -139,7 +139,7 @@ def _publish_status(device_list=None,ignore_time=False):
         device_list = _devlist.values()
 
     current_time=time.ticks_us()
-    if not ignore_time and \
+    if ignore_time or \
             abs(_last_publish-current_time)>=MIN_PUBLISH_TIME_US:
         _last_publish = current_time
         try:
