@@ -30,7 +30,7 @@ fi
 mpfscript="$(tempfile --suffix .mpfscript)"
 echo "Detecting file changes."
 echo
-python "$dir/create_upload_list.py" "$port" "$hashfile" "$mpfscript"
+python "$ULNOIOT_ROOT/bin/create_upload_list.py" "$port" "$hashfile" "$mpfscript"
 echo
 echo "Executing changes:"
 
