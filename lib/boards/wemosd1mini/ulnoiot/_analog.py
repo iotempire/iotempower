@@ -14,6 +14,7 @@ class Analog(Device):
     # Handle contact or button like devices, if both false-> rising
     def __init__(self, name, precision=1, threshold=None):
         self.precision=precision
+        self.threshold = None
         if threshold is not None:
             self.threshold=max(1,min(threshold,1023))
         self.current_value=-10000
