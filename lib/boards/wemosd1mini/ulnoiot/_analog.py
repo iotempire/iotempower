@@ -12,7 +12,11 @@ class Analog(Device):
     # Handle analog input devices
     OVERFLOW=1000000
     # Handle contact or button like devices, if both false-> rising
-    def __init__(self, name, precision=1):
+    def __init__(self, name, precision=1, threshold=None):
+        self.precision=precision
+        if threshold is not None:
+            self.threshold=max(1,min(threshold,1023))
+        self.current_value=-10000
         Device.__init__(self, name, ADC(0))
 
     def callback(self,p):
@@ -22,4 +26,14 @@ class Analog(Device):
             self.counter = 0
 
     def value(self):
-        return self.pin.read()
+        if self.threshold is None:
+            return self.current_value # just return value
+        else:
+            if self.current_value > self.threshold-self.precision: return 1
+            else: return 0
+
+    def _update(self):
+        # Needs to be read in a polling scenario on a regular basis (very frequent)
+        value = self.pin.read()
+        if abs(value-self.current_value) >= self.precision:
+            self.current_value = value

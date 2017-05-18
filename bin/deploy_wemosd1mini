@@ -13,9 +13,9 @@ test "$password" || password="ulnoiot"
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
 
-port=$("$dir/find_esp_port" "$1" "$password")
+port=$(find_esp_port "$1" "$password")
 
-cd "$dir/../lib/boards/wemosd1mini"
+cd "$ULNOIOT_ROOT/lib/boards/wemosd1mini"
 
 hashfile="$(tempfile --suffix .hashfile)"
 echo "Getting file digests."

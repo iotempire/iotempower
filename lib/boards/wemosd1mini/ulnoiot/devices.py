@@ -28,7 +28,9 @@ _password = None
 _client = None
 _report_ip = True
 _port = None
+_last_publish = 0
 #_ssl = False
+MIN_PUBLISH_TIME_US = 2000 # posting every 2ms (2000us) allowed
 
 ####### simple Input, contact devices/push buttons
 def contact(name, pin, *args, report_high="on", report_low="off",
@@ -50,10 +52,10 @@ button = contact
 input = contact
 
 ####### Analog input
-def analog(name,precision=1):
+def analog(name, precision=1, threshold=None):
     gc.collect()
     from ulnoiot._analog import Analog
-    _devlist[name] = Analog(name,precision)
+    _devlist[name] = Analog(name,precision,threshold)
     gc.collect()
     return _devlist[name]
 
@@ -130,33 +132,40 @@ def delete(name):
     _devlist.pop(name)
 
 
-def _publish_status():
-    global _client
+def _publish_status(device_list=None,ignore_time=False):
+    global _client,_last_publish
 
-    try:
-        for d in _devlist.values():
-            v = d.value()
-            if v is not None:
-                t = (_topic + "/" + d.topic).encode()
-                if isinstance(v, dict): # several values to publish
-                    print('Publish status', t, v)
-                    for k in v:
-                        t_extra = t + b"/" + k.encode()
-                        _client.publish(t_extra, str(v[k]).encode())
-                else:
-                    v_map = d.mapped_value()  # try to map
-                    if v_map is None:  # not mappable, try to send what we have
-                        v_map = str(v).encode()
+    if device_list is None:
+        device_list = _devlist.values()
 
-                    print('Publish status:', t, v_map)
-                    _client.publish(t, v_map)
-#        if _report_ip:
-#            t = (_topic + "/ip").encode()
-#            _client.publish(t, str(_wifi.config()[0]), retain=True)
-    except Exception as e:
-        print('Trouble publishing, re-init network.')
-        print(e)
-        _init_mqtt()
+    current_time=time.ticks_us()
+    if not ignore_time and \
+            abs(_last_publish-current_time)>=MIN_PUBLISH_TIME_US:
+        _last_publish = current_time
+        try:
+            for d in device_list:
+                v = d.value()
+                if v is not None:
+                    t = (_topic + "/" + d.topic).encode()
+                    if isinstance(v, dict): # several values to publish
+                        print('Publishing', t, v)
+                        for k in v:
+                            t_extra = t + b"/" + k.encode()
+                            _client.publish(t_extra, str(v[k]).encode())
+                    else:
+                        v_map = d.mapped_value()  # try to map
+                        if v_map is None:  # not mappable, try to send what we have
+                            v_map = str(v).encode()
+
+                        print('Publishing', t, v_map)
+                        _client.publish(t, v_map)
+    #        if _report_ip:
+    #            t = (_topic + "/ip").encode()
+    #            _client.publish(t, str(_wifi.config()[0]), retain=True)
+        except Exception as e:
+            print('Trouble publishing, re-init network.')
+            print(e)
+            _init_mqtt()
 
 
 #### Setup and execution
@@ -253,14 +262,13 @@ def run(updates=5, sleepms=1, poll_rate_inputs=4, poll_rate_network=10):
         if counter % poll_rate_network == 0:
             _poll_subscripton()
         if counter % poll_rate_inputs == 0:
-            change_happened = False
+            device_list = []
             for d in _devlist.values():
-                if d.update():
-                    change_happened = True
-            if change_happened:
-                _publish_status()
+                device_list.append(d)
+            if len(device_list)>0:
+                _publish_status(device_list)
         if updates != 0 and counter % (updates * 1000) == 0:
-            print("Publishing.")
+            print("Publishing update.")
             _publish_status()
 
         time.sleep_ms(sleepms)

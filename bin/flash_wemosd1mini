@@ -17,7 +17,7 @@ baudrate=115200
 
 pushd . &> /dev/null
 
-port=$("$dir/find_esp_port" "$1")
+port=$(find_esp_port "$1")
 tty="/dev/$port"
 echo "Port: $tty"
 
