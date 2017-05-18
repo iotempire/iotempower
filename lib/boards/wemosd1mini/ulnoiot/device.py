@@ -6,8 +6,10 @@
 
 class Device(object):
     def __init__(self, name, pin, value_map=None,
-                 settable=False, ignore_command_case=True):
+                 settable=False, ignore_command_case=True,
+                 on_change=None):
         global _topic
+        self.on_change=on_change
         self.topic = name
         self.name = name
         self.pin = pin
@@ -17,6 +19,9 @@ class Device(object):
             self.command_topic = self.topic + "/set"
             self.commands = {}
         self.value_map = value_map
+
+    def set_on_change(self,on_change):
+        self.on_change=on_change
 
     def is_settable(self):
         return self.command_topic is not None
@@ -48,9 +53,10 @@ class Device(object):
     def value(self):
         return None
 
-    def mapped_value(self):
-        v = self.value()
-        if v == None:
+    def mapped_value(self,v=None):
+        if v is None:
+            v = self.value()
+        if v is None:
             return None
         else:
             if isinstance( self.value_map,dict):
@@ -65,4 +71,8 @@ class Device(object):
         # returns True if the update caused a change in value
         oldval = self.value()
         self._update()
-        return oldval != self.value()
+        newval = self.value()
+        changed = oldval != newval
+        if changed and self.on_change is not None:
+            self.on_change(self)
+        return changed

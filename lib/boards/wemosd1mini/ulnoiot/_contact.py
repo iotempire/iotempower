@@ -10,13 +10,15 @@ class Contact(Device):
     # Handle contact or button like devices
     def __init__(self, name, pin, *args,
                  report_high="on", report_low="off",
-                 pullup=True, threshold=0):
+                 pullup=True, threshold=0, on_change=None):
         if len(args) > 0:
             report_high = args[0]
             if len(args) > 1:
                 report_low = args[1]
         Device.__init__(self, name, pin,
-                        value_map={True: report_high.encode(), False: report_low.encode()})
+                        value_map={True: report_high.encode(),
+                                   False: report_low.encode()},
+                        on_change = on_change )
         if pullup:
             pin.init(Pin.IN,Pin.PULL_UP)
         else:

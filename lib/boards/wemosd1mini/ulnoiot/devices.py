@@ -18,6 +18,7 @@ import ulnoiot._wifi as _wifi
 gc.collect()
 
 _devlist = {}
+_timestack = {}
 
 #### global MQTT variables
 _client_id = ubinascii.hexlify(machine.unique_id())  # make unique
@@ -34,7 +35,7 @@ MIN_PUBLISH_TIME_US = 2000 # posting every 2ms (2000us) allowed
 
 ####### simple Input, contact devices/push buttons
 def contact(name, pin, *args, report_high="on", report_low="off",
-            pullup=True,threshold=0):
+            pullup=True,threshold=0, on_change = None):
     if len(args) > 0:
         report_high = args[0]
         if len(args) > 1:
@@ -45,7 +46,8 @@ def contact(name, pin, *args, report_high="on", report_low="off",
                             report_high=report_high,
                             report_low=report_low,
                             pullup=pullup,
-                            threshold=threshold)
+                            threshold=threshold,
+                            on_change=on_change)
     gc.collect()
     return _devlist[name]
 button = contact
@@ -119,7 +121,15 @@ def display(name, sda, scl, ignore_case=False):
 
 ######## Devices End
 
-##### utils
+######## utils
+def do_later(time_delta_s,callback,id=None):
+    delta = int(time_delta_s*1000)
+    later = time.ticks_add(time.ticks_ms(),delta)
+    if id is None:
+        id = hash((hash(callback),later))
+    _timestack[id] = (later,callback)
+    return id
+
 def linecat(filename,frm=1,to=0):
     from ulnoiot import _line_edit
     _line_edit.linecat(filename,frm=frm,to=to)
@@ -130,8 +140,9 @@ def lineedit(filename,linenr,insert=False):
 
 def delete(name):
     _devlist.pop(name)
+######## end utils
 
-
+####### mqtt stuff
 def _publish_status(device_list=None,ignore_time=False):
     global _client,_last_publish
 
@@ -140,7 +151,7 @@ def _publish_status(device_list=None,ignore_time=False):
 
     current_time=time.ticks_us()
     if ignore_time or \
-            abs(_last_publish-current_time)>=MIN_PUBLISH_TIME_US:
+            time.ticks_diff(current_time,_last_publish)>=MIN_PUBLISH_TIME_US:
         _last_publish = current_time
         try:
             for d in device_list:
@@ -270,7 +281,14 @@ def run(updates=5, sleepms=1, poll_rate_inputs=4, poll_rate_network=10):
                 _publish_status(device_list)
         if updates != 0 and counter % (updates * 1000) == 0:
             print("Publishing full update.")
-            _publish_status()
+            _publish_status(ignore_time=True)
+        # execute things on timestack
+        now = time.ticks_ms()
+        for id in list(_timestack):
+            t,cb = _timestack[id]
+            if time.ticks_diff(now,t)>=0:
+                del(_timestack[id])
+                cb(id)
 
         time.sleep_ms(sleepms)
         counter += 1
