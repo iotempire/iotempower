@@ -54,34 +54,37 @@ button = contact
 input = contact
 
 ####### Analog input
-def analog(name, precision=1, threshold=None):
+def analog(name, precision=1, threshold=None, on_change = None):
     gc.collect()
     from ulnoiot._analog import Analog
-    _devlist[name] = Analog(name,precision,threshold)
+    _devlist[name] = Analog(name,precision,threshold,on_change=on_change)
     gc.collect()
     return _devlist[name]
 
 ####### simple Input, contact devices/push buttons
 def trigger(name, pin, rising=False, falling=False,
-            pullup=True):
+            pullup=True, on_change = None):
     gc.collect()
     from ulnoiot._trigger import Trigger
     _devlist[name] = Trigger(name, pin,
                             rising=rising, falling=falling,
-                            pullup=pullup)
+                            pullup=pullup, on_change=on_change)
     gc.collect()
     return _devlist[name]
 
 
 ####### simple LEDs, other Output (switches)
-def out(name, pin, *args, high_command='on', low_command='off', ignore_case=True):
+def out(name, pin, *args, high_command='on', low_command='off',
+        ignore_case=True, on_change = None):
     if len(args) > 0:
         high_command = args[0]
         if len(args) > 1:
             low_command = args[1]
     gc.collect()
     from ulnoiot._output import Output
-    _devlist[name] = Output(name, pin, high_command=high_command, low_command=low_command, ignore_case=ignore_case)
+    _devlist[name] = Output(name, pin, high_command=high_command,
+                            low_command=low_command, ignore_case=ignore_case,
+                            on_change=on_change)
     gc.collect()
     return _devlist[name]
 led = out
@@ -90,24 +93,24 @@ output = out
 
 ####### HT temperature/humidity with
 # TODO think about calibration
-def dht11(name, pin):
+def dht11(name, pin, on_change = None):
     gc.collect()
     from ulnoiot._ht import DHT11
-    _devlist[name] = DHT11(name, pin)
+    _devlist[name] = DHT11(name, pin, on_change=on_change)
     gc.collect()
     return _devlist[name]
 
-def dht22(name, pin):
+def dht22(name, pin, on_change = None):
     gc.collect()
     from ulnoiot._ht import DHT22
-    _devlist[name] = DHT22(name, pin)
+    _devlist[name] = DHT22(name, pin, on_change=on_change)
     gc.collect()
     return _devlist[name]
 
-def ds18x20(name, pin):
+def ds18x20(name, pin, on_change = None):
     gc.collect()
     from ulnoiot._ht import DS18X20
-    _devlist[name] = DS18X20(name, pin)
+    _devlist[name] = DS18X20(name, pin, on_change=on_change)
     gc.collect()
     return _devlist[name]
 

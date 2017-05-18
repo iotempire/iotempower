@@ -12,8 +12,8 @@ class _HTDHT(Device):
     delay = 1000
 
     # Handle humidity and temperature from dht devices
-    def __init__(self, name, pin, dht_dev, delay):
-        Device.__init__(self, name, pin)
+    def __init__(self, name, pin, dht_dev, delay, on_change=None):
+        Device.__init__(self, name, pin, on_change=on_change)
         self.delay = delay
         import dht
         self.dht = dht_dev
@@ -43,22 +43,24 @@ class _HTDHT(Device):
         self.time_controlled_measure()
 
 class DHT11(_HTDHT):
-    def __init__(self, name, pin):
+    def __init__(self, name, pin, on_change=None):
         import dht
-        _HTDHT.__init__(self, name, pin, dht.DHT11(pin), 1000)
+        _HTDHT.__init__(self, name, pin, dht.DHT11(pin), 1000,
+                        on_change=on_change)
 
 class DHT22(_HTDHT):
-    def __init__(self, name, pin):
+    def __init__(self, name, pin, on_change=None):
         # TODO: also handle an I2C object here
         import dht
-        _HTDHT.__init__(self, name, pin, dht.DHT22(pin), 2000)
+        _HTDHT.__init__(self, name, pin, dht.DHT22(pin), 2000,
+                        on_change=on_change)
 
 class DS18X20(Device):
     MEASURE_DELAY = 750
 
     # Handle humidity and temperature from dht devices
-    def __init__(self, name, pin):
-        Device.__init__(self, name, pin)
+    def __init__(self, name, pin, on_change=None):
+        Device.__init__(self, name, pin,on_change=on_change)
         import onewire, ds18x20
         self.ds = ds18x20.DS18X20(onewire.OneWire(pin))
         self.roms = self.ds.scan()

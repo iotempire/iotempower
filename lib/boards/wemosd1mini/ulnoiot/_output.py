@@ -10,14 +10,17 @@ from ulnoiot.device import Device
 ####### simple LEDs, other Output (switches)
 class Output(Device):
     # Handle output devices
-    def __init__(self, name, pin, *args, high_command='on', low_command='off', ignore_case=True):
+    def __init__(self, name, pin, *args, high_command='on', low_command='off',
+                 ignore_case=True, on_change=None):
         if len(args) > 0:
             high_command = args[0]
             if len(args) > 1:
                 low_command = args[1]
         Device.__init__(self, name, pin,
                         settable=True, ignore_command_case=ignore_case,
-                        value_map={1: high_command.encode(), 0: low_command.encode()})
+                        value_map={1: high_command.encode(),
+                                   0: low_command.encode()},
+                        on_change = on_change)
         pin.init(Pin.OUT)
         self.add_command(high_command, self.high)
         self.add_command(low_command, self.low)

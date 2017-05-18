@@ -12,8 +12,8 @@ class Trigger(Device):
     # Handle contact or button like devices, if both false-> rising
     def __init__(self, name, pin,
                  rising=False, falling=False,
-                 pullup=True):
-        Device.__init__(self, name, pin)
+                 pullup=True, on_change=None):
+        Device.__init__(self, name, pin, on_change=on_change)
         if pullup:
             pin.init(Pin.IN,Pin.PULL_UP)
         else:

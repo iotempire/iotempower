@@ -12,13 +12,13 @@ class Analog(Device):
     # Handle analog input devices
     OVERFLOW=1000000
     # Handle contact or button like devices, if both false-> rising
-    def __init__(self, name, precision=1, threshold=None):
+    def __init__(self, name, precision=1, threshold=None, on_change=None):
         self.precision=precision
         self.threshold = None
         if threshold is not None:
             self.threshold=max(1,min(threshold,1023))
         self.current_value=-10000
-        Device.__init__(self, name, ADC(0))
+        Device.__init__(self, name, ADC(0), on_change=on_change)
 
     def callback(self,p):
         self.triggered = True
