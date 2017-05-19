@@ -1,14 +1,40 @@
 from ulnoiot import *
+from ulnoiot.shield.onboardled import blue
+import time
+
+wsensor=None
+
+def test_turn_led(myid):
+    global wsensor
+
+    if myid=="blue_off":
+        myid="blue_off2"
+    else:
+        myid="blue_off"
+    if wsensor.value()==1:
+        do_later(2,test_turn_led,id=myid) # check again in 2s and keep led on
+    else:
+        blue.high()
+
+
+def light_up_blue(t):
+    if t.value() == 1:
+        blue.low()
+        do_later(2,test_turn_led,id="blue_off")
+
 
 def main():
-    mqtt("192.168.12.144", "pipe07/wsens01")
+    global wsensor
 
-    from ulnoiot.shield.onboardled import blue
-    blue.high() # make sure it's off
+    blue.low() # turn on to signal start
 
-    input("water",d2,"1","0",threshold=10)
+    mqtt("192.168.12.1", "pipe07/wsens01")
+    wsensor=analog("water",threshold=450, precision=10, on_change=light_up_blue)
 
-    ## start to transmit every 10 seconds (or when status changed)
-    run(10)
+    time.sleep(0.5)
+
+    blue.high() # turn off
+
+    run(60)
 
 main()
