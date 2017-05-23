@@ -4,9 +4,11 @@
 #
 
 import time
+import gc
 from ulnoiot.device import Device
 
 ####### HT temperature/humidity with
+# TODO think about calibration
 class _HTDHT(Device):
     # minimum ms between two reads
     delay = 1000
@@ -62,8 +64,9 @@ class DS18X20(Device):
 
     # Handle humidity and temperature from dht devices
     def __init__(self, name, pin, on_change=None):
-        Device.__init__(self, name, pin,on_change=on_change)
         import onewire, ds18x20
+        gc.collect()
+        Device.__init__(self, name, pin,on_change=on_change)
         self.ds = ds18x20.DS18X20(onewire.OneWire(pin))
         self.roms = self.ds.scan()
         self.lasttime = time.ticks_ms()

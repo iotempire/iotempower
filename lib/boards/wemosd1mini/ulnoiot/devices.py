@@ -33,103 +33,53 @@ _last_publish = 0
 #_ssl = False
 MIN_PUBLISH_TIME_US = 2000 # posting every 2ms (2000us) allowed
 
-####### simple Input, contact devices/push buttons
-def contact(name, pin, *args, report_high="on", report_low="off",
-            pullup=True,threshold=0, on_change = None):
-    if len(args) > 0:
-        report_high = args[0]
-        if len(args) > 1:
-            report_low = args[1]
+##### Devices
+def create_device(import_name,class_name,name,*args,**kwargs):
+    global _devlist
+
     gc.collect()
-    from ulnoiot._contact import Contact
-    _devlist[name] = Contact(name, pin,
-                            report_high=report_high,
-                            report_low=report_low,
-                            pullup=pullup,
-                            threshold=threshold,
-                            on_change=on_change)
+    x="from ulnoiot.{} import {}".format(import_name,class_name)
+    exec(x)
+    _Class=eval(class_name)
+    gc.collect()
+    _devlist[name]=_Class(name,*args,**kwargs)
     gc.collect()
     return _devlist[name]
+
+def contact(name,*args,**kwargs):
+    return create_device("_contact","Contact",name,*args,**kwargs)
 button = contact
 input = contact
 
-####### Analog input
-def analog(name, precision=1, threshold=None, on_change = None):
-    gc.collect()
-    from ulnoiot._analog import Analog
-    _devlist[name] = Analog(name,precision,threshold,on_change=on_change)
-    gc.collect()
-    return _devlist[name]
+def analog(name,*args,**kwargs):
+    return create_device("_analog","Analog",name,*args,**kwargs)
 
-####### simple Input, contact devices/push buttons
-def trigger(name, pin, rising=False, falling=False,
-            pullup=True, on_change = None):
-    gc.collect()
-    from ulnoiot._trigger import Trigger
-    _devlist[name] = Trigger(name, pin,
-                            rising=rising, falling=falling,
-                            pullup=pullup, on_change=on_change)
-    gc.collect()
-    return _devlist[name]
+def trigger(name,*args,**kwargs):
+    return create_device("_trigger","Trigger",name,*args,**kwargs)
 
-
-####### simple LEDs, other Output (switches)
-def out(name, pin, *args, high_command='on', low_command='off',
-        ignore_case=True, on_change = None):
-    if len(args) > 0:
-        high_command = args[0]
-        if len(args) > 1:
-            low_command = args[1]
-    gc.collect()
-    from ulnoiot._output import Output
-    _devlist[name] = Output(name, pin, high_command=high_command,
-                            low_command=low_command, ignore_case=ignore_case,
-                            on_change=on_change)
-    gc.collect()
-    return _devlist[name]
+def out(name,*args,**kwargs):
+    return create_device("_output","Output",name,*args,**kwargs)
 led = out
 switch = out
 output = out
 
-####### RGB leds + strips
-def rgb(name,pin,*args,ignore_case=True, on_change = None,rgb_order=(1, 2, 3)):
-    from ulnoiot._rgb import RGB
-    _devlist[name] = RGB(name, pin, *args, ignore_case=ignore_case,
-                            on_change=on_change,rgb_order=rgb_order)
-    gc.collect()
-    return _devlist[name]
+def rgb(name,*args,**kwargs):
+    return create_device("_rgb","RGB",name,*args,**kwargs)
 neopixel=rgb
 
 ####### HT temperature/humidity with
-# TODO think about calibration
-def dht11(name, pin, on_change = None):
-    gc.collect()
-    from ulnoiot._ht import DHT11
-    _devlist[name] = DHT11(name, pin, on_change=on_change)
-    gc.collect()
-    return _devlist[name]
+def dht11(name,*args,**kwargs):
+    return create_device("_ht","DHT11",name,*args,**kwargs)
 
-def dht22(name, pin, on_change = None):
-    gc.collect()
-    from ulnoiot._ht import DHT22
-    _devlist[name] = DHT22(name, pin, on_change=on_change)
-    gc.collect()
-    return _devlist[name]
+def dht22(name,*args,**kwargs):
+    return create_device("_ht","DHT22",name,*args,**kwargs)
 
-def ds18x20(name, pin, on_change = None):
-    gc.collect()
-    from ulnoiot._ht import DS18X20
-    _devlist[name] = DS18X20(name, pin, on_change=on_change)
-    gc.collect()
-    return _devlist[name]
+def ds18x20(name,*args,**kwargs):
+    return create_device("_ht","DS18X20",name,*args,**kwargs)
 
 ####### display
-def display(name, sda, scl, ignore_case=False):
-    gc.collect()
-    from ulnoiot._display import Display
-    _devlist[name] = Display(name, sda, scl, ignore_case=ignore_case)
-    gc.collect()
-    return _devlist[name]
+def display(name,*args,**kwargs):
+    return create_device("_display","Display",name,*args,**kwargs)
 
 ######## Devices End
 

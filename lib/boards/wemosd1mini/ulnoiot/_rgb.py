@@ -32,7 +32,7 @@ class RGB(Device):
         else: # more given -> should be other pins
             from machine import PWM
             pin = (PWM(pin),PWM(args[0]),PWM(args[1]))
-        Device.__init__(self, name, pin, *args,
+        Device.__init__(self, name, pin,
                         setters={"brightness/set":self._set_brightness,
                                  "rgb/set":self._set_rgb,
                                  "set":self._set,
