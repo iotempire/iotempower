@@ -28,7 +28,7 @@ def main():
 
     blue.low() # turn on to signal start
 
-    mqtt("192.168.12.1", "pipe07/wsens01")
+    mqtt("192.168.43.1", "pipe07/wsens01")
     wsensor=analog("water",threshold=450, precision=10, on_change=light_up_blue)
 
     time.sleep(0.5)

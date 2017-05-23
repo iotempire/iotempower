@@ -30,8 +30,8 @@ class Display(Device):
             print("lcd not found")
         else:
             self.present = True
-            Device.__init__(self, name, i2c, settable=True, ignore_command_case=ignore_case)
-            self.set_command( self.evaluate )
+            Device.__init__(self, name, i2c, setters={"set":self.evaluate()},
+                            ignore_command_case=ignore_case)
 
     def fill(self,c):
         self.dp.fill(c)

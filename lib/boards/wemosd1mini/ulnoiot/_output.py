@@ -16,14 +16,18 @@ class Output(Device):
             high_command = args[0]
             if len(args) > 1:
                 low_command = args[1]
+        self.high_command=high_command
+        self.low_command=low_command
         Device.__init__(self, name, pin,
-                        settable=True, ignore_command_case=ignore_case,
-                        value_map={1: high_command.encode(),
-                                   0: low_command.encode()},
+                        setters={"set":self.evaluate}, ignore_command_case=ignore_case,
                         on_change = on_change)
         pin.init(Pin.OUT)
-        self.add_command(high_command, self.high)
-        self.add_command(low_command, self.low)
+
+    def evaluate(self,msg):
+        if msg==self.high_command:
+            self.high()
+        elif msg == self.low_command:
+            self.low()
 
     def high(self):
         self.pin.high()

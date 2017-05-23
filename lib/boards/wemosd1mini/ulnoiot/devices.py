@@ -91,6 +91,15 @@ led = out
 switch = out
 output = out
 
+####### RGB leds + strips
+def rgb(name,pin,*args,ignore_case=True, on_change = None,rgb_order=(1, 2, 3)):
+    from ulnoiot._rgb import RGB
+    _devlist[name] = RGB(name, pin, *args, ignore_case=ignore_case,
+                            on_change=on_change,rgb_order=rgb_order)
+    gc.collect()
+    return _devlist[name]
+neopixel=rgb
+
 ####### HT temperature/humidity with
 # TODO think about calibration
 def dht11(name, pin, on_change = None):
@@ -160,22 +169,15 @@ def _publish_status(device_list=None,ignore_time=False):
             for d in device_list:
                 v = d.value()
                 if v is not None:
-                    t = (_topic + "/" + d.topic).encode()
-                    if isinstance(v, dict): # several values to publish
-                        print('Publishing', t, v)
-                        for k in v:
-                            t_extra = t + b"/" + k.encode()
-                            _client.publish(t_extra, str(v[k]).encode())
-                    else:
-                        v_map = d.mapped_value()  # try to map
-                        if v_map is None:  # not mappable, try to send what we have
-                            v_map = str(v).encode()
-
-                        print('Publishing', t, v_map)
-                        _client.publish(t, v_map)
-    #        if _report_ip:
-    #            t = (_topic + "/ip").encode()
-    #            _client.publish(t, str(_wifi.config()[0]), retain=True)
+                    rt = (_topic + "/" + d.name).encode()
+                    for s in d.getters:
+                        if s=="":
+                            t=rt
+                        else:
+                            t=rt+"/"+s.encode()
+                        my_value = d.getters[s]()
+                        print('Publishing', t, my_value)
+                        _client.publish(t, str(my_value).encode())
         except Exception as e:
             print('Trouble publishing, re-init network.')
             print(e)
@@ -214,14 +216,20 @@ def mqtt(broker_host, topic, *args, user=None, password=None,
 
 
 def _subscription_cb(topic, msg):
+    global _topic
+
     topic = topic.decode();
     msg = msg.decode();
     for d in _devlist.values():
-        if d.command_topic is not None:
-            t = _topic + "/" + d.command_topic
+        root_topic = _topic + "/" + d.name
+        for st in d.setters:
+            if st == "":
+                t = root_topic
+            else:
+                t = root_topic + "/" + st
             if topic == t:
                 print("Received \"%s\" for topic %s"%(msg, topic))
-                d.command(msg)
+                d.run_setter(st,msg)
 
 
 def _init_mqtt():

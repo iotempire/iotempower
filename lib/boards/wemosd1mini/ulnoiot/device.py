@@ -6,49 +6,55 @@
 
 class Device(object):
     def __init__(self, name, pin, value_map=None,
-                 settable=False, ignore_command_case=True,
-                 on_change=None):
+                setters={}, getters={},
+                ignore_case=True, on_change=None):
         global _topic
-        self.on_change=on_change
-        self.topic = name
+        self.on_change = on_change
         self.name = name
         self.pin = pin
-        self.command_topic = None
-        self.ignore_case = ignore_command_case
-        if settable:
-            self.command_topic = self.topic + "/set"
-            self.commands = {}
+        self.ignore_case = ignore_case
+        self.setters = setters
+        self.getters = getters
+        if len(getters) == 0:
+            getters[''] = self.mapped_value # add default getter for main topic
         self.value_map = value_map
 
     def set_on_change(self,on_change):
         self.on_change=on_change
 
     def is_settable(self):
-        return self.command_topic is not None
+        return len(self.setters) > 0
 
-    def set_command(self, callback):
-        # this adds one generic command for all incoming commands
-        self.commands = callback
+    def add_setter(self, setter_name, callback):
+        if self.ignore_case: setter_name = setter_name.lower()
+        self.commands[setter_name] = callback
 
-    def add_command(self, command_name, callback):
-        if self.ignore_case: command_name = command_name.lower()
-        self.commands[command_name] = callback
+    def delete_setter(self, setter_name):
+        if self.ignore_case: setter_name = setter_name.lower()
+        self.commands.pop(setter_name)
 
-    def delete_command(self, command_name):
-        if self.ignore_case: command_name = command_name.lower()
-        self.commands.pop(command_name)
-
-    def command(self, command_str):
+    def run_setter(self, setter, command_str):
         if self.ignore_case:
             command_str = command_str.lower()
-        if isinstance( self.commands, dict ):
-            command_run = self.commands.get(command_str)
-            if command_run is not None:
-                command_run()
-            else:
-                print("Device %s cannot run command %s." % (self.name, command_str))
-        else: # processes message itself
-            self.commands(command_str)
+            setter = setter.lower()
+        if setter in self.setters:
+            self.setters[setter](command_str)
+        # else ignore
+
+    def add_getter(self, getter_name, callback):
+        if self.ignore_case: getter_name = getter_name.lower()
+        self.commands[getter_name] = callback
+
+    def delete_getter(self, getter_name):
+        if self.ignore_case: getter_name = getter_name.lower()
+        self.commands.pop(getter_name)
+
+    def run_getter(self, getter):
+        if self.ignore_case:
+            getter = getter.lower()
+        if getter in self.getters:
+            return self.getters[getter]()
+        return None # else ignore
 
     def value(self):
         return None
@@ -65,7 +71,8 @@ class Device(object):
                 return None
 
     def _update(self):
-        pass  # usually does nothing, can be overrriden to actualy update values, called by update
+        pass  # usually does nothing, can be overwritten
+        # to actualy update values, called by update
 
     def update(self):
         # returns True if the update caused a change in value
