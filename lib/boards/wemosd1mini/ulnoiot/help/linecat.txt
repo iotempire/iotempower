@@ -9,5 +9,5 @@ cat(filename)
 Example:
 >>> linecat("/ulnoiot/help/linecat.txt",frm=3,to=4)
 3 Show contents of file and precede all lines with line numbers.
-4 If frm or to are specified, only list respective part of file.
+4 If from or to are specified, only list respective part of file.
 >>>
