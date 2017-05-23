@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # load a list of hash-filename entries and compare with local files
 # to generate an upload list
 #

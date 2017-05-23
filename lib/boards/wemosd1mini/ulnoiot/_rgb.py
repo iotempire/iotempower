@@ -36,7 +36,7 @@ class RGB(Device):
                         setters={"brightness/set":self._set_brightness,
                                  "rgb/set":self._set_rgb,
                                  "set":self._set,
-                                 "animation":self.set},
+                                 "animation":self._set_animation},
                         getters={"":self.get_status,
                                  "brightness/status":self.get_brightness,
                                  "rgb/status":self.get_rgb},
@@ -131,6 +131,9 @@ class RGB(Device):
         b=int(msg)
         self.set(b,b,b)
         self.last_rgb = self.current_rgb
+
+    def _set_animation(self,msg):
+        pass
 
     def get_status(self):
         if self.is_on:
