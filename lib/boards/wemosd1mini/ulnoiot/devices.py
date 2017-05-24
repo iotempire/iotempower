@@ -65,7 +65,10 @@ output = out
 
 def rgb(name,*args,**kwargs):
     return create_device("_rgb","RGB",name,*args,**kwargs)
-neopixel=rgb
+
+def rgb_multi(name,*args,**kwargs):
+    return create_device("_rgb_multi","RGB_Multi",name,*args,**kwargs)
+neopixel=rgb_multi
 
 ####### HT temperature/humidity with
 def dht11(name,*args,**kwargs):
