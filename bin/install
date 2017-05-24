@@ -79,6 +79,10 @@ else
     # accesspoint
     git clone https://github.com/oblique/create_ap "$ULNOIOT_EXTERNAL/create_ap"
     #cd "$ULNOIOT_EXTERNAL/create_ap"
+    # pyminifier
+    git clone https://github.com/liftoff/pyminifier "$ULNOIOT_EXTERNAL/pyminifier"
+    cd "$ULNOIOT_EXTERNAL/pyminifier"
+    python setup.py install
     # download firmware
     mkdir -p "$ULNOIOT_EXTERNAL/firmware"
     cd "$ULNOIOT_EXTERNAL/firmware"

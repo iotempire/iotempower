@@ -6,147 +6,154 @@
 #
 
 import gc
-import time
-from machine import Pin
 from ulnoiot.device import Device
 from ulnoiot import colors as _c
 gc.collect()
 
-####### RGB leds or led strips
 class RGB(Device):
+    def get_status(sf):
+        if sf.is_on: return 'on'
+        else: return 'off'
 
-    # Handle output devices
-    def __init__(self, name, pin, *args,
-                 ignore_case=True, on_change=None, rgb_order=(1, 2, 3)):
-        self.ws_leds=0
-        self.is_on=False
-        self.last_rgb=_c.white
-        self.current_rgb=_c.black
-        self.rgb_order=rgb_order
+    def get_rgb(sf,led_num=None):
+        if led_num is None or sf.ws_leds<=0:
+            return sf.current_rgb
+        else:
+            if[led_num<=0]: led_num=1
+            return sf.pin[led_num]
+    # can't return brightness cause of mem overflow
+
+    def __init__(sf, name, pin, *args,
+                 ignore_case=True, on_change=None, rgb_order=(1,2,3)):
+        sf.ws_leds=0
+        sf.is_on=False
+        sf.last_rgb=_c.white
+        sf.current_rgb=_c.black
+        sf.rgb_order=rgb_order
+        sf.ani = None
         if len(args) <= 1: # either one rgb led or a number based on ws2812b
-            self.ws_leds=1
+            sf.ws_leds=1
             if len(args)==1:
-                self.ws_leds=args[0]
+                sf.ws_leds=args[0]
             import neopixel
-            pin=neopixel.NeoPixel(pin,self.ws_leds)
-        else: # more given -> should be other pins
+            gc.collect()
+            pin=neopixel.NeoPixel(pin,sf.ws_leds)
+        else: # more -> other pins
             from machine import PWM
+            gc.collect()
             pin = (PWM(pin),PWM(args[0]),PWM(args[1]))
-        Device.__init__(self, name, pin,
-                        setters={"brightness/set":self._set_brightness,
-                                 "rgb/set":self._set_rgb,
-                                 "set":self._set,
-                                 "animation":self._set_animation},
-                        getters={"":self.get_status,
-                                 "brightness/status":self.get_brightness,
-                                 "rgb/status":self.get_rgb},
+        b="brightness"; r="rgb"; s="set"; st="/status"
+        Device.__init__(sf, name, pin,
+                        setters={b+"/"+s:sf._set_brightness,
+                                 r+"/"+s:sf._set_rgb,
+                                 s:sf._set,
+                                 "animation":sf.animation},
+                        getters={"":sf.get_status,
+                                 b+st:(lambda x:x.brightness),
+                                 r+st:sf.get_rgb},
                         ignore_case=ignore_case,
                         on_change = on_change)
+        sf.set(*_c.black) # off
 
-        self.set(*_c.black) # make sure it's off
+    def _write_rgb(sf):
+        if sf.ws_leds > 0:
+            sf.pin.write()
+        else:
+            (r,g,b)=sf.current_rgb
+            pr,pg,pb = sf.pin
+            m=1023/255
+            pr.duty(int(r*m))
+            pg.duty(int(g*m))
+            pb.duty(int(b*m))
 
-    def set(self,r,g,b,led_num=None):
+    def set(sf,r,g,b,led_num=None,no_write=False):
         rgb=(r,g,b)
-        r=rgb[self.rgb_order[0] - 1]
-        g=rgb[self.rgb_order[1] - 1]
-        b=rgb[self.rgb_order[2] - 1]
-        if self.ws_leds > 0:  # this is a programmable strip
+        r=rgb[sf.rgb_order[0] - 1]
+        g=rgb[sf.rgb_order[1] - 1]
+        b=rgb[sf.rgb_order[2] - 1]
+        if sf.ws_leds > 0:  # programmable strip
             if led_num is None:
-                for led in range(self.ws_leds):
-                    self.pin[led] = (r,g,b)
-                self.current_rgb = (r,g,b)
-                self.brightness = int((r+g+b)/3)
+                for led in range(sf.ws_leds):
+                    sf.pin[led] = (r,g,b)
+                sf.current_rgb = (r,g,b)
+                sf.brightness = int((r+g+b)/3)
             else:
                 if led_num<=0: led_num=1
-                self.pin[led_num-1] = (r,g,b)
+                sf.pin[led_num-1] = (r,g,b)
                 # recompute average
                 ar,ag,ab = _c.black
                 brightness=0
-                for r,g,b in self.pin:
+                for r,g,b in sf.pin:
                     ar+=r
                     ag+=g
                     ab+=b
                     brightness+=r+g+b
-                self.current_rgb = (int(ar/self.ws_leds),
-                                    int(ag/self.ws_leds),
-                                    int(ab/self.ws_leds))
-                self.brightness = int(brightness/self.ws_leds/3)
-            self.pin.write() # TODO: consider moving this to update
+                sf.current_rgb = (int(ar/sf.ws_leds),
+                                    int(ag/sf.ws_leds),
+                                    int(ab/sf.ws_leds))
+                sf.brightness = int(brightness/sf.ws_leds/3)
         else:
-            pr,pg,pb = self.pin
-            pr.duty(int(r*1023/255))
-            pg.duty(int(g*1023/255))
-            pb.duty(int(b*1023/255))
-            self.current_rgb=(r,g,b)
-            self.brightness = int((r + g + b) / 3)
+            sf.current_rgb=(r,g,b)
+            sf.brightness = int((r + g + b) / 3)
+        if not no_write:
+            sf._write_rgb() # TODO: to update?
 
-    def _set(self,msg):
+    def _set(sf,msg):
         rgb=None
         if msg == "on":
-            if not self.is_on:
-                if self.last_rgb==_c.black:
-                    self.last_rgb=_c.white
-                rgb=self.last_rgb
-            else: # go to full brightness
+            if not sf.is_on:
+                if sf.last_rgb==_c.black:
+                    sf.last_rgb=_c.white
+                rgb=sf.last_rgb
+            else: # full brightness
                 rgb=_c.white
-            self.is_on = True
+            sf.is_on = True
         elif msg == "off":
-            if self.is_on:
-                self.last_rgb = self.current_rgb
+            if sf.is_on:
+                sf.last_rgb = sf.current_rgb
             rgb=_c.black
-            self.is_on = False
+            sf.is_on = False
         if rgb is not None:
-            self.set(*rgb)
+            sf.set(*rgb)
 
-    def _split(self,s):
-        args=[]
+    def _split(sf,s):
+        a=[]
         for vs in s.split(','):
-            args.extend(vs.split())
-        return args
+            a.extend(vs.split())
+        return a
 
-    def get_color(self,s):
-        if s in _c.clist:
-            return _c.clist[s]
-        # it might be given in hex
-        if len(s)==6:
-            r=int("0x"+s[0:2])
-            g=int("0x"+s[2:4])
-            b=int("0x"+s[4:6])
-            return(r,g,b)
-        return None
+    def _set_rgb_list(sf,a,no_write=False):
+        if len(a) == 3: # r,g,b
+            sf.set(int(a[0]), int(a[1]), int(a[2]), no_write=no_write)
+        elif len(a) == 4: # num,r,g,b
+            sf.set(int(a[1]), int(a[2]), int(a[3]),
+                     led_num=int(a[0]), no_write=no_write)
+        elif len(a) == 1: # color (or hex)
+            sf.set(*_c.get(a[0]), no_write=no_write)
+        elif len(a) == 2: # color (or hex)
+            sf.set(*_c.get(a[1]), led_num=int(a[0]),
+                     no_write = no_write)
+        sf.last_rgb = sf.current_rgb
 
-    def _set_rgb(self,msg):
-        args = self._split(msg)
-        if len(args) == 3: # r,g,b
-            self.set(int(args[0]),int(args[1]),int(args[2]))
-        elif len(args) == 4: # num,r,g,b
-            self.set(int(args[1]),int(args[2]),int(args[3]),led_num=int(args[0]))
-        elif len(args) == 1: # color (or hex)
-            self.set(*self.get_color(args[0]))
-        elif len(args) == 2: # color (or hex)
-            self.set(*self.get_color(args[1]),led_num=int(args[1]))
-        self.last_rgb = self.current_rgb
+    def _set_rgb(sf,msg,no_write=False):
+        sf.ani.stop()
+        sf._set_rgb_list(sf._split(msg),no_write=no_write)
 
-    def _set_brightness(self,msg):
+    def _set_brightness(sf,msg):
+        sf.ani.stop()
         b=int(msg)
-        self.set(b,b,b)
-        self.last_rgb = self.current_rgb
+        sf.set(b,b,b)
+        sf.last_rgb = sf.current_rgb
 
-    def _set_animation(self,msg):
-        pass
+    def _update(sf):
+        if sf.ani is not None:
+            sf.ani.next()
 
-    def get_status(self):
-        if self.is_on:
-            return 'on'
-        else:
-            return 'off'
+    def animation(sf,msg):
+        gc.collect()
+        from ulnoiot._rgb_animator import Animation
+        gc.collect()
+        sf.ani=Animation(msg)
 
-    def get_brightness(self):
-        return self.brightness
-
-    def get_rgb(self):
-        return self.current_rgb
-
-    def value(self):
-        return "{},{},{}".format(self.get_status(),
-                                 self.get_brightness(),self.get_rgb())
+    def value(sf):
+        return (sf.get_status(),sf.brightness,sf.get_rgb())

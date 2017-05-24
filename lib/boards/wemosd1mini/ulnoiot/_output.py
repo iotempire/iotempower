@@ -19,7 +19,7 @@ class Output(Device):
         self.high_command=high_command
         self.low_command=low_command
         Device.__init__(self, name, pin,
-                        setters={"set":self.evaluate}, ignore_command_case=ignore_case,
+                        setters={"set":self.evaluate}, ignore_case=ignore_case,
                         on_change = on_change)
         pin.init(Pin.OUT)
 

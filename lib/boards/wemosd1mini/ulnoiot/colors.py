@@ -19,3 +19,11 @@ clist = {
     "white": white
 }
 
+
+def get(s):
+    if s in clist:
+        return clist[s]
+    # it might be given in hex
+    if len(s) == 6:
+        return (int("0x" + s[0:2]), int("0x" + s[2:4]), int("0x" + s[4:6]))
+    return None
