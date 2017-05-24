@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ANIMATION=\
+ANIMATION="\
 s 1 black \
 s 2 black \
 f 1 red \
@@ -10,6 +10,6 @@ f 1 black \
 p 500 \
 f 2 black \
 p 1000 \
-r
+r"
 
 ulnoiot mqtt_send owl01/eyes/animation "$ANIMATION"
