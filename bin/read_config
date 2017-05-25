@@ -29,7 +29,9 @@ ULNOIOT_AP_NAME="iotempire"
 ULNOIOT_AP_PASSWORD="internetofthings"
 ULNOIOT_AP_CHANNEL=9
 ULNOIOT_AP_IP="192.168.12.1"
+ULNOIOT_AP_HIDDEN=no
 ULNOIOT_MQTT_HOST="$ULNOIOT_AP_IP"
+
 
 if [ -e "$ULNOIOT_ROOT/etc/ulnoiot.conf" ]; then
     source "$ULNOIOT_ROOT/etc/ulnoiot.conf"
@@ -45,6 +47,7 @@ export ULNOIOT_AP_NAME
 export ULNOIOT_AP_PASSWORD
 export ULNOIOT_AP_CHANNEL
 export ULNOIOT_AP_IP
+export ULNOIOT_AP_HIDDEN
 
 # activate the virtual python environment
 source "$ULNOIOT_VPYTHON/bin/activate" &> /dev/null
