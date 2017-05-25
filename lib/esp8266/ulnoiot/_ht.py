@@ -14,10 +14,12 @@ class _HTDHT(Device):
     delay = 1000
 
     # Handle humidity and temperature from dht devices
-    def __init__(self, name, pin, dht_dev, delay, on_change=None):
+    def __init__(self, name, pin, dht_dev, delay,
+                 on_change=None,report_change=True):
         Device.__init__(self, name, pin, on_change=on_change,
                         getters={"temperature":self.temperature(),
-                                 "humidity":self.humidity()})
+                                 "humidity":self.humidity()},
+                        report_change=report_change)
         self.delay = delay
         import dht
         self.dht = dht_dev

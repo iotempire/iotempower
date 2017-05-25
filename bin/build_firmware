@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+# download, if necessary micropython firmware and buidl everything
+#
+# if called as build_firmware clean, it will delete content of ULNOIOT_EXTERNAL/firmware
+#
+# Author: ulno
+# Create date: 2017-05-17
+#
+
+# TODO: test for build-essential gperf bison flex texinfo help2man libtool-bin?
+# might also: sudo apt-get install make unrar-free autoconf automake libtool gcc g++ gperf \
+#    flex bison texinfo gawk ncurses-dev libexpat-dev python-dev python python-serial \
+#    sed git unzip bash help2man wget bzip2
+
+[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+
+ULNOIOT_FIRMWARE="$ULNOIOT_EXTERNAL/firmware"
+
+if [[ "$1" == clean ]]; then
+  echo "Deleting external cache."
+  echo
+  rm -rf "$ULNOIOT_FIRMWARE"
+fi
+
+mkdir -p "$ULNOIOT_FIRMWARE"
+
+# check if firmware tools are downloaded
+if [[ -e "$ULNOIOT_FIRMWARE/micropython/README.md" ]]; then # check for existing venv
+    echo "Firmware tools found."
+else
+    echo "Firmware tools not found. Download them? (Y/n)"
+    read answer
+    if [[ ${answer,,} == "y" || ${answer,,} == "" ]]; then
+        if [[ $(which git) == "" ]]; then
+            echo "You need to install git. Exiting."
+            exit 1
+        fi
+    else
+        echo "Can't continue, exiting now."
+        exit 1
+    fi
+    cd "$ULNOIOT_FIRMWARE"
+    echo
+    echo "Downloading esp-open-sdk."
+    git clone --recursive https://github.com/pfalcon/esp-open-sdk
+    echo
+    echo "Downloading micropython."
+    git clone https://github.com/micropython/micropython
+    echo
+    echo "Downloading micropython-lib."
+    git clone https://github.com/micropython/micropython-lib
+fi
+
+# build everything.
+echo
+echo "Trying to build everything to create the ulnoiot micropython firmware for you."
+# the next things dosn't work with python3, so let's trick them
+cd "$ULNOIOT_FIRMWARE"
+mkdir -p bin
+cat << EOF > bin/python
+#!$(which bash)
+exec python2 "\$@"
+EOF
+chmod a+x bin/python
+alias python=python2
+
+export PATH="$ULNOIOT_FIRMWARE/bin:$PATH"
+
+echo
+echo "First, open-sdk. This might take really long."
+cd "$ULNOIOT_FIRMWARE/esp-open-sdk"
+make || { echo "Trouble making esp-open-sdk, aborting.";exit 1; }
+
+echo
+echo "Second, link code to freeze."
+cd "$ULNOIOT_FIRMWARE/micropython/esp8266/modules"
+# remove old stuff
+mkdir -p ../modules.bak
+mv upip* ../modules.bak
+mv ntptime* ../modules.bak
+rm -rf ulnoiot umqtt ssd1306
+# relink new stuff
+ln -s ../../../micropython-lib/umqtt.simple/umqtt .
+ln -s $ULNOIOT_ROOT/lib/esp8266/ulnoiot .
+
+echo
+echo "Third, build firmware."
+cd ../..
+git submodule update --init
+cd esp8266
+export "PATH=$ULNOIOT_FIRMWARE/esp-open-sdk/xtensa-lx106-elf/bin:$PATH"
+make axtls && make || { echo "Something went wrong, check errors.";exit 1; }
+echo "Done building firmware successfully."
+echo "Copying firmware to flash position."
+cp "$ULNOIOT_FIRMWARE/micropython/esp8266/build/firmware-combined.bin" \
+    "$ULNOIOT_FIRMWARE"
+
+unalias python
+
+exit 0

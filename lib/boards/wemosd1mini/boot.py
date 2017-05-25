@@ -3,6 +3,8 @@
 #esp.osdebug(None)
 import gc
 import webrepl
+import esp
+esp.osdebug(None)
 
 webrepl.start()
 gc.collect()

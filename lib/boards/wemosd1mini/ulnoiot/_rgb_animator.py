@@ -8,10 +8,11 @@ import time
 from ulnoiot import colors as _c
 
 class Animation():
-    def __init__(self,device,command_list):
+    def __init__(self, device, command_str):
+        self.program=command_str.split()
         self.device=device
         self.playing = True
-        self.program = self.split()
+        self.program = command_str.split()
         self.step = 0
         self.fade_goals = {}
         self.length = 0
@@ -48,33 +49,39 @@ class Animation():
                 args.append(self.program[self.step])
                 self.step += 1
             if cmd=="s": # set
-                self.device._set_rgb_list(args)
+                self.device._command_list_rgb(args)
             elif cmd=="f": # fade goal
-                led_num=int(args[0])
-                self.fade_goals[int(args[0])] = \
-                    (self.device.get_rgb(led_num=led_num), \
+                led_num=int(args[0])-1
+                if led_num<=0: led_num=0
+                self.fade_goals[led_num] = \
+                    (self.device.get(led_num=led_num), \
                      _c.get(args[1]))
+                print("fade goal",led_num,self.fade_goals[led_num])
             elif cmd=="p":
                 self.length =  int(args[0])
                 self.starttime = current_time
             elif cmd=="r":
                 self.step = 0
                 break # even if this loses a bit of time, we want to prevent endless loops
+
         if self.length > 0: # play animation
             delta = time.ticks_diff(current_time, self.starttime)
-            progress = delta / self.length
+            progress = min(1.0,delta/self.length)
             changed=False
             for i in self.fade_goals:
                 ((fr,fg,fb),(tr,tg,tb)) = self.fade_goals[i]
-                (cr,cg,cb) =  self.device.get_rgb(led_num=i)
-                if self.length <= delta :
-                    (nr, ng, nb) = (tr,tg,tb)
+                (cr,cg,cb) = self.device.get(led_num=i)
+                if self.length <= delta:
+                    (nr,ng,nb) = (tr,tg,tb)
+                    self.length=0 # signal finished of this animation
+                    del(self.fade_goals[i]) # clear them
                 else:
-                    nr = tr-(fr-tr)*progress
-                    ng = tg-(fg-tg)*progress
-                    nb = tb-(fb-tb)*progress
+                    nr = int(fr+(tr-fr)*progress)
+                    #debug print("i",i,"new r",nr,"from r",fr,"to r",tr,"progress",progress)
+                    ng = int(fg+(tg-fg)*progress)
+                    nb = int(fb+(tb-fb)*progress)
                 if (cr,cg,cb) != (nr,ng,nb):
-                    self.device._set_rgb(nr,ng,nb,no_write=True)
+                    self.device._set(nr,ng,nb,i)
                     changed=True
             if changed:
-                self.device._write_rgb()
+                self.device._write()

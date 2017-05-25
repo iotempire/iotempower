@@ -5,9 +5,9 @@
 #
 
 board_name="Wemos D1 mini"
-flash_size=32 # wemos d1 mini 32m-bit=4m-byte flash http://www.wemos.cc/Products/d1_mini.html
-#flash_size=16 # olimex
-#flash_size=8 # sonoff flash is only 1m-byte
+flash_size=4 # wemos d1 mini 32m-bit=4m-byte flash http://www.wemos.cc/Products/d1_mini.html
+#flash_size=2 # olimex
+#flash_size=1 # sonoff flash is only 1m-byte
 # 115200 seems safer and prevents problems with lesser quality ttl converters
 baudrate=115200
 #baudrate=230400
@@ -23,7 +23,8 @@ echo "Port: $tty"
 
 # find firmware
 cd "$ULNOIOT_EXTERNAL/firmware"
-firmware="$(ls esp*.bin|sort|tail -n1)"
+#firmware="$(ls esp*.bin|sort|tail -n1)"
+firmware="firmware-combined.bin"
 echo "Firmware: $firmware"
 
 echo Performing erase flash.
@@ -31,11 +32,11 @@ esptool --port "$tty" erase_flash
 sleep 1
 echo Performing firmware flash.
 esptool \
-    --after soft_reset \
+    --after hard_reset \
     --port "$tty" \
     --baud "$baudrate" \
-    write_flash --flash_size="$flash_size"m --verify \
-    0 "$firmware"
+    write_flash --flash_size="$flash_size"MB --verify \
+        0 "$firmware"
 
 sleep 1
 echo "Do hardreset via mpfshell..."

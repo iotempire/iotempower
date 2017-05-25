@@ -18,20 +18,16 @@ def connect():
     _ap.active(False)
     _wlan.active(True)
 
-    nets = _wlan.scan()
-    for net in nets:
-        ssid = net[0].decode()
-        if ssid == wifi_config.name:
-            print('Wifi: network %s found.' % ssid)
-            _wlan.connect(ssid, wifi_config.password)
-            tries=15
-            for i in range(tries):
-                print("%d/%d. Trying to connect." %(i+1, tries))
-                machine.idle()
-                time.sleep(1)
+    # removed scan of networks to allow conenct to hidden
+    # Try to connect
+    _wlan.connect(wifi_config.name, wifi_config.password)
+    tries=15
+    for i in range(tries):
+        print("%d/%d. Trying to connect." %(i+1, tries))
+        machine.idle()
+        time.sleep(1)
 #                if _wlan.isconnected(): break
-                if _wlan.status() == network.STAT_GOT_IP: break
-            break
+        if _wlan.status() == network.STAT_GOT_IP: break
 
     if _wlan.isconnected() and _wlan.status() == network.STAT_GOT_IP:
         print('Wifi: connection succeeded!')
@@ -69,13 +65,13 @@ class SCAN:
         if not state:
             _wlan.active(True)
         nets = _wlan.scan()
-        l=""
-        for n in nets:
-            l=l+n[0].decode()+" %ddB\n"%n[3]
         _wlan.active(state)
-        return l
+        return nets
     def __call__(self):
-        return self.__repr__()
+        l=""
+        for n in self.__repr__():
+            l=l+n[0].decode()+" %ddB\n"%n[3]
+        return l
 scan = SCAN()
 
 class WIP:

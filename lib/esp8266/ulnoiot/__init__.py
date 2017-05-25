@@ -18,26 +18,16 @@ a0=machine.ADC(0)
 
 from . import _wifi
 wifi=_wifi.setup
-wscan = _wifi.scan
-wip = _wifi.wip
+wifi_connect=_wifi.connect
+wscan=_wifi.scan
+wip=_wifi.wip
 
 # convenient reset
 def reset():
     machine.reset()
 reboot=reset
 
-from upysh import ls,rm,cd,clear,pwd,mkdir,head,cat,mv,rmdir,newfile
-# overwrite man
-
-# copy helper
-def cp(from_file,to_file):
-    print("Copying %s to %s."%(from_file,to_file))
-    ff=open(from_file,"rb")
-    tf=open(to_file,"wb")
-    tf.write(ff.read())
-    tf.close()
-    ff.close()
-copy=cp
+from ulnoiot.ulnoupysh import ls,rm,cd,clear,pwd,mkdir,head,cat,mv,rmdir,newfile,cp,copy
 
 gc.collect()
 from ulnoiot.devices import *

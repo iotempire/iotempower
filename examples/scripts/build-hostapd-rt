@@ -1,0 +1,37 @@
+# creating an folder to work in
+mkdir hostapd-comp
+cd hostapd-comp
+
+# getting the source from hosted 2.4 (not the latest but works with Noobs 1.8.0)
+wget https://w1.fi/releases/hostapd-2.4.tar.gz
+tar zxvf hostapd-2.4.tar.gz
+cd hostapd-2.4
+
+# getting the source for the patch to allow WiFi chips such as RT8188C and RT8192C, who are recognized as RTL8188CUS
+wget https://github.com/pritambaral/hostapd-rtl871xdrv/archive/hostapd_2_4.zip
+unzip hostapd_2_4.zip
+
+# now we patch the original source
+patch -Np1 -i hostapd-rtl871xdrv-hostapd_2_4/rtlxdrv.patch
+cp hostapd-rtl871xdrv-hostapd_2_4/driver_rt* src/drivers/
+cp hostapd-rtl871xdrv-hostapd_2_4/.config hostapd/.config
+
+cd hostapd
+# the following may take a while and hopefully will not terminate
+make
+
+# Checking if it could be compiled and shows the patch
+# it should show a line containing ”hostapd v2.4 for Realtek rtl871xdrv”
+./hostapd -v
+
+# moving the original hostapd files out of the way and saving them as a backup
+sudo mv /usr/sbin/hostapd /usr/sbin/hostapd.bak
+sudo mv /usr/sbin/hostapd_cli /usr/sbin/hostapd_cli.bak
+
+# putting the new hostapd files in place
+sudo cp hostapd /usr/sbin/hostapd
+sudo cp hostapd_cli /usr/sbin/hostapd_cli
+
+# now cleaning up again (deleting all the stuff that we downloaded and extracted)
+cd ..
+sudo rm -R hostapd-comp

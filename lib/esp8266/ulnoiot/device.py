@@ -7,7 +7,8 @@
 class Device(object):
     def __init__(self, name, pin, value_map=None,
                 setters={}, getters={},
-                ignore_case=True, on_change=None):
+                ignore_case=True, on_change=None,
+                report_change=True):
         global _topic
         self.on_change = on_change
         self.name = name
@@ -15,6 +16,7 @@ class Device(object):
         self.ignore_case = ignore_case
         self.setters = setters
         self.getters = getters
+        self.report_change=report_change
         if len(getters) == 0:
             getters[''] = self.mapped_value # add default getter for main topic
         self.value_map = value_map
@@ -82,4 +84,6 @@ class Device(object):
         changed = oldval != newval
         if changed and self.on_change is not None:
             self.on_change(self)
-        return changed
+        if self.report_change:
+            return changed
+        return False

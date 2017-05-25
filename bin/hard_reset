@@ -8,5 +8,5 @@
 
 port=$(find_esp_port "$1")
 
-mpfshell -n -c "open tty$port" --reset
+mpfshell -n -c "open $port" --reset
 

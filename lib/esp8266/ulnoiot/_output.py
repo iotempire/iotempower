@@ -11,7 +11,7 @@ from ulnoiot.device import Device
 class Output(Device):
     # Handle output devices
     def __init__(self, name, pin, *args, high_command='on', low_command='off',
-                 ignore_case=True, on_change=None):
+                 ignore_case=True, on_change=None,report_change=False):
         if len(args) > 0:
             high_command = args[0]
             if len(args) > 1:
@@ -20,7 +20,7 @@ class Output(Device):
         self.low_command=low_command
         Device.__init__(self, name, pin,
                         setters={"set":self.evaluate}, ignore_case=ignore_case,
-                        on_change = on_change)
+                        on_change = on_change,report_change=report_change)
         pin.init(Pin.OUT)
 
     def evaluate(self,msg):
