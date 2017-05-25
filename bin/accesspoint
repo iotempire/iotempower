@@ -33,6 +33,11 @@ PASSWORD="$ULNOIOT_AP_PASSWORD"
 CHANNEL="$ULNOIOT_AP_CHANNEL"
 IP="$ULNOIOT_AP_IP"
 
+HIDDEN=""
+if [ "$ULNOIOT_AP_HIDDEN" = "yes" ]; then
+    HIDDEN="--hidden"
+fi
+
 while true; do
     echo "Stopping all existing services."
     sudo pkill create_ap
@@ -42,7 +47,7 @@ while true; do
         --who "accesspoint" \
         --why "accesspoint will fail if sleep happens" \
         "$ULNOIOT_EXTERNAL/create_ap/create_ap" \
-        -c "$CHANNEL" \
+        -c "$CHANNEL" $HIDDEN \
         -g "$IP" \
         "$OUTPUT_WIFI" "$INPUT_DEVICE" "$AP_NAME" "$PASSWORD"
     sleep 2 # let ap start up

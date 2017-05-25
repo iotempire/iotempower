@@ -10,6 +10,8 @@ ULNOIOT_AP_NAME="iotempire"
 ULNOIOT_AP_PASSWORD="internetofthings"
 # Channel to tun on
 ULNOIOT_AP_CHANNEL=9
+# Hide the essid when this is yes
+ULNOIOT_AP_HIDDEN=no
 # IP to pick
 ULNOIOT_AP_IP="192.168.12.1"
 
