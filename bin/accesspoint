@@ -3,10 +3,6 @@
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
-APTEMP="$ULNOIOT_LOCAL/tmp/mosquitto"
-rm -rf "$APTEMP" &> /dev/null
-mkdir -p "$APTEMP"
-
 # find input network device
 INPUT_DEVICE=$(ip route ls|grep default|head -n1|cut -d\  -f5)
 if [ ! "$INPUT_DEVICE" ]; then
@@ -49,6 +45,11 @@ IP="$ULNOIOT_AP_IP"
 HIDDEN=""
 if [ "$ULNOIOT_AP_HIDDEN" = "yes" ]; then
     HIDDEN="--hidden"
+fi
+
+if [ "$1" = "show" ]; then
+    echo "ACCESSPOINT_NAME=$AP_NAME"
+    exit 0
 fi
 
 while true; do
