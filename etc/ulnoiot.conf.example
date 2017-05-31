@@ -1,17 +1,29 @@
 # Configuration options to be sourced by shells and available
 # in environment
 
-# potential devices for wifi sharing (if not defined, will be all)
-#ULNOIOT_AP_DEVICES="wlxf8d1110c9230 wlxe84e0619a4f8"
+# potential devices for wifi sharing (if not defined, will be all
+# deveices startign with wl)
+#ULNOIOT_AP_DEVICES="wlan0 wlan1"
 
 # Name of accesspoint to create
 ULNOIOT_AP_NAME="iotempire"
+
+# if set to yes, add unique ID from MAC-address as extension to name
+ULNOIOT_AP_ADDID=no
+
 # Its pw
 ULNOIOT_AP_PASSWORD="internetofthings"
-# Channel to tun on
-ULNOIOT_AP_CHANNEL=9
+
+# Channel to run on (set to actual number)
+# if set to random, will pick one of 2 3 4 5 7 8 9 10
+# ULNOIOT_AP_CHANNEL=9
+ULNOIOT_AP_CHANNEL=random
+
 # Hide the essid when this is yes
+# Attention, this has no effect on lots of chipsets
+# it does works with the built-in wifi of the reaspbeery pi.
 ULNOIOT_AP_HIDDEN=no
+
 # IP to pick
 ULNOIOT_AP_IP="192.168.12.1"
 
@@ -19,7 +31,9 @@ ULNOIOT_AP_IP="192.168.12.1"
 ULNOIOT_MQTT_HOST="$ULNOIOT_AP_IP"
 
 # Data to configure an mqtt bridge
-ULNOIOT_MQTT_BRIDGE_HOST="ulno.net"
-ULNOIOT_MQTT_BRIDGE_PORT="18883"
-ULNOIOT_MQTT_BRIDGE_CERTPATH="/etc/ssl/certs"
-
+#ULNOIOT_MQTT_BRIDGE_HOST="ulno.net"
+#ULNOIOT_MQTT_BRIDGE_PORT="8883"
+#ULNOIOT_MQTT_BRIDGE_CERTPATH="/etc/ssl/certs"
+#ULNOIOT_MQTT_BRIDGE_TOPIC="bridged"
+#ULNOIOT_MQTT_BRIDGE_USER="bridgeuser"
+#ULNOIOT_MQTT_BRIDGE_PW="secretpw"

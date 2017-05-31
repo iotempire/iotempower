@@ -13,14 +13,34 @@ cat << EOF > "$APTEMP/mosquitto.conf"
 pid_file $APTEMP/pid
 persistence false
 persistence_location $APTEMP/mosquitto.db
-log_dest none
-#log_type none
+log_dest stdout
+log_type error
+log_type warning
 bind_address 127.0.0.1
 listener 1883 $ULNOIOT_MQTT_HOST
 EOF
 
-# TODO: add bridge
+# create bridge
+if [ "$ULNOIOT_MQTT_BRIDGE_HOST" ]; then
 
+# brideg config based on example in http://owntracks.org/booklet/guide/bridge/
+cat << EOF >> "$APTEMP/mosquitto.conf"
+connection bridge-to-$ULNOIOT_MQTT_BRIDGE_HOST
+bridge_capath $ULNOIOT_MQTT_BRIDGE_CERTPATH
+bridge_insecure false
+address $ULNOIOT_MQTT_BRIDGE_HOST:$ULNOIOT_MQTT_BRIDGE_PORT
+cleansession false
+clientid bridge-$HOSTNAME-$ULNOIOT_MQTT_BRIDGE_HOST
+start_type automatic
+username $ULNOIOT_MQTT_BRIDGE_USER
+password $ULNOIOT_MQTT_BRIDGE_PW
+notifications false
+try_private true
+topic $ULNOIOT_MQTT_BRIDGE_TOPIC in 2 ${ULNOIOT_MQTT_BRIDGE_TOPIC}/ ${ULNOIOT_MQTT_BRIDGE_TOPIC}/
+topic $ULNOIOT_MQTT_BRIDGE_TOPIC out 2 ${ULNOIOT_MQTT_BRIDGE_TOPIC}/ ${ULNOIOT_MQTT_BRIDGE_TOPIC}/
+EOF
+
+fi # bridge-config
 
 while true; do
     echo "Stopping all existing services."
