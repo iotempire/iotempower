@@ -1,0 +1,14 @@
+#!/bin/bash
+# Get accesspoint-name
+
+[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+
+AP_NAME="$ULNOIOT_AP_NAME"
+if [ "$ULNOIOT_AP_ADDID" = "yes" ]; then
+    # add prefix to essid based on network adapater for unique class setup
+    OUTPUT_MAC=$(ip link show "$OUTPUT_WIFI"|tail -n1|\
+            cut -d\  -f6|sed s/://g|cut -b7-)
+    AP_NAME="${AP_NAME}-$OUTPUT_MAC"
+fi
+
+echo "$AP_NAME"

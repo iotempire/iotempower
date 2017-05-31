@@ -88,27 +88,9 @@ else
     cd "$ULNOIOT_EXTERNAL/firmware"
     "$ULNOIOT_ROOT/bin/download_firmware"
     popd  &> /dev/null
-    #### create the fixed binary directory
-    MYBIN="$ULNOIOT_LOCAL/bin"
-    mkdir -p "$MYBIN"
-    # create the fixed runner
-    SBRUN="$MYBIN/shebang_run"
-    rm "$SBRUN" &> /dev/null
-    echo "#!$(which bash)" > "$SBRUN"
-    tail -n+2 "$ULNOIOT_ROOT/bin/shebang_run" >> "$SBRUN"
-    chmod a+x "$SBRUN"
-    # create representative links for all files from the bin drectory
-    find "$ULNOIOT_ROOT/bin" -print0 | while read -d $'\0' file; do
-        b=$(basename "$file")
-        # if executable and not the shebang_run itself
-        if [ "$b" != "shebang_run" \
-                -a "$b" != "ulnoiot" \
-                -a -x "$file" ]; then
-            dest="$MYBIN/$b"
-            rm "$dest" &> /dev/null
-            ln -s "shebang_run" "$dest"
-        fi
-    done
+
+    bash "$ULNOIOT_ROOT/bin/fix_bin"
+
 
 fi
 

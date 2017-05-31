@@ -4,4 +4,4 @@
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
-exec "$ULNOIOT_LOCAL/bin/getip"
+exec "$ULNOIOT_LOCAL/bin/get_ip"

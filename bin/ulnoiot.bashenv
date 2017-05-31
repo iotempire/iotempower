@@ -5,10 +5,14 @@ source "$ULNOIOT_ROOT/bin/read_config" \
 
 PSGREEN="\[$(tput setaf 2)\]"
 PSLBLUE="\[$(tput setaf 14)\]"
+PSWHITE="\[$(tput setaf 15)\]"
 PSBLACK="\[$(tput setaf 16)\]"
 PSDRED="\[$(tput setaf 88)\]"
 
-PS1="\[\033[01;32m\]\u${PSDRED}#${PSBLACK}ul${PSDRED}no${PSBLACK}iot${PSDRED}:\[\033[01;34m\]"
+PSWHITEBG="\[$(tput setab 15)\]"
+
+
+PS1="\[\033[01;32m\]\u@\h${PSWHITEBG}${PSDRED}#${PSBLACK}ul${PSDRED}no${PSBLACK}iot${PSDRED}:\e[0m\[\033[01;34m\]"
 PS1="$PS1\$(pwd|cut -b$(( ${#ULNOIOT_ROOT} + 2 ))-)\[\033[00m\]\$ "
 
 # if you type cd you go to ulnoiot-root
