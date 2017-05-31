@@ -35,19 +35,19 @@ function check_root() {
     if [ -e "$ULNOIOT_ROOT/bin/ulnoiot.bashenv" ]; then
         cd "$ULNOIOT_ROOT"
     fi
-    echo -n "Checking now that we are in the ulnoiot root directory. "
+    #echo -n "Checking now that we are in the ulnoiot root directory. "
     check_files "bin/ulnoiot.bashenv" \
         "bin/shebang_run" \
         "etc/ulnoiot.conf.example"
     if [ $? -ne 0 ]; then
-        echo "No."
+        #echo "No."
         echo
         echo "Make sure you run or source this from the ulnoiot root directory."
         echo "Stopping now."
         return 1
     fi
 
-    echo "Yes."
+    #echo "Yes."
     echo
     return 0
 }

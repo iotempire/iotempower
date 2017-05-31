@@ -1,6 +1,11 @@
 #!/bin/bash
+
 #URL="http://micropython.org/resources/firmware/esp8266-ota-20170524-v1.8.7-783-g1c9ee497.bin"
 URL="https://github.com/ulno/ulnoiot/releases/download/0.1/firmware-combined.bin"
+
+[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+
+cd "$ULNOIOT_EXTERNAL/firmware"
 curl -L -o firmware-combined.bin "$URL"
 # TODO: deal with LoPy (pycomupdatr)
 

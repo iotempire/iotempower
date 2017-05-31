@@ -86,7 +86,7 @@ else
     # download firmware
     mkdir -p "$ULNOIOT_EXTERNAL/firmware"
     cd "$ULNOIOT_EXTERNAL/firmware"
-    "$ULNOIOT_ROOT/bin/download_allfirmware_here"
+    "$ULNOIOT_ROOT/bin/download_firmware"
     popd  &> /dev/null
     #### create the fixed binary directory
     MYBIN="$ULNOIOT_LOCAL/bin"
