@@ -23,7 +23,7 @@ EOF
 # create bridge
 if [ "$ULNOIOT_MQTT_BRIDGE_HOST" ]; then
 
-# brideg config based on example in http://owntracks.org/booklet/guide/bridge/
+# bridge config based on example in http://owntracks.org/booklet/guide/bridge/
 cat << EOF >> "$APTEMP/mosquitto.conf"
 connection bridge-to-$ULNOIOT_MQTT_BRIDGE_HOST
 bridge_capath $ULNOIOT_MQTT_BRIDGE_CERTPATH

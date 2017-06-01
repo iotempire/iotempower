@@ -18,7 +18,7 @@ class Device(object):
         self.getters = getters
         self.report_change=report_change
         if len(getters) == 0:
-            getters[''] = self.mapped_value # add default getter for main topic
+            self.getters[''] = self.mapped_value # add default getter for main topic
         self.value_map = value_map
 
     def set_on_change(self,on_change):
@@ -63,7 +63,7 @@ class Device(object):
 
     def mapped_value(self,v=None):
         if v is None:
-            v = self.value()
+            return self.value()
         if v is None:
             return None
         else:

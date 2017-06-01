@@ -59,7 +59,7 @@ def remove():
     delete()
 
 class SCAN:
-    def __repr__(self):
+    def __call__(self):
         global _wlan
         state = _wlan.active()
         if not state:
@@ -67,9 +67,9 @@ class SCAN:
         nets = _wlan.scan()
         _wlan.active(state)
         return nets
-    def __call__(self):
+    def __repr__(self):
         l=""
-        for n in self.__repr__():
+        for n in self.__call__():
             l=l+n[0].decode()+" %ddB\n"%n[3]
         return l
 scan = SCAN()
