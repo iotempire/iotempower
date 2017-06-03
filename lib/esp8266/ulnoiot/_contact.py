@@ -11,14 +11,14 @@ class Contact(Device):
     def __init__(self, name, pin, *args,
                  report_high="on", report_low="off",
                  pullup=True, threshold=0,
-                 on_change=None, report_change=False):
+                 on_change=None, report_change=True):
         if len(args) > 0:
             report_high = args[0]
             if len(args) > 1:
                 report_low = args[1]
         Device.__init__(self, name, pin,
-                        value_map={True: report_high.encode(),
-                                   False: report_low.encode()},
+                        value_map={True: report_high,
+                                   False: report_low},
                         on_change = on_change,
                         report_change=report_change)
         if pullup:

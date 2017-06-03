@@ -63,7 +63,7 @@ class Device(object):
 
     def mapped_value(self,v=None):
         if v is None:
-            return self.value()
+            v=self.value()
         if v is None:
             return None
         else:

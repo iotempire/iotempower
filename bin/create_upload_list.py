@@ -20,6 +20,7 @@ def main(argv):
         hashs[l[41:]] = l[0:40]
     output=open(argv[2],"wb")
     output.write(("open %s\n"%argv[0]).encode())
+    output.write(b"cd /\n")
     output.write(b"md /ulnoiot\n")
     output.write(b"md /ulnoiot/help\n")
     output.write(b"md /ulnoiot/shield\n")
