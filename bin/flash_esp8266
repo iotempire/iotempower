@@ -4,10 +4,13 @@
 # $1 can give a tty port as destination parameter (for example: USB0)
 #
 
-board_name="Wemos D1 mini"
-flash_size=4 # wemos d1 mini 32m-bit=4m-byte flash http://www.wemos.cc/Products/d1_mini.html
+#board_name="Wemos D1 mini"
+board_name="Generic ESP8266"
+# flash size should be autodetectedin modern esptool
+#flash_size=4 # wemos d1 mini 32m-bit=4m-byte flash http://www.wemos.cc/Products/d1_mini.html
 #flash_size=2 # olimex
 #flash_size=1 # sonoff flash is only 1m-byte
+
 # 115200 seems safer and prevents problems with lesser quality ttl converters
 baudrate=115200
 #baudrate=230400
@@ -35,8 +38,9 @@ esptool \
     --after hard_reset \
     --port "$tty" \
     --baud "$baudrate" \
-    write_flash --flash_size="$flash_size"MB --verify \
+    write_flash --verify \
         0 "$firmware"
+# --flash_size="$flash_size"MB <- should now be autodetected
 
 sleep 1
 echo "Do hardreset via mpfshell..."
