@@ -42,11 +42,16 @@ esptool \
         0 "$firmware"
 # --flash_size="$flash_size"MB <- should now be autodetected
 
+# Bring board in known state to allow direct deploy
 sleep 1
 echo "Do hardreset via mpfshell..."
 mpfshell -c "open $port" -n --reset
 sleep 4
-echo "Reset should be done now."
+echo "Hard-reset should be done now."
+sleep 2
+echo "Doing soft-reset."
+board_reset "$1" "$2"
+echo "Soft reset shoudl be done now."
 
 popd &> /dev/null
 
