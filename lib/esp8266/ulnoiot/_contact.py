@@ -39,8 +39,8 @@ class Contact(Device):
         # Needs to be read in a polling scenario on a regular basis (very frequent)
         if self.pin() == 1:
             self.debouncer += 1
-            if self.debouncer > self.threshold * 2:
-                self.debouncer = self.threshold * 2
+            if self.debouncer > self.threshold * 2 - 1:
+                self.debouncer = self.threshold * 2 - 1
         else:
             self.debouncer -= 1
             if self.debouncer < 0:

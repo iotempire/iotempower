@@ -20,20 +20,21 @@ class Output(Device):
         self.low_command=low_command
         Device.__init__(self, name, pin,
                         setters={"set":self.evaluate}, ignore_case=ignore_case,
-                        on_change = on_change,report_change=report_change)
+                        on_change = on_change,report_change=report_change,
+                        value_map={1:self.high_command,0:self.low_command})
         pin.init(Pin.OUT)
 
     def evaluate(self,msg):
         if msg==self.high_command:
-            self.high()
+            self.on()
         elif msg == self.low_command:
-            self.low()
+            self.off()
 
     def high(self):
-        self.pin.high()
+        self.pin.on()
 
     def low(self):
-        self.pin.low()
+        self.pin.off()
 
     on = high
     off = low

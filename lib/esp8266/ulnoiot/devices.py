@@ -63,6 +63,12 @@ led = out
 switch = out
 output = out
 
+def servo(name,*args,**kwargs):
+    return create_device("_servo","Servo",name,*args,**kwargs)
+
+def servo_switch(name,*args,**kwargs):
+    return create_device("_servo_switch","Servo_Switch",name,*args,**kwargs)
+
 def rgb(name,*args,**kwargs):
     return create_device("_rgb","RGB",name,*args,**kwargs)
 

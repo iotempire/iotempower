@@ -6,19 +6,24 @@
 
 class Device(object):
     def __init__(self, name, pin, value_map=None,
-                setters={}, getters={},
+                setters=None, getters=None,
                 ignore_case=True, on_change=None,
                 report_change=True):
         global _topic
         self.on_change = on_change
+        self.report_change = report_change
         self.name = name
         self.pin = pin
         self.ignore_case = ignore_case
-        self.setters = setters
-        self.getters = getters
-        self.report_change=report_change
-        if len(getters) == 0:
-            self.getters[''] = self.mapped_value # add default getter for main topic
+        # using these in defaults and with len comparison does not work
+        if setters is None:
+            self.setters = {}
+        else:
+            self.setters = setters
+        if getters is None:
+            self.getters = {"": self.mapped_value} # add default getter for main topic
+        else:
+            self.getters = getters
         self.value_map = value_map
 
     def set_on_change(self,on_change):
