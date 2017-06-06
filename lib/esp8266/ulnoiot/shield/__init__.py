@@ -1,3 +1,3 @@
-from ulnoiot import *
+#from ulnoiot import *
 
-help("shield")
+#help("shield")

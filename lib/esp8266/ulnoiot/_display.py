@@ -13,7 +13,7 @@ class Display(Device):
     CHAR_HEIGHT = 64 // 8
 
     # Handle display
-    def __init__(self, name, sda, scl, ignore_case=False):
+    def __init__(self, name, sda=None, scl=None, ignore_case=False):
         self.present = False
         self._y = 0
         self._x = 0
@@ -30,8 +30,8 @@ class Display(Device):
             print("lcd not found")
         else:
             self.present = True
-            Device.__init__(self, name, i2c, setters={"set":self.evaluate()},
-                            ignore_command_case=ignore_case,report_change=False)
+            Device.__init__(self, name, i2c, setters={"set":self.evaluate},
+                            ignore_case=ignore_case,report_change=False)
 
     def fill(self,c):
         self.dp.fill(c)

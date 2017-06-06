@@ -78,10 +78,11 @@ cd "$ULNOIOT_FIRMWARE/micropython/esp8266/modules"
 mkdir -p ../modules.bak
 mv upip* ../modules.bak
 mv ntptime* ../modules.bak
-rm -rf ulnoiot umqtt ssd1306
+rm -rf ulnoiot umqtt ssd1306.py
 # relink new stuff
 ln -s ../../../micropython-lib/umqtt.simple/umqtt .
 ln -s $ULNOIOT_ROOT/lib/esp8266/ulnoiot .
+ln -s ../../drivers/display/ssd1306.py .
 
 echo
 echo "Third, build firmware."
