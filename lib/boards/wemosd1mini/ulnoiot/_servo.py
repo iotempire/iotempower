@@ -20,7 +20,7 @@ class Servo(Device):
         self.us = 0
         self.freq = freq
         self.angle = angle
-        self.degree=None
+        self.angle_list=None
         self.turn_time_ms=turn_time_ms
         self.turn_start=None
         Device.__init__(self, name, PWM(pin, freq=self.freq, duty=0),
@@ -31,10 +31,17 @@ class Servo(Device):
     def _init(self):
         self.pin.init()
 
-    def turn(self,msg):
-        self.degree=int(msg) # TODO: accept floats?
+    def _trigger_next_turn(self):
         self.turn_start=time.ticks_ms()
-        self.write_angle(self.degree) # TODO: write only in first update?
+        self.write_angle(self.angle_list[0])
+        del self.angle_list[0]
+
+    def turn(self,msg):
+        if type(msg) is str:
+            self.angle_list=[int(msg)] # TODO: accept floats?
+        else: # should be a list
+            self.angle_list = msg
+        self._trigger_next_turn()
 
     def write_us(self, us):
         """Set the signal to be ``us`` microseconds long. Zero disables it."""
@@ -55,11 +62,14 @@ class Servo(Device):
         if self.turn_start is not None: # turn in process
             current=time.ticks_ms()
             if time.ticks_diff(current, self.turn_start) >= self.turn_time_ms:
-                self._release()
+                if len(self.angle_list) > 0:
+                    self._trigger_next_turn()
+                else:
+                    self._release()
 
     def _release(self):
         self.turn_start = None
         self.pin.deinit()
 
     def value(self):
-        return self.degree
+        return self.angle_list
