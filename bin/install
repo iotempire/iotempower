@@ -77,7 +77,7 @@ else
     cd "$ULNOIOT_EXTERNAL/mpfshell.git"
     python setup.py install
     # accesspoint
-    git clone https://github.com/oblique/create_ap "$ULNOIOT_EXTERNAL/create_ap"
+    git clone https://github.com/ulno/create_ap "$ULNOIOT_EXTERNAL/create_ap"
     #cd "$ULNOIOT_EXTERNAL/create_ap"
     # pyminifier
     git clone https://github.com/liftoff/pyminifier "$ULNOIOT_EXTERNAL/pyminifier"
