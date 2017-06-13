@@ -42,6 +42,8 @@ else
     cd "$ULNOIOT_FIRMWARE"
     echo
     echo "Downloading esp-open-sdk."
+    # TODO:make sure olderversion of cosstool-NG is downloaded (pre-June)
+    # new one is broken
     git clone --recursive https://github.com/pfalcon/esp-open-sdk
     echo
     echo "Downloading micropython."

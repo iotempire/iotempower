@@ -32,6 +32,7 @@ class Display(Device):
             self.present = True
             Device.__init__(self, name, i2c, setters={"set":self.evaluate},
                             ignore_case=ignore_case,report_change=False)
+            self.getters[""]=self.value
 
     def fill(self,c):
         self.dp.fill(c)
@@ -114,6 +115,11 @@ class Display(Device):
         print("Received text in callback:", msg)
         if msg == "&&clear":
             self.clear()
+        if msg.startswith("&&plot"):
+            msg=msg[6:].strip().split()
+            for i in range(0,len(msg),2):
+                self.pixel(msg[i],msg[i+1],1)
+            self.show()
         else:
             self.println( msg )
             self.last_text = msg

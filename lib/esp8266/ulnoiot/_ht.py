@@ -16,15 +16,15 @@ class _HTDHT(Device):
     # Handle humidity and temperature from dht devices
     def __init__(self, name, pin, dht_dev, delay,
                  on_change=None,report_change=True):
-        Device.__init__(self, name, pin, on_change=on_change,
-                        getters={"temperature":self.temperature(),
-                                 "humidity":self.humidity()},
-                        report_change=report_change)
         self.delay = delay
         import dht
         self.dht = dht_dev
         self.lasttime = time.ticks_ms()
         self.dht.measure()
+        Device.__init__(self, name, pin, on_change=on_change,
+                        getters={"temperature":self.temperature,
+                                 "humidity":self.humidity},
+                        report_change=report_change)
 
     def time_controlled_measure(self):
         newtime = time.ticks_ms()
