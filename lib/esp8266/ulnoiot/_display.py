@@ -115,10 +115,10 @@ class Display(Device):
         print("Received text in callback:", msg)
         if msg == "&&clear":
             self.clear()
-        if msg.startswith("&&plot"):
+        elif msg.startswith("&&plot"):
             msg=msg[6:].strip().split()
             for i in range(0,len(msg),2):
-                self.pixel(msg[i],msg[i+1],1)
+                self.pixel(int(msg[i]),int(msg[i+1]),1)
             self.show()
         else:
             self.println( msg )
