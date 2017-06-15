@@ -37,5 +37,6 @@
         </SOURCES>
       </library>
     </orderEntry>
+    <orderEntry type="library" name="mqtt-client-java1.4-uber-1.7" level="project" />
   </component>
 </module>
