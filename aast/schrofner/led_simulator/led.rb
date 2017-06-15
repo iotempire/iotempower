@@ -10,7 +10,7 @@ color = "red" #last set color
 
 input_array = ARGV
 
-def color_window(window_color)
+def color_window(color)
   system('clear') 
   term_width = `/usr/bin/env tput cols`.to_i
   term_height = `/usr/bin/env tput lines`.to_i
@@ -23,12 +23,22 @@ def color_window(window_color)
     fill_string = fill_string + "\n"
   end
 
-  puts Paint[fill_string, window_color, window_color]
+  puts Paint[fill_string, color, color]
+end
+
+def publish_status(connection, topic, status, color)
+  publish_status_key = topic + "/status"
+  publish_color_key = topic + "/color"
+  connection.publish(publish_status_key, status == 1 ? "on" : "off")
+  connection.publish(publish_color_key, color)
 end
 
 if input_array.length == 2
   color_window(color)
   MQTT::Client.connect(input_array[0]) do |c|
+
+    publish_status(c, input_array[1], status, color)
+
     c.subscribe(input_array[1])
     c.subscribe(input_array[1] + control_key)
 
@@ -49,7 +59,7 @@ if input_array.length == 2
           color_window("black")
         end
       end
-
+      publish_status(c, input_array[1], status, color)
     end
   end
 else
