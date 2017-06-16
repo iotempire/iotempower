@@ -8,7 +8,7 @@ import sys
 import os
 from hashlib import sha1
 
-onlycreate=["webrepl_cfg.py","user.py"]
+onlycreate=["webrepl_cfg.py","user.py","my_devices.py"]
 
 def main(argv):
     if len(argv)<3:
