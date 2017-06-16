@@ -117,7 +117,8 @@ public class Window extends JFrame implements ChangeListener, ActionListener {
                 if (connection.isConnected()) {
                     System.out.println("Temp: " + currentTemp);
                     try {
-                        connection.publish("tempserver/temperature", String.valueOf(currentTemp).getBytes(), QoS.AT_LEAST_ONCE, false);
+                        // connection.publish("lock/relay/set")
+                        connection.publish("tempserver/relay/set", String.valueOf(currentTemp).getBytes(), QoS.AT_LEAST_ONCE, false);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
