@@ -9,17 +9,18 @@ from ulnoiot.device import Device
 ####### simple Input, contact devices/push buttons
 class Trigger(Device):
     OVERFLOW=1000000
+
+    def value(self):
+        return self.report_counter
+
     # Handle contact or button like devices, if both false-> rising
     def __init__(self, name, pin,
                  rising=False, falling=False,
                  pullup=True, on_change=None, report_change=True):
-        Device.__init__(self, name, pin, on_change=on_change,
-                        report_change=report_change)
         if pullup:
             pin.init(Pin.IN,Pin.PULL_UP)
         else:
             pin.init(Pin.IN,Pin.OPEN_DRAIN)
-        trigger = None
         if rising and falling:
             trigger=Pin.IRQ_RISING|Pin.IRQ_FALLING
         elif not rising and falling:
@@ -30,15 +31,15 @@ class Trigger(Device):
         self.counter = 0
         self.report_counter = 0
         self.triggered = False
+        Device.__init__(self, name, pin, on_change=on_change,
+                        report_change=report_change)
+        self.getters[""] = self.value
 
     def callback(self,p):
         self.triggered = True
         self.counter += 1
         if self.counter >= Trigger.OVERFLOW:
             self.counter = 0
-
-    def value(self):
-        return self.report_counter
 
     def _update(self):
         if self.triggered:

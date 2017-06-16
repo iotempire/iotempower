@@ -90,6 +90,8 @@ def ds18x20(name,*args,**kwargs):
 def display(name,*args,**kwargs):
     return create_device("_display","Display",name,*args,**kwargs)
 
+import ulnoiot.new_devices # allow adding new devices
+
 ######## Devices End
 
 ######## utils
