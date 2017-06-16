@@ -5,11 +5,13 @@
 #
 # $1 can be a usb0-usb9 or acm0-acm9 as suggestion
 # $2 can be a webrepl password
-port=ttyUSB0
+default_port=ttyUSB0
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
-if [[ "$1" = ws* || "$1" = tty* ]]; then # already found, no conversion necessary
+if [[ "$1" = "" ]]; then # no port given
+  port="$default_port"
+elif [[ "$1" = ws* || "$1" = tty* ]]; then # already found, no conversion necessary
   port="$1"
 elif [[ "$1" =~ ^[Uu][Ss][Bb][0-9]$ ]]; then
   port=ttyUSB${1:3:1}
@@ -18,6 +20,7 @@ elif [[ "$1" =~ ^[Aa][Cc][Mm][0-9]$ ]]; then
 elif ping -c 2 -i 0.5 "$1" -W 2 &> /dev/null; then
   port="ws:$1,$2"
 else
+    port="$default_port"
     # as no port is given, try to find one locally
     for p in USB0 USB1 USB2 USB3 USB4 USB5 USB6 USB7 USB8 USB9 \
              ACM0 ACM1 ACM2 ACM3 ACM4 ACM5 ACM6 ACM7 ACM8 ACM9; do
