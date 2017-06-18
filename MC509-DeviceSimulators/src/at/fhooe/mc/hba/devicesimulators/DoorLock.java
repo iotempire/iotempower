@@ -23,7 +23,6 @@ public class DoorLock implements MqttCallback {
 	private static final int WAIT_SECONDS = 5;
 
 	public static void main(String[] args) {
-
 		if (instance == null) {
 			instance = new DoorLock();
 		}
