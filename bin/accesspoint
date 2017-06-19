@@ -81,7 +81,7 @@ while true; do
     if [[ "$ULNOIOT_AP_BRIDGE" ]]; then
         # fix ip address
         sudo ifconfig "$OUTPUT_WIFI" 0.0.0.0
-        sudo ifconfig "$ULNOIOT_AP_BRIDGE" "$IP"
+        sudo ifconfig br0 "$IP"
     fi
     wait $ap_id
 done
