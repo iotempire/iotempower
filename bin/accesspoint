@@ -43,13 +43,18 @@ fi
 IP="$ULNOIOT_AP_IP"
 
 HIDDEN=""
-if [ "$ULNOIOT_AP_HIDDEN" = "yes" ]; then
+if [[ "$ULNOIOT_AP_HIDDEN" = "yes" ]]; then
     HIDDEN="--hidden"
 fi
 
-if [ "$1" = "show" ]; then
+if [[ "$1" = "show" ]]; then
     echo "ACCESSPOINT_NAME=$AP_NAME"
     exit 0
+fi
+
+HOSTAPD_EXTRA=""
+if [[ "$ULNOIOT_AP_BRIDGE" ]]; then
+    HOSTAPD_EXTRA="--hostapd-extra "\""bridge=br0"\"
 fi
 
 while true; do
@@ -57,12 +62,26 @@ while true; do
     sudo pkill create_ap
     sleep 1
     echo "Starting accesspoint with name $AP_NAME on channel $CHANNEL."
+    if [[ "$ULNOIOT_AP_BRIDGE" ]]; then
+        sudo ifconfig br0 down
+        sudo brctl delbr br0
+        sudo brctl addbr br0
+        sudo brctl addif "$ULNOIOT_AP_BRIDGE"
+    fi
     sudo systemd-inhibit \
         --who "accesspoint" \
         --why "accesspoint will fail if sleep happens" \
         "$ULNOIOT_EXTERNAL/create_ap/create_ap" \
         -c "$CHANNEL" $HIDDEN \
         -g "$IP" \
-        "$OUTPUT_WIFI" "$INPUT_DEVICE" "$AP_NAME" "$PASSWORD"
+        "HOSTAPD_EXTRA" \
+        "$OUTPUT_WIFI" "$INPUT_DEVICE" "$AP_NAME" "$PASSWORD" &
+    ap_id=$!
     sleep 2 # let ap start up
+    if [[ "$ULNOIOT_AP_BRIDGE" ]]; then
+        # fix ip address
+        ifconfig "$OUTPUT_WIFI" 0.0.0.0
+        ifconfig "$ULNOIOT_AP_BIDGE" "$IP"
+    fi
+    wait $ap_id
 done
