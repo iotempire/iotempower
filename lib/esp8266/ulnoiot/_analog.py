@@ -21,6 +21,7 @@ class Analog(Device):
         self.current_value=-10000
         Device.__init__(self, name, ADC(0), on_change=on_change,
                         report_change=report_change)
+        self.getters[""] = self.value
 
     def callback(self,p):
         self.triggered = True
