@@ -77,11 +77,11 @@ while true; do
         $HOSTAPD_EXTRA \
         "$OUTPUT_WIFI" "$INPUT_DEVICE" "$AP_NAME" "$PASSWORD" &
     ap_id=$!
-    sleep 2 # let ap start up
+    sleep 3 # let ap start up
     if [[ "$ULNOIOT_AP_BRIDGE" ]]; then
         # fix ip address
-        ifconfig "$OUTPUT_WIFI" 0.0.0.0
-        ifconfig "$ULNOIOT_AP_BIDGE" "$IP"
+        sudo ifconfig "$OUTPUT_WIFI" 0.0.0.0
+        sudo ifconfig "$ULNOIOT_AP_BRIDGE" "$IP"
     fi
     wait $ap_id
 done
