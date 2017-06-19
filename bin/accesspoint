@@ -54,7 +54,7 @@ fi
 
 HOSTAPD_EXTRA=""
 if [[ "$ULNOIOT_AP_BRIDGE" ]]; then
-    HOSTAPD_EXTRA="--hostapd-extra "\""bridge=br0"\"
+    HOSTAPD_EXTRA="--hostapd-extra bridge=br0"
 fi
 
 while true; do
