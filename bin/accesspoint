@@ -74,7 +74,7 @@ while true; do
         "$ULNOIOT_EXTERNAL/create_ap/create_ap" \
         -c "$CHANNEL" $HIDDEN \
         -g "$IP" \
-        "$HOSTAPD_EXTRA" \
+        $HOSTAPD_EXTRA \
         "$OUTPUT_WIFI" "$INPUT_DEVICE" "$AP_NAME" "$PASSWORD" &
     ap_id=$!
     sleep 2 # let ap start up
