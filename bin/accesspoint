@@ -60,7 +60,7 @@ fi
 while true; do
     echo "Stopping all existing services."
     sudo pkill create_ap
-    sleep 1
+    sleep 2
     echo "Starting accesspoint with name $AP_NAME on channel $CHANNEL."
     if [[ "$ULNOIOT_AP_BRIDGE" ]]; then
         sudo ifconfig br0 down
@@ -77,7 +77,7 @@ while true; do
         $HOSTAPD_EXTRA \
         "$OUTPUT_WIFI" "$INPUT_DEVICE" "$AP_NAME" "$PASSWORD" &
     ap_id=$!
-    sleep 3 # let ap start up
+    sleep 7 # let ap start up
     if [[ "$ULNOIOT_AP_BRIDGE" ]]; then
         # fix ip address
         sudo ifconfig "$OUTPUT_WIFI" 0.0.0.0
