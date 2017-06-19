@@ -24,6 +24,9 @@ ULNOIOT_AP_CHANNEL=random
 # it does works with the built-in wifi of the reaspbeery pi.
 ULNOIOT_AP_HIDDEN=no
 
+# An ethernet-interface to bridge the network to
+#ULNOIOT_AP_BRIDGE=eth0
+
 # IP to pick
 ULNOIOT_AP_IP="192.168.12.1"
 
