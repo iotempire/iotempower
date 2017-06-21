@@ -24,6 +24,8 @@ public class Thermostat implements MqttCallback {
 	private JLabel lblDesiredTempValue = new JLabel("");
 	private JLabel lblCooling = new JLabel("cooling: off");
 	private JLabel lblHeating = new JLabel("heating: off");
+	private boolean isCooling = false;
+	private boolean isHeating = false;
 
 	// times 100 gives us 2 decimal places without the problems double brings with it
 	private int currentTempTimes100 = 1800;
@@ -108,7 +110,8 @@ public class Thermostat implements MqttCallback {
 				try {
 					while (true) {
 						try {
-							client.publish("livingroom/temperature", new MqttMessage(String.valueOf(getCurrentTempRounded()).getBytes()));
+							String msgString = "current-temperature:" + getCurrentTempRounded() + ";heating:" + isHeating + ";cooling:" + isCooling;
+							client.publish("livingroom/temperature", new MqttMessage(msgString.getBytes()));
 						} catch (MqttException e) {
 							e.printStackTrace();
 						}
@@ -135,8 +138,8 @@ public class Thermostat implements MqttCallback {
 		lblCurrentTempValue.setText(getCurrentTempRounded() + "°");
 		lblDesiredTempValue.setText(getDesiredTempRounded() + "°");
 
-		boolean isCooling = currentTempTimes100 > desiredTempTimes100;
-		boolean isHeating = currentTempTimes100 < desiredTempTimes100;
+		isCooling = currentTempTimes100 > desiredTempTimes100;
+		isHeating = currentTempTimes100 < desiredTempTimes100;
 
 		lblCooling.setText("cooling: " + (isCooling ? "on" : "off"));
 		lblHeating.setText("heating: " + (isHeating ? "on" : "off"));
