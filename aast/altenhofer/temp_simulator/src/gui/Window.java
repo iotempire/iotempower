@@ -1,8 +1,10 @@
 package gui;
 
-import org.fusesource.mqtt.client.BlockingConnection;
-import org.fusesource.mqtt.client.MQTT;
-import org.fusesource.mqtt.client.QoS;
+import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -28,8 +30,12 @@ public class Window extends JFrame implements ChangeListener, ActionListener {
 
     private JSlider tempSlider;
 
-    private MQTT client;
-    private BlockingConnection connection;
+    private MqttClient client;
+    private String topic        = "tempchan/temperature";
+    private int qos             = 2;
+    private String broker       = "tcp://192.168.12.1:1883"; // tcp: is necessary
+    private String clientId     = "temp_java_simulator";
+    private MemoryPersistence persistence = new MemoryPersistence();
 
     private boolean running = false;
 
@@ -97,16 +103,14 @@ public class Window extends JFrame implements ChangeListener, ActionListener {
         System.out.println("Start pressed");
         running = true;
         try {
-            client = new MQTT();
-            client.setHost("192.168.12.1", 1883);
-
-            connection = client.blockingConnection();
-            connection.connect();
-
+            client = new MqttClient(broker, clientId, persistence);
+            MqttConnectOptions connOpts = new MqttConnectOptions();
+            connOpts.setCleanSession(true);
+            client.connect(connOpts);
             // connection.publish("nfc-id", String.valueOf(currentTemp).getBytes(), QoS.AT_LEAST_ONCE, false);
             // connection.publish("lock/relay/set", "on".getBytes(), QoS.AT_LEAST_ONCE, false);
             new TempThread().start();
-        } catch (Exception e) {
+        } catch (MqttException e) {
             e.printStackTrace();
         }
     }
@@ -115,8 +119,8 @@ public class Window extends JFrame implements ChangeListener, ActionListener {
         System.out.println("Close pressed");
 
         try {
-            if (connection.isConnected()) {
-                connection.disconnect();
+            if (client.isConnected()) {
+                client.disconnect();
                 running = false;
             }
         } catch (Exception e) {
@@ -128,10 +132,12 @@ public class Window extends JFrame implements ChangeListener, ActionListener {
         @Override
         public void run() {
             while (running) {
-                if (connection.isConnected()) {
+                if (client.isConnected()) {
                     System.out.println("Temp: " + currentTemp);
                     try {
-                        connection.publish("tempserver/temperature", String.valueOf(currentTemp).getBytes(), QoS.AT_LEAST_ONCE, false);
+                        MqttMessage message = new MqttMessage(String.valueOf(currentTemp).getBytes());
+                        message.setQos(qos);
+                        client.publish(topic, message);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
