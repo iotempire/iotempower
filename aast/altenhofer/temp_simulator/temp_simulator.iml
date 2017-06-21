@@ -15,6 +15,17 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module-library">
+      <library name="Gradle: org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.0.2">
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.eclipse.paho/org.eclipse.paho.client.mqttv3/1.0.2/e1c9a81aadf25b884c779298a90750d0ab8013a5/org.eclipse.paho.client.mqttv3-1.0.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.eclipse.paho/org.eclipse.paho.client.mqttv3/1.0.2/ddbdeb2951e6dd60443763e6555f3bd2903943fc/org.eclipse.paho.client.mqttv3-1.0.2-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
     <orderEntry type="module-library" scope="TEST">
       <library name="Gradle: junit:junit:4.11">
         <CLASSES>
@@ -37,6 +48,5 @@
         </SOURCES>
       </library>
     </orderEntry>
-    <orderEntry type="library" name="mqtt-client-java1.4-uber-1.7" level="project" />
   </component>
 </module>
