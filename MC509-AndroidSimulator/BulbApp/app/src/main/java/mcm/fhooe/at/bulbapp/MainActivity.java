@@ -26,26 +26,45 @@ import static android.webkit.ConsoleMessage.MessageLevel.LOG;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static final String TOPIC_BULB1_SET_ON = "sensors/rgb1/set";
+    public static final String TOPIC_BULB1_SET_COLOR = "sensors/rgb1/rgb/set";
+    public static final String TOPIC_BULB1_SET_BRIGHTNESS = "sensors/rgb1/brightness/set";
+
+    public static final String TOPIC_BULB2_SET_ON = "sensors/rgb2/set";
+    public static final String TOPIC_BULB2_SET_COLOR = "sensors/rgb2/rgb/set";
+    public static final String TOPIC_BULB2_SET_BRIGHTNESS =  "sensors/rgb2/brightness/set";
+
+    public static final String TOPIC_BULB1_ON_STATUS = "sensors/rgb1/status";
+    public static final String TOPIC_BULB1_COLOR_STATUS = "sensors/rgb1/rgb/status";
+    public static final String TOPIC_BULB1_BRIGHTNESS_STATUS = "sensors/rgb1/brightness/status";
+
+    public static final int PUBLISH_INTERVAL = 5000; //ms
+
+    public static final String TOPIC_BULB2_ON_STATUS = "sensors/rgb2/status";
+    public static final String TOPIC_BULB2_COLOR_STATUS = "sensors/rgb2/rgb/status";
+    public static final String TOPIC_BULB2_BRIGHTNESS_STATUS = "sensors/rgb2/brightness/status";
+
     ImageView bulb1, bulb2;
     MqttCallback callback;
     MqttAndroidClient androidClient;
-    final String subscriptionTopic = "app";
 
-    final int standardOn = Color.rgb(255,247,40);
+    //final int standardOn = Color.rgb(255,247,40);
     final int standardOff = Color.rgb(175,175,175);
 
     int bulb1alpha = 255;
-    int bulb1red = -1;
-    int bulb1green = -1;
-    int bulb1blue = -1;
+    int bulb1red = 255;
+    int bulb1green = 247;
+    int bulb1blue = 40;
 
     int bulb2alpha = 255;
-    int bulb2red = -1;
-    int bulb2green = -1;
-    int bulb2blue = -1;
+    int bulb2red = 255;
+    int bulb2green = 247;
+    int bulb2blue = 40;
 
     boolean bulb1on = false;
     boolean bulb2on = false;
+
+    Thread publishThread = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +72,101 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         setupUI();
         setupMQTT();
+    }
+
+    private void createThread(){
+
+        publishThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                while(!Thread.interrupted()){
+                    if(bulb1on){
+                        try {
+                            if(androidClient.isConnected()){
+                                androidClient.publish(TOPIC_BULB1_ON_STATUS,new MqttMessage("on".getBytes()));
+                            }
+                        } catch (MqttException e) {
+                            e.printStackTrace();
+                        }
+                    }else{
+                        try {
+                            if(androidClient.isConnected()){
+                                androidClient.publish(TOPIC_BULB1_ON_STATUS,new MqttMessage("off".getBytes()));
+                            }
+                        } catch (MqttException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    if(bulb2on){
+                        try {
+                            if(androidClient.isConnected()){
+                                androidClient.publish(TOPIC_BULB2_ON_STATUS,new MqttMessage("on".getBytes()));
+                            }
+                        } catch (MqttException e) {
+                            e.printStackTrace();
+                        }
+                    }else{
+                        try {
+                            if(androidClient.isConnected()) {
+                                androidClient.publish(TOPIC_BULB2_ON_STATUS, new MqttMessage("off".getBytes()));
+                            }
+                        } catch (MqttException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    String rgbBulb1="("+bulb1red+","+bulb1green+","+bulb1blue+")";
+                    try {
+                        if(androidClient.isConnected()){
+                            androidClient.publish(TOPIC_BULB1_COLOR_STATUS,new MqttMessage(rgbBulb1.getBytes()));
+                        }
+                    } catch (MqttException e) {
+                        e.printStackTrace();
+                    }
+
+                    String rgbBulb2="("+bulb2red+","+bulb2green+","+bulb2blue+")";
+                    try {
+                        if(androidClient.isConnected()) {
+                            androidClient.publish(TOPIC_BULB2_COLOR_STATUS, new MqttMessage(rgbBulb2.getBytes()));
+                        }
+                    } catch (MqttException e) {
+                        e.printStackTrace();
+                    }
+
+                    String alpha1 = String.valueOf(bulb1alpha);
+                    try {if(androidClient.isConnected()){
+                        androidClient.publish(TOPIC_BULB1_BRIGHTNESS_STATUS,new MqttMessage(alpha1.getBytes()));
+                    }
+                    } catch (MqttException e) {
+                        e.printStackTrace();
+                    }
+                    String alpha2 = String.valueOf(bulb2alpha);
+                    try {
+                        if(androidClient.isConnected()) {
+                            androidClient.publish(TOPIC_BULB2_BRIGHTNESS_STATUS, new MqttMessage(alpha2.getBytes()));
+                        }
+                    } catch (MqttException e) {
+                        e.printStackTrace();
+                    }
+
+                    try {
+                        Thread.sleep(PUBLISH_INTERVAL);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                       break;
+                    }
+                }
+
+                try {
+                    androidClient.disconnect();
+                    Log.i("TAG","disconnect called --------------------------------- ");
+                } catch (MqttException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        publishThread.start();
     }
 
     private void setupUI() {
@@ -78,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
                     subscribeToTopic();
                 } else {
                     Log.i("TAG", "Connected to: " + serverURI);
-                    MqttMessage msg = new MqttMessage("hello".getBytes());
+                    MqttMessage msg = new MqttMessage("Reconnect from APP-simulator".getBytes());
                     try {
                         androidClient.publish("app/publish",msg);
                     } catch (MqttException e) {
@@ -101,14 +215,14 @@ public class MainActivity extends AppCompatActivity {
                 Log.i("TAG","Topic: "+topic+" | message: "+message.toString());
 
                 switch (topic){
-                    case "sensors/rgb1":
+                    case TOPIC_BULB1_SET_ON:
                         if(message.toString().equalsIgnoreCase("on")){
                             //bulb1.setImageDrawable(getDrawable(R.drawable.bulb_on_new));
-                            if(bulb1red != -1){
+                      /*      if(bulb1red != -1){*/
                                 bulb1.setColorFilter(getBulb1Color(), PorterDuff.Mode.MULTIPLY);
-                            }else{
+  /*                          }else{
                                 bulb1.setColorFilter(standardOn, PorterDuff.Mode.MULTIPLY);
-                            }
+                            }*/
                             bulb1on = true;
                         }else if(message.toString().equalsIgnoreCase("off")){
                             bulb1.setColorFilter(standardOff, PorterDuff.Mode.MULTIPLY);
@@ -116,40 +230,40 @@ public class MainActivity extends AppCompatActivity {
                             //bulb2alpha= 255;
                         }
                         break;
-                    case "sensors/rgb2":
+                    case TOPIC_BULB2_SET_ON:
                         if(message.toString().equalsIgnoreCase("on")){
                            // bulb2.setImageDrawable(getDrawable(R.drawable.bulb_on_new));
                             bulb2on = true;
-                            if(bulb2red != -1){
+/*                            if(bulb2red != -1){*/
                                 bulb2.setColorFilter(getBulb2Color(), PorterDuff.Mode.MULTIPLY);
-                            }else{
+  /*                          }else{
                                 bulb2.setColorFilter(standardOn, PorterDuff.Mode.MULTIPLY);
-                            }
+                            }*/
                         }else if(message.toString().equalsIgnoreCase("off")){
                             bulb2.setColorFilter(standardOff, PorterDuff.Mode.MULTIPLY);
                             //bulb2alpha = 255;
                             bulb2on = false;
                         }
                         break;
-                    case "sensors/rgb1/rgb/status":
+                    case TOPIC_BULB1_SET_COLOR:
                         setColorFromMessage(message.toString(),true);
                         if(bulb1on){
                            bulb1.setColorFilter(getBulb1Color(), PorterDuff.Mode.MULTIPLY);
                         }
                         break;
-                    case "sensors/rgb2/rgb/status":
+                    case TOPIC_BULB2_SET_COLOR:
                         setColorFromMessage(message.toString(),false);
                         if(bulb2on){
                             bulb2.setColorFilter(getBulb2Color(), PorterDuff.Mode.MULTIPLY);
                         }
                         break;
-                    case "sensors/rgb1/brightness/status":
+                    case TOPIC_BULB1_SET_BRIGHTNESS:
                         setAlphaFromMessage(message.toString(),true);
                         if(bulb1on){
                             bulb1.setColorFilter(getBulb1Color(), PorterDuff.Mode.MULTIPLY);
                         }
                         break;
-                    case "sensors/rgb2/brightness/status":
+                    case TOPIC_BULB2_SET_BRIGHTNESS:
                         setAlphaFromMessage(message.toString(),false);
                         if(bulb2on){
                             bulb2.setColorFilter(getBulb2Color(), PorterDuff.Mode.MULTIPLY);
@@ -178,6 +292,7 @@ public class MainActivity extends AppCompatActivity {
                     disconnectedBufferOptions.setDeleteOldestMessages(false);
                     androidClient.setBufferOpts(disconnectedBufferOptions);
                     subscribeToTopic();
+
                 }
 
                 @Override
@@ -231,7 +346,7 @@ public class MainActivity extends AppCompatActivity {
     public void subscribeToTopic() {
         try {
 
-            androidClient.subscribe("sensors/rgb1", 0, null, new IMqttActionListener() {
+            androidClient.subscribe(TOPIC_BULB1_SET_ON, 0, null, new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
                     Log.i("TAG","bulb1 Subscribed!");
@@ -242,7 +357,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.i("TAG","Failed to subscribe");
                 }
             });
-            androidClient.subscribe("sensors/rgb2", 0, null, new IMqttActionListener() {
+            androidClient.subscribe(TOPIC_BULB2_SET_ON, 0, null, new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
                     Log.i("TAG","bulb 2 Subscribed!");
@@ -252,7 +367,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.i("TAG","Failed to subscribe");
                 }
             });
-            androidClient.subscribe("sensors/rgb1/rgb/status", 0, null, new IMqttActionListener() {
+            androidClient.subscribe(TOPIC_BULB1_SET_COLOR, 0, null, new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
                     Log.i("TAG","bulb1 Subscribed!");
@@ -263,7 +378,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.i("TAG","Failed to subscribe");
                 }
             });
-            androidClient.subscribe("sensors/rgb2/rgb/status", 0, null, new IMqttActionListener() {
+            androidClient.subscribe(TOPIC_BULB2_SET_COLOR, 0, null, new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
                     Log.i("TAG","bulb 2 Subscribed!");
@@ -273,7 +388,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.i("TAG","Failed to subscribe");
                 }
             });
-            androidClient.subscribe("sensors/rgb1/brightness/status", 0, null, new IMqttActionListener() {
+            androidClient.subscribe(TOPIC_BULB1_SET_BRIGHTNESS, 0, null, new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
                     Log.i("TAG","bulb1 Subscribed!");
@@ -283,7 +398,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.i("TAG","Failed to subscribe");
                 }
             });
-            androidClient.subscribe("sensors/rgb2/brightness/status", 0, null, new IMqttActionListener() {
+            androidClient.subscribe(TOPIC_BULB2_SET_BRIGHTNESS, 0, null, new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
                     Log.i("TAG","bulb 2 Subscribed!");
@@ -294,28 +409,24 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
-
-            androidClient.subscribe(subscriptionTopic, 0, new IMqttMessageListener() {
-                @Override
-                public void messageArrived(String topic, MqttMessage message) throws Exception {
-                    System.out.println("Message: " + topic + " : " + new String(message.getPayload()));
-                }
-            });
 
         } catch (MqttException ex) {
             System.err.println("Exception whilst subscribing");
             ex.printStackTrace();
         }
+
+        createThread();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        try {
+        publishThread.interrupt();
+/*        try {
             androidClient.disconnect();
         } catch (MqttException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
     @Override
@@ -325,12 +436,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        publishThread.interrupt();
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
-        try {
-            androidClient.disconnect();
+        publishThread.interrupt();
+/*        try {
+            androidClient.disconnectForcibly();
+            androidClient.close();
         } catch (MqttException e) {
-            e.printStackTrace();
-        }
+            e.pr*//*intStackTrace();
+        }*/
     }
 }
