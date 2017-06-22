@@ -33,7 +33,7 @@ public class Window extends JFrame implements ChangeListener, ActionListener {
     private MqttClient client;
     private String topic        = "tempchan/temperature";
     private int qos             = 2;
-    private String broker       = "tcp://192.168.12.1:1883"; // tcp: is necessary
+    private String broker       = "tcp://192.168.1.104:1883"; // tcp: is necessary
     private String clientId     = "temp_java_simulator";
     private MemoryPersistence persistence = new MemoryPersistence();
 
