@@ -4,7 +4,7 @@ require 'rubygems'
 require 'mqtt'
 require 'paint'
 
-control_key = "/turn"
+control_key = "/set"
 status = 1 #0 = off, 1 = on
 color = "red" #last set color
 
