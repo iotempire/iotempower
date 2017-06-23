@@ -5,6 +5,7 @@ require 'mqtt'
 require 'paint'
 
 control_key = "/set"
+color_key = "/rgb"
 status = 1 #0 = off, 1 = on
 color = "red" #last set color
 
@@ -27,8 +28,8 @@ def color_window(color)
 end
 
 def publish_status(connection, topic, status, color)
-  publish_status_key = topic + "/status"
-  publish_color_key = topic + "/color"
+  publish_status_key = topic
+  publish_color_key = topic + "/rgb/status"
   connection.publish(publish_status_key, status == 1 ? "on" : "off")
   connection.publish(publish_color_key, color)
 end
@@ -39,11 +40,11 @@ if input_array.length == 2
 
     publish_status(c, input_array[1], status, color)
 
-    c.subscribe(input_array[1])
+    c.subscribe(input_array[1] + color_key + control_key)
     c.subscribe(input_array[1] + control_key)
 
     c.get() do |topic,message|
-      if topic == input_array[1] + control_key
+      if topic == (input_array[1] + control_key)
         if message == "off"
           status = 0
           color_window("black")
@@ -51,7 +52,7 @@ if input_array.length == 2
           status = 1
           color_window(color)
         end
-      else
+      elsif topic == (input_array[1] + color_key + control_key)
         color = message
         if status == 1
           color_window(message)
