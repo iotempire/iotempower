@@ -13,7 +13,7 @@ public class MqttHandler {
 	private MqttClient mClient;
 	private MqttCallback mCallback;
 	
-	private static int qos             = 2;
+	private static int qos             = 0;
 	private static String broker       = "tcp://192.168.12.1:1883";
 	private static String clientId     = "HBA_Simluator_Actuators";
 	private static MemoryPersistence persistence = new MemoryPersistence();
