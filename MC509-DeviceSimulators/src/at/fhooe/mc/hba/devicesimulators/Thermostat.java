@@ -28,8 +28,8 @@ public class Thermostat implements MqttCallback {
 	private boolean isHeating = false;
 
 	// times 100 gives us 2 decimal places without the problems double brings with it
-	private int currentTempTimes100 = 1800;
-	private int desiredTempTimes100 = 1800;
+	private int currentTempTimes100 = 2800;
+	private int desiredTempTimes100 = 2800;
 
 	public static void main(String[] args) {
 		if (instance == null) {
