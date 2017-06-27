@@ -13,6 +13,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.URISyntaxException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by christian on 14.06.2017.
@@ -27,17 +29,26 @@ public class Window extends JFrame implements ChangeListener, ActionListener {
     private int currentTemp;
     private JButton startBut;
     private JButton closeBut;
+    private JEditorPane ipText;
 
     private JSlider tempSlider;
 
     private MqttClient client;
     private String topic        = "tempchan/temperature";
     private int qos             = 2;
-    private String broker       = "tcp://192.168.1.104:1883"; // tcp: is necessary
+    private String broker;
     private String clientId     = "temp_java_simulator";
     private MemoryPersistence persistence = new MemoryPersistence();
 
     private boolean running = false;
+
+    private Pattern pattern;
+    private Matcher matcher;
+    private static final String IPADDRESS_PATTERN =
+            "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+                    "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+                    "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+                    "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
 
     public Window(String title) throws HeadlessException {
         this.title = title;
@@ -52,11 +63,14 @@ public class Window extends JFrame implements ChangeListener, ActionListener {
 
         JLabel tempLabel = new JLabel("Temperature");
         JPanel buttonPan = new JPanel();
-        buttonPan.setLayout(new GridLayout(1, 2));
+        buttonPan.setLayout(new GridLayout(2, 2));
+        ipText = new JEditorPane();
 
         startBut = new JButton("Start");
         closeBut = new JButton("Close");
 
+        buttonPan.add(new Label("Enter IP: "));
+        buttonPan.add(ipText);
         buttonPan.add(startBut);
         buttonPan.add(closeBut);
 
@@ -78,6 +92,14 @@ public class Window extends JFrame implements ChangeListener, ActionListener {
 
         this.setSize(300, 200);
         this.setVisible(true);
+
+        pattern = Pattern.compile(IPADDRESS_PATTERN);
+
+    }
+
+    public boolean validate(final String ip){
+        matcher = pattern.matcher(ip);
+        return matcher.matches();
     }
 
     @Override
@@ -100,7 +122,12 @@ public class Window extends JFrame implements ChangeListener, ActionListener {
     }
 
     private void initMqttConnection() {
-        System.out.println("Start pressed");
+        if(!validate(ipText.getText()))  {
+            System.out.println(ipText.getText() + " is not an ip address");
+            return;
+        }
+        broker = "tcp://" + ipText.getText() + ":1883"; // tcp: is necessary
+        System.out.println("Start connection to: " + broker);
         running = true;
         try {
             client = new MqttClient(broker, clientId, persistence);
