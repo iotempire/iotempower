@@ -31,14 +31,14 @@ public class ContextManagement implements ChangeListener, MqttCallback {
 	// Context Elements initial values
 	private static final int INIT_TRANSMISSION_FREQUENCY = 1;
 	private static final int INIT_BRIGHTNESS = 0;
-	private static final int INIT_TEMPERATURE = 10;
+	private static final int INIT_TEMPERATURE = 23;
 
 	// Update ContextSituation
 	private long transmissionFrequencySec = 2;
 	private Timer timer;
 	
 	//Temperature regulator;
-	private int tmpOffset = 1;
+	private int tmpOffset = 0;
 	
 	// MQTT
 	private MqttHandler mMqttHandler;
