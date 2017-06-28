@@ -1,3 +1,4 @@
+#If not working as expected blame pramodag(https://github.com/pramodag)
 import paho.mqtt.client as mqtt
 import thread
 import random
@@ -11,7 +12,10 @@ def publish(client, topic, clock):
 broker ="192.168.12.1"
 topic='internetofthings/'
 subtopic='virtualClock'
-
+topic=raw_input("Enter mqtt topic without / at the end ")
+#appending / for topic
+topic+="/"
+subtopic=raw_input("enter mqtt subtopic ")
 
 client = mqtt.Client()
 client.connect(broker, 1883, 60)
@@ -25,7 +29,7 @@ virtualSecond=day_length/86400.0
 hours=0
 mins=0
 sec=0
-print("Sending mqtt messages. press ctrl + C to stop.")
+print("Sending mqtt messages to topic "+ topic+subtopic+ ". press ctrl + C to stop.")
 while True:
 	thread.start_new_thread(publish, (client, topic+subtopic, str(hours)+":"+str(mins)+":"+str(sec), ) )
 	time.sleep(virtualSecond*updateIntervel)
