@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>Wemos Websocket Connector</title>
+    <link rel="stylesheet" href="libs/w3.css">
+    <script src="libs/jquery-3.2.1.min.js"></script>
+
+    <script>
+        var ws;
+        var isPassword = true;
+
+        $(document).ready(function () {
+            var btDisconnect = $("#btDisconnect");
+            var inCommand = $("#inCommand");
+            var inWebSocketIp = $("#inWebSocketIp");
+
+            btDisconnect.prop("disabled", true);
+
+            $("#btConnect").click(function () {
+                $("#btConnect").prop("disabled", true);
+                webSocketConnection();
+            });
+
+            inWebSocketIp.on('keydown', function (e) {
+                if(e.keyCode === 13){
+                    $("#btConnect").prop("disabled", true);
+                    webSocketConnection();
+                }
+            });
+
+            btDisconnect.click(function () {
+                ws.close();
+                location.reload();
+            });
+
+            inCommand.on('keydown', function (e) {
+                if(e.keyCode === 13){
+                    //alert($("#command").val().substr(4));
+                    var data = inCommand.val();
+                    if(isPassword){
+                        data = data + "\n";
+                        isPassword = false;
+                    }else{
+                        data = data + "\r";
+                    }
+
+                    ws.send(data);
+                    inCommand.val("");
+                }
+            });
+
+        });
+        function webSocketConnection() {
+            if ("WebSocket" in window) {
+
+                ws = new WebSocket($("#inWebSocketIp").val());
+
+                ws.onopen = function () {
+                    $("#btDisconnect").prop("disabled", false);
+                };
+
+                ws.onmessage = function (evt) {
+                    var received_msg = evt.data;
+                    var taOutput = $("#taOutput");
+                    taOutput.append(received_msg);
+
+                    if(taOutput.length)
+                        taOutput.scrollTop(taOutput[0].scrollHeight - taOutput.height());
+                };
+
+                ws.onclose = function () {
+                    alert("Connection is closed...");
+                    $("#taOutput").val("");
+                    $("#btConnect").prop("disabled", false);
+                    $("#btDisconnect").prop("disabled", true);
+                };
+
+                ws.onerror = function () {
+                    alert("Connection error...")
+                }
+            }
+            else {
+                alert("WebSocket NOT supported by your Browser!");
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1 class="w3-center">Alternative WebRepl</h1>
+
+    <div class="w3-row w3-margin">
+        <div class="w3-container w3-half">
+            <input id="inWebSocketIp" class="w3-input w3-border w3-border-black w3-leftbar" placeholder="Example: ws://192.168.12.18:8266" type="text">
+        </div>
+        <div class="w3-container w3-quarter">
+            <button id="btConnect" class="w3-btn w3-block w3-green w3-border w3-border-black">Connect</button>
+        </div>
+        <div class="w3-container w3-quarter">
+            <button id="btDisconnect" class="w3-btn w3-block w3-indigo w3-border w3-border-black">Disconnect</button>
+        </div>
+    </div>
+    <div class="w3-row w3-margin-left w3-margin-right">
+        <div class="w3-container">
+            <textarea id="taOutput" class="w3-input w3-light-gray w3-border w3-border-black w3-leftbar" placeholder="Communication output" rows="16"
+                      style="resize: vertical; margin-bottom: 5px" readonly></textarea>
+        </div>
+    </div>
+    <div class="w3-row w3-margin-left w3-margin-right w3-margin-bottom">
+        <div class="w3-container">
+            <input id="inCommand" class="w3-input w3-sand w3-border w3-border-black w3-leftbar" placeholder="Example: help()" type="text">
+        </div>
+    </div>
+</body>
+</html>
