@@ -42,7 +42,7 @@ if [[ -e "$ULNOIOT_VPYTHON/bin/activate" ]]; then # check for existing venv
 else
     welcome
     read answer
-    if [[ "answer" == "y" ||  "answer" == "Y" || "$answer" == "" ]]; then
+    if [[ "$answer" == "y" ||  "$answer" == "Y" || "$answer" == "" ]]; then
         if [[ $(which virtualenv) == "" ]]; then
             echo "You need to install virtualenv. Exiting."
             exit 1
