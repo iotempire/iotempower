@@ -38,6 +38,7 @@ single-board Linux computers like the Raspberry Pi Zero W).
 If you are interested in shopping for related hardware, check http://iot.ulno.net/hardware.
 
 The server side has been tested to run on:
+
 - Raspberry Pi 1 (B and B+), 2, 3, and Zero W
 - Linux laptop running Ubuntu 17.04
 
