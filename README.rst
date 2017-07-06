@@ -105,8 +105,10 @@ Getting Started
 ---------------
 
 - setup ulnoiot: clone this repository
+
   - If you just want read-only access just type in a folder of your choice:
     ``git clone https://github.com/ulno/ulnoiot``
+
   - If you are a ulnoiot developer, use
     ``git clone git@github.com:ulno/ulnoiot``
 
