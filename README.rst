@@ -1,14 +1,52 @@
-# ulnoiot
+=======
+ulnoiot
+=======
 
-Here, your find extensions to [micropython](http://www.micropython.org/)
+Introduction
+------------
+
+*ulnoiot* (pronounced: "You'll know IoT") is a framework and environment
+for making the entrance into working with the Internet of Things (IoT) accessible
+for everybody -- tinkerers, makers, programmers, hobbyists, students,
+and professionals alike.
+It has a special focus on education and is intended to support classes to teach
+Internet of Things (IoT) and
+home automation.
+
+However, it also supports existing IoT deployments and brings
+mechanisms for over the air (OTA) updates and automatic
+multi-device deployment.
+
+If you are impatient and want to dive into it right now, forward to
+`Getting Started`_.
+
+It is based on a multi-layered network architecture. This means for this project
+that each IoT-system (small network of connected sensors and actors) has its own
+gateway - usually running an mqtt-broker. These gateways can be connected to cloud
+resources, other cloud or Internet based mqtt brokers or interconnected among
+themsleves. Security and privacy can be selctively controleld at each layer
+border (everywhere, where a gateway connects to layers).
+
+
+Supported Hardware
+------------------
+
+*ulnoiot* is targeted to run on a variaty of (mainly Linnux-based) hardware and
+on wireless microcontrollers (initally mainly esp8266-based microcontrollers and
+single-board Linux computers like the Raspberry Pi Zero W).
+
+The part of ulnoiot running on the esp8266 is an extension of
+[micropython](http://www.micropython.org/)
 enabling IoT classes and easy getting started using 
 [micropython](http://www.micropython.org/).
 To support this start, we are using our own development kits as well as 
 supporting very simple
 selections of devices usually including one ESP8266 board.
 
-## 1st supported development kit: ulno's devkit1
-For a start, the original author Ulno (http://ulno.net) has desigened some
+1st supported development kit: ulnoiot_devkit1
+++++++++++++++++++++++++++++++++++++++++++++++
+
+For a start, the original author Ulno (http://ulno.net) has designed some
 shields (little electronic parts you can just plug together) to plug into
 a Wemos D1 mini. This is now called the devkit1.
 You can also find manuals to build different parts of the 
@@ -23,7 +61,9 @@ devkit1 envisions the following shields:
 - [mpr121](shields/mpr121/README.md): this is a shield using the mpr121 multi touch and gpio chip over i2c
 - [relay](shields/relay/README.md): supporting the default relay shield for the wemos d1 mini attached to d1
 
-## Tool support
+Tool support
+------------
+
 Other tools allow an easy way to deploy the Micropython firmware
 and also adding the present libraries to allow writing really simple
 software for these devices and integrate them in an mqtt-based IoT environment.
@@ -52,7 +92,13 @@ If you create a user_boot.py file
 with your own context, this will be started automatically,
 when the system boots.
 
-## External resources
+Getting Started
+---------------
+
+
+External resources
+------------------
+
 This project would not have been possible without a thriving open source
 community around the Internet of Things. We make a lot of use of the following
 tools:
