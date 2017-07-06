@@ -104,18 +104,34 @@ the ulnoiot command or executing run in the main ulnoiot directory):
 Getting Started
 ---------------
 
-- setup ulnoiot: clone this repository (``git clone https://github.com/ulno/ulnoiot``)
+- setup ulnoiot: clone this repository
+  - If you just want read-only access just type in a folder of your choice:
+    ``git clone https://github.com/ulno/ulnoiot``
+  - If you are a ulnoiot developer, use
+    ``git clone git@github.com:ulno/ulnoiot``
+
 - make ulnoiot runnable -> copy examples/scripts/ulnoiot into your bin folder and adapt
   the path
+
 - install mosquitto (``sudo apt install mosquitto mosquitto-clients``)
   and eventually disable the server
   (``sudo systemctl stop mosquitto; sudo systemctl disable mosquitto``)
+
 - start ulnoiot and agree and wait for dependencies to be downloaded
   (if packages are mssing, fix dependencies and try to run
   ``ulnoiot install clean``)
-- After successfully entering ulnoiot (the prompt should have changed clors and
+
+- After successfully entering ulnoiot (the prompt should have changed colors and
   show ulnoiot in red, white, and black), flash and deploy some hardware using
   for example ``flash_esp8266`` and ``deploy_wemosd1mini``.
+
+- Access the command prompt with ``console`` (if only a wemos is connected
+   the serial port will be dicovered automatically else supply it as usb1 or acm2
+   or an IP address and password as paramaters). You can also use webrepl
+   (see below) to access the wemos.
+
+If something gets stuck, try to power cycle the wemos d1 mini.
+
 
 To setup wifi on the esp8266 device,
 connect to the wireless network of the esp8266,
@@ -125,22 +141,23 @@ from https://github.com/micropython/webrepl to get a command line.
 You can also connect to the command line via a serial terminal
 (use console in ulnoiot).
  
-The webrepl password is hardcoded to "ulnoiot". You can change it later in the 
-[webrepl_cfg.py](/lib/webrepl_cfg.py) file (just re-upload the file with a
-different password and reconnect.
-Attention, the password can't be too complex, 
+The webrepl password is hardcoded to "ulnoiot".
+If you want to change the webrepl login password from default ulnoiot to
+something else use ``import webrepl_setup``
+Attention, the password can't be too complex,
 so stick with something around 8 characters and not too many 
 special things in it. I haven't figured out why, it seems to be a
 webrepl thing - or just stick with the default.
 
 Try typing help and check the small manual.
-You can setup the wifi with wifi( "network-name", "password" ). You can scan
-the existing wifi networks with wscan and when the wifi is configured, you can
-see the current ip with typing wip.
+You can setup the wifi with ``wifi( "network-name", "password" )``.
+You can scan
+the existing wifi networks with ``wscan`` and when the wifi is configured,
+you can see the current ip with typing wip.
 
 If you create a user.py file
 with your own context, this will be started automatically,
-when the system boots. Try help("user.py") at the repl prompt.
+when the system boots. Try ``help("user.py")`` at the repl prompt.
 
 
 External Resources
@@ -155,6 +172,7 @@ tools:
 - `create_ap <https://github.com/oblique/create_ap>`__ forked for ulnoiot
   `here <https://github.com/ulno/create_ap>`__.
 - `mosquitto <https://mosquitto.org/>`__.
+- `micropython reference  <https://micropython.org/>`__
 
 As ulnoiot relies heavily on MQTT, it integrates very easily with
 `home-assistant <http://home-assistant.io>`__ and
