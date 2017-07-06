@@ -90,18 +90,18 @@ the ulnoiot command or executing run in the main ulnoiot directory):
 Getting Started
 ---------------
 
-- setup ulnoiot: clone this repository (```git clone https://github.com/ulno/ulnoiot```)
+- setup ulnoiot: clone this repository (``git clone https://github.com/ulno/ulnoiot``)
 - make ulnoiot runnable -> copy examples/scripts/ulnoiot into your bin folder and adapt
   the path
-- install mosquitto (```sudo apt install mosquitto mosquitto-clients```)
+- install mosquitto (``sudo apt install mosquitto mosquitto-clients``)
   and eventually disable the server
-  (```sudo systemctl stop mosquitto; sudo systemctl disable mosquitto```)
+  (``sudo systemctl stop mosquitto; sudo systemctl disable mosquitto``)
 - start ulnoiot and agree and wait for dependencies to be downloaded
   (if packages are mssing, fix dependencies and try to run
-  ```ulnoiot install clean```)
+  ``ulnoiot install clean``)
 - After successfully entering ulnoiot (the prompt should have changed clors and
   show ulnoiot in red, white, and black), flash and deploy some hardware using
-  for example ```flash_esp8266``` and ```deploy_wemosd1mini```.
+  for example ``flash_esp8266`` and ``deploy_wemosd1mini``.
 
 To setup wifi on the esp8266 device,
 connect to the wireless network of the esp8266,
