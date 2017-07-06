@@ -54,9 +54,10 @@ devkit and the links to youtube videos using and soldering them on
 `ulno's youtube channel <https://www.youtube.com/channel/UCaDpsG87Q99Ja2q3UoiXRVA>`__.
 
 devkit1 envisions the following shields:
+
 - `devel </doc/shields/wemosd1mini/devkit1/2led3but/README.md>`__:
   a shield with two leds and 3 buttons
-- `display </doc/shields/wemosd1mini/devkit1/display/README.md`__:
+- `display </doc/shields/wemosd1mini/devkit1/display/README.md>`__:
   supports using an i2c-based 128x64 LCD (ssd1306) on d5 and d2
 - `ht </doc/shields/wemosd1mini/devkit1/ht/README.md>`__:
   a shield employing a DHT11 temperature and humidity sensor (connected to d1)
@@ -134,6 +135,7 @@ External Resources
 This project would not have been possible without a thriving open source
 community around the Internet of Things. We make a lot of use of the following
 tools:
+
 - `mpfshell <https://github.com/wendlers/mpfshell>`__ forked for ulnoiot
   `here <https://github.com/ulno/mpfshell>`__.
 - `create_ap <https://github.com/oblique/create_ap>`__ forked for ulnoiot
