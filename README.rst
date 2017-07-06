@@ -70,7 +70,8 @@ Tool support
 ------------
 
 *ulnoiot* includes a lot of small scripts to simplify a plethora of tasks
-supporting the deployment of a small IoT system or mqtt-based IoT environment.
+supporting the deployment of a small IoT system or
+`MQTT <http://mqtt.org/>`__-based IoT environment.
 Among them are the following (most of these scripts are available after starting
 the ulnoiot command or executing run in the main ulnoiot directory):
 
@@ -142,6 +143,11 @@ tools:
 - `create_ap <https://github.com/oblique/create_ap>`__ forked for ulnoiot
   `here <https://github.com/ulno/create_ap>`__.
 - `mosquitto <https://mosquitto.org/>`__.
+
+As ulnoiot relies heavily on MQTT, it integrates very easily with
+`home-assistant <http://home-assistant.io>`__ and
+`openhab <https://openhab.org>`__.
+
 
 
 Further Documentation
