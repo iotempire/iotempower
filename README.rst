@@ -23,7 +23,7 @@ If you are impatient and want to dive into it right now, forward to
 It is based on a multi-layered network architecture. This means for this project
 that each IoT-system (small network of connected sensors and actors) has its own
 gateway - usually running an MQTT-broker. These gateways can be connected to cloud
-resources, other cloud or Internet based mqtt brokers or interconnected among
+resources, other cloud or Internet based MQTT brokers or interconnected among
 themselves. Security and privacy can be selectively controlled at each layer
 border (everywhere, where a gateway connects to layers).
 
@@ -31,8 +31,8 @@ border (everywhere, where a gateway connects to layers).
 Supported Hardware
 ------------------
 
-*ulnoiot* is targeted to run on a variaty of (mainly Linnux-based) hardware and
-on wireless microcontrollers (initally mainly esp8266-based microcontrollers and
+*ulnoiot* is targeted to run on a variety of (mainly Linux-based) hardware and
+on wireless microcontrollers (initially mainly esp8266-based microcontrollers and
 single-board Linux computers like the Raspberry Pi Zero W).
 
 The part of ulnoiot running on the esp8266 is an extension of
@@ -50,8 +50,8 @@ For a start, the original author Ulno (http://ulno.net) has designed some
 shields (little electronic parts you can just plug together) to plug into
 a Wemos D1 mini. This is now called the devkit1.
 You can also find manuals to build different parts of the 
-devkit and the links to youtube videos using and soldering them on ulno's
-`youtube channel <https://www.youtube.com/channel/UCaDpsG87Q99Ja2q3UoiXRVA>`__.
+devkit and the links to youtube videos using and soldering them on
+`ulno's youtube channel <https://www.youtube.com/channel/UCaDpsG87Q99Ja2q3UoiXRVA>`__.
 
 devkit1 envisions the following shields:
 - `devel </doc/shields/wemosd1mini/devkit1/2led3but/README.md>`__:
@@ -68,12 +68,12 @@ devkit1 envisions the following shields:
 Tool support
 ------------
 
-*ulnoiot* includes a lot of small scripts to simplify a plethory of tasks
+*ulnoiot* includes a lot of small scripts to simplify a plethora of tasks
 supporting the deployment of a small IoT system or mqtt-based IoT environment.
 Among them are the following (most of these scripts are available after starting
 the ulnoiot command or executing run in the main ulnoiot directory):
-- run/ulnoiot: enter or run a command in th eulnoiot-environment (setting
-  system variables and virtual python enviroments)
+- run/ulnoiot: enter or run a command in the ulnoiot-environment (setting
+  system variables and virtual python environments)
 - accesspoint: start an accesspoint on a free wifi interface
 - console: connect to a serial or network connected esp8266 microcontroller,
   running micropython
