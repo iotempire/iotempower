@@ -1,0 +1,15 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    mqtt (0.5.0)
+    paint (2.0.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  mqtt!
+  paint!
+
+BUNDLED WITH
+   1.14.3
