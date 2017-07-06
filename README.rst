@@ -35,13 +35,24 @@ Supported Hardware
 on wireless microcontrollers (initially mainly esp8266-based microcontrollers and
 single-board Linux computers like the Raspberry Pi Zero W).
 
+If you are interested in shopping for related hardware, check http://iot.ulno.net/hardware.
+
+The server side has been tested to run on:
+- Raspberry Pi 1 (B and B+), 2, 3, and Zero W
+- Linux laptop running Ubuntu 17.04
+
+We are trying to provide virtualbox images as soon as we find time or volunteers.
+
+We are also working on verifying that ulniot works well on Orange-Pi Zero and
+the C.H.I.P. from NextThing to allow cost-effective solutions to use ulnoiot.
+
 The part of ulnoiot running on the esp8266 is an extension of
 `micropython <http://www.micropython.org/>`__
 enabling IoT classes and easy getting started using 
 micropython.
 To support this start, we are using our own development kits as well as 
 supporting very simple
-selections of devices usually including one ESP8266 board.
+selections of devices usually including the ESP8266 board Wemos D1 mini.
 
 1st supported development kit: ulnoiot_devkit1
 ++++++++++++++++++++++++++++++++++++++++++++++
