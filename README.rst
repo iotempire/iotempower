@@ -128,9 +128,9 @@ Getting Started
   for example ``flash_esp8266`` and ``deploy_wemosd1mini``.
 
 - Access the command prompt with ``console`` (if only a wemos is connected
-   the serial port will be dicovered automatically else supply it as usb1 or acm2
-   or an IP address and password as paramaters). You can also use webrepl
-   (see below) to access the wemos.
+  the serial port will be dicovered automatically else supply it as usb1 or acm2
+  or an IP address and password as paramaters). You can also use webrepl
+  (see below) to access the wemos.
 
 If something gets stuck, try to power cycle the wemos d1 mini.
 
