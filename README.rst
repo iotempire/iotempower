@@ -104,6 +104,12 @@ the ulnoiot command or executing run in the main ulnoiot directory):
 Getting Started
 ---------------
 
+- install dependencies:
+  ``sudo apt install git mc mosquitto mosquitto-clients virtualenv iptables bridge-utils``
+
+- disable the mosquitto server:
+  ``sudo systemctl stop mosquitto; sudo systemctl disable mosquitto``
+
 - setup ulnoiot: clone this repository
 
   - If you just want read-only access just type in a folder of your choice:
@@ -113,11 +119,7 @@ Getting Started
     ``git clone git@github.com:ulno/ulnoiot``
 
 - make ulnoiot runnable -> copy examples/scripts/ulnoiot into your bin folder and adapt
-  the path
-
-- install mosquitto (``sudo apt install mosquitto mosquitto-clients``)
-  and eventually disable the server
-  (``sudo systemctl stop mosquitto; sudo systemctl disable mosquitto``)
+  the path in it to reflect the location where you cloned ulnoiot
 
 - start ulnoiot and agree and wait for dependencies to be downloaded
   (if packages are mssing, fix dependencies and try to run
