@@ -29,7 +29,7 @@ class RGB_Multi(RGB_Base):
         if led_num is None:
             return self.current_rgb
         else:
-            if[led_num<=0]: led_num=0
+            if led_num<=0: led_num=0
             return self.pin[led_num]
 
     def _set(self,r,g,b,led_num=None):
