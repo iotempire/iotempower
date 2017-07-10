@@ -112,5 +112,8 @@ class RGB_Base(Device):
         gc.collect()
         self.ani=Animation(self,msg)
 
+    def animation_is_playing(self):
+        return self.ani is not None and self.ani.playing
+
     def value(self):
         return (self.is_on,self.brightness,self.current_rgb)
