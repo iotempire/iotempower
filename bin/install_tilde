@@ -64,7 +64,6 @@ sudo mkdir -p /usr/lib/transcript1
 sudo mkdir -p /usr/share/doc/libtranscript/doc/API/search
 sudo checkinstall \
     --pkgname="$PNAME" \
-    --requires="" \
     --default \
     make install
 cd ..
@@ -78,7 +77,6 @@ sudo mkdir -p /usr/include/t3/config/t3config
 sudo mkdir -p /usr/share/doc/libt3config/API/search
 sudo checkinstall \
     --pkgname="$PNAME" \
-    --requires="" \
     --default \
     make install
 cd ..
@@ -92,7 +90,7 @@ sudo mkdir -p /usr/include/t3/key/t3key
 sudo mkdir -p /usr/share/doc/libt3key/API/search
 sudo checkinstall \
     --pkgname="$PNAME" \
-    --requires="" \
+    --requires="libt3config libncurses libxcb1" \
     --default \
     make install
 cd ..
@@ -106,7 +104,7 @@ sudo mkdir -p /usr/include/t3/window/t3window
 sudo mkdir -p /usr/share/doc/libt3window/API/search
 sudo checkinstall \
     --pkgname="$PNAME" \
-    --requires="" \
+    --requires="libncurses libunistring libtranscript" \
     --default \
     make install
 cd ..
@@ -122,7 +120,7 @@ sudo mkdir -p /usr/include/t3/widget/t3widget/widgets
 sudo mkdir -p /usr/share/doc/libt3widget/API/search
 sudo checkinstall \
     --pkgname="$PNAME" \
-    --requires="" \
+    --requires="libt3key libt3window" \
     --default \
     make install
 cd ..
@@ -137,7 +135,7 @@ sudo mkdir -p /usr/share/libt3highlight2/def
 sudo mkdir -p /usr/share/doc/libt3highlight/API/search
 sudo checkinstall \
     --pkgname="$PNAME" \
-    --requires="" \
+    --requires="libt3config" \
     --default \
     make install
 cd ..
@@ -151,7 +149,7 @@ sudo mkdir -p /usr/share/doc/tilde
 sudo mkdir -p /usr/share/tilde
 sudo checkinstall \
     --pkgname="$PNAME" \
-    --requires="" \
+    --requires="libt3highlight libt3widget" \
     --default \
     make install
 cd ..
