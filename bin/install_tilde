@@ -34,14 +34,14 @@ fi
 
 echo "Deleting cache."
 echo
-#rm -rf "$TILDEDIR" &> /dev/null
+sudo rm -rf "$TILDEDIR" &> /dev/null
 
 mkdir -p "$TILDEDIR"
 cd "$TILDEDIR"
 
 sudo apt install libunistring-dev xsel xclip libnl-3-dev libnl-genl-3-dev \
     libssl-dev build-essential libncurses5-dev libsigc++-2.0-dev libpcre3-dev \
-    libxcb1-dev checkinstall wget libtool-bin
+    libxcb1-dev checkinstall wget libtool-bin autoconf gettext
 
 wget http://os.ghalkes.nl/dist/libtranscript-0.3.2.tar.bz2
 wget http://os.ghalkes.nl/dist/libt3config-0.2.10.tar.bz2
@@ -90,7 +90,7 @@ sudo mkdir -p /usr/include/t3/key/t3key
 sudo mkdir -p /usr/share/doc/libt3key/API/search
 sudo checkinstall \
     --pkgname="$PNAME" \
-    --requires="libt3config libncurses libxcb1" \
+    --requires="libt3config,libncurses,libxcb1" \
     --default \
     make install
 cd ..
@@ -104,7 +104,7 @@ sudo mkdir -p /usr/include/t3/window/t3window
 sudo mkdir -p /usr/share/doc/libt3window/API/search
 sudo checkinstall \
     --pkgname="$PNAME" \
-    --requires="libncurses libunistring libtranscript" \
+    --requires="libncurses,libunistring,libtranscript" \
     --default \
     make install
 cd ..
@@ -120,7 +120,7 @@ sudo mkdir -p /usr/include/t3/widget/t3widget/widgets
 sudo mkdir -p /usr/share/doc/libt3widget/API/search
 sudo checkinstall \
     --pkgname="$PNAME" \
-    --requires="libt3key libt3window" \
+    --requires="libt3key,libt3window" \
     --default \
     make install
 cd ..
@@ -149,7 +149,7 @@ sudo mkdir -p /usr/share/doc/tilde
 sudo mkdir -p /usr/share/tilde
 sudo checkinstall \
     --pkgname="$PNAME" \
-    --requires="libt3highlight libt3widget" \
+    --requires="libt3highlight,libt3widget" \
     --default \
     make install
 cd ..
