@@ -41,7 +41,7 @@ cd "$TILDEDIR"
 
 sudo apt install libunistring-dev xsel xclip libnl-3-dev libnl-genl-3-dev \
     libssl-dev build-essential libncurses5-dev libsigc++-2.0-dev libpcre3-dev \
-    libxcb1-dev checkinstall wget
+    libxcb1-dev checkinstall wget libtool-bin
 
 wget http://os.ghalkes.nl/dist/libtranscript-0.3.2.tar.bz2
 wget http://os.ghalkes.nl/dist/libt3config-0.2.10.tar.bz2
