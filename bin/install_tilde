@@ -90,7 +90,7 @@ sudo mkdir -p /usr/include/t3/key/t3key
 sudo mkdir -p /usr/share/doc/libt3key/API/search
 sudo checkinstall \
     --pkgname="$PNAME" \
-    --requires="libt3config,libncurses,libxcb1" \
+    --requires="libt3config,libncurses5,libxcb1" \
     --default \
     make install
 cd ..
