@@ -104,7 +104,7 @@ sudo mkdir -p /usr/include/t3/window/t3window
 sudo mkdir -p /usr/share/doc/libt3window/API/search
 sudo checkinstall \
     --pkgname="$PNAME" \
-    --requires="libncurses,libunistring,libtranscript" \
+    --requires="libncurses5,libunistring,libtranscript" \
     --default \
     make install
 cd ..
