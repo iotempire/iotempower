@@ -25,7 +25,7 @@ that each IoT-system (small network of connected sensors and actors) has its own
 gateway - usually running an MQTT-broker. These gateways can be connected to cloud
 resources, other cloud or Internet based MQTT brokers or interconnected among
 themselves. Security and privacy can be selectively controlled at each layer
-border (everywhere, where a gateway connects to layers).
+border (everywhere, where a gateway connects two layers).
 
 
 Supported Hardware
@@ -42,7 +42,7 @@ The server side has been tested to run on:
 - Raspberry Pi 1 (B and B+), 2, 3, and Zero W
 - Linux laptop running Ubuntu 17.04
 
-We are trying to provide virtualbox images as soon as we find time or volunteers.
+We are trying to provide virtualbox images as soon as we find time and/or volunteers.
 
 We are also working on verifying that ulniot works well on Orange-Pi Zero and
 the C.H.I.P. from NextThing to allow cost-effective solutions to use ulnoiot.
