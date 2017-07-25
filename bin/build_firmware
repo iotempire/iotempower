@@ -53,11 +53,11 @@ else
     git clone https://github.com/micropython/micropython-lib
     echo
     echo "Downloading ota-firmware tools"
-    git clone https://github.com/pfalcon/yaota8266
-    # link axtls
-    rmdir "$ULNOIOT_FIRMWARE/yaota8266/ota-server/lib/axtls"
-    ln -s "$ULNOIOT_FIRMWARE/micropython/lib/axtls" \
-        "$ULNOIOT_FIRMWARE/yaota8266/ota-server/lib/axtls"
+    git clone --recursive https://github.com/pfalcon/yaota8266
+    ## link axtls <- NO, this leads to exceptions, --recursive is the trick!
+    #rmdir "$ULNOIOT_FIRMWARE/yaota8266/ota-server/lib/axtls"
+    #ln -s "$ULNOIOT_FIRMWARE/micropython/lib/axtls" \
+    #    "$ULNOIOT_FIRMWARE/yaota8266/ota-server/lib/axtls"
 fi
 
 # build everything.
@@ -106,7 +106,7 @@ git submodule update --init
 cd esp8266
 # TODO: make doesn't work anymore after having made ota once <- maybe no fix as switching to ota
 #make axtls && make || { echo "Something went wrong, check errors.";exit 1; }
-make axtls && make ota || { echo "Something went wrong, check errors.";exit 1; }
+make axtls && make ota || { echo "Something went wrong compiling fw, check errors.";exit 1; }
 echo "Done building firmware successfully."
 #echo "Copying firmware to flash position."
 #cp "$ULNOIOT_FIRMWARE/micropython/esp8266/build/firmware-combined.bin" \
@@ -140,11 +140,12 @@ if [[ ! -e "$conffile" ]]; then # check for config.h-file
         done
     )
     sed "s/^.*#define MODULUS .*$/#define MODULUS "\""$cmodulus"\""/" config.h.example > config.h
+    #cat config.h.example > config.h
 fi
 
 echo Compiling ota-bootloader
 make clean # need to clean to cover changes in config
-make
+make || { echo "Something went wrong compiling yaota, check errors.";exit 1; }
 
 echo "Merging bootloader and OTA-firmware to flash position."
 cat "$ULNOIOT_FIRMWARE/yaota8266/yaota8266.bin" \
