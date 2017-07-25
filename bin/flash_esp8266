@@ -27,7 +27,7 @@ echo "Port: $tty"
 # find firmware
 cd "$ULNOIOT_EXTERNAL/firmware"
 #firmware="$(ls esp*.bin|sort|tail -n1)"
-firmware="firmware-combined.bin"
+firmware="firmware-initial.bin"
 echo "Firmware: $firmware"
 
 echo Performing erase flash.

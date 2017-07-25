@@ -14,8 +14,6 @@
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
-ULNOIOT_FIRMWARE="$ULNOIOT_EXTERNAL/firmware"
-
 if [[ "$1" == clean ]]; then
   echo "Deleting external cache."
   echo
@@ -42,8 +40,10 @@ else
     cd "$ULNOIOT_FIRMWARE"
     echo
     echo "Downloading esp-open-sdk."
-    # TODO:make sure olderversion of cosstool-NG is downloaded (pre-June)
-    # new one is broken
+    # seems that just files are missing (fixed below)
+    ## make sure older version of crosstool-NG is downloaded? (pre-June)
+    ## new one is broken -> only files missing
+    # TODO: nonos-zips not available
     git clone --recursive https://github.com/pfalcon/esp-open-sdk
     echo
     echo "Downloading micropython."
@@ -51,12 +51,19 @@ else
     echo
     echo "Downloading micropython-lib."
     git clone https://github.com/micropython/micropython-lib
+    echo
+    echo "Downloading ota-firmware tools"
+    git clone https://github.com/pfalcon/yaota8266
+    # link axtls
+    rmdir "$ULNOIOT_FIRMWARE/yaota8266/ota-server/lib/axtls"
+    ln -s "$ULNOIOT_FIRMWARE/micropython/lib/axtls" \
+        "$ULNOIOT_FIRMWARE/yaota8266/ota-server/lib/axtls"
 fi
 
 # build everything.
 echo
 echo "Trying to build everything to create the ulnoiot micropython firmware for you."
-# the next things dosn't work with python3, so let's trick them
+# the next things dosn't work with python3, so let's trick them to use python2
 cd "$ULNOIOT_FIRMWARE"
 mkdir -p bin
 cat << EOF > bin/python
@@ -66,11 +73,17 @@ EOF
 chmod a+x bin/python
 alias python=python2
 
-export PATH="$ULNOIOT_FIRMWARE/bin:$PATH"
 
 echo
 echo "First, open-sdk. This might take really long."
 cd "$ULNOIOT_FIRMWARE/esp-open-sdk"
+#make # this will fail but migh tdownload some important stuff?
+# recreate missing files
+echo
+echo "[ulnoiot] Patching open-sdk (copying missing files)"
+for f in conf kconfig.mk mconf nconf; do
+    cp "crosstool-NG/kconfig/$f" crosstool-NG/lib/crosstool-ng-*/kconfig
+done
 make || { echo "Trouble making esp-open-sdk, aborting.";exit 1; }
 
 echo
@@ -78,8 +91,8 @@ echo "Second, link code to freeze."
 cd "$ULNOIOT_FIRMWARE/micropython/esp8266/modules"
 # remove old stuff
 mkdir -p ../modules.bak
-mv upip* ../modules.bak
-mv ntptime* ../modules.bak
+mv upip* ../modules.bak &> /dev/null
+mv ntptime* ../modules.bak  &> /dev/null
 rm -rf ulnoiot umqtt ssd1306.py
 # relink new stuff
 ln -s ../../../micropython-lib/umqtt.simple/umqtt .
@@ -91,13 +104,63 @@ echo "Third, build firmware."
 cd ../..
 git submodule update --init
 cd esp8266
-export "PATH=$ULNOIOT_FIRMWARE/esp-open-sdk/xtensa-lx106-elf/bin:$PATH"
-make axtls && make || { echo "Something went wrong, check errors.";exit 1; }
+# TODO: make doesn't work anymore after having made ota once <- maybe no fix as switching to ota
+#make axtls && make || { echo "Something went wrong, check errors.";exit 1; }
+make axtls && make ota || { echo "Something went wrong, check errors.";exit 1; }
 echo "Done building firmware successfully."
-echo "Copying firmware to flash position."
-cp "$ULNOIOT_FIRMWARE/micropython/esp8266/build/firmware-combined.bin" \
-    "$ULNOIOT_FIRMWARE"
+#echo "Copying firmware to flash position."
+#cp "$ULNOIOT_FIRMWARE/micropython/esp8266/build/firmware-combined.bin" \
+#    "$ULNOIOT_FIRMWARE"
+#cp "$ULNOIOT_FIRMWARE/micropython/esp8266/build/firmware-ota.bin" \
+#    "$ULNOIOT_FIRMWARE"
 
+#### YAOTA8266 OTA for micropython
+cd "$ULNOIOT_FIRMWARE/yaota8266"
+# check if keys have been created
+echo Preparing bootloader
+keydir="$ULNOIOT_ROOT/etc/yaota8266-keys"
+mkdir -p "$keydir"
+chmod 700 "$keydir"
+ln -s "$keydir/priv.key" ota-client &> /dev/null
+ln -s "$keydir/pub.key" ota-client &> /dev/null
+ln -s "$conffile" . &> /dev/null
+if [[ ! -e "$conffile" ]]; then # check for config.h-file
+    if [[ ! -e "$keydir/priv.key" ]]; then
+        echo "Creating your own keys in $keydir."
+        pushd . &> /dev/null
+        cd "$keydir"
+        bash "$ULNOIOT_FIRMWARE/yaota8266/ota-client/gen_keys.sh"
+        popd &> /dev/null
+    fi
+    modulus=$(openssl rsa -modulus -noout -in "$keydir/priv.key"|cut -d= -f2)
+    # prepare for insertion into config.h
+    cmodulus=$(
+        for n in $( seq 0 2 $(( ${#modulus} - 1 )) ); do
+            echo -n "\\\\x${modulus:$n:2}"
+        done
+    )
+    sed "s/^.*#define MODULUS .*$/#define MODULUS "\""$cmodulus"\""/" config.h.example > config.h
+fi
+
+echo Compiling ota-bootloader
+make clean # need to clean to cover changes in config
+make
+
+echo "Merging bootloader and OTA-firmware to flash position."
+cat "$ULNOIOT_FIRMWARE/yaota8266/yaota8266.bin" \
+    "$ULNOIOT_FIRMWARE/micropython/esp8266/build/firmware-ota.bin" \
+    > "$ULNOIOT_FIRMWARE/firmware-initial.bin"
+
+# sign firmware
+echo "Signing firmware."
+cd "ota-client"
+python3 ota_client.py sign "$ULNOIOT_FIRMWARE/micropython/esp8266/build/firmware-ota.bin"
+cp "$ULNOIOT_FIRMWARE/micropython/esp8266/build/firmware-ota.bin.ota" \
+    "$ULNOIOT_FIRMWARE/firmware.ota"
+
+# cleanup
 unalias python
+rm "$ULNOIOT_FIRMWARE/bin/python"
+
 
 exit 0

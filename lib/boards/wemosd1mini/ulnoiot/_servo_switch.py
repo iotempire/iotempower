@@ -20,9 +20,12 @@ class Servo_Switch(Servo):
                         freq=freq, min_us=min_us,max_us=max_us,angle=angle,
                         ignore_case=ignore_case,
                         on_change = on_change,report_change=report_change)
-        self.on_angle=on_angle
-        self.off_angle=off_angle
-        self.back_to_angle=back_to_angle
+        if back_to_angle is None:
+            self.on_angle=on_angle
+            self.off_angle=off_angle
+        else:
+            self.on_angle=[on_angle,back_to_angle]
+            self.off_angle = [off_angle,back_to_angle]
         self.status=None
         self.value_map={on_command:self.on,off_command:self.off}
         self.getters={"":self.mapped_value}

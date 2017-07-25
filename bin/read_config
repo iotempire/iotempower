@@ -63,4 +63,9 @@ export ULNOIOT_MQTT_BRIDGE_PW
 source "$ULNOIOT_VPYTHON/bin/activate" &> /dev/null
 true # ignore result of this
 
+# add pathes for firmware compilation
+export ULNOIOT_FIRMWARE="$ULNOIOT_EXTERNAL/firmware"
+export PATH="$ULNOIOT_FIRMWARE/bin:$PATH"
+export PATH="$ULNOIOT_FIRMWARE/esp-open-sdk/xtensa-lx106-elf/bin:$PATH"
+
 fi ### ULNOIOT_ACTIVE
