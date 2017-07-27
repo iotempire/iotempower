@@ -9,21 +9,22 @@ if [ ! "$INPUT_DEVICE" ]; then
   INPUT_DEVICE=lo
 fi
 
+# detect output wireless network device to start AP on
 OUTPUT_WIFI=""
-# detect output network device
-for dev in $(ip link show|cut -d: -f2|grep " wl"|cut -b2-); do
-    if [ ! "$dev" = "$INPUT_DEVICE" ]; then
-        for possible in $(echo "$ULNOIOT_AP_DEVICES"); do
-            if [ "$possible" = "$dev" ]; then
-                OUTPUT_WIFI="$dev"
-            fi
-        done
-        if [ "$OUTPUT_WIFI" ]; then
+if [[ "$ULNOIOT_AP_DEVICES" ]]; then
+    available_wifi=$(ip link show|cut -d: -f2|grep " wl"|cut -b2-)
+    for possible in $(echo "$ULNOIOT_AP_DEVICES"); do
+        if [[ "$available_wifi" =~ .*"$possible".* ]]; then
+            OUTPUT_WIFI="$possible"
             break
         fi
-    fi
-done
+    done
+else
+    # Take first available
+    OUTPUT_WIFI=$(ip link show|cut -d: -f2|grep " wl"|cut -b2-|tail -n1)
+fi
 
+# add network extension for making essid more unique
 AP_NAME="$ULNOIOT_AP_NAME"
 if [ "$ULNOIOT_AP_ADDID" = "yes" ]; then
     # add prefix to essid based on network adapater for unique class setup
@@ -52,6 +53,13 @@ if [[ "$1" = "show" ]]; then
     exit 0
 fi
 
+mkdir -p "$ULNOIOT_ROOT/tmp"
+HOSTFILE="$ULNOIOT_ROOT/tmp/ap-host"
+cat << EOF > "$HOSTFILE"
+$ULNOIOT_AP_IP $ULNOIOT_AP_HOSTNAME
+EOF
+
+
 HOSTAPD_EXTRA=""
 if [[ "$ULNOIOT_AP_BRIDGE" ]]; then
     HOSTAPD_EXTRA="--hostapd-extra bridge=br0"
@@ -75,6 +83,7 @@ while true; do
         -c "$CHANNEL" $HIDDEN \
         -g "$IP" \
         $HOSTAPD_EXTRA \
+        -e "$HOSTFILE" \
         "$OUTPUT_WIFI" "$INPUT_DEVICE" "$AP_NAME" "$PASSWORD" &
     ap_id=$!
     sleep 7 # let ap start up
@@ -85,3 +94,5 @@ while true; do
     fi
     wait $ap_id
 done
+
+q
