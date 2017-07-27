@@ -43,7 +43,8 @@ esptool \
 # --flash_size="$flash_size"MB <- should now be autodetected
 
 # Bring board in known state to allow direct deploy
-sleep 1
+echo "Let board do its initial reset".
+sleep 5
 echo "Do hardreset via mpfshell..."
 mpfshell -c "open $port" -n --reset
 sleep 4
