@@ -80,7 +80,7 @@ while true; do
 #    sudo systemd-inhibit \
 #        --who "accesspoint" \
 #        --why "accesspoint will fail if sleep happens" \
-    "$ULNOIOT_EXTERNAL/create_ap/create_ap" \
+    sudo "$ULNOIOT_EXTERNAL/create_ap/create_ap" \
         -c "$CHANNEL" $HIDDEN \
         -g "$IP" \
         $HOSTAPD_EXTRA \
