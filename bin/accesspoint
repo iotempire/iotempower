@@ -76,10 +76,11 @@ while true; do
         sudo brctl addbr br0
         sudo brctl addif br0 "$ULNOIOT_AP_BRIDGE"
     fi
-    sudo systemd-inhibit \
-        --who "accesspoint" \
-        --why "accesspoint will fail if sleep happens" \
-        "$ULNOIOT_EXTERNAL/create_ap/create_ap" \
+# sleep needs to be controlled from soemwhere outside this
+#    sudo systemd-inhibit \
+#        --who "accesspoint" \
+#        --why "accesspoint will fail if sleep happens" \
+    "$ULNOIOT_EXTERNAL/create_ap/create_ap" \
         -c "$CHANNEL" $HIDDEN \
         -g "$IP" \
         $HOSTAPD_EXTRA \
