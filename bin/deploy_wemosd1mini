@@ -17,7 +17,7 @@ port=$(find_esp_port "$1" "$password")
 
 cd "$ULNOIOT_ROOT/lib/boards/wemosd1mini"
 
-hashfile="$(tempfile --suffix .hashfile)"
+hashfile="$(mktemp --suffix .hashfile)"
 echo "Getting file digests."
 mpfshell -n -c \
     "open $port; exec from ulnoiot.util import file_hashs; exec file_hashs()" \
@@ -27,7 +27,7 @@ if [[ "$DEBUG" = yes ]]; then
     less "$hashfile"
 fi
 
-mpfscript="$(tempfile --suffix .mpfscript)"
+mpfscript="$(mktemp --suffix .mpfscript)"
 echo "Detecting file changes."
 echo
 python "$ULNOIOT_ROOT/bin/create_upload_list.py" "$port" "$hashfile" "$mpfscript"
@@ -39,7 +39,7 @@ if [[ "$DEBUG" = yes ]]; then
     less "$mpfscript"
 fi
 
-logfile="$(tempfile -suffix .mpfshell.log)"
+logfile="$(mktemp --suffix .mpfshell.log)"
 touch "$logfile" # create so tail doesn't fail
 
 mpfshell --loglevel INFO --logfile "$logfile" -s "$mpfscript" \

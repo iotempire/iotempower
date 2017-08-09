@@ -14,8 +14,8 @@ else
   topic="#"
 fi
 
-iplog=$(tempfile --suffix .ulnoiot.getip)
-iplogall=$(tempfile --suffix .ulnoiot.getip)
+iplog=$(mktemp --suffix .ulnoiot.getip)
+iplogall=$(mktemp --suffix .ulnoiot.getip)
 echo -n "Scanning for ips"
 filter=""
 while true; do

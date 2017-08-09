@@ -11,7 +11,7 @@
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
-tmpfile=$(tempfile --suffix .py)
+tmpfile=$(mktemp --suffix .py)
 
 unexpand -t 4 "$1" | expand -t 1 > "$2"
 #unexpand -t 4 "$1" | expand -t 1 > "$tmpfile"
