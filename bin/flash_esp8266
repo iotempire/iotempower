@@ -38,6 +38,7 @@ esptool \
     --after hard_reset \
     --port "$tty" \
     --baud "$baudrate" \
+    --flash_mode dio \
     write_flash --verify \
         0 "$firmware"
 # --flash_size="$flash_size"MB <- should now be autodetected
