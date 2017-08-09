@@ -12,7 +12,7 @@ fi
 # detect output wireless network device to start AP on
 OUTPUT_WIFI=""
 if [[ "$ULNOIOT_AP_DEVICES" ]]; then
-    available_wifi=$(ip link show|cut -d: -f2|grep " wl"|cut -b2-)
+    available_wifi=$(echo $(ip link show|cut -d: -f2|grep " wl"|cut -b2-))
     for possible in $(echo "$ULNOIOT_AP_DEVICES"); do
         if [[ "$available_wifi" =~ .*"$possible".* ]]; then
             OUTPUT_WIFI="$possible"
