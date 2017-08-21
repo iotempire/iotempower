@@ -69,7 +69,11 @@ while true; do
     echo "Stopping all existing services."
     sudo pkill create_ap
     sleep 2
+    echo
     echo "Starting accesspoint with name $AP_NAME on channel $CHANNEL."
+    echo "Will use $OUTPUT_WIFI with mac $OUTPUT_MAC to run an accesspoint."
+    echo "Internet-input device is $INPUT_DEVICE."
+    echo
     if [[ "$ULNOIOT_AP_BRIDGE" ]]; then
         sudo ifconfig br0 down
         sudo brctl delbr br0
@@ -95,5 +99,3 @@ while true; do
     fi
     wait $ap_id
 done
-
-q
