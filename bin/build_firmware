@@ -88,16 +88,16 @@ make || { echo "Trouble making esp-open-sdk, aborting.";exit 1; }
 
 echo
 echo "Second, link code to freeze."
-cd "$ULNOIOT_FIRMWARE/micropython/esp8266/modules"
+cd "$ULNOIOT_FIRMWARE/micropython/ports/esp8266/modules"
 # remove old stuff
 mkdir -p ../modules.bak
 mv upip* ../modules.bak &> /dev/null
 mv ntptime* ../modules.bak  &> /dev/null
 rm -rf ulnoiot umqtt ssd1306.py
 # relink new stuff
-ln -s ../../../micropython-lib/umqtt.simple/umqtt .
+ln -s ../../../../micropython-lib/umqtt.simple/umqtt .
 ln -s $ULNOIOT_ROOT/lib/esp8266/ulnoiot .
-ln -s ../../drivers/display/ssd1306.py .
+ln -s ../../../drivers/display/ssd1306.py .
 
 echo
 echo "Third, build firmware."
@@ -149,14 +149,14 @@ make || { echo "Something went wrong compiling yaota, check errors.";exit 1; }
 
 echo "Merging bootloader and OTA-firmware to flash position."
 cat "$ULNOIOT_FIRMWARE/yaota8266/yaota8266.bin" \
-    "$ULNOIOT_FIRMWARE/micropython/esp8266/build/firmware-ota.bin" \
+    "$ULNOIOT_FIRMWARE/micropython/ports/esp8266/build/firmware-ota.bin" \
     > "$ULNOIOT_FIRMWARE/firmware-initial.bin"
 
 # sign firmware
 echo "Signing firmware."
 cd "ota-client"
-python3 ota_client.py sign "$ULNOIOT_FIRMWARE/micropython/esp8266/build/firmware-ota.bin"
-cp "$ULNOIOT_FIRMWARE/micropython/esp8266/build/firmware-ota.bin.ota" \
+python3 ota_client.py sign "$ULNOIOT_FIRMWARE/micropython/ports/esp8266/build/firmware-ota.bin"
+cp "$ULNOIOT_FIRMWARE/micropython/ports/esp8266/build/firmware-ota.bin.ota" \
     "$ULNOIOT_FIRMWARE/firmware.ota"
 
 # cleanup
