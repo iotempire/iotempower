@@ -2,9 +2,13 @@
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
+TS=ts
+if which moreutils_ts; then
+    TS=moreutils_ts
+fi
 
 topic="$1"
-outfile="../log/${topic//\//_}.log"
+outfile="${topic//\//_}.log"
 echo "Logging to $outfile."
 mosquitto_sub  -h "$ULNOIOT_MQTT_HOST" -t "$topic" | \
-    ts "%.s" | tee -a "$outfile"
+    $TS "%.s" | tee -a "$outfile"
