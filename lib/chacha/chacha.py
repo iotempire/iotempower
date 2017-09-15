@@ -31,7 +31,8 @@
 
 """
 
-    
+import ustruct as struct
+
 #-----------------------------------------------------------------------
 
 class ChaCha(object):
@@ -105,7 +106,8 @@ class ChaCha(object):
 
     TAU    = ( 0x61707865, 0x3120646e, 0x79622d36, 0x6b206574 )
     SIGMA  = ( 0x61707865, 0x3320646e, 0x79622d32, 0x6b206574 )
-    ROUNDS = 8                         # ...10, 12, 20?
+#    ROUNDS = 8                         # ...10, 12, 20?
+    ROUNDS = 12                         # ...10, 12, 20? [ulno] playing it safer with 12
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -121,6 +123,7 @@ class ChaCha(object):
         #     the same key, you may reuse the same instance and
         #     simply call iv_setup() to set the new iv.  The previous
         #     key and the new iv will establish a new state.
+        #
         # """
         self._key_setup(key)
         self.iv_setup(iv)
@@ -139,7 +142,7 @@ class ChaCha(object):
             raise Exception('key must be either 16 or 32 bytes')
         key_state = [0]*16
         if len(key) == 16:
-            k = list(struct.unpack('<4I', key))
+            k = key # should already be bytestr
             key_state[0]  = self.TAU[0]
             key_state[1]  = self.TAU[1]
             key_state[2]  = self.TAU[2]
@@ -156,7 +159,7 @@ class ChaCha(object):
             # 14 and 15 are reserved for the IV
 
         elif len(key) == 32:
-            k = list(struct.unpack('<8I', key))
+            k = key # should already be bytestr
             key_state[0]  = self.SIGMA[0]
             key_state[1]  = self.SIGMA[1]
             key_state[2]  = self.SIGMA[2]
@@ -192,7 +195,8 @@ class ChaCha(object):
         # """
         if len(iv) != 8:
             raise Exception('iv must be 8 bytes')
-        v = list(struct.unpack('<2I', iv))
+        v = [((((((iv[0] << 8) + iv[1]) << 8) + iv[2]) << 8) + iv[3]),
+             ((((((iv[4] << 8) + iv[5]) << 8) + iv[6]) << 8) + iv[7])]
         iv_state = self.key_state[:]
         iv_state[12] = 0
         iv_state[13] = 0
@@ -222,15 +226,15 @@ class ChaCha(object):
         # """
         if self.lastblock_sz != 64:
             raise Exception('last chunk size not a multiple of 64 bytes')
-        dataout = []
+        dataout = bytearray(0)
         while datain:
             # generate 64 bytes of cipher stream
             stream = self._chacha_scramble();
             # XOR the stream onto the next 64 bytes of data
-            dataout.append(self._xor(stream, datain))
+            dataout += self._xor(stream, datain)
             if len(datain) <= 64:
                 self.lastblock_sz = len(datain)
-                return ''.join(dataout)
+                return dataout
             # increment the iv.  In this case we increment words
             # 12 and 13 in little endian order.  This will work 
             # nicely for data up to 2^70 bytes (1,099,511,627,776GB) 
@@ -250,7 +254,7 @@ class ChaCha(object):
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     
     def _chacha_scramble(self):     # 64 bytes in
-        # """ self.state and other working strucures are lists of
+        # """ self.state and other working structures are lists of
         #     4-byte unsigned integers (32 bits).
         #
         #     output must be converted to bytestring before return.
@@ -325,10 +329,11 @@ class ChaCha(object):
     
     
     def _xor(self, stream, datain):
-        dataout = []
-        for i in range(min(len(stream), len(datain))):
-            dataout.append(chr(ord(stream[i])^ord(datain[i])))
-        return ''.join(dataout)
+        l=min(len(stream), len(datain))
+        dataout = bytearray(l)
+        for i in range(l):
+            dataout[i]=stream[i]^datain[i]
+        return dataout
     
 #-----------------------------------------------------------------------
 #-----------------------------------------------------------------------
