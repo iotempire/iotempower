@@ -38,58 +38,93 @@ server_socket = None
 
 # Provide necessary functions for dupterm and replace telnet control characters that come in.
 class TelnetWrapper():
-    def __init__(self, socket):
-        self.socket = socket
+    def __init__(self, cc_in, cc_out):
+        self.cc_in = cc_in
+        self.cc_out = cc_out
         self.discard_count = 0
         self.buffer=bytes(0)
         
     def readinto(self, b):
-        global _cc_in
+        lb=len(b)
+        if lb == 0: return None
+        if len(self.buffer) == 0:
+            self.buffer = self.cc_in.receive()
+ #           print("+",self.buffer,b)
+        lbuffer = len(self.buffer)
+        if lbuffer == 0: return None
+        #if lbuffer == 0: return 0 # this aborts
 
-        readbytes = 0
-        byte = 0
-        try:
-            while byte==0:
-                if len(self.buffer) == 0:
-                    self.buffer = _cc_in.receive()
-                print("Buffer:",self.buffer)
-                if readbytes == len(b):
-                    print("netrepl: Too much data. len:", readbytes, "data:", self.buffer)
-                    break
-                byte=self.buffer[0]
-                self.buffer=self.buffer[1:]
-                # discard telnet control characters and
-                # null bytes
-                if byte == 0xFF:
-                    self.discard_count = 2
-                    byte = 0
-                elif self.discard_count > 0:
-                    self.discard_count -= 1
-                    byte = 0
-                b[readbytes] = byte
-                readbytes += 1
-        except (IndexError, OSError) as e:
-            if type(e) == IndexError or len(e.args) > 0 and e.args[0] == errno.EAGAIN:
-                if readbytes == 0:
-                    return None
-                else:
-                    return readbytes
-            else:
-                raise
-        return readbytes
-    
+        #self.buffer=bytes(0)
+        #return None
+
+        if lbuffer > 0:
+            b[0] = self.buffer[0]
+            self.buffer=self.buffer[1:]
+#            print("!", b, lb)
+            if lbuffer>1: return 1
+        return None
+
+        # if lbuffer>lb:
+        #     for i in range(lb):
+        #         b[i]=self.buffer[i]
+        #     self.buffer=self.buffer[lb:]
+        # else:
+        #     for i in range(lbuffer):
+        #         b[i]=self.buffer[i]
+        #     self.buffer=bytes(0)
+        # print("!",b,lb)
+        # return lb
+
+            # readbytes = 0
+        # for i in range(len(b)):
+        #     try:
+        #         byte = 0
+        #         # discard telnet control characters and
+        #         # null bytes
+        #         while (byte == 0):
+        #             if len(self.buffer) == 0:
+        #                 self.buffer = self.cc_in.receive()
+        #             #print("Buffer:", self.buffer)
+        #             byte = self.buffer[0]
+        #             self.buffer = self.buffer[1:]
+        #             if byte == 0xFF:
+        #                 self.discard_count = 2
+        #                 byte = 0
+        #             elif self.discard_count > 0:
+        #                 self.discard_count -= 1
+        #                 byte = 0
+        #
+        #         b[i] = byte
+        #
+        #         readbytes += 1
+        #     except (IndexError, OSError) as e:
+        #         if type(e) == IndexError or len(e.args) > 0 and \
+        #                         e.args[0] == errno.EAGAIN:
+        #             if readbytes == 0:
+        #                 return None
+        #             else:
+        #                 return readbytes
+        #         else:
+        #             raise
+        #
+        # if readbytes == 0:
+        #     return None
+        #
+        # return readbytes
+
+
     def write(self, data):
-        global _cc_out
-        _cc_out.send(data)
+        self.cc_out.send(data)
+        #pass
 
     def close(self):
-        self.socket.close()
+        self.cc_in.socket.close()
 
 # Attach new clients to dupterm and 
 # send telnet control characters to disable line mode
 # and stop local echoing
 def accept_telnet_connect(telnet_server):
-    global last_client_socket, _cc_in, _cc_out, _key
+    global last_client_socket, _key
     
     if last_client_socket:
         # close any previous clients
@@ -100,7 +135,7 @@ def accept_telnet_connect(telnet_server):
     print("Telnet connection from:", remote_addr)
 
     # reset encryption status vector TODO: consider variable iv
-    _cc_in = chacha.ChaCha(_key,bytes(8),socket=last_client_socket)
+    cc_in = chacha.ChaCha(_key,bytes(8),socket=last_client_socket)
 
     # prepare answer channel
     last_client_socket.setblocking(False)
@@ -110,15 +145,33 @@ def accept_telnet_connect(telnet_server):
     # key (32byte=256bit) and iv (8byte=64bit)
     # but encrypted
     #init=decrypt_receive(last_client_socket,64,2000) # 2s timeout for init
-    init=_cc_in.receive(timeoutms=2000) # 2s timeout for init
+    init=cc_in.receive(timeoutms=2000) # 2s timeout for init
     if init[0:16] == MAGIC: # Magic correct
+        print("Initial handshake succeeded, received session key.")
         # use rest for output key
-        _cc_out =  chacha.ChaCha(init[16:48],init[48:64],socket=last_client_socket)
+        cc_out =  chacha.ChaCha(init[16:48],init[48:64],socket=last_client_socket)
 
         # print in terminal: last_client_socket.sendall(bytes([255, 252, 34])) # dont allow line mode
         # print in terminal: last_client_socket.sendall(bytes([255, 251, 1])) # turn off local echo
     
-        uos.dupterm(TelnetWrapper(last_client_socket))
+        uos.dupterm(TelnetWrapper(cc_in,cc_out))
+        # while True:
+        #     d=cc_in.receive()
+        #     if len(d)>0:
+        #         d=bytes(d).decode().strip()
+        #         print(d)
+        #         if d.startswith("quit"):
+        #             print("done")
+        #             break
+        #         v=None
+        #         try:
+        #             v=eval(d)
+        #             print("result", v)
+        #             cc_out.send(str(v))
+        #         except Exception as e:
+        #             print(e.args[0])
+        #             cc_out.send(str(v))
+
 
     else:
         last_client_socket.sendall('Wrong protocol for ulnoiot netrepl.\n') # dont allow line mode
@@ -126,13 +179,13 @@ def accept_telnet_connect(telnet_server):
 
 
 def stop():
-    global server_socket, last_client_socket, _cc_in, _cc_out
+    global server_socket, last_client_socket
     uos.dupterm(None)
     if server_socket:
         server_socket.close()
     if last_client_socket:
         last_client_socket.close()
-    _cc_in = None
+
 
 # start listening for telnet connections on port 23
 def start(port=23,key=b'ulnoiot.netrepl.ulnoiot.netrepl.'): # TODO: take simpler default key as it will be reset
@@ -141,7 +194,7 @@ def start(port=23,key=b'ulnoiot.netrepl.ulnoiot.netrepl.'): # TODO: take simpler
     _key = key
 
     # will be initialized after connection
-    # _cc_out = chacha.ChaCha(key, bytes(8))
+    # cc_out = chacha.ChaCha(key, bytes(8))
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     

@@ -54,7 +54,7 @@ def main():
         print('Unable to connect. Exiting.')
         sys.exit()
 
-    print('Connected to remote host. Sending initialization and key.')
+    print('Connected to remote host. Sending initialization and session key.')
     cc_out = chacha.ChaCha(key,bytes(8),socket=s) # TODO: consider IV here? sync with netrepl
     key_in = os.urandom(32)
     iv_in = os.urandom(8)
@@ -63,6 +63,7 @@ def main():
 
     cc_in = chacha.ChaCha(key_in, iv_in,socket=s)
 
+    #cc_out.send(b"help\r")
 
     while True:
         socket_list = [sys.stdin, s]
@@ -75,16 +76,20 @@ def main():
             # incoming message from remote server
             if sock == s:
                 data = cc_in.receive()
+                #print("recvd:",data)
                 if not data:
-                    print('Connection closed')
+                    print('\nConnection closed')
                     sys.exit()
                 else:
-                    # print data
-                    sys.stdout.write(data.decode())
+                    if len(data)>0:
+                        # print data
+                        sys.stdout.write(data.decode())
+                        sys.stdout.flush()
 
             # user entered a message
             else:
-                msg = sys.stdin.readline().encode()
+                msg = (sys.stdin.readline().strip()+'\r\n').encode()
+                print("\nSending:",msg)
                 cc_out.send(msg)
 
 # main function

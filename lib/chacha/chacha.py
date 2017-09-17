@@ -31,13 +31,17 @@
 
 """
 
+sockwrite=False
 
 try: # micropython
     import ustruct as struct
+    import uos as os
     import urandom as random
+    sockwrite=True
 except:
     try: # normal python
         import struct
+        import os
         import random
     except:
         pass
@@ -365,8 +369,7 @@ class ChaCha(object):
                 block = datain[b*63:(b+1)*63]
                 l = len(block)
                 block = bytes([l+64*random.getrandbits(2)]) \
-                            + block + bytes(random.getrandbits(8)
-                               for _ in range(63-l)) # pad
+                        + block + os.urandom(63-l)  # pad
                 data = self.encrypt(block)
                 self._write(data)
         else:
@@ -375,11 +378,15 @@ class ChaCha(object):
 
 
     def _write(self, data):
+        global sockwrite
         # we need to write all the data but it's a non-blocking socket
         # so loop until it's all written eating EAGAIN exceptions
         while len(data) > 0:
             try:
-                written_bytes = self.socket.send(data)
+                if sockwrite:
+                    written_bytes = self.socket.write(data)
+                else:
+                    written_bytes = self.socket.send(data)
                 data = data[written_bytes:]
             except OSError as e:
                 if len(e.args) > 0 and e.args[0] == errno.EAGAIN:
@@ -396,9 +403,13 @@ class ChaCha(object):
         readbytes = 0
         while readbytes < 64:
             try:
-                byte=self.socket.recv(1)[0]
-                answer[readbytes] = byte
-                readbytes += 1
+                received=self.socket.recv(1)
+                if len(received) < 1:
+                    if readbytes==0:
+                        break # no data -> return early
+                else:
+                    answer[readbytes] = received[0]
+                    readbytes += 1
             except (IndexError, OSError) as e:
                 if type(e) == IndexError or len(e.args) > 0 \
                         and e.args[0] == errno.EAGAIN:
