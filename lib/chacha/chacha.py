@@ -31,7 +31,27 @@
 
 """
 
-import ustruct as struct
+
+try: # micropython
+    import ustruct as struct
+    import urandom as random
+except:
+    try: # normal python
+        import struct
+        import random
+    except:
+        pass
+import errno
+import time
+if 'ticks_ms' in dir(time): # workaround for ticks in normal python
+    ticks_ms=time.ticks_ms
+    ticks_diff=time.ticks_diff
+else:
+    def ticks_ms():
+        return int(time.clock()*1000)
+    def ticks_diff(a,b):
+        return a-b
+
 
 #-----------------------------------------------------------------------
 
@@ -111,7 +131,7 @@ class ChaCha(object):
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    def __init__(self, key, iv, rounds=ROUNDS):
+    def __init__(self, key, iv, rounds=ROUNDS, socket=None):
         # """ Both key and iv are byte strings.  The key must be
         #     exactly 16 or 32 bytes, 128 or 256 bits respectively.
         #     The iv must be exactly 8 bytes (64 bits) and MUST
@@ -128,6 +148,7 @@ class ChaCha(object):
         self._key_setup(key)
         self.iv_setup(iv)
         self.rounds = rounds
+        self.socket = socket
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -224,6 +245,7 @@ class ChaCha(object):
         #     perhaps not.  This routine is intended for educational
         #     purposes so application developers should take heed.
         # """
+        # debug print("ChaCha Size:",len(datain))
         if self.lastblock_sz != 64:
             raise Exception('last chunk size not a multiple of 64 bytes')
         dataout = bytearray(0)
@@ -250,7 +272,7 @@ class ChaCha(object):
         raise Exception('Huh?')
     
     decrypt = encrypt
-    
+
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     
     def _chacha_scramble(self):     # 64 bytes in
@@ -334,7 +356,66 @@ class ChaCha(object):
         for i in range(l):
             dataout[i]=stream[i]^datain[i]
         return dataout
-    
+
+    def send(self, datain, pad=True):
+        if pad == True:
+            l=len(datain)
+            blocks=(l+62)//63
+            for b in range(blocks):
+                block = datain[b*63:(b+1)*63]
+                l = len(block)
+                block = bytes([l+64*random.getrandbits(2)]) \
+                            + block + bytes(random.getrandbits(8)
+                               for _ in range(63-l)) # pad
+                data = self.encrypt(block)
+                self._write(data)
+        else:
+            data=self.encrypt(datain)
+            self._write(data)
+
+
+    def _write(self, data):
+        # we need to write all the data but it's a non-blocking socket
+        # so loop until it's all written eating EAGAIN exceptions
+        while len(data) > 0:
+            try:
+                written_bytes = self.socket.send(data)
+                data = data[written_bytes:]
+            except OSError as e:
+                if len(e.args) > 0 and e.args[0] == errno.EAGAIN:
+                    # can't write yet, try again
+                    pass
+                else:
+                    # something else...propagate the exception
+                    raise
+
+
+    def receive(self, pad=True, timeoutms=None):
+        start_t = ticks_ms()
+        answer = bytearray(64) # max one block
+        readbytes = 0
+        while readbytes < 64:
+            try:
+                byte=self.socket.recv(1)[0]
+                answer[readbytes] = byte
+                readbytes += 1
+            except (IndexError, OSError) as e:
+                if type(e) == IndexError or len(e.args) > 0 \
+                        and e.args[0] == errno.EAGAIN:
+                    pass  # try eventually again
+                else:
+                    raise
+            if timeoutms is not None \
+                    and ticks_diff(ticks_ms(), start_t) >= timeoutms:
+                break
+        if readbytes==0: # ne need to try to decrypt
+            return bytes(0)
+        answer = self.decrypt(answer[0:readbytes])
+        if pad:
+            readbytes=min(readbytes,answer[0] & 63) # discard random upper bits
+            answer=answer[1:1+readbytes]
+        return answer[0:readbytes]
+
 #-----------------------------------------------------------------------
 #-----------------------------------------------------------------------
 #-----------------------------------------------------------------------
