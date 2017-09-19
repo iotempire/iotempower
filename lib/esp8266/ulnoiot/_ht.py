@@ -64,7 +64,7 @@ class DHT22(_HTDHT):
 class DS18X20(Device):
     MEASURE_DELAY = 750
 
-    # Handle humidity and temperature from dht devices
+    # Handle temperature from sd18x20 device
     def __init__(self, name, pin, on_change=None):
         import onewire, ds18x20
         gc.collect()
