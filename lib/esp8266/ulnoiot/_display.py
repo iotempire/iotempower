@@ -69,6 +69,8 @@ class Display(Device):
             self._y += 1
         else:
             self.dp.scroll(0, -8)
+            # TODO: check if line really needs to be cleared (seems to happen sometimes that it does not clear)
+            self.clear_line()
             if show:
                 self.dp.show()
         self._x = 0
