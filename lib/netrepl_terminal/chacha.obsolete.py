@@ -167,7 +167,7 @@ class ChaCha(object):
             raise Exception('key must be either 16 or 32 bytes')
         key_state = [0]*16
         if len(key) == 16:
-            k = key # should already be bytestr
+            k = struct.unpack('<4I',key)
             key_state[0]  = self.TAU[0]
             key_state[1]  = self.TAU[1]
             key_state[2]  = self.TAU[2]
@@ -184,7 +184,7 @@ class ChaCha(object):
             # 14 and 15 are reserved for the IV
 
         elif len(key) == 32:
-            k = key # should already be bytestr
+            k = struct.unpack('<8I',key)
             key_state[0]  = self.SIGMA[0]
             key_state[1]  = self.SIGMA[1]
             key_state[2]  = self.SIGMA[2]
@@ -220,8 +220,7 @@ class ChaCha(object):
         # """
         if len(iv) != 8:
             raise Exception('iv must be 8 bytes')
-        v = [((((((iv[0] << 8) + iv[1]) << 8) + iv[2]) << 8) + iv[3]),
-             ((((((iv[4] << 8) + iv[5]) << 8) + iv[6]) << 8) + iv[7])]
+        v = struct.unpack('<2I',iv)
         iv_state = self.key_state[:]
         iv_state[12] = 0
         iv_state[13] = 0

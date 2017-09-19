@@ -13,7 +13,7 @@
 
 MAGIC = b"UlnoIOT-NetREPL:"
 
-import socket, select, sys, os
+import socket, select, sys, os, time
 import chacha
 
 def main():
@@ -51,10 +51,11 @@ def main():
     try:
         s.connect((host, port))
     except:
-        print('Unable to connect. Exiting.')
+        print('\nterminal: Unable to connect. Exiting.')
         sys.exit()
 
-    print('Connected to remote host. Sending initialization and session key.')
+    print('\nterminal: Connected to remote host.')
+    print('terminal: Sending initialization and session key.\n')
     cc_out = chacha.ChaCha(key,bytes(8),socket=s) # TODO: consider IV here? sync with netrepl
     key_in = os.urandom(32)
     iv_in = os.urandom(8)
@@ -63,7 +64,10 @@ def main():
 
     cc_in = chacha.ChaCha(key_in, iv_in,socket=s)
 
-    #cc_out.send(b"help\r")
+    print('terminal: Waiting for connection.\n')
+    time.sleep(2)
+    #print('terminal: Requesting startscreen.\n')
+    #cc_out.send(b"help\r\n")
 
     while True:
         socket_list = [sys.stdin, s]
@@ -78,18 +82,18 @@ def main():
                 data = cc_in.receive()
                 #print("recvd:",data)
                 if not data:
-                    print('\nConnection closed')
+                    print('\nterminal: Connection closed.')
                     sys.exit()
                 else:
                     if len(data)>0:
                         # print data
-                        sys.stdout.write(data.decode())
+                        sys.stdout.write(bytes(data).decode())
+#                        print("data:", str(data))
                         sys.stdout.flush()
 
             # user entered a message
             else:
                 msg = (sys.stdin.readline().strip()+'\r\n').encode()
-                print("\nSending:",msg)
                 cc_out.send(msg)
 
 # main function

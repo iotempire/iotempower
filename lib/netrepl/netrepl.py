@@ -13,10 +13,10 @@ import time
 import machine
 import micropython
 
-# # debug
-# from ulnoiot import *
-# import ulnoiot.shield.devkit1_display
-# dp=devices["dp1"]
+# debug
+#from ulnoiot import *
+#import ulnoiot.shield.devkit1_display
+#dp=devices["dp1"]
 
 _client_socket = None
 _server_socket = None
@@ -25,13 +25,13 @@ _telnetwrapper = None
 
 # Provide necessary functions for dupterm and replace telnet control characters that come in.
 class TelnetWrapper():
-    MAXFILL=63 # best: multiples of 63
-    INTERVAL=100 # 100 ms for buffering
+    MAXFILL=189 # best: multiples of 63
+    INTERVAL=20 # 20 ms for buffering
     def __init__(self, cc_in, cc_out):
         self.cc_in = cc_in
         self.cc_out = cc_out
         self.discard_count = 0
-        self.in_buffer=bytes(0)
+        self.in_buffer=bytearray(0)
         self.out_buffer=bytearray(self.MAXFILL)
         self.out_fill=0
         self.out_last_sent=time.ticks_ms()
@@ -55,7 +55,7 @@ class TelnetWrapper():
         if self.sending == True: return # TODO: check if this locking is enough
         self.sending=True
 # debug        dp.println("s {},{},{}".format(self.out_fill,int(self.out_buffer[0]),int(self.out_buffer[1])))
-        self.cc_out.send(self.out_buffer[0:self.out_fill])
+        self.cc_out.send(self.out_buffer,length=self.out_fill)
         self.out_fill = 0
         self.out_last_sent = time.ticks_ms()
         self.sending=False
@@ -126,10 +126,10 @@ def accept_telnet_connect(telnet_server):
         _client_socket.close()
 
     _client_socket, remote_addr = telnet_server.accept()
-    print("Socket connection from:", remote_addr)
+    print("\nnetrepl: Socket connection from:", remote_addr)
 
     # reset encryption status vector TODO: consider variable iv
-    cc_in = chacha.ChaCha(_key, bytes(8), socket=_client_socket)
+    cc_in = chacha.ChaCha(_key, bytearray(8), socket=_client_socket)
 
     # prepare answer channel
     _client_socket.setblocking(False)
@@ -141,7 +141,7 @@ def accept_telnet_connect(telnet_server):
     #init=decrypt_receive(last_client_socket,64,2000) # 2s timeout for init
     init=cc_in.receive(timeoutms=2000) # 2s timeout for init
     if init[0:16] == MAGIC: # Magic correct
-        print("Initial handshake succeeded, received session key.")
+        print("\nnetrepl: Initial handshake succeeded, received session key.")
         # use rest for output key
         cc_out =  chacha.ChaCha(init[16:48],init[48:64], socket=_client_socket)
 
@@ -171,8 +171,9 @@ def accept_telnet_connect(telnet_server):
         # construct timer to flush buffers often enough
 
     else:
-        _client_socket.sendall('Wrong protocol for ulnoiot netrepl.\n') # dont allow line mode
+        _client_socket.sendall('\nnetrepl: Wrong protocol for ulnoiot netrepl.\n')
         _client_socket.close()
+        print("\nWrong protocol for this client. Closing.\n")
 
 
 def stop():
@@ -193,7 +194,7 @@ def start(port=23,key=b'ulnoiot.netrepl.ulnoiot.netrepl.'): # TODO: take simpler
     _key = key
 
     # will be initialized after connection
-    # cc_out = chacha.ChaCha(key, bytes(8))
+    # cc_out = chacha.ChaCha(key, bytearray(8))
     _server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     _server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     
@@ -207,4 +208,4 @@ def start(port=23,key=b'ulnoiot.netrepl.ulnoiot.netrepl.'): # TODO: take simpler
     for i in (network.AP_IF, network.STA_IF):
         wlan = network.WLAN(i)
         if wlan.active():
-            print("UlnoIOT netrepl server started on {}:{}".format(wlan.ifconfig()[0], port))
+            print("\nnetrepl: UlnoIOT netrepl server started on {}:{}".format(wlan.ifconfig()[0], port))
