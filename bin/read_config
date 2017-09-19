@@ -41,6 +41,8 @@ ULNOIOT_MQTT_BRIDGE_TOPIC="bridge"
 ULNOIOT_MQTT_BRIDGE_USER="bridgeuser"
 ULNOIOT_MQTT_BRIDGE_PW="secretpw"
 
+ULNOIOT_WEBREPL_PW="ulnoiot"
+
 if [ -e "$ULNOIOT_ROOT/etc/ulnoiot.conf" ]; then
     source "$ULNOIOT_ROOT/etc/ulnoiot.conf"
 fi
