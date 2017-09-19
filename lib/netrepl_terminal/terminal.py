@@ -60,7 +60,7 @@ def main():
     key_in = os.urandom(32)
     iv_in = os.urandom(8)
 
-    cc_out.send(MAGIC+key_in+iv_in,pad=True)  # send the key
+    cc_out.send(MAGIC+key_in+iv_in)  # send the key
 
     cc_in = chacha.ChaCha(key_in, iv_in,socket=s)
 
@@ -79,17 +79,19 @@ def main():
         for sock in read_sockets:
             # incoming message from remote server
             if sock == s:
-                data = cc_in.receive()
-                #print("recvd:",data)
-                if not data:
-                    print('\nterminal: Connection closed.')
-                    sys.exit()
-                else:
-                    if len(data)>0:
-                        # print data
-                        sys.stdout.write(bytes(data).decode())
-#                        print("data:", str(data))
-                        sys.stdout.flush()
+                (data,l) = cc_in.receive()
+
+                # TODO: figure out how to detect conenction close
+                # #print("recvd:",data)
+                # if not data:
+                #     print('\nterminal: Connection closed.')
+                #     sys.exit()
+                # else:
+                if l>0:
+                    # print data
+                    sys.stdout.write(bytes(data[0:l]).decode())
+                    #print("data:", str(data[0:l]))
+                    sys.stdout.flush()
 
             # user entered a message
             else:

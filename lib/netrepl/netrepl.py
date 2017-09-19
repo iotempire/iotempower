@@ -25,13 +25,15 @@ _telnetwrapper = None
 
 # Provide necessary functions for dupterm and replace telnet control characters that come in.
 class TelnetWrapper():
-    MAXFILL=189 # best: multiples of 63
-    INTERVAL=20 # 20 ms for buffering
+    MAXFILL=63 # best: multiples of 63
+    INTERVAL=64 # 64 ms for buffering
     def __init__(self, cc_in, cc_out):
         self.cc_in = cc_in
         self.cc_out = cc_out
         self.discard_count = 0
-        self.in_buffer=bytearray(0)
+        self.in_buffer=bytearray(self.MAXFILL)
+        self.in_fill=0
+        self.in_process=0
         self.out_buffer=bytearray(self.MAXFILL)
         self.out_fill=0
         self.out_last_sent=time.ticks_ms()
@@ -40,15 +42,16 @@ class TelnetWrapper():
     def readinto(self, b):
         lb=len(b)
         if lb == 0: return None
-        if len(self.in_buffer) == 0:
-            self.in_buffer = self.cc_in.receive()
-# debug           print("+",self.buffer,b)
-        lbuffer = len(self.in_buffer)
-        if lbuffer > 0:
-            b[0] = self.in_buffer[0]
-            self.in_buffer= self.in_buffer[1:]
-# debug           print("!", b, lb)
-            if lbuffer>1: return 1
+        if self.in_process == self.in_fill:
+            (data,lbuffer)=self.cc_in.receive()
+            self.in_buffer[0:lbuffer]=data[0:lbuffer]
+            #print("received:",self.in_buffer[0:lbuffer]) # debug
+            self.in_fill = lbuffer
+            self.in_process = 0
+        if self.in_process < self.in_fill:
+            b[0] = self.in_buffer[self.in_process]
+            self.in_process+=1
+            if self.in_process < self.in_fill: return 1 # still sth. left
         return None
 
     def _send(self):
@@ -139,11 +142,11 @@ def accept_telnet_connect(telnet_server):
     # key (32byte=256bit) and iv (8byte=64bit)
     # but encrypted
     #init=decrypt_receive(last_client_socket,64,2000) # 2s timeout for init
-    init=cc_in.receive(timeoutms=2000) # 2s timeout for init
-    if init[0:16] == MAGIC: # Magic correct
+    (init,l)=cc_in.receive(timeoutms=2000) # 2s timeout for init
+    if l==56 and init[0:16] == MAGIC: # Magic correct
         print("\nnetrepl: Initial handshake succeeded, received session key.")
         # use rest for output key
-        cc_out =  chacha.ChaCha(init[16:48],init[48:64], socket=_client_socket)
+        cc_out =  chacha.ChaCha(init[16:48],init[48:56], socket=_client_socket)
 
         # print in terminal: last_client_socket.sendall(bytes([255, 252, 34])) # dont allow line mode
         # print in terminal: last_client_socket.sendall(bytes([255, 251, 1])) # turn off local echo
