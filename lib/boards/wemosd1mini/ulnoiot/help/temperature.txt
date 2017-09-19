@@ -1,0 +1,22 @@
+dht11(name, pin, on_change=None)
+dht22(name, pin, on_change=None):
+ds18x20(name, pin, on_change=None):
+
+Create a new temperature (+ humidity) sensor device.
+name will be appended to the mqtt topic and corresponding
+value will be published there under a subtopic temperature
+or humidity.
+Corrently the dht11, dht22, and ds18x20 chips are supported. Chose
+the respective device name.
+
+Parameters:
+- name: the name it can be addressed under
+- pin: the gpio pin
+- on_change: a method that will be called when the value changes
+
+Example:
+mqtt("mymqtthost","living room/ht1")
+dht22("ht01", d1)
+
+Now temperature and humidity are published as "living room/ht1/temperature" and
+"living room/ht1/humidity".
