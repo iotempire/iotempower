@@ -8,9 +8,9 @@
 #
 
 # TODO: test for build-essential gperf bison flex texinfo help2man libtool-bin?
-# might also: sudo apt-get install make unrar-free autoconf automake libtool gcc g++ gperf \
+# might also: sudo apt-get install make unrar-free autoconf automake libtool gcc g++ \
 #    flex bison texinfo gawk ncurses-dev libexpat-dev python-dev python python-serial \
-#    sed git unzip bash help2man wget bzip2
+#    sed git unzip bash help2man wget bzip2 gperf help2man
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
@@ -75,9 +75,9 @@ alias python=python2
 
 
 echo
-echo "First, open-sdk. This might take really long."
+echo "First, building open-sdk. This might take really long."
 cd "$ULNOIOT_FIRMWARE/esp-open-sdk"
-#make # this will fail but migh tdownload some important stuff?
+make # this will fail but might download some important stuff?
 # recreate missing files
 echo
 echo "[ulnoiot] Patching open-sdk (copying missing files)"
@@ -98,7 +98,7 @@ rm -rf ulnoiot umqtt ssd1306.py
 ln -s ../../../../micropython-lib/umqtt.simple/umqtt .
 ln -s ../../../drivers/display/ssd1306.py .
 ln -s $ULNOIOT_ROOT/lib/esp8266/ulnoiot .
-ln -s $ULNOIOT_ROOT/lib/chacha/chacha.py .
+ln -s $ULNOIOT_ROOT/lib/netrepl/chacha.py .
 
 echo
 echo "Third, build firmware."
