@@ -79,17 +79,19 @@ def main():
     if key is None:
         print('Enter key (32bytes as hex->64bytes):')
         key=sys.stdin.readline().strip().encode()
-        if len(key)!=64:
+        if len(key)!=64 and len(key)!=0:
             print("Key has to specified as 64 byte hex. Exiting.")
             sys.exit(1)
     if len(key)==64:
         key=bytes.fromhex(key)
+    if len(key)==0:
+        key = bytearray(32)
     if len(key)!=32:
         print("Key doesn't resolve to 256bit (32 bytes). Exiting.")
         sys.exit(1)
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.settimeout(2) # block for 2s
+    s.settimeout(2)  # block for 2s
 
     # connect to remote host
     try:

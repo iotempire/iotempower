@@ -9,6 +9,7 @@ _ap = network.WLAN(network.AP_IF)
 _ap.active(False)
 _wlan = network.WLAN(network.STA_IF)
 _wlan.active(True)
+_config_file="/wifi_config.py"
 time.sleep(1) # wait to become active
 
 # connect to wifi
@@ -51,7 +52,7 @@ def config():
     
 def delete():
     import os
-    os.remove("wifi_config.py")
+    os.remove(_config_file)
     # TODO: clear internal wifi assignment
     accesspoint()
 
@@ -87,7 +88,7 @@ def setup( name,  password, reset=True ):
 
     if name != wifi_config.name or \
           password != wifi_config.password:
-        f=open("wifi_config.py", "w")
+        f=open(_config_file, "w")
         f.write("name=\"%s\"\npassword=\"%s\"" % (name,password))
         f.close()
         print("Updated wifi_config.")

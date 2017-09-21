@@ -37,17 +37,15 @@ try: # micropython
     import ustruct as struct
     import uos as os
     import urandom as random
+    from ua32 import A32
 except: # normal python
     def const(a): return a
-    try:
-        import struct
-        import os
-        import random
-    except:
-        pass
+    import struct
+    import os
+    import random
+    from a32 import A32
 import errno
 import time
-from cpointers import A32
 
 #-----------------------------------------------------------------------
 
@@ -323,7 +321,7 @@ class ChaCha(object):
         x[d] = xd
 
     def _scramble_xor(self, data, length):
-        stream=self.scramble_buf.a
+        stream=self.scramble_buf.raw()
         for i in range(length):
             if self.scramble_pos>=64: # used up
                 self._chacha_scramble() # get some new bytes

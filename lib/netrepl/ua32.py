@@ -11,3 +11,5 @@ class A32():
         return A32(self.a[:])
     def into(self,d):
         d.a[:]=self.a[:]
+    def raw(self):
+        return self.a

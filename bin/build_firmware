@@ -94,11 +94,14 @@ mkdir -p ../modules.bak
 mv upip* ../modules.bak &> /dev/null
 mv ntptime* ../modules.bak  &> /dev/null
 rm -rf ulnoiot umqtt ssd1306.py
+# TODO: remove webrepl
 # relink new stuff
 ln -s ../../../../micropython-lib/umqtt.simple/umqtt .
 ln -s ../../../drivers/display/ssd1306.py .
 ln -s $ULNOIOT_ROOT/lib/esp8266/ulnoiot .
 ln -s $ULNOIOT_ROOT/lib/netrepl/chacha.py .
+ln -s $ULNOIOT_ROOT/lib/netrepl/netrepl.py .
+ln -s $ULNOIOT_ROOT/lib/netrepl/crypt_socket.py .
 
 echo
 echo "Third, build firmware."
