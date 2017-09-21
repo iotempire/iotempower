@@ -2,9 +2,14 @@
 #import esp
 #esp.osdebug(None)
 import gc
-import webrepl
+#import webrepl
 import esp
 esp.osdebug(None)
+import machine
+machine.freq(160000000) # fast default
 
-webrepl.start()
+import ulnoiot._wifi
+ulnoiot._wifi.connect()
+
+#webrepl.start()
 gc.collect()

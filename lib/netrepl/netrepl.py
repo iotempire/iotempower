@@ -203,10 +203,17 @@ def stop():
 
 
 # start listening for telnet connections on port 23
-def start(port=23,key=None): # TODO: take simpler default key as it will be reset
-    stop()
+def start(port=23,key=None,nostop=False): # TODO: take simpler default key as it will be reset
     global _server_socket, netrepl_config
 
+    if nostop: # we want to check if it's already running and not restart it
+        if _server_socket: # not none
+            return # no new intialization _> stop here
+
+    stop()
+
+    if key is None:
+        key=netrepl_config.key
     if key is None or len(key)==0:
         key=bytearray(32) # empty default key
     elif len(key) == 64:
@@ -260,4 +267,4 @@ except ImportError:
     class netrepl_config():
         pass
     netrepl_config.key=None
-start(key=netrepl_config.key)
+#start(key=netrepl_config.key)
