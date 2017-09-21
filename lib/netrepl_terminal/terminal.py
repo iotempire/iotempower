@@ -117,9 +117,9 @@ def main():
     print('terminal: Waiting for connection.\n')
     print('terminal: press ctrl-] to quit.\n')
 
-    #print('terminal: Requesting startscreen.')
-    #time.sleep(2)
-    #cs.send(b"help\r\n")
+    print('terminal: Requesting startscreen.')
+    time.sleep(1)
+    cs.send(b"help\r\n")
 
     fd = sys.stdin.fileno()
     old_settings = termios.tcgetattr(fd)

@@ -204,8 +204,6 @@ class ChaCha(object):
         v = A32(iv)
         self.state = self.key_state.copy()
         self.scramble_buf = self.key_state.copy()
-        self.scramble_x = self.key_state.copy()
-        self.scramble_s = self.key_state.copy()
         self.scramble_pos = 64 # all used up to trigger new generation
         iv_state = self.state # quick ref
         iv_state[12] = 0
@@ -246,10 +244,8 @@ class ChaCha(object):
         # """
 
         # make a copy of state
-        s=self.scramble_s
-        x=self.scramble_x
-        self.state.into(s)
-        self.scramble_buf.into(x)
+        s=self.state
+        x=self.scramble_buf
         for i in range(16): x[i] = s[i]
 
         for i in range(0, self.rounds, 2):
@@ -266,7 +262,7 @@ class ChaCha(object):
             
         for i in range(16):
             x[i] = (x[i] + s[i]) & 0xffffffff
-        self.scramble_pos = 0
+        self.scramble_pos = 0 # reset pos
 
         # increment the iv.  In this case we increment words
         # 12 and 13 in little endian order.  This will work
