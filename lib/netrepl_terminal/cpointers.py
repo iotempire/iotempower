@@ -5,9 +5,9 @@ import struct
 
 _packstr="<1I" # unsigned 32-bit integer
 
-class p32():
+class A32():
     def __init__(self,a):
-        self.a=a
+        self.a=bytearray(a)
     def __getitem__(self,k):
         k*=4
         return struct.unpack(_packstr,self.a[k:k+4])[0]
@@ -18,3 +18,7 @@ class p32():
         self.a[k+1]=p[1]
         self.a[k+2]=p[2]
         self.a[k+3]=p[3]
+    def copy(self):
+        return A32(self.a[:])
+    def into(self,d):
+        d.a[:]=self.a[:]

@@ -25,14 +25,18 @@ quit_flag = False
 # TODO: use whole readchar to support windows?
 
 import tty, sys, termios  # raises ImportError if unsupported
+#def readchar():
+#    fd = sys.stdin.fileno()
+#    old_settings = termios.tcgetattr(fd)
+#    try:
+#        tty.setraw(sys.stdin.fileno())
+#        ch = sys.stdin.read(1)
+#    finally:
+#        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+#    return ch
+
 def readchar():
-    fd = sys.stdin.fileno()
-    old_settings = termios.tcgetattr(fd)
-    try:
-        tty.setraw(sys.stdin.fileno())
-        ch = sys.stdin.read(1)
-    finally:
-        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+    ch = sys.stdin.read(1)
     return ch
 
 def char_reader():
@@ -117,6 +121,10 @@ def main():
     #time.sleep(2)
     #cs.send(b"help\r\n")
 
+    fd = sys.stdin.fileno()
+    old_settings = termios.tcgetattr(fd)
+    tty.setraw(sys.stdin.fileno())
+
     input_thread=threading.Thread(target=char_reader)
     input_thread.start()
 
@@ -139,7 +147,10 @@ def main():
                 # else:
                 if l>0:
                     # print data
-                    sys.stdout.write(bytes(data[0:l]).decode())
+                    try:
+                        sys.stdout.write(bytes(data[0:l]).decode())
+                    except:
+                        print("\r\nGot some weird data of len {}: >>{}<<\r\n".format(l,data[0:l]))
                     #print("data:", str(data[0:l]))
                     sys.stdout.flush()
 
@@ -158,7 +169,9 @@ def main():
     input_thread.join()
     print("Closing connection.")
     cs.close()
+    termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
 
 # main function
 if __name__ == "__main__":
     main()
+

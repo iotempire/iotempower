@@ -47,7 +47,7 @@ except: # normal python
         pass
 import errno
 import time
-from cpointers import p32 as ptr32
+from cpointers import A32
 
 #-----------------------------------------------------------------------
 
@@ -132,8 +132,8 @@ class ChaCha(object):
         #     key and the new iv will establish a new state.
         #
         # """
-        self._key_setup(bytearray(key))
-        self.iv_setup(bytearray(iv))
+        self._key_setup(key)
+        self.iv_setup(iv)
         self.rounds = rounds
 
     def _key_setup(self, key):
@@ -145,14 +145,12 @@ class ChaCha(object):
         # """
         if len(key) not in [16, 32]:
             raise Exception('key must be either 16 or 32 bytes')
-        key=bytearray(key)
-        self.key_state = bytearray(64)
-        key_state = ptr32(self.key_state)
+        k=A32(key)
+        self.key_state = A32(64)
+        key_state=self.key_state # ref
 
         if len(key) == 16:
-            k = ptr32(key) # access as 4x4
-
-            tau = ptr32(bytearray(b"expand 16-byte k"))
+            tau = A32(b"expand 16-byte k")
             key_state[0]  = tau[0]
             key_state[1]  = tau[1]
             key_state[2]  = tau[2]
@@ -169,8 +167,7 @@ class ChaCha(object):
             # 14 and 15 are reserved for the IV
 
         elif len(key) == 32:
-            k = ptr32(key) # access as 8x4
-            sigma = ptr32(bytearray(b"expand 32-byte k"))
+            sigma = A32(b"expand 32-byte k")
             key_state[0]  = sigma[0]
             key_state[1]  = sigma[1]
             key_state[2]  = sigma[2]
@@ -204,11 +201,13 @@ class ChaCha(object):
         # """
         if len(iv) != 8:
             raise Exception('iv must be 8 bytes')
-        v = ptr32(iv)
-        self.state = bytearray(self.key_state)
-        self.scramble_buf = bytearray(self.key_state)
+        v = A32(iv)
+        self.state = self.key_state.copy()
+        self.scramble_buf = self.key_state.copy()
+        self.scramble_x = self.key_state.copy()
+        self.scramble_s = self.key_state.copy()
         self.scramble_pos = 64 # all used up to trigger new generation
-        iv_state = ptr32(self.state)
+        iv_state = self.state # quick ref
         iv_state[12] = 0
         iv_state[13] = 0
         iv_state[14] = v[0]
@@ -247,8 +246,10 @@ class ChaCha(object):
         # """
 
         # make a copy of state
-        s = ptr32(self.state)
-        x = ptr32(self.scramble_buf)
+        s=self.scramble_s
+        x=self.scramble_x
+        self.state.into(s)
+        self.scramble_buf.into(x)
         for i in range(16): x[i] = s[i]
 
         for i in range(0, self.rounds, 2):
@@ -272,7 +273,7 @@ class ChaCha(object):
         # nicely for data up to 2^70 bytes (1,099,511,627,776GB)
         # in length.  After that it is the user's responsibility
         # to generate a new nonce/iv.
-        iv = ptr32(self.state)
+        iv = self.state
         iv[12] = (iv[12] + 1) & 0xffffffff
         if iv[12] == 0:  # if overflow in state[12]
             iv[13] += 1  # carry to state[13]
@@ -300,7 +301,7 @@ class ChaCha(object):
     # surprisingly, the following tweaks/accelerations provide
     # about a 20-40% gain
     def _quarterround(self, x, a, b, c, d):
-        #x=ptr32(xi) is already
+        #x=A32(xi) is already
         xa = x[a]
         xb = x[b]
         xc = x[c]
@@ -326,7 +327,7 @@ class ChaCha(object):
         x[d] = xd
 
     def _scramble_xor(self, data, length):
-        stream=self.scramble_buf
+        stream=self.scramble_buf.a
         for i in range(length):
             if self.scramble_pos>=64: # used up
                 self._chacha_scramble() # get some new bytes

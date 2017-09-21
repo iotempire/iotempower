@@ -36,8 +36,7 @@ class TelnetWrapper():
         # TODO: check that this is non-blocking
         # return None, when no data available
         # else return the number of bytes read.
-        lb=len(b)
-        if lb == 0:
+        if len(b) == 0:
             print("readinfo: empty buffer")
             return None # TODO:maybe we should then return 0?
         if self.in_process == self.in_fill: # more data needed
@@ -65,6 +64,7 @@ class TelnetWrapper():
     def _write1(self, byte):
         #if byte == 0 or byte == 0xff: return # TODO: debug
         #if byte != 10 and byte != 13 and (byte < 32 or byte > 127): return # TODO: debug
+        #if byte==0 or byte>127: return # not sending this
         self.out_buffer[self.out_fill] = byte
 #        dp.println("f1 {},{}".format(self.out_fill, self.MAXFILL))
         self.out_fill += 1
@@ -85,6 +85,7 @@ class TelnetWrapper():
 
     def write(self, data):
         # sadly not called without input, makes buffering tricky
+        # requires teh scheduled flush
         for byte in data:
             self._write1(byte)
         self.flush()
@@ -176,26 +177,11 @@ def accept_telnet_connect(telnet_server):
 
             _telnetwrapper = TelnetWrapper(_crypt_socket)
             uos.dupterm(_telnetwrapper)
-            # while True:
-            #     d=cc_in.receive()
-            #     if len(d)>0:
-            #         d=bytes(d).decode().strip()
-            #         print(d)
-            #         if d.startswith("quit"):
-            #             print("done")
-            #             break
-            #         v=None
-            #         try:
-            #             v=eval(d)
-            #             print("result", v)
-            #             cc_out.send(str(v))
-            #         except Exception as e:
-            #             print(e.args[0])
-            #             cc_out.send(str(v))
 
-            init_flush_timer()
             # construct timer to flush buffers often enough
+            init_flush_timer()
             return
+
     # something went wrong
     client_socket.sendall('\nnetrepl: Wrong protocol for ulnoiot netrepl.\n')
     print("\nWrong protocol for this client. Closing.\n")

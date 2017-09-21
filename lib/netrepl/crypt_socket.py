@@ -23,11 +23,41 @@ NETBUF_SIZE = const(192)
 
 class Crypt_Socket:
 
+    # micropython
+    def _sock_write(self,a):
+        return self.socket.write(a)
+
+    def _sock_readinto(self,a):
+        return self.socket.readinto(a)
+
+    # normal python
+    def _sock_send(self,a):
+        return self.socket.send(a)
+
+    def _sock_read(self,a):
+        b=self.socket.recv(1)
+        if len(b) == 0:
+            return None
+        else:
+            a[0]=b[0]
+            return 1
+
     def __init__(self, socket):
-        self.netbuf = bytearray(NETBUF_SIZE)
+        global sockwrite
+        # need in and out buffers as reading and writing can happen concurrently
+        self.netbuf_in = bytearray(NETBUF_SIZE)
+        self.netbuf_in_mv = memoryview(self.netbuf_in)
+        self.netbuf_out = bytearray(NETBUF_SIZE)
+        self.netbuf_out_mv = memoryview(self.netbuf_out)
         self.crypt_in = None
         self.crypt_out = None
         self.socket = socket
+        if sockwrite:
+            self.sock_write = self._sock_write
+            self.sock_read = self._sock_readinto
+        else:
+            self.sock_write = self._sock_send
+            self.sock_read = self._sock_read
         socket.setblocking(False) # non blocking
 
     def init_in(self, key, iv):
@@ -42,22 +72,18 @@ class Crypt_Socket:
         else: l=length
         if l>NETBUF_SIZE:
             raise Exception("Can't send packages longer than {} bytes.".format(NETBUF_SIZE))
-        self.netbuf[0:l] = datain[0:l]
-        self.crypt_out.encrypt(self.netbuf, length=l)
+        self.netbuf_out[0:l] = datain[0:l]
+        self.crypt_out.encrypt(self.netbuf_out, length=l)
         self._write(l) # as padded, send full block
 
     def _write(self, length):
-        global sockwrite
         # we need to write all the data but it's a non-blocking socket
         # so loop until it's all written eating EAGAIN exceptions
-        data=memoryview(self.netbuf)
+        data=self.netbuf_out_mv
         written=0
         while written < length:
             try:
-                if sockwrite:
-                    written += self.socket.write(data[written:length])
-                else:
-                    written += self.socket.send(data[written:length])
+                written += self.sock_write(data[written:length])
             except OSError as e:
                 if len(e.args) > 0 and e.args[0] == errno.EAGAIN:
                     # can't write yet, try again
@@ -72,18 +98,17 @@ class Crypt_Socket:
         # fill buffer once and decrypt
         # if request>0 wait blocking for request number of bytes (if timeout
         # given interrupt after timeoutms ms)
-        data = self.netbuf
+        data = self.netbuf_in
+        data_mv = self.netbuf_in_mv
         readbytes = 0
         start_t = ticks_ms()
         while readbytes < NETBUF_SIZE:
             try:
-                received = self.socket.recv(1)
-                if len(received) == 0: # no new data
+                if self.sock_read(data_mv[readbytes:readbytes+1]):
+                    readbytes += 1
+                else:
                     if readbytes >= request:
                         break  # break if not blocking to request size
-                else:
-                    data[readbytes] = received[0]
-                    readbytes += 1
             except OSError as e:
                 if len(e.args) > 0 \
                         and (e.args[0] == errno.EAGAIN
