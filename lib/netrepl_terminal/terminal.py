@@ -13,10 +13,50 @@
 
 MAGIC = b"UlnoIOT-NetREPL:"
 
-import socket, select, sys, os, time
-import chacha
+import socket, select, sys, os, time, threading
+from crypt_socket import Crypt_Socket
+
+input_buffer = ""
+input_buffer_lock=threading.Lock()
+quit_flag = False
+
+# from: https://stackoverflow.com/questions/510357/python-read-a-single-character-from-the-user
+# and https://github.com/magmax/python-readchar
+# TODO: use whole readchar to support windows?
+
+import tty, sys, termios  # raises ImportError if unsupported
+def readchar():
+    fd = sys.stdin.fileno()
+    old_settings = termios.tcgetattr(fd)
+    try:
+        tty.setraw(sys.stdin.fileno())
+        ch = sys.stdin.read(1)
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+    return ch
+
+def char_reader():
+    # thread reading from stdin into inputbuffer
+    global input_buffer, input_buffer_lock, quit_flag
+    while not quit_flag:
+        ch = readchar()
+        if ch=="\x1d":
+            quit_flag=True
+            ch=""
+        elif ch=="\r":
+            ch="\r\n"
+        input_buffer_lock.acquire()
+        input_buffer += ch
+        input_buffer_lock.release()
+
+
+def getChar():
+    answer = sys.stdin.read(1)
+    return answer
 
 def main():
+    global quit_flag, input_buffer_lock, input_buffer
+
     if len(sys.argv) < 2:
         print('Usage : python terminal.py hostname [port] [key]')
         sys.exit(1)
@@ -45,7 +85,7 @@ def main():
         sys.exit(1)
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.settimeout(2)
+    s.settimeout(2) # block for 2s
 
     # connect to remote host
     try:
@@ -55,33 +95,43 @@ def main():
         sys.exit()
 
     print('\nterminal: Connected to remote host.')
-    print('terminal: Sending initialization and session key.\n')
-    cc_out = chacha.ChaCha(key,bytes(8),socket=s) # TODO: consider IV here? sync with netrepl
+    print('terminal: Sending plain text initialization and initialization vector.\n')
+    iv_out = os.urandom(8)
+    s.send(MAGIC+iv_out)
+    print('terminal: Generating session key.\n')
+    s.settimeout(0) # now, we can be non blocking
+    cs = Crypt_Socket(s)
+    cs.init_out(key,iv_out)
     key_in = os.urandom(32)
     iv_in = os.urandom(8)
+    print('terminal: Sending initialization and session key.\n')
 
-    cc_out.send(MAGIC+key_in+iv_in)  # send the key
+    cs.send(MAGIC+key_in+iv_in)  # send the key
 
-    cc_in = chacha.ChaCha(key_in, iv_in,socket=s)
+    cs.init_in(key_in, iv_in)
 
     print('terminal: Waiting for connection.\n')
-    time.sleep(2)
-    #print('terminal: Requesting startscreen.\n')
-    #cc_out.send(b"help\r\n")
+    print('terminal: press ctrl-] to quit.\n')
 
-    while True:
-        socket_list = [sys.stdin, s]
+    #print('terminal: Requesting startscreen.')
+    #time.sleep(2)
+    #cs.send(b"help\r\n")
 
+    input_thread=threading.Thread(target=char_reader)
+    input_thread.start()
+
+    while not quit_flag:
+        # Check if we received anything via network
         # Get the list sockets which are readable
         read_sockets, write_sockets, error_sockets = \
-            select.select(socket_list, [], [])
+            select.select([s], [], [], 0.01)
 
         for sock in read_sockets:
             # incoming message from remote server
             if sock == s:
-                (data,l) = cc_in.receive()
+                (data,l) = cs.receive()
 
-                # TODO: figure out how to detect conenction close
+                # TODO: figure out how to detect connection close
                 # #print("recvd:",data)
                 # if not data:
                 #     print('\nterminal: Connection closed.')
@@ -93,10 +143,21 @@ def main():
                     #print("data:", str(data[0:l]))
                     sys.stdout.flush()
 
+        if len(input_buffer)>0:
             # user entered a message
-            else:
-                msg = (sys.stdin.readline().strip()+'\r\n').encode()
-                cc_out.send(msg)
+            input_buffer_lock.acquire()
+            send_buffer=input_buffer.encode()
+            input_buffer=""
+            input_buffer_lock.release()
+            #msg = sys.stdin.readline().strip()+'\r\n'
+            #print("\r\nmsg {} <<\r\n".format(send_buffer))
+            cs.send(send_buffer)
+            #cs.send(send_buffer+b'\r\n')
+            #cs.send(send_buffer+b'!')
+
+    input_thread.join()
+    print("Closing connection.")
+    cs.close()
 
 # main function
 if __name__ == "__main__":

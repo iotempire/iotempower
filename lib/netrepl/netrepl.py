@@ -5,60 +5,59 @@
 
 MAGIC = b"UlnoIOT-NetREPL:"
 
-import socket
-import network
-import uos
-import chacha
-import time
-import machine
-import micropython
+import time, socket, network, uos, machine, micropython, errno
+from crypt_socket import Crypt_Socket
 
 # debug
 #from ulnoiot import *
 #import ulnoiot.shield.devkit1_display
 #dp=devices["dp1"]
 
-_client_socket = None
+_crypt_socket = None
 _server_socket = None
 _flush_timer = None
 _telnetwrapper = None
 
 # Provide necessary functions for dupterm and replace telnet control characters that come in.
 class TelnetWrapper():
-    MAXFILL=63 # best: multiples of 63
-    INTERVAL=64 # 64 ms for buffering
-    def __init__(self, cc_in, cc_out):
-        self.cc_in = cc_in
-        self.cc_out = cc_out
-        self.discard_count = 0
-        self.in_buffer=bytearray(self.MAXFILL)
+    BUFFER_SIZE=192
+    INTERVAL=20 # reaction time in ms for buffering
+    def __init__(self, crypt_socket):
+        self.cs = crypt_socket
+        self.in_buffer=None
         self.in_fill=0
         self.in_process=0
-        self.out_buffer=bytearray(self.MAXFILL)
+        self.out_buffer=bytearray(self.BUFFER_SIZE)
         self.out_fill=0
         self.out_last_sent=time.ticks_ms()
         self.sending = False
         
     def readinto(self, b):
+        # TODO: check that this is non-blocking
+        # return None, when no data available
+        # else return the number of bytes read.
         lb=len(b)
-        if lb == 0: return None
-        if self.in_process == self.in_fill:
-            (data,lbuffer)=self.cc_in.receive()
-            self.in_buffer[0:lbuffer]=data[0:lbuffer]
-            #print("received:",self.in_buffer[0:lbuffer]) # debug
-            self.in_fill = lbuffer
+        if lb == 0:
+            print("readinfo: empty buffer")
+            return None # TODO:maybe we should then return 0?
+        if self.in_process == self.in_fill: # more data needed
+            (self.in_buffer,self.in_fill) = self.cs.receive()
+            #print("r:",self.in_buffer[0:self.in_fill]) # debug
             self.in_process = 0
         if self.in_process < self.in_fill:
             b[0] = self.in_buffer[self.in_process]
+            #print("read",b[0])
             self.in_process+=1
-            if self.in_process < self.in_fill: return 1 # still sth. left
-        return None
+            #if self.in_process < self.in_fill: return 1 # just handing over 1 byte
+            return 1  # just handed over 1 byte
+        return None # couldn't read anything
 
     def _send(self):
+        # TODO: does this need to be unblocking?
         if self.sending == True: return # TODO: check if this locking is enough
         self.sending=True
-# debug        dp.println("s {},{},{}".format(self.out_fill,int(self.out_buffer[0]),int(self.out_buffer[1])))
-        self.cc_out.send(self.out_buffer,length=self.out_fill)
+        #dp.println("s {},{},{}".format(self.out_fill,int(self.out_buffer[0]),int(self.out_buffer[1]))) # debug
+        self.cs.send(self.out_buffer,length=self.out_fill)
         self.out_fill = 0
         self.out_last_sent = time.ticks_ms()
         self.sending=False
@@ -70,7 +69,7 @@ class TelnetWrapper():
 #        dp.println("f1 {},{}".format(self.out_fill, self.MAXFILL))
         self.out_fill += 1
 #        dp.println("f2 {},{}".format(self.out_fill, self.MAXFILL))
-        if self.out_fill >= self.MAXFILL:
+        if self.out_fill >= self.BUFFER_SIZE:
 #            dp.println("f3 {},{}".format(self.out_fill,self.MAXFILL))
             self._send()
 
@@ -91,7 +90,7 @@ class TelnetWrapper():
         self.flush()
 
     def close(self):
-        self.cc_in.socket.close()
+        self.cs.close()
 
 
 def flush(t):
@@ -121,71 +120,97 @@ def init_flush_timer():
 # send telnet control characters to disable line mode
 # and stop local echoing
 def accept_telnet_connect(telnet_server):
-    global _client_socket, _key, _telnetwrapper
+    global _crypt_socket, _key, _telnetwrapper
     
-    if _client_socket:
+    if _crypt_socket is not None:
         # close any previous clients
         uos.dupterm(None)
-        _client_socket.close()
+        _crypt_socket.close()
 
-    _client_socket, remote_addr = telnet_server.accept()
-    print("\nnetrepl: Socket connection from:", remote_addr)
-
-    # reset encryption status vector TODO: consider variable iv
-    cc_in = chacha.ChaCha(_key, bytearray(8), socket=_client_socket)
+    client_socket, remote_addr = telnet_server.accept()
+    print("\nnetrepl: Connection request from:", remote_addr[0])
 
     # prepare answer channel
-    _client_socket.setblocking(False)
-    _client_socket.setsockopt(socket.SOL_SOCKET, 20, uos.dupterm_notify)
+    client_socket.setblocking(False)
+    client_socket.setsockopt(socket.SOL_SOCKET, 20, uos.dupterm_notify)
 
-    # read magic word (16byte="UlnoIOT-NetREPL:"),
-    # key (32byte=256bit) and iv (8byte=64bit)
-    # but encrypted
-    #init=decrypt_receive(last_client_socket,64,2000) # 2s timeout for init
-    (init,l)=cc_in.receive(timeoutms=2000) # 2s timeout for init
-    if l==56 and init[0:16] == MAGIC: # Magic correct
-        print("\nnetrepl: Initial handshake succeeded, received session key.")
-        # use rest for output key
-        cc_out =  chacha.ChaCha(init[16:48],init[48:56], socket=_client_socket)
+    # read magic and initialization in first 2s
+    readbytes = 0
+    start_t = time.ticks_ms()
+    block=bytearray(24)
+    while readbytes < 24:
+        try:
+            received = client_socket.recv(1)
+            if received and len(received) > 0:
+                block[readbytes] = received[0]
+                readbytes += 1
+        except OSError as e:
+            if len(e.args) > 0 \
+                    and e.args[0] == errno.EAGAIN:
+                pass  # try eventually again
+            else:
+                raise
+        if time.ticks_diff(time.ticks_ms(), start_t) >= 2000:
+            break
 
-        # print in terminal: last_client_socket.sendall(bytes([255, 252, 34])) # dont allow line mode
-        # print in terminal: last_client_socket.sendall(bytes([255, 251, 1])) # turn off local echo
+    _crypt_socket=Crypt_Socket(client_socket)
 
-        _telnetwrapper = TelnetWrapper(cc_in,cc_out)
-        uos.dupterm(_telnetwrapper)
-        # while True:
-        #     d=cc_in.receive()
-        #     if len(d)>0:
-        #         d=bytes(d).decode().strip()
-        #         print(d)
-        #         if d.startswith("quit"):
-        #             print("done")
-        #             break
-        #         v=None
-        #         try:
-        #             v=eval(d)
-        #             print("result", v)
-        #             cc_out.send(str(v))
-        #         except Exception as e:
-        #             print(e.args[0])
-        #             cc_out.send(str(v))
+    if readbytes == 24 and block[0:16]==MAGIC:
+        print("netrepl: Received initialization request and vector.")
 
-        init_flush_timer()
-        # construct timer to flush buffers often enough
+        # setup input encryption
+        _crypt_socket.init_in(_key, block[16:24])
 
-    else:
-        _client_socket.sendall('\nnetrepl: Wrong protocol for ulnoiot netrepl.\n')
-        _client_socket.close()
-        print("\nWrong protocol for this client. Closing.\n")
+        # read (now encrypted) magic word (16byte="UlnoIOT-NetREPL:"),
+        # key (32byte=256bit) and iv (8byte=64bit)
+        # but encrypted
+        #init=decrypt_receive(last_client_socket,64,2000) # 2s timeout for init
+        (init,l)=_crypt_socket.receive(request=56,timeoutms=2000) # 2s timeout for init
+        if l==56 and init[0:16] == MAGIC: # Magic correct
+            print("netrepl: Initial handshake succeeded, received session key.\n")
+            # use rest for output key
+            _crypt_socket.init_out(init[16:48],init[48:56])
+
+            # print in terminal: last_client_socket.sendall(bytes([255, 252, 34])) # dont allow line mode
+            # print in terminal: last_client_socket.sendall(bytes([255, 251, 1])) # turn off local echo
+
+            _telnetwrapper = TelnetWrapper(_crypt_socket)
+            uos.dupterm(_telnetwrapper)
+            # while True:
+            #     d=cc_in.receive()
+            #     if len(d)>0:
+            #         d=bytes(d).decode().strip()
+            #         print(d)
+            #         if d.startswith("quit"):
+            #             print("done")
+            #             break
+            #         v=None
+            #         try:
+            #             v=eval(d)
+            #             print("result", v)
+            #             cc_out.send(str(v))
+            #         except Exception as e:
+            #             print(e.args[0])
+            #             cc_out.send(str(v))
+
+            init_flush_timer()
+            # construct timer to flush buffers often enough
+            return
+    # something went wrong
+    client_socket.sendall('\nnetrepl: Wrong protocol for ulnoiot netrepl.\n')
+    print("\nWrong protocol for this client. Closing.\n")
+    _crypt_socket.close()
+    _crypt_socket=None
 
 
 def stop():
-    global _server_socket, _client_socket
+    global _server_socket, _crypt_socket
     uos.dupterm(None)
     if _server_socket:
         _server_socket.close()
-    if _client_socket:
-        _client_socket.close()
+    if _crypt_socket:
+        _crypt_socket.close()
+        _crypt_socket=None
     if _flush_timer:
         _flush_timer.deinit()
 

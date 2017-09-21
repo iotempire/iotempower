@@ -1,48 +1,45 @@
-
-"""
-    chacha.py
-    
-    An implementation of ChaCha in about 130 operative lines 
-    of 100% pure Python code.
-    
-    Copyright (c) 2009-2011 by Larry Bugbee, Kent, WA
-    ALL RIGHTS RESERVED.
-
-    chacha.py IS EXPERIMENTAL SOFTWARE FOR EDUCATIONAL
-    PURPOSES ONLY.  IT IS MADE AVAILABLE "AS-IS" WITHOUT 
-    WARRANTY OR GUARANTEE OF ANY KIND.  USE SIGNIFIES 
-    ACCEPTANCE OF ALL RISK.  
-
-    To make your learning and experimentation less cumbersome, 
-    chacha.py is free for any use.      
-    
-    This implementation is intended for Python 2.x.
-    
-    Larry Bugbee
-    May 2009     (Salsa20)
-    August 2009  (ChaCha)
-    rev June 2010
-    rev March 2011  - tweaked _quarterround() to get 20-30% speed gain
-
-    Modifications by ulno (http://ulnol.net) starting on 2017-09-20.
-    Taken from: http://www.seanet.com/~bugbee/crypto/chacha/chacha.py
-
-    Intended to be used as stream cipher for repl in micropython.
-
-    This version is optimized for micropython.
-
-"""
-
-sockwrite=False
+# """
+#     chacha.py
+#
+#     An implementation of ChaCha in about 130 operative lines
+#     of 100% pure Python code.
+#
+#     Copyright (c) 2009-2011 by Larry Bugbee, Kent, WA
+#     ALL RIGHTS RESERVED.
+#
+#     chacha.py IS EXPERIMENTAL SOFTWARE FOR EDUCATIONAL
+#     PURPOSES ONLY.  IT IS MADE AVAILABLE "AS-IS" WITHOUT
+#     WARRANTY OR GUARANTEE OF ANY KIND.  USE SIGNIFIES
+#     ACCEPTANCE OF ALL RISK.
+#
+#     To make your learning and experimentation less cumbersome,
+#     chacha.py is free for any use.
+#
+#     This implementation is intended for Python 2.x.
+#
+#     Larry Bugbee
+#     May 2009     (Salsa20)
+#     August 2009  (ChaCha)
+#     rev June 2010
+#     rev March 2011  - tweaked _quarterround() to get 20-30% speed gain
+#
+#     Modifications by ulno (http://ulnol.net) starting on 2017-09-20.
+#     Taken from: http://www.seanet.com/~bugbee/crypto/chacha/chacha.py
+#
+#     Intended to be used as stream cipher for repl in micropython.
+#
+#     This version is optimized for micropython.
+#
+# """
 
 try: # micropython
+    from micropython import const
     import ustruct as struct
     import uos as os
     import urandom as random
-    sockwrite=True
-    from micropython import const
-except:
-    try: # normal python
+except: # normal python
+    def const(a): return a
+    try:
         import struct
         import os
         import random
@@ -50,16 +47,6 @@ except:
         pass
 import errno
 import time
-if 'ticks_ms' in dir(time): # workaround for ticks in normal python
-    ticks_ms=time.ticks_ms
-    ticks_diff=time.ticks_diff
-else:
-    def ticks_ms():
-        return int(time.clock()*1000)
-    def ticks_diff(a,b):
-        return a-b
-    def const(a): return a
-
 from cpointers import p32 as ptr32
 
 #-----------------------------------------------------------------------
@@ -128,16 +115,10 @@ class ChaCha(object):
     #     rev June 2010
     # """
 
-    TAU    = ( 0x61707865, 0x3120646e, 0x79622d36, 0x6b206574 )
-    SIGMA  = ( 0x61707865, 0x3320646e, 0x79622d32, 0x6b206574 )
 #    ROUNDS = 8                         # ...10, 12, 20?
     ROUNDS = const(12)                         # ...10, 12, 20? [ulno] playing it safer with 12
-    MAX_CRYPT = const(64)
-    NETBUF_SIZE = const(64)  # Check how to increase to bigger network blocks
 
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-    def __init__(self, key, iv, rounds=ROUNDS, maxsize=MAX_CRYPT, socket=None):
+    def __init__(self, key, iv, rounds=ROUNDS):
         # """ Both key and iv are byte strings.  The key must be
         #     exactly 16 or 32 bytes, 128 or 256 bits respectively.
         #     The iv must be exactly 8 bytes (64 bits) and MUST
@@ -154,13 +135,6 @@ class ChaCha(object):
         self._key_setup(bytearray(key))
         self.iv_setup(bytearray(iv))
         self.rounds = rounds
-        self.socket = socket
-        self.crypt_buf = bytearray(maxsize)
-        self.crypt_buf_size = 0
-        self.network_buf = bytearray(self.NETBUF_SIZE)
-        self.maxsize = maxsize
-
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     def _key_setup(self, key):
         # """ key is converted to a list of 4-byte unsigned integers
@@ -177,10 +151,12 @@ class ChaCha(object):
 
         if len(key) == 16:
             k = ptr32(key) # access as 4x4
-            key_state[0]  = self.TAU[0]
-            key_state[1]  = self.TAU[1]
-            key_state[2]  = self.TAU[2]
-            key_state[3]  = self.TAU[3]
+
+            tau = ptr32(bytearray(b"expand 16-byte k"))
+            key_state[0]  = tau[0]
+            key_state[1]  = tau[1]
+            key_state[2]  = tau[2]
+            key_state[3]  = tau[3]
             key_state[4]  = k[0]
             key_state[5]  = k[1]
             key_state[6]  = k[2]
@@ -194,10 +170,11 @@ class ChaCha(object):
 
         elif len(key) == 32:
             k = ptr32(key) # access as 8x4
-            key_state[0]  = self.SIGMA[0]
-            key_state[1]  = self.SIGMA[1]
-            key_state[2]  = self.SIGMA[2]
-            key_state[3]  = self.SIGMA[3]
+            sigma = ptr32(bytearray(b"expand 32-byte k"))
+            key_state[0]  = sigma[0]
+            key_state[1]  = sigma[1]
+            key_state[2]  = sigma[2]
+            key_state[3]  = sigma[3]
             key_state[4]  = k[0]
             key_state[5]  = k[1]
             key_state[6]  = k[2]
@@ -209,9 +186,7 @@ class ChaCha(object):
             # 12 and 13 are reserved for the counter
             # 14 and 15 are reserved for the IV
 
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    #@micropython.viper
     def iv_setup(self, iv):
         # """ self.state and other working structures are lists of
         #     4-byte unsigned integers (32 bits).
@@ -232,17 +207,14 @@ class ChaCha(object):
         v = ptr32(iv)
         self.state = bytearray(self.key_state)
         self.scramble_buf = bytearray(self.key_state)
+        self.scramble_pos = 64 # all used up to trigger new generation
         iv_state = ptr32(self.state)
         iv_state[12] = 0
         iv_state[13] = 0
         iv_state[14] = v[0]
         iv_state[15] = v[1]
-        self.lastblock_sz = 64      # init flag - unsafe to continue
-                                    # processing if not 64
 
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-    def encrypt(self, datain, length=None):
+    def encrypt(self, data, length=None):
         # """ Encrypt a chunk of data.  datain and the returned value
         #     are byte strings.
         #
@@ -257,46 +229,16 @@ class ChaCha(object):
         #     Typically 10's and 100's of KB are available but then,
         #     perhaps not.  This routine is intended for educational
         #     purposes so application developers should take heed.
+        #
+        # As we use xor, en-/decryption can be done in place
+        #
         # """
-        if self.lastblock_sz != 64:
-            raise Exception('last chunk size not a multiple of 64 bytes')
-        if length is None: datain_size=len(datain)
-        else: datain_size=length
-        if datain_size > self.maxsize:
-            raise Exception('Block too large to crypt in pre-reserved buffer')
-        dataout = self.crypt_buf
-        self.crypt_buf_size = datain_size
-        datain_start = 0
-        while datain_start < datain_size:
-            # generate 64 bytes of cipher stream
-            stream = self._chacha_scramble();
-            # XOR the stream onto the next 64 bytes of data
-            end=min(datain_start+64,datain_size)
-            self._xor(stream, datain, dataout, datain_start, end)
-            datain_left = datain_size - datain_start
-            if datain_left <= 64:
-                self.lastblock_sz = datain_left
-                return self.crypt_buf # size is known in advance, so just give resulting buffer
-            # increment the iv.  In this case we increment words
-            # 12 and 13 in little endian order.  This will work 
-            # nicely for data up to 2^70 bytes (1,099,511,627,776GB) 
-            # in length.  After that it is the user's responsibility 
-            # to generate a new nonce/iv.
-            iv = ptr32(self.state)
-            iv[12] = (iv[12] + 1) & 0xffffffff
-            if iv[12] == 0:           # if overflow in state[12]
-                iv[13] += 1           # carry to state[13]
-                # not to exceed 2^70 x 2^64 = 2^134 data size ??? <<<<
-            # get ready for the next iteration
-            datain_start += 64
-        # should never get here
-        raise Exception('Huh?')
-    
-    decrypt = encrypt
+        if length is None: data_size=len(data)
+        else: data_size=length
+        self._scramble_xor(data, data_size) # XOR the stream
 
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    
-    #@micropython.viper
+    decrypt = encrypt # same -> we are using xor against the evolving scramble-buffer
+
     def _chacha_scramble(self):     # 64 bytes in
         # """ self.state and other working structures are lists of
         #     4-byte unsigned integers (32 bits).
@@ -323,9 +265,20 @@ class ChaCha(object):
             
         for i in range(16):
             x[i] = (x[i] + s[i]) & 0xffffffff
-        return self.scramble_buf  # 64 bytes out
-    
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        self.scramble_pos = 0
+
+        # increment the iv.  In this case we increment words
+        # 12 and 13 in little endian order.  This will work
+        # nicely for data up to 2^70 bytes (1,099,511,627,776GB)
+        # in length.  After that it is the user's responsibility
+        # to generate a new nonce/iv.
+        iv = ptr32(self.state)
+        iv[12] = (iv[12] + 1) & 0xffffffff
+        if iv[12] == 0:  # if overflow in state[12]
+            iv[13] += 1  # carry to state[13]
+            # not to exceed 2^70 x 2^64 = 2^134 data size ??? <<<<
+
+        # return None  # result in scramble_buf
     
     # '''
     # # as per definition - deprecated
@@ -346,7 +299,6 @@ class ChaCha(object):
 
     # surprisingly, the following tweaks/accelerations provide
     # about a 20-40% gain
-    #@micropython.viper
     def _quarterround(self, x, a, b, c, d):
         #x=ptr32(xi) is already
         xa = x[a]
@@ -372,88 +324,11 @@ class ChaCha(object):
         x[b] = xb
         x[c] = xc
         x[d] = xd
-    
-    
-    #@micropython.viper
-    def _xor(self, stream, datain, dataout, from_, to):
-        j=0
-        for i in range(from_,to):
-            dataout[i]=stream[j]^datain[i]
-            j+=1
 
-    def send(self, datain, length=None):
-        #print("Sending",datain)
-        if length is None: l=len(datain)
-        else: l=length
-        block = self.network_buf
-        bstart=0
-        while l>0:
-            lthis=min(l,63)
-            block[0] = lthis + 64*random.getrandbits(2)
-            block[1:1+lthis] = datain[bstart:bstart+lthis]
-            block[1+lthis:64] = os.urandom(63-lthis)  # pad
-            self.encrypt(block,length=64)
-            self._write(length=64) # as padded, send full block
-            l -= 63
-            bstart += 63
-
-
-    def _write(self, length=None):
-        global sockwrite
-        if length is None: l=64
-        else: l=length
-        # we need to write all the data but it's a non-blocking socket
-        # so loop until it's all written eating EAGAIN exceptions
-        data=self.crypt_buf
-        written=0
-        while written < l:
-            try:
-                if sockwrite:
-                    written += self.socket.write(data[written:l])
-                else:
-                    written += self.socket.send(data[written:l])
-            except OSError as e:
-                if len(e.args) > 0 and e.args[0] == errno.EAGAIN:
-                    # can't write yet, try again
-                    pass
-                else:
-                    # something else...propagate the exception
-                    raise
-
-
-    def receive(self, timeoutms=None):
-        # receive from buffer,
-        # fill buffer once and decrypt
-        block = self.network_buf
-        readbytes = 0
-        start_t = ticks_ms()
-        while readbytes < 64:
-            try:
-                received=self.socket.recv(1)
-                if len(received) < 1:
-                    if readbytes==0:
-                        break # no data -> return early
-                else:
-                    block[readbytes] = received[0]
-                    readbytes += 1
-            except (IndexError, OSError) as e:
-                if type(e) == IndexError or len(e.args) > 0 \
-                        and e.args[0] == errno.EAGAIN:
-                    pass  # try eventually again
-                else:
-                    raise
-            if timeoutms is not None \
-                    and ticks_diff(ticks_ms(), start_t) >= timeoutms:
-                break
-        data=self.crypt_buf
-        if readbytes==0: # no need to try to decrypt
-            return (data,0)
-        self.decrypt(block[0:readbytes])
-        readbytes=min(readbytes,data[0] & 63)  # discard random upper bits
-        for i in range(readbytes):
-            data[i]=data[i+1]
-        return (data,readbytes)
-
-#-----------------------------------------------------------------------
-#-----------------------------------------------------------------------
-#-----------------------------------------------------------------------
+    def _scramble_xor(self, data, length):
+        stream=self.scramble_buf
+        for i in range(length):
+            if self.scramble_pos>=64: # used up
+                self._chacha_scramble() # get some new bytes
+            data[i] ^= stream[self.scramble_pos]
+            self.scramble_pos+=1 # use up encryption buffer
