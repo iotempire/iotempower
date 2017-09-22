@@ -4,7 +4,7 @@ import machine
 import network
 import time
 #import webrepl
-import netrepl
+import unetrepl as nr
 
 _ap = network.WLAN(network.AP_IF)
 _ap.active(False)
@@ -37,7 +37,7 @@ def connect():
     else:
         print('Wifi: connection failed, starting accesspoint!')
         accesspoint()
-    netrepl.start(nostop=True)
+    nr.start(nostop=True)
 
 def accesspoint():
     global _wlan
@@ -100,7 +100,7 @@ def setup( name,  password, reset=True ):
             print("Resetting system in 3 seconds.")
             time.sleep(1)
             #webrepl.stop()
-            netrepl.stop()
+            nr.stop()
             time.sleep(2)
             machine.reset()
         else:
