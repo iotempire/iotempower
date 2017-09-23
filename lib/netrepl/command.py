@@ -24,35 +24,22 @@ def main():
     if _debug: print(_debug,'Sending command.')
     con.repl_interrupt()
     con.repl_raw()
+    con.read_until(b"raw REPL; CTRL-B to exit\r\n>", timeoutms=2000)
     con.send(" ".join(parser.args.command).encode())
     con.repl_execute()
-
-    quit_flag=False
-    while not quit_flag:
-        # Check if we received anything via network
-        # Get the list sockets which are readable
-        read_sockets, write_sockets, error_sockets = \
-            select.select([con.socket], [], [], 0.2)
-
-        for sock in read_sockets:
-            # incoming message from remote server
-            if sock == con.socket:
-                while True:
-                    data = con.receive()
-                    if data is None: break
-                    # print data
-                    try:
-                        sys.stdout.write(data.decode())
-                    except:
-                        if _debug:
-                            print("\r\n{} Got some weird data of len "
-                                  "{}: >>{}<<\r\n".format(_debug,len(data),data))
-                    #print("data:", str(data[0:l]))
-                    sys.stdout.flush()
+    con.read_until(b"OK", timeoutms=2000)  # wait for output start
+    data=con.read_until(b"\x04\x04>", timeoutms=60000)
+    try:
+        sys.stdout.write(data.decode())
+    except:
+        if _debug:
+            print("\r\n{} Got some weird data of len "
+                  "{}: >>{}<<\r\n".format(_debug, len(data), data))
+    sys.stdout.flush()
 
     if _debug: print("\r\n{} Closing connection.\r".format(_debug))
     con.repl_normal()  # normal repl
-    con.close()
+    con.close(report=True)
     if _debug: print("\r\n{} Connection closed.\n".format(_debug))
 
 

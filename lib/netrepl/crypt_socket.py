@@ -15,7 +15,7 @@ try: # micropython
     _upy=True
 except: # normal python
     def const(a): return a
-    def ticks_ms(): return int(time.clock() * 1000)
+    def ticks_ms(): return int(time.time() * 1000)
     def ticks_diff(a, b): return a - b
     def sleep_ms(t): time.sleep(t/1000)
 
@@ -85,9 +85,14 @@ class Crypt_Socket:
             try:
                 written += self.sock_write(data[written:length])
             except OSError as e:
-                if len(e.args) > 0 and e.args[0] == errno.EAGAIN:
-                    # can't write yet, try again
-                    pass
+                if len(e.args) > 0:
+                    if e.args[0] == errno.EAGAIN:
+                        # can't write yet, try again
+                        pass
+                    elif e.args[0] == errno.ECONNRESET: # connection closed
+                        return # we are done: TODO: error?
+                    else:
+                        raise
                 else:
                     # something else...propagate the exception
                     raise
@@ -98,6 +103,11 @@ class Crypt_Socket:
         # fill buffer once and decrypt
         # if request>0 wait blocking for request number of bytes (if timeout
         # given interrupt after timeoutms ms)
+        # timeout==None: block
+        # timeout==0: return immediately after trying to read something from network buffer
+        # timeout>0: try for time specified to read something before returning
+        # this function always returns a pointer to the buffer and number of bytes
+        # read (could be 0)
         data = self.netbuf_in
         data_mv = self.netbuf_in_mv
         readbytes = 0

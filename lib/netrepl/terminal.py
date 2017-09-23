@@ -62,6 +62,8 @@ def main():
 
 
     con = parser.connect()
+    if _debug is not None:
+        print(_debug, 'Press ctrl-] to quit.\n')
     if _debug: print(_debug,'Requesting startscreen.')
     con.send(b"\r\nhelp\r\n")
 
@@ -116,7 +118,7 @@ def main():
     input_thread.join()  # finsih input_thread
     if _debug: print("\r\n{} Closing connection.\r".format(_debug))
     con.repl_normal()  # normal repl
-    con.close()
+    con.close(report=True)
     if _debug: print("\r\n{} Connection closed.\n".format(_debug))
     termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
 

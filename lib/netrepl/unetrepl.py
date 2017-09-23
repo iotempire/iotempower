@@ -45,11 +45,16 @@ class TelnetWrapper():
             #print("r:",self.in_buffer[0:self.in_fill]) # debug
             self.in_process = 0
         if self.in_process < self.in_fill:
-            b[0] = self.in_buffer[self.in_process]
-            #print("read",b[0])
-            self.in_process+=1
-            #if self.in_process < self.in_fill: return 1 # just handing over 1 byte
-            return 1  # just handed over 1 byte
+            r = self.in_buffer[self.in_process]
+            if r==0x1e: # close requested
+                self.close()
+                return None
+            else:
+                b[0] = r
+                #print("read",b[0])
+                self.in_process+=1
+                #if self.in_process < self.in_fill: return 1 # just handing over 1 byte
+                return 1  # just handed over 1 byte
         return None # couldn't read anything
 
     def _send(self):
@@ -86,14 +91,16 @@ class TelnetWrapper():
 
     def write(self, data):
         # sadly not called without input, makes buffering tricky
-        # requires teh scheduled flush
+        # requires the scheduled flush
         for byte in data:
             self._write1(byte)
         self.flush()
 
-    def close(self):
-        self.cs.close()
-
+    def close(self, report=False):
+        # TODO: empty network buffers first?
+        if report:
+            self.write(b"\x1e")
+        micropython.schedule(stop_client, 0)  # we are maybe in interrupt
 
 def flush(t):
     # callback for timer to flush buffer (scheduled and safe to execute)
@@ -190,16 +197,23 @@ def accept_telnet_connect(telnet_server):
     _crypt_socket=None
 
 
-def stop():
-    global _server_socket, _crypt_socket
+def stop_client(t=None):  # allow random parameter for being scheduled
+    global _crypt_socket, _flush_timer
+
     uos.dupterm(None)
-    if _server_socket:
-        _server_socket.close()
     if _crypt_socket:
         _crypt_socket.close()
         _crypt_socket=None
+        print("\nnetrepl: Connection closed.\n")
     if _flush_timer:
         _flush_timer.deinit()
+
+def stop():
+    global _server_socket
+    stop_client()
+    if _server_socket:
+        _server_socket.close()
+
 
 
 # start listening for telnet connections on port 23

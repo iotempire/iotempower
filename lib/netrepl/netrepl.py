@@ -14,6 +14,12 @@ MAGIC = b"UlnoIOT-NetREPL:"
 import socket, sys, os, time
 from crypt_socket import Crypt_Socket
 
+
+def ticks_ms(): return int(time.time() * 1000)
+def ticks_diff(a, b): return a - b
+def sleep_ms(t): time.sleep(t / 1000)
+
+
 class Netrepl:
     def __init__(self,host,port=23,key=None,debug=None):
         """
@@ -65,8 +71,6 @@ class Netrepl:
         if debug is not None:
             print(debug, 'Waiting for connection.')
         time.sleep(0.5)
-        if debug is not None:
-            print(debug, 'Press ctrl-] to quit.')
         self.debug = debug
 
     def send(self,data):
@@ -79,12 +83,15 @@ class Netrepl:
 
     def receive(self,request=0,timeoutms=0):
         """
-        Try to non blockingly read data. (Block if request>0 until received or
+        Try to none blockingly read data. (Block if request>0 until received or
         timeout happened - try to read at least request bytes.)
 
         :param data:
         :param request: if > 0 wait for actual data to arrive
-        :param timeout:  if 0 and request>0, wait infinite, else number of ms
+        :param timeoutms:
+               timeoutms == None: block infinitely
+               timeout==0: return immediately after trying to read something from network buffer
+               timeout>0: try for time specified to read something before returning
         :return: a newly allocated byte-buffer with the received data or None,
         if nothing received
         """
@@ -106,9 +113,36 @@ class Netrepl:
     def repl_execute(self):
         self.cs.send(b"\x04")
 
+    def repl_close(self):
+        self.cs.send(b"\x1e")  # ctrl-]
 
-    def close(self):
+    def read_until(self,term,timeoutms=None):
+        """
+        Read until given term-string is found, return all data read until then
+
+        :param term:
+        :param timeoutms:
+        :return: data read or None if interrupted by timeout
+        """
+        buffer = bytearray(0)
+        starttime = ticks_ms()
+        while True:
+            next=self.receive(request=1,timeoutms=0)
+            if next is not None:
+                buffer.append(next[0])
+            if buffer.endswith(term):
+                return buffer[0:-len(term)]
+            if timeoutms is not None:
+                if ticks_diff(ticks_ms(),starttime) >= timeoutms:
+                    return None
+            sleep_ms(10) # give some time for filling buffer
+        # should not come here
+
+    def close(self,report=False):
+        if report:
+            self.repl_close()
         self.cs.close()
+
 
 class Netrepl_Parser():
     def __init__(self,description,usage="%(prog)s [key|port [key]]",debug="netrepl:"):
