@@ -16,26 +16,27 @@ def main():
     parser = Netrepl_Parser('Connect to netrepl and run'
                             'a command.',
                             debug=_debug)
+    parser.parser.add_argument('-t','--timeout',
+                               type=int, required=False, default = 60,
+                               help='Seconds to wait for command '
+                                    'to finish (default 60)')
     parser.parser.add_argument('-c','--command',
                                type=str, nargs="+", required=True,
                                help='A command to execute remotely.')
 
     con = parser.connect()
-    if _debug: print(_debug,'Sending command.')
-    con.repl_interrupt()
-    con.repl_raw()
-    con.read_until(b"raw REPL; CTRL-B to exit\r\n>", timeoutms=2000)
-    con.send(" ".join(parser.args.command).encode())
-    con.repl_execute()
-    con.read_until(b"OK", timeoutms=2000)  # wait for output start
-    data=con.read_until(b"\x04\x04>", timeoutms=60000)
-    try:
-        sys.stdout.write(data.decode())
-    except:
-        if _debug:
-            print("\r\n{} Got some weird data of len "
-                  "{}: >>{}<<\r\n".format(_debug, len(data), data))
-    sys.stdout.flush()
+    data=con.repl_command(" ".join(parser.args.command),
+                          timeoutms=parser.args.timeout*1000)
+    if data==None:
+        if _debug: print(_debug, 'Timeout occured.')
+    else:
+        try:
+            sys.stdout.write(data.decode())
+        except:
+            if _debug:
+                print("\r\n{} Got some weird data of len "
+                      "{}: >>{}<<\r\n".format(_debug, len(data), data))
+        sys.stdout.flush()
 
     if _debug: print("\r\n{} Closing connection.\r".format(_debug))
     con.repl_normal()  # normal repl

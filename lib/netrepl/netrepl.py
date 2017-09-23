@@ -138,6 +138,27 @@ class Netrepl:
             sleep_ms(10) # give some time for filling buffer
         # should not come here
 
+    def repl_command(self, command, timeoutms=None, interrupt=True):
+        """
+        Execute a command remotely and return output.
+        :param command:
+        :param timeoutms: None (block), >=0 block until given time.
+        :param interrupt: By default try to interrupt current process.
+        :return:
+        """
+        if self.debug: print(self.debug, 'Sending command.')
+        if type(command) is str:
+            command=command.encode()
+        if interrupt:
+            self.repl_interrupt()
+        self.repl_raw()
+        self.read_until(b"raw REPL; CTRL-B to exit\r\n>", timeoutms=2000)
+        self.send(command)
+        self.repl_execute()
+        self.read_until(b"OK", timeoutms=2000)  # wait for output start
+        return self.read_until(b"\x04\x04>", timeoutms=timeoutms)
+
+
     def close(self,report=False):
         if report:
             self.repl_close()
