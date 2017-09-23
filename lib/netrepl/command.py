@@ -27,21 +27,25 @@ def main():
     con = parser.connect()
     data=con.repl_command(" ".join(parser.args.command),
                           timeoutms=parser.args.timeout*1000)
-    if data==None:
-        if _debug: print(_debug, 'Timeout occured.')
+    if data is None:
+        if _debug: print(_debug, 'Timeout occurred, data discarded.')
     else:
+        if _debug: print(_debug, 'Data successfully received.')
+    if _debug: print("{} Closing connection.".format(_debug))
+    con.repl_normal()  # normal repl
+    con.close(report=True)
+    if _debug: print("{} Connection closed.".format(_debug))
+    if data is None:
+        sys.exit(1)  # not successful
+    else:
+        if _debug: print(_debug,"Output follows starting from next line.")
         try:
             sys.stdout.write(data.decode())
         except:
             if _debug:
-                print("\r\n{} Got some weird data of len "
-                      "{}: >>{}<<\r\n".format(_debug, len(data), data))
+                print("{} Got some weird data of len "
+                      "{}: >>{}<<".format(_debug, len(data), data))
         sys.stdout.flush()
-
-    if _debug: print("\r\n{} Closing connection.\r".format(_debug))
-    con.repl_normal()  # normal repl
-    con.close(report=True)
-    if _debug: print("\r\n{} Connection closed.\n".format(_debug))
 
 
 # main function
