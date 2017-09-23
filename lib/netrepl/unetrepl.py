@@ -31,7 +31,7 @@ class TelnetWrapper():
         self.out_buffer=bytearray(self.BUFFER_SIZE)
         self.out_fill=0
         self.out_last_sent=time.ticks_ms()
-        self.sending = False
+        self.out_buffer_lock = False
         
     def readinto(self, b):
         # TODO: check that this is non-blocking
@@ -57,17 +57,29 @@ class TelnetWrapper():
                 return 1  # just handed over 1 byte
         return None # couldn't read anything
 
+    def acquire_out_buffer(self):
+        while self.out_buffer_lock == True:
+            time.sleep_ms(1) # Wait for release
+        self.irqstate=machine.disable_irq()
+        if self.out_buffer_lock == True: # TODO: check if this locking is enough
+            machine.enable_irq(self.irqstate)
+            return False
+        self.out_buffer_lock=True
+        return True
+
+    def release_out_buffer(self):
+        self.out_buffer_lock=False
+        machine.enable_irq(self.irqstate)
+
     def _send(self):
         # TODO: does this need to be unblocking?
-        if self.sending == True: return # TODO: check if this locking is enough
-        self.sending=True
         #dp.println("s {},{},{}".format(self.out_fill,int(self.out_buffer[0]),int(self.out_buffer[1]))) # debug
         self.cs.send(self.out_buffer,length=self.out_fill)
         self.out_fill = 0
         self.out_last_sent = time.ticks_ms()
-        self.sending=False
 
     def _write1(self, byte):
+        self.acquire_out_buffer()
         #if byte == 0 or byte == 0xff: return # TODO: debug
         #if byte != 10 and byte != 13 and (byte < 32 or byte > 127): return # TODO: debug
         #if byte==0 or byte>127: return # not sending this
@@ -78,6 +90,7 @@ class TelnetWrapper():
         if self.out_fill >= self.BUFFER_SIZE:
 #            dp.println("f3 {},{}".format(self.out_fill,self.MAXFILL))
             self._send()
+        self.release_out_buffer()
 
     def flush(self):
         t = time.ticks_ms()
@@ -87,7 +100,9 @@ class TelnetWrapper():
         elif time.ticks_diff(t, self.out_last_sent) > self.INTERVAL:
             # debug           dp.println("t {},{},{}".format(time.ticks_diff(t,self.out_last_sent),
             #                                           t,self.out_last_sent))
+            self.acquire_out_buffer()
             self._send()
+            self.release_out_buffer()
 
     def write(self, data):
         # sadly not called without input, makes buffering tricky

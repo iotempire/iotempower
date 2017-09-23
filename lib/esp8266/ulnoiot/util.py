@@ -8,28 +8,35 @@ import gc
 import machine
 
 
-def file_hashs():
+def file_hashs(root="/"):
+    if not root.endswith("/"):
+        root+="/"
     speed=machine.freq()
     machine.freq(160000000) # we want to be fast for this
     p=os.getcwd()
     if p == "":
         p = "/"
     os.chdir("/")
-    _file_hashs("")
+    _file_hashs(root)
     os.chdir(p)
     machine.freq(speed) # restore speed
 
 
 def _file_hashs(root):
-    l = os.listdir(root)
+    if root != "/":
+        l = os.listdir(root[0:-1])
+    else:
+        l = os.listdir(root)
     for f in l:
         gc.collect()
-        st = os.stat("%s/%s" % (root, f))
+        p = root + f
+        st = os.stat(p)
         if st[0] & 0x4000:  # stat.S_IFDIR
-            _file_hashs(root+"/"+f)
+            print("<dir>",p)
+            _file_hashs(p+"/")
         else:
-            file=root+"/"+f
             h=sha1()
-            for l in open(file):
+            for l in open(p):
                 h.update(l)
-            print(ubinascii.hexlify(h.digest()).decode(),file[1:])
+            # TODO: do this in blocks (not lines) to allow to handle binary
+            print(ubinascii.hexlify(h.digest()).decode(),p)

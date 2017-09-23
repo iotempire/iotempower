@@ -70,11 +70,14 @@ class Crypt_Socket:
         #print("Sending",datain)
         if length is None: l=len(datain)
         else: l=length
-        if l>NETBUF_SIZE:
-            raise Exception("Can't send packages longer than {} bytes.".format(NETBUF_SIZE))
-        self.netbuf_out[0:l] = datain[0:l]
-        self.crypt_out.encrypt(self.netbuf_out, length=l)
-        self._write(l) # as padded, send full block
+        dp=0
+        while l>0:
+            m=min(NETBUF_SIZE,l)
+            self.netbuf_out[0:m] = datain[dp:dp+m]
+            self.crypt_out.encrypt(self.netbuf_out, length=m)
+            self._write(m)
+            dp+=m
+            l-=m
 
     def _write(self, length):
         # we need to write all the data but it's a non-blocking socket
@@ -104,10 +107,11 @@ class Crypt_Socket:
         # if request>0 wait blocking for request number of bytes (if timeout
         # given interrupt after timeoutms ms)
         # timeout==None: block
-        # timeout==0: return immediately after trying to read something from network buffer
+        # timeout==0: return immediately after trying to read something from
+        #             network buffer
         # timeout>0: try for time specified to read something before returning
-        # this function always returns a pointer to the buffer and number of bytes
-        # read (could be 0)
+        #            this function always returns a pointer to the buffer and
+        #            number of bytes read (could be 0)
         data = self.netbuf_in
         data_mv = self.netbuf_in_mv
         readbytes = 0
@@ -115,7 +119,7 @@ class Crypt_Socket:
         while readbytes < NETBUF_SIZE:
             try:
                 if self.sock_read(data_mv[readbytes:readbytes+1]):
-                    readbytes += 1
+                    readbytes += 1 # result was not 0 or none
                 else:
                     if readbytes >= request:
                         break  # break if not blocking to request size

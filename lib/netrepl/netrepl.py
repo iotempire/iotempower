@@ -130,6 +130,7 @@ class Netrepl:
             next=self.receive(request=1,timeoutms=0)
             if next is not None:
                 buffer.append(next[0])
+                #if(len(buffer)%40==0): print(len(buffer),buffer[-40:]) # debug
             if buffer.endswith(term):
                 return buffer[0:-len(term)]
             if timeoutms is not None:

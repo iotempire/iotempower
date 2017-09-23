@@ -17,7 +17,9 @@ def main(argv):
     hashs={}
     for l in open(argv[1]):
         l=l.strip()
-        hashs[l[41:]] = l[0:40]
+        parts=l.split(" ")
+        if parts[0] != "<dir>":
+            hashs[(" ".join(parts[1:]))[1:]]=parts[0]
     output=open(argv[2],"wb")
     output.write(("open %s\n"%argv[0]).encode())
     output.write(b"cd /\n")
