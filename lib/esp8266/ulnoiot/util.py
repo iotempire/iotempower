@@ -21,6 +21,8 @@ def file_hashs(root="/"):
 
 
 def _file_hashs(root):
+    if root.endswith("/"):
+        root = root[0:-1]  # strip slash
     try:
         st = os.stat(root)
     except:
@@ -29,8 +31,6 @@ def _file_hashs(root):
     if st[0] & 0x4000:  # stat.S_IFDIR
         print("<dir>", root)
         l = os.listdir(root)
-        if root.endswith("/"):
-            root = root[0:-1] # strip slash
         for f in l:
             gc.collect()
             p = root + "/" + f

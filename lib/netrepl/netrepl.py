@@ -21,6 +21,7 @@ def ticks_diff(a, b): return a - b
 def sleep_ms(t): time.sleep(t / 1000)
 
 
+
 class Netrepl:
     def __init__(self,host,port=23,key=None,debug=None):
         """
@@ -33,6 +34,7 @@ class Netrepl:
         The key can also be a 32bit-byte string or array or a 64-byte hex
         string.
         """
+        self.oldbuffer = bytearray(0)
         if key is None or len(key)==0:
             key=bytearray(32)
         elif len(key)==64:
@@ -110,6 +112,10 @@ class Netrepl:
     def repl_interrupt(self):
         self.cs.send(b"\r\n\x03\x03\r\n")  # Interrupt
         time.sleep(0.5)  # wait for interrupt to finish
+        # self.repl_normal()
+        # time.sleep(1)  # wait for interrupt to finish
+        # self.cs.send(b"\r\n\x03\x03\r\n")  # Interrupt
+        # time.sleep(1)  # wait for interrupt to finish
 
     def repl_execute(self):
         self.cs.send(b"\x04")
@@ -117,7 +123,7 @@ class Netrepl:
     def repl_close(self):
         self.cs.send(b"\x1e")  # ctrl-]
 
-    def read_until(self,term,timeoutms=None):
+    def read_until(self,term,timeoutms=None,fresh_buffer=False):
         """
         Read until given term-string is found, return all data read until then
 
@@ -125,27 +131,37 @@ class Netrepl:
         :param timeoutms:
         :return: data read or None if interrupted by timeout
         """
-        buffer = bytearray(0)
+        if fresh_buffer:
+            buffer = bytearray(0)
+        else:
+            buffer = self.oldbuffer
         buffer_p = 0
+        term_len = len(term)
         starttime = ticks_ms()
+
         while True:
+            # check if it's in the updated (or old) buffer
+            newpos = buffer.find(term, buffer_p)
+            # print("read_until:", term, newpos, buffer) # debug
+            if newpos >= 0:
+                self.oldbuffer = buffer[
+                                 newpos + term_len:]  # keep rest for later
+                return buffer[0:newpos]
+            buffer_p = max(0, len(buffer) - term_len + 1)  # update searched space
+
+            # if not in there, try to get some more data
             next = self.receive(request=NETBUF_SIZE,timeoutms=100)
-            if next is None:
-                next_len = 0
-            else:
-                next_len = len(next)
+            if next is not None:
                 buffer.extend(next)
-                newpos=buffer.find(term,buffer_p)
-                if newpos>=0:
-                    return buffer[0:newpos] # TODO think about returning what has been read too much
-                buffer_p=min(0,buffer_p + len(next) - len(term) + 1)
+
+            # stop if timeout passed
             if timeoutms is not None:
                 if ticks_diff(ticks_ms(),starttime) >= timeoutms:
                     return None
             sleep_ms(10) # give some time for filling buffer
         # should not come here
 
-    def repl_command(self, command, timeoutms=None, interrupt=True):
+    def repl_command(self, command, timeoutms=None, interrupt=False):
         """
         Execute a command remotely and return output.
         :param command:
@@ -153,19 +169,93 @@ class Netrepl:
         :param interrupt: By default try to interrupt current process.
         :return:
         """
-        if self.debug: print(self.debug, 'Sending command and waiting '
-                                         'for answer.')
+        if self.debug: print(self.debug, 'Sending command: >>{}<<'
+                                            .format(command))
         if type(command) is str:
             command=command.encode()
         if interrupt:
             self.repl_interrupt()
         self.repl_raw()
-        self.read_until(b"raw REPL; CTRL-B to exit\r\n>", timeoutms=2000)
+        a=self.read_until(b"raw REPL; CTRL-B to exit\r\n>", timeoutms=2000)
+        if a is None:
+            if self.debug: print(self.debug, 'Timeout waiting for raw REPL, '
+                                             'aborting')
+            return None
         self.send(command)
         self.repl_execute()
-        self.read_until(b"OK", timeoutms=2000)  # wait for output start
-        return self.read_until(b"\x04\x04>", timeoutms=timeoutms)
+        a = self.read_until(b"OK", timeoutms=2000)  # wait for output start
+        if a is None:
+            if self.debug: print(self.debug, 'Timeout waiting for OK, aborting')
+            return None
+        #print("oldbuffer",self.oldbuffer) # debug
+        a=self.read_until(b"\x04\x04>", timeoutms=timeoutms)
+        if a is None:
+            if self.debug: print(self.debug, 'Timeout waiting for command '
+                                             'execution, aborting.')
+        if self.debug: print(self.debug, 'Returning answer: >>{}<<.'
+                                            .format(a))
+        return a
 
+    def _guard(self, check, command):
+        a = self.repl_command(command + '\r\nprint("{}")'.format(check),
+                              timeoutms=5000)
+        if type(check) is str: check = check.encode()
+        if not a or not a.startswith(check):
+            if self.debug: print(self.debug, "Copy communication "
+                                             "failed for status {}."
+                                 .format(check.decode()))
+            return True  # this means failure
+        return False  # success
+
+    def upload(self,local,remote,remove=True):
+        # print("upload",local,remote) # debug
+        c = self._guard # shortcut
+
+        remote_tmp=remote+".tmp_netrepl"
+        f=open(local,"rb")
+        if c('setup','import gc;gc.collect();f=open("{}","wb")'
+                .format(remote_tmp)): return
+        bnr=0
+        while True:
+            block = f.read(128)
+            if len(block)==0: break
+            if c('w%d'%bnr,'f.write({})'.format(block)): return
+            bnr+=1
+        f.close()
+        if c('close','f.close()'): return
+        if remove:
+            if c('remove','import os;os.remove("{}")'.format(remote)): return
+        if c('rename','import os;os.rename("{}","{}")'
+                .format(remote_tmp,remote)): return
+
+    def mkdir(self,path,nofail=False):
+        """
+        Create a directory on remote.
+        :param nofail: if nofail is set, command does nto fail if directory
+        already exists
+        :return:
+        """
+        c = self._guard # shortcut
+
+        if path.endswith("/"):
+            path=path[:-1]
+        command='mkdir("{}")'.format(path)
+        if nofail:
+            command="\r\ntry:\r\n {}\r\nexcept:\r\n pass\r\n".format(command)
+        if c('mkdir','import os\r\n{}'.format(command)): return
+
+    def rm(self,path):
+        c = self._guard # shortcut
+
+        if c("rm",'import os;os.remove("{}")'.format(path)): return
+
+    def rmdir(self,path,recursive=False):
+        c = self._guard # shortcut
+        # TODO: add recursive delete
+
+        if path.endswith("/"): # dir
+            path=path[:-1]
+        if c("rmdir", 'import os;os.remove("{}")'.format(path)): return
 
     def close(self,report=False):
         if report:
