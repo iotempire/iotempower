@@ -18,7 +18,7 @@ def main():
     parser = Netrepl_Parser('Copy recursively a local file or directory to a '
                             'netrepl enabled device.',
                             debug=_debug)
-    parser.parser.add_argument('-t','--timeout', nargs=1,
+    parser.parser.add_argument('-t','--timeout', nargs="?",
                                type=int, required=False, default = 600,
                                help='seconds to wait for process '
                                     'to finish (default 600s)')
@@ -66,22 +66,23 @@ def main():
     con = parser.connect()
     source=parser.args.src
     src_dir=os.path.dirname(source)
-    if not src_dir.endswith("/"):
+    if len(src_dir)>0 and not src_dir.endswith("/"):
         src_dir += "/"
-    src_file=os.path.basename(source)
-    dest=parser.args.dest
+    src_file = os.path.basename(source)
+    dest = parser.args.dest
     dest_base_dir = os.path.dirname(dest)
     if not dest_base_dir.endswith("/"):
         dest_base_dir += "/"
     dest_prefix_dir = os.path.basename(dest)
-    if dest_prefix_dir: dest_prefix_dir+="/"
+    if dest_prefix_dir:
+        dest_prefix_dir += "/"
 
     # create source list
-    if src_file: # not empty
-        src_list=[src_file]
+    if src_file: # got a (single) file
+        src_list = [src_file]
     else:
         # just got a directory, so let's generate it
-        src_list=[]
+        src_list = []
         for root, dirs, files in os.walk(src_dir):
             if not root.endswith("/"):
                 root += "/"
@@ -93,10 +94,15 @@ def main():
                 src_list.append(path)
 
     # get destination file-list with hashes
+    if len(src_list) == 1:
+        search_path = "/"+src_list[0]
+    else:
+        search_path = dest_base_dir+dest_prefix_dir
     if _debug: print("{} Requesting destination hash list.".format(_debug))
     data=con.repl_command("from ulnoiot.util import file_hashs; "
-                          "file_hashs(root=\"{}\")".format(dest_base_dir+dest_prefix_dir),
-                          timeoutms=parser.args.timeout*1000)
+                          "file_hashs(root=\"{}\")".format(search_path),
+                          timeoutms=parser.args.timeout*1000,
+                          interrupt=True)
     dest_hashes={}
     for line in data.split(b"\n"):
         line=line[:-1]
@@ -106,8 +112,8 @@ def main():
                 [len(dest_base_dir+dest_prefix_dir):]] \
                     = bytes(parts[0]).decode()
 
-    #print(src_list) # debug
-    #print(dest_hashes)  # debug
+    #print("src_list",src_list) # debug
+    #print("dest_hashes",dest_hashes)  # debug
 
     # Compute copy, delete, exclude, create only lists
     exclude_list=parser.args.exclude
@@ -158,7 +164,7 @@ def main():
 
     # create delete list
     delete_list=[]
-    if parser.args.delete:
+    if parser.args.delete: # only when option set
         for f in dest_hashes:
             if f not in src_list:
                 delete_list.append(f)
@@ -167,9 +173,15 @@ def main():
     # process delete list
     for f in delete_list:
         print("Deleting {}.".format(f))
-        if not_dryrun:
-            pass # TODO: delete
+        if not_dryrun:  # TODO: check that deleting directories works
+            if f.endswith("/"):  # dir
+                con.rmdir(dest_base_dir + dest_prefix_dir + f[:-1])
+            else: # file
+                con.rm(dest_base_dir + dest_prefix_dir + f)
     # process copy list
+    if dest_prefix_dir:  # need to create basedir?
+        if not_dryrun:
+            con.mkdir(dest_base_dir + dest_prefix_dir[:-1])
     for f in copy_list:
         h = sha256()
         hf = open(src_dir + f, "rb")
@@ -177,13 +189,15 @@ def main():
             b = hf.read(1024)
             if len(b) == 0: break
             h.update(b)
+        hf.close()
         digest=binascii.hexlify(h.digest()).decode()
-        if digest == dest_hashes[f]:
-            print("Skipping {} due to same hash.".format(f))
+        if f in dest_hashes and digest == dest_hashes[f]:
+            print("Skipping {} due to equal hash.".format(f))
         else:
             print("Copying {}.".format(f))
             if not_dryrun:
-                pass # TODO: copy
+                con.upload(src_dir + f, dest_base_dir + dest_prefix_dir + f,
+                           f in dest_hashes)
 
     if _debug: print("{} Closing connection.".format(_debug))
     con.repl_normal()  # normal repl

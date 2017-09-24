@@ -76,7 +76,11 @@ class Crypt_Socket:
             m=min(NETBUF_SIZE,l)
             self.netbuf_out[0:m] = datain[dp:dp+m]
             self.crypt_out.encrypt(self.netbuf_out, length=m)
-            self._write(m)
+            try:
+                self._write(m)
+            except OSError as e:
+                print(e.args[0])  # show, but do not raise
+                break
             dp+=m
             l-=m
 

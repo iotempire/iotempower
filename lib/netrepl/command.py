@@ -26,7 +26,8 @@ def main():
 
     con = parser.connect()
     data=con.repl_command(" ".join(parser.args.command),
-                          timeoutms=parser.args.timeout*1000)
+                          timeoutms=parser.args.timeout*1000,
+                          interrupt=True)
     if data is None:
         if _debug: print(_debug, 'Timeout occurred, data discarded.')
     else:
