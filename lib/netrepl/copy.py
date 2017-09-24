@@ -12,7 +12,8 @@ import sys, os, select
 from hashlib import sha256
 import binascii
 
-_debug="netrepl copy:"
+#_debug="netrepl copy:"
+_debug=None
 
 def main():
     parser = Netrepl_Parser('Copy recursively a local file or directory to a '
