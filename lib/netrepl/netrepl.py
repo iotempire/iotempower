@@ -10,6 +10,7 @@
 
 # Magic word for the protocol start
 MAGIC = b"UlnoIOT-NetREPL:"
+NETBUF_SIZE=1024
 
 import socket, sys, os, time
 from crypt_socket import Crypt_Socket
@@ -57,7 +58,7 @@ class Netrepl:
         if debug is not None: print(debug,'Generating session key.')
         s.settimeout(0)  # now, we can be non blocking
 
-        self.cs = Crypt_Socket(s)
+        self.cs = Crypt_Socket(s,netbuf_size=NETBUF_SIZE)
         self.cs.init_out(key,iv_out)
         key_in = os.urandom(32)
         iv_in = os.urandom(8)
@@ -125,14 +126,19 @@ class Netrepl:
         :return: data read or None if interrupted by timeout
         """
         buffer = bytearray(0)
+        buffer_p = 0
         starttime = ticks_ms()
         while True:
-            next=self.receive(request=1,timeoutms=0)
-            if next is not None:
-                buffer.append(next[0])
-                #if(len(buffer)%40==0): print(len(buffer),buffer[-40:]) # debug
-            if buffer.endswith(term):
-                return buffer[0:-len(term)]
+            next = self.receive(request=NETBUF_SIZE,timeoutms=100)
+            if next is None:
+                next_len = 0
+            else:
+                next_len = len(next)
+                buffer.extend(next)
+                newpos=buffer.find(term,buffer_p)
+                if newpos>=0:
+                    return buffer[0:newpos] # TODO think about returning what has been read too much
+                buffer_p=min(0,buffer_p + len(next) - len(term) + 1)
             if timeoutms is not None:
                 if ticks_diff(ticks_ms(),starttime) >= timeoutms:
                     return None
@@ -147,7 +153,8 @@ class Netrepl:
         :param interrupt: By default try to interrupt current process.
         :return:
         """
-        if self.debug: print(self.debug, 'Sending command.')
+        if self.debug: print(self.debug, 'Sending command and waiting '
+                                         'for answer.')
         if type(command) is str:
             command=command.encode()
         if interrupt:

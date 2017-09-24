@@ -6,7 +6,7 @@
 
 import sys
 import os
-from hashlib import sha1
+from hashlib import sha256
 
 onlycreate=["webrepl_cfg.py","user.py","my_devices.py"]
 
@@ -18,7 +18,7 @@ def main(argv):
     for l in open(argv[1]):
         l=l.strip()
         parts=l.split(" ")
-        if parts[0] != "<dir>":
+        if len(parts) and parts[0] and parts[0] != "<dir>":
             hashs[(" ".join(parts[1:]))[1:]]=parts[0]
     output=open(argv[2],"wb")
     output.write(("open %s\n"%argv[0]).encode())
@@ -37,7 +37,7 @@ def main(argv):
             print("#", filename,"is not existing locally.")
         else:
             if filename not in onlycreate:
-                h=sha1()
+                h=sha256()
                 for l in f:
                     h.update(l)
                 if h.hexdigest() == hashs[filename]:

@@ -42,12 +42,13 @@ class Crypt_Socket:
             a[0]=b[0]
             return 1
 
-    def __init__(self, socket):
+    def __init__(self, socket, netbuf_size=NETBUF_SIZE):
         global _upy
         # need in and out buffers as reading and writing can happen concurrently
-        self.netbuf_in = bytearray(NETBUF_SIZE)
+        self.netbuf_size=netbuf_size
+        self.netbuf_in = bytearray(netbuf_size)
         self.netbuf_in_mv = memoryview(self.netbuf_in)
-        self.netbuf_out = bytearray(NETBUF_SIZE)
+        self.netbuf_out = bytearray(netbuf_size)
         self.netbuf_out_mv = memoryview(self.netbuf_out)
         self.crypt_in = None
         self.crypt_out = None
@@ -116,7 +117,7 @@ class Crypt_Socket:
         data_mv = self.netbuf_in_mv
         readbytes = 0
         start_t = ticks_ms()
-        while readbytes < NETBUF_SIZE:
+        while readbytes < self.netbuf_size:
             try:
                 if self.sock_read(data_mv[readbytes:readbytes+1]):
                     readbytes += 1 # result was not 0 or none

@@ -2,7 +2,7 @@
 #
 
 import os
-from uhashlib import sha1
+from uhashlib import sha256
 import ubinascii
 import gc
 import machine
@@ -35,8 +35,11 @@ def _file_hashs(root):
             print("<dir>",p)
             _file_hashs(p+"/")
         else:
-            h=sha1()
-            for l in open(p):
-                h.update(l)
-            # TODO: do this in blocks (not lines) to allow to handle binary
+            h=sha256()
+            hf=open(p,"rb")
+            while True:
+                b=hf.read(40)
+                if len(b) == 0: break
+                h.update(b)
             print(ubinascii.hexlify(h.digest()).decode(),p)
+            hf.close()
