@@ -303,7 +303,7 @@ class Netrepl_Parser():
         key = args.key
         if key is None:
             print('Enter key (32bytes as hex->64bytes):')
-            key = sys.stdin.readline().strip().encode()
+            key = sys.stdin.readline().strip()
             if len(key) != 64 and len(key) != 0:
                 print("Key has to specified as 64 byte hex. Exiting.")
                 sys.exit(1)

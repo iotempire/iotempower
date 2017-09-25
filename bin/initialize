@@ -28,16 +28,16 @@ echo
 echo "7s wait for reset to finish."
 sleep 7
 
+fi # noflash
+
 # check key-file and eventually regenerate
 KEYFILE=key.hex
 key=$(tail -n1 "$KEYFILE")
 if [[ ! ${#key} = 64 ]]; then
     # TODO: check that haveged is running and maybe check not to overwrite key?
-    head -c32 /dev/random|hexdump -e '"%x"' > "$KEYFILE"
+    head -c32 /dev/random|od -A n -t x2|tr -d ' \r\n' > "$KEYFILE"
     key=$(tail -n1 "$KEYFILE")
 fi
-
-fi # noflash
 
 echo
 echo "Creating wifi config."
