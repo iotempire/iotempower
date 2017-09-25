@@ -107,7 +107,7 @@ def main():
         search_path = dest_base_dir+dest_prefix_dir
     print("Connecting and requesting destination hash list.")
     data=con.repl_command("import hashlist; "
-                          "hashlist(root=\"{}\")".format(search_path),
+                          "hashlist.hashlist(root=\"{}\")".format(search_path),
                           timeoutms=parser.args.timeout*1000,
                           interrupt=True)
     if data is None: # timeout
