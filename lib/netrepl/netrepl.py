@@ -244,6 +244,13 @@ class Netrepl:
             command="\r\ntry:\r\n {}\r\nexcept:\r\n pass\r\n".format(command)
         if c('mkdir','import os\r\n{}'.format(command)): return
 
+    def reset(self):
+        """
+        Reset/reboot the board
+        :return:
+        """
+        self.repl_command('import machine;machine.reset()')
+
     def rm(self,path):
         c = self._guard # shortcut
 

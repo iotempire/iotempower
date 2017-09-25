@@ -22,7 +22,6 @@ cd "$path" # return to original path
 
 board="wemos d1 mini"
 
-
 mqtt_server="$ULNOIOT_MQTT_HOST"
 mqtt_user="$ULNOIOT_MQTT_USER"
 mqtt_password="$ULNOIOT_MQTT_PW"

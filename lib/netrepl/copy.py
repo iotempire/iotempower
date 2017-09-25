@@ -47,6 +47,9 @@ def main():
                                required=False, action="store_true",
                                help='if given, only show what would be done, '
                                     'do not copy or delete actually anything.')
+    parser.parser.add_argument('--reset','--reboot',
+                               required=False, action="store_true",
+                               help='if given, reset node after copy.')
     parser.parser.add_argument('-x','--exclude', '--ignore',
                                required=False, type=str, nargs="+", default="",
                                help='files or directories to exclude. '
@@ -233,7 +236,12 @@ def main():
                                    + dest_prefix_dir + f,
                                    f in dest_hashes)
 
-        if not not_dryrun:
+        if not_dryrun:
+            if parser.args.reset:
+                print("Resetting device.")
+                con.reset()
+
+        else:
             print("This was a dryrun, no actual changes executed.")
 
     if _debug: print("{} Closing connection.".format(_debug))

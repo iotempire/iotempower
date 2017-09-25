@@ -23,7 +23,7 @@ flash_serial_esp8266 "$1"
 echo "Waiting 7s until things are settled (formatting internal flash)."
 sleep 7 # let things rest
 echo "Installing software."
-deploy_serial_wemosd1mini "$1"
+update_serial_wemosd1mini "$1"
 echo
 echo "7s wait for reset to finish."
 sleep 7
@@ -81,7 +81,7 @@ rm "$wifi_cfg" "$gw_cfg" "$netrepl_cfg"
 echo "Waiting 10s until reset is done and internet connected."
 sleep 10
 echo "Copying files via network."
-# TODO
+deploy nodeploy
 
 echo
 echo "Done."

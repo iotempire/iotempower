@@ -1,0 +1,44 @@
+#!/bin/bash
+# (updates and) deploys a node
+# can be called from a node folder or from parent folder of node-folders
+#
+# if noupdate as parameter is given only the user-part is deployed
+# (deploy is skipped)
+# configuration files are not updated (TODO: consider making this possible)
+
+
+[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+
+if [[ -e "node.conf" ]]; then  # started from node-directory
+    source "$ULNOIOT_ROOT/bin/read_conf"
+    echo "Deploying user files to node $topic."
+    if [[ "$1" != noupdate ]]; then
+        update noreset
+    fi
+    ip=$(get_ip "$topic" 2>/dev/null|grep "$topic"|cut -d\  -f2)
+    if [ "$ip" ]; then
+        echo "Connecting to node $topic with ip $ip."
+        path="$(pwd)"
+        cd "$ULNOIOT_ROOT/lib/netrepl"
+        python3 copy.py "$ip" --keyfile "$path/key.hex" \
+            --src "$pwd/files/" --reset
+    else
+        echo "Couldn't find IP of node with topic $topic. Skipping."
+        exit 1
+    fi
+
+else # started from somewhere else, so search for node.conf in subdirs
+
+    path="$(pwd)"
+    echo "This is not a node, so search sub-folders for node.conf files and"
+    echo "deploy all of them."
+    echo
+    # TODO: think about runnning them all in parallel (or batches)
+    find -name node.conf |\
+        while read n; do
+            cd "$path"
+            cd $(basedir "$n")
+            deploy # call recursive for node-dir
+        done
+
+fi # not in node-dir

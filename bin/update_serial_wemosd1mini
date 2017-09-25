@@ -1,8 +1,8 @@
 #!/bin/bash
-# deploy ulnoiot software on wemos d1 mini
+# update (or initially install) ulnoiot software on wemos d1 mini
 #
 # $1 can give a tty port as destination parameter (for example: USB0)
-# $2 can be a webrepl password
+# $2 can be a webrepl password <- obsolete
 
 # uncomment for debugging
 #DEBUG=yes
@@ -30,7 +30,8 @@ fi
 mpfscript="$(mktemp --suffix .mpfscript)"
 echo "Detecting file changes."
 echo
-python "$ULNOIOT_ROOT/bin/create_upload_list.py" "$port" "$hashfile" "$mpfscript"
+python "$ULNOIOT_ROOT/bin/update_create_upload_list.py" \
+    "$port" "$hashfile" "$mpfscript"
 echo
 echo "Executing changes:"
 
