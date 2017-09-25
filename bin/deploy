@@ -21,7 +21,7 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
         path="$(pwd)"
         cd "$ULNOIOT_ROOT/lib/netrepl"
         python3 copy.py "$ip" --keyfile "$path/key.hex" \
-            --src "$pwd/files/" --reset
+            --src "$path/files/" --reset
     else
         echo "Couldn't find IP of node with topic $topic. Skipping."
         exit 1

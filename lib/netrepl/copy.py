@@ -111,7 +111,7 @@ def main():
                           timeoutms=parser.args.timeout*1000,
                           interrupt=True)
     if data is None: # timeout
-        print("Problem with initial connection - timeout occured, aborting.")
+        print("Problem with initial connection - timeout occurred, aborting.")
     else:
         dest_hashes={}
         for line in data.split(b"\n"):
