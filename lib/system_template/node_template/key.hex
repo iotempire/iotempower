@@ -1,0 +1,5 @@
+# The last line of this file holds the 256bit (32byte/64hexdigits) symmetric
+# key for the netrepl communication with the node
+# If the last line is not exactly 64 bytes long, the whole file will be
+# overwritten during initialization of the microcontroller.
+00001111aaaabbbb00001111aaaabbbb00001111aaaabbbb00001111aaaabbbb too long

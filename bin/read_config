@@ -1,0 +1,15 @@
+#@IgnoreInspection BashAddShebang
+# Read node and system configuration
+
+source "../system.conf" || { echo "Can't find system.conf. Aborting." 1>&2;exit 1; }
+
+board="wemos d1 mini"
+
+topic=$(basename "$(pwd)")
+
+mqtt_server="$ULNOIOT_MQTT_HOST"
+mqtt_user="$ULNOIOT_MQTT_USER"
+mqtt_password="$ULNOIOT_MQTT_PW"
+
+
+source "node.conf" || { echo "Can't find node.conf. Aborting." 1>&2;exit 1; }

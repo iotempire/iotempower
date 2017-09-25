@@ -20,7 +20,7 @@ def connect():
     _ap.active(False)
     _wlan.active(True)
 
-    # removed scan of networks to allow conenct to hidden
+    # removed scan of networks to allow connect to hidden essid
     # Try to connect
     _wlan.connect(wifi_cfg.name, wifi_cfg.password)
     tries=15
@@ -115,3 +115,4 @@ except ImportError:
         pass
     wifi_cfg.name=""
     wifi_cfg.password=""
+

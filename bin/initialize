@@ -1,0 +1,88 @@
+#!/bin/bash
+# initialize the locally (via serial) connected hardware of a ulnoiot node
+#
+# $1 can give a tty port as destination parameter (for example: USB0)
+# if $1 or $2 is noflash, skip flashing and deployment
+
+# uncomment for debugging
+#DEBUG=yes
+
+[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+
+source "$ULNOIOT_ROOT/bin/read_config"
+
+port=$(find_esp_port "$1")
+
+
+# if this is set, skip flashing
+if [[ "$1" != noflash && "$2" != noflash ]]; then
+
+## TODO: support other boards
+echo "Flashing Wemos D1 Mini."
+flash_serial_esp8266 "$1"
+echo "Waiting 7s until things are settled (formatting internal flash)."
+sleep 7 # let things rest
+echo "Installing software."
+deploy_serial_wemosd1mini "$1"
+echo
+echo "7s wait for reset to finish."
+sleep 7
+
+# check key-file and eventually regenerate
+KEYFILE=key.hex
+key=$(tail -n1 "$KEYFILE")
+if [[ ! ${#key} = 64 ]]; then
+    # TODO: check that haveged is running and maybe check not to overwrite key?
+    head -c32 /dev/random|hexdump -e '"%x"' > "$KEYFILE"
+    key=$(tail -n1 "$KEYFILE")
+fi
+
+fi # noflash
+
+echo
+echo "Creating wifi config."
+wifi_cfg="$(mktemp --suffix .ulnoiot)"
+cat > "$wifi_cfg" << EOF
+name="$ULNOIOT_AP_NAME"
+password="$ULNOIOT_AP_PASSWORD"
+EOF
+
+echo "Creating netrepl config."
+netrepl_cfg="$(mktemp --suffix .ulnoiot)"
+cat > "$netrepl_cfg" << EOF
+key="$key"
+EOF
+
+echo "Creating gw config."
+gw_cfg="$(mktemp --suffix .ulnoiot)"
+if [ "$ULNOIOT_MQTT_USER" ]; then # authentication is set
+    cat > "$gw_cfg" << EOF
+from ulnoiot import *
+mqtt("$ULNOIOT_AP_HOSTNAME","$topic","$ULNOIOT_MQTT_USER","$ULNOIOT_MQTT_PW")
+EOF
+else
+    cat > "$gw_cfg" << EOF
+from ulnoiot import *
+mqtt("$ULNOIOT_AP_HOSTNAME","$topic")
+EOF
+fi
+
+echo "Sending key, config, and resetting."
+mpfshell -n -c \
+"open $port; "\
+"put $wifi_cfg /wifi_cfg.py; "\
+"put $netrepl_cfg /netrepl_cfg.py;"\
+"put $gw_cfg /gw_cfg.py;"\
+"exec import machine; exec machine.reset()"
+
+# tidy up
+rm "$wifi_cfg" "$gw_cfg" "$netrepl_cfg"
+
+echo "Waiting 10s until reset is done and internet connected."
+sleep 10
+echo "Copying files via network."
+# TODO
+
+echo
+echo "Done."
+

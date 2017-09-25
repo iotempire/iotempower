@@ -1,2 +1,0 @@
-Create the file user.py if you want to start a project automatically.
-You can see an example with: cat("/user.py.example")

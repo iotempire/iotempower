@@ -1,0 +1,22 @@
+#!/bin/bash
+# open a repl terminal on the given port (USB..) or ip address
+# $1: suggested port or host
+# $2: webrepl password
+password="$2"
+test "$password" || password="ulnoiot"
+
+[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+
+port=$(find_esp_port "$1" "$password")
+
+if [[ "$port" = tty* ]]; then
+    echo "Opening serial console on $port."
+    echo "Type help to get basic help information."
+    echo "If you do not see what you are typing, try to press"
+    echo "ctrl-B."
+    echo
+    #minicom -D "/dev/$port" -b 115000
+    miniterm.py --raw "/dev/$port" 115000
+else
+    mpfshell --nocache -n -c "open $port; repl"
+fi

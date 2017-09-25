@@ -175,6 +175,8 @@ def mqtt(broker_host, topic, *args, user=None, password=None,
     _port = port
 #    _ssl = ssl
 
+    if _report_ip: # already report ip
+        _init_mqtt()
 
 def _subscription_cb(topic, msg):
     global _topic

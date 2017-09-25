@@ -1,0 +1,2 @@
+Create the file autostart.py if you want to start a project automatically.
+You can see an examples in the node_template directory.

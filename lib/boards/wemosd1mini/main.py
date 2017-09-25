@@ -1,16 +1,20 @@
 # main.py script for ulnoiot wemosd1mini version
 #
 import gc
-import machine
-#machine.freq(160000000) # be fast by default
-
 from ulnoiot import *
 gc.collect()
 
-print(clear())
-help()
-
+# Try to setup network/gw connection (i.e. mqtt)
 try:
-    import user
+    import gw_cfg
 except ImportError:
-    help("user.py")
+    pass
+gc.collect()
+
+# try to autostart user.py
+try:
+    import autostart
+except ImportError:
+    print(clear())
+    help()
+    help("autostart.py")

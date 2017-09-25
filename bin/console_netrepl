@@ -1,0 +1,7 @@
+#!/bin/bash
+# open a netrepl terminal
+
+[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+
+cd "$ULNOIOT_ROOT/lib/netrepl"
+python3 terminal.py "$@"
