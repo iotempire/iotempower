@@ -68,7 +68,7 @@ def main():
     con.send(b"\r\nhelp\r\n")
 
     fd = sys.stdin.fileno()
-    old_settings = termios.tcgetattr(fd)
+    #old_settings = termios.tcgetattr(fd)
     tty.setraw(sys.stdin.fileno())
 
     input_thread=threading.Thread(target=char_reader)
@@ -120,7 +120,8 @@ def main():
     con.repl_normal()  # normal repl
     con.close(report=True)
     if _debug: print("\r\n{} Connection closed.\n".format(_debug))
-    termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+    tty.setcbreak(sys.stdin.fileno())
+    #termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
 
 
 # main function
