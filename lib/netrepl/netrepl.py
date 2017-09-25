@@ -279,6 +279,10 @@ class Netrepl_Parser():
                                  'Key needs to be 256bit in either bytes or hex notation, '
                                  'If key is not given as option it is read as newline '
                                  'terminated 64 byte hex notation from stdin')
+        parser.add_argument('--keyfile','--key-file', type=str, nargs='?',
+                            help='Read key from specified file (last line in '
+                                 'that file should be 64 bytes hex-key).')
+
         self.parser=parser
         if debug is not None:
             if debug.endswith(":"):
@@ -302,11 +306,21 @@ class Netrepl_Parser():
 
         key = args.key
         if key is None:
-            print('Enter key (32bytes as hex->64bytes):')
-            key = sys.stdin.readline().strip()
-            if len(key) != 64 and len(key) != 0:
-                print("Key has to specified as 64 byte hex. Exiting.")
-                sys.exit(1)
+            # Check if key was provided as keyfile
+            if args.keyfile is not None:
+                f=open(args.keyfile,"rb")
+                for l in f:
+                    s=l.strip()
+                    if len(s) == 64:
+                        key=l
+                key=key.decode()
+                f.close()
+            else:
+                print('Enter key (32bytes as hex->64bytes):')
+                key = sys.stdin.readline().strip()
+                if len(key) != 64 and len(key) != 0:
+                    print("Key has to specified as 64 byte hex. Exiting.")
+                    sys.exit(1)
         if len(key) == 64:
             key = bytes.fromhex(key)
         if len(key) == 0:

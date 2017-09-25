@@ -9,7 +9,7 @@ if [ -e "node.conf" ]; then # started from node-directory -> network connect
     ip=$(get_ip "$topic" 2>/dev/null|grep "$topic"|cut -d\  -f2)
     if [ "$ip" ]; then
         echo "Connecting to node $topic with ip $ip."
-        tail -n1 key.hex | console_netrepl "$ip"
+        console_netrepl "$ip" --keyfile key.hex
     else
         echo "Couldn't find IP of node with topic $topic."
         echo "If connected via serial or usb, try console_serial."

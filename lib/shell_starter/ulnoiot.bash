@@ -52,12 +52,12 @@ _UIOT_PTH="${PSGREEN}\W${PSRESET}"
 _UIOT_PMT="${PSBLACK}\$${PSRESET} "
 
 # start is always the same (colored ulnoiot - when ulnoiot defined)
-PS1="${_UIOT_UIOT}${_UIOT_SEP}"
+PS1="${_UIOT_UIOT}"
 PS1='$( [[ "$ULNOIOT_ACTIVE" = "yes" ]] && echo "'"$PS1"'")'
 
 ## allow recording of pwd in byobu/tmux
 ## (from https://stackoverflow.com/questions/19200589/auto-update-tmux-status-bar-with-active-pane-pwd#19205087)
-PS1=$PS1'$( [[ ! "$TMUX" ]] && echo "'"${_UIOT_UH}${_UIOT_CLN}${_UIOT_PTH}"'")'
+PS1=$PS1'$( [[ ! "$TMUX" ]] && echo "'"${_UIOT_SEP}${_UIOT_UH}${_UIOT_CLN}${_UIOT_PTH}"'")'
 PS1=$PS1'$( [[ "$TMUX" ]] && tmux setenv -g TMUX_PWD_$(tmux display -p "#D" 2>/dev/null| tr -d %) "$PWD")'
 PS1="${PS1}${_UIOT_PMT}"
 
