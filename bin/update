@@ -7,7 +7,7 @@
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
 if [[ -e "node.conf" ]]; then  # started from node-directory
-    source "$ULNOIOT_ROOT/bin/read_conf"
+    source "$ULNOIOT_ROOT/bin/read_config"
     echo "Updating system files on node $topic."
     reset="--reset"
     if [[ "$1" != noreset ]]; then
