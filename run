@@ -3,11 +3,13 @@
 # Android). This file is best run as: bash run
 # (after changing into this ulnoiot directory)
 #
-# At first start it installs the local ulniot-environment
+# At first start it installs the local ulnoiot-environment
 #
 # Author: ulno
 # Create date: 2017-05-17
 #
+# if parameters are given and the first is "exec", ulnoiot will execute
+# the rest of the parameters as command in ulnoiot environment
 
 function welcome() {
 cat << EOF
@@ -32,22 +34,22 @@ function check_files() {
 
 
 function check_root() {
-    if [ -e "$ULNOIOT_ROOT/bin/ulnoiot.bashenv" ]; then
+    if [ -e "$ULNOIOT_ROOT/lib/shell_starter/ulnoiot.bash" ]; then
         cd "$ULNOIOT_ROOT"
     fi
+    # else we should assume that we were started from the root-directory
     #echo -n "Checking now that we are in the ulnoiot root directory. "
-    check_files "bin/ulnoiot.bashenv" \
+    check_files "lib/shell_starter/ulnoiot.bash" \
         "bin/shebang_run" \
         "etc/ulnoiot.conf.example"
     if [ $? -ne 0 ]; then
-        #echo "No."
         echo
-        echo "Make sure you run or source this from the ulnoiot root directory."
+        echo "Cannot find ulnoiot files."
         echo "Stopping now."
         return 1
     fi
 
-    #echo "Yes."
+    # Yes, found them.
     echo
     return 0
 }
@@ -66,26 +68,28 @@ function install() {
 
 
 function run() {
-    if [ "$1" = "ulnoiot" ]; then
+    if [ "$1" = "exec" ]; then
         shift
-        exec bash --rcfile "$ULNOIOT_ROOT/bin/ulnoiot.bashenv" "$@"
+        exec "$@"
     else
-        exec bash --rcfile "$ULNOIOT_ROOT/bin/ulnoiot.bashenv"
+        exec bash
     fi
 }
 
 
 ######## Main #########
 welcome
+current_path="$(pwd)" # save to restore later
 if check_root; then
     export ULNOIOT_ROOT=$(realpath "$(pwd)")
-    source "$ULNOIOT_ROOT/bin/read_config" \
+    source "$ULNOIOT_ROOT/lib/shell_starter/ulnoiot.bash" \
         || { echo "Can't read configuration. Aborting."; exit 1; }
     check_install
+    cd "$current_path" # back to where we have been called
     if [ $? -eq 0 ]; then
         run "$@"
     else
-        if install; then
+        if install; then # if it failed, try to install first
             run "$@"
         fi
     fi

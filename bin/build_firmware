@@ -99,9 +99,12 @@ rm -rf ulnoiot umqtt ssd1306.py
 ln -s ../../../../micropython-lib/umqtt.simple/umqtt .
 ln -s ../../../drivers/display/ssd1306.py .
 ln -s $ULNOIOT_ROOT/lib/esp8266/ulnoiot .
+
+# netrepl stuff
 ln -s $ULNOIOT_ROOT/lib/netrepl/chacha.py .
-# temporarily disabled ln -s $ULNOIOT_ROOT/lib/netrepl/unetrepl.py .
+ln -s $ULNOIOT_ROOT/lib/netrepl/unetrepl.py .
 ln -s $ULNOIOT_ROOT/lib/netrepl/crypt_socket.py .
+ln -s $ULNOIOT_ROOT/lib/netrepl/hashlist.py .
 
 echo
 echo "Third, build firmware."

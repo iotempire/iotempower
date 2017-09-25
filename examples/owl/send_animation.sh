@@ -15,4 +15,4 @@ f 2 black \
 p 3000 \
 "
 
-ulnoiot mqtt_send owl01/eyes/animation "$ANIMATION"
+ulnoiot exec mqtt_send owl01/eyes/animation "$ANIMATION"

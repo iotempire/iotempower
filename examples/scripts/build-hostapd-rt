@@ -1,4 +1,4 @@
-# creating an folder to work in
+# creating a folder to work in
 mkdir hostapd-comp
 cd hostapd-comp
 

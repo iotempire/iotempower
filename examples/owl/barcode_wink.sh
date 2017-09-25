@@ -6,4 +6,4 @@ dir=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
 
 cd "$dir"
 
-ulnoiot mqtt_action cgi/mixowl01 each . bash "$dir/send_animation.sh"
+ulnoiot exec mqtt_action cgi/mixowl01 each . bash "$dir/send_animation.sh"

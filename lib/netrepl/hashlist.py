@@ -1,5 +1,5 @@
-# Some small utilities for ulnoiot
-#
+# Some small utilities for the ulnoiot netrepl to generate
+# a list of hashes for files
 
 import os
 from uhashlib import sha256
@@ -8,19 +8,19 @@ import gc
 import machine
 
 
-def file_hashs(root="/"):
+def hashlist(root="/"):
     speed=machine.freq()
     machine.freq(160000000) # we want to be fast for this
     p=os.getcwd()
     if p == "":
         p = "/"
     os.chdir("/")
-    _file_hashs(root)
+    _hashlist(root)
     os.chdir(p)
     machine.freq(speed) # restore speed
 
 
-def _file_hashs(root):
+def _hashlist(root):
     if root.endswith("/"):
         root = root[0:-1]  # strip slash
     try:
@@ -34,7 +34,7 @@ def _file_hashs(root):
         for f in l:
             gc.collect()
             p = root + "/" + f
-            _file_hashs(p)
+            _hashlist(p)
     else:
         h = sha256()
         hf = open(root, "rb")

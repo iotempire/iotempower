@@ -10,19 +10,19 @@ _ap = network.WLAN(network.AP_IF)
 _ap.active(False)
 _wlan = network.WLAN(network.STA_IF)
 _wlan.active(True)
-_config_file="/wifi_config.py"
+_config_file="/wifi_cfg.py"
 time.sleep(1) # wait to become active
 
 # connect to wifi
 def connect():
-    global wifi_config,  _wlan
+    global wifi_cfg,  _wlan
 
     _ap.active(False)
     _wlan.active(True)
 
     # removed scan of networks to allow conenct to hidden
     # Try to connect
-    _wlan.connect(wifi_config.name, wifi_config.password)
+    _wlan.connect(wifi_cfg.name, wifi_cfg.password)
     tries=15
     for i in range(tries):
         print("%d/%d. Trying to connect." %(i+1, tries))
@@ -86,16 +86,16 @@ wip = WIP()
 
 # write config and connect
 def setup( name,  password, reset=True ):
-    global wifi_config
+    global wifi_cfg
 
-    if name != wifi_config.name or \
-          password != wifi_config.password:
+    if name != wifi_cfg.name or \
+          password != wifi_cfg.password:
         f=open(_config_file, "w")
         f.write("name=\"%s\"\npassword=\"%s\"" % (name,password))
         f.close()
-        print("Updated wifi_config.")
-        wifi_config.name = name
-        wifi_config.password = password
+        print("Updated wifi_cfg.")
+        wifi_cfg.name = name
+        wifi_cfg.password = password
         if reset:
             print("Resetting system in 3 seconds.")
             time.sleep(1)
@@ -106,12 +106,12 @@ def setup( name,  password, reset=True ):
         else:
             connect()
 
-# Try to find wifi_config
+# Try to find wifi_cfg
 try:
-    import wifi_config
+    import wifi_cfg
     connect()
 except ImportError:
-    class wifi_config():
+    class wifi_cfg():
         pass
-    wifi_config.name=""
-    wifi_config.password=""
+    wifi_cfg.name=""
+    wifi_cfg.password=""

@@ -1,3 +1,4 @@
+#@IgnoreInspection BashAddShebang
 # enable local bin and python environment
 # set all values based on a given ULNOIOT_ROOT
 #
@@ -9,8 +10,7 @@ export ULNOIOT_ACTIVE=yes
 
 # ULNOIOT_ROOT needs to be set
 if [ ! "$ULNOIOT_ROOT" ]; then
-    echo "ULNOIOT_ROOT not set. Aborting." 1>&2
-    exit 1
+    echo "ULNOIOT_ROOT not set. ENvironment might not work." 1>&2
 fi
 
 # derived variables

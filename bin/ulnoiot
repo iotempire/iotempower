@@ -4,9 +4,5 @@
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
-ulnoiot=""
-if [ "$1" ]; then
-    ulnoiot="ulnoiot"
-fi
-exec bash "$ULNOIOT_ROOT/run" $ulnoiot "$@"
+exec bash "$ULNOIOT_ROOT/run" "$@"
 

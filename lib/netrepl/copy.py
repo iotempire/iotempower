@@ -6,11 +6,10 @@
 # create date: 2017-09-23
 #
 
-import time
-from netrepl import Netrepl_Parser
-import sys, os, select
 from hashlib import sha256
 import binascii
+import os
+from netrepl import Netrepl_Parser
 
 #_debug="netrepl copy:"
 _debug=None
@@ -104,8 +103,8 @@ def main():
     else:
         search_path = dest_base_dir+dest_prefix_dir
     print("Connecting and requesting destination hash list.")
-    data=con.repl_command("from ulnoiot.util import file_hashs; "
-                          "file_hashs(root=\"{}\")".format(search_path),
+    data=con.repl_command("import hashlist; "
+                          "hashlist(root=\"{}\")".format(search_path),
                           timeoutms=parser.args.timeout*1000,
                           interrupt=True)
     if data is None: # timeout
