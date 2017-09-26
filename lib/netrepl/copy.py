@@ -101,7 +101,8 @@ def main():
                 src_list.append(path)
 
     # get destination file-list with hashes
-    if len(src_list) == 1:
+    if src_file and len(src_list) == 1: # if we only copy one file
+        # (only small hashlist necessary)
         search_path = "/"+src_list[0]
     else:
         search_path = dest_base_dir+dest_prefix_dir
@@ -196,7 +197,7 @@ def main():
                 else: # file
                     con.rm(dest_base_dir + dest_prefix_dir + f)
         # process copy list
-        if dest_base_dir: # if there is one always try to create it
+        if dest_base_dir and dest_base_dir !="/": # if there is one always try to create it
             if not_dryrun:
                 con.mkdir(dest_base_dir[:-1], nofail=True)
         if dest_prefix_dir:  # need to prefixdir?
