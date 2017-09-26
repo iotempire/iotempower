@@ -34,14 +34,14 @@ else # started from somewhere else, so search for node.conf in subdirs
 
     path="$(pwd)"
     echo "This is not a node, so search sub-folders for node.conf files and"
-    echo "deploy all of them."
+    echo "flash all of them."
     echo
     # TODO: think about runnning them all in parallel (or batches)
     find -name node.conf |\
         while read n; do
             cd "$path"
             cd $(dirname "$n")
-            deploy "$@" # call recursive for node-dir
+            flash "$@" # call recursive for node-dir
         done
 
 fi # not in node-dir
