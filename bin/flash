@@ -15,7 +15,7 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
         echo "Triggering reset for flash."
         cd "$ULNOIOT_ROOT/lib/netrepl"
         python3 command.py "$ip" --keyfile "$path/key.hex" \
-            --command "import machine;machine.RTC().memory("yaotaota");machine.reset()"
+            --command 'import machine;machine.RTC().memory("yaotaota");machine.reset()'
         echo "Waiting for reset and wifi reconnect."
         sleep 10; # let reset happen
         # TODO: make sure yaota has been downloaded and built
