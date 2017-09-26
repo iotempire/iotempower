@@ -21,7 +21,7 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
         # TODO: make sure yaota has been downloaded and built
         cd "$ULNOIOT_FIRMWARE/yaota8266/ota-client"
         echo "Sending firmware to yaota bootloader on $node with IP $ip."
-        python3 ota_client.py -a $ip -h ota "$ULNOIOT_FIRMWARE/firmware.ota"
+        python3 ota_client.py -a $ip ota "$ULNOIOT_FIRMWARE/firmware.ota"
     else
         echo "Couldn't find IP of node with topic $topic for falshing. Skipping."
         exit 1
