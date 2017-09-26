@@ -10,7 +10,7 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
     source "$ULNOIOT_ROOT/bin/read_config"
     echo "Updating system files on node $topic."
     reset="--reset"
-    if [[ "$1" != noreset ]]; then
+    if [[ "$1" = noreset ]]; then
         reset=""
     fi
     ip=$(get_ip "$topic" 2>/dev/null|grep "$topic"|cut -d\  -f2)
