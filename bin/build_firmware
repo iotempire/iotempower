@@ -53,7 +53,7 @@ else
     git clone https://github.com/micropython/micropython-lib
     echo
     echo "Downloading ota-firmware tools"
-    git clone --recursive https://github.com/pfalcon/yaota8266
+    git clone --recursive https://github.com/ulno/yaota8266
     ## link axtls <- NO, this leads to exceptions, --recursive is the trick!
     #rmdir "$ULNOIOT_FIRMWARE/yaota8266/ota-server/lib/axtls"
     #ln -s "$ULNOIOT_FIRMWARE/micropython/lib/axtls" \

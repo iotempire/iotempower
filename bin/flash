@@ -1,11 +1,7 @@
 #!/bin/bash
-# (updates and) deploys a node
+# remote flashes a node
 # can be called from a node folder or from parent folder of node-folders
 #
-# if noupdate as parameter is given only the user-part is deployed
-# (deploy is skipped)
-# configuration files are not updated (TODO: consider making this possible)
-
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
@@ -14,16 +10,23 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
     if [[ "$1" != noupdate ]]; then
         update noreset
     fi
-    echo "Getting IP of node $topic for deployment."
+    echo "Getting IP of node $topic for flashing."
     ip=$(get_ip "$topic" 2>/dev/null|grep "$topic"|cut -d\  -f2)
     if [ "$ip" ]; then
-        echo "Deploying user files to node $topic with IP $ip."
+        echo "Remote flashing node $topic with IP $ip."
         path="$(pwd)"
+        echo "Triggering reset for flash."
         cd "$ULNOIOT_ROOT/lib/netrepl"
-        python3 copy.py "$ip" --keyfile "$path/key.hex" \
-            --src "$path/files/" --reset
+        python3 comand.py "$ip" --keyfile "$path/key.hex" \
+            --command "import machine;machine.RTC().memory("yaotaota");machine.reset()"
+        echo "Waiting for reset and wifi reconnect."
+        sleep 10; # let reset happen
+        # TODO: make sure yaota has been downloaded and built
+        cd "$ULNOIOT_FIRMWARE/yaota8266/ota-client"
+        echo "Sending firmware to yaota bootloader on $node with IP $ip."
+        ota_client.py -a $ip -h ota "$ULNOIOT_FIRMWARE/firmware.ota"
     else
-        echo "Couldn't find IP of node with topic $topic for deployment. Skipping."
+        echo "Couldn't find IP of node with topic $topic for falshing. Skipping."
         exit 1
     fi
 

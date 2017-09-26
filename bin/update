@@ -15,7 +15,7 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
     echo "Getting IP of node $topic for update."
     ip=$(get_ip "$topic" 2>/dev/null|grep "$topic"|cut -d\  -f2)
     if [ "$ip" ]; then
-        echo "Updating system files on node $topic with ip $ip."
+        echo "Updating system files on node $topic with IP $ip."
         path="$(pwd)"
         cd "$ULNOIOT_ROOT/lib/netrepl"
         # TODO: make board configurable
