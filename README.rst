@@ -6,7 +6,8 @@ Introduction
 ------------
 
 *ulnoiot* (pronounced: "You'll know IoT") is a framework and environment
-for making it easy for everyone to explore and develop for the Internet of Things (IoT)
+for making it easy for everyone to explore and develop for the
+Internet of Things (IoT)
 -- easy for tinkerers, makers, programmers, hobbyists, students,
 and professionals alike.
 It has a special focus on education and is intended to support classes to teach
@@ -18,7 +19,7 @@ mechanisms for over the air (OTA) updates and automatic
 multi-device deployment.
 
 If you are impatient and want to dive into it right now, forward to
-`Getting Started`_.
+`Installation`_ or `First IoT Nodes`_.
 
 It is based on a multi-layered network architecture. This means for this project
 that each IoT-system (small network of connected sensors and actors) has its own
@@ -101,8 +102,8 @@ the ulnoiot command or executing run in the main ulnoiot directory):
 - deploy_wemosd1mini: copy or update the modifieable files for the ulnoiot
   environment to a locally or remotely connected wemosd1mini
 
-Getting Started
----------------
+Installation
+------------
 
 - install dependencies:
   ``sudo apt install git mc mosquitto mosquitto-clients virtualenv iptables bridge-utils``
@@ -119,49 +120,64 @@ Getting Started
     ``git clone git@github.com:ulno/ulnoiot``
 
 - make ulnoiot runnable -> copy examples/scripts/ulnoiot into your bin folder and adapt
-  the path in it to reflect the location where you cloned ulnoiot
+  the path in it to reflect the location where you cloned ulnoiot. If you use
+  tmux or byobu with bash consider sourcing ``lib/shell_starter/ulnoiot.bash``
+  in your .bashrc.
 
 - start ulnoiot and agree and wait for dependencies to be downloaded
   (if packages are mssing, fix dependencies and try to run
   ``ulnoiot install clean``)
 
 - After successfully entering ulnoiot (the prompt should have changed colors and
-  show ulnoiot in red, white, and black), flash and deploy some hardware using
-  for example ``flash_esp8266`` and ``deploy_wemosd1mini``.
+  show ulnoiot in red, white, and black), start configuring your first IoT node,
+  see `First IoT Nodes`_
 
-- Access the command prompt with ``console`` (if only a wemos is connected
+First IoT Nodes
+---------------
+
+- Copy the folder ``lib/system_templates`` to a project directory,
+  you can rename
+  system_templates to a project name (i.e. iot-test-prject)
+
+- Rename the included node_template to a name for the node you want to
+  configure (i.e. onboard_blinker)
+
+- Adapt and configure system.conf and node.conf. If you installed ulnoiot on
+  an orange pi or raspberry pi, you might want to also configure etc/ulnoiot.conf
+  and run ``accesspoint`` and ``mqtt_broker``
+
+- now change into your node directory, connect an esp8266 based microcontroller
+  to your pc or raspberry/orange pi and type ``initialize``. This flashes and
+  pre-configures teh device.
+
+- Access the command prompt with ``console_serial`` (if only one esp is connected
   the serial port will be dicovered automatically else supply it as usb1 or acm2
-  or an IP address and password as paramaters). You can also use webrepl
-  (see below) to access the wemos.
+  or an IP address and password as paramaters). If your wifi network is
+  configured correctly, you can just type console and it's ip shoudl be
+  discovered automatically and you ge a web-based terminal on it.
 
-If something gets stuck, try to power cycle the wemos d1 mini.
+If something gets stuck, try to power cycle the esp8266.
 
+``initialize`` sets up your wifi based on the settings in system.conf and also
+encrypts the network connectin, but if you want to set it up manually,
+call ``wifi`` on the esp8266 node from teh serial console.
 
-To setup wifi on the esp8266 device,
-connect to the wireless network of the esp8266,
-when in access point mode and use 
-`webrepl <http://micropython.org/webrepl/>`__ or your own local copy of it
-from https://github.com/micropython/webrepl to get a command line.
-You can also connect to the command line via a serial terminal
-(use console in ulnoiot).
- 
-The webrepl password is hardcoded to "ulnoiot".
-If you want to change the webrepl login password from default ulnoiot to
-something else use ``import webrepl_setup``
-Attention, the password can't be too complex,
-so stick with something around 8 characters and not too many 
-special things in it. I haven't figured out why, it seems to be a
-webrepl thing - or just stick with the default.
-
-Try typing help and check the small manual.
+Try typing ``help`` and check the small manual.
 You can setup the wifi with ``wifi( "network-name", "password" )``.
 You can scan
 the existing wifi networks with ``wscan`` and when the wifi is configured,
 you can see the current ip with typing wip.
 
-If you create a user.py file
-with your own context, this will be started automatically,
-when the system boots. Try ``help("user.py")`` at the repl prompt.
+If you create an autostart.py file or modify the existing one in your
+nodes/files directory and then call ``deploy noupdate``, you can add your own
+devices to thsi newly configured node. Don't forget to add ``run()`` add the end
+of your autostart file.
+However, try first to add some devices manually at the console comamnd prompt,
+check and browse the help for available devices. type ``run()`` to activate
+these devices and then use the ``mqtt_all`` and ``mqtt_send`` tools to watch and
+interact.
+Try also ``help("autostart.py")`` at the console prompt.
+
 
 
 External Resources
