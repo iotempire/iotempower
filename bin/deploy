@@ -17,7 +17,7 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
     echo "Getting IP of node $topic for deployment."
     ip=$(get_ip "$topic" 2>/dev/null|grep "$topic"|cut -d\  -f2)
     if [ "$ip" ]; then
-        echo "Deplying user files to node $topic with ip $ip."
+        echo "Deploying user files to node $topic with ip $ip."
         path="$(pwd)"
         cd "$ULNOIOT_ROOT/lib/netrepl"
         python3 copy.py "$ip" --keyfile "$path/key.hex" \
