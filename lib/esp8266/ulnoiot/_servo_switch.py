@@ -20,21 +20,23 @@ class Servo_Switch(Servo):
                         freq=freq, min_us=min_us,max_us=max_us,angle=angle,
                         ignore_case=ignore_case,
                         on_change = on_change,report_change=report_change)
+        self.on_command=on_command
+        self.off_command=off_command
         if back_to_angle is None:
             self.on_angle=on_angle
             self.off_angle=off_angle
         else:
-            self.on_angle=[on_angle,back_to_angle]
+            self.on_angle = [on_angle,back_to_angle]
             self.off_angle = [off_angle,back_to_angle]
-        self.status=None
+        self.status=None #no status, we don't really know where motor is (in between usually)
         self.value_map={on_command:self.on,off_command:self.off}
         self.getters={"":self.mapped_value}
         self.setters={"set":self.evaluate}
 
     def evaluate(self,msg):
-        if msg==self.on_command:
+        if msg == self.on_command:
             self.on()
-        elif msg == self.low_command:
+        elif msg == self.off_command:
             self.off()
 
     def on(self):

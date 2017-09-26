@@ -1,0 +1,30 @@
+servo( name, pin, on_angle, off_angle,
+     on_command='on', off_command='off',
+     back_to_angle=None,
+     turn_time_ms=700,
+     freq=50, min_us=600, max_us=2400, angle=180,
+     ignore_case = True, on_change = None,
+     report_change = False)
+
+Create a new stepper motor controller acting as a switch.
+name will be appended to the mqtt topic and a set appended to
+send commands to.
+
+Parameters:
+- name: the name it can be addressed under
+- pin: the gpiopin
+- on_angle/off_angle: respective angles for on/off postions
+- on_command/off_command: what needs to be sent to turn the motor to on/off
+                          position
+- back_to_angle: a medium angle to return to after pushing to on/off position
+- turn_time_ms: how long to give the motor in ms to reach its position before
+-               stopping power
+- freq, min_us, max_us: values controlling the motor settings
+- angle: reach of the stepper motor
+- ignore_case: should case in the command detection be ignored
+
+Example:
+servo_switch("m1",d4,0,179,back_to_angle=90)
+
+Now the motor can be controlled via sending to the mqtt-broker
+to the topic "node_topic/m1/set" the command on or off

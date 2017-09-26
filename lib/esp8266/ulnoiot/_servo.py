@@ -33,14 +33,15 @@ class Servo(Device):
 
     def _trigger_next_turn(self):
         self.turn_start=time.ticks_ms()
-        self.write_angle(self.angle_list[0])
-        del self.angle_list[0]
+        if len(self.angle_list)>0:
+            self.write_angle(self.angle_list[0])
+            del self.angle_list[0]
 
     def turn(self,msg):
-        if type(msg) is str:
+        if type(msg) in [str,int]:
             self.angle_list=[int(msg)] # TODO: accept floats?
         else: # should be a list
-            self.angle_list = msg
+            self.angle_list = msg[:]
         self._trigger_next_turn()
 
     def write_us(self, us):

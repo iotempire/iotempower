@@ -20,7 +20,7 @@ cd "$ULNOIOT_ROOT/lib/boards/wemosd1mini"
 hashfile="$(mktemp --suffix .hashfile)"
 echo "Getting file digests."
 mpfshell -n -c \
-    "open $port; exec import hashlist; exec hashlist()" \
+    "open $port; exec import hashlist; exec hashlist.hashlist()" \
     | tail -n+2 > "$hashfile"
 
 if [[ "$DEBUG" = yes ]]; then
