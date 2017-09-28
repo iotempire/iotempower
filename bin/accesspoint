@@ -27,7 +27,7 @@ fi
 # add network extension for making essid more unique
 AP_NAME="$ULNOIOT_AP_NAME"
 if [ "$ULNOIOT_AP_ADDID" = "yes" ]; then
-    # add prefix to essid based on network adapater for unique class setup
+    # add prefix to essid based on network adapter for unique class setup
     OUTPUT_MAC=$(ip link show "$OUTPUT_WIFI"|tail -n1|\
             cut -d\  -f6|sed s/://g|cut -b7-)
     AP_NAME="${AP_NAME}-$OUTPUT_MAC"
@@ -84,6 +84,10 @@ while true; do
 #    sudo systemd-inhibit \
 #        --who "accesspoint" \
 #        --why "accesspoint will fail if sleep happens" \
+    # udp forwarding seems not to work from 53->5353 seems not to work
+    # on void linux
+    # enable ip-forwarding
+    sudo sysctl -w net.ipv4.ip_forward=1
     sudo "$ULNOIOT_EXTERNAL/create_ap/create_ap" \
         -c "$CHANNEL" $HIDDEN \
         -g "$IP" \

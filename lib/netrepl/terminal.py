@@ -64,8 +64,11 @@ def main():
     con = parser.connect()
     if _debug is not None:
         print(_debug, 'Press ctrl-] to quit.\n')
-    if _debug: print(_debug,'Requesting startscreen.')
-    con.send(b"\r\nhelp\r\n")
+        print
+        print("Try to type help to get an initial help.")
+    # Do not request help-screen, gets too confusing later
+    #if _debug: print(_debug,'Requesting startscreen.')
+    #con.send(b"\r\nhelp\r\n")
 
     fd = sys.stdin.fileno()
     old_settings = termios.tcgetattr(fd)
