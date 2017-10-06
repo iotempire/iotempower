@@ -89,18 +89,46 @@ Among them are the following (most of these scripts are available after starting
 the ulnoiot command or executing run in the main ulnoiot directory):
 
 - run/ulnoiot: enter or run a command in the ulnoiot-environment (setting
-  system variables and virtual python environments)
+  system variables and virtual python environments). To run a command, prefix
+  it by the exec keyword, i.e.: ``ulnoiot exec accesspoint``
+
 - accesspoint: start an accesspoint on a free wifi interface
-- console: connect to a serial or network connected esp8266 microcontroller,
-  running micropython
+
+- download_firmware: download latest firmware
+
 - shell: starting mpfshell to connect to locally or network connected esp8266
   device
-- install: (re-)install the ulnoiot environment
-- download_firmware: download latest firmware
-- flash_esp8266: flash the ulnoiot-modified micropython on a locally connected
-  esp8266
-- deploy_wemosd1mini: copy or update the modifieable files for the ulnoiot
-  environment to a locally or remotely connected wemosd1mini
+
+- install: (re-)install the ulnoiot environment (if you specify clean,
+  it re-installs)
+
+- network based commands:
+
+    - console: (determines destiantion via the directory you are in) open a
+      console to the respective node (the one configured with the local
+      directory)
+
+    - flash: firmware update over the network of the currently selected
+      configuration folder (or all it's configuration sub-folders)
+
+    - update: update ulnoiot micropython user-mode (non firmware) extensions
+      over the network of the currently selected
+      configuration folder (or all it's configuration sub-folders)
+
+    - deploy: update ulnoiot micropython node coniguration (non firmware) extensions
+      over the network of the currently selected
+      configuration folder (or all it's configuration sub-folders).
+      If noupdate is specified as option, only update the node-specific files.
+
+
+- serial connection based commands:
+
+    - console_serial: connect via serial to a locally connected
+      microcontroller
+    - flash_serial_esp8266: flash the ulnoiot-modified micropython on a locally connected
+      esp8266
+    - deploy_wemosd1mini: copy or update the modifieable files for the ulnoiot
+      environment to a locally or remotely connected wemosd1mini
 
 Installation
 ------------
