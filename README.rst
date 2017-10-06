@@ -137,7 +137,7 @@ First IoT Nodes
 
 - Copy the folder ``lib/system_templates`` to a project directory,
   you can rename
-  system_templates to a project name (i.e. iot-test-prject)
+  system_templates to a project name (i.e. iot-test-project)
 
 - Rename the included node_template to a name for the node you want to
   configure (i.e. onboard_blinker)
@@ -148,7 +148,7 @@ First IoT Nodes
 
 - now change into your node directory, connect an esp8266 based microcontroller
   to your pc or raspberry/orange pi and type ``initialize``. This flashes and
-  pre-configures teh device.
+  pre-configures the device.
 
 - Access the command prompt with ``console_serial`` (if only one esp is connected
   the serial port will be dicovered automatically else supply it as usb1 or acm2
