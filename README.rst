@@ -127,7 +127,7 @@ the ulnoiot command or executing run in the main ulnoiot directory):
       microcontroller
     - flash_serial_esp8266: flash the ulnoiot-modified micropython on a locally connected
       esp8266
-    - deploy_wemosd1mini: copy or update the modifieable files for the ulnoiot
+    - update_serial_wemosd1mini: copy or update the modifieable files for the ulnoiot
       environment to a locally or remotely connected wemosd1mini
 
 Installation
