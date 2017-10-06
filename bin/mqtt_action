@@ -2,7 +2,7 @@
 #
 # execute another switch when a given command is received
 # $1: topic to listen to
-# $2: trigger type (each, anychange, onechange, payload)
+# $2: trigger type (any, anychange, onechange, payload)
 # $3: trigger data
 # $4-: command to execute (gets as last param the payload other params first)
 
@@ -25,6 +25,9 @@ mosquitto_sub  -h "$ULNOIOT_MQTT_HOST" -t "$topic" \
         fi
         trigger=""
         case "$trigger_type" in
+            "any")
+                trigger="yes"
+                ;;
             "each")
                 trigger="yes"
                 ;;

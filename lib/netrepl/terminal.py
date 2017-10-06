@@ -65,7 +65,7 @@ def main():
     if _debug is not None:
         print(_debug, 'Press ctrl-] to quit.\n')
         print
-        print("Try to type help to get an initial help.")
+        print("Try to type help to get an initial help screen.")
     # Do not request help-screen, gets too confusing later
     #if _debug: print(_debug,'Requesting startscreen.')
     #con.send(b"\r\nhelp\r\n")
