@@ -153,8 +153,8 @@ First IoT Nodes
 - Access the command prompt with ``console_serial`` (if only one esp is connected
   the serial port will be dicovered automatically else supply it as usb1 or acm2
   or an IP address and password as paramaters). If your wifi network is
-  configured correctly, you can just type console and it's ip shoudl be
-  discovered automatically and you ge a web-based terminal on it.
+  configured correctly, you can just type console. Its ip should now 
+  automatically be discovered, and you get a web-based terminal on it.
 
 If something gets stuck, try to power cycle the esp8266.
 
