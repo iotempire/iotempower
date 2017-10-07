@@ -46,14 +46,14 @@ class MQTTDevice(Device):
         """
         self._add_callback_entry(sub_topic, lambda t, m: callback(m), ignore_case)
 
-    def add_callback_change(self, sub_topic, callback, ignore_case=True):
+    def add_callback_change(self, sub_topic="", callback=None, ignore_case=True):
         """
         Add a callback function for incoming data on a specific
         sub_topic.
         This is called any time data arrives on sub_topic which is different to
         the data received last time.
         :param sub_topic: the subtopic to react on
-        :param callback: a calback function of form func(topic, message)
+        :param callback: a callback function of form func(topic, message)
         :param ignore_case: if True, cast all received payload into lowercase
         :return:
         """

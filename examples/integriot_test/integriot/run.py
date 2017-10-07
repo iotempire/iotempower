@@ -1,19 +1,18 @@
 from integriot import *
 
 
-def show(m):
-    global s
-    print("received:",m)
-    if m == "off":
-        s.toggle()
+def show(msg):
+    global onboard_blue
+    print("received:", msg)
+    if msg == "off":
+        onboard_blue.toggle()
 
 
 init("localhost")
 
 prefix("testnode1")
-sensor("b1",{"":(True,show)})
-s = led("blue")
-
-s.publish("set","off")
+button = sensor("b1")
+button.add_callback_change(callback=show)
+onboard_blue = led("blue", init_state="off")
 
 run()

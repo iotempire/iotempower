@@ -81,10 +81,10 @@ class Devices():
         return d
 
     def switch(self, topic, on_command="on", off_command="off",
-               set_topic="set", qos=0):
+               set_topic="set", state_topic="", init_state=None, qos=0):
         t = self._device_full_topic(topic)
         d = device.MQTTSwitch(self.client, t, on_command, off_command,
-                              set_topic, qos)
+                              set_topic, state_topic, init_state, qos)
         self._add_device(d, t)
         return d
     led = switch

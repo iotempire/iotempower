@@ -27,9 +27,11 @@ def device_list():
     return _main_devices.device_list
 
 
-def switch(t, on="on", off="off", set="set", state=""):
+def switch(t, on_command="on", off_command="off", set_topic="set",
+           state_topic="", init_state=None):
     global _main_devices
-    return _main_devices.switch(t,on,off,set,state)
+    return _main_devices.switch(t, on_command, off_command, set_topic,
+                                state_topic, init_state)
 led = switch
 relay = switch
 
