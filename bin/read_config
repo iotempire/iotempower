@@ -1,6 +1,7 @@
 #@IgnoreInspection BashAddShebang
 # Read node and system configuration
 
+[[ -e "node.conf" ]] || cd ..
 [[ -e "node.conf" ]] || { echo "Can't find node.conf. Aborting." 1>&2;exit 1; }
 
 # search source.conf in parent directories and build a respective path to self
