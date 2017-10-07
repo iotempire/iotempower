@@ -12,6 +12,8 @@ if [[ ! "$ULNOIOT_ACTIVE" = "yes" ]]; then # only import once
 source "$ULNOIOT_ROOT/lib/shell_starter/config.bash" \
         || echo "trouble initializing, environment might not work." 1>&2
 
+export PYTHONPATH="$PYTHONPATH:$ULNOIOT_ROOT/lib"
+
 ## if you type cd you go to ulnoiot-root
 #ulnoiot_cd() {
 #    ULNOIOT_HOMEBACK="$HOME"

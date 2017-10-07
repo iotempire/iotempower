@@ -9,9 +9,21 @@
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
-if [[ -e "node.conf" ]]; then  # started from node-directory
+
+if [[ -e "node.conf" || -e "../node.conf" ]]; then  # started from node-directory
     source "$ULNOIOT_ROOT/bin/read_config"
-    if [[ "$1" != noupdate ]]; then
+
+    noupdate=""
+    if [[ "$@" == *noupdate* ]]; then
+        noupdate=1
+    fi
+
+    sync=""
+    if [[ "$@" == *sync* ]]; then
+        sync="--sync"
+    fi
+
+    if [[ ! $noupdate ]]; then
         update noreset
     fi
     echo "Getting IP of node $topic for deployment."
@@ -20,7 +32,7 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
         echo "Deploying user files to node $topic with IP $ip."
         path="$(pwd)"
         cd "$ULNOIOT_ROOT/lib/netrepl"
-        python3 copy.py "$ip" --keyfile "$path/key.hex" \
+        python3 copy.py "$ip" --keyfile "$path/key.hex" $sync \
             --src "$path/files/" --reset
     else
         echo "Couldn't find IP of node with topic $topic for deployment. Skipping."

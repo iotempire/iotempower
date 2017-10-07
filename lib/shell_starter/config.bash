@@ -10,7 +10,7 @@ export ULNOIOT_ACTIVE=yes
 
 # ULNOIOT_ROOT needs to be set
 if [ ! "$ULNOIOT_ROOT" ]; then
-    echo "ULNOIOT_ROOT not set. ENvironment might not work." 1>&2
+    echo "ULNOIOT_ROOT not set. Environment might not work." 1>&2
 fi
 
 # derived variables

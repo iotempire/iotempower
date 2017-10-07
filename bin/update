@@ -6,7 +6,7 @@
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
-if [[ -e "node.conf" ]]; then  # started from node-directory
+if [[ -e "node.conf" || -e "../node.conf" ]]; then  # started from node-directory
     source "$ULNOIOT_ROOT/bin/read_config"
     reset="--reset"
     if [[ "$1" = noreset ]]; then
@@ -19,7 +19,7 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
         path="$(pwd)"
         cd "$ULNOIOT_ROOT/lib/netrepl"
         # TODO: make board configurable
-        python3 copy.py "$ip" --keyfile "$path/key.hex" \
+        python3 copy.py "$ip" --keyfile "$path/key.hex" --sync \
             --src "$ULNOIOT_ROOT/lib/boards/wemosd1mini/" $reset
     else
         echo "Couldn't find IP of node with topic $topic for update. Skipping."

@@ -10,6 +10,7 @@ from hashlib import sha256
 import binascii
 import os
 from netrepl import Netrepl_Parser
+import time
 
 #_debug="netrepl copy:"
 _debug=None
@@ -43,6 +44,11 @@ def main():
                                required=False, action="store_true",
                                help='if given, delete locally absent files '
                                     'also on destination.')
+    parser.parser.add_argument('-y','--sync',
+                               required=False, action="store_true",
+                               help='if given, use list of hash codes '
+                                    'to determine which files have to '
+                                    'be copied and which can be skipped.')
     parser.parser.add_argument('-n','--dry', '--dryrun',
                                required=False, action="store_true",
                                help='if given, only show what would be done, '
@@ -66,7 +72,6 @@ def main():
                                     'Multiple files and directories can be '
                                     'specified here.')
     # TODO: what about symlinks?
-    # TODO: should hashing be optional?
 
     con = parser.connect()
     source=parser.args.src
@@ -100,80 +105,87 @@ def main():
                 path = root + filename  # skip ./
                 src_list.append(path)
 
+    # interrupt what is running
+    con.repl_interrupt()
+    time.sleep(1)  # wait a bit
+
     # get destination file-list with hashes
     if src_file and len(src_list) == 1: # if we only copy one file
         # (only small hashlist necessary)
         search_path = "/"+src_list[0]
     else:
         search_path = dest_base_dir+dest_prefix_dir
-    print("Connecting and requesting destination hash list.")
-    data=con.repl_command("import hashlist; "
-                          "hashlist.hashlist(root=\"{}\")".format(search_path),
-                          timeoutms=parser.args.timeout*1000,
-                          interrupt=True)
-    if data is None: # timeout
-        print("Problem with initial connection - timeout occurred, aborting.")
-    else:
-        dest_hashes={}
-        for line in data.split(b"\n"):
-            line=line[:-1]
-            parts=line.split(b" ")
-            if len(parts) and parts[0]:
-                key=b" ".join(parts[1:]).decode()[
-                    len(dest_base_dir+dest_prefix_dir):]
-                if key:
-                    dest_hashes[key] \
-                        = bytes(parts[0]).decode()
 
-        if _debug: print(_debug,"src_list:",src_list) # debug
-        if _debug: print(_debug,"dest_hashes:",dest_hashes)  # debug
+    # if sync requested get hash-files
+    dest_hashes={}
+    if parser.args.sync:
+        print("Connecting and requesting destination hash list.")
+        data=con.repl_command("import hashlist; "
+                              "hashlist.hashlist(root=\"{}\")".format(search_path),
+                              timeoutms=parser.args.timeout*1000)
+        if data is None: # timeout
+            print("Problem with initial connection - timeout occurred, aborting.")
+        else:
+            dest_hashes={}
+            for line in data.split(b"\n"):
+                line=line[:-1]
+                parts=line.split(b" ")
+                if len(parts) and parts[0]:
+                    key=b" ".join(parts[1:]).decode()[
+                        len(dest_base_dir+dest_prefix_dir):]
+                    if key:
+                        dest_hashes[key] \
+                            = bytes(parts[0]).decode()
 
-        # Compute copy, delete, exclude, create only lists
-        exclude_list=parser.args.exclude
-        only_create_list=parser.args.only_create
-        # create copy_list
-        copy_list=[]
-        for f in src_list:
-            # check if file needs to be excluded due to being on exclude list
-            match=False
-            for e in exclude_list:
-                if e.startswith("/"): # only allow path matches
-                    e=e[1:]
-                    if e.endswith("/"):
-                        if f.startswith(e):
-                            match=True
-                            break
-                    else:
-                        if f.startswith(e+"/") or f==e:
-                            match = True
-                            break
-                else: # allow also file match
-                    if e.endswith("/"):
-                        if f.startswith(e):
-                            match=True
-                            break
-                    else:
-                        if f.startswith(e+"/"):
-                            match = True
-                            break
-                        if os.path.basename(f) == e or f==e:
-                            match = True
-                            break
-            # check if file needs to be excluded due to being in only-create
-            match=False
-            for o in only_create_list:
-                if o.startswith("/"):
-                    if o[1:] == f:
+            if _debug: print(_debug,"src_list:",src_list) # debug
+            if _debug: print(_debug,"dest_hashes:",dest_hashes)  # debug
+
+    # Compute copy, delete, exclude, create only lists
+    exclude_list=parser.args.exclude
+    only_create_list=parser.args.only_create
+    # create copy_list
+    copy_list=[]
+    for f in src_list:
+        # check if file needs to be excluded due to being on exclude list
+        match=False
+        for e in exclude_list:
+            if e.startswith("/"): # only allow path matches
+                e=e[1:]
+                if e.endswith("/"):
+                    if f.startswith(e):
+                        match=True
+                        break
+                else:
+                    if f.startswith(e+"/") or f==e:
                         match = True
                         break
-                if f==o or os.path.basename(f)==o:
-                    match=True
+            else: # allow also file match
+                if e.endswith("/"):
+                    if f.startswith(e):
+                        match=True
+                        break
+                else:
+                    if f.startswith(e+"/"):
+                        match = True
+                        break
+                    if os.path.basename(f) == e or f==e:
+                        match = True
+                        break
+        # check if file needs to be excluded due to being in only-create
+        match=False
+        for o in only_create_list:
+            if o.startswith("/"):
+                if o[1:] == f:
+                    match = True
                     break
-            if match: # is in create_only list, so check if it's already at destin.
-                if f in dest_hashes:
-                    continue  # then we don't need to add it
-            # nothing matches, so add it
-            copy_list.append(f)
+            if f==o or os.path.basename(f)==o:
+                match=True
+                break
+        if match: # is in create_only list, so check if it's already at destin.
+            if f in dest_hashes:
+                continue  # then we don't need to add it
+        # nothing matches, so add it
+        copy_list.append(f)
 
         # create delete list
         delete_list=[]
