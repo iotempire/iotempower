@@ -201,7 +201,7 @@ nodes/files directory and then call ``deploy noupdate``, you can add your own
 devices to this newly configured node. Don't forget to add ``run()`` add the end
 of your autostart file.
 However, try first to add some devices manually at the console command prompt,
-check and browse the help for available devices. type ``run()`` to activate
+check and browse the help for available devices. Type ``run()`` to activate
 these devices and then use the ``mqtt_all`` and ``mqtt_send`` tools to watch and
 interact.
 Try also ``help("autostart.py")`` at the console prompt.
