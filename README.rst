@@ -187,8 +187,8 @@ First IoT Nodes
 If something gets stuck, try to power cycle the esp8266.
 
 ``initialize`` sets up your wifi based on the settings in system.conf and also
-encrypts the network connectin, but if you want to set it up manually,
-call ``wifi`` on the esp8266 node from teh serial console.
+encrypts the network connecting, but if you want to set it up manually,
+call ``wifi`` on the esp8266 node from the serial console.
 
 Try typing ``help`` and check the small manual.
 You can setup the wifi with ``wifi( "network-name", "password" )``.
