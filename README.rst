@@ -198,7 +198,7 @@ you can see the current ip with typing wip.
 
 If you create an autostart.py file or modify the existing one in your
 nodes/files directory and then call ``deploy noupdate``, you can add your own
-devices to thsi newly configured node. Don't forget to add ``run()`` add the end
+devices to this newly configured node. Don't forget to add ``run()`` add the end
 of your autostart file.
 However, try first to add some devices manually at the console comamnd prompt,
 check and browse the help for available devices. type ``run()`` to activate
