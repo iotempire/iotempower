@@ -179,7 +179,7 @@ First IoT Nodes
   pre-configures the device.
 
 - Access the command prompt with ``console_serial`` (if only one esp is connected
-  the serial port will be dicovered automatically else supply it as usb1 or acm2
+  the serial port will be discovered automatically else supply it as usb1 or acm2
   or an IP address and password as paramaters). If your wifi network is
   configured correctly, you can just type console. Its ip should now 
   automatically be discovered, and you get a web-based terminal on it.
