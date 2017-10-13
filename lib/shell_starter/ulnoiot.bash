@@ -38,20 +38,21 @@ PSDRED="\[$(tput setaf 88)\]"
 PSWHITEBG="\[$(tput setab 15)\]"
 PSBOLD="\[$(tput bold)\]"
 PSRESET="\[$(tput sgr0)\]"
+#PSRESET='\[\033[0m\]'
 
 # user@host
-_UIOT_UH="${PSBLACK}\u@\h${PSRESET}"
+_UIOT_UH="\u@\h${PSRESET}"
 # colored seperator after colored ulnoiot
 #_UIOT_SEP="${PSWHITEBG}${PSBOLD}${PSDRED}#${PSRESET}"
 _UIOT_SEP=" "
 # colored ulnoiot
 _UIOT_UIOT="${PSWHITEBG}${PSBOLD}${PSBLACK}ul${PSDRED}no${PSBLACK}iot${PSRESET}"
 # colored and bold :
-_UIOT_CLN="${PSWHITEBG}${PSBOLD}${PSDRED}:${PSRESET}"
+_UIOT_CLN="${PSBOLD}${PSDRED}:${PSRESET}"
 # path
 _UIOT_PTH="${PSGREEN}\W${PSRESET}"
 # prompt
-_UIOT_PMT="${PSBLACK}\$${PSRESET} "
+_UIOT_PMT="\$${PSRESET} "
 
 # start is always the same (colored ulnoiot - when ulnoiot defined)
 PS1="${_UIOT_UIOT}"
