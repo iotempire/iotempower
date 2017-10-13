@@ -179,7 +179,7 @@ First IoT Nodes
   pre-configures the device.
 
 - Access the command prompt with ``console_serial`` (if only one esp is connected
-  the serial port will be dicovered automatically else supply it as usb1 or acm2
+  the serial port will be discovered automatically else supply it as usb1 or acm2
   or an IP address and password as paramaters). If your wifi network is
   configured correctly, you can just type console. Its ip should now 
   automatically be discovered, and you get a web-based terminal on it.
@@ -187,8 +187,8 @@ First IoT Nodes
 If something gets stuck, try to power cycle the esp8266.
 
 ``initialize`` sets up your wifi based on the settings in system.conf and also
-encrypts the network connectin, but if you want to set it up manually,
-call ``wifi`` on the esp8266 node from teh serial console.
+encrypts the network connecting, but if you want to set it up manually,
+call ``wifi`` on the esp8266 node from the serial console.
 
 Try typing ``help`` and check the small manual.
 You can setup the wifi with ``wifi( "network-name", "password" )``.
@@ -198,10 +198,10 @@ you can see the current ip with typing wip.
 
 If you create an autostart.py file or modify the existing one in your
 nodes/files directory and then call ``deploy noupdate``, you can add your own
-devices to thsi newly configured node. Don't forget to add ``run()`` add the end
+devices to this newly configured node. Don't forget to add ``run()`` add the end
 of your autostart file.
-However, try first to add some devices manually at the console comamnd prompt,
-check and browse the help for available devices. type ``run()`` to activate
+However, try first to add some devices manually at the console command prompt,
+check and browse the help for available devices. Type ``run()`` to activate
 these devices and then use the ``mqtt_all`` and ``mqtt_send`` tools to watch and
 interact.
 Try also ``help("autostart.py")`` at the console prompt.
