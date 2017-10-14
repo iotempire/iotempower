@@ -1,12 +1,13 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-if [[ $# -lt 2 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
+if [[ $# -gt 1 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF
-Syntax: mqtt_send topic_or_subtopic message
+Syntax: mqtt_listen [topic_or_subtopic]
 
-mqtt_send sends a message via mqtt.
+mqtt_listen subscribes to a topic and all its subtopics via mqtt and prints
+the received messages.
 
-If mqtt_send is called from a node directory, the root topic is automatically
+If mqtt_listen is called from a node directory, the root topic is automatically
 based on the node's main topic and the given subtopic is prefixed with it.
 Also the system.node is taken into account for other MQTT settings.
 To send to the node's main topic, give "" as topic.
@@ -35,7 +36,11 @@ else
     fi
 fi
 
-shift
+if [[ "$topic" ]]; then
+    topic="$topic/#"
+else
+    topic="#"
+fi
 
-echo "Trying to send $@ to mqtt://$ULNOIOT_MQTT_HOST/$topic." >&2
-exec mosquitto_pub -h "$ULNOIOT_MQTT_HOST" -t "$topic" -m "$*"
+echo "Subscribing and listening to mqtt://$ULNOIOT_MQTT_HOST/$topic." >&2
+mosquitto_sub -v -h "$ULNOIOT_MQTT_HOST" -t "$topic"

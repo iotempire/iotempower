@@ -1,23 +1,68 @@
 #!/usr/bin/env bash
-#
-# execute another switch when a given command is received
-# $1: topic to listen to
-# $2: trigger type (any, anychange, onechange, payload)
-# $3: trigger data
-# $4-: command to execute (gets as last param the payload other params first)
+
+if [[ $# -lt 4 || $# = 0 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
+cat << EOF
+Syntax: mqtt_action topic trigger_type trigger_data command
+
+mqtt_action subscribes to a topic via mqtt and executes a given command
+based on the received messages.
+
+topic: topic to listen to (specify "" to take node topic)
+
+trigger_type:
+  any or each - execute command for any incoming data on topic
+  anychange - execute command when new data arrives (not same as last)
+  onechange - execute command when a change to the trigger_data happened
+  payload - execute command any time when trigger_data received
+
+trigger_data: data which is matched for onechange and payload (ignored for
+              other types)
+command: command to execute (gets as last param the payload other params first)
+         The command gets the received payload passed as argument.
+
+If mqtt_action is called from a node directory, the root topic is automatically
+based on the node's main topic and the given subtopic is prefixed with it.
+Also the system.node is taken into account for other MQTT settings.
+EOF
+exit 1
+fi
+
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
-topic="$1"
+arg_topic="$1"
 trigger_type="$2"
 trigger_data="$3"
 shift 3
+
+
+if [[ -e "node.conf" || -e "../node.conf" ]]; then  # started from node-directory
+    source "$ULNOIOT_ROOT/bin/read_config"
+else # Check if in system directory and read
+    source "system.conf" &> /dev/null
+fi
+
+if [[ "$arg_topic" = "/"* ]]; then
+    topic="${arg_topic:1}"
+else
+    if [[ "$arg_topic" ]]; then
+        if [[ "$topic" ]]; then
+            topic="$topic/$arg_topic"
+        else
+            topic="$arg_topic"
+        fi
+    fi
+fi
+
 last_data="123ulno.net321"
 
-echo "Listening to $topic with trigger $trigger_type for $trigger_data."
-mosquitto_sub  -h "$ULNOIOT_MQTT_HOST" -t "$topic" \
+
+echo "Subscribing to mqtt://$ULNOIOT_MQTT_HOST/$topic " >&2
+echo "with trigger $trigger_type for data $trigger_data" >&2
+echo "executing: $@ <received payload>" >&2
+mosquitto_sub -h "$ULNOIOT_MQTT_HOST" -t "$topic" \
 |   while read data; do
-        echo "Received: $data"
+        echo "mqtt_action: received $data" >&2
         changed=""
         if [ "$data" != "$last_data" ]; then # change happened
             changed="yes"
@@ -54,6 +99,7 @@ mosquitto_sub  -h "$ULNOIOT_MQTT_HOST" -t "$topic" \
                 exit 1
         esac
         if [ "$trigger" ]; then
+            echo "mqtt_action: trigger fulfilled, executing command." >&2
             "$@" "$data"
         fi
     done

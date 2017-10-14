@@ -1,6 +1,16 @@
 #!/bin/bash
 
+if [[ $# -ne 0 ]]; then
+cat << EOF
+Syntax: mqtt_all
+
+mqtt_listen subscribes to all messages of the currently selected mqtt broker.
+
+The broker is based on teh an existing node.conf or sytem.conf.
+EOF
+exit 1
+fi
+
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
-exec mosquitto_sub -v -h "$ULNOIOT_MQTT_HOST" -t "#"
-
+exec mqtt_listen "/"

@@ -1,14 +1,48 @@
 #!/usr/bin/env bash
 
+if [[ $# -gt 2 || $# = 0 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
+cat << EOF
+Syntax: mqtt_log [topic_or_subtopic] outfile
+
+mqtt_log subscribes to a topic and all its subtopics via mqtt and logs
+the received messages to a given file.
+It also add a timestamp to the received messages.
+
+If mqtt_log is called from a node directory, the root topic is automatically
+based on the node's main topic and the given subtopic is prefixed with it.
+Also the system.node is taken into account for other MQTT settings.
+To send to the node's main topic, give "" as topic.
+If topic starts with / the node main topic is ignored.
+
+If the outfile exists, the log is appended to it.
+EOF
+exit 1
+fi
+
+# TODO: deal better with topic removal than with cut
+
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
+# find how to call ts
 TS=ts
-if which moreutils_ts; then
+if which moreutils_ts &>/dev/null; then
     TS=moreutils_ts
 fi
 
-topic="$1"
-outfile="${topic//\//_}.log"
-echo "Logging to $outfile."
-mosquitto_sub  -h "$ULNOIOT_MQTT_HOST" -t "$topic" | \
-    $TS "%.s" | tee -a "$outfile"
+if [[ $# = 2 ]]; then
+    topic="$1"
+    outfile="$2"
+else
+    topic=""
+    outfile="$1"
+fi
+
+#outfile="${topic//\//_}.log"
+echo "Calling mqtt_listen and logging timestamped to $outfile."  >&2
+{
+    if [[ "$topic" ]]; then
+        mqtt_listen "$topic"
+    else
+        mqtt_listen
+    fi
+} | stdbuf -oL -eL cut -d\  -f2- | $TS "%.s" | tee -a "$outfile"
