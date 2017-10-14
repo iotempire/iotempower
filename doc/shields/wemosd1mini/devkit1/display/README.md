@@ -44,6 +44,6 @@ Here are prototyping view and schematics
 
 The top and buttom of the shield.
 
-![top](../../doc/pics/display_t.jpg)
+![top](display_t.jpg)
 
-![bottom](../../doc/pics/display_b.jpg)
+![bottom](display_b.jpg)

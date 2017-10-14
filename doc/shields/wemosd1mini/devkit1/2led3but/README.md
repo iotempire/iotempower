@@ -17,6 +17,6 @@ from ulnoiot.shield import devkit_2led3but
 
 Here some images of the shield:
 
-![top](../../doc/pics/devel_t.jpg)
+![top](devel_t.jpg)
 
-![button](../../doc/pics/devel_b.jpg)
+![button](devel_b.jpg)
