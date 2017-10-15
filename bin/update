@@ -1,8 +1,21 @@
 #!/bin/bash
-# update node(s) (update ulnoiot system files)
-# can be called from a node folder or from parent folder of node-folders
-#
-# if noreset as parameter is given no reset is executed in the end
+if [[ $# -gt 1 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
+cat << EOF
+Syntax: update [noreset]
+
+update must be called from a node directory (or one of its parent system
+directories) and reads its configuration from there.
+
+It remotely updates the system files of the respective node.
+
+If it is called from a node's parent folder, it updates all nodes in
+subdirectories of this parent folder.
+
+If noreset is specified the final reset of the node is skipped.
+(If noreset is not given the respective node is reset after its update)
+EOF
+exit 1
+fi
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 

@@ -45,6 +45,8 @@ The following commands are possible:
 - help [cmd]:
   Display help on a specific command given in cmd. If cmd is empty,
   show this help.
+  After entering the ulnoiot environment, this help is also available just via
+  typing uhelp.
 
 If no command is given, execute the bash shell in the ulnoiot environment.
 The first time this is run, external dependencies are downloaded and
@@ -147,8 +149,10 @@ function run() {
             echo "Upgrading ulnoiot."
             echo "Getting changes from git."
             git pull
-            echo "Fixing binary links."
-            fix_bin
+            fix_bin # prints out Fixing links
+            echo "Downloading latest firmware."
+            download_firmware
+            echo "Upgrade finished."
             ;;
         exec | -x | -c | --exec)
             shift

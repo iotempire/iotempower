@@ -1,4 +1,23 @@
 #!/bin/bash
+if [[ $# -gt 1 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
+cat << EOF
+Syntax: deploy [noupdate]
+
+deploy must be called from a node directory (or one of its parent system
+directories) and reads its configuration from there.
+
+It remotely deploys the user defined files (like autostart.py)
+to the respective node(s).
+If noupdate is not given, it will also call update to update the system files.
+If noupdate is given this update is skipped and only the user files are
+transferred.
+
+If it is called from a node's parent folder, it updates all nodes in
+subdirectories of this parent folder.
+
+EOF
+exit 1
+fi
 # (updates and) deploys a node
 # can be called from a node folder or from parent folder of node-folders
 #

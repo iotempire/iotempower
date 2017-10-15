@@ -1,7 +1,18 @@
 #!/bin/bash
-# remote flashes a node
-# can be called from a node folder or from parent folder of node-folders
-#
+if [[ $# -gt 0 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
+cat << EOF
+Syntax: flash
+
+flash must be called from a node directory (or one of its parent system
+directories) and reads its configuration from there.
+
+It remotely flashes the board with ulnoiot's version of micropython.
+
+If it is called from a node's parent folder, it flashes all nodes in
+subdirectories of this parent folder.
+EOF
+exit 1
+fi
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
