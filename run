@@ -154,7 +154,7 @@ function run() {
             download_firmware
             echo "Upgrade finished."
             ;;
-        exec | -x | -c | --exec)
+        exec | x | run | -x | -c | --exec)
             shift
             exec "$@"
             ;;

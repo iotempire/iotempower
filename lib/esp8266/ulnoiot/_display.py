@@ -9,20 +9,22 @@ import ssd1306
 from ulnoiot.device import Device
 
 class Display(Device):
-    CHAR_WIDTH = 128 // 8
-    CHAR_HEIGHT = 64 // 8
 
     # Handle display
-    def __init__(self, name, sda=None, scl=None, ignore_case=False):
+    def __init__(self, name, sda=None, scl=None,
+                 width=128, height=64,
+                 addr=0x3c, ignore_case=False):
         self.present = False
         self._y = 0
         self._x = 0
         self.last_text = ""
+        self.char_width = width // 8
+        self.char_height = height // 8
 
         # test if lcd is responding
         i2c = I2C(sda=sda, scl=scl)
         try:
-            self.dp = ssd1306.SSD1306_I2C(128, 64, i2c)
+            self.dp = ssd1306.SSD1306_I2C(width, height, i2c, addr=addr)
             self.clear(show=False)
             self.println("  iot.ulno.net\n",show=True)
 
@@ -48,8 +50,8 @@ class Display(Device):
     def set_cursor(self,x, y):
         if x < 0: x = 0
         if y < 0: y = 0
-        if x >= Display.CHAR_WIDTH: x = Display.CHAR_WIDTH - 1
-        if y >= Display.CHAR_HEIGHT: y = Display.CHAR_HEIGHT - 1
+        if x >= self.char_width: x = self.char_width - 1
+        if y >= self.char_height: y = self.char_height - 1
         self._x = x
         self._y = y
 
@@ -65,7 +67,7 @@ class Display(Device):
 
     # move cursor down and scroll the text area by one line if at screen end
     def line_feed(self,show=True):
-        if (self._y < Display.CHAR_HEIGHT - 1):
+        if (self._y < self.char_height - 1):
             self._y += 1
         else:
             self.dp.scroll(0, -8)
@@ -80,7 +82,7 @@ class Display(Device):
         self._x = 0
         # clear line
         for y in range(self._y * 8, (self._y + 1) * 8):
-            for x in range(0, Display.CHAR_WIDTH * 8):
+            for x in range(0, self.char_width * 8):
                 self.dp.pixel(x, y, False)
         if show:
             self.dp.show()
@@ -97,10 +99,10 @@ class Display(Device):
                 self.line_feed(show=False)
             l_first = False
             while len(l) > 0:
-                sub = l[0:Display.CHAR_WIDTH - self._x]
+                sub = l[0:self.char_width - self._x]
                 self.dp.text(sub, self._x * 8, self._y * 8)
                 self._x += len(sub)
-                if self._x >= Display.CHAR_WIDTH:
+                if self._x >= self.char_width:
                     self.line_feed(show=False)
                 l = l[len(sub):]
         if linefeed_last:
