@@ -1,11 +1,29 @@
 #!/bin/bash
-# initialize the locally (via serial) connected hardware of a ulnoiot node
-#
-# $1 can give a tty port as destination parameter (for example: USB0)
-# if $1 or $2 is noflash, skip flashing and deployment
+if [[ $# -gt 2 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
+cat << EOF
+Syntax: initialize [[serial_port] noflash]
 
-# uncomment for debugging
-#DEBUG=yes
+initialize must be called from a node directory and reads its configuration
+from there.
+It looks for a locally (i.e. via serial) connected board matching the node
+description.
+
+It flashes the board with ulnoiot's version of micropython (if noflash is given,
+this step is skipped).
+It then sets or overwrites wifi and encryption data, respective to the current
+node configuration folder.
+Then, it calls a local/serial update on it and installs initial system
+user-space software.
+Then it calls a network deploy to copy the user folder and autostart to it.
+The last two steps fail, if the node router and mqtt broker are not available.
+Running deploy noupdate again (when router and mqtt broker become avaialable)
+fixes/finishes this.
+
+serial_port: can be usb0, usb1, or acm0, acm1, ...
+EOF
+exit 1
+fi
+
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
@@ -13,9 +31,8 @@ source "$ULNOIOT_ROOT/bin/read_config"
 
 port=$(find_esp_port "$1")
 
-
 # if this is set, skip flashing
-if [[ "$1" != noflash && "$2" != noflash ]]; then
+if [[ "$*" != *noflash ]]; then
 
 ## TODO: support other boards
 echo "Flashing Wemos D1 Mini."
@@ -81,7 +98,7 @@ rm "$wifi_cfg" "$gw_cfg" "$netrepl_cfg"
 echo "Waiting 10s until reset is done and internet connected."
 sleep 10
 echo "Copying files via network."
-deploy nodeploy
+deploy noupdate
 
 echo
 echo "Done."

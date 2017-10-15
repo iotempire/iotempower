@@ -2,19 +2,36 @@
 # open a repl terminal on the given port (USB..) or ip address
 # $1: suggested port or host
 
+if [[ "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
+cat << EOF
+Syntax: console [serial_port]
+
+console opens a terminal on a microcontroller either via serial or
+ulnoiot's netrepl connection, taking eventually a local node-configuration
+into account.
+
+serial_port: can be usb0, usb1, or acm0, acm1, ...
+EOF
+exit 1
+fi
+
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
-if [[ -e "node.conf" || -e "../node.conf" ]]; then  # started from node-directory
-    source "$ULNOIOT_ROOT/bin/read_config"
-    ip=$(get_ip "$topic" 2>/dev/null|grep "$topic"|cut -d\  -f2)
-    if [ "$ip" ]; then
-        echo "Connecting to node $topic with ip $ip."
-        console_netrepl "$ip" --keyfile "$(pwd)/key.hex"
-    else
-        echo "Couldn't find IP of node with topic $topic."
-        echo "If connected via serial or usb, try console_serial."
-        exit 1
-    fi
-else
+if [[ "$1" ]]; then
     console_serial "$1"
+else
+    if [[ -e "node.conf" || -e "../node.conf" ]]; then  # started from node-directory
+        source "$ULNOIOT_ROOT/bin/read_config"
+        ip=$(get_ip "$topic" 2>/dev/null|grep "$topic"|cut -d\  -f2)
+        if [ "$ip" ]; then
+            echo "Connecting to node $topic with ip $ip."
+            console_netrepl "$ip" --keyfile "$(pwd)/key.hex"
+        else
+            echo "Couldn't find IP of node with topic $topic."
+            echo "If connected via serial or usb, try console_serial."
+            exit 1
+        fi
+    else
+        console_serial # try to find automatically
+    fi
 fi

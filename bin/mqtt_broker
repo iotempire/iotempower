@@ -1,5 +1,13 @@
 #!/bin/bash
-# create accesspoint on a wifi interface
+if [[ "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
+cat << EOF
+Syntax: mqtt_broker
+
+mqtt_broker starts a local mosquitto-mqtt-server corresponding to parameters
+set in ulnoiot/etc/ulnoiot.conf.
+EOF
+exit 1
+fi
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 

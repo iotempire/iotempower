@@ -11,15 +11,58 @@
 # if parameters are given and the first is "exec", ulnoiot will execute
 # the rest of the parameters as command in ulnoiot environment
 
+HELP_PATH=lib/boards/wemosd1mini/ulnoiot/help
+# TODO: adjust path to different selected micro controllers depending on node
+
 function welcome() {
 cat << EOF
 ulnoiot
 =======
 
 Your friendly and affordable Internet of Things environment.
-More at http://iot.ulno.net
+More at http://github.com/ulno/ulnoiot
 
 EOF
+}
+
+function usage() {
+welcome
+cat << EOF
+Syntax: ulnoiot [command command_parameters]
+
+The following commands are possible:
+
+- exec [cmd+arguments]:
+  Execute cmd inside the ulnoiot environment. Check out all the helper scripts
+  in ulnoiot/bin
+
+- upgrade:
+  Update current version ulnoiot with newest version from git repository.
+
+- welcome:
+  Print the welcome message (again).
+
+- help [cmd]:
+  Display help on a specific command given in cmd. If cmd is empty,
+  show this help.
+
+If no command is given, execute the bash shell in the ulnoiot environment.
+The first time this is run, external dependencies are downloaded and
+installed here too.
+
+cmd in help [cmd] can be any of the following:
+EOF
+comma=""
+ls "$ULNOIOT_ROOT/$HELP_PATH/"*.txt | while read f; do
+    f=$(basename "$f")
+    if [[ ${f:0:1} != "_" ]]; then
+        echo -n $comma${f:0:-4}
+    fi
+    comma=", "
+done
+echo
+echo
+
 }
 
 function check_files() {
@@ -66,19 +109,59 @@ function install() {
     bash "$ULNOIOT_ROOT/bin/install"
 }
 
+function help() {
+    local m
+    local p
+    local l
+    p="$ULNOIOT_ROOT/$HELP_PATH/$1.txt"
+    { cat "$p"; echo; } | while read l; do
+        if [[ "$l" = "!!"* ]]; then
+            if [[ "$l" =~ '!!help("'(.*)'")' ]]; then
+                m="${BASH_REMATCH[1]}"
+                help "$m"
+            else
+                echo "[[Cannot parse (call help on micro controller prompt:"
+                echo "  ${l:2}]]"
+            fi
+        else
+            echo "$l"
+        fi
+    done
+}
 
 function run() {
-    if [ "$1" = "exec" ]; then
-        shift
-        exec "$@"
-    else
-        exec bash
-    fi
+    case "$1" in
+        welcome)
+            welcome
+            ;;
+        help | -h | --help)
+            shift
+            if [[ "$1" ]]; then
+                help "$1"
+            else
+                usage
+            fi
+            ;;
+        upgrade)
+            cd "$ULNOIOT_ROOT"
+            echo "Upgrading ulnoiot."
+            echo "Getting changes from git."
+            git pull
+            echo "Fixing binary links."
+            fix_bin
+            ;;
+        exec | -x | -c | --exec)
+            shift
+            exec "$@"
+            ;;
+        *)
+            welcome
+            exec bash
+    esac
 }
 
 
 ######## Main #########
-welcome
 current_path="$(pwd)" # save to restore later
 if check_root; then
     export ULNOIOT_ROOT=$(realpath "$(pwd)")
