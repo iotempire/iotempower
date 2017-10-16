@@ -40,7 +40,7 @@ class MQTTDevice(Device):
         sub_topic.
         This is called any time data arrives on sub_topic.
         :param sub_topic: the subtopic to react on
-        :param callback: a calback function of form func(topic, message)
+        :param callback: a callback function of form func(message)
         :param ignore_case: if True, cast all received payload into lowercase
         :return:
         """
@@ -53,7 +53,7 @@ class MQTTDevice(Device):
         This is called any time data arrives on sub_topic which is different to
         the data received last time.
         :param sub_topic: the subtopic to react on
-        :param callback: a callback function of form func(topic, message)
+        :param callback: a callback function of form func(message)
         :param ignore_case: if True, cast all received payload into lowercase
         :return:
         """
@@ -67,7 +67,7 @@ class MQTTDevice(Device):
         Add a callback function for specific incoming data on a sub_topic.
         This is called any time teh specified data arrives on sub_topic.
         :param sub_topic: the subtopic to react on
-        :param callback: a calback function of form func(topic, message)
+        :param callback: a calback function of form func()
         :param ignore_case: if True, cast all received payload into lowercase
         :return:
         """
