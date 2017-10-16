@@ -73,6 +73,7 @@ _UIOT_BKUP="$PS1"
 true
 } &>/dev/null;
 PS1="$_UIOT_BKUP"
+unset _UIOT_BKUP
 else
 '"$PROMPT_COMMAND"'
 true
