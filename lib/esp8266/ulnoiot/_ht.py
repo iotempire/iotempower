@@ -74,6 +74,7 @@ class DS18X20(Device):
         self.lasttime = time.ticks_ms()
         self.ds.convert_temp()
         self.temp_list = None
+        self.getters[""] = self.value
 
     def time_controlled_measure(self):
         newtime = time.ticks_ms()

@@ -53,7 +53,7 @@ class Devices():
             callbackn can be of the following forms:
             1. function -> call function if there is any new data for subtopicn
                function needs to take one param (message)
-            2. (True,function) -> call function, if thre is new different data
+            2. (True,function) -> call function, if there is new different data
                for subtopicn
                function needs to take one param (message)
             3. {"data1":callbackn1,["data2":callbackn2]} -> call respective
