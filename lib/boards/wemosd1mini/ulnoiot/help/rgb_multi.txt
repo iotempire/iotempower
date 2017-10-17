@@ -18,8 +18,7 @@ Parameters:
 - num_led: number of leds on strip
 - ignore_case: should case in the command detection be ignored
 
-Example:
-mqtt("192.168.12.1","living room/tvlights")
+Example (node name: living room/tvlights):
 rgb_multi("rgb2",d2,10)
 
 Now the second RGB LED can be switched to red via sending to the mqtt-broker

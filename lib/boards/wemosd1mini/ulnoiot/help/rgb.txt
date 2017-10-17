@@ -14,8 +14,7 @@ Parameters:
 - pin_r, pin_g, pin_b: the gpiopin for red, green, and blue lines
 - ignore_case: should case in the command detection be ignored
 
-Example:
-mqtt("192.168.12.1","living room/tvlights")
+Example (node name: living room/tvlights):
 rgb("rgb1",d3,d4,d2)
 
 

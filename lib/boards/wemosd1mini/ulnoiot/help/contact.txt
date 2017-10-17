@@ -15,8 +15,7 @@ Parameters:
 - threshold: debouncing value (higher -> avarage more
   measurements)
 
-Example:
-mqtt("mymqtthost","living room/leds1")
+Example (node name: living room/leds1):
 button("lower", d2, "depressed", "pressed")
 
 Now the status button is published as "living room/leds1/lower"

@@ -16,8 +16,7 @@ Parameters:
   if both, rising and falling are False, only rising is measured
 - pullup: enable internal pullup (default)
 
-Example:
-mqtt("mymqtthost","living room/leds1")
+Example (node name: living room/shock1):
 trigger("left", d3)
 
-Now, the number of triggers is published as "living room/leds1/left"
+Now, the number of triggers is published as "living room/shock1/left"

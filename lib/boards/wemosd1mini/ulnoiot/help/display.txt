@@ -2,7 +2,7 @@ display( name, sda, scl,
          width=128, height=64,
          addr=0x3c, ignore_case=False):
 
-Create a new controller for an i2c 128x64 lcd display.
+Create a new controller for an i2c 128x64 ssd1306 lcd display.
 name will be appended to the mqtt topic and a set appended to
 send text and commands to.
 
@@ -24,3 +24,6 @@ Normal text will be printed as text - scrolling is supported.
 There are also these special commands:
 &&clear                       to clear the display
 &&plot x1 y1 x2 y2 ...        to draw a list of pixels
+&&cursor x y                  to set the text cursor
+&&newline, &&linefeed, &&nl, or &&lf
+                              to go to next line and evtl. scroll display

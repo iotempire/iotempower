@@ -14,8 +14,7 @@ Parameters:
 - pin: the gpio pin
 - on_change: a method that will be called when the value changes
 
-Example:
-mqtt("mymqtthost","living room/ht1")
+Example (node name: living room/ht1):
 dht22("ht01", d1)
 
 Now temperature and humidity are published as "living room/ht1/temperature" and

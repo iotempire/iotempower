@@ -67,10 +67,10 @@ class Display(Device):
 
     # move cursor down and scroll the text area by one line if at screen end
     def line_feed(self,show=True):
-        if (self._y < self.char_height - 1):
+        if self._y < self.char_height - 1:
             self._y += 1
         else:
-            self.dp.scroll(0, -8)
+            self.scroll(0, -8)
             # TODO: check if line really needs to be cleared (seems to happen sometimes that it does not clear)
             self.clear_line()
             if show:
@@ -119,13 +119,19 @@ class Display(Device):
         print("Received text in callback:", msg)
         if msg == "&&clear":
             self.clear()
+        elif msg == "&&linefeed" or msg == "&&lf" or msg == "&&nl" or msg == "&&newline":
+            self.line_feed()
+        elif msg.startswith("&&cursor"):
+            msg = msg[9:].strip().split()
+            self.set_cursor(int(msg[0]), int(msg[1]))
+            self.show()
         elif msg.startswith("&&plot"):
             msg=msg[6:].strip().split()
             for i in range(0,len(msg),2):
                 self.pixel(int(msg[i]),int(msg[i+1]),1)
             self.show()
         else:
-            self.println( msg )
+            self.print( msg )
             self.last_text = msg
 
     def value(self):

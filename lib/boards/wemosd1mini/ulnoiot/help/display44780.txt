@@ -24,3 +24,6 @@ Normal text will be printed as text - scrolling is supported.
 There are also these special commands:
 &&clear                       to clear the display
 &&plot x1 y1 x2 y2 ...        to draw a list of pixels
+&&cursor x y                  to set the text cursor
+&&newline, &&linefeed, &&nl, or &&lf
+                              to go to next line and evtl. scroll display

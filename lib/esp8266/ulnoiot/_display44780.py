@@ -3,6 +3,9 @@
 # created: 2017-10-16
 #
 # drive 44780/1602 i2c displays
+#
+# uses library from here:
+#
 
 # TODO: enable scrolling (get from display, predict wrapping and cursor)
 
@@ -20,14 +23,19 @@ class Display44780(Device):
         self.last_text = ""
         self.char_width = width
         self.char_height = height
+        self.display_buffer = bytearray(b" " * width * height)
+        self.back_buffer = bytearray(b" " * width * height)
+        self.x = 0
+        self.y = 0
 
         # test if lcd is responding
         i2c = I2C(sda=sda, scl=scl)
         try:
             self.dp = I2cLcd(i2c, addr, height, width)
+            self.dp.clear()
             self.clear()
             self.hide_cursor()
-            self.println("iot.ulno.net\n")
+            self.println("iot.ulno.net")
 
         except OSError:
             print("lcd not found")
@@ -35,7 +43,7 @@ class Display44780(Device):
             self.present = True
             Device.__init__(self, name, i2c, setters={"set":self.evaluate},
                             ignore_case=ignore_case,report_change=False)
-            self.getters[""]=self.value
+            self.getters[""] = self.value
 
     def hide_cursor(self):
         self.dp.hide_cursor()
@@ -46,34 +54,106 @@ class Display44780(Device):
     def off(self):
         self.dp.backlight_off()
 
-    def text(self,t,x,y):
-        self.dp.move_to(x,y)
-        self.dp.putstr(t)
+    def text(self,t,x,y,show=True):
+        self.set_cursor(x,y)
+        tx = x
+        for c in t:
+            self.back_buffer[y*self.char_width+tx] = ord(c)
+            tx += 1
+        if show: self.show()
 
-    def set_cursor(self,x, y):
-        self.dp.move_to(x,y)
+    def set_cursor(self, x, y):
+        self.x = x
+        self.y = y
 
     # clear display immediately
-    def clear(self):
-        self.dp.clear()
+    def clear(self,show=True):
+        for line in range(self.char_height):
+            for column in range(self.char_width):
+                self.back_buffer[line*self.char_width+column] = 32
+        self.set_cursor(0,0)
+        if show: self.show()
 
+    def show(self):
+        for line in range(self.char_height):
+            for column in range(self.char_width):
+                if self.display_buffer[line*self.char_width+column] \
+                        != self.back_buffer[line*self.char_width+column]:
+                    self.dp.move_to(column, line)
+                    self.dp.putchar(chr(self.back_buffer[line*self.char_width+column]))
+                    self.display_buffer[line * self.char_width + column] \
+                        = self.back_buffer[line * self.char_width + column]
+        self.dp.move_to(self.x, self.y)
+
+    # scroll one line (add empty line at bottom)
+    def scroll(self, show=True):
+        for line in range(self.char_height -1):
+            self.back_buffer[line*self.char_width:(line+1)*self.char_width] = \
+                self.back_buffer[(line+1)*self.char_width:(line+2)*self.char_width]
+        for x in range(self.char_width):
+            self.back_buffer[(self.char_height-1)*self.char_width] = 32
+        if show: self.show()
+
+    # move cursor down and scroll the text area by one line if at screen end
+    def line_feed(self, show=True):
+        if self.y < self.char_height - 1:
+            self.y += 1
+        else:
+            self.scroll()
+            self.dp.move_to(0, 0)
+
+            # TODO: check if line really needs to be cleared (seems to happen sometimes that it does not clear)
+            self.clear_line()
+            if show: self.dp.show()
+        self.x = 0
+
+    # move just to start of line and clear the whole line
+    def clear_line(self, show=True):
+        self.x = 0
+        # clear line
+        for x in range(self.char_width):
+            self.back_buffer[self.y*self.char_width+x] = 32
+        if show: self.show()
 
     # print some text in the text area and linebreak and wrap if necessary
-    def print(self,text="", newline=False, show=True):
-        text=str(text)
-        self.dp.putstr(text)
+    def print(self, text="", newline=False, show=True):
+        text = str(text)
+        linefeed_last = text.endswith("\n")
+        if linefeed_last:
+            text = text[:-1]
+        l_first = True
+        for l in text.split("\n"):
+            if not l_first:  # scroll if it's not the first line
+                self.line_feed(show=False)
+            l_first = False
+            while len(l) > 0:
+                sub = l[0:self.char_width - self.x]
+                self.text(sub, self.x, self.y)
+                self.x += len(sub)
+                if self.x >= self.char_width:
+                    self.line_feed(show=False)
+                l = l[len(sub):]
+        if linefeed_last:
+            self.line_feed(show=False)
         if newline:
-            self.dp.putstr("\n")
+            self.line_feed(show=False)
+        if show: self.show()
 
-    def println(self,text="", show=True):
+    def println(self, text="", show=True):
         self.print(text, newline=True, show=show)
 
     def evaluate(self, msg):
         print("Received text in callback:", msg)
         if msg == "&&clear":
             self.clear()
+        elif msg == "&&linefeed" or msg == "&&lf" or msg == "&&nl" or msg == "&&newline":
+            self.line_feed()
+        elif msg.startswith("&&cursor"):
+            msg = msg[9:].strip().split()
+            self.set_cursor(int(msg[0]), int(msg[1]))
+            self.show()
         else:
-            self.println( msg )
+            self.print( msg )
             self.last_text = msg
 
     def value(self):
