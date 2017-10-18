@@ -18,6 +18,11 @@ baudrate=115200
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
+if [[ "$*" = *wemosd1pro* ]]; then
+    echo "Flashing in Wemos D1 Mini Pro mode (fixing flash size to 4MB)."
+    pro_options="--flash_size=4MB"
+fi
+
 pushd . &> /dev/null
 
 port=$(find_esp_port "$1")
@@ -26,9 +31,7 @@ echo "Port: $tty"
 
 # find firmware
 cd "$ULNOIOT_EXTERNAL/firmware"
-#firmware="$(ls esp*.bin|sort|tail -n1)"
 firmware="firmware-initial.bin"
-echo "Firmware: $firmware"
 
 echo Performing erase flash.
 esptool --port "$tty" erase_flash
@@ -38,7 +41,7 @@ esptool \
     --after hard_reset \
     --port "$tty" \
     --baud "$baudrate" \
-    write_flash --flash_mode dio --verify \
+    write_flash --flash_mode dio $pro_options --verify \
         0 "$firmware"
 # --flash_size="$flash_size"MB <- should now be autodetected
 
