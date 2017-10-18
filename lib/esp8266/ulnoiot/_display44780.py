@@ -144,16 +144,34 @@ class Display44780(Device):
 
     def evaluate(self, msg):
         print("Received text in callback:", msg)
-        if msg == "&&clear":
+        if msg.startswith("&&clear"):
             self.clear()
-        elif msg == "&&linefeed" or msg == "&&lf" or msg == "&&nl" or msg == "&&newline":
+            if len(msg) > 8:
+                self.evaluate(msg[8:])
+        elif msg.startswith("&&linefeed"):
             self.line_feed()
+            if len(msg) > 11:
+                self.evaluate(msg[11:])
+        elif msg.startswith("&&newline"):
+            self.line_feed()
+            if len(msg) > 11:
+                self.evaluate(msg[11:])
+        elif msg.startswith("&&lf"):
+            self.line_feed()
+            if len(msg) > 5:
+                self.evaluate(msg[5:])
+        elif msg.startswith("&&nl"):
+            self.line_feed()
+            if len(msg) > 5:
+                self.evaluate(msg[5:])
         elif msg.startswith("&&cursor"):
-            msg = msg[9:].strip().split()
-            self.set_cursor(int(msg[0]), int(msg[1]))
-            self.show()
+            csplit = msg[9:].strip().split()
+            self.set_cursor(int(csplit[0]), int(csplit[1]))
+            inlen = 11 + len(csplit[0]) + len(csplit[1])
+            if len(msg) > inlen:
+                self.evaluate(msg[inlen:])
         else:
-            self.print( msg )
+            self.print(msg)
             self.last_text = msg
 
     def value(self):
