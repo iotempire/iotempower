@@ -1,0 +1,152 @@
+#!/usr/bin/env bash
+#
+# manually download and compile the tilde text-editor on a generic linux system
+#
+# Author: ulno
+# Create date: 2017-07-12
+#
+
+[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+
+MAKEFLAGS="-j4"
+#MAKEFLAGS=""
+
+function welcome() {
+cat << EOF
+ulnoiot tilde editor installer
+==============================
+
+Welcome to the ulnoiot tilde editor for generic linux installer.
+
+Make sure you have the following dependencies installed:
+libunistring-dev xsel xclip libnl-3-dev libnl-genl-3-dev
+libssl-dev build-essential libncurses5-dev libsigc++-2.0-dev libpcre3-dev
+libxcb1-dev checkinstall wget libtool-bin autoconf gettext libX11-dev
+
+In void linux, you need at least:
+xi libnl3-devel libressl-devel xsel xclip libunistring-devel \
+  libnl3-devel libsigc++-devel plibxcb-devel pcre-devel pcre \
+  libltdl-devel libX11-devel
+
+You also need this link for g++ in /usr/lib/gcc/x86_64-unknown-linux-gnu:
+ln -s 6.3.0 4.9.3
+
+
+Do you want to try to set it up now? (y/N)
+EOF
+}
+
+TILDEDIR="$ULNOIOT_EXTERNAL/tilde"
+
+
+welcome
+read answer
+if [[ "$answer" != "y" && "$answer" != "Y" ]]; then
+    echo "Can't continue, exiting now."
+    exit 1
+fi
+
+if [[ "$1" = clean ]]; then
+    echo "Deleting cache (root required)."
+    echo
+    sudo rm -rf "$TILDEDIR" &> /dev/null
+fi
+
+# make sure to not use install from ulnoiot
+export PATH="/usr/bin:$PATH"
+
+mkdir -p "$TILDEDIR"
+cd "$TILDEDIR"
+
+if [[ $(ls *.tar.bz2 | wc -l) != 7 ]]; then
+    wget -c http://os.ghalkes.nl/dist/libtranscript-0.3.2.tar.bz2
+    wget -c http://os.ghalkes.nl/dist/libt3config-0.2.10.tar.bz2
+    wget -c http://os.ghalkes.nl/dist/libt3key-0.2.6.tar.bz2
+    wget -c http://os.ghalkes.nl/dist/libt3window-0.2.3.tar.bz2
+    wget -c http://os.ghalkes.nl/dist/libt3widget-0.5.2.tar.bz2
+    wget -c http://os.ghalkes.nl/dist/libt3highlight-0.4.2.tar.bz2
+    wget -c http://os.ghalkes.nl/dist/tilde-0.3.7.tar.bz2
+    for a in $(ls *.tar.bz2); do
+        tar xjf "$a"
+    done
+fi
+
+
+export PKG_CONFIG_PATH="/usr/local/lib/pkgconfig/:$PKG_CONFIG_PATH"
+
+PNAME="libtranscript"
+cd $(ls |grep "$PNAME-"|grep -v ".tar.bz2"|head -n1)
+chmod a+x configure install.sh
+./configure CFLAGS="-O2 -D_POSIX_C_SOURCE=200809L"
+make $MAKEFLAGS
+sudo mkdir -p /usr/local/lib/transcript1
+sudo mkdir -p /usr/local/share/doc/libtranscript/doc/API/search
+sudo make install
+cd ..
+
+PNAME="libt3config"
+cd $(ls |grep "$PNAME-"|grep -v ".tar.bz2"|head -n1)
+chmod a+x configure install.sh
+./configure CFLAGS="-O2 -D_POSIX_C_SOURCE=200809L"
+make $MAKEFLAGS
+sudo mkdir -p /usr/local/include/t3/config/t3config
+sudo mkdir -p /usr/local/share/doc/libt3config/API/search
+sudo make install
+cd ..
+
+PNAME="libt3key"
+cd $(ls |grep "$PNAME-"|grep -v ".tar.bz2"|head -n1)
+chmod a+x configure install.sh
+./configure CFLAGS="-O2 -D_POSIX_C_SOURCE=200809L"
+make $MAKEFLAGS
+sudo mkdir -p /usr/local/include/t3/key/t3key
+sudo mkdir -p /usr/local/share/doc/libt3key/API/search
+sudo make install
+cd ..
+
+PNAME="libt3window"
+cd $(ls |grep "$PNAME-"|grep -v ".tar.bz2"|head -n1)
+chmod a+x configure install.sh
+./configure CFLAGS="-O2 -D_POSIX_C_SOURCE=200809L"
+make $MAKEFLAGS
+sudo mkdir -p /usr/local/include/t3/window/t3window
+sudo mkdir -p /usr/local/share/doc/libt3window/API/search
+sudo make install
+cd ..
+
+PNAME="libt3widget"
+cd $(ls |grep "$PNAME-"|grep -v ".tar.bz2"|head -n1)
+chmod a+x configure install.sh
+./configure CFLAGS="-O2 -D_POSIX_C_SOURCE=200809L"
+make $MAKEFLAGS
+sudo mkdir -p /usr/local/include/t3/widget/t3widget
+sudo mkdir -p /usr/local/include/t3/widget/t3widget/dialogs
+sudo mkdir -p /usr/local/include/t3/widget/t3widget/widgets
+sudo mkdir -p /usr/local/share/doc/libt3widget/API/search
+sudo make install
+cd ..
+
+PNAME="libt3highlight"
+cd $(ls |grep "$PNAME-"|grep -v ".tar.bz2"|head -n1)
+chmod a+x configure install.sh
+./configure CFLAGS="-O2 -D_POSIX_C_SOURCE=200809L"
+make $MAKEFLAGS
+sudo mkdir -p /usr/local/include/t3/highlight/t3highlight
+sudo mkdir -p /usr/local/share/libt3highlight2/def
+sudo mkdir -p /usr/local/share/doc/libt3highlight/API/search
+sudo make install
+cd ..
+
+PNAME="tilde"
+cd $(ls |grep "$PNAME-"|grep -v ".tar.bz2"|head -n1)
+chmod a+x configure install.sh
+./configure CFLAGS="-O2 -D_POSIX_C_SOURCE=200809L"
+make $MAKEFLAGS
+sudo mkdir -p /usr/local/share/doc/tilde
+sudo mkdir -p /usr/local/share/tilde
+sudo make install
+cd ..
+
+
+exit 0
+

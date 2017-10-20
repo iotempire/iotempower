@@ -16,7 +16,7 @@ cat << EOF
 ulnoiot tilde editor installer
 ==============================
 
-Welcome to the ulnoiot tilde editor installer.
+Welcome to the ulnoiot tilde editor for debian-systems installer.
 
 Do you want to set it up? (y/N)
 EOF
