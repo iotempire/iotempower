@@ -1,4 +1,4 @@
-# user.py is the autostart code for a ulnoiot node.
+# This is the autostart code for a ulnoiot node.
 # Configure your devices, sensors and local interaction here.
 
 # Always start with this to make everything from ulnoiot available.
