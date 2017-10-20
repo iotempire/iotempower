@@ -21,8 +21,11 @@ class Display(Device):
         self.char_width = width // 8
         self.char_height = height // 8
 
+        if type(sda) is I2C:
+            i2c = sda
+        else:
+            i2c = I2C(sda=sda, scl=scl)
         # test if lcd is responding
-        i2c = I2C(sda=sda, scl=scl)
         try:
             self.dp = ssd1306.SSD1306_I2C(width, height, i2c, addr=addr)
             self.clear(show=False)

@@ -28,8 +28,11 @@ class Display44780(Device):
         self.x = 0
         self.y = 0
 
+        if type(sda) is I2C:
+            i2c = sda
+        else:
+            i2c = I2C(sda=sda, scl=scl)
         # test if lcd is responding
-        i2c = I2C(sda=sda, scl=scl)
         try:
             self.dp = I2cLcd(i2c, addr, height, width)
             self.dp.clear()

@@ -41,3 +41,5 @@ class Analog(Device):
         value = self.pin.read()
         if abs(value-self.current_value) >= self.precision:
             self.current_value = value
+
+    # TODO: allow some averaging over several values

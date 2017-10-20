@@ -144,12 +144,12 @@ def main():
     exclude_list=parser.args.exclude
     only_create_list=parser.args.only_create
     # create copy_list
-    copy_list=[]
+    copy_list = []
     for f in src_list:
         # check if file needs to be excluded due to being on exclude list
-        match=False
+        match = False
         for e in exclude_list:
-            if e.startswith("/"): # only allow path matches
+            if e.startswith("/"):  # only allow path matches
                 e=e[1:]
                 if e.endswith("/"):
                     if f.startswith(e):
@@ -171,15 +171,16 @@ def main():
                     if os.path.basename(f) == e or f==e:
                         match = True
                         break
+        if match: continue  # don't need to look further
         # check if file needs to be excluded due to being in only-create
-        match=False
+        match = False
         for o in only_create_list:
             if o.startswith("/"):
                 if o[1:] == f:
                     match = True
                     break
             if f==o or os.path.basename(f)==o:
-                match=True
+                match = True
                 break
         if match: # is in create_only list, so check if it's already at destin.
             if f in dest_hashes:
@@ -187,67 +188,67 @@ def main():
         # nothing matches, so add it
         copy_list.append(f)
 
-        # create delete list
-        delete_list=[]
-        if parser.args.delete: # only when option set
-            for f in dest_hashes:
-                # might be a directory
-                if f not in src_list:
-                    if not f.endswith("/"):
-                        if f + '/' not in src_list:
-                            delete_list.append(f)
-                    else:
+    # create delete list
+    delete_list = []
+    if parser.args.delete: # only when option set
+        for f in dest_hashes:
+            # might be a directory
+            if f not in src_list:
+                if not f.endswith("/"):
+                    if f + '/' not in src_list:
                         delete_list.append(f)
+                else:
+                    delete_list.append(f)
 
-        not_dryrun=not parser.args.dry
-        # process delete list
-        for f in delete_list:
-            print("Deleting {}.".format(f))
-            if not_dryrun:  # TODO: check that deleting directories works
-                if f.endswith("/"):  # dir
-                    con.rmdir(dest_base_dir + dest_prefix_dir + f[:-1])
-                else: # file
-                    con.rm(dest_base_dir + dest_prefix_dir + f)
-        # process copy list
-        if dest_base_dir and dest_base_dir !="/": # if there is one always try to create it
-            if not_dryrun:
-                con.mkdir(dest_base_dir[:-1], nofail=True)
-        if dest_prefix_dir:  # need to prefixdir?
-            if not_dryrun:
-                con.mkdir(dest_base_dir + dest_prefix_dir[:-1], nofail=True)
-        for f in copy_list:
-            if f.endswith("/"):  # directory
-                if f[:-1] in dest_hashes: f=f[:-1]
-                if f in dest_hashes:
-                    if dest_hashes[f] == "<dir>":
-                        print("Skipping directory {} as it's already"
-                              " on remote.".format(f))
-                    else:
-                        print("Caution, remote has a file where"
-                              " there should be a "
-                              "directory ({}). Aborting.".format(f))
-                        break
+    not_dryrun=not parser.args.dry
+    # process delete list
+    for f in delete_list:
+        print("Deleting {}.".format(f))
+        if not_dryrun:  # TODO: check that deleting directories works
+            if f.endswith("/"):  # dir
+                con.rmdir(dest_base_dir + dest_prefix_dir + f[:-1])
+            else: # file
+                con.rm(dest_base_dir + dest_prefix_dir + f)
+    # process copy list
+    if dest_base_dir and dest_base_dir !="/": # if there is one always try to create it
+        if not_dryrun:
+            con.mkdir(dest_base_dir[:-1], nofail=True)
+    if dest_prefix_dir:  # need to prefixdir?
+        if not_dryrun:
+            con.mkdir(dest_base_dir + dest_prefix_dir[:-1], nofail=True)
+    for f in copy_list:
+        if f.endswith("/"):  # directory
+            if f[:-1] in dest_hashes: f=f[:-1]
+            if f in dest_hashes:
+                if dest_hashes[f] == "<dir>":
+                    print("Skipping directory {} as it's already"
+                          " on remote.".format(f))
                 else:
-                    print("Creating directory {}.".format(f))
-                    if not_dryrun:
-                        con.mkdir(dest_base_dir + dest_prefix_dir + f)
-            else: # it is a file
-                h = sha256()
-                hf = open(src_dir + f, "rb")
-                while True:
-                    b = hf.read(1024)
-                    if len(b) == 0: break
-                    h.update(b)
-                hf.close()
-                digest=binascii.hexlify(h.digest()).decode()
-                if f in dest_hashes and digest == dest_hashes[f]:
-                    print("Skipping {} due to equal hash.".format(f))
-                else:
-                    print("Copying {}.".format(f))
-                    if not_dryrun:
-                        con.upload(src_dir + f, dest_base_dir
-                                   + dest_prefix_dir + f,
-                                   f in dest_hashes)
+                    print("Caution, remote has a file where"
+                          " there should be a "
+                          "directory ({}). Aborting.".format(f))
+                    break
+            else:
+                print("Creating directory {}.".format(f))
+                if not_dryrun:
+                    con.mkdir(dest_base_dir + dest_prefix_dir + f)
+        else: # it is a file
+            h = sha256()
+            hf = open(src_dir + f, "rb")
+            while True:
+                b = hf.read(1024)
+                if len(b) == 0: break
+                h.update(b)
+            hf.close()
+            digest=binascii.hexlify(h.digest()).decode()
+            if f in dest_hashes and digest == dest_hashes[f]:
+                print("Skipping {} due to equal hash.".format(f))
+            else:
+                print("Copying {}.".format(f))
+                if not_dryrun:
+                    con.upload(src_dir + f, dest_base_dir
+                               + dest_prefix_dir + f,
+                               f in dest_hashes)
 
         if not_dryrun:
             if parser.args.reset:
