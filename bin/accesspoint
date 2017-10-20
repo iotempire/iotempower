@@ -87,6 +87,7 @@ while true; do
         sudo brctl delbr br0
         sudo brctl addbr br0
         sudo brctl addif br0 "$ULNOIOT_AP_BRIDGE"
+        sudo ifconfig br0 "$IP"
     fi
 # sleep needs to be controlled from soemwhere outside this
 #    sudo systemd-inhibit \
@@ -108,6 +109,9 @@ while true; do
         # fix ip address
         sudo ifconfig "$OUTPUT_WIFI" 0.0.0.0
         sudo ifconfig br0 "$IP"
+        sudo iptables -t nat -D POSTROUTING 1
+        sudo iptables -t nat -A POSTROUTING -s $ULNOIOT_AP_IP/24 \
+                -o "$INPUT_DEVICE" -j MASQUERADE
     fi
     wait $ap_id
 done
