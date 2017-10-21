@@ -14,7 +14,7 @@ class I2cConnector(Device):
     BUFFER_SIZE=64
 
     def __init__(self, name, sda=None, scl=None,
-                 addr=8, ignore_case=False,report_change=False):
+                 addr=8, ignore_case=False, report_change=True):
         not_found = "i2c device not found"
 
         self.addr = addr
@@ -49,6 +49,7 @@ class I2cConnector(Device):
                 or abs(self.count-count) > 255:
             self.count = count
             self.current_value = s[3:3+s[2]]
+
 
     def value(self):
         return self.current_value

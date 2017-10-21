@@ -18,7 +18,7 @@ class Display44780(Device):
     # Handle display
     def __init__(self, name, sda=None, scl=None,
                  width=16, height=2,
-                 addr=0x27, ignore_case=False):
+                 addr=0x27):
         self.present = False
         self.last_text = ""
         self.char_width = width
@@ -45,7 +45,7 @@ class Display44780(Device):
         else:
             self.present = True
             Device.__init__(self, name, i2c, setters={"set":self.evaluate},
-                            ignore_case=ignore_case,report_change=False)
+                            report_change=False)
             self.getters[""] = self.value
 
     def hide_cursor(self):

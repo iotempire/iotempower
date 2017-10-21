@@ -1,6 +1,6 @@
 display( name, sda, scl,
          width=128, height=64,
-         addr=0x3c, ignore_case=False):
+         addr=0x3c):
 
 Create a new controller for an i2c 128x64 ssd1306 lcd display.
 name will be appended to the mqtt topic and a set appended to
@@ -13,7 +13,6 @@ Parameters:
 - width/height: dimensions of display in pixels
 - addr: the i2c address of display, this is usually either 0x3c or 0x3d
   (on the display it says 0x7a or 0x78 respectively)
-- ignore_case: should case in the command detection be ignored
 
 Example:
 display("dp1",d4,d3)

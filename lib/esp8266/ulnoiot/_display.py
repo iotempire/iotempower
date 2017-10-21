@@ -13,7 +13,7 @@ class Display(Device):
     # Handle display
     def __init__(self, name, sda=None, scl=None,
                  width=128, height=64,
-                 addr=0x3c, ignore_case=False):
+                 addr=0x3c):
         self.present = False
         self._y = 0
         self._x = 0
@@ -36,7 +36,7 @@ class Display(Device):
         else:
             self.present = True
             Device.__init__(self, name, i2c, setters={"set":self.evaluate},
-                            ignore_case=ignore_case,report_change=False)
+                            report_change=False)
             self.getters[""]=self.value
 
     def fill(self,c):

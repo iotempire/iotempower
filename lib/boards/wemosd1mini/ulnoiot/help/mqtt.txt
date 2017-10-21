@@ -12,5 +12,8 @@ Set up mqtt parameters for later mqtt communication in transfer/run:
   ip of the device , turn off by setting this to false
 - port to cummunicate on
 
+This command is usually not necessary anymore as it is configured in the system
+and node configuration.
+
 Example:
 mqtt("192.168.12.1","test1/mysensor")

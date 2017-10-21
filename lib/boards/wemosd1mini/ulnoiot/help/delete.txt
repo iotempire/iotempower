@@ -1,6 +1,6 @@
 delete(name)
 
-Delete a device, which has bbeen added before.
+Delete a device, which has been added before.
 
 Example:
 >>> trigger("mytrig",d7)

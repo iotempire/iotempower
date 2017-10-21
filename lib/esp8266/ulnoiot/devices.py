@@ -141,7 +141,10 @@ def _publish_status(device_list=None,ignore_time=False):
                             t=rt+"/"+s.encode()
                         my_value = d.getters[s]()
                         print('Publishing', t, my_value)
-                        _client.publish(t, str(my_value).encode())
+                        if type(my_value) is bytes or type(my_value) is bytearray:
+                            _client.publish(t, my_value)
+                        else:
+                            _client.publish(t, str(my_value).encode())
         except Exception as e:
             print('Trouble publishing, re-init network.')
             print(e)

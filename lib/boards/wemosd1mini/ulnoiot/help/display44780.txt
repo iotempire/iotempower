@@ -1,6 +1,6 @@
 display44780( name, name, sda=None, scl=None,
                  width=16, height=2,
-                 addr=0x27, ignore_case=False)
+                 addr=0x27)
 
 Create a new controller for an i2c 1602 or 44780 based lcd display.
 name will be appended to the mqtt topic and a set appended to
@@ -13,7 +13,6 @@ Parameters:
 - width/height: dimensions of display in characters
 - addr: the i2c address of display, this is usually either 0x3c or 0x3d
   (on the display it says 0x7a or 0x78 respectively)
-- ignore_case: should case in the command detection be ignored
 
 Example:
 display44780("dp1",d3,d4)

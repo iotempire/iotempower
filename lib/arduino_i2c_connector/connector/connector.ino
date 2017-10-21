@@ -27,18 +27,19 @@ void ulnoiot_i2c_request() {
 }
 
 void ulnoiot_i2c_write(String s) {
-  ulnoiot_i2c_buffer_size = 0;
-  ulnoiot_i2c_buffer[0] = (ulnoiot_i2c_buffer_counter & 0xff00 ) >> 8;
-  ulnoiot_i2c_buffer[1] = ulnoiot_i2c_buffer_counter & 0xff;
+  ulnoiot_i2c_receive_buffer[2] = 0;
+  ulnoiot_i2c_buffer_size = 3; // assume empty buffer TODO: check if mutex needed
   int l = s.length();
   if(l > I2C_BUFFER_SIZE - 3) { // ignore if string too long
     l = I2C_BUFFER_SIZE - 3;
   }
-  ulnoiot_i2c_buffer[2] = l;
   ulnoiot_i2c_buffer_counter += 1;
   for( int i=0; i<l; i++ )
     ulnoiot_i2c_buffer[i+3] = s[i];
+  ulnoiot_i2c_buffer[2] = l;
   ulnoiot_i2c_buffer_size = l+3;
+  ulnoiot_i2c_buffer[0] = (ulnoiot_i2c_buffer_counter & 0xff00 ) >> 8;
+  ulnoiot_i2c_buffer[1] = ulnoiot_i2c_buffer_counter & 0xff;
 }
 
 void ulnoiot_i2c_receive(int count) {
@@ -80,7 +81,7 @@ int counter = 0;
 
 void loop() {
   char mystr[20];
-  snprintf(mystr, 19, "count: %d", counter);
+  snprintf(mystr, 19, "%d", counter);
   ulnoiot_i2c_write(mystr);
   Serial.println(mystr);
   delay(1000);
