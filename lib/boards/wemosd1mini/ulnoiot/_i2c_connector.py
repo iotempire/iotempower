@@ -42,13 +42,19 @@ class I2cConnector(Device):
         self.pin.writeto(self.addr,msg)
 
     def _update(self):
-        s = self.pin.readfrom(self.addr,self.BUFFER_SIZE)
-        count = s[0]*256+s[1]
-        if self.count is None  \
-                or count > self.count \
-                or abs(self.count-count) > 255:
-            self.count = count
-            self.current_value = s[3:3+s[2]]
+        try:
+            s = self.pin.readfrom(self.addr,self.BUFFER_SIZE)
+        except:
+            print("Trouble reading from i2c.")
+        else:
+            count = s[0]*256+s[1]
+            if self.count is None  \
+                    or count > self.count \
+                    or abs(self.count-count) > 255:
+                l = s[2];
+                if l <= self.BUFFER_SIZE: # discard if too big
+                    self.count = count
+                    self.current_value = s[3:3+l]
 
 
     def value(self):

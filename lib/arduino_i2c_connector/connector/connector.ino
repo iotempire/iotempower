@@ -1,4 +1,4 @@
-// Example for an i2c onnector to communicate with ulnoiot-node via i2c
+// Example for an i2c connector to communicate with ulnoiot-node via i2c
 //
 // Based on Wire example by Nicholas Zambetti <http://www.zambetti.com>
 
@@ -12,8 +12,9 @@
 
 #include <Wire.h>
 
-char ulnoiot_i2c_buffer[I2C_BUFFER_SIZE];
-int ulnoiot_i2c_buffer_size = 3;
+char ulnoiot_i2c_buffer1[I2C_BUFFER_SIZE];
+char ulnoiot_i2c_buffer2[I2C_BUFFER_SIZE];
+char *ulnoiot_i2c_buffer = ulnoiot_i2c_buffer1;
 char ulnoiot_i2c_receive_buffer[I2C_BUFFER_SIZE+1]; // one more which can be 0 for end
 int ulnoiot_i2c_receive_buffer_size = 0;
 
@@ -22,24 +23,44 @@ int ulnoiot_i2c_buffer_counter = 0;
 typedef void (*ulnoiot_i2c_receive_callback_type)(char *, int);
 ulnoiot_i2c_receive_callback_type ulnoiot_i2c_receive_callback = NULL;
 
+bool ulnoiot_i2c_inwrite=false; // ulnoiot is in write critical region
+bool ulnoiot_i2c_inrequest=false; // ulnoiot is in request
+
 void ulnoiot_i2c_request() {
-  Wire.write(ulnoiot_i2c_buffer, ulnoiot_i2c_buffer_size); // respond
+  char *buf = ulnoiot_i2c_buffer; // pick one buffer
+  ulnoiot_i2c_inrequest=true;
+  Wire.write(buf, ((unsigned int)buf[2])+3); // respond
+  ulnoiot_i2c_inrequest=false;
 }
 
 void ulnoiot_i2c_write(String s) {
-  ulnoiot_i2c_receive_buffer[2] = 0;
-  ulnoiot_i2c_buffer_size = 3; // assume empty buffer TODO: check if mutex needed
-  int l = s.length();
-  if(l > I2C_BUFFER_SIZE - 3) { // ignore if string too long
-    l = I2C_BUFFER_SIZE - 3;
+  char *buf;
+
+  // problem is that this function could interrupt the request
+  // therefore we use double buffering.
+  noInterrupts(); // this needs to be written atomically
+  if (!ulnoiot_i2c_inwrite) { // enter only once
+    ulnoiot_i2c_inwrite=true; // enter critical region
+    
+    if( ulnoiot_i2c_buffer == ulnoiot_i2c_buffer1 ) { // write to inactive buffer
+      buf = ulnoiot_i2c_buffer2;
+    } else {
+      buf = ulnoiot_i2c_buffer1;
+    }
+    int l = s.length();
+    if(l > I2C_BUFFER_SIZE - 3) { // ignore if string too long
+      l = I2C_BUFFER_SIZE - 3;
+    }
+    ulnoiot_i2c_buffer_counter += 1;
+    for( int i=0; i<l; i++ ) buf[i+3] = s[i]; // copy contents
+    buf[2] = l;  // set length
+    // set counter
+    buf[0] = (ulnoiot_i2c_buffer_counter & 0xff00 ) >> 8;
+    buf[1] = ulnoiot_i2c_buffer_counter & 0xff;
+    ulnoiot_i2c_buffer =  buf; // swap to updated buffer
+    ulnoiot_i2c_inwrite = false; // leave critical region
   }
-  ulnoiot_i2c_buffer_counter += 1;
-  for( int i=0; i<l; i++ )
-    ulnoiot_i2c_buffer[i+3] = s[i];
-  ulnoiot_i2c_buffer[2] = l;
-  ulnoiot_i2c_buffer_size = l+3;
-  ulnoiot_i2c_buffer[0] = (ulnoiot_i2c_buffer_counter & 0xff00 ) >> 8;
-  ulnoiot_i2c_buffer[1] = ulnoiot_i2c_buffer_counter & 0xff;
+  interrupts();
 }
 
 void ulnoiot_i2c_receive(int count) {
@@ -62,6 +83,16 @@ void ulnoiot_i2c_init() {
   ulnoiot_i2c_write(""); // init empty buffer
 }
 
+void ulnoiot_i2c_reinit() {
+  Wire.onRequest(ulnoiot_i2c_request); // register request event (to send data to master)
+  Wire.onReceive(ulnoiot_i2c_receive); // register receive event (to receive data from master)
+}
+
+void ulnoiot_i2c_deinit() {
+  Wire.onRequest(NULL); // de-register request event
+  Wire.onReceive(NULL); // de-register receive event
+}
+
 
 ///////// example main program, replace with your own
 void myreceive( char *msg, int len ) {
@@ -72,8 +103,8 @@ void myreceive( char *msg, int len ) {
 }
 
 void setup() {
-  ulnoiot_i2c_init(); // call this to start the ulnoiot connector
-  ulnoiot_i2c_receive_callback = myreceive;
+  ulnoiot_i2c_receive_callback = myreceive; // call before init
+  ulnoiot_i2c_init(); // call this to start the ulnoiot connector (call last in setup)
   Serial.begin(115200); // start serial for debug output
 }
 
@@ -81,9 +112,11 @@ int counter = 0;
 
 void loop() {
   char mystr[20];
+  ulnoiot_i2c_deinit();
   snprintf(mystr, 19, "%d", counter);
   ulnoiot_i2c_write(mystr);
   Serial.println(mystr);
+  ulnoiot_i2c_reinit();
   delay(1000);
   counter += 1;
 }
