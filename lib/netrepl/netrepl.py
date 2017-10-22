@@ -212,6 +212,8 @@ class Netrepl:
         c = self._guard # shortcut
 
         remote_tmp=remote+".tmp_netrepl"
+        if c('tmp_rm', 'import os\ntry: os.remove("{}")\nexcept: pass\n'
+                .format(remote_tmp)): return # try to remove tmp
         f=open(local,"rb")
         if c('setup','import gc;gc.collect();f=open("{}","wb")'
                 .format(remote_tmp)): return
