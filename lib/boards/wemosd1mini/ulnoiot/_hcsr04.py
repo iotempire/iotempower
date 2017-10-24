@@ -1,5 +1,5 @@
 # HCSR04 Device
-# author: cmuck
+# author: cmuck, ktakač
 # created: 2017-10-23
 
 from machine import Pin
@@ -8,11 +8,12 @@ from time import sleep_us,ticks_us,ticks_diff
 
 ####### HCSR04 Distance sensor
 class HCSR04(Device):
-    def __init__(self, name, trigger_pin, echo_pin,
+    def __init__(self, name, trigger_pin, echo_pin, precision=1,
                  on_change=None, report_change=True):
         self.current_value = 0
         self.trigger_pin = trigger_pin
         self.echo_pin = echo_pin
+        self.precision = precision
         Device.__init__(self, name, echo_pin, on_change=on_change,
                         report_change=report_change)
         self.getters[""] = self.value
@@ -23,7 +24,9 @@ class HCSR04(Device):
         return self.current_value  # just return value
 
     def _update(self):
-        self.current_value = self.measure()
+        value = self.measure()
+        if abs(value-self.current_value) >= self.precision:
+            self.current_value = value
 
     def measure(self):
         sleep_us(5)
