@@ -12,3 +12,7 @@ from ulnoiot.devices import create_device
 def i2c_connector(name,*args,**kwargs):
     return create_device("_i2c_connector",
                          "I2cConnector",name,*args,**kwargs)
+
+def hcsr04(name,*args,**kwargs):
+    return create_device("_hcsr04",
+                         "HCSR04",name,*args,**kwargs)
