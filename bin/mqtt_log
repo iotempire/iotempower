@@ -37,7 +37,7 @@ else
     outfile="$1"
 fi
 
-#outfile="${topic//\//_}.log"
+outfile="${outfile//\//_}.log"
 echo "Calling mqtt_listen and logging timestamped to $outfile."  >&2
 {
     if [[ "$topic" ]]; then
