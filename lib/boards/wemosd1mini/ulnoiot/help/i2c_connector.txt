@@ -1,6 +1,6 @@
 i2c_connector( name, sda, scl, addr=8):
 
-Create a new controller for an Arduino connceted as i2c slave to teh given
+Create a new controller for an Arduino connected as i2c slave to the given
 i2c bus.
 name will be appended to the mqtt topic to report i2c output of the Arduino
 and a set appended to send messages as input to the Arduino.
@@ -14,7 +14,7 @@ Parameters:
 Example:
 i2c_connector("scale1",d3,d4)
 
-Now the commands can be sent to the connected Arduino via  the topic
+Now the commands can be sent to the connected Arduino via the topic
 "node_topic/scale1/set". On "node_topic/scale1" output of the Arduino will
 be received.
 
