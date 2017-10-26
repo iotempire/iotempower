@@ -45,7 +45,6 @@ class Servo(Device):
         self._trigger_next_turn()
 
     def write_us(self, us):
-        """Set the signal to be ``us`` microseconds long. Zero disables it."""
         if us == 0:
             self.pin.duty(0)
             return

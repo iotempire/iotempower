@@ -69,6 +69,9 @@ def servo(name,*args,**kwargs):
 def servo_switch(name,*args,**kwargs):
     return create_device("_servo_switch","Servo_Switch",name,*args,**kwargs)
 
+def pwm(name,*args,**kwargs):
+    return create_device("_pwm","UIOTPWM",name,*args,**kwargs)
+
 def rgb(name,*args,**kwargs):
     return create_device("_rgb","RGB",name,*args,**kwargs)
 
