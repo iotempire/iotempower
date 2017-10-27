@@ -110,12 +110,9 @@ class Netrepl:
         self.cs.send(b"\x02")
 
     def repl_interrupt(self):
-        self.cs.send(b"\r\n\x03\x03\r\n")  # Interrupt
-        time.sleep(0.5)  # wait for interrupt to finish
-        # self.repl_normal()
-        # time.sleep(1)  # wait for interrupt to finish
-        # self.cs.send(b"\r\n\x03\x03\r\n")  # Interrupt
-        # time.sleep(1)  # wait for interrupt to finish
+        self.cs.send(b"\r\n\x03")  # Interrupt
+        time.sleep(0.1)  # wait for interrupt to finish
+        self.cs.send(b"\x03\r\n")  # Interrupt
 
     def repl_execute(self):
         self.cs.send(b"\x04")
@@ -161,7 +158,7 @@ class Netrepl:
             sleep_ms(10) # give some time for filling buffer
         # should not come here
 
-    def repl_command(self, command, timeoutms=None, interrupt=False):
+    def repl_command(self, command, timeoutms=5000, interrupt=False):
         """
         Execute a command remotely and return output.
         :param command:
@@ -176,14 +173,14 @@ class Netrepl:
         if interrupt:
             self.repl_interrupt()
         self.repl_raw()
-        a=self.read_until(b"raw REPL; CTRL-B to exit\r\n>", timeoutms=2000)
+        a=self.read_until(b"raw REPL; CTRL-B to exit\r\n>", timeoutms=timeoutms)
         if a is None:
             if self.debug: print(self.debug, 'Timeout waiting for raw REPL, '
                                              'aborting')
             return None
         self.send(command)
         self.repl_execute()
-        a = self.read_until(b"OK", timeoutms=2000)  # wait for output start
+        a = self.read_until(b"OK", timeoutms=timeoutms)  # wait for output start
         if a is None:
             if self.debug: print(self.debug, 'Timeout waiting for OK, aborting')
             return None

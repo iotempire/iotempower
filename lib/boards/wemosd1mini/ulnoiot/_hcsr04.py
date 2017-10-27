@@ -24,9 +24,9 @@ from time import sleep_us, ticks_us, ticks_ms, ticks_diff
 ####### HCSR04 Distance sensor
 class HCSR04(Device):
     INTERVAL=5  # wait how many ms until next measurement?
-    
+
     def __init__(self, name, trigger_pin, echo_pin,
-                 echo_timeout_us=500 * 2 * 30, precision=1,
+                 echo_timeout_us=30000, precision=1,
                  on_change=None, report_change=True):
         # trigger_pin: Output pin to send pulses
         # echo_pin: Readonly pin to measure the distance. The pin should be protected with 1k resistor
@@ -42,9 +42,10 @@ class HCSR04(Device):
         self.precision = precision
         self.trigger_pin.init(Pin.OUT,pull=None)
         self.echo_pin.init(Pin.IN,pull=None)
+        self.echo_timeout_us=echo_timeout_us
         self._distance=None
         self._measure()
-        Device.__init__(self, name, echo_pin,
+        Device.__init__(self, name, (trigger_pin,echo_pin),
                         getters={"": self.value},
                         on_change=on_change,
                         report_change=report_change)
@@ -57,19 +58,20 @@ class HCSR04(Device):
             value = self._measure()
             if abs(value - self._distance) >= self.precision:
                 self._distance = value
+            self._last_measure = ticks_ms()
 
     def _send_pulse_and_wait(self):
         # Send the pulse to trigger and listen on echo pin.
         # We use the method `machine.time_pulse_us()` to
         # get the microseconds until the echo is received.
-        self.trigger.value(0) # Stabilize the sensor
+        self.trigger_pin.value(0)  # Stabilize the sensor
         sleep_us(5)
-        self.trigger.value(1)
+        self.trigger_pin.value(1)
         # Send a 10us pulse.
         sleep_us(10)
-        self.trigger.value(0)
+        self.trigger_pin.value(0)
         try:
-            pulse_time = machine.time_pulse_us(self.echo, 1, self.echo_timeout_us)
+            pulse_time = machine.time_pulse_us(self.echo_pin, 1, self.echo_timeout_us)
             return pulse_time
         except OSError as ex:
             if ex.args[0] == 110: # 110 = ETIMEDOUT
@@ -85,5 +87,4 @@ class HCSR04(Device):
         # the sound speed on air (343.2 m/s), that It's equivalent to
         # 0.34320 mm/us that is 1mm each 2.91us
         # pulse_time // 2 // 2.91 -> pulse_time // 5.82 -> pulse_time * 100 // 582
-        self._distance = pulse_time * 100 // 582
-        self._last_measure=ticks_ms()
+        return pulse_time * 100 // 582
