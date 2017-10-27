@@ -4,7 +4,7 @@
 
 from machine import Pin
 from ulnoiot.device import Device
-from time import sleep_us,ticks_us,ticks_diff
+from time import sleep_us, ticks_us, ticks_diff
 
 ####### HCSR04 Distance sensor
 class HCSR04(Device):
@@ -14,22 +14,25 @@ class HCSR04(Device):
         self.trigger_pin = trigger_pin
         self.echo_pin = echo_pin
         self.precision = precision
-        Device.__init__(self, name, echo_pin, on_change=on_change,
+        Device.__init__(self, name, echo_pin,
+                        getters={"cm": self.measure},
+                        on_change=on_change,
                         report_change=report_change)
-        self.getters[""] = self.value
         self.trigger_pin.init(Pin.OUT)
         self.echo_pin.init(Pin.IN)
 
     def value(self):
-        return self.current_value  # just return value
+        return {"cm": self.measure()}  # just return value
 
     def _update(self):
         value = self.measure()
-        if abs(value-self.current_value) >= self.precision:
+        if abs(value - self.current_value) >= self.precision:
             self.current_value = value
 
     def measure(self):
+        self.trigger_pin.off()
         sleep_us(5)
+
         self.trigger_pin.on()
         sleep_us(10)
         self.trigger_pin.off()
