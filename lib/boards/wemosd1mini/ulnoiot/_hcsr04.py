@@ -40,11 +40,12 @@ class HCSR04(Device):
             echo_pin=Pin(trigger_pin)
         self.echo_pin = echo_pin
         self.precision = precision
-        self.trigger_pin.init(Pin.OUT,pull=None)
-        self.echo_pin.init(Pin.IN,pull=None)
+        trigger_pin.init(Pin.OUT)
+        trigger_pin.off()
+        echo_pin.init(Pin.IN)
+        echo_pin.init(Pin.OPEN_DRAIN)
         self.echo_timeout_us=echo_timeout_us
-        self._distance=None
-        self._measure()
+        self._distance=self._measure()
         Device.__init__(self, name, (trigger_pin,echo_pin),
                         getters={"": self.value},
                         on_change=on_change,
@@ -66,17 +67,34 @@ class HCSR04(Device):
         # get the microseconds until the echo is received.
         self.trigger_pin.value(0)  # Stabilize the sensor
         sleep_us(5)
-        self.trigger_pin.value(1)
+        self.trigger_pin.on()
         # Send a 10us pulse.
         sleep_us(10)
-        self.trigger_pin.value(0)
-        try:
-            pulse_time = machine.time_pulse_us(self.echo_pin, 1, self.echo_timeout_us)
-            return pulse_time
-        except OSError as ex:
-            if ex.args[0] == 110: # 110 = ETIMEDOUT
-                raise OSError('Out of range') # TODO: raise something else?
-            raise ex
+        self.trigger_pin.off()
+        # try:
+        #     pulse_time = machine.time_pulse_us(self.echo_pin, 1, self.echo_timeout_us)
+        #     return pulse_time
+        # except OSError as ex:
+        #     if ex.args[0] == 110: # 110 = ETIMEDOUT
+        #         return -1 # out of range
+        #     raise ex
+
+
+        start = ticks_us()
+        while not self.echo_pin():
+            t = ticks_us()
+            if ticks_diff(t, start) > self.echo_timeout_us:
+                print("HCR04: timeout")
+                return -1
+        start = ticks_us()
+        while self.echo_pin():
+            t = ticks_us()
+            if ticks_diff(t, start) > self.echo_timeout_us:
+                print("HCR04: timeout")
+                return -1
+        delta = ticks_diff(ticks_us(), start)
+        return delta * 100 // 588
+
 
     def _measure(self):
         # Get the distance in millimeters without floating point operations.
@@ -87,4 +105,7 @@ class HCSR04(Device):
         # the sound speed on air (343.2 m/s), that It's equivalent to
         # 0.34320 mm/us that is 1mm each 2.91us
         # pulse_time // 2 // 2.91 -> pulse_time // 5.82 -> pulse_time * 100 // 582
-        return pulse_time * 100 // 582
+        if pulse_time is not None:
+            return pulse_time * 100 // 582
+        else:
+            return -1
