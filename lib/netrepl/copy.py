@@ -250,13 +250,13 @@ def main():
                                + dest_prefix_dir + f,
                                f in dest_hashes)
 
-        if not_dryrun:
-            if parser.args.reset:
-                print("Resetting device.")
-                con.reset()
+    if not_dryrun:
+        if parser.args.reset:
+            print("Resetting device.")
+            con.reset()
 
-        else:
-            print("This was a dryrun, no actual changes executed.")
+    else:
+        print("This was a dryrun, no actual changes executed.")
 
     if _debug: print("{} Closing connection.".format(_debug))
     con.repl_normal()  # normal repl
