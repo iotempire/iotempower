@@ -113,6 +113,11 @@ ln -s $ULNOIOT_ROOT/lib/netrepl/chacha.py .
 ln -s $ULNOIOT_ROOT/lib/netrepl/unetrepl.py .
 ln -s $ULNOIOT_ROOT/lib/netrepl/crypt_socket.py .
 ln -s $ULNOIOT_ROOT/lib/netrepl/hashlist.py .
+# as we now use netrepl, remove webrepl
+rm webrepl.py
+rm webrepl_setup.py
+rm websocket_helper.py
+
 
 echo
 echo "Third, build firmware."
