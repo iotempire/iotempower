@@ -1,0 +1,13 @@
+hcsr04(name, trigger_pin, echo_pin, precision=1)
+
+Create a new HC-SR04 ultrasonic distance measuring device.
+It reads the distance in cm.
+
+Parameters:
+- name: the name it can be addressed under
+- trigger_pin: where the trigger pin is connected to
+- echo_pin: where the echo pin is connected to
+
+Example:
+nodename: basement/water-sensor01
+hcsr04("distance", d2, d1, precision=10)
