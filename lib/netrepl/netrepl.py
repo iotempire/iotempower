@@ -10,20 +10,23 @@
 
 # Magic word for the protocol start
 MAGIC = b"UlnoIOT-NetREPL:"
-NETBUF_SIZE=1024
+NETBUF_SIZE = 1024
 
 import socket, sys, os, time
 from crypt_socket import Crypt_Socket
 
 
 def ticks_ms(): return int(time.time() * 1000)
+
+
 def ticks_diff(a, b): return a - b
+
+
 def sleep_ms(t): time.sleep(t / 1000)
 
 
-
 class Netrepl:
-    def __init__(self,host,port=23,key=None,debug=None):
+    def __init__(self, host, port=23, key=None, debug=None):
         """
         Build a connection object for netrepl
 
@@ -35,39 +38,40 @@ class Netrepl:
         string.
         """
         self.oldbuffer = bytearray(0)
-        if key is None or len(key)==0:
-            key=bytearray(32)
-        elif len(key)==64:
-            key=bytes.fromhex(key)
+        if key is None or len(key) == 0:
+            key = bytearray(32)
+        elif len(key) == 64:
+            key = bytes.fromhex(key)
 
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket=s
+        self.socket = s
         s.settimeout(2)  # initially this is a blocking port (for 2s)
 
         # connect to remote host
         try:
             s.connect((host, port))
         except:
-            if debug is not None: print(debug,"Unable to connect.")
+            if debug is not None: print(debug, "Unable to connect.")
             raise
 
         if debug is not None:
             print(debug, "Connected to remote host")
-            print(debug, "Sending plain text initialization and initialization vector.")
+            print(debug,
+                  "Sending plain text initialization and initialization vector.")
 
         iv_out = os.urandom(8)
-        s.send(MAGIC+iv_out)
-        if debug is not None: print(debug,'Generating session key.')
+        s.send(MAGIC + iv_out)
+        if debug is not None: print(debug, 'Generating session key.')
         s.settimeout(0)  # now, we can be non blocking
 
-        self.cs = Crypt_Socket(s,netbuf_size=NETBUF_SIZE)
-        self.cs.init_out(key,iv_out)
+        self.cs = Crypt_Socket(s, netbuf_size=NETBUF_SIZE)
+        self.cs.init_out(key, iv_out)
         key_in = os.urandom(32)
         iv_in = os.urandom(8)
         if debug is not None:
-            print(debug,'Sending initialization and session key.')
+            print(debug, 'Sending initialization and session key.')
 
-        self.cs.send(MAGIC+key_in+iv_in)  # send the key
+        self.cs.send(MAGIC + key_in + iv_in)  # send the key
 
         self.cs.init_in(key_in, iv_in)
 
@@ -76,7 +80,7 @@ class Netrepl:
         time.sleep(0.5)
         self.debug = debug
 
-    def send(self,data):
+    def send(self, data):
         """
         Send all data given out (and block until all is sent).
         :param data:
@@ -84,7 +88,7 @@ class Netrepl:
         """
         self.cs.send(bytearray(data))
 
-    def receive(self,request=0,timeoutms=0):
+    def receive(self, request=0, timeoutms=0):
         """
         Try to none blockingly read data. (Block if request>0 until received or
         timeout happened - try to read at least request bytes.)
@@ -98,8 +102,8 @@ class Netrepl:
         :return: a newly allocated byte-buffer with the received data or None,
         if nothing received
         """
-        (data,l)=self.cs.receive(request,timeoutms)
-        if l==0:
+        (data, l) = self.cs.receive(request, timeoutms)
+        if l == 0:
             return None
         return bytes(data[0:l])
 
@@ -120,7 +124,7 @@ class Netrepl:
     def repl_close(self):
         self.cs.send(b"\x1e")  # ctrl-]
 
-    def read_until(self,term,timeoutms=None,fresh_buffer=False):
+    def read_until(self, term, timeoutms=None, fresh_buffer=False):
         """
         Read until given term-string is found, return all data read until then
 
@@ -144,19 +148,20 @@ class Netrepl:
                 self.oldbuffer = buffer[
                                  newpos + term_len:]  # keep rest for later
                 return buffer[0:newpos]
-            buffer_p = max(0, len(buffer) - term_len + 1)  # update searched space
+            buffer_p = max(0,
+                           len(buffer) - term_len + 1)  # update searched space
 
             # if not in there, try to get some more data
-            next = self.receive(request=NETBUF_SIZE,timeoutms=100)
+            next = self.receive(request=NETBUF_SIZE, timeoutms=100)
             if next is not None:
                 buffer.extend(next)
 
             # stop if timeout passed
             if timeoutms is not None:
-                if ticks_diff(ticks_ms(),starttime) >= timeoutms:
+                if ticks_diff(ticks_ms(), starttime) >= timeoutms:
                     return None
-            sleep_ms(10) # give some time for filling buffer
-        # should not come here
+            sleep_ms(10)  # give some time for filling buffer
+            # should not come here
 
     def repl_command(self, command, timeoutms=5000, interrupt=False):
         """
@@ -167,13 +172,14 @@ class Netrepl:
         :return:
         """
         if self.debug: print(self.debug, 'Sending command: >>{}<<'
-                                            .format(command))
+                             .format(command))
         if type(command) is str:
-            command=command.encode()
+            command = command.encode()
         if interrupt:
             self.repl_interrupt()
         self.repl_raw()
-        a=self.read_until(b"raw REPL; CTRL-B to exit\r\n>", timeoutms=timeoutms)
+        a = self.read_until(b"raw REPL; CTRL-B to exit\r\n>",
+                            timeoutms=timeoutms)
         if a is None:
             if self.debug: print(self.debug, 'Timeout waiting for raw REPL, '
                                              'aborting')
@@ -184,13 +190,13 @@ class Netrepl:
         if a is None:
             if self.debug: print(self.debug, 'Timeout waiting for OK, aborting')
             return None
-        #print("oldbuffer",self.oldbuffer) # debug
-        a=self.read_until(b"\x04\x04>", timeoutms=timeoutms)
+        # print("oldbuffer",self.oldbuffer) # debug
+        a = self.read_until(b"\x04\x04>", timeoutms=timeoutms)
         if a is None:
             if self.debug: print(self.debug, 'Timeout waiting for command '
                                              'execution, aborting.')
         if self.debug: print(self.debug, 'Returning answer: >>{}<<.'
-                                            .format(a))
+                             .format(a))
         return a
 
     def _guard(self, check, command):
@@ -204,44 +210,45 @@ class Netrepl:
             return True  # this means failure
         return False  # success
 
-    def upload(self,local,remote,remove=True):
-        # print("upload",local,remote) # debug
-        c = self._guard # shortcut
+    def upload(self, local, remote, remove=True):
+        # print("upload",local,remote)  # debug
+        c = self._guard  # shortcut
+        self.debug = "testing"  # TODO: remove
 
-        remote_tmp=remote+".tmp_netrepl"
+        remote_tmp = remote + ".tmp_netrepl"
         if c('tmp_rm', 'import os\ntry: os.remove("{}")\nexcept: pass\n'
-                .format(remote_tmp)): return # try to remove tmp
-        f=open(local,"rb")
-        if c('setup','import gc;gc.collect();f=open("{}","wb")'
+                .format(remote_tmp)): return  # try to remove tmp
+        f = open(local, "rb")
+        if c('setup', 'import gc;gc.collect();f=open("{}","wb")'
                 .format(remote_tmp)): return
-        bnr=0
+        bnr = 0
         while True:
             block = f.read(128)
-            if len(block)==0: break
-            if c('w%d'%bnr,'f.write({})'.format(block)): return
-            bnr+=1
+            if len(block) == 0: break
+            if c('w%d' % bnr, 'f.write({})'.format(block)): return
+            bnr += 1
         f.close()
-        if c('close','f.close()'): return
+        if c('close', 'f.close()'): return
         if remove:
-            if c('remove','import os;os.remove("{}")'.format(remote)): return
-        if c('rename','import os;os.rename("{}","{}")'
-                .format(remote_tmp,remote)): return
+            if c('remove', 'import os;os.remove("{}")'.format(remote)): return
+        if c('rename', 'import os;os.rename("{}","{}")'
+                .format(remote_tmp, remote)): return
 
-    def mkdir(self,path,nofail=False):
+    def mkdir(self, path, nofail=False):
         """
         Create a directory on remote.
         :param nofail: if nofail is set, command does nto fail if directory
         already exists
         :return:
         """
-        c = self._guard # shortcut
+        c = self._guard  # shortcut
 
         if path.endswith("/"):
-            path=path[:-1]
-        command='mkdir("{}")'.format(path)
+            path = path[:-1]
+        command = 'mkdir("{}")'.format(path)
         if nofail:
-            command="\r\ntry:\r\n {}\r\nexcept:\r\n pass\r\n".format(command)
-        if c('mkdir','import os\r\n{}'.format(command)): return
+            command = "\r\ntry:\r\n {}\r\nexcept:\r\n pass\r\n".format(command)
+        if c('mkdir', 'import os\r\n{}'.format(command)): return
 
     def reset(self):
         """
@@ -250,28 +257,29 @@ class Netrepl:
         """
         self.repl_command('import machine;machine.reset()')
 
-    def rm(self,path):
-        c = self._guard # shortcut
+    def rm(self, path):
+        c = self._guard  # shortcut
 
-        if c("rm",'import os;os.remove("{}")'.format(path)): return
+        if c("rm", 'import os;os.remove("{}")'.format(path)): return
 
-    def rmdir(self,path,recursive=False):
-        c = self._guard # shortcut
+    def rmdir(self, path, recursive=False):
+        c = self._guard  # shortcut
         # TODO: add recursive delete
 
-        if path.endswith("/"): # dir
-            path=path[:-1]
+        if path.endswith("/"):  # dir
+            path = path[:-1]
         if c("rmdir", 'import os;os.remove("{}")'.format(path)): return
 
-    def close(self,report=False):
+    def close(self, report=False):
         if report:
             self.repl_close()
         self.cs.close()
 
 
 class Netrepl_Parser():
-    def __init__(self,description,usage="%(prog)s [key|port [key]]",debug="netrepl:"):
-        import argparse # only import when used
+    def __init__(self, description, usage="%(prog)s [key|port [key]]",
+                 debug="netrepl:"):
+        import argparse  # only import when used
         parser = argparse.ArgumentParser(usage=usage,
                                          description=description)
         parser.add_argument('host', type=str,
@@ -285,16 +293,16 @@ class Netrepl_Parser():
                                  'Key needs to be 256bit in either bytes or hex notation, '
                                  'If key is not given as option it is read as newline '
                                  'terminated 64 byte hex notation from stdin')
-        parser.add_argument('--keyfile','--key-file', type=str, nargs='?',
+        parser.add_argument('--keyfile', '--key-file', type=str, nargs='?',
                             help='Read key from specified file (last line in '
                                  'that file should be 64 bytes hex-key).')
 
-        self.parser=parser
+        self.parser = parser
         if debug is not None:
             if debug.endswith(":"):
                 self.debug = debug
             else:
-                self.debug = debug+":"
+                self.debug = debug + ":"
         else:
             self.debug = None
         self.parsed = False
@@ -314,12 +322,12 @@ class Netrepl_Parser():
         if key is None:
             # Check if key was provided as keyfile
             if args.keyfile is not None:
-                f=open(args.keyfile,"rb")
+                f = open(args.keyfile, "rb")
                 for l in f:
-                    s=l.strip()
+                    s = l.strip()
                     if len(s) == 64:
-                        key=l
-                key=key.decode()
+                        key = l
+                key = key.decode()
                 f.close()
             else:
                 print('Enter key (32bytes as hex->64bytes):')
@@ -345,5 +353,3 @@ class Netrepl_Parser():
             self.parse()
         con = Netrepl(self.host, self.port, self.key, debug=self.debug)
         return con
-
-

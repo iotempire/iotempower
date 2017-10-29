@@ -12,24 +12,25 @@ import os
 from netrepl import Netrepl_Parser
 import time
 
-#_debug="netrepl copy:"
-_debug=None
+# _debug="netrepl copy:"
+_debug = None
+
 
 def main():
     parser = Netrepl_Parser('Copy recursively a local file or directory to a '
                             'netrepl enabled device.',
                             debug=_debug)
-    parser.parser.add_argument('-t','--timeout', nargs="?",
-                               type=int, required=False, default = 600,
+    parser.parser.add_argument('-t', '--timeout', nargs="?",
+                               type=int, required=False, default=600,
                                help='seconds to wait for process '
                                     'to finish (default 600s)')
-    parser.parser.add_argument('-s','--src', '--source', nargs="?",
+    parser.parser.add_argument('-s', '--src', '--source', nargs="?",
                                type=str, required=False, default="./",
                                help='source directory. '
                                     'Default: current directory (./). '
                                     'If source should be a directory it has to '
                                     'be postfixed by a slash (/).')
-    parser.parser.add_argument('-d','--dest', '--destination',
+    parser.parser.add_argument('-d', '--dest', '--destination',
                                type=str, required=False, nargs="?", default="/",
                                help='destination directory on netrepl device). '
                                     'Default: netrepl root (/) directory. '
@@ -40,31 +41,31 @@ def main():
                                     'destination. This will always get a /'
                                     'added to its beginning and therfore '
                                     'absolute on the remote.')
-    parser.parser.add_argument('--delete','--del',
+    parser.parser.add_argument('--delete', '--del',
                                required=False, action="store_true",
                                help='if given, delete locally absent files '
                                     'also on destination.')
-    parser.parser.add_argument('-y','--sync',
+    parser.parser.add_argument('-y', '--sync',
                                required=False, action="store_true",
                                help='if given, use list of hash codes '
                                     'to determine which files have to '
                                     'be copied and which can be skipped.')
-    parser.parser.add_argument('-n','--dry', '--dryrun',
+    parser.parser.add_argument('-n', '--dry', '--dryrun',
                                required=False, action="store_true",
                                help='if given, only show what would be done, '
                                     'do not copy or delete actually anything.')
-    parser.parser.add_argument('--reset','--reboot',
+    parser.parser.add_argument('--reset', '--reboot',
                                required=False, action="store_true",
                                help='if given, reset node after copy.')
-    parser.parser.add_argument('-x','--exclude', '--ignore',
+    parser.parser.add_argument('-x', '--exclude', '--ignore',
                                required=False, type=str, nargs="+", default="",
                                help='files or directories to exclude. '
                                     'Tries to match path or filename '
                                     '(like rsync).'
                                     'Multiple files and directories can be '
                                     'specified here.')
-    parser.parser.add_argument('-o','--only-create','--create-only',
-                               required=False, type=str, nargs="+",default="",
+    parser.parser.add_argument('-o', '--only-create', '--create-only',
+                               required=False, type=str, nargs="+", default="",
                                help='files or directories to only create, '
                                     'when they are not yet present in '
                                     'destination. '
@@ -74,9 +75,9 @@ def main():
     # TODO: what about symlinks?
 
     con = parser.connect()
-    source=parser.args.src
-    src_dir=os.path.dirname(source)
-    if len(src_dir)>0 and not src_dir.endswith("/"):
+    source = parser.args.src
+    src_dir = os.path.dirname(source)
+    if len(src_dir) > 0 and not src_dir.endswith("/"):
         src_dir += "/"
     src_file = os.path.basename(source)
     dest = parser.args.dest
@@ -90,7 +91,7 @@ def main():
         dest_prefix_dir += "/"
 
     # create source list
-    if src_file: # got a (single) file
+    if src_file:  # got a (single) file
         src_list = [src_file]
     else:
         # just got a directory, so let's generate it
@@ -98,9 +99,9 @@ def main():
         for root, dirs, files in os.walk(src_dir):
             if not root.endswith("/"):
                 root += "/"
-            root=root[len(src_dir):]
+            root = root[len(src_dir):]
             for d in dirs:
-                src_list.append(root+d+"/")
+                src_list.append(root + d + "/")
             for filename in files:
                 path = root + filename  # skip ./
                 src_list.append(path)
@@ -110,39 +111,41 @@ def main():
     time.sleep(1)  # wait a bit
 
     # get destination file-list with hashes
-    if src_file and len(src_list) == 1: # if we only copy one file
+    if src_file and len(src_list) == 1:  # if we only copy one file
         # (only small hashlist necessary)
-        search_path = "/"+src_list[0]
+        search_path = "/" + src_list[0]
     else:
-        search_path = dest_base_dir+dest_prefix_dir
+        search_path = dest_base_dir + dest_prefix_dir
 
     # if sync requested get hash-files
-    dest_hashes={}
+    dest_hashes = {}
     if parser.args.sync:
         print("Connecting and requesting destination hash list.")
-        data=con.repl_command("import hashlist; "
-                              "hashlist.hashlist(root=\"{}\")".format(search_path),
-                              timeoutms=parser.args.timeout*1000)
-        if data is None: # timeout
-            print("Problem with initial connection - timeout occurred, aborting.")
+        data = con.repl_command("import hashlist; "
+                                "hashlist.hashlist(root=\"{}\")".format(
+            search_path),
+                                timeoutms=parser.args.timeout * 1000)
+        if data is None:  # timeout
+            print(
+                "Problem with initial connection - timeout occurred, aborting.")
         else:
-            dest_hashes={}
+            dest_hashes = {}
             for line in data.split(b"\n"):
-                line=line[:-1]
-                parts=line.split(b" ")
+                line = line[:-1]
+                parts = line.split(b" ")
                 if len(parts) and parts[0]:
-                    key=b" ".join(parts[1:]).decode()[
-                        len(dest_base_dir+dest_prefix_dir):]
+                    key = b" ".join(parts[1:]).decode()[
+                          len(dest_base_dir + dest_prefix_dir):]
                     if key:
                         dest_hashes[key] \
                             = bytes(parts[0]).decode()
 
-            if _debug: print(_debug,"src_list:",src_list) # debug
-            if _debug: print(_debug,"dest_hashes:",dest_hashes)  # debug
+            if _debug: print(_debug, "src_list:", src_list)  # debug
+            if _debug: print(_debug, "dest_hashes:", dest_hashes)  # debug
 
     # Compute copy, delete, exclude, create only lists
-    exclude_list=parser.args.exclude
-    only_create_list=parser.args.only_create
+    exclude_list = parser.args.exclude
+    only_create_list = parser.args.only_create
     # create copy_list
     copy_list = []
     for f in src_list:
@@ -150,25 +153,25 @@ def main():
         match = False
         for e in exclude_list:
             if e.startswith("/"):  # only allow path matches
-                e=e[1:]
+                e = e[1:]
                 if e.endswith("/"):
                     if f.startswith(e):
-                        match=True
-                        break
-                else:
-                    if f.startswith(e+"/") or f==e:
                         match = True
                         break
-            else: # allow also file match
+                else:
+                    if f.startswith(e + "/") or f == e:
+                        match = True
+                        break
+            else:  # allow also file match
                 if e.endswith("/"):
                     if f.startswith(e):
-                        match=True
-                        break
-                else:
-                    if f.startswith(e+"/"):
                         match = True
                         break
-                    if os.path.basename(f) == e or f==e:
+                else:
+                    if f.startswith(e + "/"):
+                        match = True
+                        break
+                    if os.path.basename(f) == e or f == e:
                         match = True
                         break
         if match: continue  # don't need to look further
@@ -179,10 +182,10 @@ def main():
                 if o[1:] == f:
                     match = True
                     break
-            if f==o or os.path.basename(f)==o:
+            if f == o or os.path.basename(f) == o:
                 match = True
                 break
-        if match: # is in create_only list, so check if it's already at destin.
+        if match:  # is in create_only list, so check if it's already at destin.
             if f in dest_hashes:
                 continue  # then we don't need to add it
         # nothing matches, so add it
@@ -190,7 +193,7 @@ def main():
 
     # create delete list
     delete_list = []
-    if parser.args.delete: # only when option set
+    if parser.args.delete:  # only when option set
         for f in dest_hashes:
             # might be a directory
             if f not in src_list:
@@ -200,17 +203,18 @@ def main():
                 else:
                     delete_list.append(f)
 
-    not_dryrun=not parser.args.dry
+    not_dryrun = not parser.args.dry
     # process delete list
     for f in delete_list:
         print("Deleting {}.".format(f))
         if not_dryrun:  # TODO: check that deleting directories works
             if f.endswith("/"):  # dir
                 con.rmdir(dest_base_dir + dest_prefix_dir + f[:-1])
-            else: # file
+            else:  # file
                 con.rm(dest_base_dir + dest_prefix_dir + f)
     # process copy list
-    if dest_base_dir and dest_base_dir !="/": # if there is one always try to create it
+    if dest_base_dir and dest_base_dir != "/":  # if there is one
+                                                # always try to create it
         if not_dryrun:
             con.mkdir(dest_base_dir[:-1], nofail=True)
     if dest_prefix_dir:  # need to prefixdir?
@@ -218,7 +222,7 @@ def main():
             con.mkdir(dest_base_dir + dest_prefix_dir[:-1], nofail=True)
     for f in copy_list:
         if f.endswith("/"):  # directory
-            if f[:-1] in dest_hashes: f=f[:-1]
+            if f[:-1] in dest_hashes: f = f[:-1]
             if f in dest_hashes:
                 if dest_hashes[f] == "<dir>":
                     print("Skipping directory {} as it's already"
@@ -232,7 +236,7 @@ def main():
                 print("Creating directory {}.".format(f))
                 if not_dryrun:
                     con.mkdir(dest_base_dir + dest_prefix_dir + f)
-        else: # it is a file
+        else:  # it is a file
             h = sha256()
             hf = open(src_dir + f, "rb")
             while True:
@@ -240,7 +244,7 @@ def main():
                 if len(b) == 0: break
                 h.update(b)
             hf.close()
-            digest=binascii.hexlify(h.digest()).decode()
+            digest = binascii.hexlify(h.digest()).decode()
             if f in dest_hashes and digest == dest_hashes[f]:
                 print("Skipping {} due to equal hash.".format(f))
             else:
@@ -262,6 +266,7 @@ def main():
     con.repl_normal()  # normal repl
     con.close(report=True)
     if _debug: print("{} Connection closed.".format(_debug))
+
 
 # main function
 if __name__ == "__main__":
