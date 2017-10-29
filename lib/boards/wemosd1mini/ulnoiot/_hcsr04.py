@@ -26,14 +26,14 @@ class HCSR04(Device):
     INTERVAL=50  # wait how many ms until next measurement?
 
     def __init__(self, name, trigger_pin, echo_pin,
-                 echo_timeout_us=30000, precision=1,
+                 echo_timeout_us=30000, precision=10,
                  on_change=None, report_change=True):
         # trigger_pin: Output pin to send pulses
         # echo_pin: Readonly pin to measure the distance. The pin should be protected with 1k resistor
         # echo_timeout_us: Timeout in microseconds to listen to echo pin.
         # By default is based in sensor limit range (4m)
         self.current_value = 0
-        self._lastMeasure = 0
+        self._lastmeasure = 0
         if type(trigger_pin) is not Pin:
             trigger_pin=Pin(trigger_pin)
         self.trigger_pin = trigger_pin
@@ -56,11 +56,11 @@ class HCSR04(Device):
         return self._distance
 
     def _update(self):
-        if ticks_diff(ticks_ms(), self._lastMeasure) > self.INTERVAL:
+        if ticks_diff(ticks_ms(), self._lastmeasure) > self.INTERVAL:
             value = self._measure()
             if abs(value - self._distance) >= self.precision:
                 self._distance = value
-            self._lastMeasure = ticks_ms()
+            self._lastmeasure = ticks_ms()
 
     def _send_pulse_and_wait(self):
         # Send the pulse to trigger and listen on echo pin.
@@ -107,6 +107,6 @@ class HCSR04(Device):
         # 0.34320 mm/us that is 1mm each 2.91us
         # pulse_time // 2 // 2.91 -> pulse_time // 5.82 -> pulse_time * 100 // 582
         if pulse_time is not None:
-            return pulse_time * 100 // 582 // 10
+            return pulse_time * 100 // 582
         else:
             return -1
