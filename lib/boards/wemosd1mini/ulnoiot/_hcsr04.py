@@ -94,7 +94,7 @@ class HCSR04(Device):
                 print("HCR04: timeout")
                 return -1
         delta = ticks_diff(ticks_us(), start)
-        return delta * 100 // 588
+        return delta
 
 
     def _measure(self):
@@ -107,6 +107,6 @@ class HCSR04(Device):
         # 0.34320 mm/us that is 1mm each 2.91us
         # pulse_time // 2 // 2.91 -> pulse_time // 5.82 -> pulse_time * 100 // 582
         if pulse_time is not None:
-            return pulse_time * 100 // 582
+            return pulse_time * 100 // 582 // 10
         else:
             return -1
