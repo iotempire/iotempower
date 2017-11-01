@@ -213,7 +213,6 @@ class Netrepl:
     def upload(self, local, remote, remove=True):
         # print("upload",local,remote)  # debug
         c = self._guard  # shortcut
-        self.debug = "testing"  # TODO: remove
 
         remote_tmp = remote + ".tmp_netrepl"
         if c('tmp_rm', 'import os\ntry: os.remove("{}")\nexcept: pass\n'
