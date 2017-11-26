@@ -68,7 +68,8 @@ if [[ "$*" = *dout* ]]; then
     flash_mode=dout
 fi
 if [[ "$*" = *waiterase* ]]; then
-    echo "Press enter to continue to actual flash."
+    echo "If necessary, bring esp back into falsh mode now."
+    echo "Press enter to continue to actual firmware flash."
     read w
 fi
 echo Performing firmware flash.
@@ -77,7 +78,7 @@ esptool \
     --port "$tty" \
     --baud "$baudrate" \
     write_flash --flash_mode $flash_mode --flash_size=$flash_size --verify \
-        0 "$firmware"
+        0x0 "$firmware"
 
 # Bring board in known state to allow direct deploy
 echo "Let board do its initial reset (15s)."
