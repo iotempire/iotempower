@@ -5,10 +5,13 @@
 #
 if [[ "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF
-Syntax: flash_serial_esp8266 [port] [noerase] [wemosd1pro]
+Syntax: flash_serial_esp8266 [port] [noerase] [onlyerase] [waiterase] [dout] [wemosd1pro]
 
 flash_serial_esp8266 flashes an esp8266 on usb0 or the given usb port.
 noerase prevents the flash memory to firstly be erased.
+onlyerase only performs the flash erase.
+waiterase waits for keypress before continuing to flash.
+dout sets flash_mode dout (default dio) - might be important tto flash sonoff.
 wemosd1pro allows the wemos d1 mini pro to be flashed (however, only with 4MB
 flash even if it has 16MB)
 
@@ -25,15 +28,17 @@ board_name="Generic ESP8266"
 #flash_size=1 # sonoff flash is only 1m-byte
 
 # 115200 seems safer and prevents problems with lesser quality ttl converters
+#baudrate=9600
 baudrate=115200
 #baudrate=230400
 #baudrate=460800
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
+flash_size=detect
 if [[ "$*" = *wemosd1pro* ]]; then
     echo "Flashing in Wemos D1 Mini Pro mode (fixing flash size to 4MB)."
-    pro_options="--flash_size=4MB"
+    flash_size="4MB"
 fi
 
 pushd . &> /dev/null
@@ -48,32 +53,43 @@ firmware="firmware-initial.bin"
 
 if [[ "$*" = *noerase* ]]; then
     echo "Not erasing flash."
-    pro_options="--flash_size=4MB"
 else
     echo Performing erase flash.
-    esptool --port "$tty" erase_flash
+    esptool \
+        --port "$tty" erase_flash
     sleep 1
+fi
+if [[ "$*" = *onlyerase* ]]; then
+    echo "onlyerase set, exiting."
+    exit 0
+fi
+flash_mode=dio
+if [[ "$*" = *dout* ]]; then
+    flash_mode=dout
+fi
+if [[ "$*" = *waiterase* ]]; then
+    echo "Press enter to continue to actual flash."
+    read w
 fi
 echo Performing firmware flash.
 esptool \
     --after hard_reset \
     --port "$tty" \
     --baud "$baudrate" \
-    write_flash --flash_mode dio $pro_options --verify \
+    write_flash --flash_mode $flash_mode --flash_size=$flash_size --verify \
         0 "$firmware"
-# --flash_size="$flash_size"MB <- should now be autodetected
 
 # Bring board in known state to allow direct deploy
-echo "Let board do its initial reset".
-sleep 5
-echo "Do hardreset via mpfshell..."
-mpfshell -c "open $port" -n --reset
-sleep 4
-echo "Hard-reset should be done now."
-sleep 2
-echo "Doing soft-reset."
-board_reset "$1" "$2"
-echo "Soft reset should be done now."
+echo "Let board do its initial reset (15s)."
+sleep 15
+#echo "Do hardreset via mpfshell..."
+#mpfshell -c "open $port" -n --reset
+#sleep 4
+#echo "Hard-reset should be done now."
+#sleep 2
+#echo "Doing soft-reset."
+#board_reset "$1" "$2"
+echo "Reset should be done now."
 
 popd &> /dev/null
 
