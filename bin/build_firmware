@@ -120,19 +120,23 @@ rm websocket_helper.py
 
 
 echo
-echo "Third, build firmware."
+echo "Third, build firmware for non-ota."
 cd ../..
 git submodule update --init
 cd esp8266
-# TODO: make doesn't work anymore after having made ota once <- maybe no fix as switching to ota
-#make axtls && make || { echo "Something went wrong, check errors.";exit 1; }
-make axtls && make ota || { echo "Something went wrong compiling fw, check errors.";exit 1; }
+# make doesn't work anymore after having made ota once, there seems to be
+# too much firmware around, so delete it first
+rm build/firmware.elf-0x*.bin
+make axtls && make || { echo "Something went wrong compiling no-ota fw, check errors.";exit 1; }
 echo "Done building firmware successfully."
-#echo "Copying firmware to flash position."
-#cp "$ULNOIOT_FIRMWARE/micropython/esp8266/build/firmware-combined.bin" \
-#    "$ULNOIOT_FIRMWARE"
-#cp "$ULNOIOT_FIRMWARE/micropython/esp8266/build/firmware-ota.bin" \
-#    "$ULNOIOT_FIRMWARE"
+echo "Copying no-ota firmware to flash position."
+cp "$ULNOIOT_FIRMWARE/micropython/ports/esp8266/build/firmware-combined.bin" \
+    "$ULNOIOT_FIRMWARE/firmware.bin"
+
+echo
+echo "Fourth, build ota firmware."
+make ota || { echo "Something went wrong compiling ota-fw, check errors.";exit 1; }
+
 
 #### YAOTA8266 OTA for micropython
 cd "$ULNOIOT_FIRMWARE/yaota8266"

@@ -5,15 +5,18 @@
 #
 if [[ "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF
-Syntax: flash_serial_esp8266 [port] [noerase] [onlyerase] [waiterase] [dout] [wemosd1pro]
+Syntax: flash_serial_esp8266 [port] [noerase] [onlyerase] [waiterase] [dout] [wemosd1pro] [noota]
 
 flash_serial_esp8266 flashes an esp8266 on usb0 or the given usb port.
-noerase prevents the flash memory to firstly be erased.
-onlyerase only performs the flash erase.
-waiterase waits for keypress before continuing to flash.
-dout sets flash_mode dout (default dio) - might be important tto flash sonoff.
-wemosd1pro allows the wemos d1 mini pro to be flashed (however, only with 4MB
-flash even if it has 16MB)
+
+- noerase: prevents the flash memory to firstly be erased.
+- onlyerase: only performs the flash erase.
+- waiterase: waits for keypress before continuing to flash.
+- dout: sets flash_mode to dout (default dio) - might be important
+  to flash sonoff.
+- wemosd1pro: allows the wemos d1 mini pro to be flashed (however, only with 4MB
+  flash even if it has 16MB)
+- noota: flashes the micropython version without ota-update possibility
 
 EOF
 exit 1
@@ -50,6 +53,10 @@ echo "Port: $tty"
 # find firmware
 cd "$ULNOIOT_EXTERNAL/firmware"
 firmware="firmware-initial.bin"
+if [[ "$*" = *noota* ]]; then
+    echo "Flashing no-ota version of micropython."
+    firmware="firmware.bin"
+fi
 
 if [[ "$*" = *noerase* ]]; then
     echo "Not erasing flash."
@@ -68,17 +75,19 @@ if [[ "$*" = *dout* ]]; then
     flash_mode=dout
 fi
 if [[ "$*" = *waiterase* ]]; then
-    echo "If necessary, bring esp back into falsh mode now."
+    echo "If necessary, bring esp back into flash mode now."
     echo "Press enter to continue to actual firmware flash."
     read w
 fi
 echo Performing firmware flash.
+set -x
 esptool \
     --after hard_reset \
     --port "$tty" \
     --baud "$baudrate" \
     write_flash --flash_mode $flash_mode --flash_size=$flash_size --verify \
         0x0 "$firmware"
+set +x
 
 # Bring board in known state to allow direct deploy
 echo "Let board do its initial reset (15s)."

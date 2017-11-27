@@ -47,7 +47,10 @@ if [ -e "$ULNOIOT_ROOT/etc/ulnoiot.conf" ]; then
     source "$ULNOIOT_ROOT/etc/ulnoiot.conf"
 fi
 
+ULNOIOT_VERSION=$(cat "$ULNOIOT_ROOT/VERSION")
+
 # export all
+export ULNOIOT_VERSION
 export ULNOIOT_MQTT_HOST
 export ULNOIOT_AP_DEVICES
 export ULNOIOT_AP_NAME
