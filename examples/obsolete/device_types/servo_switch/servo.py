@@ -14,6 +14,7 @@ class Servo:
         angle (int): The angle between the minimum and maximum positions.
 
     """
+
     def __init__(self, pin, freq=50, min_us=600, max_us=2400, angle=180):
         self.min_us = min_us
         self.max_us = max_us
@@ -23,7 +24,7 @@ class Servo:
         self.pin = pin
         self.pwm = PWM(self.pin, freq=self.freq, duty=0)
         self.init()
-    
+
     def init(self):
         self.pwm.init()
 
@@ -44,7 +45,6 @@ class Servo:
         total_range = self.max_us - self.min_us
         us = self.min_us + total_range * degrees // self.angle
         self.write_us(us)
-        
-    def release( self ):
-        self.pwm.deinit()
 
+    def release(self):
+        self.pwm.deinit()

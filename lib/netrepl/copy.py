@@ -124,7 +124,7 @@ def main():
         data = con.repl_command("import hashlist; "
                                 "hashlist.hashlist(root=\"{}\")".format(
             search_path),
-                                timeoutms=parser.args.timeout * 1000)
+            timeoutms=parser.args.timeout * 1000)
         if data is None:  # timeout
             print(
                 "Problem with initial connection - timeout occurred, aborting.")
@@ -214,7 +214,7 @@ def main():
                 con.rm(dest_base_dir + dest_prefix_dir + f)
     # process copy list
     if dest_base_dir and dest_base_dir != "/":  # if there is one
-                                                # always try to create it
+        # always try to create it
         if not_dryrun:
             con.mkdir(dest_base_dir[:-1], nofail=True)
     if dest_prefix_dir:  # need to prefixdir?

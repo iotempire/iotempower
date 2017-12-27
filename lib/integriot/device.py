@@ -5,7 +5,7 @@
 
 class Device():
     def __init__(self):
-        self.status=None
+        self.status = None
 
 
 class MQTTDevice(Device):
@@ -57,9 +57,11 @@ class MQTTDevice(Device):
         :param ignore_case: if True, cast all received payload into lowercase
         :return:
         """
+
         def new_cb(t, m):
             if t not in self.last_received or self.last_received[t] != m:
                 callback(m)
+
         self._add_callback_entry(sub_topic, new_cb, ignore_case)
 
     def add_callback_data(self, sub_topic, data, callback, ignore_case=True):
@@ -71,9 +73,11 @@ class MQTTDevice(Device):
         :param ignore_case: if True, cast all received payload into lowercase
         :return:
         """
+
         def new_cb(t, m):
             if m == data:
                 callback()
+
         self._add_callback_entry(sub_topic, new_cb, ignore_case)
 
     def remove_callback(self, sub_topic):
@@ -91,7 +95,7 @@ class MQTTDevice(Device):
         t = message.topic
         if not t.startswith(self.main_topic):
             return
-        sub_topic =  t[len(self.main_topic)+1:]
+        sub_topic = t[len(self.main_topic) + 1:]
         if not sub_topic in self.callbacks:
             return
         p = message.payload.decode()  # TODO: might not work -> check
@@ -125,7 +129,7 @@ class MQTTSwitch(MQTTDevice):
         self.set_topic = set_topic
         self.state_topic = state_topic
         if init_state:
-            self.publish(set_topic,init_state)
+            self.publish(set_topic, init_state)
             self.state = init_state
         else:
             self.state = off_command
@@ -133,9 +137,9 @@ class MQTTSwitch(MQTTDevice):
             full_set_topic = main_topic + "/" + set_topic
         else:
             full_set_topic = main_topic
-        self.add_callback(full_set_topic,self.update_state_cb)
+        self.add_callback(full_set_topic, self.update_state_cb)
 
-    def update_state_cb(self,topic,msg):
+    def update_state_cb(self, topic, msg):
         self.update_state(msg)
 
     def update_state(self, new_state):
@@ -145,11 +149,13 @@ class MQTTSwitch(MQTTDevice):
     def on(self):
         self.publish(self.set_topic, self.on_command)
         self.update_state(self.on_command)
+
     high = on
 
     def off(self):
         self.publish(self.set_topic, self.off_command)
         self.update_state(self.off_command)
+
     low = off
 
     def toggle(self):

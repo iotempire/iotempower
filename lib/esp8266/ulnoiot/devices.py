@@ -111,8 +111,10 @@ def dht22(name, *args, **kwargs):
 def ds18x20(name, *args, **kwargs):
     return create_device("_ht", "DS18X20", name, *args, **kwargs)
 
+
 def display(name, *args, **kwargs):
     return create_device("_display", "Display", name, *args, **kwargs)
+
 
 def display44780(name, *args, **kwargs):
     return create_device("_display44780", "Display44780", name, *args, **kwargs)
@@ -158,8 +160,8 @@ def _publish_status(device_list=None, ignore_time=False):
 
     current_time = time.ticks_us()
     if ignore_time or \
-                    time.ticks_diff(current_time,
-                                    _last_publish) >= MIN_PUBLISH_TIME_US:
+            time.ticks_diff(current_time,
+                            _last_publish) >= MIN_PUBLISH_TIME_US:
         _last_publish = current_time
         try:
             for d in device_list:

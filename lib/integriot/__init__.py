@@ -32,6 +32,8 @@ def switch(t, on_command="on", off_command="off", set_topic="set",
     global _main_devices
     return _main_devices.switch(t, on_command, off_command, set_topic,
                                 state_topic, init_state)
+
+
 led = switch
 relay = switch
 
@@ -43,7 +45,7 @@ def init(mqtt_host):
     :return:
     """
     global _main_devices
-    _main_devices = devices.Devices(mqtt_host)   # TODO: auth+tls
+    _main_devices = devices.Devices(mqtt_host)  # TODO: auth+tls
 
 
 def prefix(p):

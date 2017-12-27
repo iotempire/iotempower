@@ -12,8 +12,6 @@
 
 from ulnoiot import *
 
-
 button("button1", d4, "up", "down")
-
 
 run(10)

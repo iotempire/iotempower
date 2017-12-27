@@ -11,13 +11,13 @@ def _help_file_name(name):
 
 
 def help_list_print(list):
-    max_line=79
-    output=""
+    max_line = 79
+    output = ""
     for e in list:
         newlen = len(output) + len(e) + 2
-        if  newlen >= max_line:
+        if newlen >= max_line:
             print(output + ", ")
-            output=e
+            output = e
         else:
             if len(output) > 0:
                 output = output + ", " + e
@@ -26,15 +26,15 @@ def help_list_print(list):
     print(output)
 
 
-def dir_content(path, extensions=["py","txt","rst"], ignore_underscore=True):
-    outlist=[]
+def dir_content(path, extensions=["py", "txt", "rst"], ignore_underscore=True):
+    outlist = []
     for f in os.listdir(path):
         if ignore_underscore:
             if f.startswith("_"):
                 continue
         for ext in extensions:
             if f.endswith("." + ext):
-                outlist.append(f[0:-len(ext)-1])
+                outlist.append(f[0:-len(ext) - 1])
     outlist.sort()
     return outlist
 
@@ -42,10 +42,11 @@ def dir_content(path, extensions=["py","txt","rst"], ignore_underscore=True):
 def command_list():
     return dir_content(help_path)
 
+
 def _process_help(name):
-    p=os.getcwd()
+    p = os.getcwd()
     if p == "":
-        p="/"
+        p = "/"
     os.chdir(help_path)
     for l in open(_help_file_name(name)):
         if l.startswith("!!"):
@@ -60,10 +61,10 @@ class HELP:
         _process_help("_general")
         return ""
 
-    def __call__(self,*args):
-        if len(args)>0:
-            h=args[0]
-            if h is not None and isinstance(h,str):
+    def __call__(self, *args):
+        if len(args) > 0:
+            h = args[0]
+            if h is not None and isinstance(h, str):
                 try:
                     _process_help(h)
                 except:
@@ -74,17 +75,21 @@ class HELP:
             self.__repr__()
             print()
 
+
 help = HELP()
+
 
 class Man():
 
     def __repr__(self):
         _process_help("man")
         return ""
-    def __call__(self,*args):
+
+    def __call__(self, *args):
         if len(args) == 0:
             self.__repr__()
         else:
             help(*args)
+
 
 man = Man()

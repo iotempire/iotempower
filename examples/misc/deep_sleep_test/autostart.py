@@ -4,13 +4,12 @@ import machine
 import time
 from machine import Pin
 
-blue=Pin(2,Pin.OUT)
+blue = Pin(2, Pin.OUT)
 for i in range(3):
-	blue.low()
-	time.sleep(0.5)
-	blue.high()
-	time.sleep(0.5)
-
+    blue.low()
+    time.sleep(0.5)
+    blue.high()
+    time.sleep(0.5)
 
 # configure RTC.ALARM0 to be able to wake the device
 rtc = machine.RTC()

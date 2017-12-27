@@ -6,9 +6,9 @@
 
 class Device(object):
     def __init__(self, name, pin, value_map=None,
-                setters=None, getters=None,
-                ignore_case=True, on_change=None,
-                report_change=True):
+                 setters=None, getters=None,
+                 ignore_case=True, on_change=None,
+                 report_change=True):
         global _topic
         self.on_change = on_change
         self.report_change = report_change
@@ -21,13 +21,13 @@ class Device(object):
         else:
             self.setters = setters
         if getters is None:
-            self.getters = {"": self.mapped_value} # add default getter for main topic
+            self.getters = {"": self.mapped_value}  # add default getter for main topic
         else:
             self.getters = getters
         self.value_map = value_map
 
-    def set_on_change(self,on_change):
-        self.on_change=on_change
+    def set_on_change(self, on_change):
+        self.on_change = on_change
 
     def is_settable(self):
         return len(self.setters) > 0
@@ -61,18 +61,18 @@ class Device(object):
             getter = getter.lower()
         if getter in self.getters:
             return self.getters[getter]()
-        return None # else ignore
+        return None  # else ignore
 
     def value(self):
         return None
 
-    def mapped_value(self,v=None):
+    def mapped_value(self, v=None):
         if v is None:
-            v=self.value()
+            v = self.value()
         if v is None:
             return None
         else:
-            if isinstance( self.value_map,dict):
+            if isinstance(self.value_map, dict):
                 return self.value_map[v]
             else:
                 return None

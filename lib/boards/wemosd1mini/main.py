@@ -2,6 +2,7 @@
 #
 import gc
 from ulnoiot import *
+
 gc.collect()
 
 # Try to setup network/gw connection (i.e. mqtt)

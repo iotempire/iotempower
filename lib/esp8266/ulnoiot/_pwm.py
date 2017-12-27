@@ -8,6 +8,7 @@ import time
 from machine import PWM
 from ulnoiot.device import Device
 
+
 class UIOTPWM(Device):
     # Handle output devices
     def __init__(self, name, pin, freq=50, duty=0,
@@ -16,23 +17,23 @@ class UIOTPWM(Device):
         self._duty = 0
         self._freq = freq
         Device.__init__(self, name, PWM(pin, freq=freq, duty=duty),
-                        setters={"freq/set":self.set_freq,"duty/set":self.set_duty},
-                        getters={"freq":self.get_freq,"duty":self.get_duty},
+                        setters={"freq/set": self.set_freq, "duty/set": self.set_duty},
+                        getters={"freq": self.get_freq, "duty": self.get_duty},
                         ignore_case=ignore_case,
                         on_change=on_change, report_change=report_change)
 
-    def turn(self,msg):
-        if type(msg) in [str,int]:
-            self.angle_list=[int(msg)] # TODO: accept floats?
-        else: # should be a list
+    def turn(self, msg):
+        if type(msg) in [str, int]:
+            self.angle_list = [int(msg)]  # TODO: accept floats?
+        else:  # should be a list
             self.angle_list = msg[:]
         self._trigger_next_turn()
 
     def set_duty(self, d):
         try:
-            d=int(d)
+            d = int(d)
         except:
-            print("PWM: received invalid duty value:",d)
+            print("PWM: received invalid duty value:", d)
         else:
             self._duty = d
             self.pin.duty(d)
@@ -42,9 +43,9 @@ class UIOTPWM(Device):
 
     def set_freq(self, f):
         try:
-            f=int(f)
+            f = int(f)
         except:
-            print("PWM: received invalid frequency value:",f)
+            print("PWM: received invalid frequency value:", f)
         else:
             self._freq = f
             self.pin.freq(f)

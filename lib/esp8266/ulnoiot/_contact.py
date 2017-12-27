@@ -5,6 +5,7 @@
 from machine import Pin
 from ulnoiot.device import Device
 
+
 ####### simple Input, contact devices/push buttons
 class Contact(Device):
     # Handle contact or button like devices
@@ -19,10 +20,10 @@ class Contact(Device):
         Device.__init__(self, name, pin,
                         value_map={True: report_high,
                                    False: report_low},
-                        on_change = on_change,
+                        on_change=on_change,
                         report_change=report_change)
         if pullup:
-            pin.init(Pin.IN,Pin.PULL_UP)
+            pin.init(Pin.IN, Pin.PULL_UP)
         else:
             pin.init(Pin.IN)
             try:

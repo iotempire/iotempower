@@ -13,7 +13,7 @@ import select, threading
 from netrepl import Netrepl_Parser
 
 input_buffer = ""
-input_buffer_lock=threading.Lock()
+input_buffer_lock = threading.Lock()
 quit_flag = False
 
 # from: https://stackoverflow.com/questions/510357/python-read-a-single-character-from-the-user
@@ -21,7 +21,9 @@ quit_flag = False
 # TODO: use whole readchar to support windows?
 
 import tty, sys, termios  # raises ImportError if unsupported
-#def readchar():
+
+
+# def readchar():
 #    fd = sys.stdin.fileno()
 #    old_settings = termios.tcgetattr(fd)
 #    try:
@@ -35,16 +37,17 @@ def readchar():
     ch = sys.stdin.read(1)
     return ch
 
+
 def char_reader():
     # thread reading from stdin into inputbuffer
     global input_buffer, input_buffer_lock, quit_flag
     while not quit_flag:
         ch = readchar()
-        if ch=="\x1d":
-            quit_flag=True
-            ch=""
-        elif ch=="\r":
-            ch="\r\n"
+        if ch == "\x1d":
+            quit_flag = True
+            ch = ""
+        elif ch == "\r":
+            ch = "\r\n"
         input_buffer_lock.acquire()
         input_buffer += ch
         input_buffer_lock.release()
@@ -54,12 +57,12 @@ def getChar():
     answer = sys.stdin.read(1)
     return answer
 
+
 def main():
     global quit_flag, input_buffer_lock, input_buffer
 
     parser = Netrepl_Parser('Connect to netrepl and open an'
-                            'interactive terminal.',debug=_debug)
-
+                            'interactive terminal.', debug=_debug)
 
     con = parser.connect()
     if _debug is not None:
@@ -67,14 +70,14 @@ def main():
         print
         print("Try to type help to get an initial help screen.")
     # Do not request help-screen, gets too confusing later
-    #if _debug: print(_debug,'Requesting startscreen.')
-    #con.send(b"\r\nhelp\r\n")
+    # if _debug: print(_debug,'Requesting startscreen.')
+    # con.send(b"\r\nhelp\r\n")
 
     fd = sys.stdin.fileno()
     old_settings = termios.tcgetattr(fd)
     tty.setraw(fd)
 
-    input_thread=threading.Thread(target=char_reader)
+    input_thread = threading.Thread(target=char_reader)
     input_thread.start()
 
     while not quit_flag:
@@ -87,7 +90,7 @@ def main():
             # incoming message from remote server
             if sock == con.socket:
                 data = con.receive()
-                l=len(data)
+                l = len(data)
 
                 # TODO: figure out how to detect connection close
                 # #print("recvd:",data)
@@ -95,28 +98,28 @@ def main():
                 #     print('\nterminal: Connection closed.')
                 #     sys.exit()
                 # else:
-                if l>0:
+                if l > 0:
                     # print data
                     try:
                         sys.stdout.write(bytes(data[0:l]).decode())
                     except:
                         if _debug:
                             print("\r\n{} Got some weird data of len "
-                                  "{}: >>{}<<\r\n".format(_debug,len(data),data))
-                    #print("data:", str(data[0:l]))
+                                  "{}: >>{}<<\r\n".format(_debug, len(data), data))
+                    # print("data:", str(data[0:l]))
                     sys.stdout.flush()
 
-        if len(input_buffer)>0:
+        if len(input_buffer) > 0:
             # user entered a message
             input_buffer_lock.acquire()
-            send_buffer=input_buffer.encode()
-            input_buffer=""
+            send_buffer = input_buffer.encode()
+            input_buffer = ""
             input_buffer_lock.release()
-            #msg = sys.stdin.readline().strip()+'\r\n'
-            #print("\r\nmsg {} <<\r\n".format(send_buffer))
+            # msg = sys.stdin.readline().strip()+'\r\n'
+            # print("\r\nmsg {} <<\r\n".format(send_buffer))
             con.send(send_buffer)
-            #cs.send(send_buffer+b'\r\n')
-            #cs.send(send_buffer+b'!')
+            # cs.send(send_buffer+b'\r\n')
+            # cs.send(send_buffer+b'!')
 
     input_thread.join()  # finsih input_thread
     if _debug: print("\r\n{} Closing connection.\r".format(_debug))
@@ -129,4 +132,3 @@ def main():
 # main function
 if __name__ == "__main__":
     main()
-

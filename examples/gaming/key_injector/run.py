@@ -13,14 +13,23 @@ def inject_key(key, msg):
     else:
         kb.release_key(key)
 
+
 def up_cb(msg):
     inject_key(kb.up_key, msg)
+
+
 def left_cb(msg):
     inject_key(kb.left_key, msg)
+
+
 def down_cb(msg):
     inject_key(kb.down_key, msg)
+
+
 def right_cb(msg):
     inject_key(kb.right_key, msg)
+
+
 def fire_cb(msg):
     inject_key(kb.space, msg)
 

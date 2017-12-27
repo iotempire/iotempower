@@ -3,5 +3,4 @@
 
 from ulnoiot import *
 
-relay=out("relay",d1)
-
+relay = out("relay", d1)

@@ -8,6 +8,7 @@
 from integriot import device
 import paho.mqtt.client as mqtt
 
+
 class Devices():
     def __init__(self, mqtt_host):
         # TODO: add username/password/tsl
@@ -34,7 +35,7 @@ class Devices():
     def _add_device(self, d, full_topic):
         self.devices[full_topic] = d
 
-    def delete(self,topic):
+    def delete(self, topic):
         t = self._device_full_topic(topic)
         del self.devices[t]
 
@@ -87,5 +88,6 @@ class Devices():
                               set_topic, state_topic, init_state, qos)
         self._add_device(d, t)
         return d
+
     led = switch
     relay = switch

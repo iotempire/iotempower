@@ -80,7 +80,6 @@ class Netrepl:
         time.sleep(0.5)
         self.debug = debug
 
-
     def send(self, data):
         """
         Send all data given out (and block until all is sent).

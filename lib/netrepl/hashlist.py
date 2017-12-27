@@ -9,15 +9,15 @@ import machine
 
 
 def hashlist(root="/"):
-    speed=machine.freq()
-    machine.freq(160000000) # we want to be fast for this
-    p=os.getcwd()
+    speed = machine.freq()
+    machine.freq(160000000)  # we want to be fast for this
+    p = os.getcwd()
     if p == "":
         p = "/"
     os.chdir("/")
     _hashlist(root)
     os.chdir(p)
-    machine.freq(speed) # restore speed
+    machine.freq(speed)  # restore speed
 
 
 def _hashlist(root):
@@ -26,7 +26,7 @@ def _hashlist(root):
     try:
         st = os.stat(root)
     except:
-        #print("noaccess",root) - does not exist, so don't print
+        # print("noaccess",root) - does not exist, so don't print
         return
     if st[0] & 0x4000:  # stat.S_IFDIR
         print("<dir>", root)
@@ -44,4 +44,3 @@ def _hashlist(root):
             h.update(b)
         print(ubinascii.hexlify(h.digest()).decode(), root)
         hf.close()
-

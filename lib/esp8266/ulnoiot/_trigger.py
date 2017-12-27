@@ -6,9 +6,10 @@
 from machine import Pin
 from ulnoiot.device import Device
 
+
 ####### simple Input, contact devices/push buttons
 class Trigger(Device):
-    OVERFLOW=1000000
+    OVERFLOW = 1000000
 
     def value(self):
         return self.report_counter
@@ -18,14 +19,14 @@ class Trigger(Device):
                  rising=False, falling=False,
                  pullup=True, on_change=None, report_change=True):
         if pullup:
-            pin.init(Pin.IN,Pin.PULL_UP)
+            pin.init(Pin.IN, Pin.PULL_UP)
         else:
-            pin.init(Pin.IN,Pin.OPEN_DRAIN)
+            pin.init(Pin.IN, Pin.OPEN_DRAIN)
         if rising and falling:
-            trigger=Pin.IRQ_RISING|Pin.IRQ_FALLING
+            trigger = Pin.IRQ_RISING | Pin.IRQ_FALLING
         elif not rising and falling:
             trigger = Pin.IRQ_FALLING
-        else: # also if both all false
+        else:  # also if both all false
             trigger = Pin.IRQ_RISING
         pin.irq(trigger=trigger, handler=self.callback)
         self.counter = 0
@@ -35,7 +36,7 @@ class Trigger(Device):
                         report_change=report_change)
         self.getters[""] = self.value
 
-    def callback(self,p):
+    def callback(self, p):
         self.triggered = True
         self.counter += 1
         if self.counter >= Trigger.OVERFLOW:

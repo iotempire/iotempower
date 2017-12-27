@@ -32,32 +32,46 @@
 #
 # """
 
-try: # micropython
+try:  # micropython
     from micropython import const
-except: # normal python
-    def const(a): return a
+except:  # normal python
+    def const(a):
+        return a
 import errno
 import time
 
-#-----------------------------------------------------------------------
 
-def _add4(x,xi,s,si):
+# -----------------------------------------------------------------------
+
+def _add4(x, xi, s, si):
     # 4byte add x[xi] += s[si] little endian (lowest first)
-    c=0
+    c = 0
     n = x[xi] + s[si] + c
-    if n > 255: c=1;n&=255
-    else: c = 0
-    x[xi] = n; xi+=1; si+=1
+    if n > 255:
+        c = 1;n &= 255
+    else:
+        c = 0
+    x[xi] = n;
+    xi += 1;
+    si += 1
     n = x[xi] + s[si] + c
-    if n > 255: c=1;n&=255
-    else: c = 0
-    x[xi] = n; xi+=1; si+=1
+    if n > 255:
+        c = 1;n &= 255
+    else:
+        c = 0
+    x[xi] = n;
+    xi += 1;
+    si += 1
     n = x[xi] + s[si] + c
-    if n > 255: c=1;n&=255
-    else: c = 0
-    x[xi] = n; xi+=1; si+=1
+    if n > 255:
+        c = 1;n &= 255
+    else:
+        c = 0
+    x[xi] = n;
+    xi += 1;
+    si += 1
     n = x[xi] + s[si] + c
-    x[xi] = n&255
+    x[xi] = n & 255
 
 
 class ChaCha(object):
@@ -124,8 +138,8 @@ class ChaCha(object):
     #     rev June 2010
     # """
 
-#    ROUNDS = 8                         # ...10, 12, 20?
-    ROUNDS = const(12)                         # ...10, 12, 20? [ulno] playing it safer with 12
+    #    ROUNDS = 8                         # ...10, 12, 20?
+    ROUNDS = const(12)  # ...10, 12, 20? [ulno] playing it safer with 12
 
     def __init__(self, key, iv, rounds=ROUNDS):
         # """ Both key and iv are byte strings.  The key must be
@@ -144,7 +158,7 @@ class ChaCha(object):
         self._key_setup(key)
         self.iv_setup(iv)
         self.rounds = rounds
-        self.tmp = [0,0,0,0]
+        self.tmp = [0, 0, 0, 0]
 
     def _key_setup(self, key):
         # """ key is converted to a list of 4-byte unsigned integers
@@ -156,7 +170,7 @@ class ChaCha(object):
         if len(key) not in [16, 32]:
             raise Exception('key must be either 16 or 32 bytes')
         self.key_state = bytearray(64)
-        key_state=self.key_state # ref
+        key_state = self.key_state  # ref
 
         if len(key) == 16:
             key_state[0:16] = b"expand 16-byte k"
@@ -168,7 +182,6 @@ class ChaCha(object):
 
         # 12*4 and 13*4 are reserved for the counter
         # 14*4 and 15*4 are reserved for the IV
-
 
     def iv_setup(self, iv):
         # """ self.state and other working structures are lists of
@@ -189,10 +202,10 @@ class ChaCha(object):
             raise Exception('iv must be 8 bytes')
         self.state = bytearray(self.key_state)
         self.scramble_buf = bytearray(self.key_state)
-        self.scramble_pos = 64 # all used up to trigger new generation
-        iv_state = self.state # quick ref
-        #iv_state[12] = 0 already 0
-        #iv_state[13] = 0 already 0
+        self.scramble_pos = 64  # all used up to trigger new generation
+        iv_state = self.state  # quick ref
+        # iv_state[12] = 0 already 0
+        # iv_state[13] = 0 already 0
         iv_state[56:64] = iv[0:8]
 
     def encrypt(self, data, length=None):
@@ -214,22 +227,24 @@ class ChaCha(object):
         # As we use xor, en-/decryption can be done in place
         #
         # """
-        if length is None: data_size=len(data)
-        else: data_size=length
-        self._scramble_xor(data, data_size) # XOR the stream
+        if length is None:
+            data_size = len(data)
+        else:
+            data_size = length
+        self._scramble_xor(data, data_size)  # XOR the stream
 
-    decrypt = encrypt # same -> we are using xor against the evolving scramble-buffer
+    decrypt = encrypt  # same -> we are using xor against the evolving scramble-buffer
 
-    def _chacha_scramble(self):     # 64 bytes in
+    def _chacha_scramble(self):  # 64 bytes in
         # """ self.state and other working structures are lists of
         #     4-byte unsigned integers (32 bits).
         #
         #     output must be converted to bytestring before return.
         # """
 
-        s=self.state
-        x=self.scramble_buf
-        x[:]=s[:]
+        s = self.state
+        x = self.scramble_buf
+        x[:] = s[:]
 
         for i in range(0, self.rounds, 2):
             # two rounds per iteration
@@ -237,32 +252,32 @@ class ChaCha(object):
             # self._quarterround(x, 1, 5, 9,13)
             # self._quarterround(x, 2, 6,10,14)
             # self._quarterround(x, 3, 7,11,15)
-            self._quarterround(x, 0,16,32,48)
-            self._quarterround(x, 4,20,36,52)
-            self._quarterround(x, 8,24,40,56)
-            self._quarterround(x,12,28,44,60)
+            self._quarterround(x, 0, 16, 32, 48)
+            self._quarterround(x, 4, 20, 36, 52)
+            self._quarterround(x, 8, 24, 40, 56)
+            self._quarterround(x, 12, 28, 44, 60)
 
             # self._quarterround(x, 0, 5,10,15)
             # self._quarterround(x, 1, 6,11,12)
             # self._quarterround(x, 2, 7, 8,13)
             # self._quarterround(x, 3, 4, 9,14)
-            self._quarterround(x, 0,20,40,60)
-            self._quarterround(x, 4,24,44,48)
-            self._quarterround(x, 8,28,32,52)
-            self._quarterround(x,12,16,36,56)
+            self._quarterround(x, 0, 20, 40, 60)
+            self._quarterround(x, 4, 24, 44, 48)
+            self._quarterround(x, 8, 28, 32, 52)
+            self._quarterround(x, 12, 16, 36, 56)
 
-        for i in range(0,64,4):
+        for i in range(0, 64, 4):
             # add 4 byte wise x[i] = (x[i] + s[i]) & 0xffffffff
-            _add4(x,i,s,i)
+            _add4(x, i, s, i)
 
-        self.scramble_pos = 0 # reset pos
+        self.scramble_pos = 0  # reset pos
 
         # increment the iv.  In this case we increment words
         # 12*4 and 13*4 in little endian order.  This will work
         # nicely for data up to 2^70 bytes (1,099,511,627,776GB)
         # in length.  After that it is the user's responsibility
         # to generate a new nonce/iv.
-        c = 1 # feed 1 to add in initial carry
+        c = 1  # feed 1 to add in initial carry
         for j in range(48, 56):
             n = s[j] + c
             if n > 255:
@@ -274,47 +289,47 @@ class ChaCha(object):
             # not to exceed 2^70 x 2^64 = 2^134 data size ??? <<<<
 
         # return None  # result in scramble_buf
-    
+
     def _quarterround(self, x, a, b, c, d):
         # def _rotate(self, v, n):        # aka ROTL32
         #     return ((v << n) & 0xFFFFFFFF) | (v >> (32 - n))
 
-        t=self.tmp
+        t = self.tmp
         # x[a] = (x[a] + x[b]) & 0xFFFFFFFF
-        _add4(x,a,x,b)
+        _add4(x, a, x, b)
         #     x[d] = self._rotate((x[d]^x[a]), 16)
         t[0] = x[d + 2] ^ x[a + 2]
         t[1] = x[d + 3] ^ x[a + 3]
-        t[2] = x[d    ] ^ x[a    ]
+        t[2] = x[d] ^ x[a]
         t[3] = x[d + 1] ^ x[a + 1]
-        x[d]=t[0]
-        x[d+1]=t[1]
-        x[d+2]=t[2]
-        x[d+3]=t[3]
+        x[d] = t[0]
+        x[d + 1] = t[1]
+        x[d + 2] = t[2]
+        x[d + 3] = t[3]
 
         # x[c] = (x[c] + x[d]) & 0xFFFFFFFF
-        _add4(x,c,x,d)
+        _add4(x, c, x, d)
         # x[b] = self._rotate((x[b]^x[c]), 12)
         t[0] = (x[b + 1] ^ x[c + 1]) << 4
         t[1] = (x[b + 2] ^ x[c + 2]) << 4
         t[2] = (x[b + 3] ^ x[c + 3]) << 4
-        t[3] = (x[b    ] ^ x[c    ]) << 4
-        x[b]   = t[0] >> 8 + t[0] & 255
-        x[b+1] = t[1] >> 8 + t[1] & 255
-        x[b+2] = t[2] >> 8 + t[2] & 255
-        x[b+3] = t[3] >> 8 + t[3] & 255
+        t[3] = (x[b] ^ x[c]) << 4
+        x[b] = t[0] >> 8 + t[0] & 255
+        x[b + 1] = t[1] >> 8 + t[1] & 255
+        x[b + 2] = t[2] >> 8 + t[2] & 255
+        x[b + 3] = t[3] >> 8 + t[3] & 255
 
         # x[a] = (x[a] + x[b]) & 0xFFFFFFFF
-        _add4(x,a,x,b)
+        _add4(x, a, x, b)
         # x[d] = self._rotate((x[d]^x[a]), 8)
         t[0] = x[d + 3] ^ x[a + 3]
         t[1] = x[d + 2] ^ x[a + 2]
         t[2] = x[d + 1] ^ x[a + 1]
-        t[3] = x[d    ] ^ x[a    ]
-        x[d]=t[0]
-        x[d+1]=t[1]
-        x[d+2]=t[2]
-        x[d+3]=t[3]
+        t[3] = x[d] ^ x[a]
+        x[d] = t[0]
+        x[d + 1] = t[1]
+        x[d + 2] = t[2]
+        x[d + 3] = t[3]
 
         # x[c] = (x[c] + x[d]) & 0xFFFFFFFF
         _add4(x, c, x, d)
@@ -322,12 +337,11 @@ class ChaCha(object):
         t[0] = (x[b + 1] ^ x[c + 1]) << 7
         t[1] = (x[b + 2] ^ x[c + 2]) << 7
         t[2] = (x[b + 3] ^ x[c + 3]) << 7
-        t[3] = (x[b    ] ^ x[c    ]) << 7
-        x[b]   = t[0] >> 15 + t[0] & 255
-        x[b+1] = t[1] >> 15 + t[1] & 255
-        x[b+2] = t[2] >> 15 + t[2] & 255
-        x[b+3] = t[3] >> 15 + t[3] & 255
-
+        t[3] = (x[b] ^ x[c]) << 7
+        x[b] = t[0] >> 15 + t[0] & 255
+        x[b + 1] = t[1] >> 15 + t[1] & 255
+        x[b + 2] = t[2] >> 15 + t[2] & 255
+        x[b + 3] = t[3] >> 15 + t[3] & 255
 
     # # surprisingly, the following tweaks/accelerations provide
     # # about a 20-40% gain
@@ -358,9 +372,9 @@ class ChaCha(object):
     #     x[d] = xd
 
     def _scramble_xor(self, data, length):
-        stream=self.scramble_buf
+        stream = self.scramble_buf
         for i in range(length):
-            if self.scramble_pos>=64: # used up
-                self._chacha_scramble() # get some new bytes
+            if self.scramble_pos >= 64:  # used up
+                self._chacha_scramble()  # get some new bytes
             data[i] ^= stream[self.scramble_pos]
-            self.scramble_pos+=1 # use up encryption buffer
+            self.scramble_pos += 1  # use up encryption buffer

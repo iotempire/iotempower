@@ -32,14 +32,17 @@
 #
 # """
 
-try: # micropython
+try:  # micropython
     from micropython import const
     import ustruct as struct
     import uos as os
     import urandom as random
     from ua32 import A32
-except: # normal python
-    def const(a): return a
+except:  # normal python
+    def const(a):
+        return a
+
+
     import struct
     import os
     import random
@@ -47,7 +50,8 @@ except: # normal python
 import errno
 import time
 
-#-----------------------------------------------------------------------
+
+# -----------------------------------------------------------------------
 
 class ChaCha(object):
     # """
@@ -113,8 +117,8 @@ class ChaCha(object):
     #     rev June 2010
     # """
 
-#    ROUNDS = 8                         # ...10, 12, 20?
-    ROUNDS = const(12)                         # ...10, 12, 20? [ulno] playing it safer with 12
+    #    ROUNDS = 8                         # ...10, 12, 20?
+    ROUNDS = const(12)  # ...10, 12, 20? [ulno] playing it safer with 12
 
     def __init__(self, key, iv, rounds=ROUNDS):
         # """ Both key and iv are byte strings.  The key must be
@@ -143,22 +147,22 @@ class ChaCha(object):
         # """
         if len(key) not in [16, 32]:
             raise Exception('key must be either 16 or 32 bytes')
-        k=A32(key)
+        k = A32(key)
         self.key_state = A32(64)
-        key_state=self.key_state # ref
+        key_state = self.key_state  # ref
 
         if len(key) == 16:
             tau = A32(b"expand 16-byte k")
-            key_state[0]  = tau[0]
-            key_state[1]  = tau[1]
-            key_state[2]  = tau[2]
-            key_state[3]  = tau[3]
-            key_state[4]  = k[0]
-            key_state[5]  = k[1]
-            key_state[6]  = k[2]
-            key_state[7]  = k[3]
-            key_state[8]  = k[0]
-            key_state[9]  = k[1]
+            key_state[0] = tau[0]
+            key_state[1] = tau[1]
+            key_state[2] = tau[2]
+            key_state[3] = tau[3]
+            key_state[4] = k[0]
+            key_state[5] = k[1]
+            key_state[6] = k[2]
+            key_state[7] = k[3]
+            key_state[8] = k[0]
+            key_state[9] = k[1]
             key_state[10] = k[2]
             key_state[11] = k[3]
             # 12 and 13 are reserved for the counter
@@ -166,21 +170,20 @@ class ChaCha(object):
 
         elif len(key) == 32:
             sigma = A32(b"expand 32-byte k")
-            key_state[0]  = sigma[0]
-            key_state[1]  = sigma[1]
-            key_state[2]  = sigma[2]
-            key_state[3]  = sigma[3]
-            key_state[4]  = k[0]
-            key_state[5]  = k[1]
-            key_state[6]  = k[2]
-            key_state[7]  = k[3]
-            key_state[8]  = k[4]
-            key_state[9]  = k[5]
+            key_state[0] = sigma[0]
+            key_state[1] = sigma[1]
+            key_state[2] = sigma[2]
+            key_state[3] = sigma[3]
+            key_state[4] = k[0]
+            key_state[5] = k[1]
+            key_state[6] = k[2]
+            key_state[7] = k[3]
+            key_state[8] = k[4]
+            key_state[9] = k[5]
             key_state[10] = k[6]
             key_state[11] = k[7]
             # 12 and 13 are reserved for the counter
             # 14 and 15 are reserved for the IV
-
 
     def iv_setup(self, iv):
         # """ self.state and other working structures are lists of
@@ -202,8 +205,8 @@ class ChaCha(object):
         v = A32(iv)
         self.state = self.key_state.copy()
         self.scramble_buf = self.key_state.copy()
-        self.scramble_pos = 64 # all used up to trigger new generation
-        iv_state = self.state # quick ref
+        self.scramble_pos = 64  # all used up to trigger new generation
+        iv_state = self.state  # quick ref
         iv_state[12] = 0
         iv_state[13] = 0
         iv_state[14] = v[0]
@@ -228,13 +231,15 @@ class ChaCha(object):
         # As we use xor, en-/decryption can be done in place
         #
         # """
-        if length is None: data_size=len(data)
-        else: data_size=length
-        self._scramble_xor(data, data_size) # XOR the stream
+        if length is None:
+            data_size = len(data)
+        else:
+            data_size = length
+        self._scramble_xor(data, data_size)  # XOR the stream
 
-    decrypt = encrypt # same -> we are using xor against the evolving scramble-buffer
+    decrypt = encrypt  # same -> we are using xor against the evolving scramble-buffer
 
-    def _chacha_scramble(self):     # 64 bytes in
+    def _chacha_scramble(self):  # 64 bytes in
         # """ self.state and other working structures are lists of
         #     4-byte unsigned integers (32 bits).
         #
@@ -242,25 +247,25 @@ class ChaCha(object):
         # """
 
         # make a copy of state
-        s=self.state
-        x=self.scramble_buf
+        s = self.state
+        x = self.scramble_buf
         for i in range(16): x[i] = s[i]
 
         for i in range(0, self.rounds, 2):
             # two rounds per iteration
-            self._quarterround(x, 0, 4, 8,12)
-            self._quarterround(x, 1, 5, 9,13)
-            self._quarterround(x, 2, 6,10,14)
-            self._quarterround(x, 3, 7,11,15)
-            
-            self._quarterround(x, 0, 5,10,15)
-            self._quarterround(x, 1, 6,11,12)
-            self._quarterround(x, 2, 7, 8,13)
-            self._quarterround(x, 3, 4, 9,14)
-            
+            self._quarterround(x, 0, 4, 8, 12)
+            self._quarterround(x, 1, 5, 9, 13)
+            self._quarterround(x, 2, 6, 10, 14)
+            self._quarterround(x, 3, 7, 11, 15)
+
+            self._quarterround(x, 0, 5, 10, 15)
+            self._quarterround(x, 1, 6, 11, 12)
+            self._quarterround(x, 2, 7, 8, 13)
+            self._quarterround(x, 3, 4, 9, 14)
+
         for i in range(16):
             x[i] = (x[i] + s[i]) & 0xffffffff
-        self.scramble_pos = 0 # reset pos
+        self.scramble_pos = 0  # reset pos
 
         # increment the iv.  In this case we increment words
         # 12 and 13 in little endian order.  This will work
@@ -274,7 +279,7 @@ class ChaCha(object):
             # not to exceed 2^70 x 2^64 = 2^134 data size ??? <<<<
 
         # return None  # result in scramble_buf
-    
+
     # '''
     # # as per definition - deprecated
     # def _quarterround(self, x, a, b, c, d):
@@ -295,35 +300,35 @@ class ChaCha(object):
     # surprisingly, the following tweaks/accelerations provide
     # about a 20-40% gain
     def _quarterround(self, x, a, b, c, d):
-        #x=A32(xi) is already
+        # x=A32(xi) is already
         xa = x[a]
         xb = x[b]
         xc = x[c]
         xd = x[d]
-        
-        xa  = (xa + xb)  & 0xFFFFFFFF
-        tmp =  xd ^ xa
-        xd  = ((tmp << 16) & 0xFFFFFFFF) | (tmp >> 16)  # 16=32-16
-        xc  = (xc + xd)  & 0xFFFFFFFF
-        tmp =  xb ^ xc
-        xb  = ((tmp << 12) & 0xFFFFFFFF) | (tmp >> 20)  # 20=32-12
-        
-        xa  = (xa + xb)  & 0xFFFFFFFF
-        tmp =  xd ^ xa
-        xd  = ((tmp <<  8) & 0xFFFFFFFF) | (tmp >> 24)  # 24=32-8
-        xc  = (xc + xd)  & 0xFFFFFFFF
-        tmp =  xb ^ xc
-        xb  = ((tmp <<  7) & 0xFFFFFFFF) | (tmp >> 25)  # 25=32-7
-        
+
+        xa = (xa + xb) & 0xFFFFFFFF
+        tmp = xd ^ xa
+        xd = ((tmp << 16) & 0xFFFFFFFF) | (tmp >> 16)  # 16=32-16
+        xc = (xc + xd) & 0xFFFFFFFF
+        tmp = xb ^ xc
+        xb = ((tmp << 12) & 0xFFFFFFFF) | (tmp >> 20)  # 20=32-12
+
+        xa = (xa + xb) & 0xFFFFFFFF
+        tmp = xd ^ xa
+        xd = ((tmp << 8) & 0xFFFFFFFF) | (tmp >> 24)  # 24=32-8
+        xc = (xc + xd) & 0xFFFFFFFF
+        tmp = xb ^ xc
+        xb = ((tmp << 7) & 0xFFFFFFFF) | (tmp >> 25)  # 25=32-7
+
         x[a] = xa
         x[b] = xb
         x[c] = xc
         x[d] = xd
 
     def _scramble_xor(self, data, length):
-        stream=self.scramble_buf.raw()
+        stream = self.scramble_buf.raw()
         for i in range(length):
-            if self.scramble_pos>=64: # used up
-                self._chacha_scramble() # get some new bytes
+            if self.scramble_pos >= 64:  # used up
+                self._chacha_scramble()  # get some new bytes
             data[i] ^= stream[self.scramble_pos]
-            self.scramble_pos+=1 # use up encryption buffer
+            self.scramble_pos += 1  # use up encryption buffer

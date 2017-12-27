@@ -91,7 +91,7 @@ class Animation():
                 self.step = 0
                 self.length = 0
                 break  # even if this loses a bit of time,
-                       # we want to prevent endless loops
+                # we want to prevent endless loops
 
         if self.length > 0:  # play animation
             delta = time.ticks_diff(current_time, self.starttime)

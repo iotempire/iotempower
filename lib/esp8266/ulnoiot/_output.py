@@ -7,6 +7,7 @@ import time
 from machine import Pin
 from ulnoiot.device import Device
 
+
 ####### simple LEDs, other Output (switches)
 class Output(Device):
     # Handle output devices
@@ -19,16 +20,16 @@ class Output(Device):
         if ignore_case:
             high_command = high_command.lower()
             low_command = low_command.lower()
-        self.high_command=high_command
-        self.low_command=low_command
+        self.high_command = high_command
+        self.low_command = low_command
         Device.__init__(self, name, pin,
-                        setters={"set":self.evaluate}, ignore_case=ignore_case,
-                        on_change = on_change,report_change=report_change,
-                        value_map={1:self.high_command,0:self.low_command})
+                        setters={"set": self.evaluate}, ignore_case=ignore_case,
+                        on_change=on_change, report_change=report_change,
+                        value_map={1: self.high_command, 0: self.low_command})
         pin.init(Pin.OUT)
 
-    def evaluate(self,msg):
-        if msg==self.high_command:
+    def evaluate(self, msg):
+        if msg == self.high_command:
             self.on()
         elif msg == self.low_command:
             self.off()

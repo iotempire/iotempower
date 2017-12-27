@@ -3,6 +3,4 @@
 
 from ulnoiot import *
 
-blue=out("blue",onboardled,"off","on")
-
-
+blue = out("blue", onboardled, "off", "on")

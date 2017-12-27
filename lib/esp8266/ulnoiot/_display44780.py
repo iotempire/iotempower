@@ -13,6 +13,7 @@ from machine import I2C
 from esp8266_i2c_lcd import I2cLcd
 from ulnoiot.device import Device
 
+
 class Display44780(Device):
 
     # Handle display
@@ -44,24 +45,27 @@ class Display44780(Device):
             print("lcd not found")
         else:
             self.present = True
-            Device.__init__(self, name, i2c, setters={"set":self.evaluate},
+            Device.__init__(self, name, i2c, setters={"set": self.evaluate},
                             report_change=False)
             self.getters[""] = self.value
 
     def hide_cursor(self):
         self.dp.hide_cursor()
+
     def show_cursor(self):
         self.dp.show_cursor()
+
     def on(self):
         self.dp.backlight_on()
+
     def off(self):
         self.dp.backlight_off()
 
-    def text(self,t,x,y,show=True):
-        self.set_cursor(x,y)
+    def text(self, t, x, y, show=True):
+        self.set_cursor(x, y)
         tx = x
         for c in t:
-            self.back_buffer[y*self.char_width+tx] = ord(c)
+            self.back_buffer[y * self.char_width + tx] = ord(c)
             tx += 1
         if show: self.show()
 
@@ -70,31 +74,31 @@ class Display44780(Device):
         self.y = y
 
     # clear display immediately
-    def clear(self,show=True):
+    def clear(self, show=True):
         for line in range(self.char_height):
             for column in range(self.char_width):
-                self.back_buffer[line*self.char_width+column] = 32
-        self.set_cursor(0,0)
+                self.back_buffer[line * self.char_width + column] = 32
+        self.set_cursor(0, 0)
         if show: self.show()
 
     def show(self):
         for line in range(self.char_height):
             for column in range(self.char_width):
-                if self.display_buffer[line*self.char_width+column] \
-                        != self.back_buffer[line*self.char_width+column]:
+                if self.display_buffer[line * self.char_width + column] \
+                        != self.back_buffer[line * self.char_width + column]:
                     self.dp.move_to(column, line)
-                    self.dp.putchar(chr(self.back_buffer[line*self.char_width+column]))
+                    self.dp.putchar(chr(self.back_buffer[line * self.char_width + column]))
                     self.display_buffer[line * self.char_width + column] \
                         = self.back_buffer[line * self.char_width + column]
         self.dp.move_to(self.x, self.y)
 
     # scroll one line (add empty line at bottom)
     def scroll(self, show=True):
-        for line in range(self.char_height -1):
-            self.back_buffer[line*self.char_width:(line+1)*self.char_width] = \
-                self.back_buffer[(line+1)*self.char_width:(line+2)*self.char_width]
+        for line in range(self.char_height - 1):
+            self.back_buffer[line * self.char_width:(line + 1) * self.char_width] = \
+                self.back_buffer[(line + 1) * self.char_width:(line + 2) * self.char_width]
         for x in range(self.char_width):
-            self.back_buffer[(self.char_height-1)*self.char_width] = 32
+            self.back_buffer[(self.char_height - 1) * self.char_width] = 32
         if show: self.show()
 
     # move cursor down and scroll the text area by one line if at screen end
@@ -115,7 +119,7 @@ class Display44780(Device):
         self.x = 0
         # clear line
         for x in range(self.char_width):
-            self.back_buffer[self.y*self.char_width+x] = 32
+            self.back_buffer[self.y * self.char_width + x] = 32
         if show: self.show()
 
     # print some text in the text area and linebreak and wrap if necessary

@@ -1,2 +1,2 @@
-name="ehdemo-iotempire"
-password="internetofthings"
+name = "ehdemo-iotempire"
+password = "internetofthings"

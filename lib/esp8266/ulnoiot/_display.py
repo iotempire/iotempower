@@ -8,6 +8,7 @@ from machine import I2C
 import ssd1306
 from ulnoiot.device import Device
 
+
 class Display(Device):
 
     # Handle display
@@ -29,28 +30,32 @@ class Display(Device):
         try:
             self.dp = ssd1306.SSD1306_I2C(width, height, i2c, addr=addr)
             self.clear(show=False)
-            self.println("  iot.ulno.net\n",show=True)
+            self.println("  iot.ulno.net\n", show=True)
 
         except OSError:
             print("lcd not found")
         else:
             self.present = True
-            Device.__init__(self, name, i2c, setters={"set":self.evaluate},
+            Device.__init__(self, name, i2c, setters={"set": self.evaluate},
                             report_change=False)
-            self.getters[""]=self.value
+            self.getters[""] = self.value
 
-    def fill(self,c):
+    def fill(self, c):
         self.dp.fill(c)
-    def text(self,t,x,y):
-        self.dp.text(t,x,y)
+
+    def text(self, t, x, y):
+        self.dp.text(t, x, y)
+
     def show(self):
         self.dp.show()
-    def scroll(self,y0,y1):
-        self.dp.scroll(y0,y1)
-    def pixel(self,x,y,fill):
-        self.dp.pixel(x,y,fill)
 
-    def set_cursor(self,x, y):
+    def scroll(self, y0, y1):
+        self.dp.scroll(y0, y1)
+
+    def pixel(self, x, y, fill):
+        self.dp.pixel(x, y, fill)
+
+    def set_cursor(self, x, y):
         if x < 0: x = 0
         if y < 0: y = 0
         if x >= self.char_width: x = self.char_width - 1
@@ -62,14 +67,14 @@ class Display(Device):
         return (self._x, self._y)
 
     # clear display immediately
-    def clear(self,show=True):
+    def clear(self, show=True):
         self.set_cursor(0, 0)
         self.dp.fill(0)
         if show:
             self.dp.show()
 
     # move cursor down and scroll the text area by one line if at screen end
-    def line_feed(self,show=True):
+    def line_feed(self, show=True):
         if self._y < self.char_height - 1:
             self._y += 1
         else:
@@ -81,7 +86,7 @@ class Display(Device):
         self._x = 0
 
     # move just to start of line and clear the whole line
-    def clear_line(self,show=True):
+    def clear_line(self, show=True):
         self._x = 0
         # clear line
         for y in range(self._y * 8, (self._y + 1) * 8):
@@ -91,8 +96,8 @@ class Display(Device):
             self.dp.show()
 
     # print some text in the text area and linebreak and wrap if necessary
-    def print(self,text="", newline=False, show=True):
-        text=str(text)
+    def print(self, text="", newline=False, show=True):
+        text = str(text)
         linefeed_last = text.endswith("\n")
         if linefeed_last:
             text = text[:-1]
@@ -115,7 +120,7 @@ class Display(Device):
         if show:
             self.dp.show()
 
-    def println(self,text="", show=True):
+    def println(self, text="", show=True):
         self.print(text, newline=True, show=show)
 
     def evaluate(self, msg):
@@ -146,9 +151,9 @@ class Display(Device):
             if len(msg) > inlen:
                 self.evaluate(msg[inlen:])
         elif msg.startswith("&&plot"):
-            msg=msg[6:].strip().split()
-            for i in range(0,len(msg),2):
-                self.pixel(int(msg[i]),int(msg[i+1]),1)
+            msg = msg[6:].strip().split()
+            for i in range(0, len(msg), 2):
+                self.pixel(int(msg[i]), int(msg[i + 1]), 1)
             self.show()
         else:
             self.print(msg)

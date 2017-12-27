@@ -8,9 +8,10 @@ import datetime
 ##### Flags #####
 TEMP_RISE = True
 
-BROKER ="192.168.12.1"
-TOPIC ='internetofthings/sim/'
-SUBTOPIC ='temperature'
+BROKER = "192.168.12.1"
+TOPIC = 'internetofthings/sim/'
+SUBTOPIC = 'temperature'
+
 
 def show_values():
     input_temp = w2.get()
@@ -26,18 +27,22 @@ def show_values():
         thread1.start()
         time.sleep(4)
 
+
 def publish(client, topic, temperatur):
     client.publish(topic, temperatur)
     print("published data in " + TOPIC + SUBTOPIC + " " + str(temperatur) + "°")
 
+
 def on_message(client, userdata, msg):
-    print(msg.topic+" "+str(msg.payload))
+    print(msg.topic + " " + str(msg.payload))
+
 
 def on_closing():
-        master.destroy()
+    master.destroy()
+
 
 client = mqtt.Client()
-client.on_message=on_message
+client.on_message = on_message
 client.connect(BROKER, 1883, 60)
 
 master = Tk()

@@ -9,8 +9,6 @@
 
 from ulnoiot import *
 
-
 led("led1", onboardled, "off", "on")
-
 
 run(10)

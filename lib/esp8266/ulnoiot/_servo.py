@@ -8,6 +8,7 @@ import time
 from machine import PWM
 from ulnoiot.device import Device
 
+
 class Servo(Device):
     # Handle output devices
     def __init__(self, name, pin,
@@ -20,27 +21,27 @@ class Servo(Device):
         self.us = 0
         self.freq = freq
         self.angle = angle
-        self.angle_list=None
-        self.turn_time_ms=turn_time_ms
-        self.turn_start=None
+        self.angle_list = None
+        self.turn_time_ms = turn_time_ms
+        self.turn_start = None
         Device.__init__(self, name, PWM(pin, freq=self.freq, duty=0),
-                        setters={"set":self.turn}, ignore_case=ignore_case,
-                        on_change = on_change,report_change=report_change)
+                        setters={"set": self.turn}, ignore_case=ignore_case,
+                        on_change=on_change, report_change=report_change)
         self._init()
 
     def _init(self):
         self.pin.init()
 
     def _trigger_next_turn(self):
-        self.turn_start=time.ticks_ms()
-        if len(self.angle_list)>0:
+        self.turn_start = time.ticks_ms()
+        if len(self.angle_list) > 0:
             self.write_angle(self.angle_list[0])
             del self.angle_list[0]
 
-    def turn(self,msg):
-        if type(msg) in [str,int]:
-            self.angle_list=[int(msg)] # TODO: accept floats?
-        else: # should be a list
+    def turn(self, msg):
+        if type(msg) in [str, int]:
+            self.angle_list = [int(msg)]  # TODO: accept floats?
+        else:  # should be a list
             self.angle_list = msg[:]
         self._trigger_next_turn()
 
@@ -59,8 +60,8 @@ class Servo(Device):
         self.write_us(us)
 
     def _update(self):
-        if self.turn_start is not None: # turn in process
-            current=time.ticks_ms()
+        if self.turn_start is not None:  # turn in process
+            current = time.ticks_ms()
             if time.ticks_diff(current, self.turn_start) >= self.turn_time_ms:
                 if len(self.angle_list) > 0:
                     self._trigger_next_turn()

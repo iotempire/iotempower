@@ -10,24 +10,25 @@ import time
 from netrepl import Netrepl_Parser
 import sys, select
 
-_debug="netrepl command:"
+_debug = "netrepl command:"
+
 
 def main():
     parser = Netrepl_Parser('Connect to netrepl and run'
                             'a command.',
                             debug=_debug)
-    parser.parser.add_argument('-t','--timeout',
-                               type=int, required=False, default = 60,
+    parser.parser.add_argument('-t', '--timeout',
+                               type=int, required=False, default=60,
                                help='Seconds to wait for command '
                                     'to finish (default 60)')
-    parser.parser.add_argument('-c','--command',
+    parser.parser.add_argument('-c', '--command',
                                type=str, nargs="+", required=True,
                                help='A command to execute remotely.')
 
     con = parser.connect()
-    data=con.repl_command(" ".join(parser.args.command),
-                          timeoutms=parser.args.timeout*1000,
-                          interrupt=True)
+    data = con.repl_command(" ".join(parser.args.command),
+                            timeoutms=parser.args.timeout * 1000,
+                            interrupt=True)
     if data is None:
         if _debug: print(_debug, 'Timeout occurred, data discarded.')
     else:
@@ -39,7 +40,7 @@ def main():
     if data is None:
         sys.exit(1)  # not successful
     else:
-        if _debug: print(_debug,"Output follows starting from next line.")
+        if _debug: print(_debug, "Output follows starting from next line.")
         try:
             sys.stdout.write(data.decode())
         except:

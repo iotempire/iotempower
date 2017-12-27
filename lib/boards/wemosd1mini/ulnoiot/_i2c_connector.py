@@ -9,9 +9,9 @@ import time
 from machine import I2C
 from ulnoiot.device import Device
 
-class I2cConnector(Device):
 
-    BUFFER_SIZE = 36 # counter (2) + size (1) + suspend request (1) + data (32)
+class I2cConnector(Device):
+    BUFFER_SIZE = 36  # counter (2) + size (1) + suspend request (1) + data (32)
 
     def __init__(self, name, sda=None, scl=None,
                  addr=8, ignore_case=False, report_change=True):
@@ -36,9 +36,9 @@ class I2cConnector(Device):
         else:
             if addr in l:
                 self.present = True
-                Device.__init__(self, name, i2c, setters={"set":self.evaluate},
-                                ignore_case=ignore_case,report_change=report_change)
-                self.getters[""]=self.value
+                Device.__init__(self, name, i2c, setters={"set": self.evaluate},
+                                ignore_case=ignore_case, report_change=report_change)
+                self.getters[""] = self.value
             else:
                 print(not_found)
 
@@ -48,44 +48,43 @@ class I2cConnector(Device):
 
     def _update(self):
         t = time.ticks_ms()
-        #if self.suspend_start is not None \
+        # if self.suspend_start is not None \
         #        and time.ticks_diff(t,self.suspend_start) <= self.suspend_time:
         #    print("Bus access suspended.")
         if self.suspend_start is None \
-            or time.ticks_diff(t,self.suspend_start) > self.suspend_time:
+                or time.ticks_diff(t, self.suspend_start) > self.suspend_time:
             self.suspend_start = None  # done waiting
             try:
                 if self.msgq is not None:
                     self.pin.writeto(self.addr, self.msgq)
                     self.msgq = None
-                s = self.pin.readfrom(self.addr,self.BUFFER_SIZE)
+                s = self.pin.readfrom(self.addr, self.BUFFER_SIZE)
             except:
                 print("Trouble accessing i2c.")
             else:
-                if s[0]==255 and s[1]==255: # illegal read
+                if s[0] == 255 and s[1] == 255:  # illegal read
                     print("Got garbage, waiting 1s before accessing bus again.")
                     print("data:", s)
-                    self.suspend_time=1000 # take a break
+                    self.suspend_time = 1000  # take a break
                     self.suspend_start = time.ticks_ms();
                 else:
-                    count = s[0]*256+s[1]
+                    count = s[0] * 256 + s[1]
                     if self.count != count:
                         l = s[2];
                         self.suspend_time = s[3];
                         # scale timer
                         if self.suspend_time & 128:
                             self.suspend_time = (self.suspend_time & 127) * 100
-                            if self.suspend_time>5000: # should not happen
+                            if self.suspend_time > 5000:  # should not happen
                                 print("Garbage time -> waiting 1s before accessing bus again.")
-                                print("data:",s)
-                                self.suspend_time=1000
+                                print("data:", s)
+                                self.suspend_time = 1000
                         if self.suspend_time > 0:
                             self.suspend_start = time.ticks_ms();
-                            print("Bus suspend for",self.suspend_time,"ms requested.")
-                        if l <= self.BUFFER_SIZE: # discard if too big
+                            print("Bus suspend for", self.suspend_time, "ms requested.")
+                        if l <= self.BUFFER_SIZE:  # discard if too big
                             self.count = count
-                            self.current_value = s[4:4+l]
-
+                            self.current_value = s[4:4 + l]
 
     def value(self):
         return self.current_value

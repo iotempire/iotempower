@@ -7,6 +7,7 @@ import time
 import gc
 from ulnoiot.device import Device
 
+
 ####### HT temperature/humidity with
 # TODO think about calibration
 class _HTDHT(Device):
@@ -15,15 +16,15 @@ class _HTDHT(Device):
 
     # Handle humidity and temperature from dht devices
     def __init__(self, name, pin, dht_dev, delay,
-                 on_change=None,report_change=True):
+                 on_change=None, report_change=True):
         self.delay = delay
         import dht
         self.dht = dht_dev
         self.lasttime = time.ticks_ms()
         self.dht.measure()
         Device.__init__(self, name, pin, on_change=on_change,
-                        getters={"temperature":self.temperature,
-                                 "humidity":self.humidity},
+                        getters={"temperature": self.temperature,
+                                 "humidity": self.humidity},
                         report_change=report_change)
 
     def time_controlled_measure(self):
@@ -41,18 +42,20 @@ class _HTDHT(Device):
         return self.dht.humidity()
 
     def value(self):
-        return { "humidity": self.humidity(),
-                 "temperature": self.temperature() }
+        return {"humidity": self.humidity(),
+                "temperature": self.temperature()}
 
     def _update(self):
         # trigger reading show eventually changed values
         self.time_controlled_measure()
+
 
 class DHT11(_HTDHT):
     def __init__(self, name, pin, on_change=None):
         import dht
         _HTDHT.__init__(self, name, pin, dht.DHT11(pin), 1000,
                         on_change=on_change)
+
 
 class DHT22(_HTDHT):
     def __init__(self, name, pin, on_change=None):
@@ -61,6 +64,7 @@ class DHT22(_HTDHT):
         _HTDHT.__init__(self, name, pin, dht.DHT22(pin), 2000,
                         on_change=on_change)
 
+
 class DS18X20(Device):
     MEASURE_DELAY = 750
 
@@ -68,7 +72,7 @@ class DS18X20(Device):
     def __init__(self, name, pin, on_change=None):
         import onewire, ds18x20
         gc.collect()
-        Device.__init__(self, name, pin,on_change=on_change)
+        Device.__init__(self, name, pin, on_change=on_change)
         self.ds = ds18x20.DS18X20(onewire.OneWire(pin))
         self.roms = self.ds.scan()
         self.lasttime = time.ticks_ms()
@@ -82,7 +86,7 @@ class DS18X20(Device):
             self.temp_list = []
             for rom in self.roms:
                 self.temp_list.append(self.ds.read_temp(rom))
-            if len(self.temp_list)==1:
+            if len(self.temp_list) == 1:
                 self.temp_list = self.temp_list[0]
             self.ds.convert_temp()
             self.lasttime = newtime

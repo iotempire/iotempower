@@ -1,5 +1,5 @@
 mqtt_broker = "192.168.10.254"
-mqtt_client_id =  b"esp_kitchen_servo_switch"
+mqtt_client_id = b"esp_kitchen_servo_switch"
 mqtt_topic = b"kitchen/light1"
 mqtt_user = "homeassistant"
 mqtt_password = "internetofthings"
