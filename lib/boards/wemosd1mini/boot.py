@@ -5,10 +5,16 @@ import gc
 # import webrepl
 import esp
 
+from machine import UART
+uart0 = UART(0)
+
 esp.osdebug(None)
 import machine
 
 machine.freq(160000000)  # fast default
+
+from machine import UART
+uart0 = UART(0)
 
 import ulnoiot._wifi
 
