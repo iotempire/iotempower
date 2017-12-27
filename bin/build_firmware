@@ -46,8 +46,13 @@ else
     # TODO: nonos-zips not available
     git clone --recursive https://github.com/pfalcon/esp-open-sdk
     echo
-    echo "Downloading micropython."
-    git clone https://github.com/micropython/micropython
+#    echo "Downloading micropython."
+#    git clone https://github.com/micropython/micropython
+    # to allow deallocating serial, we now use upy from here:
+    # https://github.com/micropython/micropython/pull/3277#pullrequestreview-57380140
+    echo "Downloading micropython from dmkent."
+    git clone https://github.com/dmkent/micropython
+    git checkout uart-sep
     echo
     echo "Downloading micropython-lib."
     git clone https://github.com/micropython/micropython-lib
@@ -93,7 +98,9 @@ make || { echo "Trouble making esp-open-sdk, aborting.";exit 1; }
 
 echo
 echo "Second, link code to freeze."
-cd "$ULNOIOT_FIRMWARE/micropython/ports/esp8266/modules"
+#ports="ports/" # for newer micropython versions
+ports="" # for upy versions until 1.9.2
+cd "$ULNOIOT_FIRMWARE/micropython/${ports}esp8266/modules"
 # remove old stuff
 mkdir -p ../modules.bak
 mv upip* ../modules.bak &> /dev/null
@@ -101,11 +108,11 @@ mv ntptime* ../modules.bak  &> /dev/null
 rm -rf ulnoiot umqtt ssd1306.py
 # TODO: remove webrepl
 # relink new stuff
-ln -s ../../../../micropython-lib/umqtt.simple/umqtt .
-ln -s ../../../drivers/display/ssd1306.py .
-ln -s $ULNOIOT_ROOT/lib/esp8266/ulnoiot .
-ln -s ../../../../python_lcd/lcd/esp8266_i2c_lcd.py .
-ln -s ../../../../python_lcd/lcd/lcd_api.py .
+ln -s "$ULNOIOT_FIRMWARE/micropython-lib/umqtt.simple/umqtt" .
+ln -s "$ULNOIOT_FIRMWARE/micropython/drivers/display/ssd1306.py" .
+ln -s "$ULNOIOT_ROOT/lib/esp8266/ulnoiot" .
+ln -s "$ULNOIOT_FIRMWARE/python_lcd/lcd/esp8266_i2c_lcd.py" .
+ln -s "$ULNOIOT_FIRMWARE/python_lcd/lcd/lcd_api.py" .
 
 
 # netrepl stuff
@@ -130,7 +137,7 @@ rm build/firmware.elf-0x*.bin
 make axtls && make || { echo "Something went wrong compiling no-ota fw, check errors.";exit 1; }
 echo "Done building firmware successfully."
 echo "Copying no-ota firmware to flash position."
-cp "$ULNOIOT_FIRMWARE/micropython/ports/esp8266/build/firmware-combined.bin" \
+cp "$ULNOIOT_FIRMWARE/micropython/${ports}esp8266/build/firmware-combined.bin" \
     "$ULNOIOT_FIRMWARE/firmware.bin"
 
 echo
@@ -173,14 +180,14 @@ make || { echo "Something went wrong compiling yaota, check errors.";exit 1; }
 
 echo "Merging bootloader and OTA-firmware to flash position."
 cat "$ULNOIOT_FIRMWARE/yaota8266/yaota8266.bin" \
-    "$ULNOIOT_FIRMWARE/micropython/ports/esp8266/build/firmware-ota.bin" \
+    "$ULNOIOT_FIRMWARE/micropython/${ports}esp8266/build/firmware-ota.bin" \
     > "$ULNOIOT_FIRMWARE/firmware-initial.bin"
 
 # sign firmware
 echo "Signing firmware."
 cd "ota-client"
-python3 ota_client.py sign "$ULNOIOT_FIRMWARE/micropython/ports/esp8266/build/firmware-ota.bin"
-cp "$ULNOIOT_FIRMWARE/micropython/ports/esp8266/build/firmware-ota.bin.ota" \
+python3 ota_client.py sign "$ULNOIOT_FIRMWARE/micropython/${ports}esp8266/build/firmware-ota.bin"
+cp "$ULNOIOT_FIRMWARE/micropython/${ports}esp8266/build/firmware-ota.bin.ota" \
     "$ULNOIOT_FIRMWARE/firmware.ota"
 
 # cleanup

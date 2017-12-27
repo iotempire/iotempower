@@ -13,7 +13,7 @@
 
 tmpfile=$(mktemp --suffix .py)
 
-unexpand -t 4 "$1" | expand -t 1 > "$2"
-#unexpand -t 4 "$1" | expand -t 1 > "$tmpfile"
-#pyminifier -o "$2" "$tmpfile"
+#unexpand -t 4 "$1" | expand -t 1 > "$2"
+unexpand -t 4 "$1" | expand -t 1 > "$tmpfile"
+pyminifier -o "$2" "$tmpfile"
 rm "$tmpfile"
