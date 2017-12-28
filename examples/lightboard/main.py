@@ -30,6 +30,21 @@ matrix = [
 [ (1,19), (1,18), (1,17), (1,16), (1,15), (1,14), (1,13), (1,12), (1,11), (1,10), (1, 9), (1, 8), (1, 7), (1, 6), (1, 5), (1, 4), (1, 3), (1, 2), (1, 1), (1, 0) ],
 [ (0,19), (0,18), (0,17), (0,16), (0,15), (0,14), (0,13), (0,12), (0,11), (0,10), (0, 9), (0, 8), (0, 7), (0, 6), (0, 5), (0, 4), (0, 3), (0, 2), (0, 1), (0, 0) ],
 ]
+
+def rotate90(inmatrix):
+    h = len(inmatrix)
+    w = len(inmatrix[0])
+    outmatrix = []
+    for x in range(w):
+        line=[]
+        for y in range(h):
+            line.appen(inmatrix[y][x])
+        outmatrix.append(line)
+    return outmatrix
+
+# turn matrix by 90 degrees, to work in portrait mode
+matrix = rotate90(matrix)
+
 MATRIX_HEIGHT=len(matrix)
 MATRIX_WIDTH=len(matrix[0])
 
