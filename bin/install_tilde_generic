@@ -59,13 +59,13 @@ mkdir -p "$TILDEDIR"
 cd "$TILDEDIR"
 
 if [[ $(ls *.tar.bz2 | wc -l) != 7 ]]; then
-    wget -c http://os.ghalkes.nl/dist/libtranscript-0.3.2.tar.bz2
-    wget -c http://os.ghalkes.nl/dist/libt3config-0.2.10.tar.bz2
-    wget -c http://os.ghalkes.nl/dist/libt3key-0.2.6.tar.bz2
-    wget -c http://os.ghalkes.nl/dist/libt3window-0.2.3.tar.bz2
-    wget -c http://os.ghalkes.nl/dist/libt3widget-0.5.2.tar.bz2
-    wget -c http://os.ghalkes.nl/dist/libt3highlight-0.4.2.tar.bz2
-    wget -c http://os.ghalkes.nl/dist/tilde-0.3.7.tar.bz2
+    wget http://os.ghalkes.nl/dist/libtranscript-0.3.2.tar.bz2
+    wget http://os.ghalkes.nl/dist/libt3config-0.2.11.tar.bz2
+    wget http://os.ghalkes.nl/dist/libt3key-0.2.6.tar.bz2
+    wget http://os.ghalkes.nl/dist/libt3window-0.2.4.tar.bz2
+    wget http://os.ghalkes.nl/dist/libt3widget-0.5.3.tar.bz2
+    wget http://os.ghalkes.nl/dist/libt3highlight-0.4.4.tar.bz2
+    wget http://os.ghalkes.nl/dist/tilde-0.3.8.tar.bz2
     for a in $(ls *.tar.bz2); do
         tar xjf "$a"
     done
