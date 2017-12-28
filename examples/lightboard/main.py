@@ -54,7 +54,7 @@ def set_pixel( x, y, color ):
     strip[s].setPixelColor( nr, color )
 
 def fill( color ):
-    global strip
+    global strip, matrix
     for line in matrix:
         for s,nr in line:
             strip[s].setPixelColor( nr, color )
