@@ -88,6 +88,7 @@ chmod a+x configure install.sh
 ./configure --prefix=/usr CFLAGS="-O2 -D_POSIX_C_SOURCE=200809L"
 make $MAKEFLAGS
 sudo mkdir -p /usr/include/t3/key/t3key
+sudo mkdir -p /usr/share/libt3key1
 sudo mkdir -p /usr/share/doc/libt3key/API/search
 sudo checkinstall \
     --pkgname="$PNAME" \
