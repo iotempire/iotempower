@@ -90,6 +90,7 @@ make $MAKEFLAGS
 sudo mkdir -p /usr/include/t3/key/t3key
 sudo mkdir -p /usr/share/libt3key1
 sudo mkdir -p /usr/share/doc/libt3key/API/search
+sudo cp src.util/t3keyc/t3keyc /usr/bin/
 sudo checkinstall \
     --pkgname="$PNAME" \
     --requires="libt3config,libncurses5,libxcb1" \
