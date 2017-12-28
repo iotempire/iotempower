@@ -91,16 +91,25 @@ prefix("lightboard00")  # prototype lightboard
 
 imagelist=[]
 animation=[]
+animation_start_time = -1
 step_length=100
 
-def animate():
-    global animation
-    t = int(animation[0])
-    for a in animation[1:]:
-        draw_image(imagelist[int(a)-1], 0, 0)
-        show()
-        time.sleep(0.001*t)
+def animation_start():
+    global animation, animation_start_time, animation_last
+    animation_last = -1
+    animation_start_time = time.time()
 
+def animation_next():
+    global animation, animation_start_time, animation_last
+    if animation.starttime > 0:
+        current_time = time.time()
+        current_frame = int((current_time - animation_start_time)*1000/animation[0])
+        if current_frame < len(animation)-1:
+            if current_frame != animation_last:
+                draw_image(imagelist[animation[current_frame+1]], 0, 0)
+                show()
+        else:
+            animation_start_time = -1
 
 def imagelist_cb(msg):
     # Accept a list of blank-separated image urls
@@ -128,8 +137,10 @@ def animation_cb(msg):
 
     global animation
     animation=msg.split()
+    for i in range(len(animation)):
+        animation[i]=int(animation[i]) # convert to int
     print("received: ", animation)
-    animate()
+    animation_start()
 
 
 imagelist_sensor = sensor("imagelist")
@@ -142,4 +153,5 @@ animation_sensor.add_callback_change(callback=animation_cb)
 begin()
 clear()
 # run integriot event loop
-run()
+while True:
+    process()  # call integriot loop
