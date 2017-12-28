@@ -74,7 +74,6 @@ def begin():
         strip[s].begin()
 
 def draw_image(im,startx,starty):
-    print("drawing image:",im.size)
     imw,imh = im.size
     for y in range(MATRIX_HEIGHT):
         imx = startx
@@ -106,8 +105,11 @@ def animation_next():
         current_frame = int((current_time - animation_start_time)*1000/animation[0])
         if current_frame < len(animation)-1:
             if current_frame != animation_last:
-                draw_image(imagelist[animation[current_frame+1]-1], 0, 0)
-                show()
+                imnr = animation[current_frame+1]-1
+                print("showing image nr",imnr)
+                if imnr>0 and imnr<len(imagelist):
+                    draw_image(imagelist[imnr], 0, 0)
+                    show()
         else:
             animation_start_time = -1
 
