@@ -116,7 +116,7 @@ def imagelist_cb(msg):
         wsize = int((float(im.size[0]) * float(hpercent)))
         im = im.resize((wsize, MATRIX_HEIGHT), Image.ANTIALIAS)
         x = (wsize-MATRIX_WIDTH)//2
-        im = im.crop((x,0,x+MATRIX_WIDTH-1,MATRIX_HEIGHT-1))
+        im = im.crop((x,0,x+MATRIX_WIDTH,MATRIX_HEIGHT))
         print("new image size:",im.size)
         imagelist.append(im)
 
