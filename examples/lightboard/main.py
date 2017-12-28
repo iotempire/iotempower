@@ -106,7 +106,7 @@ def animation_next():
         current_frame = int((current_time - animation_start_time)*1000/animation[0])
         if current_frame < len(animation)-1:
             if current_frame != animation_last:
-                draw_image(imagelist[animation[current_frame+1]], 0, 0)
+                draw_image(imagelist[animation[current_frame+1]-1], 0, 0)
                 show()
         else:
             animation_start_time = -1
@@ -152,6 +152,8 @@ animation_sensor.add_callback_change(callback=animation_cb)
 # init led matrix
 begin()
 clear()
+print("Ready to accept commands, ctrl-c to stop.")
 # run integriot event loop
 while True:
     process()  # call integriot loop
+    animation_next() # call update
