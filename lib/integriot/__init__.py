@@ -58,6 +58,24 @@ def stop():
     _stopped = True
 
 
+def process(*args):
+    """
+    Process one step in workign on mqtt events
+    :param args: a list of Devices-objects (if empty try to use global devices)
+    :return:
+    """
+    global _main_devices
+
+    if len(args) == 0:
+        args = [_main_devices]
+
+    for d in args:
+        d.client.loop(0.001)
+
+
+loop = process
+
+
 def start(*args):
     """
     Run until interrupted or quit called from any of the callbacks.
