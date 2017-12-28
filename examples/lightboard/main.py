@@ -112,12 +112,11 @@ def imagelist_cb(msg):
         im = Image.open(BytesIO(response.content))
         print("original image size:",im.size)
         # resize/crop image # TODO: verify (probably not taking center but complete shrink)
-        baseheight = MATRIX_HEIGHT
-        hpercent = (baseheight / float(im.size[1]))
+        hpercent = (MATRIX_HEIGHT / float(im.size[1]))
         wsize = int((float(im.size[0]) * float(hpercent)))
-        im = im.resize((wsize, baseheight), Image.ANTIALIAS)
+        im = im.resize((wsize, MATRIX_HEIGHT), Image.ANTIALIAS)
         x = (wsize-MATRIX_WIDTH)//2
-        im = im.crop((x,0,x+MATRIX_WIDTH-1,mbasehight-1))
+        im = im.crop((x,0,x+MATRIX_WIDTH-1,MATRIX_HEIGHT-1))
         print("new image size:",im.size)
         imagelist.append(im)
 
