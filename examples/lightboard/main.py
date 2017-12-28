@@ -94,10 +94,12 @@ animation=[]
 step_length=100
 
 def animate():
-    for im in imagelist:
-        draw_image(im, 0, 0)
+    global animation
+    t = animation[0]
+    for a in animation[1:]:
+        draw_image(imagelist[a-1], 0, 0)
         show()
-        time.sleep(0.5)
+        time.sleep(0.001*t)
 
 
 def imagelist_cb(msg):
@@ -120,9 +122,6 @@ def imagelist_cb(msg):
         print("new image size:",im.size)
         imagelist.append(im)
 
-    animate()
-
-
 def animation_cb(msg):
     # Accept a list of blank-separated animation steps (referring to the images)
     # first value should be number of ms before moving on to next image
@@ -130,6 +129,8 @@ def animation_cb(msg):
     global animation
     animation=msg.split()
     print("received: ", animation)
+    animate()
+
 
 imagelist_sensor = sensor("imagelist")
 imagelist_sensor.add_callback_change(callback=imagelist_cb)
