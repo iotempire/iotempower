@@ -34,7 +34,7 @@ class MQTTDevice(Device):
             self.callbacks[sub_topic] = []
         self.callbacks[sub_topic].append((callback, ignore_case))
 
-    def add_callback(self, sub_topic, callback, ignore_case=True):
+    def add_callback(self, sub_topic="", callback=None, ignore_case=True):
         """
         Add a generic callback function for incoming data on a specific
         sub_topic.
