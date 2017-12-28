@@ -60,6 +60,7 @@ cd $(ls |grep "$PNAME-"|grep -v ".tar.bz2"|head -n1)
 chmod a+x configure install.sh
 ./configure --prefix=/usr CFLAGS="-O2 -D_POSIX_C_SOURCE=200809L"
 make $MAKEFLAGS
+sudo mkdir -p /usr/include/transcript
 sudo mkdir -p /usr/lib/transcript1
 sudo mkdir -p /usr/share/doc/libtranscript/doc/API/search
 sudo checkinstall \
