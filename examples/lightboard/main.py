@@ -137,5 +137,8 @@ imagelist_sensor.add_callback_change(callback=imagelist_cb)
 animation_sensor = sensor("animation")
 animation_sensor.add_callback_change(callback=animation_cb)
 
-
+# init led matrix
+begin()
+clear()
+# run integriot event loop
 run()
