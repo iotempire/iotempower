@@ -94,11 +94,13 @@ def imagelist_cb(msg):
         # download image
         response = requests.get(url)
         im = Image.open(BytesIO(response.content))
+        print("original image size:",im.size)
         # resize/crop image # TODO: verify (probably not taking center but complete shrink)
         baseheight = MATRIX_HEIGHT
         hpercent = (baseheight / float(im.size[1]))
         wsize = int((float(im.size[0]) * float(hpercent)))
         im = im.resize((wsize, baseheight), Image.ANTIALIAS)
+        print("new image size:",im.size)
         imagelist.append(im)
 
     animate()
