@@ -95,9 +95,9 @@ step_length=100
 
 def animate():
     global animation
-    t = animation[0]
+    t = int(animation[0])
     for a in animation[1:]:
-        draw_image(imagelist[a-1], 0, 0)
+        draw_image(imagelist[int(a)-1], 0, 0)
         show()
         time.sleep(0.001*t)
 
