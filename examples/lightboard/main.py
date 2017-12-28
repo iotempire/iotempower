@@ -107,7 +107,7 @@ def animation_next():
             if current_frame != animation_last:
                 imnr = animation[current_frame+1]-1
                 print("showing image nr",imnr)
-                if imnr>0 and imnr<len(imagelist):
+                if imnr>=0 and imnr<len(imagelist):
                     draw_image(imagelist[imnr], 0, 0)
                     show()
                 animation_last = current_frame
