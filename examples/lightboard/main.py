@@ -74,6 +74,7 @@ def begin():
         strip[s].begin()
 
 def draw_image(im,startx,starty):
+    print("drawing image:",im.size)
     imw,imh = im.size
     for y in range(MATRIX_HEIGHT):
         imx = startx
@@ -115,6 +116,8 @@ def imagelist_cb(msg):
         hpercent = (baseheight / float(im.size[1]))
         wsize = int((float(im.size[0]) * float(hpercent)))
         im = im.resize((wsize, baseheight), Image.ANTIALIAS)
+        x = (wsize-MATRIX_WIDTH)//2
+        im = im.crop((x,0,x+MATRIX_WIDTH-1,mbasehight-1))
         print("new image size:",im.size)
         imagelist.append(im)
 
