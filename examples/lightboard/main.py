@@ -38,7 +38,7 @@ def rotate90(inmatrix):
     for x in range(w):
         line=[]
         for y in range(h):
-            line.appen(inmatrix[y][x])
+            line.append(inmatrix[y][x])
         outmatrix.append(line)
     return outmatrix
 
