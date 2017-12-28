@@ -110,6 +110,7 @@ def animation_next():
                 if imnr>0 and imnr<len(imagelist):
                     draw_image(imagelist[imnr], 0, 0)
                     show()
+                animation_last = current_frame
         else:
             animation_start_time = -1
 
@@ -149,7 +150,7 @@ imagelist_sensor = sensor("imagelist")
 imagelist_sensor.add_callback_change(callback=imagelist_cb)
 
 animation_sensor = sensor("animation")
-animation_sensor.add_callback_change(callback=animation_cb)
+animation_sensor.add_callback(callback=animation_cb)
 
 # init led matrix
 begin()
