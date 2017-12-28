@@ -155,6 +155,7 @@ animation_sensor.add_callback(callback=animation_cb)
 # init led matrix
 begin()
 clear()
+show()
 print("Ready to accept commands, ctrl-c to stop.")
 # run integriot event loop
 while True:
