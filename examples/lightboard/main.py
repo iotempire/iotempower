@@ -101,7 +101,7 @@ def animation_start():
 
 def animation_next():
     global animation, animation_start_time, animation_last
-    if animation.starttime > 0:
+    if animation_start_time > 0:
         current_time = time.time()
         current_frame = int((current_time - animation_start_time)*1000/animation[0])
         if current_frame < len(animation)-1:
