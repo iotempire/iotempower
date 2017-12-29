@@ -13,9 +13,10 @@
 #    wpa-conf /run/uiot_wpa_supplicant.conf
 
 
-[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+[ ! "$ULNOIOT_ROOT" ] || { echo "ULNOIOT_ROOT not set, aborting." 1>&2;exit 1; }
 
-# needs to be still read as started fro rc.local and it does not know bash's source
+# needs to be still read as started from rc.local and it does not know bash's source
+# this activates ulnoiot environment
 source "$ULNOIOT_ROOT/lib/shell_starter/ulnoiot.bash"
 
 # check if otg-mode was enabled
