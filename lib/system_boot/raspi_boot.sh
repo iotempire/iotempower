@@ -4,9 +4,7 @@
 egrep '^\s*dtoverlay=dwc2\s*' /boot/config.txt && otg_on=1
 
 # read boot/config.txt and evaluate uiot-part in there
-egrep '^\s*uiot_.*=' /boot/config.txt | while read l; do
-    eval "$l"
-done
+eval "$(egrep '^\s*uiot_.*=' /boot/config.txt)"
 
 if [[ ! "$otg_on" = 1 ]]; then
     # otg is not activated, so we need to try eventually to get our
