@@ -14,7 +14,7 @@ if [[ ! "$otg_on" = 1 ]]; then
         # If wifi_user is set (and uncommented), try to connect to enterprise network
         # without extra certificate (for example to an eduroam university network)
         # else try to connect to wpa network
-        cfg="/usr/local/etc/uiot_wpa_supplicant.conf.orig"
+        cfg="/usr/local/etc/uiot_wpa_supplicant.conf"
         cp "$cfg.orig" "$cfg"
         if [[ "$uiot_wifi_user" ]]; then # a user was given, so try enterprise network
 
