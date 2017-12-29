@@ -5,10 +5,10 @@ egrep '^\s*dtoverlay=dwc2\s*' /boot/config.txt && otg_on=1
 
 # read boot/config.txt and evaluate uiot-part in there
 egrep '^\s*uiot_.*=' /boot/config.txt | while read l; do
-    eval set "$l"
+    eval "$l"
 done
 
-if [[ ! "$otg_on"=1 ]]; then
+if [[ ! "$otg_on" = 1 ]]; then
     # otg is not activated, so we need to try eventually to get our
     # internet via wifi on wlan1
     if [[ "$uiot_wifi_name" ]]; then # a name was given
