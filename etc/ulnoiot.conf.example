@@ -1,7 +1,6 @@
 # Configuration options of ulnoiot
-# This is specific to this hardware platform and ulniot installation,
-# it can support several system
-# configurations
+# This is specific to this hardware platform and ulnoiot installation,
+# it can support several system configurations
 
 
 #### Accesspoint configuration ####
