@@ -4,17 +4,19 @@
 # To enable this, add the following to the end of /etc/rc.local with adjusted ULNOIOT_ROOT:
 # export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 # export ULNOIOT_ROOT="/home/pi/ulnoiot"
-# source "$ULNOIOT_ROOT/lib/shell_starter/ulnoiot.bash"
 # "$ULNOIOT_ROOT/lib/system_boot/raspi_boot.sh"
 #
 # Also disable all network devices in /etc/network/interfaces apart lo and wlan1
 # and make sure that wlan1 configuration looks like this:
 # allow-hotplug wlan1
 # iface wlan1 inet manual
-#    wpa-conf /usr/local/etc/uiot_wpa_supplicant.conf
+#    wpa-conf /run/uiot_wpa_supplicant.conf
 
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+
+# needs to be still read as started fro rc.local and it does not know bash's source
+source "$ULNOIOT_ROOT/lib/shell_starter/ulnoiot.bash"
 
 # check if otg-mode was enabled
 egrep '^\s*dtoverlay=dwc2\s*' /boot/config.txt && otg_on=1
@@ -30,7 +32,7 @@ if [[ ! "$otg_on" = 1 ]]; then
         # If wifi_user is set (and uncommented), try to connect to enterprise network
         # without extra certificate (for example to an eduroam university network)
         # else try to connect to wpa network
-        cfg="/usr/local/etc/uiot_wpa_supplicant.conf"
+        cfg="/run/uiot_wpa_supplicant.conf"
         cp "$ULNOIOT_ROOT/etc/ulnoiot_wpa_supplicant.conf.base" "$cfg"
         chown root.root "$cfg"
         chmod 600 "$cfg"
