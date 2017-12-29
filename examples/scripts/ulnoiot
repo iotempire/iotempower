@@ -4,5 +4,8 @@
 #
 # If you run in termux, apply termux-fix shebang onto this script
 
+# if this should run as root make sure to fix $HOME like this:
+# HOME=/home/pi
+
 export ULNOIOT_ROOT="$HOME/ulnoiot"
 exec bash "$ULNOIOT_ROOT/run" "$@"
