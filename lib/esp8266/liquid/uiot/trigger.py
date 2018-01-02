@@ -4,7 +4,7 @@
 # detect falling or/and rising edges on gpio inputs
 
 from machine import Pin
-from ulnoiot.device import Device
+from uiot.device import Device
 
 
 ####### simple Input, contact devices/push buttons

@@ -7,10 +7,10 @@
 
 import time
 from machine import I2C
-from ulnoiot.device import Device
+from uiot.device import Device
 
 
-class I2cConnector(Device):
+class I2c_Connector(Device):
     BUFFER_SIZE = 36  # counter (2) + size (1) + suspend request (1) + data (32)
 
     def __init__(self, name, sda=None, scl=None,

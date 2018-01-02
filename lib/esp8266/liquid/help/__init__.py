@@ -3,7 +3,7 @@
 import os
 
 _oldhelp = help
-help_path = "/ulnoiot/help"
+help_path = "/help"
 
 
 def _help_file_name(name):

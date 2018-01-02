@@ -5,7 +5,7 @@
 
 import time
 import gc
-from ulnoiot.device import Device
+from uiot.device import Device
 
 
 ####### HT temperature/humidity with

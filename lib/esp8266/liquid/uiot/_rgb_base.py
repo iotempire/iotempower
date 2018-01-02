@@ -6,7 +6,7 @@
 #
 
 import gc
-from ulnoiot.device import Device
+from uiot.device import Device
 from ulnoiot import colors as _c
 
 gc.collect()
@@ -115,7 +115,7 @@ class RGB_Base(Device):
 
     def animation(self, msg):
         gc.collect()
-        from ulnoiot._rgb_animator import Animation
+        from uiot._rgb_animator import Animation
         gc.collect()
         self.ani = Animation(self, msg)
 

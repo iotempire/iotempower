@@ -7,7 +7,7 @@
 
 import gc
 from machine import PWM
-from ulnoiot._rgb_base import RGB_Base
+from uiot._rgb_base import RGB_Base
 
 gc.collect()
 

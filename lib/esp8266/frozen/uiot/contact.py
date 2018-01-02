@@ -3,7 +3,7 @@
 # created: 2017-04-08
 
 from machine import Pin
-from ulnoiot.device import Device
+from uiot.device import Device
 
 
 ####### simple Input, contact devices/push buttons

@@ -9,13 +9,13 @@ import gc
 import neopixel
 
 gc.collect()
-from ulnoiot._rgb_base import RGB_Base
+from uiot._rgb_base import RGB_Base
 from ulnoiot import colors as _c
 
 gc.collect()
 
 
-class RGB_Multi(RGB_Base):
+class Rgb_Multi(RGB_Base):
     def __init__(self, name, pin, num_of_leds=1,
                  ignore_case=True, on_change=None, rgb_order=(1, 2, 3),
                  report_change=False):

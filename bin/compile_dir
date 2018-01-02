@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+if [[ $# -ne 2 || $# = 0 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
+cat << EOF
+Syntax: compile_dir input-dir output-dir
+
+compile_dir copies input-dir to output-dir and creates bytecode
+for all included python files.
+
+EOF
+exit 1
+fi
+
+[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+
+echo Copying directory
+rsync -rv --del "$1/" "$2/"
+
+echo Compiling all python files.
+cd "$2"
+find . -name "*.py" | while read f; do
+    "$ULNOIOT_FIRMWARE/micropython/mpy-cross" "$f"
+    rm "$f"
+done

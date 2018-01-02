@@ -16,7 +16,7 @@ import time
 import ubinascii
 
 gc.collect()
-import ulnoiot._wifi as _wifi
+import uiot._wifi as _wifi
 
 gc.collect()
 
@@ -37,93 +37,28 @@ _last_publish = 0
 MIN_PUBLISH_TIME_US = 2000  # posting every 2ms (2000us) allowed
 
 
-# ====== Devices
-def create_device(import_name, class_name, name, *args, **kwargs):
+# ======= Devices
+def d(type, name, *args, **kwargs):
+    # create a new device
     global _devlist
 
     gc.collect()
-    x = "from ulnoiot.{} import {}".format(import_name, class_name)
+    import_name = type.lower()
+    class_name = import_name.title()
+    x = "from uiot.{} import {}".format(import_name, class_name)
     exec(x)
     _Class = eval(class_name)
     gc.collect()
     _devlist[name] = _Class(name, *args, **kwargs)
+    # TODO: consider catching an exception that this doesn't exist
     gc.collect()
     return _devlist[name]
 
-
-def contact(name, *args, **kwargs):
-    return create_device("_contact", "Contact", name, *args, **kwargs)
-
-
-button = contact
-input = contact
-
-
-def analog(name, *args, **kwargs):
-    return create_device("_analog", "Analog", name, *args, **kwargs)
-
-
-def trigger(name, *args, **kwargs):
-    return create_device("_trigger", "Trigger", name, *args, **kwargs)
-
-
-def out(name, *args, **kwargs):
-    return create_device("_output", "Output", name, *args, **kwargs)
-
-
-led = out
-switch = out
-output = out
-
-
-def servo(name, *args, **kwargs):
-    return create_device("_servo", "Servo", name, *args, **kwargs)
-
-
-def servo_switch(name, *args, **kwargs):
-    return create_device("_servo_switch", "Servo_Switch", name, *args, **kwargs)
-
-
-def pwm(name, *args, **kwargs):
-    return create_device("_pwm", "UIOTPWM", name, *args, **kwargs)
-
-
-def rgb(name, *args, **kwargs):
-    return create_device("_rgb", "RGB", name, *args, **kwargs)
-
-
-def rgb_multi(name, *args, **kwargs):
-    return create_device("_rgb_multi", "RGB_Multi", name, *args, **kwargs)
-
-
-neopixel = rgb_multi
-
-
-# ======== HT temperature/humidity with
-def dht11(name, *args, **kwargs):
-    return create_device("_ht", "DHT11", name, *args, **kwargs)
-
-
-def dht22(name, *args, **kwargs):
-    return create_device("_ht", "DHT22", name, *args, **kwargs)
-
-
-def ds18x20(name, *args, **kwargs):
-    return create_device("_ht", "DS18X20", name, *args, **kwargs)
-
-
-def display(name, *args, **kwargs):
-    return create_device("_display", "Display", name, *args, **kwargs)
-
-
-def display44780(name, *args, **kwargs):
-    return create_device("_display44780", "Display44780", name, *args, **kwargs)
-
-
-from ulnoiot.new_devices import *  # allow adding new devices
-
+# obsolete now as everything accessible in same namespace
+# from uiot.new_devices import *  # allow adding new devices
 
 # ======= Devices End
+
 
 # ======= utils
 def do_later(time_delta_s, callback, id=None):
@@ -147,9 +82,8 @@ def lineedit(filename, linenr, insert=False):
 
 def delete(name):
     _devlist.pop(name)
-
-
 # ====== end utils
+
 
 # ====== mqtt stuff
 def _publish_status(device_list=None, ignore_time=False):

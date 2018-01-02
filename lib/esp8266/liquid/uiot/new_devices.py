@@ -3,7 +3,7 @@
 # create a new module and class and then
 # add them in the following format in this file
 
-from ulnoiot.devices import create_device
+from uiot.devices import create_device
 
 
 # def mydevice(name,*args,**kwargs):

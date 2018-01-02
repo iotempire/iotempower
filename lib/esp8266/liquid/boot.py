@@ -11,14 +11,14 @@ uart0 = UART(0)
 esp.osdebug(None)
 import machine
 
-machine.freq(160000000)  # fast default
+machine.freq(160000000)  # fast default as long as chacha not optimized
 
 from machine import UART
 uart0 = UART(0)
 
-import ulnoiot._wifi
+import uiot._wifi
 
-ulnoiot._wifi.connect()
+uiot._wifi.connect()
 
 # webrepl.start()
 gc.collect()

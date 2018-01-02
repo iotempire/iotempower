@@ -11,7 +11,7 @@
 
 from machine import I2C
 from esp8266_i2c_lcd import I2cLcd
-from ulnoiot.device import Device
+from uiot.device import Device
 
 
 class Display44780(Device):

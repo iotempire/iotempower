@@ -4,7 +4,7 @@
 
 
 from machine import ADC
-from ulnoiot.device import Device
+from uiot.device import Device
 
 
 ####### simple Input, contact devices/push buttons

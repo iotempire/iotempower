@@ -15,7 +15,9 @@ test "$password" || password="ulnoiot"
 
 port=$(find_esp_port "$1" "$password")
 
-cd "$ULNOIOT_ROOT/lib/boards/wemosd1mini"
+compile_dir "$ULNOIOT_ROOT/lib/node_types/wemosd1mini" "$ULNOIOT_EXTERNAL/wemosd1mini_liquid"
+
+cd "$ULNOIOT_EXTERNAL/wemosd1mini_liquid"
 
 hashfile="$(mktemp --suffix .hashfile)"
 echo "Getting file digests."

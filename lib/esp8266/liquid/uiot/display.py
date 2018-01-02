@@ -6,7 +6,7 @@
 import time
 from machine import I2C
 import ssd1306
-from ulnoiot.device import Device
+from uiot.device import Device
 
 
 class Display(Device):

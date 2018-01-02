@@ -6,10 +6,10 @@
 
 import time
 from machine import PWM
-from ulnoiot.device import Device
+from uiot.device import Device
 
 
-class UIOTPWM(Device):
+class Pwm(Device):
     # Handle output devices
     def __init__(self, name, pin, freq=50, duty=0,
                  ignore_case=True, on_change=None,

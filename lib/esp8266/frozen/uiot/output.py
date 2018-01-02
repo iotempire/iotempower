@@ -5,7 +5,7 @@
 
 import time
 from machine import Pin
-from ulnoiot.device import Device
+from uiot.device import Device
 
 
 ####### simple LEDs, other Output (switches)

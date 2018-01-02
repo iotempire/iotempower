@@ -105,12 +105,12 @@ cd "$ULNOIOT_FIRMWARE/micropython/${ports}esp8266/modules"
 mkdir -p ../modules.bak
 mv upip* ../modules.bak &> /dev/null
 mv ntptime* ../modules.bak  &> /dev/null
-rm -rf ulnoiot umqtt ssd1306.py
-# TODO: remove webrepl
+rm -rf ulnoiot uiot umqtt ssd1306.py
+# TODO: remove more webrepl stuff
 # relink new stuff
 ln -s "$ULNOIOT_FIRMWARE/micropython-lib/umqtt.simple/umqtt" .
-ln -s "$ULNOIOT_FIRMWARE/micropython/drivers/display/ssd1306.py" .
-ln -s "$ULNOIOT_ROOT/lib/esp8266/ulnoiot" .
+ln -s "$ULNOIOT_FIRMWARE/micropython/drivers/display/ssd1306.py" . # TODO: consider adding this to liquid
+ln -s "$ULNOIOT_ROOT/lib/esp8266/frozen/uiot" .
 ln -s "$ULNOIOT_FIRMWARE/python_lcd/lcd/esp8266_i2c_lcd.py" .
 ln -s "$ULNOIOT_FIRMWARE/python_lcd/lcd/lcd_api.py" .
 

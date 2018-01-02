@@ -6,7 +6,7 @@
 
 import time
 from machine import PWM
-from ulnoiot.device import Device
+from uiot.device import Device
 
 
 class Servo(Device):

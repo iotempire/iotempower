@@ -1,7 +1,7 @@
 # main.py script for ulnoiot wemosd1mini version
 #
 import gc
-from ulnoiot import *
+from uiot import *
 
 gc.collect()
 
