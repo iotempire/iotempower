@@ -19,5 +19,7 @@ rsync -rv -L --del "$1/" "$2/"
 echo Compiling all python files.
 cd "$2"
 find . -name "*.py" | while read f; do
-    "$ULNOIOT_FIRMWARE/micropython/mpy-cross/mpy-cross" "$f" && rm "$f"
+    if [[ ! "$f" = "./main.py" && ! "$f" = "./boot.py" ]]; then # TODO: move this somewhere else
+      "$ULNOIOT_FIRMWARE/micropython/mpy-cross/mpy-cross" "$f" && rm "$f"
+    fi
 done

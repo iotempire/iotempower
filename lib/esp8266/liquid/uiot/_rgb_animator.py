@@ -5,7 +5,7 @@
 # created: 2017-05-23
 #
 import time
-from ulnoiot import colors as _c
+from uiot import colors as _c
 
 
 class Animation():

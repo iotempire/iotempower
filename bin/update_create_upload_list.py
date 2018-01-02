@@ -23,9 +23,10 @@ def main(argv):
     output=open(argv[2],"wb")
     output.write(("open %s\n"%argv[0]).encode())
     output.write(b"cd /\n")
+    output.write(b"md /uiot\n")
     output.write(b"md /ulnoiot\n")
-    output.write(b"md /ulnoiot/help\n")
-    output.write(b"md /ulnoiot/shield\n")
+    output.write(b"md /help\n")
+    output.write(b"md /shield\n")
     for filename in hashs:
         try:
             f=open(filename,"rb")

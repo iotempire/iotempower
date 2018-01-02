@@ -84,12 +84,12 @@ echo "Creating gw config."
 gw_cfg="$(mktemp --suffix .ulnoiot)"
 if [ "$ULNOIOT_MQTT_USER" ]; then # authentication is set
     cat > "$gw_cfg" << EOF
-from ulnoiot import *
+from uiot import *
 mqtt("$ULNOIOT_AP_HOSTNAME","$topic","$ULNOIOT_MQTT_USER","$ULNOIOT_MQTT_PW")
 EOF
 else
     cat > "$gw_cfg" << EOF
-from ulnoiot import *
+from uiot import *
 mqtt("$ULNOIOT_AP_HOSTNAME","$topic")
 EOF
 fi

@@ -7,7 +7,7 @@
 
 import gc
 from uiot.device import Device
-from ulnoiot import colors as _c
+from uiot import colors as _c
 
 gc.collect()
 

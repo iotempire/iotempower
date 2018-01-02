@@ -29,7 +29,7 @@ from uiot._mgr import *
 from uiot._mgr import _devlist as devices
 
 gc.collect()
-import uiot.help as _help
+import help as _help
 
 help = _help.help
 man = _help.man
