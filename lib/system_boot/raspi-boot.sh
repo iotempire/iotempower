@@ -48,7 +48,9 @@ if [[ "$uiot_ap_password" ]]; then # pw was given, so start an accesspoint
     # channel, bridge, and mqtt data taken straight from ulnoiot.conf
 
     # start accesspoint and mqtt_broker
-    tmux new-session -n AP -s UIoTSvrs "$ULNOIOT_ROOT/run" exec accesspoint \
-         \; new-window -n MQTT  "$ULNOIOT_ROOT/run" exec mqtt_broker
+    tmux new-session -d -n AP -s UIoTSvrs \
+            "$ULNOIOT_ROOT/run" exec accesspoint \; \
+        new-window -d -n MQTT  \
+            "$ULNOIOT_ROOT/run" exec mqtt_broker
 
 fi # accesspoint check

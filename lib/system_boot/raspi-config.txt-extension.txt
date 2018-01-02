@@ -1,0 +1,37 @@
+# Add the following to the end of the the boot/config.txt file of a raspberry pi
+# ulnoiotgw.
+
+################################
+##### ulnoiotgw options ########
+################################
+
+# USB OTG
+# en- or disable USB OTG (on the go): allows to use the raspberry pi zero as
+# a usb-dongle and share network to it from a PC/laptop
+#
+# If running on raspberry pi zero, enable line with dtoverlay=dwc2 (remove #).
+# If running on normal raspberry pi disable line with dtoverlay=dwc2 (make
+#   sure there is a # before the line).
+#
+# Tech explanation: this enables usb otg but it disables other usb port and
+#   the local ethernet port.
+#dtoverlay=dwc2
+
+# Start an accesspoint on wlan0 with following essid.
+# If ap_name empty or commented iotempire+wlan-mac will be used.
+# If ap_password empty, no ap will be started.
+#uiot_ap_name=iotempire
+uiot_ap_password=internetofthings
+
+# Connect to wireless on wlan1 (external wifi adapter on pi 3 or zero w).
+# If at least wifi_name and wifi_password are set, try to connect to wpa
+# wifi network on wlan1.
+# If wifi_user is set (and uncommented), try to connect to enterprise network
+# without extra certificate (for example to an eduroam university network)
+#uiot_wifi_name="wifi-id"
+#uiot_wifi_password="secretpassword"
+#uiot_wifi_user=testuser@business.network
+
+################################
+#### end: ulnoiotgw options ####
+################################
