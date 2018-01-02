@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# download, if necessary micropython firmware and buidl everything
+# download, if necessary micropython firmware and build everything
 #
 # if called as build_firmware clean, it will delete content of ULNOIOT_EXTERNAL/firmware
 #
@@ -7,34 +7,46 @@
 # Create date: 2017-05-17
 #
 
-# TODO: test for build-essential gperf bison flex texinfo help2man libtool-bin?
-# might also: sudo apt-get install make unrar-free autoconf automake libtool gcc g++ \
+if [[ $# = 0 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
+cat << EOF
+Syntax: firmware command
+
+firmware can be used to download and build the micropython firmware. It also
+can make the  micropython bytcode compiler available.
+
+Commands supported so far:
+- download: just download everything
+- mpy: install mpy-bytecode compiler
+- build: build firmware
+- clean: delete everything firmware-related
+
+EOF
+exit 1
+fi
+
+# TODO: test for build-essential gperf bison flex texinfo help2man libtool-bin \
+#    unrar-free autoconf automake libtool gcc g++ \
 #    flex bison texinfo gawk ncurses-dev libexpat-dev python-dev python python-serial \
 #    sed git unzip bash help2man wget bzip2 gperf help2man
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
+mkdir -p "$ULNOIOT_FIRMWARE"
+
 if [[ "$1" == clean ]]; then
   echo "Deleting external cache."
   echo
   rm -rf "$ULNOIOT_FIRMWARE"
+  exit 0
 fi
 
-mkdir -p "$ULNOIOT_FIRMWARE"
 
 # check if firmware tools are downloaded
 if [[ -e "$ULNOIOT_FIRMWARE/micropython/README.md" ]]; then # check for existing venv
     echo "Firmware tools found."
 else
-    echo "Firmware tools not found. Download them? (Y/n)"
-    read answer
-    if [[ ${answer,,} == "y" || ${answer,,} == "" ]]; then
-        if [[ $(which git) == "" ]]; then
-            echo "You need to install git. Exiting."
-            exit 1
-        fi
-    else
-        echo "Can't continue, exiting now."
+    if [[ $(which git) == "" ]]; then
+        echo "You need to install git. Exiting."
         exit 1
     fi
     cd "$ULNOIOT_FIRMWARE"
@@ -70,7 +82,18 @@ else
     #    "$ULNOIOT_FIRMWARE/yaota8266/ota-server/lib/axtls"
 fi
 
-# build everything.
+if [[ "$1" == download ]]; then
+    echo "Download is done, finishing."
+    exit 0
+fi
+
+if [[ "$1" == mpy ]]; then
+    cd "$ULNOIOT_FIRMWARE/micropython/mpy-cross"
+    make
+    echo "Built mpy, finishing."
+    exit 0
+else # build everything.
+
 echo
 echo "Trying to build everything to create the ulnoiot micropython firmware for you."
 # the next things dosn't work with python3, so let's trick them to use python2
@@ -194,5 +217,6 @@ cp "$ULNOIOT_FIRMWARE/micropython/${ports}esp8266/build/firmware-ota.bin.ota" \
 unalias python
 rm "$ULNOIOT_FIRMWARE/bin/python"
 
+fi # build everything
 
 exit 0
