@@ -4,19 +4,18 @@
 #
 # based off: https://bitbucket.org/thesheep/micropython-servo/src/f562a6abeaf0e83b752838df7cd31d88ea10b2c7/servo.py?at=default&fileviewer=file-view-default
 
-import time
-from machine import PWM
+import machine
 from uiot.device import Device
 
 
-class Pwm(Device):
+class PWM(Device):
     # Handle output devices
     def __init__(self, name, pin, freq=50, duty=0,
                  ignore_case=True, on_change=None,
                  report_change=False):
         self._duty = 0
         self._freq = freq
-        Device.__init__(self, name, PWM(pin, freq=freq, duty=duty),
+        Device.__init__(self, name, machine.PWM(pin, freq=freq, duty=duty),
                         setters={"freq/set": self.set_freq, "duty/set": self.set_duty},
                         getters={"freq": self.get_freq, "duty": self.get_duty},
                         ignore_case=ignore_case,

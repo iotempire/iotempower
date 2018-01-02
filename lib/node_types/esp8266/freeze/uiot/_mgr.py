@@ -44,15 +44,24 @@ def d(type, name, *args, **kwargs):
 
     gc.collect()
     import_name = type.lower()
-    class_name = import_name.title()
-    x = "from uiot.{} import {}".format(import_name, class_name)
-    exec(x)
-    _Class = eval(class_name)
-    gc.collect()
-    _devlist[name] = _Class(name, *args, **kwargs)
-    # TODO: consider catching an exception that this doesn't exist
-    gc.collect()
-    return _devlist[name]
+    module = "uiot." + import_name
+    x = "import " + module
+    exec(x)  # TODO: consider catching an exception that this doesn't exist
+    class_name = None
+    # TODO: also strip out _ to search for respective class
+    for n in eval("dir({})".format(module)):  # find actual class_name
+        if n.lower() == import_name:
+            class_name = module+ '.' + n
+            break
+    if class_name is not None:
+        _Class = eval(class_name)
+        gc.collect()
+        _devlist[name] = _Class(name, *args, **kwargs)
+        gc.collect()
+        return _devlist[name]
+    else:
+        print("Can't find class for {}.".format(name))
+    return None
 
 # obsolete now as everything accessible in same namespace
 # from uiot.new_devices import *  # allow adding new devices

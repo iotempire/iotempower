@@ -15,9 +15,10 @@ test "$password" || password="ulnoiot"
 
 port=$(find_esp_port "$1" "$password")
 
-compile_dir "$ULNOIOT_ROOT/lib/node_types/wemosd1mini" "$ULNOIOT_EXTERNAL/wemosd1mini_liquid"
-
-cd "$ULNOIOT_EXTERNAL/wemosd1mini_liquid"
+node_dir="$ULNOIOT_ROOT/tmp/tmp-wemos-node"
+rm -rf "$node_dir" &> /dev/null # make sure it's empty
+create_node_dir wemos_d1_mini "$node_dir"
+cd "$node_dir"
 
 hashfile="$(mktemp --suffix .hashfile)"
 echo "Getting file digests."

@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+if [[ $# -ne 2 || $# = 0 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
+cat << EOF
+Syntax: create_note_dir node-type output-dir
+
+create_node_dir prepares the varible files for a specific node into a
+destination directory.
+The content of the destination directory will be deleted in this process.
+
+EOF
+exit 1
+fi
+
+[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+
+copy_type_through_base() {
+    # $1: source directory
+    # $2: type (folder to copy)
+    # $3: destination directory
+    # check if there is a base directory/link and recurse into it
+    if [[ -d "$1/base" ]]; then
+        copy_type_through_base "$1/base" "$2" "$3"
+    fi
+    if [[ -d "$1/$2" ]]; then # copy folder exists
+        rsync -rL "$1/$2/" "$3/"
+    fi
+}
+
+src_dir="$ULNOIOT_ROOT/lib/node_types/$1"
+
+copy_type_through_base "$src_dir" compile "$2"
+compile_dir "$2"
+copy_type_through_base "$src_dir" copy "$2"

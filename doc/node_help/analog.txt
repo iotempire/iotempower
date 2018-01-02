@@ -1,4 +1,4 @@
-analog(name, precision=1, threshold=None)
+d("analog", name, precision=1, threshold=None)
 
 Create a new analog sensor. By default it reports all value changes.
 An analog value is between 0 an 1023. If precision is>1, report only changes
@@ -15,7 +15,7 @@ Parameters:
 
 Example:
 nodename: basement/water-sensor01
-analog("water", threshold=100, precision=10)
+d("analog", "water", threshold=100, precision=10)
 
 Now, a value of 1 is sent to "basement/water-sensor01/water", when the analog
 port reads a value of more than 90 (threshold - precision). It will start

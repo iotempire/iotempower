@@ -22,7 +22,7 @@ from uiot.device import Device
 from time import sleep_us, ticks_us, ticks_ms, ticks_diff
 
 
-class Hcsr04(Device):
+class HCSR04(Device):
     INTERVAL = 50  # wait how many ms until next measurement?
 
     def __init__(self, name, trigger_pin, echo_pin,

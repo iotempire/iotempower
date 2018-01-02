@@ -15,7 +15,7 @@ from ulnoiot import colors as _c
 gc.collect()
 
 
-class Rgb_Multi(RGB_Base):
+class RGB_Multi(RGB_Base):
     def __init__(self, name, pin, num_of_leds=1,
                  ignore_case=True, on_change=None, rgb_order=(1, 2, 3),
                  report_change=False):

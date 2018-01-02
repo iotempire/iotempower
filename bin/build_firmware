@@ -110,7 +110,7 @@ rm -rf ulnoiot uiot umqtt ssd1306.py
 # relink new stuff
 ln -s "$ULNOIOT_FIRMWARE/micropython-lib/umqtt.simple/umqtt" .
 ln -s "$ULNOIOT_FIRMWARE/micropython/drivers/display/ssd1306.py" . # TODO: consider adding this to liquid
-ln -s "$ULNOIOT_ROOT/lib/esp8266/frozen/uiot" .
+ln -s "$ULNOIOT_ROOT/lib/node_types/esp8266/freeze/uiot" .
 ln -s "$ULNOIOT_FIRMWARE/python_lcd/lcd/esp8266_i2c_lcd.py" .
 ln -s "$ULNOIOT_FIRMWARE/python_lcd/lcd/lcd_api.py" .
 
@@ -132,7 +132,7 @@ cd ../..
 git submodule update --init
 cd esp8266
 # make doesn't work anymore after having made ota once, there seems to be
-# too much firmware around, so delete it first
+# too much fi./.AndroidStudio3.0/config/plugins/python/helpers/pycharm_generator_utils/pyparsing.pyrmware around, so delete it first
 rm build/firmware.elf-0x*.bin
 make axtls && make || { echo "Something went wrong compiling no-ota fw, check errors.";exit 1; }
 echo "Done building firmware successfully."

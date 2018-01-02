@@ -10,7 +10,7 @@ from machine import I2C
 from uiot.device import Device
 
 
-class I2c_Connector(Device):
+class I2C_Connector(Device):
     BUFFER_SIZE = 36  # counter (2) + size (1) + suspend request (1) + data (32)
 
     def __init__(self, name, sda=None, scl=None,

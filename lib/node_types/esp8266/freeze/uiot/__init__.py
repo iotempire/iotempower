@@ -1,9 +1,9 @@
+# Init ulnoiot and
+# get all names into namespace
+
 import gc
 import machine
 
-
-# Get all names into namespace
-from machine import ADC, PWM
 
 from pin_cfg import *  # get all the pins
 
@@ -22,6 +22,7 @@ def reset():
 
 reboot = reset
 
+# shell stuff
 from uiot.sh import ls, rm, cd, clear, pwd, mkdir, head, cat, mv, rmdir, newfile, cp, copy
 
 gc.collect()
