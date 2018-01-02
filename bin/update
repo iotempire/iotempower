@@ -32,8 +32,10 @@ if [[ -e "node.conf" || -e "../node.conf" ]]; then  # started from node-director
         path="$(pwd)"
         cd "$ULNOIOT_ROOT/lib/netrepl"
         # TODO: make board configurable
+        compile_dir "$ULNOIOT_ROOT/lib/node_types/wemosd1mini" "$ULNOIOT_EXTERNAL/wemosd1mini_liquid"
+
         python3 copy.py "$ip" --keyfile "$path/key.hex" --sync \
-            --src "$ULNOIOT_ROOT/lib/boards/wemosd1mini/" $reset
+            --src "$ULNOIOT_EXTERNAL/wemosd1mini_liquid" $reset
     else
         echo "Couldn't find IP of node with topic $topic for update. Skipping."
         exit 1

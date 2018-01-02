@@ -14,11 +14,10 @@ fi
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
 echo Copying directory
-rsync -rv --del "$1/" "$2/"
+rsync -rv -L --del "$1/" "$2/"
 
 echo Compiling all python files.
 cd "$2"
 find . -name "*.py" | while read f; do
-    "$ULNOIOT_FIRMWARE/micropython/mpy-cross" "$f"
-    rm "$f"
+    "$ULNOIOT_FIRMWARE/micropython/mpy-cross/mpy-cross" "$f" && rm "$f"
 done
