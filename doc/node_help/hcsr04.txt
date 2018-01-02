@@ -1,4 +1,4 @@
-hcsr04(name, trigger_pin, echo_pin, precision=1)
+d("hcsr04", name, trigger_pin, echo_pin, precision=1)
 
 Create a new HC-SR04 ultrasonic distance measuring device.
 It reads the distance in mm.
@@ -9,4 +9,4 @@ Parameters:
 - echo_pin: where the echo pin is connected to
 
 Example:
-hcsr04("distance", d2, d1, precision=10)
+d("hcsr04", "distance", d2, d1, precision=10)

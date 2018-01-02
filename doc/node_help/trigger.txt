@@ -1,4 +1,4 @@
-def trigger(name, pin,
+d("trigger", name, pin,
             rising=False, falling=False,
             pullup=True):
 
@@ -17,6 +17,6 @@ Parameters:
 - pullup: enable internal pullup (default)
 
 Example (node name: living room/shock1):
-trigger("left", d3)
+d("trigger", "left", d3)
 
 Now, the number of triggers is published as "living room/shock1/left"

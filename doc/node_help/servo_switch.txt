@@ -1,4 +1,4 @@
-servo_switch( name, pin, on_angle, off_angle,
+d("servo_switch", name, pin, on_angle, off_angle,
   on_command='on', off_command='off',
   back_to_angle=None,
   turn_time_ms=700,
@@ -24,7 +24,7 @@ Parameters:
 - ignore_case: should case in the command detection be ignored
 
 Example:
-servo_switch("m1",d4,0,179,back_to_angle=90)
+d("servo_switch", "m1", d4, 0, 179, back_to_angle=90)
 
 Now the motor can be controlled via sending to the mqtt-broker
 to the topic "node_topic/m1/set" the command on or off

@@ -1,6 +1,6 @@
-dht11(name, pin, on_change=None)
-dht22(name, pin, on_change=None):
-ds18x20(name, pin, on_change=None):
+d("dht11", name, pin, on_change=None)
+d("dht22", name, pin, on_change=None):
+d("ds18x20", name, pin, on_change=None):
 
 Create a new temperature (+ humidity) sensor device.
 name will be appended to the mqtt topic and corresponding
@@ -15,7 +15,7 @@ Parameters:
 - on_change: a method that will be called when the value changes
 
 Example (node name: living room/ht1):
-dht22("ht01", d1)
+d("dht22", "ht01", d1)
 
 Now temperature and humidity are published as "living room/ht1/temperature" and
 "living room/ht1/humidity".

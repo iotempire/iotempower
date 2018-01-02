@@ -1,4 +1,4 @@
-out(name, pin, high_command='on', low_command='off', ignore_case=True)
+d("out", name, pin, high_command='on', low_command='off', ignore_case=True)
 other names: led, output, switch
 
 Create a new output port for a simple LED or a relay switch.
@@ -13,7 +13,7 @@ Parameters:
 - ignore_case: should case in the command detection be ignored
 
 Example (node name: living room/leds1):
-out("yellow", d7, "turn on", "turn off")
+d("led", "yellow", d7, "turn on", "turn off")
 
 Now the LED can be switched on via sending to the mqtt-broker
 to the topic "living room/leds1/yellow/set" the command

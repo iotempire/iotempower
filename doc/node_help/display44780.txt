@@ -1,4 +1,4 @@
-display44780( name, name, sda=None, scl=None,
+d("display44780", name, name, sda=None, scl=None,
                  width=16, height=2,
                  addr=0x27)
 
@@ -15,7 +15,7 @@ Parameters:
   (on the display it says 0x7a or 0x78 respectively)
 
 Example:
-display44780("dp1",d3,d4)
+d("display44780", "dp1", d3, d4)
 
 Now the display can be controlled via sending to the mqtt-broker
 to the topic "node_topic/dp1/set" different text or commands.
