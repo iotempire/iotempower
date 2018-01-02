@@ -11,7 +11,7 @@
 # if parameters are given and the first is "exec", ulnoiot will execute
 # the rest of the parameters as command in ulnoiot environment
 
-HELP_PATH=lib/boards/wemosd1mini/ulnoiot/help
+HELP_PATH=doc/node_help
 # TODO: adjust path to different selected micro controllers depending on node
 
 function welcome() {
