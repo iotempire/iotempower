@@ -29,12 +29,7 @@ export PYTHONPATH="$PYTHONPATH:$ULNOIOT_ROOT/lib"
 
 fi # ending: if [[ ! "$ULNOIOT_ACTIVE" = "yes"]]; then
 
-OLDTERM=$TERM
-
-# we need a term for tput
-if [ ! "$TERM" ]; then # so define it when it's empty
-    export TERM=linux
-fi
+if [ ! "$TERM" ]; then # only mess with the prompt if there is TERM
 
 ##### always reset prompt, when ULNOIOT_ROOT defined and sourced
 PSGREEN="\[$(tput setaf 2)\]"
@@ -47,7 +42,6 @@ PSBOLD="\[$(tput bold)\]"
 PSRESET="\[$(tput sgr0)\]"
 #PSRESET='\[\033[0m\]'
 
-export TERM=$OLDTERM
 
 # user@host
 _UIOT_UH="\u@\h${PSRESET}"
@@ -92,5 +86,7 @@ unset _UIOT_UH _UIOT_SEP _UIOT_UIOT _UIOT_PTH _UIOT_PMT
 unset PSGREEN PSLBLUE PSWHITE PSBLACK PSDRED PSWHITEBG PSBOLD PSRESET
 
 export PS1
+
+fi # does TERM exist
 
 fi # ending: if [[ "$ULNOIOT_ROOT" ]]; then
