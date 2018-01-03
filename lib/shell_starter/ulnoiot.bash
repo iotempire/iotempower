@@ -29,7 +29,7 @@ export PYTHONPATH="$PYTHONPATH:$ULNOIOT_ROOT/lib"
 
 fi # ending: if [[ ! "$ULNOIOT_ACTIVE" = "yes"]]; then
 
-if [ ! "$TERM" ]; then # only mess with the prompt if there is TERM
+if [[ "$TERM" ]]; then # only mess with the prompt if there is TERM
 
 ##### always reset prompt, when ULNOIOT_ROOT defined and sourced
 PSGREEN="\[$(tput setaf 2)\]"
