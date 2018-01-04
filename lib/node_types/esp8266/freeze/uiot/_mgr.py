@@ -68,7 +68,7 @@ def d(type, name, *args, **kwargs):
 
 # ======= Devices End
 
-
+# TODO: move somewhere else
 # ======= utils
 def do_later(time_delta_s, callback, id=None):
     delta = int(time_delta_s * 1000)
@@ -80,12 +80,12 @@ def do_later(time_delta_s, callback, id=None):
 
 
 def linecat(filename, frm=1, to=0):
-    from ulnoiot import _line_edit
+    from uiot import _line_edit
     _line_edit.linecat(filename, frm=frm, to=to)
 
 
 def lineedit(filename, linenr, insert=False):
-    from ulnoiot import _line_edit
+    from uiot import _line_edit
     _line_edit.lineedit(filename, linenr, insert)
 
 

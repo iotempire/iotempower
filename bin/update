@@ -31,11 +31,13 @@ if [[ -e "node.conf" || -e "../node.conf" ]]; then  # started from node-director
         echo "Updating system files on node $topic with IP $ip."
         path="$(pwd)"
         cd "$ULNOIOT_ROOT/lib/netrepl"
+        node_dir="$ULNOIOT_ROOT/tmp/tmp-wemos-node"
+        rm -rf "$node_dir" &> /dev/null # make sure it's empty
         # TODO: make board configurable
-        compile_dir "$ULNOIOT_ROOT/lib/node_types/wemosd1mini" "$ULNOIOT_EXTERNAL/wemosd1mini_liquid"
+        create_node_dir wemos_d1_mini "$node_dir"
 
         python3 copy.py "$ip" --keyfile "$path/key.hex" --sync \
-            --src "$ULNOIOT_EXTERNAL/wemosd1mini_liquid" $reset
+            --src "$node_dir/" $reset
     else
         echo "Couldn't find IP of node with topic $topic for update. Skipping."
         exit 1
