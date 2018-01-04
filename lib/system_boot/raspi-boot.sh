@@ -52,7 +52,7 @@ if [[ "$uiot_ap_password" ]]; then # pw was given, so start an accesspoint
             "$ULNOIOT_ROOT/run" exec accesspoint \; \
         new-window -d -n MQTT  \
             "$ULNOIOT_ROOT/run" exec mqtt_broker \
-        new-window -d -n MQTT  \
+        new-window -d -n nodered  \
             su - ulno -c "$ULNOIOT_ROOT/run exec node-red"
 
 fi # accesspoint check
