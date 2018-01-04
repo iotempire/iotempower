@@ -51,6 +51,8 @@ if [[ "$uiot_ap_password" ]]; then # pw was given, so start an accesspoint
     tmux new-session -d -n AP -s UIoTSvrs \
             "$ULNOIOT_ROOT/run" exec accesspoint \; \
         new-window -d -n MQTT  \
-            "$ULNOIOT_ROOT/run" exec mqtt_broker
+            "$ULNOIOT_ROOT/run" exec mqtt_broker \
+        new-window -d -n MQTT  \
+            su - ulno -c "$ULNOIOT_ROOT/run exec node-red"
 
 fi # accesspoint check
