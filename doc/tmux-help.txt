@@ -1,0 +1,9 @@
+#######################
+## ulnoiot tmux help ##
+#######################
+
+ctrl-a h this help
+ctrl-a <- left window
+ctrl-a -> right window
+
+Press ESC to close.
