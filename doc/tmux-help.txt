@@ -1,9 +1,33 @@
-#######################
-## ulnoiot tmux help ##
-#######################
+###########################
+#### UlnoIoT Tmux Help ####
+###########################
 
-ctrl-a h this help
-ctrl-a <- left window
-ctrl-a -> right window
+Welcome to ulnoiot, your friendly and affordable Internet of Things
+environment. For more info, check http://github.com/ulno/ulnoiot.
 
-Press ESC to close.
+Use the Escape key (ESC) to close this help. Use ctrl-a h to open this help
+again.
+
+You can scroll through this help with the cursor keys as well as using the scroll wheel on your mouse or scroll gesture on your touchpad. If you want to
+search, use ctrl-f (enter search word and later use n or p for next or
+previous).
+
+The terminal here is not a totally normal terminal, it is a terminal
+multiplexer based on tmux (http://github.com/tmux/tmux). Why do you want this
+in ulnoiot, you ask? This allows you to reconnect to your terminal session,
+even if you got disconnected.
+
+However, tmux allows you to other very helpful things with your terminal
+session which are described here briefly:
+
+
+- ctrl-a ctrl-Space or ctrl-a Space: Enter tmux copy-mode
+  This allows you to select 
+- ctrl-a Right-cursor: select next window to right (next)
+- ctrl-a Left-cursor: select next window to left (previous)
+
+## commands to help in bash
+- ctrl-x ctrl-e : edit current command line in editor
+
+#### End of UlnoIoT Tmux Help ####
+

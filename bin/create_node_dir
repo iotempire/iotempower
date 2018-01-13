@@ -23,6 +23,7 @@ copy_type_through_base() {
         copy_type_through_base "$1/base" "$2" "$3"
     fi
     if [[ -d "$1/$2" ]]; then # copy folder exists
+        mkdir -p "$3" # make sure it exists
         rsync -rL "$1/$2/" "$3/"
     fi
 }
