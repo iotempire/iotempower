@@ -1,36 +1,10 @@
 #!/bin/bash
-# Get ips of registered devices
+# Get ip of current node
 #
-# $1: topic to match against (if empty, matches all)
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
+source "$ULNOIOT_ROOT/bin/read_node_config"
 
-MQTTHOST="$ULNOIOT_MQTT_HOST"
 
-if [[ "$1" ]]; then
-  topic="$1/#"
-else
-  topic="#"
-fi
-
-iplog=$(mktemp --suffix .ulnoiot.getip)
-iplogall=$(mktemp --suffix .ulnoiot.getip)
-echo -n "Scanning for ips"
-filter=""
-while true; do
-    echo -n "."
-    timeout --foreground 2 mosquitto_sub -C 1 $filter -v \
-        -h "$MQTTHOST" -t "$topic" | grep "/ip " > "$iplog"
-    t=$(cat "$iplog"|cut -d\   -f1)
-    ip=$(cat "$iplog"|cut -d\  -f2)
-    if [[ ! "$t" ]]; then
-        break
-    fi
-    echo "${t:0:-3}: $ip" >> "$iplogall"
-    filter="$filter -T $t"
-done
-echo " done."
-
-cat "$iplogall"
-rm "$iplog" "$iplogall"
+exec "$ULNOIOT_LOCAL/bin/get_ips" "$topic"

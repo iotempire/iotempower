@@ -1,6 +1,5 @@
 # this allows legacy ulnoiot-code (pre 2018-01) to still work
-from uiot._mgr import d
-from pin_cfg import *
+from uiot import *
 
 def contact(name, *args, **kwargs):
     return d("contact", "Contact", name, *args, **kwargs)

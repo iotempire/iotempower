@@ -20,7 +20,7 @@ fi
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
 if [[ -e "node.conf" || -e "../node.conf" ]]; then  # started from node-directory
-    source "$ULNOIOT_ROOT/bin/read_config"
+    source "$ULNOIOT_ROOT/bin/read_node_config"
     reset="--reset"
     if [[ "$1" = noreset ]]; then
         reset=""

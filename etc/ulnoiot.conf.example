@@ -1,5 +1,6 @@
 # Configuration options of ulnoiot
-# This is specific to this hardware platform and ulnoiot installation,
+# This is specific to this hardware platform and ulnoiot
+# gateway installation,
 # it can support several system configurations
 
 
@@ -62,7 +63,3 @@ ULNOIOT_AP_HOSTNAME="ulnoiotgw"
 #ULNOIOT_MQTT_BRIDGE_USER="bridgeuser"
 #ULNOIOT_MQTT_BRIDGE_PW="secretpw"
 #### END MQTT configuration ####
-
-# default password for webrepl
-# TODO: move to secret file
-ULNOIOT_WEBREPL_PW="ulnoiot"

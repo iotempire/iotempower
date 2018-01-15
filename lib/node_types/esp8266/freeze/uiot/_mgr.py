@@ -15,7 +15,7 @@ import machine
 import time
 import ubinascii
 
-gc.collect()
+gc.collect()|cut -d\  -f2
 import uiot._wifi as _wifi
 
 gc.collect()

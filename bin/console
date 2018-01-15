@@ -21,7 +21,7 @@ if [[ "$1" ]]; then
     console_serial "$1"
 else
     if [[ -e "node.conf" || -e "../node.conf" ]]; then  # started from node-directory
-        source "$ULNOIOT_ROOT/bin/read_config"
+        source "$ULNOIOT_ROOT/bin/read_node_config"
         ip=$(get_ip "$topic" 2>/dev/null|grep "$topic"|cut -d\  -f2)
         if [ "$ip" ]; then
             echo "Connecting to node $topic with ip $ip."

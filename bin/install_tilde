@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+#
+# manually download and compile the tilde text-editor on a debian like system
+#
+# Author: ulno
+# Create date: 2017-07-12
+#
+
+[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+
+#MAKEFLAGS="-j4"
+MAKEFLAGS=""
+
+if [[ $# -gt 1 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
+cat << EOF
+ulnoiot tilde editor installer
+==============================
+
+Welcome to the ulnoiot tilde editor for debian-systems installer (it might also
+work for other systems, but does nto automatically install dependencies).
+
+Run as:
+install_tilde [clean]
+
+EOF
+exit 1
+fi
+
+
+TILDEDIR="$ULNOIOT_EXTERNAL/tilde"
+#gitver="-git$(date +%Y%m%d)"
+gitver=""
+#libp="lib"
+libp=""
+
+
+if [[ ! -d "$TILDEDIR" || "$*" = "clean" ]]; then
+    /usr/bin/dpkg --search /usr/bin/dpkg &>/dev/null && {
+        echo "Installing development packages (you might be asked for sudo passwd)."
+        sudo apt install libunistring-dev xsel xclip libnl-3-dev libnl-genl-3-dev \
+            libssl-dev build-essential libncurses5-dev libsigc++-2.0-dev libpcre3-dev \
+            libxcb1-dev checkinstall wget libtool-bin autoconf gettext \
+            libacl1-dev libattr1-dev libfuse-dev libgpm-dev \
+            libunistring-dev libx11-dev pkg-config
+    }
+
+    echo "Deleting cache and re-downloading tilde source."
+    echo
+    rm -rf "$TILDEDIR" &> /dev/null
+    mkdir -p "$TILDEDIR"
+    cd "$TILDEDIR"
+    git clone https://github.com/gphalkes/transcript ${libp}transcript$gitver
+    git clone https://github.com/gphalkes/t3config ${libp}t3config$gitver
+    git clone https://github.com/gphalkes/t3key ${libp}t3key$gitver
+    git clone https://github.com/gphalkes/t3window ${libp}t3window$gitver
+    git clone https://github.com/ulno/t3widget ${libp}t3widget$gitver
+    git clone https://github.com/gphalkes/t3highlight ${libp}t3highlight$gitver
+    git clone https://github.com/gphalkes/tilde tilde$gitver
+    git clone https://github.com/gphalkes/t3shared
+    git clone https://github.com/gphalkes/makesys
+else
+    # just update
+    cd "$TILDEDIR"
+    for d in $(ls); do
+        cd $d
+            git pull
+        cd ..
+    done
+fi
+
+cd "$TILDEDIR"
+echo "Building tilde."
+./t3shared/doall make -C src
+
+echo "Installing tilde."
+strip -s -o "$ULNOIOT_LOCAL/bin/tilde" "$TILDEDIR/tilde/src/.objects/edit"

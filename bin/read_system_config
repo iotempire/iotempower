@@ -1,0 +1,24 @@
+#@IgnoreInspection BashAddShebang
+# Read system configuration
+
+# search source.conf in parent directories and build a respective path to self
+# this search goes the following number of levels up max
+parent_levels=5
+path="$(pwd)"
+topic=""
+while [[ ! -e "system.conf" ]]; do
+    if [[ $parent_levels == 0 ]]; then
+        break
+    fi
+    bn=$(basename "$(pwd)")
+    if [[ "$topic" ]]; then
+        topic="$bn/$topic"
+    else
+        topic="$bn"
+    fi
+    parent_levels=$(( $parent_levels - 1 ))
+    cd ..
+done
+source "system.conf" || { echo "Can't read system.conf. Aborting." 1>&2;exit 1; }
+
+cd "$path" # return to original path

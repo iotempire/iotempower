@@ -1,7 +1,7 @@
 #!/bin/bash
 if [[ $# -gt 1 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF
-Syntax: deploy [noupdate] [noreset[
+Syntax: deploy [noupdate] [noreset]
 
 deploy must be called from a node directory (or one of its parent system
 directories) and reads its configuration from there.
@@ -31,7 +31,7 @@ fi
 
 
 if [[ -e "node.conf" || -e "../node.conf" ]]; then  # started from node-directory
-    source "$ULNOIOT_ROOT/bin/read_config"
+    source "$ULNOIOT_ROOT/bin/read_node_config"
 
     noupdate=""
     if [[ "$@" == *noupdate* ]]; then

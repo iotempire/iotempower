@@ -6,7 +6,7 @@ Syntax: mqtt_all
 
 mqtt_listen subscribes to all messages of the currently selected mqtt broker.
 
-The broker is based on teh an existing node.conf or sytem.conf.
+The broker is based on an existing node.conf or sytem.conf.
 EOF
 exit 1
 fi

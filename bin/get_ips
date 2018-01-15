@@ -1,7 +1,44 @@
 #!/bin/bash
 # Get all ips of registered devices
 #
+# if parameter ($1) is given, match against that as a topic
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
-exec "$ULNOIOT_LOCAL/bin/get_ip"
+source "$ULNOIOT_ROOT/bin/read_system_config"
+
+
+if [[ "$1" ]]; then
+    topic="$1/ip"
+    result=$(timeout --foreground 2 mosquitto_sub -C 1 $filter -v \
+            -h "$ULNOIOT_MQTT_HOST" -t "$topic"|cut -d\  -f2)
+    if [[ "$result" ]]; then
+        echo "$1: $result"
+    else
+        echo "IP for $1 not found." >&2
+        exit 1
+    fi
+else # find all ending in /ip
+    topic="#"
+    iplog=$(mktemp --suffix .ulnoiot.getip)
+    iplogall=$(mktemp --suffix .ulnoiot.getip)
+    echo -n "Scanning for ips"
+    filter=""
+    while true; do
+        echo -n "."
+        timeout --foreground 2 mosquitto_sub -C 1 $filter -v \
+            -h "$ULNOIOT_MQTT_HOST" -t "$topic" | grep "/ip " > "$iplog"
+        t=$(cat "$iplog"|cut -d\   -f1)
+        ip=$(cat "$iplog"|cut -d\  -f2)
+        if [[ ! "$t" ]]; then
+            break
+        fi
+        echo "${t:0:-3}: $ip" >> "$iplogall"
+        filter="$filter -T $t"
+    done
+    echo " done."
+
+    cat "$iplogall"
+    rm "$iplog" "$iplogall"
+fi
+
