@@ -37,11 +37,12 @@ libp=""
 if [[ ! -d "$TILDEDIR" || "$*" = "clean" ]]; then
     /usr/bin/dpkg --search /usr/bin/dpkg &>/dev/null && {
         echo "Installing development packages (you might be asked for sudo passwd)."
-        sudo apt install libunistring-dev xsel xclip libnl-3-dev libnl-genl-3-dev \
+        sudo apt install libunistring-dev xclip libnl-3-dev libnl-genl-3-dev \
             libssl-dev build-essential libncurses5-dev libsigc++-2.0-dev libpcre3-dev \
-            libxcb1-dev checkinstall wget libtool-bin autoconf gettext \
+            libxcb1-dev wget libtool-bin autoconf gettext \
             libacl1-dev libattr1-dev libfuse-dev libgpm-dev \
-            libunistring-dev libx11-dev pkg-config
+            libunistring-dev pkg-config
+
     }
 
     echo "Deleting cache and re-downloading tilde source."
@@ -72,8 +73,10 @@ else
     done
 fi
 
+export CFLAGS="-O2 -D_POSIX_C_SOURCE=200809L"
+
 cd "$TILDEDIR/llnextgen"
-./configure --prefix=/usr CFLAGS="-O2 -D_POSIX_C_SOURCE=200809L"
+./configure --prefix=/usr CFLAGS="$CFLAGS"
 make $MAKEFLAGS
 strip -s -o "$ULNOIOT_LOCAL/bin/LLnextgen" "LLnextgen"
 
