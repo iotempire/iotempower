@@ -8,7 +8,7 @@
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
-MAKEFLAGS="-j4"
+MAKEFLAGS="BUILDVERSION=release LCFLAGS=-DT3_DONT_CHECK_VERSION LCXXFLAGS=-DT3_DONT_CHECK_VERSION -j4"
 #MAKEFLAGS=""
 
 if [[ $# -gt 1 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
@@ -33,6 +33,15 @@ gitver=""
 #libp="lib"
 libp=""
 
+remove_debug_from_make() {
+    # patch makefile to not create debug info
+    path="$(pwd)"
+    cd "$1/src"
+    # remove line with -D.*DEBUG
+    egrep -v '\-D.*DEBUG' Makefile > Makefile.new
+    mv Makefile.new Makefile
+    cd "$path"
+}
 
 if [[ ! -d "$TILDEDIR" || "$*" = "clean" ]]; then
     /usr/bin/dpkg --search /usr/bin/dpkg &>/dev/null && {
@@ -63,11 +72,9 @@ if [[ ! -d "$TILDEDIR" || "$*" = "clean" ]]; then
     rm LLnextgen-0.5.5.tgz
     git clone https://github.com/gphalkes/t3shared
     git clone https://github.com/gphalkes/makesys
-    # patch tilde makefile to not create debug info
-    cd tilde/src
-    # remove line with CXXFLAGS += -DTILDE_DEBUG
-    grep -v "DTILDE_DEBUG" Makefile > Makefile.new
-    mv Makefile.new Makefile
+    remove_debug_from_make tilde$gitver
+    remove_debug_from_make ${libp}transcript$gitver
+    remove_debug_from_make ${libp}t3widget$gitver
 else
     # just update
     cd "$TILDEDIR"
@@ -78,7 +85,7 @@ else
         fi
     done
 fi
-
+-DT3_DONT_CHECK_VERSION
 export CFLAGS="-O2 -D_POSIX_C_SOURCE=200809L"
 
 cd "$TILDEDIR/llnextgen"
