@@ -22,6 +22,8 @@ work for other systems, but does nto automatically install dependencies).
 Run as:
 install_tilde [clean]
 
+Specifying clean as option will clear the cache and re-download everything.
+
 EOF
 exit 1
 fi
