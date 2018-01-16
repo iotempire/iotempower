@@ -8,8 +8,8 @@
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
-#MAKEFLAGS="-j4"
-MAKEFLAGS=""
+MAKEFLAGS="-j4"
+#MAKEFLAGS=""
 
 if [[ $# -gt 1 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF
@@ -63,6 +63,11 @@ if [[ ! -d "$TILDEDIR" || "$*" = "clean" ]]; then
     rm LLnextgen-0.5.5.tgz
     git clone https://github.com/gphalkes/t3shared
     git clone https://github.com/gphalkes/makesys
+    # patch tilde makefile to not create debug info
+    cd tilde/src
+    # remove line with CXXFLAGS += -DTILDE_DEBUG
+    grep -v "DTILDE_DEBUG" Makefile > Makefile.new
+    mv Makefile.new Makefile
 else
     # just update
     cd "$TILDEDIR"
@@ -83,7 +88,10 @@ strip -s -o "$ULNOIOT_LOCAL/bin/LLnextgen" "LLnextgen"
 
 cd "$TILDEDIR"
 echo "Building tilde."
-./t3shared/doall make -C src
+./t3shared/doall make $MAKEFLAGS -C src
 
 echo "Installing tilde."
 strip -s -o "$ULNOIOT_LOCAL/bin/tilde" "$TILDEDIR/tilde/src/.objects/edit"
+# TODO consider:
+# link to /usr/local/bin/tilde
+# update-alternatives --install /usr/bin/editor editor /usr/local/bin/tilde 50
