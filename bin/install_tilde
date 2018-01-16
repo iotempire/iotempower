@@ -56,17 +56,26 @@ if [[ ! -d "$TILDEDIR" || "$*" = "clean" ]]; then
     git clone https://github.com/ulno/t3widget ${libp}t3widget$gitver
     git clone https://github.com/gphalkes/t3highlight ${libp}t3highlight$gitver
     git clone https://github.com/gphalkes/tilde tilde$gitver
+    wget https://os.ghalkes.nl/LLnextgen/releases/LLnextgen-0.5.5.tgz
+    tar xzf LLnextgen-0.5.5.tgz
+    mv LLnextgen-0.5.5 llnextgen
     git clone https://github.com/gphalkes/t3shared
     git clone https://github.com/gphalkes/makesys
 else
     # just update
     cd "$TILDEDIR"
     for d in $(ls); do
-        cd $d
+        if [[ ! "$d" = makesys && ! "$d" = t3shared ]]; then
+        cd "$TILDEDIR/$d"
             git pull
-        cd ..
+        fi
     done
 fi
+
+cd "$TILDEDIR/llnextgen"
+./configure --prefix=/usr CFLAGS="-O2 -D_POSIX_C_SOURCE=200809L"
+make $MAKEFLAGS
+strip -s -o "$ULNOIOT_LOCAL/bin/LLnextgen" "LLnextgen"
 
 cd "$TILDEDIR"
 echo "Building tilde."
