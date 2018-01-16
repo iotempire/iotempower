@@ -105,8 +105,8 @@ mpfshell -n -c \
 # tidy up
 rm "$wifi_cfg" "$gw_cfg" "$netrepl_cfg"
 
-echo "Waiting 10s until reset is done and internet connected."
-sleep 10
+echo "Waiting 15s until reset is done and internet connected."
+sleep 15
 echo "Copying files via network."
 deploy noupdate
 
