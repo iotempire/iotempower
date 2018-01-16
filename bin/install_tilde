@@ -60,6 +60,7 @@ if [[ ! -d "$TILDEDIR" || "$*" = "clean" ]]; then
     wget https://os.ghalkes.nl/LLnextgen/releases/LLnextgen-0.5.5.tgz
     tar xzf LLnextgen-0.5.5.tgz
     mv LLnextgen-0.5.5 llnextgen
+    rm LLnextgen-0.5.5.tgz
     git clone https://github.com/gphalkes/t3shared
     git clone https://github.com/gphalkes/makesys
 else
