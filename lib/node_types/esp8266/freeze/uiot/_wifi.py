@@ -3,34 +3,34 @@
 import machine
 import network
 import time
-# import webrepl
+import uiot._cfg as _cfg
 import unetrepl as nr
+
 
 _ap = network.WLAN(network.AP_IF)
 _ap.active(False)
 _wlan = network.WLAN(network.STA_IF)
 _wlan.active(True)
-_config_file = "/wifi_cfg.py"
-time.sleep(1)  # wait to become active
 
 
 # connect to wifi
 def connect():
-    global wifi_cfg, _wlan
+    global _wlan
 
     _ap.active(False)
     _wlan.active(True)
 
     # removed scan of networks to allow connect to hidden essid
     # Try to connect
-    _wlan.connect(wifi_cfg.name, wifi_cfg.password)
-    tries = 15
-    for i in range(tries):
-        print("%d/%d. Trying to connect." % (i + 1, tries))
-        machine.idle()
-        time.sleep(1)
-        #                if _wlan.isconnected(): break
-        if _wlan.status() == network.STAT_GOT_IP: break
+    if _cfg.config.wifi_name:
+        _wlan.connect(_cfg.config.wifi_name, _cfg.config.wifi_pw)
+        tries = 15
+        for i in range(tries):
+            print("%d/%d. Trying to connect." % (i + 1, tries))
+            machine.idle()
+            time.sleep(1)
+            #                if _wlan.isconnected(): break
+            if _wlan.status() == network.STAT_GOT_IP: break
 
     if _wlan.isconnected() and _wlan.status() == network.STAT_GOT_IP:
         print('Wifi: connection succeeded!')
@@ -55,17 +55,6 @@ def connected():
 
 def config():
     return _wlan.ifconfig()
-
-
-def delete():
-    import os
-    os.remove(_config_file)
-    # TODO: clear internal wifi assignment
-    accesspoint()
-
-
-def remove():
-    delete()
 
 
 class SCAN:
@@ -101,16 +90,10 @@ wip = WIP()
 
 # write config and connect
 def setup(name, password, reset=True):
-    global wifi_cfg
-
-    if name != wifi_cfg.name or \
-            password != wifi_cfg.password:
-        f = open(_config_file, "w")
-        f.write("name=\"%s\"\npassword=\"%s\"" % (name, password))
-        f.close()
-        print("Updated wifi_cfg.")
-        wifi_cfg.name = name
-        wifi_cfg.password = password
+    if name != _cfg.config.wifi_name or \
+            password != _cfg.config.wifi_pw:
+        _cfg.wifi(name, password)
+        print("Updated wifi config.")
         if reset:
             print("Resetting system in 3 seconds.")
             time.sleep(1)
@@ -120,17 +103,3 @@ def setup(name, password, reset=True):
             machine.reset()
         else:
             connect()
-
-
-# Try to find wifi_cfg
-try:
-    import wifi_cfg
-
-    connect()
-except ImportError:
-    class wifi_cfg():
-        pass
-
-
-    wifi_cfg.name = ""
-    wifi_cfg.password = ""

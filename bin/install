@@ -91,8 +91,6 @@ else
     cd "$ULNOIOT_EXTERNAL/firmware"
     "$ULNOIOT_ROOT/bin/download_firmware"
     "$ULNOIOT_ROOT/bin/firmware" download
-    # download ota
-    git clone --recursive https://github.com/ulno/yaota8266
     popd  &> /dev/null
 
     bash "$ULNOIOT_ROOT/bin/fix_bin"

@@ -67,43 +67,33 @@ if [[ ! ${#key} = 64 ]]; then
 fi
 
 echo
-echo "Creating wifi config."
-wifi_cfg="$(mktemp --suffix .ulnoiot)"
-cat > "$wifi_cfg" << EOF
-name="$ULNOIOT_AP_NAME"
-password="$ULNOIOT_AP_PASSWORD"
+echo "Creating wifi/netrepl/mqtt config."
+cfg="$(mktemp --suffix .ulnoiot)"
+cat > "$cfg" << EOF
+wifi_name = "$ULNOIOT_AP_NAME"
+wifi_pw = "$ULNOIOT_AP_PASSWORD"
 EOF
 
-echo "Creating netrepl config."
-netrepl_cfg="$(mktemp --suffix .ulnoiot)"
-cat > "$netrepl_cfg" << EOF
-key="$key"
+cat >> "$cfg" << EOF
+netrepl="$key"
 EOF
 
-echo "Creating gw config."
-gw_cfg="$(mktemp --suffix .ulnoiot)"
-if [ "$ULNOIOT_MQTT_USER" ]; then # authentication is set
-    cat > "$gw_cfg" << EOF
-from uiot import *
-mqtt("$ULNOIOT_AP_HOSTNAME","$topic","$ULNOIOT_MQTT_USER","$ULNOIOT_MQTT_PW")
+cat >> "$cfg" << EOF
+mqtt_host = "$ULNOIOT_AP_HOSTNAME"
+mqtt_topic = "$topic"
+mqtt_user = "$ULNOIOT_MQTT_USER"
+mqtt_pw = "$ULNOIOT_MQTT_PW"
 EOF
-else
-    cat > "$gw_cfg" << EOF
-from uiot import *
-mqtt("$ULNOIOT_AP_HOSTNAME","$topic")
-EOF
-fi
 
-echo "Sending key, config, and resetting."
+
+echo "Sending config and resetting."
 mpfshell -n -c \
 "open $port; "\
-"put $wifi_cfg /wifi_cfg.py; "\
-"put $netrepl_cfg /netrepl_cfg.py;"\
-"put $gw_cfg /gw_cfg.py;"\
+"put $cfg /config.py; "\
 "exec import machine; exec machine.reset()"
 
 # tidy up
-rm "$wifi_cfg" "$gw_cfg" "$netrepl_cfg"
+rm "$cfg"
 
 echo "Waiting 15s until reset is done and internet connected."
 sleep 15

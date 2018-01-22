@@ -1,0 +1,32 @@
+#!/bin/bash
+if [[ $# -gt 0 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
+cat << EOF
+Syntax: flash_sonoff
+
+flash must be called from a node directory (or one of its parent system
+directories) and reads its configuration from there.
+
+It remotely flashes the board with ulnoiot's version of micropython.
+
+This specifically flashes a serially conected sonoff module.
+Due to limited memory of the sonoff, a remote flash is currently impossible.
+EOF
+exit 1
+fi
+
+[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+
+echo "Bring sonoff into flash mode now (press button while power cycling)."
+echo "Press enter to continue to actual flash process."
+read w
+
+flash_serial_esp8266 waiterase noota dout
+echo "Hardware reset sonoff now (do NOT press button while power cycling)."
+echo "Verify with serial_console that it actually is booted to upy command line,"
+echo "but exit serial_console before continuing."
+echo "Press enter to continue to actual update process."
+read w
+update_serial_wemosd1mini
+echo "Wait 30s for sonoff to be ready to start re-nitializing."
+sleep 30
+initialize noflash

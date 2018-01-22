@@ -13,8 +13,8 @@ import machine
 
 machine.freq(160000000)  # fast default as long as chacha not optimized
 
-from machine import UART
-uart0 = UART(0)
+#from machine import UART
+#uart0 = UART(0)
 
 import uiot._wifi
 

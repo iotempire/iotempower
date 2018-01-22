@@ -17,17 +17,22 @@ can make the  micropython bytcode compiler available.
 Commands supported so far:
 - download: just download everything
 - mpy: install mpy-bytecode compiler
-- build: build firmware
+- build: build complete firmware
 - clean: delete everything firmware-related
+- deps: install dependencies (on a debian-like system)
 
 EOF
 exit 1
 fi
 
-# TODO: test for build-essential gperf bison flex texinfo help2man libtool-bin \
-#    unrar-free autoconf automake libtool gcc g++ \
-#    flex bison texinfo gawk ncurses-dev libexpat-dev python-dev python python-serial \
-#    sed git unzip bash help2man wget bzip2 gperf help2man
+if [[ "$1" == deps ]]; then
+    echo "Installing dependencies for micropython cross compiling under debian-like"
+    echo "systems. You might have to enter your password now to achieve root rights."
+    sudo apt install build-essential gperf bison flex texinfo help2man libtool-bin \
+    unrar-free autoconf automake libtool gcc g++ \
+    flex bison texinfo gawk ncurses-dev libexpat-dev python-dev python python-serial \
+    sed git unzip bash help2man wget bzip2 gperf help2man
+fi
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
@@ -55,26 +60,27 @@ else
     # seems that just files are missing (fixed below)
     ## make sure older version of crosstool-NG is downloaded? (pre-June)
     ## new one is broken -> only files missing
-    # TODO: nonos-zips not available
+    # TODO: work check if nonos-zips are available
     git clone --recursive https://github.com/pfalcon/esp-open-sdk
     echo
-#    echo "Downloading micropython."
-#    git clone https://github.com/micropython/micropython
-    # to allow deallocating serial, we now use upy from here:
-    # https://github.com/micropython/micropython/pull/3277#pullrequestreview-57380140
-    echo "Downloading micropython from dmkent."
-    git clone https://github.com/dmkent/micropython
-    git checkout uart-sep
+    echo "Downloading mainline micropython."
+    git clone https://github.com/micropython/micropython
+    git checkout tags/v1.9.3 -b ulnoiot # newer stuff currently unstable -> causes resets on sonoff
+    ## the next block enable using a upy fork with the option to disable serial
+    ## and use it for something else than debugging
+    ## https://github.com/micropython/micropython/pull/3277#pullrequestreview-57380140
+    ##echo "Downloading micropython with serial patch from dmkent."
+    ##git clone https://github.com/dmkent/micropython
+    ##git checkout uart-sep
     echo
     echo "Downloading micropython-lib."
     git clone https://github.com/micropython/micropython-lib
     echo
     echo "Downloading python-lcd support."
     git clone https://github.com/dhylands/python_lcd.git
-    # ota will be downloaded in general, not necessary here
-#    echo
-#    echo "Downloading ota-firmware tools"
-#    git clone --recursive https://github.com/ulno/yaota8266
+    echo
+    echo "Downloading ota-firmware tools"
+    git clone --recursive https://github.com/ulno/yaota8266
 
     ## link axtls <- NO, this leads to exceptions, --recursive is the trick!
     #rmdir "$ULNOIOT_FIRMWARE/yaota8266/ota-server/lib/axtls"
@@ -108,7 +114,7 @@ alias python=python2
 
 
 echo
-echo "First, building open-sdk. This might take really long."
+echo "## 1 ## Building open-sdk. This might take really long."
 cd "$ULNOIOT_FIRMWARE/esp-open-sdk"
 make # this will fail but might download some important stuff?
 # recreate missing files
@@ -118,11 +124,12 @@ for f in conf kconfig.mk mconf nconf; do
     cp "crosstool-NG/kconfig/$f" crosstool-NG/lib/crosstool-ng-*/kconfig
 done
 make || { echo "Trouble making esp-open-sdk, aborting.";exit 1; }
-
+echo "## 1 ## Building open-sdk done."
 echo
-echo "Second, link code to freeze."
-#ports="ports/" # for newer micropython versions
-ports="" # for upy versions until 1.9.2
+
+echo "## 2 ## Link code to freeze."
+ports="ports/" # for newer micropython versions
+#ports="" # for upy versions until 1.9.2 like the serial pathced version
 cd "$ULNOIOT_FIRMWARE/micropython/${ports}esp8266/modules"
 # remove old stuff
 mkdir -p ../modules.bak
@@ -148,24 +155,31 @@ rm webrepl.py
 rm webrepl_setup.py
 rm websocket_helper.py
 
-
+echo "## 2 ## Link code to freeze done."
 echo
-echo "Third, build firmware for non-ota."
+
+echo "## 3 ## Build firmware for non-ota."
 cd ../..
 git submodule update --init
 cd esp8266
 # make doesn't work anymore after having made ota once, there seems to be
-# too much fi./.AndroidStudio3.0/config/plugins/python/helpers/pycharm_generator_utils/pyparsing.pyrmware around, so delete it first
+# too much firmware around, so delete it first
 rm build/firmware.elf-0x*.bin
+rm build/firmware-*.bin
 make axtls && make || { echo "Something went wrong compiling no-ota fw, check errors.";exit 1; }
-echo "Done building firmware successfully."
 echo "Copying no-ota firmware to flash position."
 cp "$ULNOIOT_FIRMWARE/micropython/${ports}esp8266/build/firmware-combined.bin" \
     "$ULNOIOT_FIRMWARE/firmware.bin"
-
+echo "## 3 ## Done building and copying firmware successfully."
 echo
-echo "Fourth, build ota firmware."
+
+echo "## 4 ## Build ota firmware."
+# this config.h seems to be accidentaly created or at least messes up ota creation
+rm config.h
+rm build/firmware.elf-0x*.bin
+rm build/firmware-*.bin
 make ota || { echo "Something went wrong compiling ota-fw, check errors.";exit 1; }
+echo "## 4 ## Build ota firmware done."
 
 
 #### YAOTA8266 OTA for micropython

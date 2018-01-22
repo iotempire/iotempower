@@ -15,8 +15,10 @@ import machine
 import time
 import ubinascii
 
-gc.collect()|cut -d\  -f2
+gc.collect()
 import uiot._wifi as _wifi
+import uiot._cfg as _cfg
+
 
 gc.collect()
 
@@ -132,7 +134,7 @@ def _publish_status(device_list=None, ignore_time=False):
 # ======= Setup and execution
 def mqtt(broker_host, topic, *args, user=None, password=None,
          client_id=None, report_ip=True,
-         port=None):
+         port=None, save = True):
     # ssl not really possible    ,ssl=False):
     global _broker, _topic, _user, _password, _client_id, _report_ip
     global _port
@@ -147,6 +149,10 @@ def mqtt(broker_host, topic, *args, user=None, password=None,
     _topic = topic
     if client_id is not None:
         _client_id = client_id.encode() + b"_" + _client_id;
+    if user=="":
+        user=None
+    if password=="":
+        password=None
     _user = user
     _password = password
     _report_ip = report_ip
@@ -159,6 +165,8 @@ def mqtt(broker_host, topic, *args, user=None, password=None,
     _port = port
     #    _ssl = ssl
 
+    if save:
+        _cfg.mqtt( _broker, _topic, _user, _password)
     if _report_ip:  # already report ip
         _init_mqtt()
 
@@ -166,8 +174,8 @@ def mqtt(broker_host, topic, *args, user=None, password=None,
 def _subscription_cb(topic, msg):
     global _topic
 
-    topic = topic.decode();
-    msg = msg.decode();
+    topic = topic.decode()
+    msg = msg.decode()
     for d in _devlist.values():
         root_topic = _topic + "/" + d.name
         for st in d.setters:
@@ -256,3 +264,5 @@ def run(updates=5, sleepms=1, poll_rate_inputs=4, poll_rate_network=10):
 
 
 transmit = run
+mqtt(_cfg.config.mqtt_host, _cfg.config.mqtt_topic,
+     _cfg.config.mqtt_user, _cfg.config.mqtt_pw, save=False)

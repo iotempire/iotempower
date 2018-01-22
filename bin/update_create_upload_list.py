@@ -25,7 +25,6 @@ def main(argv):
     output.write(b"cd /\n")
     output.write(b"md /uiot\n")
     output.write(b"md /ulnoiot\n")
-    output.write(b"md /help\n")
     output.write(b"md /shield\n")
     for filename in hashs:
         try:

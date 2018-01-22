@@ -3,9 +3,9 @@
 # Major modifications started by ulno (http://ulno.net) on 2017-09-15
 # adding chacha encryption
 
-_config_file = "/netrepl_cfg.py"
 MAGIC = b"UlnoIOT-NetREPL:"
 
+import uiot._cfg as _cfg
 import time, socket, network, uos, machine, micropython, errno, ubinascii
 from crypt_socket import Crypt_Socket
 
@@ -14,6 +14,7 @@ from crypt_socket import Crypt_Socket
 # import ulnoiot.shield.devkit1_display
 # dp=devices["dp1"]
 
+_key = None
 _crypt_socket = None
 _server_socket = None
 _flush_timer = None
@@ -147,7 +148,7 @@ def init_flush_timer():
 # send telnet control characters to disable line mode
 # and stop local echoing
 def accept_telnet_connect(telnet_server):
-    global _crypt_socket, netrepl_cfg, _telnetwrapper
+    global _crypt_socket, _key, _telnetwrapper
 
     if _crypt_socket is not None:
         # close any previous clients
@@ -186,7 +187,7 @@ def accept_telnet_connect(telnet_server):
         print("netrepl: Received initialization request and vector.")
 
         # setup input encryption
-        _crypt_socket.init_in(netrepl_cfg.key, block[16:24])
+        _crypt_socket.init_in(_key, block[16:24])
 
         # read (now encrypted) magic word (16byte="UlnoIOT-NetREPL:"),
         # key (32byte=256bit) and iv (8byte=64bit)
@@ -236,7 +237,7 @@ def stop():
 
 # start listening for telnet connections on port 23
 def start(port=23, key=None, nostop=False):  # TODO: take simpler default key as it will be reset
-    global _server_socket, netrepl_cfg
+    global _server_socket, _key
 
     if nostop:  # we want to check if it's already running and not restart it
         if _server_socket:  # not none
@@ -245,13 +246,13 @@ def start(port=23, key=None, nostop=False):  # TODO: take simpler default key as
     stop()
 
     if key is None:
-        key = netrepl_cfg.key
+        key = _cfg.config.netrepl
     if key is None or len(key) == 0:
         key = bytearray(32)  # empty default key
     elif len(key) == 64:
         key = ubinascii.unhexlify(key)
 
-    netrepl_cfg.key = key
+    _key = key
 
     # will be initialized after connection
     # cc_out = chacha.ChaCha(key, bytearray(8))
@@ -281,26 +282,11 @@ def setup(key, reset=True):
     if len(key) != 64:
         print("Key needs to be 64 bytes hex-code (256bit key).")
         return
-    f = open(_config_file, "w")
-    f.write("key=\"{}\"".format(key))
-    f.close()
-    print("Updated netrepl_cfg.")
-    netrepl_cfg.key = key
+    _cfg.netrepl(key)
+    print("Updated netrepl config.")
     if reset:
         print("Resetting netrepl in 3 seconds.")
         time.sleep(3)
         start()
     else:
         print("Netrepl not restarted. Call start manually to restart.")
-
-
-# Try to find and load netrepl_cfg
-try:
-    import netrepl_cfg
-except ImportError:
-    class netrepl_cfg():
-        pass
-
-
-    netrepl_cfg.key = None
-# start(key=netrepl_cfg.key)

@@ -14,6 +14,8 @@ fi
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
+# TODO: incorporate current node directory
+
 copy_type_through_base() {
     # $1: source directory
     # $2: type (folder to copy)
@@ -33,3 +35,13 @@ src_dir="$ULNOIOT_ROOT/lib/node_types/$1"
 copy_type_through_base "$src_dir" compile "$2"
 compile_dir "$2"
 copy_type_through_base "$src_dir" copy "$2"
+copy_type_through_base "$src_dir" help "$2/help"
+
+# building help db
+cd "$2"
+ls help | while read fname; do
+    echo '!!!'"${fname%.*}" >> help.db
+    cat help/$fname >> help.db
+    echo >> help.db # make sure there is a new line before the new entry
+done
+rm -rf help

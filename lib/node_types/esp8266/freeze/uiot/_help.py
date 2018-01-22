@@ -3,11 +3,6 @@
 import os
 
 _oldhelp = help
-help_path = "/help"
-
-
-def _help_file_name(name):
-    return name + ".txt"
 
 
 def help_list_print(list):
@@ -26,34 +21,43 @@ def help_list_print(list):
     print(output)
 
 
-def dir_content(path, extensions=["py", "txt", "rst"], ignore_underscore=True):
-    outlist = []
-    for f in os.listdir(path):
-        if ignore_underscore:
-            if f.startswith("_"):
-                continue
-        for ext in extensions:
-            if f.endswith("." + ext):
-                outlist.append(f[0:-len(ext) - 1])
-    outlist.sort()
-    return outlist
-
-
-def command_list():
-    return dir_content(help_path)
+def _open_db():
+    return open("/help.db","r")
 
 
 def _process_help(name):
-    p = os.getcwd()
-    if p == "":
-        p = "/"
-    os.chdir(help_path)
-    for l in open(_help_file_name(name)):
-        if l.startswith("!!"):
-            eval(l[2:])
+    db = _open_db()
+    search_mode = True
+    search_for = "!!!" + name
+    for l in db:
+        l = l.strip()
+        if search_mode:
+            if l == search_for:  # found help
+                search_mode = False
         else:
-            print(l.strip())
-    os.chdir(p)
+            if l.startswith("!!!"):  # this is the next command
+                break  # stop process
+            if l.startswith("!!"):
+                eval(l[2:])
+            else:
+                print(l)
+    db.close()
+    if search_mode:  # hasn't switched -> nothing found
+        print("No help entry found for:",name)
+
+
+def command_list(ignore_underscore=True):
+    outlist = []
+    for l in _open_db():
+        if l.startswith("!!!"):
+            l = l.strip()
+            l = l[3:]
+            if ignore_underscore:
+                if l.startswith("_"):
+                    continue
+            outlist.append(l)
+    outlist.sort()
+    return outlist
 
 
 class HELP:

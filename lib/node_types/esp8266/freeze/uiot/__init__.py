@@ -5,7 +5,7 @@ import gc
 import machine
 
 
-from pin_cfg import *  # get all the pins
+from pins import *  # get all the pins
 
 from . import _wifi
 
@@ -30,8 +30,8 @@ from uiot._mgr import *
 from uiot._mgr import _devlist as devices
 
 gc.collect()
-import help as _help
+import uiot._help
 
-help = _help.help
-man = _help.man
+help = uiot._help.help
+man = uiot._help.man
 gc.collect()

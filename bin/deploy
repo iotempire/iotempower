@@ -1,5 +1,5 @@
 #!/bin/bash
-if [[ $# -gt 1 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
+if [[ $# -gt 2 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF
 Syntax: deploy [noupdate] [noreset]
 
