@@ -14,6 +14,7 @@ redled3 = d1
 
 d3 = Pin(0)
 button1 = d3
+flashbutton = d3
 
 d4 = Pin(2)
 user2 = d4

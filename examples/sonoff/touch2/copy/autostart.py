@@ -8,8 +8,9 @@ for _ in range(5):
     led.evaluate("off")
     time.sleep(0.2)
 
-# TODO: switch leds corresponding to status of relay
+# TODO: do somethign definete with power led?
 
+# leds on touch are coupled to relais
 r1 = d("out", "relais1", relais1, report_change=True)
 r1.evaluate("off")
 

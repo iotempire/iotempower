@@ -1,0 +1,10 @@
+#!/bin/bash
+
+echo "Installing software for Espresso Lite V2.0."
+port="$1"
+shift 1
+update_serial_esp8266 "$port" espresso_lite_v2 "$@"
+
+echo
+echo "7s wait for reset to finish."
+sleep 7

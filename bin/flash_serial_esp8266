@@ -5,7 +5,8 @@
 #
 if [[ "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF
-Syntax: flash_serial_esp8266 [port] [noerase] [onlyerase] [waiterase] [dout] [wemosd1pro] [noota]
+Syntax: flash_serial_esp8266 [port] [noerase] [onlyerase] [waiterase] [dout]
+                             [wemosd1pro] [noota]
 
 flash_serial_esp8266 flashes an esp8266 on usb0 or the given usb port.
 
