@@ -65,7 +65,9 @@ else
     echo
     echo "Downloading mainline micropython."
     git clone https://github.com/micropython/micropython
+    cd micropython
     git checkout tags/v1.9.3 -b ulnoiot # newer stuff currently unstable -> causes resets on sonoff
+    cd ..
     ## the next block enable using a upy fork with the option to disable serial
     ## and use it for something else than debugging
     ## https://github.com/micropython/micropython/pull/3277#pullrequestreview-57380140
