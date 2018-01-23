@@ -1,0 +1,10 @@
+#!/bin/bash
+
+echo "Installing software for NodeMCU."
+port="$1"
+shift 1
+update_serial_esp8266 "$port" nodemcu "$@"
+
+echo
+echo "7s wait for reset to finish."
+sleep 7

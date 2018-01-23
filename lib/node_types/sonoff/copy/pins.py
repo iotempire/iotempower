@@ -39,6 +39,8 @@ d8 = Pin(15)
 relais4 = d8
 redled4 = d8
 
-button2 = Pin(9)
-button3 = Pin(10)
+d9 = Pin(9)
+button2 = d9
 
+d10 = Pin(10)
+button3 = d10
