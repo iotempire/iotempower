@@ -15,3 +15,6 @@ mqtt_password="$ULNOIOT_MQTT_PW"
 
 
 source "node.conf" || { echo "Can't read node.conf. Aborting." 1>&2;exit 1; }
+
+# normalize node_type
+board=$(echo -n "$board"|tr [:upper:][:space:] [:lower:]_)

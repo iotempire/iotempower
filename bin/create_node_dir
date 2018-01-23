@@ -1,18 +1,21 @@
 #!/usr/bin/env bash
 
-if [[ $# -ne 2 || $# = 0 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
+if [[ $# -ne 1 || $# = 0 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF
-Syntax: create_note_dir node-type output-dir
+Syntax: create_note_dir node-type
 
-create_node_dir prepares the varible files for a specific node into a
-destination directory.
-The content of the destination directory will be deleted in this process.
+create_node_dir prepares the variable files for a specific node in a
+unique temporary directory.
+
+The temporary directory where files were created is printed out last.
 
 EOF
 exit 1
 fi
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+
+node_type="$1"
 
 # TODO: incorporate current node directory
 
@@ -32,16 +35,22 @@ copy_type_through_base() {
 
 src_dir="$ULNOIOT_ROOT/lib/node_types/$1"
 
-copy_type_through_base "$src_dir" compile "$2"
-compile_dir "$2"
-copy_type_through_base "$src_dir" copy "$2"
-copy_type_through_base "$src_dir" help "$2/help"
+dest_dir=$(mktemp -d "/tmp/$node_type.XXXX")
+
+copy_type_through_base "$src_dir" compile "$dest_dir"
+compile_dir "$dest_dir"
+copy_type_through_base "$src_dir" copy "$dest_dir"
+copy_type_through_base "$src_dir" help "$dest_dir/help"
 
 # building help db
-cd "$2"
+cd "$dest_dir"
 ls help | while read fname; do
     echo '!!!'"${fname%.*}" >> help.db
     cat help/$fname >> help.db
     echo >> help.db # make sure there is a new line before the new entry
 done
 rm -rf help
+
+echo
+echo "Results in following temporary dir:"
+echo "$dest_dir"

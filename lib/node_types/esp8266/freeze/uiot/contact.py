@@ -30,8 +30,8 @@ class Contact(Device):
                 Pin.init(Pin.OPEN_DRAIN)
             except:
                 pass
-        self.debouncer = 0
         self.threshold = threshold + 1
+        self.debouncer = self.pin() * self.threshold
 
     def value(self):
         return self.debouncer >= self.threshold

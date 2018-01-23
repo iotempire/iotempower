@@ -1,0 +1,14 @@
+#!/bin/bash
+
+echo "Bring Sonoff into flash mode now (press button while power cycling)."
+echo "Attention, we will flash a firmware without OTA support:"
+echo "For major software updates, you will have to connect the Sonoff again via"
+echo "serial to the computer to re-flash."
+echo
+echo "Press enter to continue to actual flash process."
+read w
+
+echo "Flashing Sonoff."
+flash_serial_esp8266 "$1" waiterase noota dout
+echo "Flashing Sonoff done."
+echo "Hardware reset Sonoff now (do NOT press button while power cycling)."

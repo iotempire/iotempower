@@ -1,0 +1,16 @@
+#!/bin/bash
+
+echo "If unsure, verify with serial_console that Sonoff actually is booted to upy"
+echo "command line, but exit serial_console before continuing."
+echo
+echo "Press enter to continue to actual update process."
+read w
+
+echo "Installing software for Sonoff."
+port="$1"
+shift 1
+update_serial_esp8266 "$port" sonoff "$@"
+
+echo
+echo "Waiting 7s for reset to finish."
+sleep 7

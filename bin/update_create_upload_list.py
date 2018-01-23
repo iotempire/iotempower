@@ -8,7 +8,7 @@ import sys
 import os
 from hashlib import sha256
 
-onlycreate=["wifi_cfg.py","webrepl_cfg.py","autostart.py"]
+onlycreate=["config.py"]
 
 def main(argv):
     if len(argv)<3:

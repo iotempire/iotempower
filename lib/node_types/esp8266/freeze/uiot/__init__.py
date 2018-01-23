@@ -4,8 +4,10 @@
 import gc
 import machine
 
-
-from pins import *  # get all the pins
+try:
+    from pins import *  # get all the pins
+except: # when update failed, it will fail here, so try to prevent stopping here
+    print("Trouble reading pins.")
 
 from . import _wifi
 

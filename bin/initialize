@@ -1,7 +1,7 @@
 #!/bin/bash
 if [[ $# -gt 2 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF
-Syntax: initialize [serial_port] [wemosd1pro] [noflash]
+Syntax: initialize [serial_port] [noflash] [noupdate]
 
 initialize must be called from a node directory and reads its configuration
 from there.
@@ -19,10 +19,7 @@ The last two steps fail, if the node router and mqtt broker are not available.
 Running deploy noupdate again (when router and mqtt broker become avaialable)
 fixes/finishes this.
 
-If the option wemosd1pro is given, the flash size is fixed to 4MB (even if the
-wemos d1 mini pro has 16MB as the flasher does not support 16MB).
-
-serial_port: can be usb0, usb1, or acm0, acm1, ...
+serial_port: can be empty, usb0, usb1, or acm0, acm1, ...
 EOF
 exit 1
 fi
@@ -34,34 +31,24 @@ source "$ULNOIOT_ROOT/bin/read_node_config"
 
 port=$(find_esp_port "$1")
 
-pro_option=""
+platform_folder="$ULNOIOT_ROOT/lib/node_types/$board"
 
 # if this is set, skip flashing
-if [[ "$*" = *wemosd1pro* || "$*" = *wemosd1minipro* || "$*" = *wemos_d1_mini_pro* ]]; then
-    pro_option="wemosd1pro"
+if [[ "$*" != *noflash* ]]; then
+    flash_serial "$port"
 fi
 
-# if this is set, skip flashing
-if [[ "$*" != *noflash ]]; then
-
-## TODO: support other boards
-echo "Flashing Wemos D1 Mini."
-flash_serial_esp8266 "$1" $pro_option
-echo "Waiting 7s until things are settled (formatting internal flash)."
-sleep 7 # let things rest
-echo "Installing software."
-update_serial_wemosd1mini "$1"
-echo
-echo "7s wait for reset to finish."
-sleep 7
-
-fi # noflash
+# potentially skip the update
+if [[ "$*" != *noupdate* ]]; then
+    update_serial "$port" alsodeploy
+fi
 
 # check key-file and eventually regenerate
 KEYFILE=key.hex
 key=$(tail -n1 "$KEYFILE")
 if [[ ! ${#key} = 64 ]]; then
     # TODO: check that haveged is running and maybe check not to overwrite key?
+    echo "Generating new key."
     head -c32 /dev/random|od -A n -t x2|tr -d ' \r\n' > "$KEYFILE"
     key=$(tail -n1 "$KEYFILE")
 fi
@@ -72,13 +59,7 @@ cfg="$(mktemp --suffix .ulnoiot)"
 cat > "$cfg" << EOF
 wifi_name = "$ULNOIOT_AP_NAME"
 wifi_pw = "$ULNOIOT_AP_PASSWORD"
-EOF
-
-cat >> "$cfg" << EOF
 netrepl="$key"
-EOF
-
-cat >> "$cfg" << EOF
 mqtt_host = "$ULNOIOT_AP_HOSTNAME"
 mqtt_topic = "$topic"
 mqtt_user = "$ULNOIOT_MQTT_USER"
@@ -95,11 +76,12 @@ mpfshell -n -c \
 # tidy up
 rm "$cfg"
 
-echo "Waiting 15s until reset is done and internet connected."
-sleep 15
-echo "Copying files via network."
-deploy noupdate
+# we deployed already in serial update
+#echo "Waiting 15s until reset is done and internet connected."
+#sleep 15
+#echo "Copying files via network."
+#deploy noupdate
 
 echo
-echo "Done."
+echo "Done initializing."
 

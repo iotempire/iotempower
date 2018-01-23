@@ -59,7 +59,7 @@ if [[ -e "node.conf" || -e "../node.conf" ]]; then  # started from node-director
         path="$(pwd)"
         cd "$ULNOIOT_ROOT/lib/netrepl"
         python3 copy.py "$ip" --keyfile "$path/key.hex" $sync \
-            --src "$path/files/" $reset
+            --src "$path/copy/" $reset
     else
         echo "Couldn't find IP of node with topic $topic for deployment. Skipping."
         exit 1

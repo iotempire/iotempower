@@ -83,6 +83,7 @@ class Device(object):
 
     def update(self):
         # returns True if the update caused a change in value
+        # will be called very often from event loop
         oldval = self.value()
         self._update()
         newval = self.value()
@@ -92,3 +93,8 @@ class Device(object):
         if self.report_change:
             return changed
         return False
+
+    def updated_value(self):
+        # This should only be used for debugging purposes
+        self.update()
+        return self.value()

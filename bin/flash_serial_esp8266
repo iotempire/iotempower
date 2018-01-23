@@ -99,7 +99,7 @@ sleep 15
 #sleep 2
 #echo "Doing soft-reset."
 #board_reset "$1" "$2"
-echo "Reset should be done now."
+echo "Initial reset should be done now."
 
 popd &> /dev/null
 

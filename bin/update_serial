@@ -1,0 +1,36 @@
+#!/bin/bash
+if [[ $# -gt 2 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
+cat << EOF
+Syntax: update_serial [serial_port] [alsodeploy]
+
+update_serial must be called from a node directory and reads its configuration
+from there.
+It looks for a locally (i.e. via serial) connected board matching the node
+description.
+
+It performs a local (serial) update and installs initial system
+user-space software.
+If alsodeploy is set it also copies the user folder and autostart to it.
+
+serial_port: can be empty, usb0, usb1, or acm0, acm1, ...
+EOF
+exit 1
+fi
+
+[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+
+source "$ULNOIOT_ROOT/bin/read_node_config"
+dep=""
+if [[ "$*" = *alsodeploy ]]; then
+    if [[ "$1" = alsodeploy ]]; then
+        port=$(find_esp_port "")
+    else
+        port=$(find_esp_port "$1")
+    fi
+    dep=alsodeploy
+else
+    port=$(find_esp_port "$1")
+fi
+
+exec bash "$ULNOIOT_ROOT/lib/node_types/$board/bin/update_serial" "$port" $dep
+

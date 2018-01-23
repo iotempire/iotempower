@@ -1,0 +1,24 @@
+#!/bin/bash
+if [[ $# -gt 1 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
+cat << EOF
+Syntax: flash_serial [serial_port]
+
+flash_serial must be called from a node directory and reads its configuration
+from there.
+It looks for a locally (i.e. via serial) connected board matching the node
+description.
+
+It performs a local (serial) flash corresponding to the local node.
+
+serial_port: can be empty, usb0, usb1, or acm0, acm1, ...
+EOF
+exit 1
+fi
+
+[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+
+source "$ULNOIOT_ROOT/bin/read_node_config"
+
+port=$(find_esp_port "")
+
+exec bash "$ULNOIOT_ROOT/lib/node_types/$board/bin/flash_serial" "$port"

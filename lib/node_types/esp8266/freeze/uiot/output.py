@@ -27,6 +27,7 @@ class Output(Device):
                         on_change=on_change, report_change=report_change,
                         value_map={1: self.high_command, 0: self.low_command})
         pin.init(Pin.OUT)
+        self.state = self.pin()
 
     def evaluate(self, msg):
         if msg == self.high_command:
@@ -43,5 +44,8 @@ class Output(Device):
     on = high
     off = low
 
+    def _update(self):
+        self.state = self.pin()
+
     def value(self):
-        return self.pin()
+        return self.state
