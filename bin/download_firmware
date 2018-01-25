@@ -1,8 +1,10 @@
 #!/bin/bash
 
-URL="https://github.com/ulno/ulnoiot/releases/download/$ULNOIOT_VERSION/firmware"
-
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+
+# make extra sure you have the right version
+ULNOIOT_VERSION="$(cat $ULNOIOT_ROOT/VERSION)"
+URL="https://github.com/ulno/ulnoiot/releases/download/$ULNOIOT_VERSION/firmware"
 
 cd "$ULNOIOT_EXTERNAL/firmware"
 curl -L -o firmware.bin "$URL.bin"
