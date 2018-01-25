@@ -62,6 +62,8 @@ if [[ ! -d "$TILDEDIR" || "$*" = "clean" ]]; then
     done
 fi
 
+cd "$TILDEDIR"
+
 PNAME="libtranscript"
 cd $(ls |grep "$PNAME-"|grep -v ".tar.bz2"|head -n1)
 chmod a+x configure install.sh
