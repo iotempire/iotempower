@@ -6,39 +6,66 @@ import time
 import uiot._cfg as _cfg
 import unetrepl as nr
 
-
+# activate wifi network
 _ap = network.WLAN(network.AP_IF)
 _ap.active(False)
 _wlan = network.WLAN(network.STA_IF)
 _wlan.active(True)
 
+_wlan_laststate = False
 
-# connect to wifi
-def connect():
+
+# connect to wifi and really try to connect
+def connect_blocking():
     global _wlan
 
-    _ap.active(False)
-    _wlan.active(True)
+    activate()
 
-    # removed scan of networks to allow connect to hidden essid
+    # no scan of networks to allow connect to hidden essid
     # Try to connect
-    if _cfg.config.wifi_name:
-        _wlan.connect(_cfg.config.wifi_name, _cfg.config.wifi_pw)
-        tries = 15
-        for i in range(tries):
-            print("%d/%d. Trying to connect." % (i + 1, tries))
-            machine.idle()
-            time.sleep(1)
-            #                if _wlan.isconnected(): break
-            if _wlan.status() == network.STAT_GOT_IP: break
+    tries = 15
+    for i in range(tries):
+        print("%d/%d. Trying to connect." % (i + 1, tries))
+        machine.idle()
+        time.sleep(1)
+        if connected():
+            break
 
-    if _wlan.isconnected() and _wlan.status() == network.STAT_GOT_IP:
+    if connected():
         print('Wifi: connection succeeded!')
         print(_wlan.ifconfig())
     else:
         print('Wifi: connection failed, starting accesspoint!')
         accesspoint()
     nr.start(nostop=True)
+
+
+def activate():
+    global _wlan
+
+    _ap.active(False)
+    _wlan.active(True)
+
+    if _cfg.config.wifi_name:
+        _wlan.connect(_cfg.config.wifi_name, _cfg.config.wifi_pw)
+
+
+def deactivate():
+    global _wlan
+    _ap.active(False)
+    _wlan.active(False)
+
+
+def monitor():
+    # needs to be called on regular basis
+    global _wlan_laststate
+    if _wlan_laststate != connected(): # connection status change
+        if _wlan_laststate:  # network became inactive
+            pass
+        else:  # network became active
+            nr.start(nostop=True)  # start netrepl
+        _wlan_laststate = not _wlan_laststate  # there was a change, so toggle
+    # TODO: consider activating AP mode, if not active for long time
 
 
 def accesspoint():
@@ -50,7 +77,7 @@ def accesspoint():
 
 
 def connected():
-    return _wlan.isconnected()
+    return _wlan.isconnected() and _wlan.status() == network.STAT_GOT_IP
 
 
 def config():
@@ -97,9 +124,12 @@ def setup(name, password, reset=True):
         if reset:
             print("Resetting system in 3 seconds.")
             time.sleep(1)
-            # webrepl.stop()
             nr.stop()
             time.sleep(2)
             machine.reset()
         else:
-            connect()
+            activate()
+
+# when module loaded the first time start blocking to also bring up netrepl at
+# right time
+connect_blocking()

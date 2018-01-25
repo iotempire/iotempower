@@ -12,7 +12,7 @@ except: # when update failed, it will fail here, so try to prevent stopping here
 from . import _wifi
 
 wifi = _wifi.setup
-wifi_connect = _wifi.connect
+wifi_connect = _wifi.connect_blocking
 wscan = _wifi.scan
 wip = _wifi.wip
 

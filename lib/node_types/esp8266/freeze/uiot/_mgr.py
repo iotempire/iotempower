@@ -125,6 +125,7 @@ def _publish_status(device_list=None, ignore_time=False):
                             _client.publish(t, my_value)
                         else:
                             _client.publish(t, str(my_value).encode())
+            _publish_ip()
         except Exception as e:
             print('Trouble publishing, re-init network.')
             print(e)
@@ -188,13 +189,19 @@ def _subscription_cb(topic, msg):
                 d.run_setter(st, msg)
 
 
+def _publish_ip():
+    global _report_ip
+    if _report_ip:
+        t = (_topic + "/ip").encode()
+        _client.publish(t, str(_wifi.config()[0]), retain=True)
+
+
 def _init_mqtt():
     global _client, _port
     #    global _ssl
     global _broker, _topic, _user, _password, _client_id
 
     print("Trying to connect to mqtt broker.")
-    _wifi.connect()
     gc.collect()
     try:
         _client = _MQTTClient(_client_id, _broker, user=_user,
@@ -205,9 +212,7 @@ def _init_mqtt():
         t = _topic.encode() + b"/#"
         _client.subscribe(t)
         print("Subscribed to topic and subtopics of", _topic)
-        if _report_ip:
-            t = (_topic + "/ip").encode()
-            _client.publish(t, str(_wifi.config()[0]), retain=True)
+        _publish_ip()
     except Exception as e:
         print("Trouble to init mqtt:", e)
 
@@ -237,6 +242,7 @@ def run(updates=5, sleepms=1, poll_rate_inputs=4, poll_rate_network=10):
     counter = 0
 
     while True:
+        _wifi.monitor() # make sure wifi is in good shape
         if counter % poll_rate_network == 0:
             _poll_subscripton()
         if counter % poll_rate_inputs == 0:
@@ -263,6 +269,5 @@ def run(updates=5, sleepms=1, poll_rate_inputs=4, poll_rate_network=10):
             counter = 0
 
 
-transmit = run
 mqtt(_cfg.config.mqtt_host, _cfg.config.mqtt_topic,
      _cfg.config.mqtt_user, _cfg.config.mqtt_pw, save=False)

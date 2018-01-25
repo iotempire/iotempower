@@ -93,7 +93,6 @@ else
         fi
     done
 fi
--DT3_DONT_CHECK_VERSION
 export CFLAGS="-O2 -D_POSIX_C_SOURCE=200809L"
 
 cd "$TILDEDIR/llnextgen"
