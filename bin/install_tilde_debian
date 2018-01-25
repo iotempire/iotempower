@@ -41,9 +41,9 @@ if [[ ! -d "$TILDEDIR" || "$*" = "clean" ]]; then
 
     }
 
-    echo "Deleting cache and re-downloading tilde source."
+    echo "Deleting cache and re-downloading tilde source (might need sudo pw)."
     echo
-    rm -rf "$TILDEDIR" &> /dev/null
+    sudo rm -rf "$TILDEDIR" &> /dev/null
     mkdir -p "$TILDEDIR"
     cd "$TILDEDIR"
 
@@ -57,8 +57,8 @@ if [[ ! -d "$TILDEDIR" || "$*" = "clean" ]]; then
     wget http://os.ghalkes.nl/dist/tilde-0.3.9.tar.bz2
 
     for a in $(ls *.tar.bz2); do
-      tar xjf "$a"
-      rm "$a"
+        tar xjf "$a"
+        rm "$a"
     done
 fi
 
