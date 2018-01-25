@@ -58,7 +58,7 @@ if [[ ! -d "$TILDEDIR" || "$*" = "clean" ]]; then
 
     for a in $(ls *.tar.bz2); do
       tar xjf "$a"
-      rf "$a"
+      rm "$a"
     done
 fi
 
