@@ -128,6 +128,7 @@ sudo mkdir -p /usr/include/t3/widget/t3widget
 sudo mkdir -p /usr/include/t3/widget/t3widget/dialogs
 sudo mkdir -p /usr/include/t3/widget/t3widget/widgets
 sudo mkdir -p /usr/share/doc/libt3widget/API/search
+sudo mkdir -p /usr/lib/libt3widget
 sudo checkinstall \
     --pkgname="$PNAME" \
     --requires="libt3key,libt3window" \
