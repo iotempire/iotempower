@@ -59,9 +59,9 @@ def deactivate():
 def monitor():
     # needs to be called on regular basis
     global _wlan_laststate
-    if _wlan_laststate != connected(): # connection status change
+    if _wlan_laststate != connected():  # connection status change
         if _wlan_laststate:  # network became inactive
-            pass
+            pass  # shoudl be retried by esp in background
         else:  # network became active
             nr.start(nostop=True)  # start netrepl
         _wlan_laststate = not _wlan_laststate  # there was a change, so toggle

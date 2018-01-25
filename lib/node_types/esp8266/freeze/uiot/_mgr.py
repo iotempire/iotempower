@@ -100,6 +100,9 @@ def delete(name):
 def _publish_status(device_list=None, ignore_time=False):
     global _client, _last_publish
 
+    if _client is None:
+        return # done nothing to publish
+
     if device_list is None:
         device_list = _devlist.values()
 
@@ -129,7 +132,7 @@ def _publish_status(device_list=None, ignore_time=False):
         except Exception as e:
             print('Trouble publishing, re-init network.')
             print(e)
-            _init_mqtt()
+            _client = None
 
 
 # ======= Setup and execution
@@ -190,10 +193,15 @@ def _subscription_cb(topic, msg):
 
 
 def _publish_ip():
-    global _report_ip
+    global _client,_report_ip
     if _report_ip:
         t = (_topic + "/ip").encode()
-        _client.publish(t, str(_wifi.config()[0]), retain=True)
+        if _client is not None:
+            try:
+                _client.publish(t, str(_wifi.config()[0]), retain=True)
+            except e:
+                print("Trouble publishing IP:", e)
+                _client = None
 
 
 def _init_mqtt():
@@ -215,14 +223,17 @@ def _init_mqtt():
         _publish_ip()
     except Exception as e:
         print("Trouble to init mqtt:", e)
+        _client = None
 
 
 def _poll_subscripton():
     global _client
-    try:
-        _client.check_msg()  # non blocking
-    except:
-        print("Trouble to receive from mqtt.")
+    if _client is not None:
+        try:
+            _client.check_msg()  # non blocking
+        except:
+            print("Trouble to receive from mqtt.")
+            _client = None
 
 
 def run(updates=5, sleepms=1, poll_rate_inputs=4, poll_rate_network=10):
@@ -231,7 +242,6 @@ def run(updates=5, sleepms=1, poll_rate_inputs=4, poll_rate_network=10):
     # sleepms: going o sleep for how long between each loop run
     # poll_rate_network: how often to evaluate incoming network commands
     # poll_rate_inputs: how often to evaluate inputs
-    _init_mqtt()
     if updates == 0:
         overflow = 1000
     else:
@@ -252,9 +262,14 @@ def run(updates=5, sleepms=1, poll_rate_inputs=4, poll_rate_network=10):
                     device_list.append(d)
             if len(device_list) > 0:
                 _publish_status(device_list)
-        if updates != 0 and counter % (updates * 1000) == 0:
-            print("Publishing full update.")
-            _publish_status(ignore_time=True)
+        # monitor mqtt
+        if _client is None:
+            if counter % 10: # don't do it too often
+                _init_mqtt()
+        else:
+            if updates != 0 and counter % (updates * 1000) == 0:
+                print("Publishing full update.")
+                _publish_status(ignore_time=True)
         # execute things on timestack
         now = time.ticks_ms()
         for id in list(_timestack):

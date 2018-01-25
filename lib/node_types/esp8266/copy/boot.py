@@ -18,7 +18,5 @@ machine.freq(160000000)  # fast default as long as chacha not optimized
 
 import uiot._wifi
 
-uiot._wifi.connect()
-
 # webrepl.start()
 gc.collect()
