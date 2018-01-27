@@ -1,15 +1,18 @@
-###########################
-#### UlnoIoT Tmux Help ####
-###########################
+UlnoIoT Tmux Help
+=================
+
 
 Welcome to ulnoiot, your friendly and affordable Internet of Things
 environment. For more info, check http://github.com/ulno/ulnoiot.
 
-Use the Escape key (ESC) to close this help. Use ctrl-a h to open this help
-again.
+Use the Escape key (ESC) or CTRL-Q to close this help. Use CTRL-A H to show it
+again. CTRL-A H means: press the A key (do not press the shift key extra only
+when specified as SHIFT), while holding the CTRL-key, release both, then press
+the H-key.
 
-You can scroll through this help with the cursor keys as well as using the scroll wheel on your mouse or scroll gesture on your touchpad. If you want to
-search, use ctrl-f (enter search word and later use n or p for next or
+You can scroll through this help with the cursor keys as well as using the
+scroll wheel on your mouse or scroll gestures on your touchpad. If you want to
+search, use CTRL-F (enter search word and later use n or p for next or
 previous).
 
 The terminal here is not a totally normal terminal, it is a terminal
@@ -17,17 +20,75 @@ multiplexer based on tmux (http://github.com/tmux/tmux). Why do you want this
 in ulnoiot, you ask? This allows you to reconnect to your terminal session,
 even if you got disconnected.
 
-However, tmux allows you to other very helpful things with your terminal
-session which are described here briefly:
+
+Tmux Keyboard Shortcuts
+-----------------------
+
+However, tmux allows you to do other very helpful things with your terminal
+session which are described here briefly (attention: these keyboard shortcuts
+are modified from the default tmux shortcuts).
+
+- CTRL-A CTRL-SPACE or CTRL-A SPACE: Enter tmux copy-mode.
+  This allows you to select text from your session (the output of the programs
+  you recently ran in this terminal. You can leave copy mode with CTRL-Q or
+  pressing the Escape key. You can mark something in copy mode with clicking
+  and dragging the mouse or pressing CTRL-SPACE and pressing CTRL-C to copy
+  the selection to the clipboard.
+- CTRL-A E: Open all the output of the current session in a text editor for
+  easier search and copying
+- CTRL-A CTRL-Q (or CTRL-A D): Disconnect from the current session, but keep
+  everything in that session running.
+- CTRL-A N: Create a (n)ew window (like a tab in your browser).
+- CTRL-A K: (K)ill/terminate the current session, everything is terminated in
+  the current session.
+- CTRL-A RIGHT (right arrow key): Select next window (tab) to the right (next).
+- CTRL-A LEFT (left arrow key): Select next window (tab) to the left (previous)
+  (you can also use your mouse to click on different tabs in the status bar
+  below and switch to them).
+- CTRL-V: The current version of tmux for ulnoiot allows you to use CTRL-V
+  anywhere to insert the current clipboard.
 
 
-- ctrl-a ctrl-Space or ctrl-a Space: Enter tmux copy-mode
-  This allows you to select 
-- ctrl-a Right-cursor: select next window to right (next)
-- ctrl-a Left-cursor: select next window to left (previous)
+Commands to Help Directly at the Command Prompt
+-----------------------------------------------
 
-## commands to help in bash
-- ctrl-x ctrl-e : edit current command line in editor
+There are also some other helpful key combinations and commands which help you
+working directly at the command prompt (of the shell, which is called bash) or
+the command line which might come in handy, so they are listed here for
+reference:
 
-#### End of UlnoIoT Tmux Help ####
+- CTRL-C: in the command line doesn't co[py anything, it interrupts the
+  currently running command.
+- CTRL-Z: will suspend the currently runnign program. You can then use
+- CTRL-X CTRL-E: edit current command line in the editor (very nice, if you
+  want to use the mouse and standard CTRL-C, CTRL-X and CTRL-V key bindings
+  to handle long commands).
+- man <command>: typing man <command>, gives you a manual page on the specific
+  command <command>.
+- man tmux: typing man tmux at the comamnd-line will give you further help on
+  tmux.
+- tmux list-keys: typing list-keys gives you a list of all keybindings defined
+  in tmux.
+- mc: opens an easy to use file-manager, which can be controlled with the
+  mouse. Look also at mc's user menu as it has several commands to help you
+  with ulnoiot.
+
+
+UlnoIoT-Specific Commands
+-------------------------
+
+All these commands need to be typed in at the command line (and executed by
+typing enter).
+- ulnoiot help: shows a complete list of ulnoiot commands, type ulnoiot help.
+- ulnoiot help <command> or uhelp: shows you more information on the specific
+  node command <command> (like typing help("<command>")
+- ulnoiot upgrade: allows you to upgrade to the newest version of ulnoiot
+
+
+Have fun inventing the next Internet of Things system!
+
+
+Yours,
+
+     The UlnoIoT Team
 
