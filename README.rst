@@ -51,6 +51,8 @@ Table of Contents
 
 - `External Resources`_
 
+- `Support`_
+
 - `Further Documentation`_
 
 
@@ -375,6 +377,19 @@ community home automation software like
 `home-assistant <http://home-assistant.io>`__ and
 `openhab <https://openhab.org>`__.
 
+
+Support
+-------
+
+You can find the developers and people using ulnoiot on matrix.org or
+respectively riot in the group ulnoiot and might get answers there in
+real time.
+Feel also free to file and discuss issues, problems, and potential new features
+at http://github.com/ulno/ulnoiot.
+Please feel also free to contact ulno directly via http://contact.ulno.net,
+especially if you want to use ulnoiot in teaching yourself, or have somebody
+teach the use and opportunities of ulnoiot to you or your organization in
+person.
 
 
 Further Documentation
