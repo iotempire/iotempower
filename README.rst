@@ -33,22 +33,25 @@ newer generation (wifi on board - both the Raspberry Pi 3 and the Raspberry Pi Z
 can be easily used as an ulnoiot gateway at this point)
 to allow them to work as wifi routers.
 
-TOC
----
 
-- `Architecture`__
+Table of Contents
+-----------------
 
-- `Supported Hardware`__
+- `Introduction`_
 
-- `Tool Support`__
+- `Architecture`_
 
-- `Instalaltion`__
+- `Supported Hardware`_
 
-- `First IoT Nodes`__
+- `Tool Support`_
 
-- `External Resources`__
+- `Installation`_
 
-- `Furher Documentation`__
+- `First IoT Nodes`_
+
+- `External Resources`_
+
+- `Furher Documentation`_
 
 
 
@@ -253,14 +256,14 @@ Installation on Raspberry Pi from Pre-Prepared Image
 - At one point, also make sure to run ``sudo raspi-config`` and chose to resize the
   hd in the advanced options.
 
-- Check out the `short tmux help <>`__,
+- Check out the `short tmux help </doc/tmux-help.txt>`__,
   pressing the ctrl-key and a-key simultanously,
   releasing them and then pressing the h-key.
 
 If you have trouble following this, make sure to checkout the tutorials on
 youtube.
 
-you can now continue with `First IoT Nodes`__
+you can now continue with `First IoT Nodes`_
 
 
 Installation on Linux
