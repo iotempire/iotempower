@@ -18,15 +18,46 @@ However, it also supports existing IoT deployments and brings
 mechanisms for over the air (OTA) updates and automatic
 multi-device deployment.
 
-If you are impatient and want to dive into it right now, forward to
+If you are impatient and want to dive into it right now, fast forward to
 `Installation`_ or `First IoT Nodes`_.
 
-It is based on a multi-layered network architecture. This means for this project
+ulnoiot is based on a multi-layered network architecture. This means for this project
 that each IoT-system (small network of connected sensors and actors) has its own
 gateway - usually running an MQTT-broker. These gateways can be connected to cloud
 resources, other cloud or Internet based MQTT brokers or interconnected among
 themselves. Security and privacy can be selectively controlled at each layer
 border (everywhere, where a gateway connects two layers).
+In a teaching context these gateways are usally based on a modified Raspbian
+running on a Raspberry Pi of a
+newer generation (wifi on board - both the Raspberry Pi 3 and the Raspberry Pi Zero W
+can be easily used as an ulnoiot gateway at this point)
+ to allow them to work as wifi routers.
+
+
+Architecture
+------------
+
+.. figure:: /doc/images/system-architecture.png
+   :width: 50%
+   :figwidth: 100%
+   :align: center
+   :alt: ulnoiot System Architecture
+
+   ulnoiot System Architecture
+
+In an ulnoiot system you find one or several ulnoiot gateways and wirelessly
+connected nodes with physically connected devices (sensors or actors).
+
+An *ulnoiot gateway* contains and runs all the software needed to configure an
+IoT system. It also provides facilities to run and manage a wifi router as well
+as an MQTT-broker. It therefore provides configuration management software as
+well as dataflow management services.
+
+Such a gateway can for example easily be installed on a Raspberry Pi 3.
+*Nodes* are wireless components which interact with physical obejcts. Usually a
+*node* has several *devices* attached to it. *devices* can be sensors (like a button or
+temperature, light, movement, or humidity sensor) or actors (like relais, solenoids,
+motors, or leds).
 
 
 Supported Hardware
@@ -34,11 +65,13 @@ Supported Hardware
 
 *ulnoiot* is targeted to run on a variety of (mainly Linux-based) hardware and
 on wireless microcontrollers (initially mainly esp8266-based microcontrollers and
-single-board Linux computers like the Raspberry Pi Zero W).
+single-board Linux computers like the Raspberry Pi 3 or Raspberry Pi Zero W).
 
-If you are interested in shopping for related hardware, check http://iot.ulno.net/hardware.
+If you are interested in shopping for related hardware, check http://iot.ulno.net/hardware
+or go directly to AliExpress, Amazon, AdaFruit or Sparkfun and search for Wemos
+D1 Mini, ESP8266, NodeMCU, 37-in-1 Arduino sensor kit.
 
-The server side has been tested to run on:
+The gateway services have been tested to run on:
 
 - Raspberry Pi 1 (B and B+), 2, 3, and Zero W
 - Linux laptop running Ubuntu 17.04
@@ -46,38 +79,18 @@ The server side has been tested to run on:
 We are trying to provide virtualbox images as soon as we find time and/or volunteers.
 
 We are also working on verifying that ulniot works well on Orange-Pi Zero and
-the C.H.I.P. from NextThing to allow cost-effective solutions to use ulnoiot.
+the C.H.I.P. from NextThing to allow more cost-effective solutions to use ulnoiot.
 
 The part of ulnoiot running on the esp8266 is an extension of
 `micropython <http://www.micropython.org/>`__
-enabling IoT classes and easy getting started using 
+enabling IoT classes and easily getting started using
 micropython.
-To support this start, we are using our own development kits as well as 
-supporting very simple
-selections of devices usually including the ESP8266 board Wemos D1 mini.
 
-1st supported development kit: ulnoiot_devkit1
-++++++++++++++++++++++++++++++++++++++++++++++
+There has been some initial effort in creating a starter development kit for
+the Wemos D1 Mini - you can see more information `here
+</doc/shields/wemosd1mini/devkit1/README.rst>`__.
 
-For a start, the original author Ulno (http://ulno.net) has designed some
-shields (little electronic parts you can just plug together) to plug into
-a Wemos D1 mini. This is now called the devkit1.
-You can also find manuals to build different parts of the 
-devkit and the links to youtube videos using and soldering them on
-`ulno's youtube channel <https://www.youtube.com/channel/UCaDpsG87Q99Ja2q3UoiXRVA>`__.
 
-devkit1 envisions the following shields:
-
-- `devel </doc/shields/wemosd1mini/devkit1/2led3but/README.md>`__:
-  a shield with two leds and 3 buttons
-- `display </doc/shields/wemosd1mini/devkit1/display/README.md>`__:
-  supports using an i2c-based 128x64 LCD (ssd1306) on d5 and d2
-- `ht </doc/shields/wemosd1mini/devkit1/ht/README.md>`__:
-  a shield employing a DHT11 temperature and humidity sensor (connected to d1)
-- `mpr121 </doc/shields/wemosd1mini/devkit1/mpr121/README.md>`__:
-  this is a shield using the mpr121 multi touch and gpio chip over i2c
-- `relay </doc/shields/wemosd1mini/relay/README.md>`__:
-  supporting the default relay shield for the wemos d1 mini attached to d1
 
 Tool support
 ------------
@@ -94,7 +107,7 @@ the ulnoiot command or executing run in the main ulnoiot directory):
 
 - accesspoint: start an accesspoint on a free wifi interface
 
-- download_firmware: download latest firmware
+- ulnoiot upgrade: get latest version of ulnoiot (inside an existing version)
 
 - shell: starting mpfshell to connect to locally or network connected esp8266
   device
@@ -125,13 +138,102 @@ the ulnoiot command or executing run in the main ulnoiot directory):
 
     - console_serial: connect via serial to a locally connected
       microcontroller
-    - flash_serial_esp8266: flash the ulnoiot-modified micropython on a locally connected
+    - initialize: set up (flash, update, and deploy) an ulnoiot node for the first time
+    - flash_serial: flash the ulnoiot-modified micropython on a locally connected
       esp8266
-    - update_serial_wemosd1mini: copy or update the modifieable files for the ulnoiot
+    - update_serial [alsodeploy]: copy or update the modifieable files for the ulnoiot
       environment to a locally or remotely connected wemosd1mini
+
+
 
 Installation
 ------------
+
+There are two ways to get the ulnoiot configuration management software
+up and running:
+
+1. Downloading and flashing a pre-prepared raspberry pi image to an sd card
+   and running the gateway and configuration management software from there.
+
+2. Setting up ulnoiot in your own Linux environment:
+   `Installation on Linux`_
+
+Please also check out the tutorial videos for this setup on ulno's youtube
+channel: https://www.youtube.com/results?search_query=ulno.net+ulnoiot
+
+
+Installation on Raspberry Pi from Pre-Prepared Image
+++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+- Download the Raspberry Pi image from here: https://goo.gl/Q3icjQ
+
+- Make sure the sha256-checksum of the image is correct. It should be:
+
+  91f98817b17f96308acb52dc7597bcaba6adb806759d42c2f840c53233148159
+
+  On Linux and MacOS, you can use sha256sum to verify the image, on Windows
+  you can use https://raylin.wordpress.com/downloads/md5-sha-1-checksum-utility/
+
+- Write the image to a (at least) 8GB class-10 sd-card with https://etcher.io/
+  (works on Windows, MacOS, or Linux).
+
+- Open the sd-card on your pc. You will see a file named config.txt
+  Edit this file and scroll to the bottom. Change and uncomment the options
+  ``uiot_ap_name`` and ``uiot_ap_password`` to your own values,
+  remember the password
+  you set in ``uiot_ap_password``. This configures the pi as a wifi-router.
+
+  If you have another USB-wifi stick, and want to use Internet via WiFi
+  connect this wifi stick to the pi and configure ``uiot_wifi_name``,
+  ``uiot_wifi_password``, and ``uiot_wifi_user`` correspondingly
+  to your WiFi network.
+
+  If you have access to ethernet (for example a free ethernet lan port on your
+  router), connect the Pi to this ethernet - no extra configuration is necessary
+  for this.
+
+- Put the sd-card into a Raspberry Pi 3 and power it up (you can also put it into
+  a Raspberry Pi Zero W, however there are some advanced configuration options
+  You need to use to make that work fluently).
+
+- In Windows, install `MobaSSH <https://mobassh.mobatek.net/>`__. On MacOS,
+  make sure, you have `XQuartz <https://www.xquartz.org/>`__ installed. Linux
+  will work out of the box.
+
+- You should now see your ulnoiot wifi network as specified in ``uiot_ap_name``.
+  Connect your computer (laptop or desktop pc) to this wifi network
+  (use the password set in
+  ``uiot_ap_password``). If everything was configured correctly you should still
+  have internet on your computer.
+
+- Connect to the ulnoiotgw via ssh. Make sure to enable X forwarding to have
+  the clipboard working transparently.
+
+  The command for Mac and Linux is:
+
+  ``ssh -X pi@ulnoiotgw``
+
+  The command on Windows will be (and can be graphically configured in MobaSSH):
+
+  ``ssh -X pi@192.168.12.1``
+
+  The default password for the user pi is ``ulnoiot``
+
+  Consider changing it immediately entering the command ``passwd``
+
+- enter and run (hit enter) the command ``ulnoiot upgrade`` to make sure that
+  you have the latest version of ulnoiot.
+
+- Check out the `short tmux help <>`__,
+  pressing the ctrl-key and a-key simultanously,
+  releasing them and then pressing the h-key.
+
+If you have trouble following this, make sure to checkout the tutorials on
+youtube.
+
+
+Installation on Linux
++++++++++++++++++++++
 
 - install dependencies:
   ``sudo apt install git mc mosquitto mosquitto-clients virtualenv iptables bridge-utils``
@@ -153,15 +255,23 @@ Installation
   in your .bashrc.
 
 - start ulnoiot and agree and wait for dependencies to be downloaded
-  (if packages are mssing, fix dependencies and try to run
+  (if packages are missing, fix dependencies and try to run
   ``ulnoiot install clean``)
 
 - After successfully entering ulnoiot (the prompt should have changed colors and
   show ulnoiot in red, white, and black), start configuring your first IoT node,
   see `First IoT Nodes`_
 
+
 First IoT Nodes
 ---------------
+
+For this section, we assume that you have successfully set-up the ulnoiot
+configuration management environment.
+
+- Consider to configure  etc/ulnoiot.conf
+  and run ``accesspoint`` and ``mqtt_broker``. If you installed from the
+  Raspberry Pi image, this should not be necessary.
 
 - Copy the folder ``lib/system_templates`` to a project directory,
   you can rename
@@ -170,11 +280,11 @@ First IoT Nodes
 - Rename the included node_template to a name for the node you want to
   configure (i.e. onboard_blinker)
 
-- Adapt and configure system.conf and node.conf. If you installed ulnoiot on
-  an orange pi or raspberry pi, you might want to also configure etc/ulnoiot.conf
-  and run ``accesspoint`` and ``mqtt_broker``
+- Adapt and configure system.conf and node.conf. Especialy make sure to add the
+  correct board in node.conf. If you use a Wemos D1 Mini (this is the default),
+  no change is necessary here.
 
-- now change into your node directory, connect an esp8266 based microcontroller
+- Now change into your node directory, connect an esp8266 based microcontroller
   to your pc or raspberry/orange pi and type ``initialize``. This flashes and
   pre-configures the device.
 
@@ -215,14 +325,17 @@ This project would not have been possible without a thriving open source
 community around the Internet of Things. We make a lot of use of the following
 tools:
 
-- `mpfshell <https://github.com/wendlers/mpfshell>`__ forked for ulnoiot
-  `here <https://github.com/ulno/mpfshell>`__.
+- `The Tilde Texteditor <https://os.ghalkes.nl/tilde>`__
 - `create_ap <https://github.com/oblique/create_ap>`__ forked for ulnoiot
   `here <https://github.com/ulno/create_ap>`__.
 - `mosquitto <https://mosquitto.org/>`__.
-- `micropython reference  <https://micropython.org/>`__
+- `mpfshell <https://github.com/wendlers/mpfshell>`__ forked for ulnoiot
+  `here <https://github.com/ulno/mpfshell>`__.
+- `micropython  <https://micropython.org/>`__
+- `node-red <https://nodered.org>`__
 
-As ulnoiot relies heavily on MQTT, it integrates very easily with
+As ulnoiot relies heavily on MQTT, it also integrates very easily with
+community home automation software like
 `home-assistant <http://home-assistant.io>`__ and
 `openhab <https://openhab.org>`__.
 
