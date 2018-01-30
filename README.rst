@@ -221,8 +221,11 @@ Installation on Raspberry Pi from Pre-Prepared Image
 
   Consider changing it immediately entering the command ``passwd``
 
-- enter and run (hit enter) the command ``ulnoiot upgrade`` to make sure that
+- Enter (and run = hit enter) the command ``ulnoiot upgrade`` to make sure that
   you have the latest version of ulnoiot.
+
+- At one point, also make sure to run ``sudo raspi-config`` and chose to resize the
+  hd in the advanced options.
 
 - Check out the `short tmux help <>`__,
   pressing the ctrl-key and a-key simultanously,
@@ -230,6 +233,8 @@ Installation on Raspberry Pi from Pre-Prepared Image
 
 If you have trouble following this, make sure to checkout the tutorials on
 youtube.
+
+you can now continue with `First IoT Nodes`__
 
 
 Installation on Linux
