@@ -31,7 +31,7 @@ In a teaching context these gateways are usally based on a modified Raspbian
 running on a Raspberry Pi of a
 newer generation (wifi on board - both the Raspberry Pi 3 and the Raspberry Pi Zero W
 can be easily used as an ulnoiot gateway at this point)
- to allow them to work as wifi routers.
+to allow them to work as wifi routers.
 
 
 Architecture
@@ -117,7 +117,7 @@ the ulnoiot command or executing run in the main ulnoiot directory):
 
 - network based commands:
 
-    - console: (determines destiantion via the directory you are in) open a
+    - console: (determines destination via the directory you are in) open a
       console to the respective node (the one configured with the local
       directory)
 
