@@ -203,8 +203,9 @@ Installation on Raspberry Pi from Pre-Prepared Image
 
   91f98817b17f96308acb52dc7597bcaba6adb806759d42c2f840c53233148159
 
-  On Linux and MacOS, you can use sha256sum to verify the image, on Windows
-  you can use https://raylin.wordpress.com/downloads/md5-sha-1-checksum-utility/
+  On Linux and MacOS, you can use ``sha256sum`` or ``shasum -a 256`` to verify
+  the image, on Windows you can use
+  https://raylin.wordpress.com/downloads/md5-sha-1-checksum-utility/
 
 - Write the image to a (at least) 8GB class-10 sd-card with https://etcher.io/
   (works on Windows, MacOS, or Linux).
