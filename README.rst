@@ -33,6 +33,24 @@ newer generation (wifi on board - both the Raspberry Pi 3 and the Raspberry Pi Z
 can be easily used as an ulnoiot gateway at this point)
 to allow them to work as wifi routers.
 
+TOC
+---
+
+- `Architecture`__
+
+- `Supported Hardware`__
+
+- `Tool Support`__
+
+- `Instalaltion`__
+
+- `First IoT Nodes`__
+
+- `External Resources`__
+
+- `Furher Documentation`__
+
+
 
 Architecture
 ------------
@@ -346,6 +364,7 @@ tools:
   `here <https://github.com/ulno/mpfshell>`__.
 - `micropython  <https://micropython.org/>`__
 - `node-red <https://nodered.org>`__
+- `rpi-clone <https://github.com/billw2/rpi-clone>`__
 
 As ulnoiot relies heavily on MQTT, it also integrates very easily with
 community home automation software like
