@@ -51,7 +51,7 @@ Table of Contents
 
 - `External Resources`_
 
-- `Furher Documentation`_
+- `Further Documentation`_
 
 
 
