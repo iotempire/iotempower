@@ -81,6 +81,14 @@ We are trying to provide virtualbox images as soon as we find time and/or volunt
 We are also working on verifying that ulniot works well on Orange-Pi Zero and
 the C.H.I.P. from NextThing to allow more cost-effective solutions to use ulnoiot.
 
+Currently the following esp8266-based devices are supported:
+
+- Wemos D1 Mini
+- NodeMCU
+- Espresso Lite V2
+- Sonoff and Sonoff Touch
+- There is an esp8266 generic opition for other esp8266-based boards.
+
 The part of ulnoiot running on the esp8266 is an extension of
 `micropython <http://www.micropython.org/>`__
 enabling IoT classes and easily getting started using
