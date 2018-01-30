@@ -146,33 +146,34 @@ the ulnoiot command or executing run in the main ulnoiot directory):
 
 - network based commands:
 
-    - console: (determines destination via the directory you are in) open a
+    - ``console``: (determines destination via the directory you are in) open a
       console to the respective node (the one configured with the local
       directory)
 
-    - flash: firmware update over the network of the currently selected
+    - ``flash``: firmware update over the network (OTA) of the currently selected
       configuration folder (or all it's configuration sub-folders)
 
-    - update: update ulnoiot micropython user-mode (non firmware) extensions
+    - ``update``: update ulnoiot micropython user-mode (non firmware) extensions
       over the network of the currently selected
       configuration folder (or all it's configuration sub-folders)
 
-    - deploy: update ulnoiot micropython node coniguration (non firmware) extensions
+    - ``deploy``: update ulnoiot micropython node coniguration (non firmware) extensions
       over the network of the currently selected
       configuration folder (or all it's configuration sub-folders).
       If noupdate is specified as option, only update the node-specific files.
 
-
 - serial connection based commands:
 
-    - console_serial: connect via serial to a locally connected
+    - ``console_serial``: connect via serial to a locally connected
       microcontroller
-    - initialize: set up (flash, update, and deploy) an ulnoiot node for the first time
-    - flash_serial: flash the ulnoiot-modified micropython on a locally connected
-      esp8266
-    - update_serial [alsodeploy]: copy or update the modifieable files for the ulnoiot
-      environment to a locally or remotely connected wemosd1mini
 
+    - ``initialize``: set up (flash, update, and deploy) an ulnoiot node for the first time
+
+    - ``flash_serial``: flash the ulnoiot-modified micropython on a locally connected
+      esp8266
+
+    - ``update_serial [alsodeploy]``: copy or update the modifieable files for the ulnoiot
+      environment to a locally or remotely connected wemosd1mini
 
 
 Installation
