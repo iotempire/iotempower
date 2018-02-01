@@ -231,7 +231,7 @@ Installation on Raspberry Pi from Pre-Prepared Image
 
 - In Windows, install `MobaSSH <https://mobassh.mobatek.net/>`__. On MacOS,
   make sure, you have `iTerm2 <https://iterm2.com/>`__ and
-  XQuartz <https://www.xquartz.org/>`__ installed. Linux
+  `XQuartz <https://www.xquartz.org/>`__ installed. Linux
   will work out of the box.
 
 - You should now see your ulnoiot wifi network as specified in ``uiot_ap_name``.
