@@ -230,7 +230,7 @@ Installation on Raspberry Pi from Pre-Prepared Image
   You need to use to make that work fluently).
 
 - In Windows, install `MobaSSH <https://mobassh.mobatek.net/>`__. On MacOS,
-  make sure, you have `iTerm2 <https://https://iterm2.com/>`__ and
+  make sure, you have `iTerm2 <https://iterm2.com/>`__ and
   XQuartz <https://www.xquartz.org/>`__ installed. Linux
   will work out of the box.
 
