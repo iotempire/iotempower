@@ -34,7 +34,7 @@ identity="$uiot_wifi_user"
 password="$uiot_wifi_password"
 phase1="peaplabel=0"
 phase2="auth=MSCHAPV2"
-key_mgmt=WPA-PSK
+key_mgmt=WPA-EAP
 }
 EOF
 
