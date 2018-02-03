@@ -201,7 +201,7 @@ Installation on Raspberry Pi from Pre-Prepared Image
 
 - Make sure the sha256-checksum of the image is correct. It should be:
 
-  c90d55a9aa403995b2473ce1932507cdbb0fed17225b2429b93b95e65527dd1e
+  df0ae9edd9270438cdc3f441369971dad99098bb1c2f60286a3824090d78918b
 
   On Linux and MacOS, you can use ``sha256sum`` or ``shasum -a 256`` to verify
   the image, on Windows you can use
