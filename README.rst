@@ -197,6 +197,16 @@ channel: https://www.youtube.com/results?search_query=ulno.net+ulnoiot
 Installation on Raspberry Pi from Pre-Prepared Image
 ++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+Tutorial videos for setup:
+
+- `On MacOS <https://www.youtube.com/watch?v=oHM-ojoST-c>`__
+
+- Will release soon: On PC/Windows
+
+
+
+Installation step by step:
+
 - Download the Raspberry Pi image from here: https://goo.gl/bVgLMr
 
 - Make sure the sha256-checksum of the image is correct. It should be:
