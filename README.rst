@@ -201,7 +201,10 @@ Tutorial videos for setup:
 
 - `On MacOS <https://www.youtube.com/watch?v=oHM-ojoST-c>`__
 
-- Will release soon: On PC/Windows
+- `On PC/Windows <https://youtu.be/DZ-PwxIc8wY>`__
+
+- On Linux: Please follow the installation steps below (or file an issue to ask
+  for specific Linux video).
 
 
 
