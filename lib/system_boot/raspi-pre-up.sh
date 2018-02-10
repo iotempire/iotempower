@@ -5,11 +5,7 @@
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
-# check if otg-mode was enabled
-egrep '^\s*dtoverlay=dwc2\s*' /boot/config.txt && otg_on=1
-
-# read boot/config.txt and evaluate uiot-part in there
-eval "$(egrep '^\s*uiot_.*=' /boot/config.txt)"
+source "$ULNOIOT_ROOT/bin/read_boot_config"
 
 if [[ ! "$otg_on" = 1 ]]; then
     # otg is not activated, so we need to try eventually to get our
@@ -18,6 +14,7 @@ if [[ ! "$otg_on" = 1 ]]; then
         # If wifi_user is set (and uncommented), try to connect to enterprise network
         # without extra certificate (for example to an eduroam university network)
         # else try to connect to wpa network
+        rm /run/wpa_supplicant/wlan1 # makes problems sometimes
         cfg="/run/uiot_wpa_supplicant.conf"
         cp "$ULNOIOT_ROOT/etc/ulnoiot_wpa_supplicant.conf.base" "$cfg"
         chown root.root "$cfg"
@@ -53,6 +50,8 @@ EOF
 
         # restart interface with new configuration
     fi # wifi connect requested check
+
+sleep 0.5 # somehow things seem to sometimes not work
 
 fi # otg check
 

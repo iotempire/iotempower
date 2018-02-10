@@ -18,12 +18,7 @@
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
-# check if otg-mode was enabled
-egrep '^\s*dtoverlay=dwc2\s*' /boot/config.txt && otg_on=1
-
-# read boot/config.txt and evaluate uiot-part in there
-eval "$(egrep '^\s*uiot_.*=' /boot/config.txt)"
-
+source "$ULNOIOT_ROOT/bin/read_boot_config"
 
 if [[ "$uiot_ap_password" ]]; then # pw was given, so start an accesspoint
     if [[ ! "$uiot_ap_name" ]]; then # no ap name, so make one up
