@@ -51,7 +51,5 @@ EOF
         # restart interface with new configuration
     fi # wifi connect requested check
 
-sleep 0.5 # somehow things seem to sometimes not work
-
 fi # otg check
 
