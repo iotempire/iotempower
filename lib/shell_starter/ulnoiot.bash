@@ -32,14 +32,14 @@ fi # ending: if [[ ! "$ULNOIOT_ACTIVE" = "yes"]]; then
 if [[ "$TERM" ]]; then # only mess with the prompt if there is TERM
 
 ##### always reset prompt, when ULNOIOT_ROOT defined and sourced
-PSGREEN="\[$(tput setaf 2)\]"
-PSLBLUE="\[$(tput setaf 14)\]"
-PSWHITE="\[$(tput setaf 15)\]"
-PSBLACK="\[$(tput setaf 16)\]"
-PSDRED="\[$(tput setaf 88)\]"
-PSWHITEBG="\[$(tput setab 15)\]"
-PSBOLD="\[$(tput bold)\]"
-PSRESET="\[$(tput sgr0)\]"
+PSGREEN="\[$(tput setaf 2 2>/dev/null)\]"
+PSLBLUE="\[$(tput setaf 14 2>/dev/null)\]"
+PSWHITE="\[$(tput setaf 15 2>/dev/null)\]"
+PSBLACK="\[$(tput setaf 16 2>/dev/null)\]"
+PSDRED="\[$(tput setaf 88 2>/dev/null)\]"
+PSWHITEBG="\[$(tput setab 15 2>/dev/null)\]"
+PSBOLD="\[$(tput bold 2>/dev/null)\]"
+PSRESET="\[$(tput sgr0 2>/dev/null)\]"
 #PSRESET='\[\033[0m\]'
 
 
