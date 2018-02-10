@@ -8,16 +8,21 @@ def write():
     f = open(_file, "w")
     f.write(
 """wifi_name = {}
-wifi_pw = {}
-netrepl = {}
-mqtt_host = {}
-mqtt_topic = {}
-mqtt_user = {}
-mqtt_pw = {}
+wifi_pw = "{}"
+netrepl = "{}"
+mqtt_host = "{}"
+mqtt_topic = "{}"
+mqtt_user = "{}"
+mqtt_pw = "{}"
 
 """.format(
     config.wifi_name,
     config.wifi_pw,
+    config.key,
+    config.mqtt_host,
+    config.mqtt_topic,
+    config.mqtt_user,
+    config.mqtt_pw
     ) )
     f.close()
 
