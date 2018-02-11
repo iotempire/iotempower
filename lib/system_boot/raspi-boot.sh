@@ -18,30 +18,11 @@
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
+
 source "$ULNOIOT_ROOT/bin/read_boot_config"
 
-if [[ "$uiot_ap_password" ]]; then # pw was given, so start an accesspoint
-    if [[ ! "$uiot_ap_name" ]]; then # no ap name, so make one up
-        add_id=1
-        uiot_ap_name=iotempire
-    fi
 
-    # overwrite some configuration variables
-    #ULNOIOT_AP_DEVICES="wlan1 wlan0"
-
-    # Name of accesspoint to create
-    export ULNOIOT_AP_NAME="$uiot_ap_name"
-
-    if [[ "$add_id" = 1 ]]; then
-        export ULNOIOT_AP_ADDID=yes
-    else
-        export ULNOIOT_AP_ADDID=no
-    fi
-
-    ULNOIOT_AP_PASSWORD="$uiot_ap_password"
-
-    # channel, bridge, and mqtt data taken straight from ulnoiot.conf
-
+if [[ "ULNOIOT_AP_PASSWORD" ]]; then # pw was given, so start an accesspoint
     # start accesspoint and mqtt_broker
     tmux new-session -d -n AP -s UIoTSvrs \
             "$ULNOIOT_ROOT/run" exec accesspoint \; \
@@ -49,5 +30,4 @@ if [[ "$uiot_ap_password" ]]; then # pw was given, so start an accesspoint
             "$ULNOIOT_ROOT/run" exec mqtt_broker \; \
         new-window -d -n nodered  \
             su - pi -c "ulnoiot exec node-red"
-
 fi # accesspoint check
