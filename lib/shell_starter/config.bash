@@ -47,6 +47,8 @@ if [ -e "$ULNOIOT_ROOT/etc/ulnoiot.conf" ]; then
     source "$ULNOIOT_ROOT/etc/ulnoiot.conf"
 fi
 
+source $ULNOIOT_ROOT/bin/read_boot_config
+
 ULNOIOT_VERSION=$(cat "$ULNOIOT_ROOT/VERSION")
 
 # export all

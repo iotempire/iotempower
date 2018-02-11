@@ -28,7 +28,7 @@ if [[ -e "$_BOOT_CONFIG" ]]; then
             export ULNOIOT_AP_ADDID=no
         fi
 
-        ULNOIOT_AP_PASSWORD="$uiot_ap_password"
+        export ULNOIOT_AP_PASSWORD="$uiot_ap_password"
 
         # channel, bridge, and mqtt data taken straight from ulnoiot.conf
     fi
