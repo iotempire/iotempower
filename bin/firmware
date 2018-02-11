@@ -17,12 +17,21 @@ can make the  micropython bytcode compiler available.
 Commands supported so far:
 - download: just download everything
 - mpy: install mpy-bytecode compiler
+- freshmpy: clean everything first, upgrade and then install new version of mpy
 - build: build complete firmware
 - clean: delete everything firmware-related
 - deps: install dependencies (on a debian-like system)
 
 EOF
 exit 1
+fi
+
+if [[ "$1" == "freshmpy" ]]; then
+    firmware clean
+    ulnoiot upgrade
+    firmware download
+    firmware mpy
+    exit 0
 fi
 
 if [[ "$1" == deps ]]; then

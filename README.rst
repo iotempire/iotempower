@@ -148,34 +148,36 @@ the ulnoiot command or executing run in the main ulnoiot directory):
 
 - network based commands:
 
-    - ``console``: (determines destination via the directory you are in) open a
-      console to the respective node (the one configured with the local
-      directory)
+  - ``console``: (determines destination via the directory you are in) open a
+    console to the respective node (the one configured with the local
+    directory)
 
-    - ``flash``: firmware update over the network (OTA) of the currently selected
-      configuration folder (or all it's configuration sub-folders)
+  - ``initialize``: initialize a current node including a serial flash
 
-    - ``update``: update ulnoiot micropython user-mode (non firmware) extensions
-      over the network of the currently selected
-      configuration folder (or all it's configuration sub-folders)
+  - ``flash``: firmware update over the network (OTA) of the currently selected
+    configuration folder (or all it's configuration sub-folders)
 
-    - ``deploy``: update ulnoiot micropython node coniguration (non firmware) extensions
-      over the network of the currently selected
-      configuration folder (or all it's configuration sub-folders).
-      If noupdate is specified as option, only update the node-specific files.
+  - ``update``: update ulnoiot micropython user-mode (non firmware) extensions
+    over the network of the currently selected
+    configuration folder (or all it's configuration sub-folders)
+
+  - ``deploy``: update ulnoiot micropython node coniguration (non firmware) extensions
+    over the network of the currently selected
+    configuration folder (or all it's configuration sub-folders).
+    If noupdate is specified as option, only update the node-specific files.
 
 - serial connection based commands:
 
-    - ``console_serial``: connect via serial to a locally connected
-      microcontroller
+  - ``console_serial``: connect via serial to a locally connected
+    microcontroller
 
-    - ``initialize``: set up (flash, update, and deploy) an ulnoiot node for the first time
+  - ``initialize``: set up (flash, update, and deploy) an ulnoiot node for the first time
 
-    - ``flash_serial``: flash the ulnoiot-modified micropython on a locally connected
-      esp8266
+  - ``flash_serial``: flash the ulnoiot-modified micropython on a locally connected
+   esp8266
 
-    - ``update_serial [alsodeploy]``: copy or update the modifieable files for the ulnoiot
-      environment to a locally or remotely connected wemosd1mini
+  - ``update_serial [alsodeploy]``: copy or update the modifieable files for the ulnoiot
+    environment to a locally or remotely connected wemosd1mini
 
 
 Installation
@@ -214,7 +216,7 @@ Installation step by step:
 
 - Make sure the sha256-checksum of the image is correct. It should be:
 
-  df0ae9edd9270438cdc3f441369971dad99098bb1c2f60286a3824090d78918b
+  8f142b8baeb7a277145f7c90b7bb37f4331e705bedfa787313a944b134335543
 
   On Linux and MacOS, you can use ``sha256sum`` or ``shasum -a 256`` to verify
   the image, on Windows you can use
@@ -228,6 +230,7 @@ Installation step by step:
   ``uiot_ap_name`` and ``uiot_ap_password`` to your own values,
   remember the password
   you set in ``uiot_ap_password``. This configures the pi as a wifi-router.
+  Make sure that ``uiot_ap_password`` is longer than 8 characters.
 
   If you have another USB-wifi stick, and want to use Internet via WiFi
   connect this wifi stick to the pi and configure ``uiot_wifi_name``,
@@ -410,6 +413,7 @@ person.
 Further Documentation
 ---------------------
 
+- `Some classes where ulnoiot is used <https://ulno.net/teaching/iot/>`__
 - `micropython reference
   <https://docs.micropython.org/en/latest/esp8266/esp8266/quickref.html>`__.
 - For a very light introduction in general python, take a look at
