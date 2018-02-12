@@ -31,6 +31,7 @@ if [[ "$1" == "freshmpy" ]]; then
     ulnoiot upgrade
     firmware download
     firmware mpy
+    ulnoiot upgrade
     exit 0
 fi
 
