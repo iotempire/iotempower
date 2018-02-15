@@ -216,7 +216,7 @@ Installation step by step:
 
 - Make sure the sha256-checksum of the image is correct. It should be:
 
-  5c0770d47de219124cffafd3e7bfdd150cb1f309fd4284e6da0d65e463f4b107
+  9d2944c12eb93a189b2451adb876c03c724c0833e8ac32f06e5012355e18e66b
 
   On Linux and MacOS, you can use ``sha256sum`` or ``shasum -a 256`` to verify
   the image, on Windows you can use
