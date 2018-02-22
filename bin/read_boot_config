@@ -5,10 +5,10 @@ _BOOT_CONFIG="/boot/config.txt"
 
 if [[ -e "$_BOOT_CONFIG" ]]; then
     # check if otg-mode was enabled
-    egrep '^\s*dtoverlay=dwc2\s*' /boot/config.txt && otg_on=1
+    sed 's/\r$//' /boot/config.txt|egrep '^\s*dtoverlay=dwc2\s*' && otg_on=1
 
     # read boot/config.txt and evaluate uiot-part in there
-    eval "$(egrep '^\s*uiot_.*=' /boot/config.txt)"
+    eval "$(sed 's/\r$//' /boot/config.txt|egrep '^\s*uiot_.*=')"
 
     if [[ "$uiot_ap_password" ]]; then # pw was given, so start an accesspoint
         if [[ ! "$uiot_ap_name" ]]; then # no ap name, so make one up
