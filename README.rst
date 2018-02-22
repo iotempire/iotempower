@@ -208,7 +208,7 @@ Tutorial videos for setup:
 - On Linux: Please follow the installation steps below (or file an issue to ask
   for specific Linux video).
 
-
+  
 
 Installation step by step:
 
@@ -216,7 +216,7 @@ Installation step by step:
 
 - Make sure the sha256-checksum of the image is correct. It should be:
 
-  9d2944c12eb93a189b2451adb876c03c724c0833e8ac32f06e5012355e18e66b
+  bd0383eb82bcd9fcf6e6ca83c6b34a524af8e6225065a8576da592cb91ecf0e7
 
   On Linux and MacOS, you can use ``sha256sum`` or ``shasum -a 256`` to verify
   the image, on Windows you can use
