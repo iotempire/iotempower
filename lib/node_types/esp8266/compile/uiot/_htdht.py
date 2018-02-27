@@ -29,8 +29,11 @@ class _HTDHT(Device):
     def time_controlled_measure(self):
         newtime = time.ticks_ms()
         if newtime - self.lasttime < 0 or newtime - self.lasttime > self.delay:
-            self.dht.measure()
-            self.lasttime = newtime
+            try:
+                self.dht.measure()
+                self.lasttime = newtime
+            except OSError:
+                print("Warning: Trouble measuring (timeout?).")
 
     def temperature(self):
         self.time_controlled_measure()
