@@ -53,7 +53,7 @@ def d(type, name, *args, **kwargs):
     # TODO: also strip out _ to search for respective class
     for n in eval("dir({})".format(module)):  # find actual class_name
         if n.lower() == import_name:
-            class_name = module+ '.' + n
+            class_name = module + '.' + n
             break
     if class_name is not None:
         _Class = eval(class_name)

@@ -10,7 +10,7 @@ import neopixel
 
 gc.collect()
 from uiot._rgb_base import RGB_Base
-from ulnoiot import colors as _c
+from uiot import colors as _c
 
 gc.collect()
 

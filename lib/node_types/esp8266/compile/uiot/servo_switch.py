@@ -3,7 +3,7 @@
 # created: 2017-06-06
 #
 
-from uiot._servo import Servo
+from uiot.servo import Servo
 
 
 class Servo_Switch(Servo):
