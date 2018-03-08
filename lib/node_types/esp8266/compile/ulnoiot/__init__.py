@@ -2,7 +2,7 @@
 from uiot import *
 
 def contact(name, *args, **kwargs):
-    return d("contact", "Contact", name, *args, **kwargs)
+    return d("contact", name, *args, **kwargs)
 
 
 button = contact
