@@ -36,7 +36,8 @@ _report_ip = True
 _port = None
 _last_publish = 0
 # _ssl = False
-MIN_PUBLISH_TIME_US = 2000  # posting every 2ms (2000us) allowed
+MIN_PUBLISH_TIME_US = 100000  # posting every 100ms (100000us) allowed -> only 10messages per second (else network stacks seesm to run full)
+# TODO: check if this is too conservative
 
 
 # ======= Devices

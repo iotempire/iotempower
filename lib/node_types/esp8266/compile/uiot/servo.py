@@ -30,7 +30,7 @@ class Servo(Device):
         self._init()
 
     def _init(self):
-        self.pin.init()
+        self.port.init()
 
     def _trigger_next_turn(self):
         self.turn_start = time.ticks_ms()
@@ -47,11 +47,11 @@ class Servo(Device):
 
     def write_us(self, us):
         if us == 0:
-            self.pin.duty(0)
+            self.port.duty(0)
             return
         us = min(self.max_us, max(self.min_us, us))
         duty = us * 1024 * self.freq // 1000000
-        self.pin.duty(duty)
+        self.port.duty(duty)
 
     def write_angle(self, degrees=None):
         degrees = degrees % 360
@@ -59,7 +59,7 @@ class Servo(Device):
         us = self.min_us + total_range * degrees // self.angle
         self.write_us(us)
 
-    def _update(self):
+    def measure(self):
         if self.turn_start is not None:  # turn in process
             current = time.ticks_ms()
             if time.ticks_diff(current, self.turn_start) >= self.turn_time_ms:
@@ -67,10 +67,8 @@ class Servo(Device):
                     self._trigger_next_turn()
                 else:
                     self._release()
+        return self.angle_list
 
     def _release(self):
         self.turn_start = None
-        self.pin.deinit()
-
-    def value(self):
-        return self.angle_list
+        self.port.deinit()

@@ -2,5 +2,5 @@
 
 echo "Flashing generic esp8266."
 flash_serial_esp8266 "$1"
-echo "Waiting 7s until things are settled (formatting internal flash)."
-sleep 7 # let things rest
+echo "Waiting 15s until things are settled (formatting internal flash)."
+sleep 15 # let things rest

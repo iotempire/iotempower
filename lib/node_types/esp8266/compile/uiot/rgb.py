@@ -32,7 +32,7 @@ class RGB(RGB_Base):
 
     def _write(self):
         (r, g, b) = self.current_rgb
-        pr, pg, pb = self.pin
+        pr, pg, pb = self.port
         m = 1023 / 255
         pr.duty(int(r * m))
         pg.duty(int(g * m))

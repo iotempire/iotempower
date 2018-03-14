@@ -35,7 +35,7 @@ class PWM(Device):
             print("PWM: received invalid duty value:", d)
         else:
             self._duty = d
-            self.pin.duty(d)
+            self.port.duty(d)
 
     def get_duty(self):
         return self._duty
@@ -47,10 +47,10 @@ class PWM(Device):
             print("PWM: received invalid frequency value:", f)
         else:
             self._freq = f
-            self.pin.freq(f)
+            self.port.freq(f)
 
     def get_freq(self):
         return self._freq
 
-    def value(self):
+    def measure(self):
         return self._duty, self._freq

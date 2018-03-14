@@ -39,6 +39,7 @@ are modified from the default tmux shortcuts).
 - CTRL-A CTRL-Q (or CTRL-A D): Disconnect from the current session, but keep
   everything in that session running.
 - CTRL-A N: Create a (n)ew window (like a tab in your browser).
+- CTRL-A T: Set a new (t)itle of the current window (tab).
 - CTRL-A K: (K)ill/terminate the current session, everything is terminated in
   the current session.
 - CTRL-A RIGHT (right arrow key): Select next window (tab) to the right (next).

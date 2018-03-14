@@ -11,9 +11,6 @@ from uiot.device import Device
 class Trigger(Device):
     OVERFLOW = 1000000
 
-    def value(self):
-        return self.report_counter
-
     # Handle contact or button like devices, if both false-> rising
     def __init__(self, name, pin,
                  rising=False, falling=False,
@@ -28,7 +25,7 @@ class Trigger(Device):
             trigger = Pin.IRQ_FALLING
         else:  # also if both all false
             trigger = Pin.IRQ_RISING
-        pin.irq(trigger=trigger, handler=self.callback)
+        pin.irq(trigger=trigger, handler=self._cb)
         self.counter = 0
         self.report_counter = 0
         self.triggered = False
@@ -36,13 +33,14 @@ class Trigger(Device):
                         report_change=report_change)
         self.getters[""] = self.value
 
-    def callback(self, p):
+    def _cb(self, p):
         self.triggered = True
         self.counter += 1
         if self.counter >= Trigger.OVERFLOW:
             self.counter = 0
 
-    def _update(self):
+    def measure(self):
         if self.triggered:
             self.report_counter = self.counter
             self.triggered = False
+        return self.report_counter

@@ -47,21 +47,18 @@ class HCSR04(Device):
         echo_pin.init(Pin.IN)
         echo_pin.init(Pin.OPEN_DRAIN)
         self.echo_timeout_us = echo_timeout_us
-        self._distance = self._measure()
+        self.distance = None
         Device.__init__(self, name, (trigger_pin, echo_pin),
-                        getters={"": self.value},
                         on_change=on_change,
                         report_change=report_change)
 
-    def value(self):
-        return self._distance
-
-    def _update(self):
+    def measure(self):
         if ticks_diff(ticks_ms(), self._last_measured) > self.INTERVAL:
-            value = self._measure()
-            if abs(value - self._distance) >= self.precision:
-                self._distance = value
+            new_dist = self._measure()
             self._last_measured = ticks_ms()
+            if abs(new_dist - self._distance) >= self.precision:
+                self.distance = new_dist
+        return self.distance
 
     def _send_pulse_and_wait(self):
         # Send the pulse to trigger and listen on echo pin.
@@ -101,7 +98,7 @@ class HCSR04(Device):
         pulse_time = self._send_pulse_and_wait()
 
         # To calculate the distance we get the pulse_time and divide it by 2
-        # (the pulse walk the distance twice) and by 29.1 becasue
+        # (the pulse walk the distance twice) and by 29.1 because
         # the sound speed on air (343.2 m/s), that It's equivalent to
         # 0.34320 mm/us that is 1mm each 2.91us
         # pulse_time // 2 // 2.91 -> pulse_time // 5.82 -> pulse_time * 100 // 582

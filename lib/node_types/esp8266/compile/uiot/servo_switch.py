@@ -46,5 +46,6 @@ class Servo_Switch(Servo):
     def off(self):
         self.turn(self.off_angle)
 
-    def value(self):
-        return self.status
+#    def measure(self):
+#        Servo.measure(self)
+#        return self.status

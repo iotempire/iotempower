@@ -33,7 +33,7 @@ class RGB_Multi(RGB_Base):
             return self.current_rgb
         else:
             if led_num <= 0: led_num = 0
-            return self.pin[led_num]
+            return self.port[led_num]
 
     def _set(self, r, g, b, led_num=None):
         rgb = (r, g, b)
@@ -42,16 +42,16 @@ class RGB_Multi(RGB_Base):
         b = rgb[self.rgb_order[2] - 1]
         if led_num is None:
             for led in range(self.ws_leds):
-                self.pin[led] = (r, g, b)
+                self.port[led] = (r, g, b)
             self.current_rgb = (r, g, b)
             self.brightness = int((r + g + b) / 3)
         else:
             if led_num <= 0: led_num = 0
-            self.pin[led_num] = (r, g, b)
+            self.port[led_num] = (r, g, b)
             # recompute average
             ar, ag, ab = _c.black
             brightness = 0
-            for r, g, b in self.pin:
+            for r, g, b in self.port:
                 ar += r
                 ag += g
                 ab += b
@@ -62,4 +62,4 @@ class RGB_Multi(RGB_Base):
             self.brightness = int(brightness / self.ws_leds / 3)
 
     def _write(self):
-        self.pin.write()
+        self.port.write()

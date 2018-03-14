@@ -15,18 +15,20 @@ class _HTDHT(Device):
 
     # Handle humidity and temperature from dht devices
     def __init__(self, name, pin, dht_dev, delay,
-                 on_change=None, report_change=True):
+                 on_change=None, report_change=True,
+                 filter=None):
         self.delay = delay
         import dht
         self.dht = dht_dev
         self.lasttime = time.ticks_ms()
         self.dht.measure()
         Device.__init__(self, name, pin, on_change=on_change,
-                        getters={"temperature": self.temperature,
-                                 "humidity": self.humidity},
-                        report_change=report_change)
+                        getters={"temperature": self._get_t,
+                                 "humidity": self._get_h},
+                        report_change=report_change,
+                        filter=filter)
 
-    def time_controlled_measure(self):
+    def measure(self):
         newtime = time.ticks_ms()
         if newtime - self.lasttime < 0 or newtime - self.lasttime > self.delay:
             try:
@@ -34,19 +36,11 @@ class _HTDHT(Device):
                 self.lasttime = newtime
             except OSError:
                 print("Warning: Trouble measuring (timeout?).")
+                return None
+        return self.dht.humidity(), self.dht.temperature()
 
-    def temperature(self):
-        self.time_controlled_measure()
-        return self.dht.temperature()
+    def _get_t(self):
+        return self.value()[1]
 
-    def humidity(self):
-        self.time_controlled_measure()
-        return self.dht.humidity()
-
-    def value(self):
-        return {"humidity": self.humidity(),
-                "temperature": self.temperature()}
-
-    def _update(self):
-        # trigger reading show eventually changed values
-        self.time_controlled_measure()
+    def _get_h(self):
+        return self.value()[0]

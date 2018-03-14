@@ -12,5 +12,5 @@ shift 1
 update_serial_esp8266 "$port" sonoff "$@"
 
 echo
-echo "Waiting 7s for reset to finish."
-sleep 7
+echo "Waiting 15s for reset to finish."
+sleep 15

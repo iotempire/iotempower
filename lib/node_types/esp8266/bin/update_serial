@@ -6,5 +6,5 @@ shift 1
 update_serial_esp8266 "$port" esp8266 "$@"
 
 echo
-echo "7s wait for reset to finish."
-sleep 7
+echo "15s wait for reset to finish."
+sleep 15

@@ -14,7 +14,7 @@ class I2C_Connector(Device):
     BUFFER_SIZE = 36  # counter (2) + size (1) + suspend request (1) + data (32)
 
     def __init__(self, name, sda=None, scl=None,
-                 addr=8, ignore_case=False, report_change=True):
+                 addr=8, ignore_case=False, report_change=True, filter=None):
         not_found = "i2c device not found"
 
         self.addr = addr
@@ -37,8 +37,8 @@ class I2C_Connector(Device):
             if addr in l:
                 self.present = True
                 Device.__init__(self, name, i2c, setters={"set": self.evaluate},
-                                ignore_case=ignore_case, report_change=report_change)
-                self.getters[""] = self.value
+                                ignore_case=ignore_case,
+                                report_change=report_change, filter=filter)
             else:
                 print(not_found)
 
@@ -46,7 +46,7 @@ class I2C_Connector(Device):
         self.msgq = msg  # queue for sending in update
         # TODO: prevent messages from getting lost
 
-    def _update(self):
+    def measure(self):
         t = time.ticks_ms()
         # if self.suspend_start is not None \
         #        and time.ticks_diff(t,self.suspend_start) <= self.suspend_time:
@@ -56,9 +56,9 @@ class I2C_Connector(Device):
             self.suspend_start = None  # done waiting
             try:
                 if self.msgq is not None:
-                    self.pin.writeto(self.addr, self.msgq)
+                    self.port.writeto(self.addr, self.msgq)
                     self.msgq = None
-                s = self.pin.readfrom(self.addr, self.BUFFER_SIZE)
+                s = self.port.readfrom(self.addr, self.BUFFER_SIZE)
             except:
                 print("Trouble accessing i2c.")
             else:
@@ -85,9 +85,8 @@ class I2C_Connector(Device):
                         if l <= self.BUFFER_SIZE:  # discard if too big
                             self.count = count
                             self.current_value = s[4:4 + l]
-
-    def value(self):
-        return self.current_value
+                            return self.current_value
+        return None
 
     def evaluate(self, msg):
         self.send(msg)

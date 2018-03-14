@@ -19,9 +19,9 @@ class RGB_Base(Device):
         self.last_rgb = _c.white
         self.current_rgb = _c.black
         self.ani = None
-        b = "brightness";
-        r = "rgb";
-        s = "set";
+        b = "brightness"
+        r = "rgb"
+        s = "set"
         st = "/status"
         Device.__init__(self, name, pin,
                         setters={b + "/" + s: self._command_brightness,
@@ -109,9 +109,10 @@ class RGB_Base(Device):
         if rgb is not None:
             self.set(*rgb)
 
-    def _update(self):
+    def measure(self):
         if self.ani is not None:
             self.ani.next()
+        return self.get_status()
 
     def animation(self, msg):
         gc.collect()
@@ -121,6 +122,3 @@ class RGB_Base(Device):
 
     def animation_is_playing(self):
         return self.ani is not None and self.ani.playing
-
-    def value(self):
-        return (self.is_on, self.brightness, self.current_rgb)

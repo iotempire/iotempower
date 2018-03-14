@@ -181,5 +181,5 @@ class Display44780(Device):
             self.print(msg)
             self.last_text = msg
 
-    def value(self):
+    def measure(self):
         return self.last_text
