@@ -4,3 +4,20 @@
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
 ulnoiot help "$@"
+
+cat << EOF
+Also try out the following commands for device management (add help to each of
+them to get a longer description)::
+- initialize (reflashing device)
+- update (update user operating system files)
+  if locally connected: update_serial or update_serial alsodeploy
+- deploy (update + copy user files like autostart.py)
+- console (connect to device node via network)
+  if locally connected: console_serial (also important for debugging)
+
+Commands for interacting via mqtt (node topic is added when in node folder):
+- mqtt_all (show all mqtt messages_
+- mqtt_listen (listen for a specific topic)
+- mqtt_send (directly send payload to specific topic)
+- mqtt_action (react on specific payload on specific mqtt topic)
+EOF
