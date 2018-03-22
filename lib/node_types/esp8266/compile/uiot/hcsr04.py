@@ -13,7 +13,7 @@
 #
 # adapted by Gabriel Schützeneder, cmuck, and ulno in order to function with ulnoiot.
 #
-# start with hcsr04("name", pin_trigger, pin_echo)
+# start with d("hcsr04","name", pin_trigger, pin_echo)
 # pins can be either GPIO Ports or Pin-objects
 
 import machine
@@ -27,7 +27,8 @@ class HCSR04(Device):
 
     def __init__(self, name, trigger_pin, echo_pin,
                  echo_timeout_us=30000, precision=10,
-                 on_change=None, report_change=True):
+                 on_change=None, report_change=True,
+                 filter=None):
         # trigger_pin: Output pin to send pulses
         # echo_pin: Readonly pin to measure the distance.
         #           The pin should be protected with 1k resistor
@@ -50,7 +51,8 @@ class HCSR04(Device):
         self.distance = None
         Device.__init__(self, name, (trigger_pin, echo_pin),
                         on_change=on_change,
-                        report_change=report_change)
+                        report_change=report_change,
+                        filter=filter)
 
     def measure(self):
         if ticks_diff(ticks_ms(), self._last_measured) > self.INTERVAL:

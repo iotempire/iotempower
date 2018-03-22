@@ -112,27 +112,38 @@ def _publish_status(device_list=None, ignore_time=False):
             time.ticks_diff(current_time,
                             _last_publish) >= MIN_PUBLISH_TIME_US:
         _last_publish = current_time
-        try:
-            for d in device_list:
+        for d in device_list:
+            try:
                 v = d.value()
-                if v is not None:
-                    rt = (_topic + "/" + d.name).encode()
-                    for s in d.getters:
-                        if s == "":
-                            t = rt
-                        else:
-                            t = rt + "/" + s.encode()
+            except Exception as e:
+                print('Trouble reading value from %s. Exception:'%str(d), e)
+            if v is not None:
+                rt = (_topic + "/" + d.name).encode()
+                for s in d.getters:
+                    if s == "":
+                        t = rt
+                    else:
+                        t = rt + "/" + s.encode()
+                    try:
                         my_value = d.getters[s]()
-                        print('Publishing', t, my_value)
+                    except Exception as e:
+                        print('Trouble executing getter for device %s for %s. Exception:'
+                              % (str(d), s), e)
+                    print('Publishing', t, my_value)
+                    try:
                         if type(my_value) is bytes or type(
                                 my_value) is bytearray:
                             _client.publish(t, my_value)
                         else:
                             _client.publish(t, str(my_value).encode())
+                    except Exception as e:
+                        print('Trouble publishing %s to %s, re-init network. Exception:'
+                              % (t, str(my_value)), e)
+                        _client = None
+        try:
             _publish_ip()
         except Exception as e:
-            print('Trouble publishing, re-init network.')
-            print(e)
+            print('Trouble publishing IP, re-init network. Exception:', e)
             _client = None
 
 
@@ -201,7 +212,8 @@ def _publish_ip():
             try:
                 _client.publish(t, str(_wifi.config()[0]), retain=True)
             except e:
-                print("Trouble publishing IP:", e)
+                # Usually no content for exception here
+                print("Trouble publishing IP. Re-init mqtt. Exception:", e)
                 _client = None
 
 
@@ -223,7 +235,7 @@ def _init_mqtt():
         print("Subscribed to topic and subtopics of", _topic)
         _publish_ip()
     except Exception as e:
-        print("Trouble to init mqtt:", e)
+        print("Trouble to init mqtt. Exception:", e)
         _client = None
 
 
@@ -232,8 +244,8 @@ def _poll_subscripton():
     if _client is not None:
         try:
             _client.check_msg()  # non blocking
-        except:
-            print("Trouble to receive from mqtt.")
+        except Exception as e:
+            print("Trouble to receive from mqtt. Re-init mqtt. Exception:", e)
             _client = None
 
 
@@ -241,36 +253,42 @@ def run(updates=5, sleepms=1, poll_rate_inputs=4, poll_rate_network=10):
     # updates: send out a status every this amount of seconds.
     #          If 0, never send time based status updates only when change happened.
     # sleepms: going o sleep for how long between each loop run
-    # poll_rate_network: how often to evaluate incoming network commands
-    # poll_rate_inputs: how often to evaluate inputs
-    if updates == 0:
-        overflow = 1000
-    else:
-        overflow = updates * 1000
-    overflow *= poll_rate_network * poll_rate_inputs / sleepms
-    overflow = int(overflow)
-    #    print("Overflow:",overflow)
-    counter = 0
+    # poll_rate_network: how often to evaluate incoming network commands (how many ms delay)
+    # poll_rate_inputs: how often to evaluate inputs (how many ms delay)
+    poll_rate_inputs *= 1000  # measure in us
+    poll_rate_network *= 1000  # measure in us
+    t = time.ticks_us()
+    last_poll_input = t
+    last_poll_network = t
+    poll_rate_mqtt = 1000000 # every 1s
+    last_poll_mqtt = t
+    updates *= 1000000 # measure in us
+    last_update = t
 
     while True:
         _wifi.monitor() # make sure wifi is in good shape
-        if counter % poll_rate_network == 0:
+        t = time.ticks_us()
+        if time.ticks_diff(t, last_poll_network) >= poll_rate_network:
             _poll_subscripton()
-        if counter % poll_rate_inputs == 0:
+            last_poll_network = t
+        if time.ticks_diff(t, last_poll_input) >= poll_rate_inputs:
             device_list = []
             for d in _devlist.values():
                 if d.update():
                     device_list.append(d)
             if len(device_list) > 0:
                 _publish_status(device_list)
+            last_poll_input = t
         # monitor mqtt
         if _client is None:
-            if counter % 10: # don't do it too often
+            if time.ticks_diff(t, last_poll_mqtt) >= poll_rate_mqtt:
                 _init_mqtt()
+                last_poll_mqtt = t
         else:
-            if updates != 0 and counter % (updates * 1000) == 0:
+            if updates != 0 and time.ticks_diff(t, last_update) >= updates:
                 print("Publishing full update.")
                 _publish_status(ignore_time=True)
+                last_update = t
         # execute things on timestack
         now = time.ticks_ms()
         for id in list(_timestack):
@@ -279,10 +297,7 @@ def run(updates=5, sleepms=1, poll_rate_inputs=4, poll_rate_network=10):
                 del (_timestack[id])
                 cb(id)
 
-        time.sleep_ms(sleepms)
-        counter += 1
-        if counter >= overflow:
-            counter = 0
+        time.sleep_ms(sleepms) # do nothing as requested for this time
 
 
 mqtt(_cfg.config.mqtt_host, _cfg.config.mqtt_topic,
