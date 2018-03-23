@@ -124,6 +124,7 @@ def _publish_status(device_list=None, ignore_time=False):
                         t = rt
                     else:
                         t = rt + "/" + s.encode()
+                    my_value=None
                     try:
                         my_value = d.getters[s]()
                     except Exception as e:
