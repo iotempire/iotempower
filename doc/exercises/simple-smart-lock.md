@@ -1,5 +1,5 @@
 # Simple Smart Lock
-This tutorial will guide you through building simple smart-lock
+This tutorial will guide you through building a solenoid-based simple smart-lock
 and allow you to control it through an mqtt server.
 Make sure you document the progress so you can share your problems, success,
 and modifications back with the community, teacher, or colleagues.
