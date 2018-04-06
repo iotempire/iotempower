@@ -31,7 +31,7 @@ if [[ -e "node.conf" || -e "../node.conf" ]]; then  # started from node-director
         echo "Updating system files on node $topic with IP $ip."
         path="$(pwd)"
         cd "$ULNOIOT_ROOT/lib/netrepl"
-        node_dir=$(create_node_dir "$2"|tail -n1)
+        node_dir=$(create_node_dir "$board"|tail -n1)
 
         python3 copy.py "$ip" --keyfile "$path/key.hex" --sync \
             --src "$node_dir/" $reset
