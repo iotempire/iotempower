@@ -16,8 +16,8 @@ class RGB(RGB_Base):
     def __init__(self, name, pinr, ping, pinb,
                  ignore_case=True, on_change=None,
                  report_change=False):
-        pin = (PWM(pinr), PWM(ping), PWM(pinb))
-        RGB_Base.__init__(self, name, pin,
+        port = (PWM(pinr), PWM(ping), PWM(pinb))
+        RGB_Base.__init__(self, name, port,
                           ignore_case=ignore_case,
                           on_change=on_change,
                           report_change=report_change)

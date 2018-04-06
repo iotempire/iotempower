@@ -13,7 +13,7 @@ gc.collect()
 
 
 class RGB_Base(Device):
-    def __init__(self, name, pin, ignore_case=True,
+    def __init__(self, name, port, ignore_case=True,
                  on_change=None, report_change=False):
         self.is_on = False
         self.last_rgb = _c.white
@@ -23,7 +23,7 @@ class RGB_Base(Device):
         r = "rgb"
         s = "set"
         st = "/status"
-        Device.__init__(self, name, pin,
+        Device.__init__(self, name, port,
                         setters={b + "/" + s: self._command_brightness,
                                  r + "/" + s: self._command_rgb,
                                  s: self._command_status,

@@ -1,15 +1,17 @@
-# This can create a list of devices per mqtt connection
+# This can create a list of thingis per mqtt connection
 # TODO: allow other connections (COAP? UDP?)
 #
 # Author: Ulrich Norbisrath (http://ulno.net)
 # Created: 2017-10-05
 
+# TODO move this all to __init__
 
-from integriot import device
+
+from integriot import thingi
 import paho.mqtt.client as mqtt
 
 
-class Devices():
+class Thingis():
     def __init__(self, mqtt_host):
         # TODO: add username/password/tsl
         self.client = mqtt.Client()
@@ -66,19 +68,19 @@ class Devices():
         """
         d = self.actor(topic, qos)
         if callable(callbacks):
-            d.add_callback("", callbacks)
+            d.subscribe("", callbacks)
         else:
             for t in callbacks:
                 item = callbacks[t]
                 if callable(item):
-                    d.add_callback(t, item)
+                    d.subscribe(t, item)
                 elif type(item) is tuple:
                     b, cb = item
                     if b:
-                        d.add_callback_change(t, cb)
+                        d.subscribe_change(t, cb)
                 elif type(item) is dict:
                     for data in item:
-                        d.add_callback_data(t, data, item[data])
+                        d.subscribe_data(t, data, item[data])
         return d
 
     def switch(self, topic, on_command="on", off_command="off",
