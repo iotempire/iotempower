@@ -48,7 +48,7 @@ class HCSR04(Device):
         echo_pin.init(Pin.IN)
         echo_pin.init(Pin.OPEN_DRAIN)
         self.echo_timeout_us = echo_timeout_us
-        self.distance = None
+        self.distance = -10000
         Device.__init__(self, name, (trigger_pin, echo_pin),
                         on_change=on_change,
                         report_change=report_change,
@@ -58,7 +58,7 @@ class HCSR04(Device):
         if ticks_diff(ticks_ms(), self._last_measured) > self.INTERVAL:
             new_dist = self._measure()
             self._last_measured = ticks_ms()
-            if abs(new_dist - self._distance) >= self.precision:
+            if abs(new_dist - self.distance) >= self.precision:
                 self.distance = new_dist
         return self.distance
 
