@@ -28,5 +28,5 @@ from uiot import *
 
 ## Start to transmit every 10 seconds (or when status changed).
 # Don't forget (uncomment!) the run-command when things shall
-# start automatically (for debugging, you want to first leve this commented).
+# start automatically (for debugging, you want to first leave this commented).
 # run(10)
