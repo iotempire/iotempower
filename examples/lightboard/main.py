@@ -147,10 +147,10 @@ def animation_cb(msg):
 
 
 imagelist_sensor = sensor("imagelist")
-imagelist_sensor.add_callback_change(callback=imagelist_cb)
+imagelist_sensor.subscribe_change(callback=imagelist_cb)
 
 animation_sensor = sensor("animation")
-animation_sensor.add_callback(callback=animation_cb)
+animation_sensor.subscribe(callback=animation_cb)
 
 # init led matrix
 begin()

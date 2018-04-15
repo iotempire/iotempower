@@ -12,7 +12,7 @@ init("localhost")
 
 prefix("testnode1")
 button = sensor("b1")
-button.add_callback_change(callback=show)
+button.subscribe_change(callback=show)
 onboard_blue = led("blue", init_state="off")
 
 run()

@@ -28,6 +28,6 @@ def button1Callback(msg):
 prefix("buttons")  # all sensors below are prefixed with /buttons
 
 button1 = sensor("button1")
-button1.add_callback_change(callback=button1Callback)
+button1.subscribe_change(callback=button1Callback)
 
 run()

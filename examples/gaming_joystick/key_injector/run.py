@@ -37,11 +37,11 @@ def fire_cb(msg):
 init("192.168.12.1")
 
 prefix("joystick1")
-sensor("up").add_callback_change(callback=up_cb)
-sensor("down").add_callback_change(callback=down_cb)
-sensor("left").add_callback_change(callback=left_cb)
-sensor("right").add_callback_change(callback=right_cb)
-sensor("fire").add_callback_change(callback=fire_cb)
+sensor("up").subscribe_change(callback=up_cb)
+sensor("down").subscribe_change(callback=down_cb)
+sensor("left").subscribe_change(callback=left_cb)
+sensor("right").subscribe_change(callback=right_cb)
+sensor("fire").subscribe_change(callback=fire_cb)
 
 onboard_blue = led("blue", init_state="off")
 

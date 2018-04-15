@@ -24,8 +24,8 @@ def forward_cb(msg):
 init("192.168.12.1")
 
 prefix("remote1")
-sensor("forward").add_callback_change(callback=forward_cb)
-sensor("back").add_callback_change(callback=back_cb)
+sensor("forward").subscribe_change(callback=forward_cb)
+sensor("back").subscribe_change(callback=back_cb)
 
 onboard_blue = led("blue", init_state="off")
 

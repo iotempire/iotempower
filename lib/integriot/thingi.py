@@ -1,14 +1,14 @@
-# base device classes
+# base Thing Interface (Thingi) classes
 #
 # Author: Ulrich Norbisrath (http://ulno.net)
 # Created: 2017-10-05
 
-class Device():
+class _Thingi():
     def __init__(self):
         self.status = None
 
 
-class MQTTDevice(Device):
+class Thingi(_Thingi):
 
     def __init__(self, mqtt_client, main_topic, qos=0):
         self.mqtt_client = mqtt_client
@@ -34,7 +34,7 @@ class MQTTDevice(Device):
             self.callbacks[sub_topic] = []
         self.callbacks[sub_topic].append((callback, ignore_case))
 
-    def add_callback(self, sub_topic="", callback=None, ignore_case=True):
+    def subscribe(self, sub_topic="", callback=None, ignore_case=True):
         """
         Add a generic callback function for incoming data on a specific
         sub_topic.
@@ -46,7 +46,7 @@ class MQTTDevice(Device):
         """
         self._add_callback_entry(sub_topic, lambda t, m: callback(m), ignore_case)
 
-    def add_callback_change(self, sub_topic="", callback=None, ignore_case=True):
+    def subscribe_change(self, sub_topic="", callback=None, ignore_case=True):
         """
         Add a callback function for incoming data on a specific
         sub_topic.
@@ -64,7 +64,7 @@ class MQTTDevice(Device):
 
         self._add_callback_entry(sub_topic, new_cb, ignore_case)
 
-    def add_callback_data(self, sub_topic, data, callback, ignore_case=True):
+    def subscribe_data(self, sub_topic, data, callback, ignore_case=True):
         """
         Add a callback function for specific incoming data on a sub_topic.
         This is called any time teh specified data arrives on sub_topic.
@@ -80,7 +80,7 @@ class MQTTDevice(Device):
 
         self._add_callback_entry(sub_topic, new_cb, ignore_case)
 
-    def remove_callback(self, sub_topic):
+    def unsubscribe(self, sub_topic):
         """
         Remove all callbacks associated to one sub_topic
         :param sub_topic:
@@ -117,13 +117,13 @@ class MQTTDevice(Device):
         self.mqtt_client.publish(t, message, qos)
 
 
-class MQTTSwitch(MQTTDevice):
+class ThingiSwitch(Thingi):
     def __init__(self, mqtt_client, main_topic,
                  on_command="on", off_command="off",
                  set_topic="set",
                  state_topic="",
                  init_state=None, qos=0):
-        MQTTDevice.__init__(self, mqtt_client, main_topic, qos)
+        Thingi.__init__(self, mqtt_client, main_topic, qos)
         self.on_command = on_command
         self.off_command = off_command
         self.set_topic = set_topic
@@ -137,7 +137,7 @@ class MQTTSwitch(MQTTDevice):
             full_set_topic = main_topic + "/" + set_topic
         else:
             full_set_topic = main_topic
-        self.add_callback(full_set_topic, self.update_state_cb)
+        self.subscribe(full_set_topic, self.update_state_cb)
 
     def update_state_cb(self, topic, msg):
         self.update_state(msg)
