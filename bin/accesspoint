@@ -11,7 +11,7 @@ fi
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
-# find input network device
+# find input network device (device connected to internet)
 INPUT_DEVICE=$(ip route ls|grep default|head -n1|cut -d\  -f5)
 if [ ! "$INPUT_DEVICE" ]; then
   INPUT_DEVICE=lo
@@ -82,6 +82,10 @@ while true; do
     echo "Will use $OUTPUT_WIFI with mac $OUTPUT_MAC to run an accesspoint."
     echo "Internet-input device is $INPUT_DEVICE."
     echo
+    sudo iptables -F
+    sudo iptables -t nat -F
+    sudo iptables -t mangle -F
+    sudo iptables -X
     if [[ "$ULNOIOT_AP_BRIDGE" ]]; then
         sudo ifconfig br0 down
         sudo brctl delbr br0
