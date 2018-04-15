@@ -11,69 +11,70 @@ fi
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
-# find input network device (device connected to internet)
-INPUT_DEVICE=$(ip route ls|grep default|head -n1|cut -d\  -f5)
-if [ ! "$INPUT_DEVICE" ]; then
-  INPUT_DEVICE=lo
-fi
-
-# detect output wireless network device to start AP on
-OUTPUT_WIFI=""
-if [[ "$ULNOIOT_AP_DEVICES" ]]; then
-    available_wifi=$(echo $(ip link show|cut -d: -f2|grep " wl"|cut -b2-))
-    for possible in $(echo "$ULNOIOT_AP_DEVICES"); do
-        if [[ "$available_wifi" =~ .*"$possible".* ]]; then
-            OUTPUT_WIFI="$possible"
-            break
-        fi
-    done
-else
-    # Take first available
-    OUTPUT_WIFI=$(ip link show|cut -d: -f2|grep " wl"|cut -b2-|tail -n1)
-fi
-
-# add network extension for making essid more unique
-AP_NAME="$ULNOIOT_AP_NAME"
-if [ "$ULNOIOT_AP_ADDID" = "yes" ]; then
-    # add prefix to essid based on network adapter for unique class setup
-    OUTPUT_MAC=$(ip link show "$OUTPUT_WIFI"|tail -n1|\
-            cut -d\  -f6|sed s/://g|cut -b7-)
-    AP_NAME="${AP_NAME}-$OUTPUT_MAC"
-fi
-
-PASSWORD="$ULNOIOT_AP_PASSWORD"
-
-CHANNEL="$ULNOIOT_AP_CHANNEL"
-if [ "$CHANNEL" = "random" ]; then
-    # pick channel randomly
-    CHANNEL=$(shuf -n 1 -e 2 3 4 5 7 8 9 10)
-fi
-
-IP="$ULNOIOT_AP_IP"
-
-HIDDEN=""
-if [[ "$ULNOIOT_AP_HIDDEN" = "yes" ]]; then
-    HIDDEN="--hidden"
-fi
-
-if [[ "$1" = "show" ]]; then
-    echo "ACCESSPOINT_NAME=$AP_NAME"
-    exit 0
-fi
-
-mkdir -p "$ULNOIOT_ROOT/tmp"
-HOSTFILE="$ULNOIOT_ROOT/tmp/ap-host"
-cat << EOF > "$HOSTFILE"
-$ULNOIOT_AP_IP $ULNOIOT_AP_HOSTNAME
-EOF
-
-
-HOSTAPD_EXTRA=""
-if [[ "$ULNOIOT_AP_BRIDGE" ]]; then
-    HOSTAPD_EXTRA="--hostapd-extra bridge=br0"
-fi
-
 while true; do
+
+    # find input network device (device connected to internet)
+    INPUT_DEVICE=$(ip route ls|grep default|head -n1|cut -d\  -f5)
+    if [ ! "$INPUT_DEVICE" ]; then
+      INPUT_DEVICE=lo
+    fi
+
+    # detect output wireless network device to start AP on
+    OUTPUT_WIFI=""
+    if [[ "$ULNOIOT_AP_DEVICES" ]]; then
+        available_wifi=$(echo $(ip link show|cut -d: -f2|grep " wl"|cut -b2-))
+        for possible in $(echo "$ULNOIOT_AP_DEVICES"); do
+            if [[ "$available_wifi" =~ .*"$possible".* ]]; then
+                OUTPUT_WIFI="$possible"
+                break
+            fi
+        done
+    else
+        # Take first available
+        OUTPUT_WIFI=$(ip link show|cut -d: -f2|grep " wl"|cut -b2-|tail -n1)
+    fi
+
+    # add network extension for making essid more unique
+    AP_NAME="$ULNOIOT_AP_NAME"
+    if [ "$ULNOIOT_AP_ADDID" = "yes" ]; then
+        # add prefix to essid based on network adapter for unique class setup
+        OUTPUT_MAC=$(ip link show "$OUTPUT_WIFI"|tail -n1|\
+                cut -d\  -f6|sed s/://g|cut -b7-)
+        AP_NAME="${AP_NAME}-$OUTPUT_MAC"
+    fi
+
+    PASSWORD="$ULNOIOT_AP_PASSWORD"
+
+    CHANNEL="$ULNOIOT_AP_CHANNEL"
+    if [ "$CHANNEL" = "random" ]; then
+        # pick channel randomly
+        CHANNEL=$(shuf -n 1 -e 2 3 4 5 7 8 9 10)
+    fi
+
+    IP="$ULNOIOT_AP_IP"
+
+    HIDDEN=""
+    if [[ "$ULNOIOT_AP_HIDDEN" = "yes" ]]; then
+        HIDDEN="--hidden"
+    fi
+
+    if [[ "$1" = "show" ]]; then
+        echo "ACCESSPOINT_NAME=$AP_NAME"
+        exit 0
+    fi
+
+    mkdir -p "$ULNOIOT_ROOT/tmp"
+    HOSTFILE="$ULNOIOT_ROOT/tmp/ap-host"
+    cat << EOF > "$HOSTFILE"
+    $ULNOIOT_AP_IP $ULNOIOT_AP_HOSTNAME
+    EOF
+
+
+    HOSTAPD_EXTRA=""
+    if [[ "$ULNOIOT_AP_BRIDGE" ]]; then
+        HOSTAPD_EXTRA="--hostapd-extra bridge=br0"
+    fi
+
     echo "Stopping all existing services."
     sudo pkill create_ap
     sleep 2
@@ -82,6 +83,8 @@ while true; do
     echo "Will use $OUTPUT_WIFI with mac $OUTPUT_MAC to run an accesspoint."
     echo "Internet-input device is $INPUT_DEVICE."
     echo
+    sudo iptables -t nat -F POSTROUTING
+    sudo iptables -t nat -F PREROUTING
     sudo iptables -F
     sudo iptables -t nat -F
     sudo iptables -t mangle -F
