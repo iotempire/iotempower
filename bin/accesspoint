@@ -66,8 +66,8 @@ while true; do
     mkdir -p "$ULNOIOT_ROOT/tmp"
     HOSTFILE="$ULNOIOT_ROOT/tmp/ap-host"
     cat << EOF > "$HOSTFILE"
-    $ULNOIOT_AP_IP $ULNOIOT_AP_HOSTNAME
-    EOF
+$ULNOIOT_AP_IP $ULNOIOT_AP_HOSTNAME
+EOF
 
 
     HOSTAPD_EXTRA=""
