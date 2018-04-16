@@ -24,10 +24,13 @@ source "$ULNOIOT_ROOT/bin/read_boot_config"
 
 if [[ "ULNOIOT_AP_PASSWORD" ]]; then # pw was given, so start an accesspoint
     # start accesspoint and mqtt_broker
-    tmux new-session -d -n AP -s UIoTSvrs \
-            "$ULNOIOT_ROOT/run" exec accesspoint \; \
-        new-window -d -n MQTT  \
-            "$ULNOIOT_ROOT/run" exec mqtt_broker \; \
-        new-window -d -n nodered  \
-            su - pi -c "ulnoiot exec node-red"
+    (
+        sleep 15 # let network devices start
+        tmux new-session -d -n AP -s UIoTSvrs \
+                "$ULNOIOT_ROOT/run" exec accesspoint \; \
+            new-window -d -n MQTT  \
+                "$ULNOIOT_ROOT/run" exec mqtt_broker \; \
+            new-window -d -n nodered  \
+                su - pi -c "ulnoiot exec node-red"
+    ) &
 fi # accesspoint check
