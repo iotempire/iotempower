@@ -11,3 +11,5 @@ external/
 etc/ulnoiot.conf
 etc/yaota8266-keys/
 .local
+
+.directory

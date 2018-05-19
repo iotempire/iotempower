@@ -73,11 +73,20 @@ else
     # TODO: work check if nonos-zips are available
     git clone --recursive https://github.com/pfalcon/esp-open-sdk
     echo
-    echo "Downloading mainline micropython."
-    git clone https://github.com/micropython/micropython
-    cd micropython
-    git checkout tags/v1.9.3 -b ulnoiot # newer stuff currently unstable -> causes resets on sonoff
+    echo "Creating copy of esp-open-sdk and downgrading for yaota."
+    cp -a esp-open-sdk esp-open-sdk-yaota
+    cd esp-open-sdk-yaota
+    git checkout b4ca4e59a81bb7d818271623fa580ec543e0603f -b ulnoiot
     cd ..
+    echo
+    echo "Downloading mainline micropython."
+    git clone --recursive https://github.com/micropython/micropython
+
+    cd micropython
+#    git checkout tags/v1.9.3 -b ulnoiot # newer stuff currently unstable -> causes resets on sonoff
+#    git checkout cada971113e6db0cf9e0751e95dbe9217dd707b5 -b ulnoiot
+    cd ..
+
     ## the next block enable using a upy fork with the option to disable serial
     ## and use it for something else than debugging
     ## https://github.com/micropython/micropython/pull/3277#pullrequestreview-57380140
@@ -139,6 +148,20 @@ make || { echo "Trouble making esp-open-sdk, aborting.";exit 1; }
 echo "## 1 ## Building open-sdk done."
 echo
 
+echo
+echo "## 1a ## Building open-sdk-yaota. This might take really long."
+cd "$ULNOIOT_FIRMWARE/esp-open-sdk-yaota"
+make # this will fail but might download some important stuff?
+# recreate missing files
+echo
+echo "[ulnoiot] Patching open-sdk (copying missing files)"
+for f in conf kconfig.mk mconf nconf; do
+    cp "crosstool-NG/kconfig/$f" crosstool-NG/lib/crosstool-ng-*/kconfig
+done
+make || { echo "Trouble making esp-open-sdk-yaota, aborting.";exit 1; }
+echo "## 1a ## Building open-sdk-yaota done."
+echo
+
 echo "## 2 ## Link code to freeze."
 ports="ports/" # for newer micropython versions
 #ports="" # for upy versions until 1.9.2 like the serial pathced version
@@ -195,6 +218,10 @@ echo "## 4 ## Build ota firmware done."
 
 
 #### YAOTA8266 OTA for micropython
+echo
+echo "## 5 ## Build yaota."
+# seems like this can only compile with old version of sdk
+export PATH="$ULNOIOT_FIRMWARE/esp-open-sdk-yaota/xtensa-lx106-elf/bin:$PATH"
 cd "$ULNOIOT_FIRMWARE/yaota8266"
 # check if keys have been created
 echo Preparing bootloader
@@ -223,7 +250,9 @@ if [[ ! -e "$conffile" ]]; then # check for config.h-file
     #cat config.h.example > config.h
 fi
 
-echo Compiling ota-bootloader
+echo
+echo #### Compiling ota-bootloader ####
+
 make clean # need to clean to cover changes in config
 make || { echo "Something went wrong compiling yaota, check errors.";exit 1; }
 
@@ -242,6 +271,8 @@ cp "$ULNOIOT_FIRMWARE/micropython/${ports}esp8266/build/firmware-ota.bin.ota" \
 # cleanup
 unalias python
 rm "$ULNOIOT_FIRMWARE/bin/python"
+
+echo "## 5 ## Build yaota done."
 
 fi # build everything
 
