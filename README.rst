@@ -418,3 +418,4 @@ Further Documentation
   <https://docs.micropython.org/en/latest/esp8266/esp8266/quickref.html>`__.
 - For a very light introduction in general python, take a look at
   `this <https://docs.python.org/3/tutorial/introduction.html>`__.
+- For any problems or just being social, visit us on matrix: https://riot.im/app/#/room/#ulnoiot:matrix.org

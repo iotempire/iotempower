@@ -83,7 +83,7 @@ else
     git clone --recursive https://github.com/micropython/micropython
 
     cd micropython
-#    git checkout tags/v1.9.3 -b ulnoiot # newer stuff currently unstable -> causes resets on sonoff
+    git checkout tags/v1.9.3 -b ulnoiot # newer stuff currently unstable -> causes spontanous resets
 #    git checkout cada971113e6db0cf9e0751e95dbe9217dd707b5 -b ulnoiot
     cd ..
 
