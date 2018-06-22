@@ -399,8 +399,9 @@ community home automation software like
 Support
 -------
 
-You can find the developers and people using ulnoiot on matrix.org or
-respectively riot in the group ulnoiot and might get answers there in
+You can find the developers and people using ulnoiot on 
+`#ulnoiot:matrix.org <https://riot.im/app/#/room/#ulnoiot:matrix.org>`__ 
+or respectively riot in the group ulnoiot and might get answers there in 
 real time.
 Feel also free to file and discuss issues, problems, and potential new features
 at http://github.com/ulno/ulnoiot.
@@ -418,4 +419,4 @@ Further Documentation
   <https://docs.micropython.org/en/latest/esp8266/esp8266/quickref.html>`__.
 - For a very light introduction in general python, take a look at
   `this <https://docs.python.org/3/tutorial/introduction.html>`__.
-- For any problems or just being social, visit us on matrix: https://riot.im/app/#/room/#ulnoiot:matrix.org
+- For any problems or just being social, visit us on matrix/riot: `#ulnoiot:matreix.org <https://riot.im/app/#/room/#ulnoiot:matrix.org>`__
