@@ -5,7 +5,7 @@ _BOOT_CONFIG="/boot/config.txt"
 
 if [[ -e "$_BOOT_CONFIG" ]]; then
     # check if otg-mode was enabled
-    sed 's/\r$//' /boot/config.txt|egrep '^\s*dtoverlay=dwc2\s*' && otg_on=1
+    sed 's/\r$//' /boot/config.txt|egrep '^\s*dtoverlay=dwc2\s*' &> /dev/null && otg_on=1
 
     # read boot/config.txt and evaluate uiot-part in there
     eval "$(sed 's/\r$//' /boot/config.txt|egrep '^\s*uiot_.*=')"
