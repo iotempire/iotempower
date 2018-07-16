@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+
+if [[ $# -ne 0 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
+cat << EOF
+Syntax: prepare_build_dir
+
+create_node_dir prepares the compilation directory for a specific node.
+The build directory will be created if it doesn't exist.
+
+EOF
+exit 1
+fi
+
+[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+
+copy_type_through_base() {
+    # $1: source directory
+    # $2: type (folder to copy)
+    # $3: destination directory
+    # check if there is a base directory/link and recurse into it
+    if [[ -d "$1/base" ]]; then
+        copy_type_through_base "$1/base" "$2" "$3"
+    fi
+    if [[ -d "$1/$2" ]]; then # copy folder exists
+        mkdir -p "$3" # make sure destination directory exists
+        rsync -rL "$1/$2/" "$3/"
+    fi
+}
+
+link_type_through_base() {
+    # $1: source directory
+    # $2: type (folder to copy)
+    # $3: destination directory
+    # check if there is a base directory/link and recurse into it
+    if [[ -d "$1/base" ]]; then
+        link_type_through_base "$1/base" "$2" "$3"
+    fi
+    if [[ -d "$1/$2" ]]; then # copy folder exists
+        mkdir -p "$3" # make sure destination directory exists
+        # make absolute links to everything in this directory
+        ls "$1/$2" | while read f; do
+            # TODO: do we have to check if this is a link and make it absolute first?
+            p=$(realpath "$1/$2/$f")
+            ln -s -f "$p" "$3/$f"
+        done
+    fi
+}
+
+if [[ -e "node.conf" ]]; then  # started from node-directory
+    source "$ULNOIOT_ROOT/bin/read_node_config"
+    node_type="$board"
+    
+    src_dir="$ULNOIOT_ROOT/lib/node_types/$node_type"
+    
+    dest_dir="build"
+    
+    link_type_through_base "$src_dir" src "$dest_dir/src"
+    link_type_through_base "$src_dir" lib "$dest_dir/lib"
+    ln -s -f "$(realpath setup.cpp)" "$dest_dir/src"
+    password=$(tail -n1 key.hex|cut -b1-64|basez -x -d|md5sum -b|cut -d\  -f1)
+    echo 'const char *keyhash = "'"$password"'";' > "$dest_dir/src/key.h"
+    p=$(realpath "$src_dir/platformio.ini")
+    ln -s -f "$p" "$dest_dir"
+
+    # create specific config file.
+cat > "$dest_dir/src/config.h" << EOF
+#define hostname "$node_name"
+#define mqtt_topic "$topic"
+#define mqtt_server "$mqtt_server"
+#define mqtt_user "$mqtt_user"
+#define mqtt_password "$mqtt_password"
+EOF
+
+else
+    echo "Not in node directory."
+    exit 1
+fi

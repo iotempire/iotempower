@@ -1,19 +1,20 @@
 #!/bin/bash
 if [[ $# -gt 2 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF
-Syntax: deploy [noupdate] [noreset]
+Syntax: deploy [node-address [password]]
 
 deploy must be called from a node directory (or one of its parent system
 directories) and reads its configuration from there.
 
-It remotely deploys the user defined files (like autostart.py)
-to the respective node(s).
-If noupdate is not given, it will also call update to update the system files.
-If noupdate is given this update is skipped and only the user files are
-transferred.
-noreset prevents the reset in the end of the copy process.
+It rebuilds firmwares for the affected nodes and remotely flashes
+the respected nodes.
 
-If it is called from a node's parent folder, it updates all nodes in
+If a node-address is given (for example as an IP), deploy will falsh the 
+node with that respective address. If also a password is given, then this
+password is used instead of the specific node password. This can be
+important to re-initialize a node configured for a diffrent system.
+
+If deploy is called from a node's parent folder, it updates all nodes in
 subdirectories of this parent folder.
 
 EOF
@@ -30,38 +31,39 @@ fi
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
 
-if [[ -e "node.conf" || -e "../node.conf" ]]; then  # started from node-directory
+if [[ -e "node.conf" ]]; then  # started from node-directory
     source "$ULNOIOT_ROOT/bin/read_node_config"
 
-    noupdate=""
-    if [[ "$@" == *noupdate* ]]; then
-        noupdate=1
-    fi
+#    noupdate=""
+#    if [[ "$@" == *noupdate* ]]; then
+#        noupdate=1
+#    fi
 
-    sync=""
-    if [[ "$@" == *sync* ]]; then
-        sync="--sync"
-    fi
-
-    if [[ "$@" == *noreset* ]]; then
-        reset=""
+    if [[ "$1" ]]; then
+        address="$1"
     else
-        reset="--reset"
+        echo "Getting IP of node $topic for deployment."
+        address=$(get_ip "$topic" 2>/dev/null|grep "$topic"|cut -d\  -f2)
+        # TODO: adapt to new mechanism
     fi
 
-    if [[ ! $noupdate ]]; then
-        update noreset
+    if [[ "$2" ]]; then
+        password="$2"
+    else
+        password=$(tail -n1 key.hex|cut -b1-64|basez -x -d|md5sum -b|cut -d\  -f1)
     fi
-    echo "Getting IP of node $topic for deployment."
-    ip=$(get_ip "$topic" 2>/dev/null|grep "$topic"|cut -d\  -f2)
-    if [ "$ip" ]; then
-        echo "Deploying user files to node $topic with IP $ip."
+
+    if [ "$address" ]; then
+        echo "Deploying user files to node $topic with address $address."
         path="$(pwd)"
-        cd "$ULNOIOT_ROOT/lib/netrepl"
-        python3 copy.py "$ip" --keyfile "$path/key.hex" $sync \
-            --src "$path/copy/" $reset
+        # prepare build folder
+        mkdir -p build
+        
+#        cd "$ULNOIOT_ROOT/lib/netrepl"
+#        python3 copy.py "$address" --keyfile "$path/key.hex" $sync \
+#            --src "$path/copy/" $reset
     else
-        echo "Couldn't find IP of node with topic $topic for deployment. Skipping."
+        echo "Could not find address of node with topic $topic for deployment. Skipping."
         exit 1
     fi
 

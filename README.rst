@@ -2,6 +2,10 @@
 ulnoiot
 =======
 
+Attention: this is ulnoiot-tng (the next generation, not anymore based on micropython, now using platformio as a base to generate firmware and code)
+Most of the following documention still refers to the original micropython based ulnoiot version, if you want to work with this development version contact ulno directly or make youself known in the forum.
+
+
 Introduction
 ------------
 
