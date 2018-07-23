@@ -1,4 +1,5 @@
-
+// main.cpp
+// main program for ulnoiot esp8266 firmware
 
 ////// Standard libraries
 #include <ESP8266WiFi.h>
@@ -14,13 +15,17 @@
 #include <WiFiManager.h>
 
 //// configuration
+#include <toolbox.h>
+#include <ulnoiot-default.h>
+#include <device-manager.h>
+
+// node specific code
 //#include "wifi-config.h" now obsolete and pre-configured
-#include "ulnoiot-default.h"
 #include "config.h"
 #include "key.h"
 #include "pins.h"
 
-// uiot functions for user modification in uiot.cpp
+// ulnoiot functions for user modification in setup.cpp
 void ulnoiot_setup();
 //void ulnoiot_loop();
 
@@ -88,8 +93,8 @@ void id_blinker() {
 void reconfigMode() {
   // go to access-point and reconfiguration mode
   
-  char *ap_ssid = (char *) (UIOT_AP_RECONFIG_NAME "-xxxxxx");
-  const char *ap_password = UIOT_AP_RECONFIG_PASSWORD;
+  char *ap_ssid = (char *) (ULNOIOT_AP_RECONFIG_NAME "-xxxxxx");
+  const char *ap_password = ULNOIOT_AP_RECONFIG_PASSWORD;
 
   Serial.println("Reconfiguration requested. Activating AP-mode.");
   WiFi.disconnect(true);
@@ -128,9 +133,9 @@ void reconfigMode() {
   if(wifiManager.getLastConxResult() == WL_CONNECTED) { // there was a connection made
     // trigger reconfigurability (flash with default password) after next reboot
     Serial.println("Requesting password reset on next boot.");
-    int magicSize = sizeof(UIOT_RECONFIG_MAGIC);
+    int magicSize = sizeof(ULNOIOT_RECONFIG_MAGIC);
     char rtcData[magicSize];
-    strncpy(rtcData, UIOT_RECONFIG_MAGIC, magicSize);
+    strncpy(rtcData, ULNOIOT_RECONFIG_MAGIC, magicSize);
     ESP.rtcUserMemoryWrite(0, (uint32_t *) rtcData, magicSize);
   } // TODO: consider going back to configuration mode if not successful
   reboot(); // Always reboot after this to free all eventually not freed memory used by WiFiManager
@@ -138,13 +143,13 @@ void reconfigMode() {
 
 void flash_mode_select() {
     // Check if flash with default password is requested
-  int magicSize = sizeof(UIOT_RECONFIG_MAGIC);
+  int magicSize = sizeof(ULNOIOT_RECONFIG_MAGIC);
   char rtcData[magicSize];
   rtcData[magicSize]=0;
   char nothing[1] = {0};
   ESP.rtcUserMemoryRead(0, (uint32_t*) rtcData, magicSize);
-  if(memcmp(rtcData,UIOT_RECONFIG_MAGIC,magicSize) == 0) {
-    const char* flash_default_password = UIOT_FLASH_DEFAULT_PASSWORD;
+  if(memcmp(rtcData,ULNOIOT_RECONFIG_MAGIC,magicSize) == 0) {
+    const char* flash_default_password = ULNOIOT_FLASH_DEFAULT_PASSWORD;
     Serial.printf("Setting flash default password to %s.\n", flash_default_password);
     ArduinoOTA.setPassword(flash_default_password);
     ESP.rtcUserMemoryWrite(0, (uint32_t*) nothing, 1 ); // only reset password once
@@ -180,12 +185,20 @@ void flash_mode_select() {
 
 WiFiClient wifiClient;
 PubSubClient client;
+Ustring node_topic;
 
 void mqtt_receive_callback(char* topic, byte* payload, unsigned int length) {
-
+  Serial.print("Receiving on topic ");
+  Serial.print(topic);
+  Serial.print(" >");
+  for(int i=0; i<(int)length; i++) {
+    Serial.print((char)payload[i]);
+  }
+  Serial.println("<");
 }
 
 void setup() {
+  // TODO: setup watchdog
   // TODO: consider not using serial at all and freeing it for other connections
   Serial.begin(115200);
   Serial.println();
@@ -255,33 +268,59 @@ void setup() {
   Serial.println(WiFi.localIP());
 
   // TODO: check if port is configurable
+
   client = PubSubClient(mqtt_server, 1883, mqtt_receive_callback, wifiClient);
 
-  ulnoiot_setup();
+  ulnoiot_setup(); // define all devices
 }
 
 boolean mqtt_connect() {
   if(!client.connected()) {
-      // reconnect
-      if(mqtt_user[0]) { // auth given
-        return client.connect(hostname,mqtt_user,mqtt_password);
-      } else {
-        return client.connect(hostname);
-      }
+    bool connected;
+    // reconnect
+    if(mqtt_user[0]) { // auth given
+      connected = client.connect(hostname,mqtt_user,mqtt_password);
+    } else {
+      connected = client.connect(hostname);
+    }
+    if(connected) {
+      devices_subscribe(client, node_topic);
+    }
+    return connected;
   }
   return true;
 }
 
+static unsigned long last_transmission = millis();
+static unsigned long transmission_delta = 5000;
+void transmission_interval(int interval) {
+    transmission_delta = ((unsigned long)interval) * 1000;
+}
+
+static int _loop_delay=1;
+void loop_delay(int delay) {
+  // TODO: should 0 be allowed here?
+  _loop_delay = delay;
+}
+
 void loop() {
+  unsigned long current_time;
   // TODO: make sure nothing weird happens -> watchdog
   ArduinoOTA.handle();
   if(mqtt_connect()) {
-    // go through devices and send reports if necessary
-
+    client.loop(); // give time to mqtt to execute callback
+    current_time = millis();
+    if(devices_update() || 
+        current_time - last_transmission >= transmission_delta) {
+      // go through devices and send reports if necessary
+      devices_publish(client, node_topic); // TODO: check error status
+      last_transmission = current_time;
+    }
   } else {
     Serial.println("Trouble connecting to mqtt server.");
     // Don't block here with delay as other processes might be running in background
     // TODO: wait a bit before trying to reconnect.
   }
+  delay(_loop_delay);
   //ulnoiot_loop(); // TODO: think if this can actually be skipped in the ulnoiot-philosophy -> maybe move to driver callbacks
 }

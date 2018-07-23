@@ -1,13 +1,121 @@
-// Manage a list of devices
+// device.h
+// author: ulno
+// created: 2018-07-16
+//
+// One ulnoiot device (actor or sensor connected to node)
+
+// General note, in ulnoiot, we pass as convinience all values as strings.
+// So other types have to be converted in such a as string or from one.
 
 #ifndef _ULNOIOT_DEVICE_H_
 #define _ULNOIOT_DEVICE_H_
 
-#include <ulnoiot.h>
+#include <functional>
+
+#include <ulnoiot-default.h>
+#include <toolbox.h>
+
+
+
+class Sub_Device {
+    protected:
+            Ustring measured_value; // the just measured value (after calling measure)
+    Ustring name; // subdevice name (added to the device name)
+    Ustring current_value;
+    bool report_change=true;
+    // This is the callback which is called based on a value change
+    // it gets passed the triggering device. Last measured values can be
+    // read from the device.
+    // TODO: commented example
+    #define ULNOIOT_ON_CHANGE_CALLBACK std::function<void(const Device&)>
+    ULNOIOT_ON_CHANGE_CALLBACK on_change_cb=NULL;
+
+    // This is the callback which is used for filtering and influencing values
+    // It gets the current deveice passed as parameter. Values
+    // modify. So it returns the same or modified value in it. If it wants to
+    // invalidate the current measurement, it needs to return an empty string (
+    // set first char to 0) or return false. To indicate change or validate the
+    // measured value it needs to return true.
+    // TODO: commented example
+    #define ULNOIOT_FILTER_CALLBACK std::function<bool(const Device&)>
+    ULNOIOT_FILTER_CALLBACK filter_cb=NULL;
+}
 
 class Device {
     private:
+        Ustring name; // device name
+        bool ignore_case=true;
+                
+        // This is a list of pairs of topics and functions which return values
+        // that need to be published.
+        Device_Publisher* publishers=NULL;
+        // This is a list of pairs of topics and functions which take received
+        // input data from a subscription and trigger respective actions.
+        Device_Subscriber* subscribers=NULL;
+
     public:
-}
+        Device(const char* _name) { name.from(_name); }
+        //// Getters & Setters
+        Device& with_ignore_case(bool ignore_case) { 
+            ignore_case = ignore_case;
+            return *this;
+        }
+        Device& set_ignore_case(bool ignore_case) {
+            return with_ignore_case(ignore_case);
+        } 
+        Device& with_report_change(bool report_change) { 
+            report_change = report_change;
+            return *this;
+        }
+        Device& set_report_change(bool report_change) {
+            return with_report_change(report_change);
+        } 
+        Device& with_on_change_callback(ULNOIOT_ON_CHANGE_CALLBACK on_change_cb) { 
+            on_change_cb = on_change_cb;
+            return *this;
+        }
+        Device& set_on_change_callback(ULNOIOT_ON_CHANGE_CALLBACK on_change_cb) { 
+            return with_on_change_callback(on_change_cb);
+        }
+        Device& with_filter_callback(ULNOIOT_FILTER_CALLBACK filter_cb) { 
+            filter_cb = filter_cb;
+            return *this;
+        }
+        Device& set_filter_callback(ULNOIOT_FILTER_CALLBACK filter_cb) { 
+            return with_filter_callback(filter_cb);
+        }
+
+        const Ustring& value() const { return current_value; }
+        const Ustring& get_name() const { return name; }
+        //const char* get_name() const { return name.as_cstr(); }
+        
+        virtual ~Device() {
+            // usually nothing has to be done here
+            // This virtual method needs to be defined to prevent warning
+            // from cpp-compiler
+        }
+
+        /* measure
+         * Does nothing by default.
+         * Usually this needs to be overwritten.
+         * It should make sure to trigger necessary steps to
+         * measure from the physical hardware a sensor value (or
+         * several values from a multi sensor).
+         * It needs to set in measured_value the currently measured value.
+         * If no value can be measured (or has not been), it should return
+         * false. If measuring was successful, return True.
+         * This is called from update to trigger the actual value generation.
+         */
+        virtual bool measure() { return true; }
+
+        /* update
+         * returns True if the update caused a change in value
+         * and report_change is set to True
+         * This will be called very often from event loop 
+         * this only reports change when the measured (and filtered) 
+         * value is new (has changed)
+         */
+        bool update();
+};
 
 #endif // _ULNOIOT_DEVICE_H_
