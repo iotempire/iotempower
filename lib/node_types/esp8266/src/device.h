@@ -17,41 +17,53 @@
 
 
 
-class Sub_Device {
-    protected:
-            Ustring measured_value; // the just measured value (after calling measure)
-    Ustring name; // subdevice name (added to the device name)
-    Ustring current_value;
-    bool report_change=true;
-    // This is the callback which is called based on a value change
-    // it gets passed the triggering device. Last measured values can be
-    // read from the device.
-    // TODO: commented example
-    #define ULNOIOT_ON_CHANGE_CALLBACK std::function<void(const Device&)>
-    ULNOIOT_ON_CHANGE_CALLBACK on_change_cb=NULL;
-
-    // This is the callback which is used for filtering and influencing values
-    // It gets the current deveice passed as parameter. Values
-    // modify. So it returns the same or modified value in it. If it wants to
-    // invalidate the current measurement, it needs to return an empty string (
-    // set first char to 0) or return false. To indicate change or validate the
-    // measured value it needs to return true.
-    // TODO: commented example
-    #define ULNOIOT_FILTER_CALLBACK std::function<bool(const Device&)>
-    ULNOIOT_FILTER_CALLBACK filter_cb=NULL;
-}
+class Subdevice {
+    private:
+        Ustring name; // subdevice name (added to the device name)
+        bool _subscribed = false;
+        void init(const char* subname, bool subscribed) {
+            name.from(subname);
+            _subscribed = subscribed;
+        }
+    public:
+        Ustring measured_value; // the just measured value (after calling measure)
+        Ustring current_value;
+        Ustring& value() { return current_value; }
+        const Ustring& get_name() const { return name; }
+        const Ustring& key() const { return name; }
+        bool subscribed() { return _subscribed; }
+        Subdevice(const char* subname, bool subscribed) {
+            init(subname, subscribed);
+        }
+        Subdevice(const char* subname) { 
+            init(subname, false);
+        }
+};
 
 class Device {
+    protected:
+        Fixed_Map<Subdevice, ULNOIOT_MAX_SUBDEVICES> subdevices;
     private:
-        Ustring name; // device name
+        Ustring name; // device name and mqtt-topic extension
         bool ignore_case=true;
-                
-        // This is a list of pairs of topics and functions which return values
-        // that need to be published.
-        Device_Publisher* publishers=NULL;
-        // This is a list of pairs of topics and functions which take received
-        // input data from a subscription and trigger respective actions.
-        Device_Subscriber* subscribers=NULL;
+        bool report_change=true;
+
+        // This is the callback which is called based on a value change
+        // it gets passed the triggering device. Last measured values can be
+        // read from the device.
+        // TODO: commented example
+        #define ULNOIOT_ON_CHANGE_CALLBACK std::function<void(const Device&)>
+        ULNOIOT_ON_CHANGE_CALLBACK on_change_cb=NULL;
+
+        // This is the callback which is used for filtering and influencing values
+        // It gets the current deveice passed as parameter. Values
+        // modify. So it returns the same or modified value in it. If it wants to
+        // invalidate the current measurement, it needs to return an empty string (
+        // set first char to 0) or return false. To indicate change or validate the
+        // measured value it needs to return true.
+        // TODO: commented example
+        #define ULNOIOT_FILTER_CALLBACK std::function<bool(const Device&)>
+        ULNOIOT_FILTER_CALLBACK filter_cb=NULL;
 
     public:
         Device(const char* _name) { name.from(_name); }
@@ -63,6 +75,21 @@ class Device {
         Device& set_ignore_case(bool ignore_case) {
             return with_ignore_case(ignore_case);
         } 
+
+        Ustring& value(unsigned long index);
+        Ustring& value() { return value(0); }
+        Ustring& measured_value(unsigned long index);
+        Ustring& measured_value() { return measured_value(0); }
+        const Ustring& get_name() const { return name; }
+        //const char* get_name() const { return name.as_cstr(); }
+        const Ustring& key() const { return name; }
+        
+        virtual ~Device() {
+            // usually nothing has to be done here
+            // This virtual method needs to be defined to prevent warning
+            // from cpp-compiler
+        }
+
         Device& with_report_change(bool report_change) { 
             report_change = report_change;
             return *this;
@@ -85,14 +112,20 @@ class Device {
             return with_filter_callback(filter_cb);
         }
 
-        const Ustring& value() const { return current_value; }
-        const Ustring& get_name() const { return name; }
-        //const char* get_name() const { return name.as_cstr(); }
-        
-        virtual ~Device() {
-            // usually nothing has to be done here
-            // This virtual method needs to be defined to prevent warning
-            // from cpp-compiler
+        Subdevice* add_subdevice(Subdevice* sd) {
+            if(subdevices.add(sd)) {
+                return sd;
+            } else {
+                return NULL;
+            }
+        }
+
+        Subdevice* subdevice(unsigned long index) {
+            return subdevices.get(index);
+        }
+
+        bool subdevices_for_each(std::function<bool(Subdevice&)> func) {
+            return subdevices.for_each(func);
         }
 
         /* measure

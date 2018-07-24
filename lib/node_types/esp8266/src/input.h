@@ -15,13 +15,12 @@ class Input : public Device {
         int _threshold;
         bool _pull_up = true;
         int debouncer = 0;
-        void init() {
+        void reinit() {
             if(_pull_up) {
                 pinMode(_pin, INPUT_PULLUP);
             } else {
                 pinMode(_pin, INPUT);
             }
-            with_threshold(0);
             measure();
         }
     public:
@@ -30,12 +29,14 @@ class Input : public Device {
             _high = high;
             _low = low;
             _pin = pin;
-            init();
+            with_threshold(0);
+            add_subdevice(new Subdevice(""));
+            reinit();
         }
         bool measure();
         Input& with_pull_up(bool pull_up) {
             _pull_up = pull_up;
-            init();
+            reinit();
             return *this;
         }
         Input& with_threshold(int threshold) {

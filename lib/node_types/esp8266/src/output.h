@@ -19,16 +19,18 @@ class Output : public Device {
             _low = low_command;
             _pin = pin;
             pinMode(_pin,OUTPUT);
-            low();
+            add_subdevice(new Subdevice(""));
+            add_subdevice(new Subdevice("set",true));
+            low(); // must be after subdevices as it uses global measured_value()
         }
         void high() { 
             digitalWrite(_pin, 1);
-            measured_value.from(_high);
+            measured_value().from(_high);
         }
         void on() { high(); }
         void low() { 
             digitalWrite(_pin, 0); 
-            measured_value.from(_low);
+            measured_value().from(_low);
         }
         void off() { low(); }
         // TODO: set output "floating"?

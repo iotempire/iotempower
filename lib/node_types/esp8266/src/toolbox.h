@@ -5,16 +5,15 @@
 #ifndef _TOOLBOX_H_
 #define _TOOLBOX_H_
 
-#include <cstring.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <functional>
 #include "ulnoiot-default.h"
-
-typedef etl::string<10> String;
 
 // a simple class for handling fixed-length strings. Ustring stands for
 // Ulnoiot-String
-class Ustring: {
+class Ustring {
     protected:
         char cstr[ULNOIOT_MAX_STRLEN+1];
     public:
@@ -45,6 +44,7 @@ class Ustring: {
             strncpy(cstr,other.cstr,ULNOIOT_MAX_STRLEN);
             return true;
         }
+        bool from(const byte* payload, unsigned long length);
         bool copy(const Ustring& other) { return from(other); }
         bool add(const Ustring& other);
         int compare(const Ustring& other) const {
@@ -70,5 +70,70 @@ class Ustring: {
         Ustring(float f) { clear(); from(f); }
         Ustring(double f) { clear(); from(f); }
 };
+
+// small fixed size map with linear search functionality
+// VALUE_TYPE needs to have a member function key, returning a Ustring,
+// which is used for searching
+// TODO: sort
+template<class VALUE_TYPE, size_t SIZE>  
+class Fixed_Map {
+    private:
+        VALUE_TYPE* list[SIZE];
+        unsigned long count=0;
+        unsigned long find_index(const Ustring& searchterm) {
+            for(unsigned long i=0; i<SIZE; i++) {
+                if(searchterm.equals(list[i]->key()))
+                    return i;
+            }
+            return -1;
+        }
+    public:
+        bool add(VALUE_TYPE* element) {
+            if(count>=SIZE) {
+                count = SIZE;
+                return false;
+            } else {
+                list[count] = element;
+                count ++;
+            }
+            return true;
+        }
+        VALUE_TYPE* find(const Ustring& searchterm) {
+            unsigned long index = find_index(searchterm);
+            if(index>0) {
+                return list[index];
+            }
+            return NULL;
+        }
+        VALUE_TYPE* find(const char* searchterm) {
+            Ustring usearch(searchterm);
+            unsigned long index = find_index(usearch);
+            if(index>0) {
+                return list[index];
+            }
+            return NULL;
+        }
+        VALUE_TYPE* get(unsigned long index) {
+            if(index>=count) return NULL;
+            return list[index];
+        }
+        VALUE_TYPE* first() {
+            return get(0);
+        }
+        unsigned long length() { return count;}
+        // Do for all elements (can be aborted if the given func returns false)
+        // this leads to for_each returning false. 
+        bool for_each(std::function<bool (VALUE_TYPE&)> func) {
+            for(unsigned long i=0; i<count; i++) {
+                if(!func(*(list[i]))) 
+                    return false;
+            }
+            return true;
+        }
+};
+
+void reboot();
+
+void controlled_crash(const char * error_message);
 
 #endif // _TOOLBOX_H_

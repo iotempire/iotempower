@@ -11,9 +11,10 @@ bool Input::measure() {
         if(debouncer < 0)
             debouncer = 0;
     }
-    if( debouncer >= _threshold)
-        measured_value.from(_high);
-    else
-        measured_value.from(_low);
+    if( debouncer >= _threshold) {
+        measured_value().from(_high);
+    } else {
+        measured_value().from(_low);
+    }
     return true;
 }

@@ -29,22 +29,6 @@
 void ulnoiot_setup();
 //void ulnoiot_loop();
 
-void reboot() {
-  // TODO: add network debugging
-  Serial.println("Rebooting in 5 seconds.");
-  delay(5000);
-  // TODO: Consider counting in rtc and going into reconfigure after a while
-
-  // make sure, reset is clean, gpio0 has to be high
-  pinMode(0,OUTPUT);
-  digitalWrite(0,1);
-  yield();
-  delay(10);
-  yield();
-  delay(500); // let things settle a bit
-  ESP.restart(); // fails when serial activity TODO: solve or warn?
-}
-
 int long_blinks=0, short_blinks;
 
 #define ID_LED LED_BUILTIN
@@ -185,15 +169,16 @@ void flash_mode_select() {
 
 WiFiClient wifiClient;
 PubSubClient client;
-Ustring node_topic;
+Ustring node_topic(mqtt_topic);
 
 void mqtt_receive_callback(char* topic, byte* payload, unsigned int length) {
+
   Serial.print("Receiving on topic ");
   Serial.print(topic);
   Serial.print(" >");
-  for(int i=0; i<(int)length; i++) {
-    Serial.print((char)payload[i]);
-  }
+  Ustring upayload;
+  upayload.from(payload, length);
+  Serial.print(upayload.as_cstr());
   Serial.println("<");
 }
 
@@ -311,7 +296,8 @@ void loop() {
     client.loop(); // give time to mqtt to execute callback
     current_time = millis();
     if(devices_update() || 
-        current_time - last_transmission >= transmission_delta) {
+        (transmission_delta > 0 &&
+          current_time - last_transmission >= transmission_delta)) {
       // go through devices and send reports if necessary
       devices_publish(client, node_topic); // TODO: check error status
       last_transmission = current_time;
