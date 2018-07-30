@@ -4,7 +4,6 @@
 # scan ports to see if there is an esp
 #
 # $1 can be a usb0-usb9 or acm0-acm9 as suggestion
-# $2 can be a webrepl password
 default_port=ttyUSB0
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }

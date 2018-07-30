@@ -5,6 +5,16 @@
 #include <Arduino.h>
 #include "device.h"
 
+bool Subdevice::call_receive_cb(Ustring& payload) {
+    Serial.print("Calling receive callback. ");
+    if(receive_cb != NULL) {
+        Serial.println(payload.as_cstr());
+        return receive_cb(payload);
+    }
+    Serial.println("!failure!");
+    return false;
+}
+
 bool Device::update() {
     if(!measure()) {  // measure new value or trigger physical update
         // re-use last value(s), if measurement not successful

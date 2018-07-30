@@ -27,7 +27,7 @@ bool Ustring::from(const char* _cstr) {
     return untruncated;
 }
 
-bool Ustring::from(const byte* payload, unsigned long length) {
+bool Ustring::from(const byte* payload, unsigned int length) {
     bool untruncated = true;
     if(length > ULNOIOT_MAX_STRLEN) {
         length = ULNOIOT_MAX_STRLEN;
@@ -35,6 +35,19 @@ bool Ustring::from(const byte* payload, unsigned long length) {
     }
     strncpy(cstr, (const char *)payload, length); // TODO: think about proper decoding
     cstr[length] = 0; // terminate properly
+    return untruncated;
+}
+
+bool Ustring::remove(unsigned int from, unsigned int interval) {
+    unsigned int mylen = length();
+    if(from > mylen) return false;
+    bool untruncated = true;
+    if( from + interval > mylen ) {
+        untruncated = false;
+        interval = mylen - from;
+    }
+    memcpy(cstr + from, cstr + from + interval, mylen - from - interval);
+    cstr[mylen - interval]=0;
     return untruncated;
 }
 
@@ -57,8 +70,15 @@ void reboot() {
 }
 
 void controlled_crash(const char * error_message) {
-    Serial.println();
-    Serial.println("Crash, cause (reboot in 5s):");
-    Serial.println(error_message);
+    log("\nCrash, cause (reboot in 5s): %s", error_message);
     reboot();
+}
+
+void log(const char *fmt, ...) {
+	char buf[LOG_LINE_MAX_LEN];
+	va_list ap;
+	va_start(ap, fmt);
+	vsnprintf(buf, LOG_LINE_MAX_LEN, fmt, ap);
+	va_end(ap);
+	Serial.println(buf);
 }

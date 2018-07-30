@@ -75,22 +75,27 @@ else
     cd "$ULNOIOT_EXTERNAL/esptool.git"
     python setup.py install
     ln -s "$ULNOIOT_EXTERNAL/esptool.git/esptool.py" "$ULNOIOT_VPYTHON/bin/esptool"
-    # mpfshell
-    git clone https://github.com/ulno/mpfshell "$ULNOIOT_EXTERNAL/mpfshell.git"
-    cd "$ULNOIOT_EXTERNAL/mpfshell.git"
-    python setup.py install
+
+    ## mpfshell - upy specific
+    #git clone https://github.com/ulno/mpfshell "$ULNOIOT_EXTERNAL/mpfshell.git"
+    #cd "$ULNOIOT_EXTERNAL/mpfshell.git"
+    #python setup.py install
+
     # accesspoint
     git clone https://github.com/ulno/create_ap "$ULNOIOT_EXTERNAL/create_ap"
     #cd "$ULNOIOT_EXTERNAL/create_ap"
-    # pyminifier
-    git clone https://github.com/liftoff/pyminifier "$ULNOIOT_EXTERNAL/pyminifier"
-    cd "$ULNOIOT_EXTERNAL/pyminifier"
-    python setup.py install
-    # download firmware
-    mkdir -p "$ULNOIOT_EXTERNAL/firmware"
-    cd "$ULNOIOT_EXTERNAL/firmware"
-    "$ULNOIOT_ROOT/bin/download_firmware"
-    "$ULNOIOT_ROOT/bin/firmware" download
+
+#    # pyminifier
+#    git clone https://github.com/liftoff/pyminifier "$ULNOIOT_EXTERNAL/pyminifier"
+#    cd "$ULNOIOT_EXTERNAL/pyminifier"
+#    python setup.py install
+
+#    # download firmware
+#    mkdir -p "$ULNOIOT_EXTERNAL/firmware"
+#    cd "$ULNOIOT_EXTERNAL/firmware"
+#    "$ULNOIOT_ROOT/bin/download_firmware"
+#    "$ULNOIOT_ROOT/bin/firmware" download
+
     popd  &> /dev/null
 
     bash "$ULNOIOT_ROOT/bin/fix_bin"

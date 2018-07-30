@@ -20,7 +20,16 @@ class Output : public Device {
             _pin = pin;
             pinMode(_pin,OUTPUT);
             add_subdevice(new Subdevice(""));
-            add_subdevice(new Subdevice("set",true));
+            add_subdevice(new Subdevice("set",true))->with_receive_cb(
+                [&] (const Ustring& payload) {
+                    if(payload.equals(_high)) high();
+                    else {
+                        if(payload.equals(_low)) low();
+                        else return false;
+                    }
+                    return true;
+                }
+            );
             low(); // must be after subdevices as it uses global measured_value()
         }
         void high() { 

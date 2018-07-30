@@ -9,10 +9,14 @@
 #include <FS.h>
 #include <ESP8266WebServer.h>     //Local WebServer used to serve the configuration portal
 #include <ESP8266TrueRandom.h>
-#include <PubSubClient.h>
 
 ////// adapted libraries
 #include <WiFiManager.h>
+#include <Ticker.h>
+
+// PubSubClient.h and ArduinoMqtt unstable
+#include <AsyncMqttClient.h>
+
 
 //// configuration
 #include <toolbox.h>
@@ -93,8 +97,14 @@ void reconfigMode() {
   id_blinker(); // TODO -> only call random init part;
   String blink_pattern = "<p>Blink pattern: " + String(long_blinks)
             + " longs, " + String(short_blinks) + " shorts</p>";
-  WiFiManagerParameter custom_text(blink_pattern.c_str());
-  wifiManager.addParameter(&custom_text);
+  WiFiManagerParameter custom_text1(blink_pattern.c_str());
+  wifiManager.addParameter(&custom_text1);
+
+  String name_display = "<p>Parameter for initialize in ulnoiot: " 
+      + String(ap_ssid+strlen(ap_ssid)-6) + " </p>";
+  WiFiManagerParameter custom_text2(name_display.c_str());
+  wifiManager.addParameter(&custom_text2);
+
 //  const char * menu[] = {"wifi","param","sep","exit"};
 //  wifiManager.setMenu(menu,4);
 //  wifiManager.setShowInfoErase(true); // disable info-field
@@ -123,22 +133,34 @@ void reconfigMode() {
     ESP.rtcUserMemoryWrite(0, (uint32_t *) rtcData, magicSize);
   } // TODO: consider going back to configuration mode if not successful
   reboot(); // Always reboot after this to free all eventually not freed memory used by WiFiManager
+  // TODO: go directly to OTA-mode for a while and then quit
 }
+
+bool reconfig_mode_active = false;
 
 void flash_mode_select() {
     // Check if flash with default password is requested
   int magicSize = sizeof(ULNOIOT_RECONFIG_MAGIC);
   char rtcData[magicSize];
   rtcData[magicSize]=0;
-  char nothing[1] = {0};
   ESP.rtcUserMemoryRead(0, (uint32_t*) rtcData, magicSize);
   if(memcmp(rtcData,ULNOIOT_RECONFIG_MAGIC,magicSize) == 0) {
+    reconfig_mode_active = true;
+    Serial.println("Reconfiguration mode requested.");
+    // reset request
+    rtcData[0]=0;
+    rtcData[1]=0;
+    ESP.rtcUserMemoryWrite(0, (uint32_t*) rtcData, magicSize );
+    
+    // // debug read back
+    // ESP.rtcUserMemoryRead(0, (uint32_t*) rtcData, magicSize);
+    // Serial.print("Another comparison yields: ");
+    // Serial.println(memcmp(rtcData,ULNOIOT_RECONFIG_MAGIC,magicSize));
+
     const char* flash_default_password = ULNOIOT_FLASH_DEFAULT_PASSWORD;
     Serial.printf("Setting flash default password to %s.\n", flash_default_password);
     ArduinoOTA.setPassword(flash_default_password);
-    ESP.rtcUserMemoryWrite(0, (uint32_t*) nothing, 1 ); // only reset password once
   } else { // do not check for special config mode, when just rebooted out of it
-  
     // Check specific GPIO port if pressed and unpressed 2-4 times to enter
     // reconfiguration mode (allow generic reflash in AP mode)
     Serial.println("Allow 5s to check if reconfiguration and AP mode is requested.");
@@ -161,25 +183,124 @@ void flash_mode_select() {
     }
 
     Serial.println("Continue to boot normally.");
-    // Password can be set with it's md5 value as well
+    // register password-hash for uploading
     ArduinoOTA.setPasswordHash(keyhash);
 
   } // endif default password flash mode
 }
 
-WiFiClient wifiClient;
-PubSubClient client;
+////////////// mqtt
+AsyncMqttClient mqttClient;
+Ticker mqttReconnectTimer;
+
+WiFiEventHandler wifiConnectHandler;
+WiFiEventHandler wifiDisconnectHandler;
+Ticker wifiReconnectTimer;
+
 Ustring node_topic(mqtt_topic);
 
-void mqtt_receive_callback(char* topic, byte* payload, unsigned int length) {
+static char* my_hostname;
+
+void connectToWifi() {
+  // Start WiFi conection and register hostname
+  Serial.println("Connecting to Wi-Fi...");
+  Serial.print("Registering hostname: ");
+  if(reconfig_mode_active) {  
+    my_hostname = (char*)"ulnoiot_xxxxxx";
+    sprintf(my_hostname+strlen(my_hostname)-6,"%06x",ESP.getChipId());
+  } else {
+    my_hostname = (char*)HOSTNAME;
+  }
+  WiFi.hostname(my_hostname);
+  ArduinoOTA.setHostname(my_hostname);
+  Serial.println(my_hostname);
+  WiFi.mode(WIFI_STA);
+//  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  WiFi.begin();
+  MDNS.begin(my_hostname);
+}
+
+void onWifiDisconnect(const WiFiEventStationModeDisconnected& event) {
+  Serial.println("Disconnected from Wi-Fi.");
+  mqttReconnectTimer.detach(); // ensure we don't reconnect to MQTT while reconnecting to Wi-Fi
+  wifiReconnectTimer.once(2, connectToWifi);
+}
+
+void connectToMqtt() {
+  if(reconfig_mode_active) return;
+  Serial.println("Connecting to MQTT...");
+  mqttClient.connect();
+}
+
+void onWifiConnect(const WiFiEventStationModeGotIP& event) {
+  Serial.println("Connected to Wi-Fi.");
+  connectToMqtt();
+}
+
+void onMqttConnect(bool sessionPresent) {
+  Serial.println("Connected to MQTT.");
+  Serial.print("Session present: ");
+  Serial.println(sessionPresent);
+
+  devices_subscribe(mqttClient, node_topic);
+}
+
+void onMqttDisconnect(AsyncMqttClientDisconnectReason reason) {
+  Serial.println("Disconnected from MQTT.");
+
+  if (WiFi.isConnected()) {
+    mqttReconnectTimer.once(2, connectToMqtt);
+  }
+}
+
+void onMqttSubscribe(uint16_t packetId, uint8_t qos) {
+  Serial.println("Subscribe acknowledged.");
+  Serial.print("  packetId: ");
+  Serial.println(packetId);
+  Serial.print("  qos: ");
+  Serial.println(qos);
+}
+
+void onMqttUnsubscribe(uint16_t packetId) {
+  Serial.println("Unsubscribe acknowledged.");
+  Serial.print("  packetId: ");
+  Serial.println(packetId);
+}
+
+void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total) {
+  Serial.println("Publish received.");
+  Serial.print("  topic: ");
+  Serial.println(topic);
+  Serial.print("  qos: ");
+  Serial.println(properties.qos);
+  Serial.print("  dup: ");
+  Serial.println(properties.dup);
+  Serial.print("  retain: ");
+  Serial.println(properties.retain);
+  Serial.print("  len: ");
+  Serial.println(len);
+  Serial.print("  index: ");
+  Serial.println(index);
+  Serial.print("  total: ");
+  Serial.println(total);
+
+  Ustring utopic(topic);
+  utopic.remove(0,node_topic.length()+1);
+  Ustring upayload(payload, (unsigned int)total);
 
   Serial.print("Receiving on topic ");
-  Serial.print(topic);
+  Serial.print(utopic.as_cstr());
   Serial.print(" >");
-  Ustring upayload;
-  upayload.from(payload, length);
   Serial.print(upayload.as_cstr());
   Serial.println("<");
+
+  devices_receive(utopic, upayload);
+}
+
+void onMqttPublish(uint16_t packetId) {
+  Serial.println("Publish acknowledged.");
+  Serial.print("  packetId: ");
+  Serial.println(packetId);
 }
 
 void setup() {
@@ -203,13 +324,13 @@ void setup() {
   //   }
   // }
   // // TODO: read configuration from SPIFFS -> necessary? or better rtc?
-  // Try already to bring up WiFi
-  WiFi.mode(WIFI_STA);
-  //WiFi.begin(wifi_ssid, wifi_password);
-  WiFi.begin(); // need to be set in advance once TODO: think about initialization -> probably just upload a program that does the preset
 
   flash_mode_select();
 
+  // Try already to bring up WiFi
+  connectToWifi();
+
+  // This reboot and wait might not be necessary
   if(WiFi.waitForConnectResult() != WL_CONNECTED) {
     Serial.println("Connection Failed! Rebooting...");
     reboot();
@@ -219,9 +340,6 @@ void setup() {
   // ArduinoOTA.setPort(8266);
 
   // TODO: only enter OTA when requested
-
-  // Hostname defaults to esp8266-[ChipID]
-  ArduinoOTA.setHostname(hostname);
 
   ArduinoOTA.onStart([]() {
     String type;
@@ -254,27 +372,31 @@ void setup() {
 
   // TODO: check if port is configurable
 
-  client = PubSubClient(mqtt_server, 1883, mqtt_receive_callback, wifiClient);
+  wifiConnectHandler = WiFi.onStationModeGotIP(onWifiConnect);
+  wifiDisconnectHandler = WiFi.onStationModeDisconnected(onWifiDisconnect);
+
+  if(!reconfig_mode_active) {
+    mqttClient.onConnect(onMqttConnect);
+    mqttClient.onDisconnect(onMqttDisconnect);
+    mqttClient.onSubscribe(onMqttSubscribe);
+    mqttClient.onUnsubscribe(onMqttUnsubscribe);
+    mqttClient.onMessage(onMqttMessage);
+    mqttClient.onPublish(onMqttPublish);
+    mqttClient.setServer(mqtt_server, 1883);
+  }
+
+  connectToMqtt();
 
   ulnoiot_setup(); // define all devices
 }
 
-boolean mqtt_connect() {
-  if(!client.connected()) {
-    bool connected;
-    // reconnect
-    if(mqtt_user[0]) { // auth given
-      connected = client.connect(hostname,mqtt_user,mqtt_password);
-    } else {
-      connected = client.connect(hostname);
-    }
-    if(connected) {
-      devices_subscribe(client, node_topic);
-    }
-    return connected;
-  }
-  return true;
-}
+      /* old TODO: add
+      if(mqtt_user[0]) { // auth given
+        connected = client.connect(hostname,mqtt_user,mqtt_password);
+      } else {
+        connected = client.connect(hostname);
+      } */
+
 
 static unsigned long last_transmission = millis();
 static unsigned long transmission_delta = 5000;
@@ -282,6 +404,7 @@ void transmission_interval(int interval) {
     transmission_delta = ((unsigned long)interval) * 1000;
 }
 
+// TODO: is this actually necessary if sending is limited
 static int _loop_delay=1;
 void loop_delay(int delay) {
   // TODO: should 0 be allowed here?
@@ -292,21 +415,23 @@ void loop() {
   unsigned long current_time;
   // TODO: make sure nothing weird happens -> watchdog
   ArduinoOTA.handle();
-  if(mqtt_connect()) {
-    client.loop(); // give time to mqtt to execute callback
-    current_time = millis();
-    if(devices_update() || 
-        (transmission_delta > 0 &&
-          current_time - last_transmission >= transmission_delta)) {
-      // go through devices and send reports if necessary
-      devices_publish(client, node_topic); // TODO: check error status
-      last_transmission = current_time;
+  if(!reconfig_mode_active) {
+    if(mqttClient.connected()) {
+      current_time = millis();
+      if(devices_update() || 
+          (transmission_delta > 0 &&
+            current_time - last_transmission >= transmission_delta)) {
+        // go through devices and send reports if necessary
+        devices_publish(mqttClient, node_topic); // TODO: check error status
+        last_transmission = current_time;
+      }
+    } else {
+      //log("Trouble connecting to mqtt server.");
+      // Don't block here with delay as other processes might be running in background
+      // TODO: wait a bit before trying to reconnect.
     }
-  } else {
-    Serial.println("Trouble connecting to mqtt server.");
-    // Don't block here with delay as other processes might be running in background
-    // TODO: wait a bit before trying to reconnect.
-  }
-  delay(_loop_delay);
-  //ulnoiot_loop(); // TODO: think if this can actually be skipped in the ulnoiot-philosophy -> maybe move to driver callbacks
+    //mqtt_client->yield(_loop_delay);
+    //ulnoiot_loop(); // TODO: think if this can actually be skipped in the ulnoiot-philosophy -> maybe move to driver callbacks
+  } // endif !reconfig_mode_active
 }
+

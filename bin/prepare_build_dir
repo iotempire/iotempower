@@ -51,20 +51,20 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
     node_type="$board"
     
     src_dir="$ULNOIOT_ROOT/lib/node_types/$node_type"
-    
     dest_dir="build"
     
     link_type_through_base "$src_dir" src "$dest_dir/src"
     link_type_through_base "$src_dir" lib "$dest_dir/lib"
     ln -s -f "$(realpath setup.cpp)" "$dest_dir/src"
-    password=$(tail -n1 key.hex|cut -b1-64|basez -x -d|md5sum -b|cut -d\  -f1)
+#    password=$(tail -n1 key.hex|head -c64|basez -x -d|md5sum -b|cut -d\  -f1)
+    password=$(tail -n1 key.txt|head -c64|md5sum -b|cut -d\  -f1)
     echo 'const char *keyhash = "'"$password"'";' > "$dest_dir/src/key.h"
     p=$(realpath "$src_dir/platformio.ini")
     ln -s -f "$p" "$dest_dir"
 
     # create specific config file.
 cat > "$dest_dir/src/config.h" << EOF
-#define hostname "$node_name"
+#define HOSTNAME "$node_name"
 #define mqtt_topic "$topic"
 #define mqtt_server "$mqtt_server"
 #define mqtt_user "$mqtt_user"

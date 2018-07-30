@@ -22,6 +22,7 @@ class Ustring {
             cstr[0]=0;
             cstr[ULNOIOT_MAX_STRLEN]=0;
         }
+        bool remove(unsigned int from, unsigned int length);
         int length() const { return strnlen(cstr,ULNOIOT_MAX_STRLEN); }
         int max_length() const { return ULNOIOT_MAX_STRLEN; }
         // most functions return true, when successful and false if something
@@ -31,6 +32,12 @@ class Ustring {
         }
         bool from(long i) { 
             return snprintf(cstr, ULNOIOT_MAX_STRLEN+1, "%ld", i) <= ULNOIOT_MAX_STRLEN; 
+        }
+        bool from(unsigned int i) { 
+            return snprintf(cstr, ULNOIOT_MAX_STRLEN+1, "%u", i) <= ULNOIOT_MAX_STRLEN; 
+        }
+        bool from(unsigned long i) { 
+            return snprintf(cstr, ULNOIOT_MAX_STRLEN+1, "%lu", i) <= ULNOIOT_MAX_STRLEN; 
         }
         bool from(float f) { 
             // TODO: check if float is actually now supported in sprintf
@@ -44,7 +51,10 @@ class Ustring {
             strncpy(cstr,other.cstr,ULNOIOT_MAX_STRLEN);
             return true;
         }
-        bool from(const byte* payload, unsigned long length);
+        bool from(const byte* payload, unsigned int length);
+        bool from(const char* payload, unsigned int length) {
+            return from((byte*) payload, length);
+        }
         bool copy(const Ustring& other) { return from(other); }
         bool add(const Ustring& other);
         int compare(const Ustring& other) const {
@@ -69,6 +79,14 @@ class Ustring {
         Ustring(long i) { clear(); from(i); }
         Ustring(float f) { clear(); from(f); }
         Ustring(double f) { clear(); from(f); }
+        Ustring(const char* payload, unsigned int length) { 
+            clear();
+            from(payload, length);
+        }
+        Ustring(const byte* payload, unsigned int length) { 
+            clear();
+            from(payload, length);
+        }
 };
 
 // small fixed size map with linear search functionality
@@ -79,9 +97,9 @@ template<class VALUE_TYPE, size_t SIZE>
 class Fixed_Map {
     private:
         VALUE_TYPE* list[SIZE];
-        unsigned long count=0;
-        unsigned long find_index(const Ustring& searchterm) {
-            for(unsigned long i=0; i<SIZE; i++) {
+        unsigned int count=0;
+        unsigned int find_index(const Ustring& searchterm) {
+            for(unsigned int i=0; i<SIZE; i++) {
                 if(searchterm.equals(list[i]->key()))
                     return i;
             }
@@ -99,7 +117,7 @@ class Fixed_Map {
             return true;
         }
         VALUE_TYPE* find(const Ustring& searchterm) {
-            unsigned long index = find_index(searchterm);
+            unsigned int index = find_index(searchterm);
             if(index>0) {
                 return list[index];
             }
@@ -107,24 +125,24 @@ class Fixed_Map {
         }
         VALUE_TYPE* find(const char* searchterm) {
             Ustring usearch(searchterm);
-            unsigned long index = find_index(usearch);
+            unsigned int index = find_index(usearch);
             if(index>0) {
                 return list[index];
             }
             return NULL;
         }
-        VALUE_TYPE* get(unsigned long index) {
+        VALUE_TYPE* get(unsigned int index) {
             if(index>=count) return NULL;
             return list[index];
         }
         VALUE_TYPE* first() {
             return get(0);
         }
-        unsigned long length() { return count;}
+        unsigned int length() { return count;}
         // Do for all elements (can be aborted if the given func returns false)
         // this leads to for_each returning false. 
         bool for_each(std::function<bool (VALUE_TYPE&)> func) {
-            for(unsigned long i=0; i<count; i++) {
+            for(unsigned int i=0; i<count; i++) {
                 if(!func(*(list[i]))) 
                     return false;
             }
@@ -135,5 +153,7 @@ class Fixed_Map {
 void reboot();
 
 void controlled_crash(const char * error_message);
+
+void log(const char *fmt, ...);
 
 #endif // _TOOLBOX_H_

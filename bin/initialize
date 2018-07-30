@@ -1,87 +1,90 @@
 #!/bin/bash
 if [[ $# -gt 2 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF
-Syntax: initialize [serial_port] [noflash] [noupdate]
+Syntax: initialize [serial_port|6-byte-identifier [key]|ip-address [key]]
 
 initialize must be called from a node directory and reads its configuration
 from there.
-It looks for a locally (i.e. via serial) connected board matching the node
-description.
+If called without any parameter or a specific serial port, it looks for a 
+locally (i.e. via serial or the respective port) connected board and overwrites
+it (re-flashes), setting all initial parameters.
 
-It flashes the board with ulnoiot's version of micropython (if noflash is given,
-this step is skipped).
-It then sets or overwrites wifi and encryption data, respective to the current
-node configuration folder.
-Then, it calls a local/serial update on it and installs initial system
-user-space software.
-Then it calls a network deploy to copy the user folder and autostart to it.
-The last two steps fail, if the node router and mqtt broker are not available.
-Running deploy noupdate again (when router and mqtt broker become avaialable)
-fixes/finishes this.
+It flashes the board with ulnoiot. It then sets or overwrites wifi and 
+encryption data, respective to the current node configuration folder.
+If the 6-byte identifier is given, it does the intialization via network.
+The respective board has to be in configuration mode and connected to the same
+wifi as ulnoiot currently runs in for this to work.
+
+If key is given it overrides the deduced flash-key.
 
 serial_port: can be empty, usb0, usb1, or acm0, acm1, ...
 EOF
 exit 1
 fi
 
-
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
 source "$ULNOIOT_ROOT/bin/read_node_config"
 
-port=$(find_esp_port "$1")
+RECONFIG_KEY="ulnoiot"
+port=""
+remote=""
+key=""
 
 platform_folder="$ULNOIOT_ROOT/lib/node_types/$board"
 
-# if this is set, skip flashing
-if [[ "$*" != *noflash* ]]; then
-    flash_serial "$port"
-fi
-
-# potentially skip the update
-if [[ "$*" != *noupdate* ]]; then
-    update_serial "$port" alsodeploy
-fi
-
 # check key-file and eventually regenerate
-KEYFILE=key.hex
+KEYFILE=key.txt
 key=$(tail -n1 "$KEYFILE")
 if [[ ! ${#key} = 64 ]]; then
     # TODO: check that haveged is running and maybe check not to overwrite key?
     echo "Generating new key."
-    head -c32 /dev/random|od -A n -t x2|tr -d ' \r\n' > "$KEYFILE"
+    # random password must not have chars like $, ", # as bash and platformio
+    # messes that up later (especially $)
+    < /dev/random tr -dc A-Za-z0-9\-\+_\=/@% | head -c64 > "$KEYFILE"
+    #head -c32 /dev/random|od -A n -t x2|tr -d ' \r\n' > "$KEYFILE"
     key=$(tail -n1 "$KEYFILE")
 fi
 
-echo
-echo "Creating wifi/netrepl/mqtt config."
-cfg="$(mktemp --suffix .ulnoiot)"
-cat > "$cfg" << EOF
-wifi_name = "$ULNOIOT_AP_NAME"
-wifi_pw = "$ULNOIOT_AP_PASSWORD"
-netrepl="$key"
-mqtt_host = "$ULNOIOT_AP_HOSTNAME"
-mqtt_topic = "$topic"
-mqtt_user = "$ULNOIOT_MQTT_USER"
-mqtt_pw = "$ULNOIOT_MQTT_PW"
-EOF
 
 
-echo "Sending config and resetting."
-mpfshell -n -c \
-"open $port; "\
-"put $cfg /config.py; "\
-"exec import machine; exec machine.reset()"
+# check if an ID (6 letters and hex) was given
+if [[ "$1" =~ ^[0-9A-Fa-f]{6}$ ]]; then
+    # check if IP was given
+    remote="ulnoiot_$1.local"
+    key="$RECONFIG_KEY"
+elif [[ "$1" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then # IP given
+    remote="$1"
+    key="$RECONFIG_KEY"
+else
+    echo "Trying to select serial port."
+    port=$(find_esp_port "$1")
+fi
 
-# tidy up
-rm "$cfg"
+# check if a key was given and eventually overwrite deduced key
+if [[ "$2" ]]; then
+    key="$2"
+fi
 
-# we deployed already in serial update
-#echo "Waiting 15s until reset is done and internet connected."
-#sleep 15
-#echo "Copying files via network."
-#deploy noupdate
+prepare_build_dir
+cd build
+
+echo "Compiling and uploading..."
+if [[ "$port" ]]; then
+    export PLATFORMIO_UPLOAD_PORT="/dev/$port"
+    # TODO: upload small program which sets the wifi password
+elif [[ "$remote" ]]; then
+    export PLATFORMIO_UPLOAD_PORT="$remote"
+    export PLATFORMIO_UPLOAD_FLAGS="--port=8266
+--auth=$key"
+
+fi
+platformio run -t upload || { echo "Trouble compiling or uploading new firmware, check errors."; exit 1; }
+echo "Uploading done."
 
 echo
 echo "Done initializing."
 
+echo
+echo "IMPORTANT:"
+echo "Please, disconnect the esp from power now (once) to make OTA updates work."

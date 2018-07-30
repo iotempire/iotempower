@@ -25,10 +25,18 @@ class Subdevice {
             name.from(subname);
             _subscribed = subscribed;
         }
+        #define ULNOIOT_ON_RECEIVE_CALLBACK std::function<bool(const Ustring&)>
+        ULNOIOT_ON_RECEIVE_CALLBACK receive_cb = NULL;
     public:
         Ustring measured_value; // the just measured value (after calling measure)
         Ustring current_value;
         Ustring& value() { return current_value; }
+        Ustring& get() { return current_value; }
+        Subdevice& with_receive_cb(ULNOIOT_ON_RECEIVE_CALLBACK cb) {
+            receive_cb = cb;
+            return *this;
+        }
+        bool call_receive_cb(Ustring& payload);
         const Ustring& get_name() const { return name; }
         const Ustring& key() const { return name; }
         bool subscribed() { return _subscribed; }
