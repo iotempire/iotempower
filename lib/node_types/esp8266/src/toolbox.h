@@ -16,6 +16,7 @@
 class Ustring {
     protected:
         char cstr[ULNOIOT_MAX_STRLEN+1];
+        bool _ignore_case = false;
     public:
         void clear() {
             // make it empty and always terminated
@@ -49,6 +50,7 @@ class Ustring {
         bool from(const char* _cstr);
         bool from(const Ustring& other) { 
             strncpy(cstr,other.cstr,ULNOIOT_MAX_STRLEN);
+            case_adjust();
             return true;
         }
         bool from(const byte* payload, unsigned int length);
@@ -57,10 +59,11 @@ class Ustring {
         }
         bool copy(const Ustring& other) { return from(other); }
         bool add(const Ustring& other);
-        int compare(const Ustring& other) const {
-            return strncmp(cstr, other.cstr, ULNOIOT_MAX_STRLEN);
-        }
+        int compare(const char* other) const;
+        int compare(const Ustring& other) const { return compare(other.cstr); }
         bool equals(const Ustring& other) const { return compare(other) == 0; }
+        bool equals(const char* other) const { return compare(other) == 0; }
+        bool equals(const char* other, bool ignore_case) const;
         bool empty() const { return cstr[0] == 0; }
         
         //int as_int() const { return atoi(cstr); }
@@ -69,13 +72,28 @@ class Ustring {
         double as_float() const { return atof(cstr); }
 
         const char* as_cstr() const { return cstr; }
-        
+
+        void lower() {
+            char *p = cstr;
+            for ( ; *p; ++p) *p = tolower(*p);
+        }
+
+        void upper() {
+            char *p = cstr;
+            for ( ; *p; ++p) *p = toupper(*p);
+        }
+
+        void case_adjust() {
+            if(_ignore_case) lower();
+        }
+
         Ustring() { clear (); }
         Ustring(const char *initstr) {
             clear();
             strncpy(cstr,initstr,ULNOIOT_MAX_STRLEN);
+            case_adjust();
         }
-        Ustring(int i) { clear(); from(i); }
+        Ustring(int i) { clear(); from(i); case_adjust();}
         Ustring(long i) { clear(); from(i); }
         Ustring(float f) { clear(); from(f); }
         Ustring(double f) { clear(); from(f); }
@@ -86,6 +104,14 @@ class Ustring {
         Ustring(const byte* payload, unsigned int length) { 
             clear();
             from(payload, length);
+        }
+        Ustring& ignore_case(bool ic) {
+            _ignore_case = ic;
+            case_adjust();
+            return *this;
+        }
+        Ustring& ignore_case() {
+            return ignore_case(true);
         }
 };
 

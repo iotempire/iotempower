@@ -22,9 +22,9 @@ class Output : public Device {
             add_subdevice(new Subdevice(""));
             add_subdevice(new Subdevice("set",true))->with_receive_cb(
                 [&] (const Ustring& payload) {
-                    if(payload.equals(_high)) high();
+                    if(payload.equals(_high) high();
                     else {
-                        if(payload.equals(_low)) low();
+                        if(payload.equals(_low) low();
                         else return false;
                     }
                     return true;

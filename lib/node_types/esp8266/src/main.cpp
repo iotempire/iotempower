@@ -397,14 +397,17 @@ void setup() {
 
 static unsigned long last_transmission = millis();
 static unsigned long transmission_delta = 5000;
+static unsigned long last_update = millis();
 void transmission_interval(int interval) {
     transmission_delta = ((unsigned long)interval) * 1000;
 }
 
 // TODO: is this actually necessary if sending is limited
-static int _loop_delay=1;
+// too small delay prevents makes analog reads interrupt wifi
+static unsigned long _loop_delay=1;
 void loop_delay(int delay) {
   // TODO: should 0 be allowed here?
+  if(delay<=0) delay=1;
   _loop_delay = delay;
 }
 
@@ -415,12 +418,15 @@ void loop() {
   if(!reconfig_mode_active) {
     if(mqttClient.connected()) {
       current_time = millis();
-      if(devices_update() || 
-          (transmission_delta > 0 &&
-            current_time - last_transmission >= transmission_delta)) {
-        // go through devices and send reports if necessary
-        devices_publish(mqttClient, node_topic); // TODO: check error status
-        last_transmission = current_time;
+      if(current_time-last_update >_loop_delay) {
+        if(devices_update() || 
+            (transmission_delta > 0 &&
+              current_time - last_transmission >= transmission_delta)) {
+          // go through devices and send reports if necessary
+          devices_publish(mqttClient, node_topic); // TODO: check error status
+          last_transmission = current_time;
+        }
+        last_update = current_time;
       }
     } else {
       //log("Trouble connecting to mqtt server.");

@@ -82,7 +82,10 @@ class Device {
         }
         Device& set_ignore_case(bool ignore_case) {
             return with_ignore_case(ignore_case);
-        } 
+        }
+        bool get_ignore_case() {
+            return ignore_case;
+        }
 
         Ustring& value(unsigned long index);
         Ustring& value() { return value(0); }

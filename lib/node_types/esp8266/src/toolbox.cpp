@@ -13,6 +13,7 @@ bool Ustring::add(const Ustring& other) {
         untruncated = false;
     }
     strncpy(cstr+ownlen, other.cstr, otherlen);
+    case_adjust();
     return untruncated;
 }
 
@@ -24,6 +25,7 @@ bool Ustring::from(const char* _cstr) {
         untruncated = false;
     }
     strncpy(cstr,_cstr,ULNOIOT_MAX_STRLEN);
+    case_adjust();
     return untruncated;
 }
 
@@ -35,6 +37,7 @@ bool Ustring::from(const byte* payload, unsigned int length) {
     }
     strncpy(cstr, (const char *)payload, length); // TODO: think about proper decoding
     cstr[length] = 0; // terminate properly
+    case_adjust();
     return untruncated;
 }
 
@@ -50,6 +53,31 @@ bool Ustring::remove(unsigned int from, unsigned int interval) {
     cstr[mylen - interval]=0;
     return untruncated;
 }
+
+int Ustring::compare(const char* other) const {
+    int delta;
+    if(_ignore_case) {
+        for(int i=0; i<length(); i++) {
+            delta = (int)tolower(cstr[i])-(int)tolower(other[i]);
+            if(delta!=0) return delta;
+        }
+        return 0;
+    } else {
+        return strncmp(cstr, other, ULNOIOT_MAX_STRLEN);
+    }
+}
+
+bool Ustring::equals(const char* other, bool ic) const {
+    if(ic) {
+        for(int i=0; i<length(); i++) {
+            if(tolower(cstr[i])!=tolower(other[i])) return false;
+        }
+        return true;
+    } else {
+        return equals(other);
+    }
+}
+
 
 
 

@@ -22,6 +22,13 @@ bool Device::update() {
             sd.measured_value.copy(sd.current_value);
             return true; // continue loop
         } );
+    } else {
+        if(ignore_case) { // if necessary, lower them all
+            subdevices.for_each( [](Subdevice& sd) {
+                sd.measured_value.lower();
+                return true; // continue loop
+            } );
+        }
     }
     // a current value is now in measured_value
     // check if it needs to be filtered
