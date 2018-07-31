@@ -4,7 +4,7 @@
 //
 // One ulnoiot device (actor or sensor connected to node)
 
-// General note, in ulnoiot, we pass as convinience all values as strings.
+// General note, in ulnoiot, we pass as convenience all values as strings.
 // So other types have to be converted in such a as string or from one.
 
 #ifndef _ULNOIOT_DEVICE_H_

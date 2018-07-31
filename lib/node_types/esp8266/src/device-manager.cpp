@@ -9,13 +9,13 @@
 
 static Fixed_Map<Device, ULNOIOT_MAX_DEVICES> device_list;
 
-static Device* find_device(const Ustring& name) {
+/*static Device* find_device(const Ustring& name) {
     return device_list.find(name);
 }
 
 static Device* find_device(const char* name) {
     return device_list.find(name);
-}
+}*/
 
 bool add_device(Device &device) {
     return device_list.add(&device);
@@ -120,7 +120,7 @@ bool devices_receive(Ustring& subtopic, Ustring& payload) {
                 Serial.print(" with ");
                 Serial.println(topic.as_cstr());
                 if(topic.equals(subtopic)) { // found match
-                    payload.ignore_case(dev->get_ignore_case());
+                    payload.ignore_case(dev.get_ignore_case());
                     sd.call_receive_cb(payload);
                 }
             }
