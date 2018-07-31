@@ -60,7 +60,8 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
         prepare_build_dir
         cd build
         export PLATFORMIO_UPLOAD_PORT="$address"
-        export PLATFORMIO_UPLOAD_FLAGS="--port=8266
+        export PLATFORMIO_UPLOAD_FLAGS="--progress
+--port=8266
 --auth="\""$password"\"
 
         platformio run -t upload || { echo "Trouble compiling or uploading new firmware, check errors."; exit 1; }

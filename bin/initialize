@@ -75,16 +75,22 @@ if [[ "$port" ]]; then
     # TODO: upload small program which sets the wifi password
 elif [[ "$remote" ]]; then
     export PLATFORMIO_UPLOAD_PORT="$remote"
-    export PLATFORMIO_UPLOAD_FLAGS="--port=8266
+    export PLATFORMIO_UPLOAD_FLAGS="--progress
+--port=8266
 --auth=$key"
 
 fi
 platformio run -t upload || { echo "Trouble compiling or uploading new firmware, check errors."; exit 1; }
 echo "Uploading done."
 
-echo
-echo "Done initializing."
+
+if [[ "$port" ]]; then
+    echo
+    echo "IMPORTANT:"
+    echo "Please, disconnect the esp from power now (once) to make OTA updates work."
+    echo "Press enter to continue."
+    read tmp
+fi
 
 echo
-echo "IMPORTANT:"
-echo "Please, disconnect the esp from power now (once) to make OTA updates work."
+echo "Done initializing."

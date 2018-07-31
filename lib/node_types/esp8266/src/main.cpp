@@ -383,19 +383,16 @@ void setup() {
     mqttClient.onMessage(onMqttMessage);
     mqttClient.onPublish(onMqttPublish);
     mqttClient.setServer(mqtt_server, 1883);
+    mqttClient.setClientId(my_hostname);
+    if(mqtt_user[0]) { // auth given
+      mqttClient.setCredentials(mqtt_user, mqtt_password);
+    }
   }
 
   connectToMqtt();
 
   ulnoiot_setup(); // define all devices
 }
-
-      /* old TODO: add
-      if(mqtt_user[0]) { // auth given
-        connected = client.connect(hostname,mqtt_user,mqtt_password);
-      } else {
-        connected = client.connect(hostname);
-      } */
 
 
 static unsigned long last_transmission = millis();

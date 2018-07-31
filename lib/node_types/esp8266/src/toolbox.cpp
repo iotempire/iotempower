@@ -66,7 +66,8 @@ void reboot() {
   delay(10);
   yield();
   delay(500); // let things settle a bit
-  ESP.restart(); // fails when serial activity TODO: solve or warn?
+  ESP.reset(); // fails when serial activity TODO: solve or warn?
+  //ESP.restart(); // fails when serial activity TODO: solve or warn?
 }
 
 void controlled_crash(const char * error_message) {
