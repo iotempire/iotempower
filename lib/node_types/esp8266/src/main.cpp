@@ -390,8 +390,9 @@ void setup() {
   }
 
   connectToMqtt();
-
-  ulnoiot_setup(); // define all devices
+  if(!reconfig_mode_active) {
+    ulnoiot_setup(); // define all devices
+  }
 }
 
 
