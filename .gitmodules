@@ -1,0 +1,3 @@
+[submodule "lib/node_types/esp/lib/WiFiManager"]
+	path = lib/node_types/esp/lib/WiFiManager
+	url = git://github.com/ulno/WiFiManager.git
