@@ -40,9 +40,19 @@ Input& input(const char* name, int pinnr) {
 }
 
 #include "analog.h"
-// can also do with_pullup and with_threshold
 Analog& analog(const char* name) {
     Analog* dev = new Analog(name);
+    CHECK_DEV(dev)
+}
+
+#include "th.h"
+Dht11& dht11(const char* name, int pinnr) {
+    Dht11* dev = new Dht11(name, pinnr);
+    CHECK_DEV(dev)
+}
+
+Ds18b20& ds18b20(const char* name, int pinnr) {
+    Ds18b20* dev = new Ds18b20(name, pinnr);
     CHECK_DEV(dev)
 }
 

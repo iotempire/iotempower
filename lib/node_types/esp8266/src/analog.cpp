@@ -1,4 +1,4 @@
-// input.cc
+// analog.cc
 #include "analog.h"
 
 static unsigned long last_read = millis()-5;
