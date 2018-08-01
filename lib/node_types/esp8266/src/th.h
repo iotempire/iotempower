@@ -38,6 +38,7 @@ class Ds18b20 : public Device {
         DallasTemperature *sensors;
         unsigned long _read_interval = 1000; // only read every interval ms
         unsigned long last_read = millis() - _read_interval;
+        bool initialized = false;
     public:
         Ds18b20(const char* name, uint8_t pin) :
             Device(name) {
@@ -47,11 +48,17 @@ class Ds18b20 : public Device {
             add_subdevice(new Subdevice("")); // TODO: think about a destructor
             sensors->begin();
             if (!sensors->getAddress(first, 0)) {
-                controlled_crash("Unable to find address for Device 0"); 
+                log("Unable to find address for Device 0. Sensor will not work.");
+            } else {
+                initialized = true;
             }
             measure();
         }
+        bool is_initialized() { return initialized; }
         bool measure();
+        ~Ds18b20() {
+
+        }
 };
 
 
