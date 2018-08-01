@@ -149,10 +149,11 @@ function run() {
             echo "Upgrading ulnoiot."
             echo "Getting changes from git."
             git pull
+            git submodule update --remote --recursive --init
             fix_bin # prints out Fixing links
-            echo "Downloading latest firmware."
-            download_firmware
-            echo "Upgrade finished."
+            #echo "Downloading latest firmware."
+            #download_firmware
+            #echo "Upgrade finished."
             ;;
         exec | x | run | -x | -c | --exec)
             shift
