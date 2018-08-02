@@ -55,6 +55,13 @@ else
         echo "Can't continue, exiting now."
         exit 1
     fi
+    # install virtualenv for python2 for platformio
+    mkdir -p "$ULNOIOT_VPYTHON2"
+    virtualenv -p "$(which python2)" "$ULNOIOT_VPYTHON"
+    source "$ULNOIOT_VPYTHON/bin/activate"
+    pip install --upgrade pip
+    
+    TODO: continue here
     # install virtualenv
     mkdir -p "$ULNOIOT_VPYTHON"
     virtualenv -p "$(which python3)" "$ULNOIOT_VPYTHON"

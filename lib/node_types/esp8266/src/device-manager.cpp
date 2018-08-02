@@ -59,7 +59,7 @@ bool devices_publish(AsyncMqttClient& mqtt_client, Ustring& node_topic) {
                         topic.add("/");
                         topic.add(sd.get_name());
                     }
-                    Serial.print(dev.get_name().as_cstr());
+                    Serial.print(topic.as_cstr()+node_topic.length()+1);
                     Serial.print(" ");
                     Serial.println(val.as_cstr());
 

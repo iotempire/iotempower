@@ -71,9 +71,21 @@ cd build
 
 echo "Compiling and uploading..."
 if [[ "$port" ]]; then
+    
     export PLATFORMIO_UPLOAD_PORT="/dev/$port"
-    # TODO: upload small program which sets the wifi password
+
+    cat > src/wifi-config.h << EOF
+#define WIFI_SSID "$ULNOIOT_AP_NAME"
+#define WIFI_PASSWORD "$ULNOIOT_AP_PASSWORD"
+EOF
+    platformio run -t upload || { echo "Trouble compiling or uploading wifi setup firmware, check errors."; exit 1; }
+    echo "Let device start and set wifi credentials (15s sleep.)"
+    sleep 15
+    echo "Reflash without credentials."
+    echo "// no wifi setup" > src/wifi-config.h
+
 elif [[ "$remote" ]]; then
+    
     export PLATFORMIO_UPLOAD_PORT="$remote"
     export PLATFORMIO_UPLOAD_FLAGS="--progress
 --port=8266

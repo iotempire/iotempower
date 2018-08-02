@@ -18,6 +18,7 @@ export ULNOIOT_LOCAL="$ULNOIOT_ROOT/.local"
 export PATH="$ULNOIOT_LOCAL/bin:$PATH"
 export ULNOIOT_EXTERNAL="$ULNOIOT_LOCAL/external"
 export ULNOIOT_VPYTHON="$ULNOIOT_LOCAL/vp"
+export ULNOIOT_VPYTHON2="$ULNOIOT_LOCAL/vp2"
 export ULNOIOT_ROOT
 
 # set some defaults

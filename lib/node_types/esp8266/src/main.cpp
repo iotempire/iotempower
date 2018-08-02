@@ -24,7 +24,7 @@
 #include <device-manager.h>
 
 // node specific code
-//#include "wifi-config.h" now obsolete and pre-configured
+#include "wifi-config.h" // will only be filled if progammed via serial
 #include "config.h"
 #include "key.h"
 #include "pins.h"
@@ -89,7 +89,7 @@ void reconfigMode() {
   sprintf(ap_ssid+strlen(ap_ssid)-6,"%06x",ESP.getChipId());
   Serial.printf("Connect to %s with password %s.\n", ap_ssid, ap_password);
   WiFiManager wifiManager;
-  wifiManager.setConnectTimeout(300); // 5 min timeout
+  wifiManager.setConnectTimeout(600); // 10 min timeout
   
   // // parameter test
   // WiFiManagerParameter test_param("tparam", "test parameter", "123", 5);
@@ -101,7 +101,7 @@ void reconfigMode() {
   wifiManager.addParameter(&custom_text1);
 
   String name_display = "<p>Parameter for initialize in ulnoiot: " 
-      + String(ap_ssid+strlen(ap_ssid)-6) + " </p>";
+      + String(ap_ssid+strlen(ap_ssid)-6) + "</p>";
   WiFiManagerParameter custom_text2(name_display.c_str());
   wifiManager.addParameter(&custom_text2);
 
@@ -110,7 +110,7 @@ void reconfigMode() {
 //  wifiManager.setShowInfoErase(true); // disable info-field
 
   // make sure, we head directly to wifi config, when configuration mode activated
-  wifiManager.setCaptivePortalWifiRedirect(true); 
+  wifiManager.setCaptivePortalWifiRedirect(true);
 
   wifiManager.setConfigPortalBlocking(false); // allow interrupts
   // wifiManager.autoConnect(ap_ssid, ap_password);
@@ -202,7 +202,7 @@ Ustring node_topic(mqtt_topic);
 static char* my_hostname;
 
 void connectToWifi() {
-  // Start WiFi conection and register hostname
+  // Start WiFi connection and register hostname
   Serial.println("Connecting to Wi-Fi...");
   Serial.print("Registering hostname: ");
   if(reconfig_mode_active) {  
@@ -215,8 +215,11 @@ void connectToWifi() {
   ArduinoOTA.setHostname(my_hostname);
   Serial.println(my_hostname);
   WiFi.mode(WIFI_STA);
-//  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+#ifdef WIFI_SSID
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+#else
   WiFi.begin();
+#endif
   MDNS.begin(my_hostname);
 }
 

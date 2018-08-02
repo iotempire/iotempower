@@ -71,6 +71,8 @@ cat > "$dest_dir/src/config.h" << EOF
 #define mqtt_password "$mqtt_password"
 EOF
 
+echo "// no wifi credentials" > "$dest_dir/src/wifi-config.h"
+
 else
     echo "Not in node directory."
     exit 1

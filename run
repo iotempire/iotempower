@@ -109,6 +109,7 @@ function install() {
     echo "Installing now."
     echo
     bash "$ULNOIOT_ROOT/bin/install"
+    run upgrade
 }
 
 function help() {
@@ -173,8 +174,9 @@ if check_root; then
     source "$ULNOIOT_ROOT/lib/shell_starter/ulnoiot.bash" \
         || { echo "Can't read configuration. Aborting."; exit 1; }
     check_install
+    installed=$?
     cd "$current_path" # back to where we have been called
-    if [ $? -eq 0 ]; then
+    if [ $installed -eq 0 ]; then
         run "$@"
     else
         if install; then # if it failed, try to install first
