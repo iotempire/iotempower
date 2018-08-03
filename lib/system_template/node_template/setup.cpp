@@ -24,16 +24,36 @@ void setup() {
     // check the output of uhelp at the ulnoiot command prompt for other
     // supported devices and options.
 
+
+    // All device setup/configuration needs to be done here,
+    // look for the following commented examples for reference
+    // and uncomment and modify as needed
+    // check the output of uhelp at the ulnoiot command prompt for other
+    // supported devices and options.
+
     // The onboard-led is always available.
     // With this configuration it will report under myroom/test1/blue
     // and can be set via sending off or on to myroom/test1/blue/test.
-    // auto blue = output("blue", onboardled, "off", "on");
+    // make sure to use aut& as a type to have a rela reference of the object
+    // which can be used in callbacks.
+    // auto& blue = output("blue", onboardled, "off", "on");
     // blue.low(); // turn on (onboadled is reversed)
     
     // Add some other devices (all commented out)
     // Add a button with a slightly higher debounce rate, which will report
-    // in the topic myroom/test1/button1.
-    // input("button1", d3, "released", "pressed").with_threshold(2);
+    // in the topic myroom/test1/button1 and switch the led locally through
+    // a callback.
+    // input("button1", d3, "released", "pressed")
+    //     .with_threshold(2)
+    //     .with_on_change_callback( [&] (Device& dev) {
+    //         if(dev.value().equals("pressed")) {
+    //             if(blue.value().equals("on")) {
+    //                 blue.high();
+    //             } else {
+    //                 blue.low();
+    //             }
+    //         }
+    //     });
     
     // Count rising signals on d2=Pin(4) and
     // report number counted at myroom/test1/shock1.

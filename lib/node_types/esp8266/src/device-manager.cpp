@@ -21,40 +21,36 @@ bool add_device(Device &device) {
     return device_list.add(&device);
 }
 
-// out of simplicity reasons, we don't allow the deletion of devices
-// as we dropped interactive configuration in the transition from
-// micropython to C
 
-
-/* measure and filter
- */
-bool devices_measure() {
-    bool measured=false;
+bool devices_update() {
+    bool changed=false;
     device_list.for_each( [&] (Device& dev) {
         if(dev.poll_measure()) {
-            dev.check_changes();
+            changed |= dev.check_changes();
         }
         return true; // Continue loop
     } );
-    return measured;
+    return changed;
 }
 
-/* check if changes have to be published
- * -> eventually publish
- * This is only called with enough time distance so send buffer doesn't run over.
- * Careful a value causing a change could already have been overwritten.
- * Return true if anything has been published.
- * Return false if nothing was published.
- */
 bool devices_publish(AsyncMqttClient& mqtt_client, Ustring& node_topic, bool publish_all) {
     bool published = false;
+    bool first = true;
     device_list.for_each( [&] (Device& dev) {
         if(publish_all || dev.needs_publishing()) {
-            dev.publish(mqtt_client, node_topic);
-            published = true;
+            if(first) {
+                Serial.print("Publishing ");
+                first = false;
+            }
+            else Serial.print("; ");
+            if(dev.publish(mqtt_client, node_topic)) {
+                published = true;
+            }
         }
         return true; // Continue loop
     } );
+    if(!first && !published) Serial.println("nothing.");
+    if(published) Serial.println(".");
     return published;
 }
 

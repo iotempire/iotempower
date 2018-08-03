@@ -10,10 +10,22 @@
 #include <toolbox.h>
 #include <device.h>
 
+// ad a device to the static device list
 bool add_device(Device& device);
+
+/* out of simplicity reasons, we don't allow the deletion of devices
+ * as we dropped interactive configuration in the transition from
+ * micropython to C */
 //bool remove_device(const char* name);
-bool devices_measure();
+
+/* measure, filter, and check values
+ * return true, when any values where updated */
+bool devices_update();
+
+/* Subscribe all devices */
 bool devices_subscribe(AsyncMqttClient& mqtt_client, Ustring& node_topic);
+
+/* match a receive-topic and deliver payload */
 bool devices_receive(Ustring& subtopic, Ustring& payload);
 
 /* check if changes have to be published
@@ -23,7 +35,6 @@ bool devices_receive(Ustring& subtopic, Ustring& payload);
  * Return true if anything has been published.
  * Return false if nothing was published.
  */
-bool devices_publish(AsyncMqttClient& mqtt_client, Ustring& node_topic, bool publish_all);
-bool devices_publish(AsyncMqttClient& mqtt_client, Ustring& node_topic); // publish_all = false
+bool devices_publish(AsyncMqttClient& mqtt_client, Ustring& node_topic, bool publish_all = false);
 
 #endif // _ULNOIOT_DEVICE_MANAGER_H_

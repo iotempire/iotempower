@@ -18,8 +18,9 @@ bool Subdevice::call_receive_cb(Ustring& payload) {
 }
 
 bool Device::publish(AsyncMqttClient& mqtt_client, Ustring& node_topic) {
-    bool published=false;
+    bool published = false;
     Ustring topic;
+    bool first = true;
     subdevices_for_each( [&] (Subdevice& sd) {
         const Ustring& val = sd.value();
         if(!val.empty()) {
@@ -32,11 +33,14 @@ bool Device::publish(AsyncMqttClient& mqtt_client, Ustring& node_topic) {
                 topic.add("/");
                 topic.add(sd.get_name());
             }
+            if(first) first = false;
+            else Serial.print("|");
             Serial.print(topic.as_cstr()+node_topic.length()+1);
-            Serial.print(" ");
-            Serial.println(val.as_cstr());
+            Serial.print(":");
+            Serial.print(val.as_cstr());
 
             if(!mqtt_client.publish(topic.as_cstr(), 0, true, val.as_cstr())) {
+                Serial.print("!publish error!");
                 // TODO: signal error and trigger reconnect - necessary?
                 return false;
             }
@@ -57,7 +61,7 @@ bool Device::poll_measure() {
             return true; // continue loop
         } );
     } else {
-        if(ignore_case) { // if necessary, lower them all
+        if(_ignore_case) { // if necessary, lower them all
             subdevices.for_each( [](Subdevice& sd) {
                 sd.measured_value.lower();
                 return true; // continue loop
@@ -66,7 +70,7 @@ bool Device::poll_measure() {
     }
     // a current value is now in measured_value
     // check if it needs to be filtered
-    if(filter_cb != NULL && ! filter_cb(*this)) {
+    if(_filter_cb != NULL && ! _filter_cb(*this)) {
         // if filter defined but indicates to ignore the current measurement
         return false; // end here with no update
     }
@@ -83,21 +87,29 @@ bool Device::check_changes() {
         if(!sd.measured_value.equals(sd.current_value)) {
             sd.current_value.copy(sd.measured_value);
             changed = true;
-            if(report_change) {
+            if(_report_change) {
                 updated = true;
                 _needs_publishing = true;
+                Serial.print("Needs publishing: ");
+                Serial.print(name.as_cstr());
+                if(!sd.get_name().empty()) {
+                    Serial.print("/");
+                    Serial.print(sd.get_name().as_cstr());
+                }
+                Serial.print(":");
+                Serial.println(sd.measured_value.as_cstr());
             }
         }
         return true; // continue loop
     } ); // end for each subdevices
 
     if(changed) {
-        if(on_change_cb != NULL) {
-            on_change_cb(*this);
-        }
+        call_on_change_callback();
     }
     return updated;
 }
+
+static Ustring value_error;
 
 // TODO: why can't I make this const/const?
 Ustring& Device::value(unsigned long index) {
@@ -105,7 +117,9 @@ Ustring& Device::value(unsigned long index) {
     if(sd == NULL) {
         Serial.print("Error in value(). Working on Device: ");
         Serial.println(name.as_cstr());
-        controlled_crash("no subdevice");
+        value_error.from("subdevice value error");
+        return value_error;
+        // TODO: should this crash here?
     }
     return sd->value();
 }

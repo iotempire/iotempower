@@ -12,7 +12,7 @@
 #define ULNOIOT_MAX_SUBDEVICES 16
 #define ULNOIOT_MAX_STRLEN 63
 #define ULNOIOT_MAX_BUFLEN 127
-#define MIN_PUBLISH_TIME_US 20000  // posting every 20ms (20000us) allowed -> only 50messages per second (else network stacks seems to run full)- TODO: check if this is too conservative or too much
+#define MIN_PUBLISH_TIME 20  // posting every 20ms allowed -> only 50messages per second (else network stacks seems to run full)- TODO: check if this is too conservative or too much
 #define LOG_LINE_MAX_LEN 128
 
 #endif // _ULNOIOT_DEFAULT_H_

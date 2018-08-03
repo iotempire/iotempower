@@ -54,8 +54,8 @@ class Device {
         Fixed_Map<Subdevice, ULNOIOT_MAX_SUBDEVICES> subdevices;
     private:
         Ustring name; // device name and mqtt-topic extension
-        bool ignore_case = true;
-        bool report_change = true;
+        bool _ignore_case = true;
+        bool _report_change = true;
         bool _needs_publishing = false;
 
         // This is the callback which is called based on a value change
@@ -63,23 +63,23 @@ class Device {
         // read from the device.
         // TODO: commented example
         #define ULNOIOT_ON_CHANGE_CALLBACK std::function<void(Device&)>
-        ULNOIOT_ON_CHANGE_CALLBACK on_change_cb=NULL;
+        ULNOIOT_ON_CHANGE_CALLBACK _on_change_cb=NULL;
 
         // This is the callback which is used for filtering and influencing values
-        // It gets the current deveice passed as parameter. Values
+        // It gets the current device passed as parameter. Values
         // modify. So it returns the same or modified value in it. If it wants to
         // invalidate the current measurement, it needs to return an empty string (
         // set first char to 0) or return false. To indicate change or validate the
         // measured value it needs to return true.
         // TODO: commented example
         #define ULNOIOT_FILTER_CALLBACK std::function<bool(Device&)>
-        ULNOIOT_FILTER_CALLBACK filter_cb=NULL;
+        ULNOIOT_FILTER_CALLBACK _filter_cb=NULL;
 
     public:
         Device(const char* _name) { name.from(_name); }
         //// Getters & Setters
         Device& with_ignore_case(bool ignore_case) { 
-            ignore_case = ignore_case;
+            _ignore_case = ignore_case;
             return *this;
         }
         Device& set_ignore_case(bool ignore_case) {
@@ -87,12 +87,12 @@ class Device {
         }
 
         bool get_ignore_case() {
-            return ignore_case;
+            return _ignore_case;
         }
 
         void call_on_change_callback() {
-            if(on_change_cb!=NULL) {
-                on_change_cb(*this);
+            if(_on_change_cb != NULL) {
+                _on_change_cb(*this);
             }
         }
 
@@ -118,21 +118,21 @@ class Device {
         }
 
         Device& with_report_change(bool report_change) { 
-            report_change = report_change;
+            _report_change = report_change;
             return *this;
         }
         Device& set_report_change(bool report_change) {
             return with_report_change(report_change);
         } 
         Device& with_on_change_callback(ULNOIOT_ON_CHANGE_CALLBACK on_change_cb) { 
-            on_change_cb = on_change_cb;
+            _on_change_cb = on_change_cb;
             return *this;
         }
         Device& set_on_change_callback(ULNOIOT_ON_CHANGE_CALLBACK on_change_cb) { 
             return with_on_change_callback(on_change_cb);
         }
         Device& with_filter_callback(ULNOIOT_FILTER_CALLBACK filter_cb) { 
-            filter_cb = filter_cb;
+            _filter_cb = filter_cb;
             return *this;
         }
         Device& set_filter_callback(ULNOIOT_FILTER_CALLBACK filter_cb) { 
