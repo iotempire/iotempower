@@ -6,7 +6,9 @@
 #include "device.h"
 
 bool Subdevice::call_receive_cb(Ustring& payload) {
-    Serial.print("Calling receive callback. ");
+    Serial.print("Calling receive callback ");
+    Serial.print(name.as_cstr());
+    Serial.print(" ");
     if(receive_cb != NULL) {
         Serial.println(payload.as_cstr());
         return receive_cb(payload);
@@ -15,7 +17,39 @@ bool Subdevice::call_receive_cb(Ustring& payload) {
     return false;
 }
 
-bool Device::update() {
+bool Device::publish(AsyncMqttClient& mqtt_client, Ustring& node_topic) {
+    bool published=false;
+    Ustring topic;
+    subdevices_for_each( [&] (Subdevice& sd) {
+        const Ustring& val = sd.value();
+        if(!val.empty()) {
+            // construct full topic
+            topic.from(node_topic);
+            topic.add("/");
+            topic.add(get_name());
+            const Ustring& sd_name = sd.get_name();
+            if(!sd_name.empty()) { // only add, if name given
+                topic.add("/");
+                topic.add(sd.get_name());
+            }
+            Serial.print(topic.as_cstr()+node_topic.length()+1);
+            Serial.print(" ");
+            Serial.println(val.as_cstr());
+
+            if(!mqtt_client.publish(topic.as_cstr(), 0, true, val.as_cstr())) {
+                // TODO: signal error and trigger reconnect - necessary?
+                return false;
+            }
+            published = true;
+        }
+        return true; // continue loop
+    } ); // end for_each - iterate over subdevices
+    if(published) _needs_publishing = false;
+    return published;
+}
+
+
+bool Device::poll_measure() {
     if(!measure()) {  // measure new value or trigger physical update
         // re-use last value(s), if measurement not successful
         subdevices.for_each( [](Subdevice& sd) {
@@ -36,24 +70,33 @@ bool Device::update() {
         // if filter defined but indicates to ignore the current measurement
         return false; // end here with no update
     }
-    // The measured value is an actual, valid new measurement
-    // check if the value has changed/is updated
+    // The measured value is now an actual, valid new measurement
+    return true;
+}
 
+bool Device::check_changes() {
+    // check if the value has changed/is updated and call on_change_cb
     bool updated = false;
+    bool changed = false;
+    
     subdevices.for_each( [&] (Subdevice& sd) {
         if(!sd.measured_value.equals(sd.current_value)) {
             sd.current_value.copy(sd.measured_value);
-            updated = true;
+            changed = true;
+            if(report_change) {
+                updated = true;
+                _needs_publishing = true;
+            }
         }
         return true; // continue loop
-    } );
-    if(updated) {
+    } ); // end for each subdevices
+
+    if(changed) {
         if(on_change_cb != NULL) {
             on_change_cb(*this);
         }
-        return true; // signal "real" (with change) update happened
     }
-    return false; // not changed
+    return updated;
 }
 
 // TODO: why can't I make this const/const?

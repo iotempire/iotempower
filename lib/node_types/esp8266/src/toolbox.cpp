@@ -78,6 +78,38 @@ bool Ustring::equals(const char* other, bool ic) const {
     }
 }
 
+void Ustring::strip() {
+    int p;
+    // truncate
+    for(p=length()-1; p>=0; p--) {
+        char c=cstr[p];
+        if(c>32) break;
+    }
+    cstr[p+1]=0;
+    // find first non whitespace
+    for(p=0; p<length(); p++) {
+        char c=cstr[p];
+        if(c>32) break;
+    }
+    remove(0,p);
+}
+
+int Ustring::find(const char* pattern) {
+    int p,i;
+    int l=(int)length();
+    for(p=0;p<length();p++) {
+        for(i=0; i<l-p; i++) {
+            if(pattern[i]==0) { // reached the end, so we found the pattern
+                return p;
+            }
+            if(pattern[i]!=cstr[p+i]) {
+                break; // try next
+            }
+        }
+        if(p+i>=l) return -1; // no space to find left
+    }
+    return -1;
+}
 
 
 

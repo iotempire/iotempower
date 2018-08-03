@@ -5,17 +5,19 @@
 #include <Arduino.h>
 #include "ulnoiot-default.h"
 #include "config.h"
-#include "pins.h"
 #include "device.h"
 #include "device-manager.h"
 #include "toolbox.h"
 #include "devices.h"
 
+// needs to be last
+#include "pins.h"
+
 // allow using more familiar naming scheme for setup and loop
 #define setup() ulnoiot_setup()
 //#define loop() ulnoiot_loop()
 
-/* Set the amoutn of seconds to pass before doing full status report.
+/* Set the amount of seconds to pass before doing full status report.
  * If interval=0, only report changes.
  *  */
 bool transmission_interval(int interval);

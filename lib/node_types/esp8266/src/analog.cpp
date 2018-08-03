@@ -23,4 +23,5 @@ bool Analog::measure() {
         }
     }
     return true;
+    // TODO: some values might be swallowed if precision is set, but values not sent out fast enough
 }

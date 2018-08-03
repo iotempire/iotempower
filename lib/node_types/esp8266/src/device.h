@@ -11,6 +11,7 @@
 #define _ULNOIOT_DEVICE_H_
 
 #include <functional>
+#include <AsyncMqttClient.h>
 
 #include <ulnoiot-default.h>
 #include <toolbox.h>
@@ -53,14 +54,15 @@ class Device {
         Fixed_Map<Subdevice, ULNOIOT_MAX_SUBDEVICES> subdevices;
     private:
         Ustring name; // device name and mqtt-topic extension
-        bool ignore_case=true;
-        bool report_change=true;
+        bool ignore_case = true;
+        bool report_change = true;
+        bool _needs_publishing = false;
 
         // This is the callback which is called based on a value change
         // it gets passed the triggering device. Last measured values can be
         // read from the device.
         // TODO: commented example
-        #define ULNOIOT_ON_CHANGE_CALLBACK std::function<void(const Device&)>
+        #define ULNOIOT_ON_CHANGE_CALLBACK std::function<void(Device&)>
         ULNOIOT_ON_CHANGE_CALLBACK on_change_cb=NULL;
 
         // This is the callback which is used for filtering and influencing values
@@ -70,7 +72,7 @@ class Device {
         // set first char to 0) or return false. To indicate change or validate the
         // measured value it needs to return true.
         // TODO: commented example
-        #define ULNOIOT_FILTER_CALLBACK std::function<bool(const Device&)>
+        #define ULNOIOT_FILTER_CALLBACK std::function<bool(Device&)>
         ULNOIOT_FILTER_CALLBACK filter_cb=NULL;
 
     public:
@@ -83,9 +85,23 @@ class Device {
         Device& set_ignore_case(bool ignore_case) {
             return with_ignore_case(ignore_case);
         }
+
         bool get_ignore_case() {
             return ignore_case;
         }
+
+        void call_on_change_callback() {
+            if(on_change_cb!=NULL) {
+                on_change_cb(*this);
+            }
+        }
+
+        bool needs_publishing() {
+            return _needs_publishing;
+        }
+
+        // publish current value(s) and resets needs_publishing state
+        bool publish(AsyncMqttClient& mqtt_client, Ustring& node_topic);
 
         Ustring& value(unsigned long index);
         Ustring& value() { return value(0); }
@@ -152,14 +168,21 @@ class Device {
          */
         virtual bool measure() { return true; }
 
-        /* update
-         * returns True if the update caused a change in value
-         * and report_change is set to True
-         * This will be called very often from event loop 
-         * this only reports change when the measured (and filtered) 
-         * value is new (has changed)
+        /* poll_measure
+         * This calls measure and and filters and sets if necessary default values. 
+         * This will be called very often from event loop
+         * Will return if current measurement was successful or invalid. 
          */
-        bool update();
+        bool poll_measure();
+
+        /* check_changes
+         * returns True if new values were measured and sets the publishing flag
+         * This will be called very often from event loop 
+         * This only reports change when the measured (and filtered) 
+         * value is new (has changed) and report_changes is set.
+         * If a change happened and a callback is set, the callback is called.
+         */
+        bool check_changes();
 };
 
 #endif // _ULNOIOT_DEVICE_H_

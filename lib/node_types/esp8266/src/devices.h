@@ -56,4 +56,22 @@ Ds18b20& ds18b20(const char* name, int pinnr) {
     CHECK_DEV(dev)
 }
 
+#include "rgb_single.h"
+RGB_Single& rgb(const char* name, int pin_r, int pin_g, int pin_b, bool invert_signal) {
+    RGB_Single* dev = new RGB_Single(name, pin_r, pin_g, pin_b, invert_signal);
+    CHECK_DEV(dev)
+}
+
+RGB_Single& rgb(const char* name, int pin_r, int pin_g, int pin_b) {
+    RGB_Single* dev = new RGB_Single(name, pin_r, pin_g, pin_b);
+    CHECK_DEV(dev)
+}
+
+#include "rgb_multi.h"
+template<uint8_t pin, int led_count> RGB_Multi<pin, led_count>& _rgb_multi(const char* name) {
+    RGB_Multi<pin, led_count>* dev = new RGB_Multi<pin, led_count>(name);
+    CHECK_DEV(dev)
+}
+#define rgb_multi(name, pin, led_count) _rgb_multi<pin, led_count>(name)
+
 #endif // _DEVICES_H_

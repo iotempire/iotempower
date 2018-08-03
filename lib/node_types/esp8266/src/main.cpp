@@ -400,19 +400,20 @@ void setup() {
 
 
 static unsigned long last_transmission = millis();
+static unsigned long last_published = millis();
+static unsigned long last_measured = millis();
 static unsigned long transmission_delta = 5000;
-static unsigned long last_update = millis();
 void transmission_interval(int interval) {
     transmission_delta = ((unsigned long)interval) * 1000;
 }
 
 // TODO: is this actually necessary if sending is limited
 // too small delay prevents makes analog reads interrupt wifi
-static unsigned long _loop_delay=1;
-void loop_delay(int delay) {
+static unsigned long _measure_delay=1;
+void measure_delay(int delay) {
   // TODO: should 0 be allowed here?
   if(delay<=0) delay=1;
-  _loop_delay = delay;
+  _measure_delay = delay;
 }
 
 void loop() {
@@ -422,16 +423,24 @@ void loop() {
   if(!reconfig_mode_active) {
     if(mqttClient.connected()) {
       current_time = millis();
-      if(current_time-last_update >_loop_delay) {
-        if(devices_update() || 
-            (transmission_delta > 0 &&
-              current_time - last_transmission >= transmission_delta)) {
+      if(current_time - last_measured >= _measure_delay) {
+        devices_measure();
+        last_measured = current_time;
+        if(current_time-last_published >= last_published) {
           // go through devices and send reports if necessary
-          devices_publish(mqttClient, node_topic); // TODO: check error status
-          last_transmission = current_time;
-        }
-        last_update = current_time;
-      }
+          if(transmission_delta > 0 &&
+            current_time - last_transmission >= transmission_delta) {
+            if(devices_publish(mqttClient, node_topic, true)) {
+              last_transmission = current_time;
+              last_published = current_time;
+            }
+          } else { // no full transmission necessary
+            if(devices_publish(mqttClient, node_topic, false)) {
+              last_published = current_time;
+            }
+          } // endif transmission delta
+        } // endif update delay
+      } // endif measure delay
     } else {
       //log("Trouble connecting to mqtt server.");
       // Don't block here with delay as other processes might be running in background

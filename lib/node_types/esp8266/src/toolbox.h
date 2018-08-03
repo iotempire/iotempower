@@ -87,6 +87,14 @@ class Ustring {
             if(_ignore_case) lower();
         }
 
+        void strip();
+
+        int find(const char* pattern);
+
+        bool contains(const char* pattern) {
+            return find(pattern) >= 0;
+        }
+
         Ustring() { clear (); }
         Ustring(const char *initstr) {
             clear();
