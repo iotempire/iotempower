@@ -3,4 +3,4 @@
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
 source "$ULNOIOT_VPYTHON2/bin/activate"
-exec platformio "$@"
+exec "$ULNOIOT_VPYTHON2/bin/platformio" "$@"
