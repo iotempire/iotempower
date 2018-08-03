@@ -42,6 +42,13 @@ class Output : public Device {
             measured_value().from(_low);
         }
         void off() { low(); }
+
+        bool is_high() {
+            return value().equals(_high);
+        }
+        bool is_low() {
+            return value().equals(_low);
+        }
         // TODO: set output "floating"?
 };
 
