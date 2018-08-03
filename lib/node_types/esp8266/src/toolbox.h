@@ -95,6 +95,11 @@ class Ustring {
             return find(pattern) >= 0;
         }
 
+        bool starts_with(const char* pattern) const {
+            unsigned long len = strnlen(pattern, ULNOIOT_MAX_STRLEN);
+            return memcmp(cstr,pattern,len) == 0;
+        }
+
         Ustring() { clear (); }
         Ustring(const char *initstr) {
             clear();

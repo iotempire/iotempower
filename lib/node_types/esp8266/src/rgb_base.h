@@ -8,10 +8,11 @@
 #include <device.h>
 
 class RGB_Base : public Device {
-    private:
+    protected:
+        int _led_count=0;
         CRGB avg_color;
     public:
-        RGB_Base(const char* name);
+        RGB_Base(const char* name, int led_count);
         void high() { 
             set_color(CRGB::White);
         }
@@ -20,15 +21,29 @@ class RGB_Base : public Device {
             set_color(CRGB::Black);
         }
         void off() { low(); }
-        void set_color(uint8_t r, uint8_t g, uint8_t b) {
-            set_color(-1, CRGB(r,g,b));
-        }
         void set_color(CRGB color) {
-            set_color(-1, color);
+            set_color(-1, color, true);
         }
-        virtual void set_color(int lednr, CRGB color) {
+        void set_color_noshow(CRGB color) {
+            set_color(-1, color, false);
+        }
+
+        void set_colorstr(int lednr, const Ustring& color, bool _show=true);
+        void set_colorstr(const Ustring& color, bool _show=true);
+
+        virtual void set_color(int lednr, CRGB color, bool _show=true) {
             avg_color = color;
         }
+        virtual CRGB get_color(int lednr) {
+            return avg_color;
+        }
+        int led_count() {
+            return _led_count;
+        }
+        virtual void show() {
+            // nothing by default
+        }
+
 };
 
 

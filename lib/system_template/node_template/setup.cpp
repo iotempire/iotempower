@@ -47,7 +47,7 @@ void setup() {
     //     .with_threshold(2)
     //     .with_on_change_callback( [&] (Device& dev) {
     //         if(dev.value().equals("pressed")) {
-    //             if(blue.value().equals("on")) {
+    //             if(blue.is_low()) {
     //                 blue.high();
     //             } else {
     //                 blue.low();
