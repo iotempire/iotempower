@@ -66,4 +66,15 @@ template<uint8_t pin, int led_count> RGB_Multi<pin, led_count>& _rgb_multi(const
 }
 #define rgb_multi(name, pin, led_count) _rgb_multi<pin, led_count>(name)
 
+Animator& animator(const char* name, RGB_Base& strip) {
+    Animator* dev = new Animator(name, strip);
+    CHECK_DEV(dev)
+}
+
+Animator& animator(const char* name, int width, int height) {
+    Animator* dev = new Animator(name, width, height);
+    CHECK_DEV(dev)
+}
+
+
 #endif // _DEVICES_H_

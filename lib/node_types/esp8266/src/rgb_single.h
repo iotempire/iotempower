@@ -23,14 +23,14 @@ class RGB_Single : public RGB_Base {
             // digitalWrite(p_r, invert);
             // digitalWrite(p_g, invert);
             // digitalWrite(p_b, invert);
-            set_color(-1, CRGB::Black);
+            set_color(ALL_LEDS, CRGB::Black);
         }
     public:
         RGB_Single(const char* name, uint8_t pin_r, uint8_t pin_g, uint8_t pin_b, bool invert_signal=false) 
                 : RGB_Base(name, 1) {
             init(pin_r, pin_g, pin_b, invert_signal);
         }
-        virtual void set_color(int lednr, CRGB color, bool show=false);
+        virtual void process_color(int lednr, CRGB color, bool show=false);
 };
 
 

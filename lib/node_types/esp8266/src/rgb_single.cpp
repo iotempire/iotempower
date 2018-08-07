@@ -3,7 +3,7 @@
 
 #include "rgb_single.h"
 
-void RGB_Single::set_color(int lednr, CRGB color, bool show) {
+void RGB_Single::process_color(int lednr, CRGB color, bool show) {
     // ignore show
     // this is a controller for single led, so we ignore lednr
     if(invert) {
