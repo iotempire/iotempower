@@ -345,6 +345,8 @@ void setup() {
 
     flash_mode_select();
 
+    WiFi.setSleepMode(WIFI_NONE_SLEEP); // TODO: check if this works
+
     // Try already to bring up WiFi
     connectToWifi();
 

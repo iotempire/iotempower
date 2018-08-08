@@ -1,5 +1,5 @@
 // Most are in pins_arduino.h
-// Pins on NodeMCU
+// Pins on ESP-M Nodemcu board
 // based on:
 // https://samnicholls.net/wp-content/uploads/2016/11/esp8266_devkit_horizontal-01.png
 // https://alexbloggt.com/wp-content/uploads/2015/10/nodemcu_pinout_700.png
@@ -16,7 +16,7 @@
 // Vin
 
 // right
-//d0 = Pin(16)
+// d0 = Pin(16)
 #define WAKE D0
 // d1 = Pin(5)
 // scl = d1

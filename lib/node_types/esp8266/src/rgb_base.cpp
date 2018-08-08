@@ -250,9 +250,17 @@ bool Animator::measure() {
 }
 
 
-void Animator::scroll_up(bool cycle) {
+void Animator::scroll_up(bool cycle, int column) {
     CRGB old;
-    for(int x=0; x<width; x++) {
+    int start,end;
+    if(column<0) {
+        start = 0;
+        end = width;
+    } else {
+        start = column;
+        end = column + 1;
+    }
+    for(int x=start; x<end; x++) {
         if(cycle)
             old = get_pixel(x,0);
         else
@@ -263,9 +271,17 @@ void Animator::scroll_up(bool cycle) {
     }
 }
 
-void Animator::scroll_down(bool cycle) {
+void Animator::scroll_down(bool cycle, int column) {
     CRGB old;
-    for(int x=0; x<width; x++) {
+    int start,end;
+    if(column<0) {
+        start = 0;
+        end = width;
+    } else {
+        start = column;
+        end = column + 1;
+    }
+    for(int x=start; x<end; x++) {
         if(cycle)
             old = get_pixel(x,height-1);
         else
@@ -276,9 +292,17 @@ void Animator::scroll_down(bool cycle) {
     }
 }
 
-void Animator::scroll_right(bool cycle) {
+void Animator::scroll_right(bool cycle, int line) {
     CRGB old;
-    for(int y=0; y<height; y++) {
+    int start,end;
+    if(line<0) {
+        start = 0;
+        end = height;
+    } else {
+        start = line;
+        end = line + 1;
+    }
+    for(int y=start; y<end; y++) {
         if(cycle)
             old = get_pixel(width-1,y);
         else
@@ -289,9 +313,17 @@ void Animator::scroll_right(bool cycle) {
     }
 }
 
-void Animator::scroll_left(bool cycle) {
+void Animator::scroll_left(bool cycle, int line) {
     CRGB old;
-    for(int y=0; y<height; y++) {
+    int start, end;
+    if(line<0) {
+        start = 0;
+        end = height;
+    } else {
+        start = line;
+        end = line + 1;
+    }
+    for(int y=start; y<end; y++) {
         if(cycle)
             old = get_pixel(0,y);
         else

@@ -14,7 +14,8 @@ template<uint8_t PIN, int LED_COUNT> class RGB_Multi : public RGB_Base {
     public:
         RGB_Multi(const char* name) : RGB_Base(name, LED_COUNT) {
             pinMode(PIN, OUTPUT);
-            FastLED.addLeds<NEOPIXEL,PIN>(leds, LED_COUNT);
+            //FastLED.addLeds<NEOPIXEL,PIN>(leds, LED_COUNT);
+            FastLED.addLeds<WS2811,PIN,BRG>(leds, LED_COUNT);
             set_color(ALL_LEDS, CRGB::Black);
         }
         virtual void process_color(int lednr, CRGB color, bool _show=true) {
