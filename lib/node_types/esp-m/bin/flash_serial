@@ -1,0 +1,6 @@
+#!/bin/bash
+
+echo "Flashing Wemos D1 Mini."
+flash_serial_esp8266 "$1"
+echo "Waiting 15s until things are settled (formatting internal flash)."
+sleep 15 # let things rest
