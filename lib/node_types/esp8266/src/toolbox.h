@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <functional>
+#include <Arduino.h>
 #include "ulnoiot-default.h"
 
 // a simple class for handling fixed-length strings. Ustring stands for

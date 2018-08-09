@@ -40,11 +40,13 @@ bool devices_publish(AsyncMqttClient& mqtt_client, Ustring& node_topic, bool pub
         if(publish_all || dev.needs_publishing()) {
             if(first) {
                 Serial.print("Publishing ");
-                first = false;
             }
-            else Serial.print("; ");
             if(dev.publish(mqtt_client, node_topic)) {
+                if(!first) Serial.print("; ");
                 published = true;
+            }
+            if(first) {
+                first = false;
             }
         }
         return true; // Continue loop

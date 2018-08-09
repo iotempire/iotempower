@@ -31,6 +31,11 @@ class RGB_Single : public RGB_Base {
             init(pin_r, pin_g, pin_b, invert_signal);
         }
         virtual void process_color(int lednr, CRGB color, bool show=false);
+        virtual CRGB get_color(int lednr) {
+            return avg_color;
+        }
+        virtual void show() {
+        }
 };
 
 
