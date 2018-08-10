@@ -130,15 +130,19 @@ class RGB_Matrix : public RGB_Base {
                 int w=-1, int h=-1,
                 uint8_t initialhue=16, uint8_t deltahue=16 );
 
-        void gradient_row( CRGB startcolor, CRGB endcolor,
+        void gradient_row(CRGB startcolor, CRGB endcolor,
                    int startx=0, int starty=0,
                    int w=-1, int h=-1 );
 
-        void gradient_column( CRGB startcolor, CRGB endcolor,
+        void gradient_column(CRGB startcolor, CRGB endcolor,
                    int startx=0, int starty=0,
                    int w=-1, int h=-1 );
 
-        void fade( uint8_t scale=4,
+        void fade_to(CRGB new_color, uint8_t scale=4,
+                int startx=0, int starty=0,
+                int w=-1, int h=-1);
+
+        void fade(uint8_t scale=4,
                 int startx=0, int starty=0,
                 int w=-1, int h=-1);
 

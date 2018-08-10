@@ -324,6 +324,23 @@ void RGB_Matrix::gradient_column( CRGB startcolor, CRGB endcolor,
     }
 }
 
+void RGB_Matrix::fade_to(CRGB new_color, uint8_t scale,
+        int startx, int starty,
+        int w, int h) {
+    CRGB color;
+    if(w<0) w=width;
+    if(h<0) h=height;
+    if(startx+w >= width) w=width-startx;
+    if(starty+h >= height) h=height-starty;
+    for( int y = starty; y < starty + h; y++) {
+        for( int x = startx; x < startx + w; x++) {
+            color = get_pixel(x, y, false);
+            color = blend(color, new_color, scale);
+            set_pixel(x, y, color, false);
+        }
+    }
+}
+
 void RGB_Matrix::fade( uint8_t scale,
         int startx, int starty,
         int w, int h) {
