@@ -24,13 +24,8 @@ class RGB_Strip : public RGB_Base {
             return *this;
         }
         virtual void process_color(int lednr, CRGB color, bool _show=true) {
-            if(lednr<0) {
-                if(lednr == ALL_LEDS) {
-                }
-            } else {
-                if(lednr < led_count()) leds[lednr] = color;
-                if(_show) show();
-            } 
+            leds[lednr] = color;
+            if(_show) show();
         }
         virtual CRGB get_color(int lednr) {
             if(lednr < 0) lednr=0;
@@ -45,8 +40,13 @@ class RGB_Strip : public RGB_Base {
 // weird hack to allow to use this wicked fastled template stuff to add the
 // controller later and still do all initialization correctly
 #define CREATE_RGB_STRIP(name, led_count, type, ...) \
-    ((new RGB_Strip(name, led_count))\
-        ->init(FastLED.addLeds< type, __VA_ARGS__ >\
-            ((CRGB*) malloc(sizeof(CRGB) * led_count), led_count)))
+    ([&] () { \
+        RGB_Strip* strip = new RGB_Strip(name, led_count); \
+        if(strip!=NULL) { \
+            CRGB* leds = (CRGB*) malloc(sizeof(CRGB) * led_count); \
+            if(leds == NULL) { delete strip; return (RGB_Strip*)NULL; } \
+            strip->init(FastLED.addLeds< type, __VA_ARGS__ >(leds, led_count)); \
+        } \
+        return strip; })()
 
 #endif // _RGB_STRIP_H_

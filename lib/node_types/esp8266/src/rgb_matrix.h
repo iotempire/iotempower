@@ -71,7 +71,6 @@ class RGB_Matrix : public RGB_Base {
         int get_height() {
             return height;
         }
-        bool measure();
         CRGB get_pixel(int x, int y, bool wrap=true) {
             Strip_Address *a;
             if(wrap) {
@@ -143,25 +142,27 @@ class RGB_Matrix : public RGB_Base {
                 int startx=0, int starty=0,
                 int w=-1, int h=-1);
 
+        virtual bool measure() { return true; }
+
         virtual void process_color(int lednr, CRGB color, bool _show=true) {
-            // interpret lednr as column
-            if(lednr == ALL_LEDS) {
-                gradient_column(color,color);
-            } else {
-                if(lednr<0) {
-                    // push from left
-                } else if(lednr>=width) {
-                    // push from right
-                } else {
-                    // normal column access
-                    gradient_column(color, color, lednr, 0, 1, -1);
-                }
-            }
+            gradient_column(color, color, lednr, 0, 1, -1);
+            if(_show) show();
         }
 
         virtual CRGB get_color(int lednr) {
-            // TODO: think later if we can return here something smarter than black
-            return CRGB::Black;
+            CRGB c;
+            int r=0,g=0,b=0;
+            for(int y=0; y<height; y++) {
+                c=get_pixel(lednr,y);
+                r+=c.r;
+                g+=c.g;
+                b+=c.b;
+            }
+            r/=height;
+            g/=height;
+            b/=height;
+            c = CRGB(r,g,b);
+            return c;
         }
 
         virtual void show() {

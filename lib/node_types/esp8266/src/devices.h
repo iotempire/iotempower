@@ -59,16 +59,19 @@ RGB_Single& rgb(const char* name, int pin_r, int pin_g, int pin_b,
     CHECK_DEV(dev)
 }
 
-#include <animator.h>
-Animator& animator(const char* name) {
-    Animator* dev = new Animator(name);
-    CHECK_DEV(dev)
-}
-
 // TODO: fix error checking in this module, this can crash horribly if there is no
 // memory left
 #define rgb_strip(name, led_count, type, ...) \
-    CREATE_RGB_STRIP(name, led_count, type, __VA_ARGS__)
+     *(([&] () { \
+        RGB_Strip* dev = CREATE_RGB_STRIP(name, led_count, type, __VA_ARGS__); \
+        if((dev) != NULL) { \
+            if(!add_device(*(dev))) { \
+                delete (dev); \
+                (dev) = NULL; \
+                log("Couldn't allocate new device."); \
+            } \
+        } \
+        return (RGB_Strip*) dev; })())
 
 
 #include <rgb_matrix.h>
@@ -78,6 +81,16 @@ RGB_Matrix& rgb_matrix(const char* name, int width, int height) {
 }
 RGB_Matrix& rgb_matrix(const char* name, RGB_Base& strip) {
     RGB_Matrix* dev = new RGB_Matrix(name, strip);
+    CHECK_DEV(dev)
+}
+
+#include <animator.h>
+Animator& animator(const char* name) {
+    Animator* dev = new Animator(name);
+    CHECK_DEV(dev)
+}
+Animator& animator(const char* name, RGB_Matrix &matrix) {
+    Animator* dev = new Animator(name, matrix);
     CHECK_DEV(dev)
 }
 

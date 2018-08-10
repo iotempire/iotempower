@@ -5,6 +5,8 @@
 #define _ANIMATOR_H_
 
 #include <device.h>
+// TODO: should this dependencies softened to classes having a show-method?
+#include <rgb_matrix.h>
 
 
 class Animator : public Device {
@@ -30,6 +32,7 @@ class Animator : public Device {
             );
             set_fps(24);
         }
+        RGB_Matrix* _matrix = NULL;
     public:
         Animator(const char* name) : Device(name) {
             init();            
@@ -41,6 +44,11 @@ class Animator : public Device {
         Animator& with_show(ANIMATOR_SHOW handler) {
             _show_handler = handler;
             return *this;
+        }
+        Animator(const char* name, RGB_Matrix& matrix) : Device(name) {
+            init();
+            _matrix = &matrix;
+            with_show([&] () { _matrix->show(); });
         }
         Animator& with_command_handler(ANIMATOR_COMMAND_HANDLER handler) {
             _command_handler = handler;
@@ -57,7 +65,7 @@ class Animator : public Device {
             return *this;
         }
         void show() {
-            if(_show_handler) show();
+            if(_show_handler) _show_handler();
         }
         bool measure();
 };

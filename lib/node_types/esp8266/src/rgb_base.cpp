@@ -115,7 +115,7 @@ void RGB_Base::set_colorstr(int lednr, const Ustring& color, bool _show) {
     }
     // Last chance: see, if we can extract 3 comma seperated integers
     int r,g,b;
-    if(sscanf(color.as_cstr(),"%d,%d,%d",&r,&b,&g) == 3) {
+    if(sscanf(color.as_cstr(),"%d,%d,%d",&r,&g,&b) == 3) {
         set_color(lednr, CRGB(r,g,b), _show);
     }
 }
