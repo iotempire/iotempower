@@ -8,7 +8,7 @@
 RGB_Matrix& RGB_Matrix::add(RGB_Base& strip, int posx, int posy, 
         Strip_Direction direction, int linelen) {
     if(strip_count >= ULNOIOT_MAX_LED_STRIPS) {
-        log("Too many led strips in animator.");
+        ulog("Too many led strips in animator.");
         return *this;
     }
     strips[strip_count] = &strip;

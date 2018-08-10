@@ -14,7 +14,7 @@ bool add_device(Device& device);
         if(!add_device(*(dev))) { \
             delete (dev); \
             (dev) = NULL; \
-            log("Couldn't allocate new device."); \
+            ulog("Couldn't allocate new device."); \
         } \
     } \
     return *(dev);
@@ -42,8 +42,8 @@ Analog& analog(const char* name) {
 }
 
 #include <th.h>
-Dht11& dht11(const char* name, int pinnr) {
-    Dht11* dev = new Dht11(name, pinnr);
+Dht& dht(const char* name, int pinnr) {
+    Dht* dev = new Dht(name, pinnr);
     CHECK_DEV(dev)
 }
 
@@ -59,6 +59,7 @@ RGB_Single& rgb(const char* name, int pin_r, int pin_g, int pin_b,
     CHECK_DEV(dev)
 }
 
+#include <rgb_strip.h>
 // TODO: fix error checking in this module, this can crash horribly if there is no
 // memory left
 #define rgb_strip(name, led_count, type, ...) \
@@ -68,7 +69,7 @@ RGB_Single& rgb(const char* name, int pin_r, int pin_g, int pin_b,
             if(!add_device(*(dev))) { \
                 delete (dev); \
                 (dev) = NULL; \
-                log("Couldn't allocate new device."); \
+                ulog("Couldn't allocate new device."); \
             } \
         } \
         return (RGB_Strip*) dev; })())

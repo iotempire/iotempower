@@ -76,8 +76,10 @@ bool devices_subscribe(AsyncMqttClient& mqtt_client, Ustring& node_topic) {
                 topic.from(node_topic);
                 topic.add("/");
                 topic.add(dev.get_name());
-                topic.add("/");
-                topic.add(sd.get_name());
+                if(sd.get_name().length()>0) {
+                    topic.add("/");
+                    topic.add(sd.get_name());
+                }
                 Serial.print("Subscribing to: ");
                 Serial.println(topic.as_cstr());
                 uint16_t packetIdSub = mqtt_client.subscribe(topic.as_cstr(), 0);
@@ -102,8 +104,10 @@ bool devices_receive(Ustring& subtopic, Ustring& payload) {
             if(sd.subscribed()) {
                 // construct full topic
                 topic.from(dev.get_name());
-                topic.add("/");
-                topic.add(sd.get_name());
+                if(sd.get_name().length()>0) {
+                    topic.add("/");
+                    topic.add(sd.get_name());
+                }
                 // Serial.print("Trying to match ");
                 // Serial.print(subtopic.as_cstr());
                 // Serial.print(" with ");

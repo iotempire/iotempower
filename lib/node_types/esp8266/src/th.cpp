@@ -1,7 +1,7 @@
 // th.cc
 #include "th.h"
 
-bool Dht11::measure() {
+bool Dht::measure() {
     unsigned long current_time = millis();
     if(current_time - last_read < _read_interval) return false;
     last_read = current_time; 

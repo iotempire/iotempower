@@ -8,7 +8,13 @@
 // TODO: should this dependencies softened to classes having a show-method?
 #include <rgb_matrix.h>
 
+#define ANIMATOR_COMMAND_HANDLER std::function<void(Ustring& command)>
+typedef struct {
+    const char *key;
+    ANIMATOR_COMMAND_HANDLER method;
+} _COMMAND_METHOD;
 
+// TODO: think if this should become a singleton
 class Animator : public Device {
     private:
         int _fps;
@@ -16,23 +22,14 @@ class Animator : public Device {
         unsigned long last_frame=millis();
         #define ANIMATOR_FRAME_BUILDER_HANDLER std::function<void()>
         ANIMATOR_FRAME_BUILDER_HANDLER _handler = NULL;
-        #define ANIMATOR_COMMAND_HANDLER std::function<void(const Ustring& command)>
-        ANIMATOR_COMMAND_HANDLER _command_handler = NULL;
+        _COMMAND_METHOD command_methods[ULNOIOT_MAX_ANIMATOR_COMMANDS];
+        int command_method_counter=0;
         #define ANIMATOR_SHOW std::function<void()>
         ANIMATOR_SHOW _show_handler = NULL;
-
-        void init() {
-            add_subdevice(new Subdevice(""));
-            add_subdevice(new Subdevice("set",true))->with_receive_cb(
-                [&] (const Ustring& payload) {
-                    measured_value(1).from(payload); // save it
-                    if(_command_handler) _command_handler(payload);
-                    return true;
-                }
-            );
-            set_fps(24);
-        }
         RGB_Matrix* _matrix = NULL;
+
+        void init();
+
     public:
         Animator(const char* name) : Device(name) {
             init();            
@@ -50,9 +47,10 @@ class Animator : public Device {
             _matrix = &matrix;
             with_show([&] () { _matrix->show(); });
         }
+        // adds so that first matched will be called "" matches always and should be added last
+        Animator& with_command_handler(const char* command_name, ANIMATOR_COMMAND_HANDLER handler);
         Animator& with_command_handler(ANIMATOR_COMMAND_HANDLER handler) {
-            _command_handler = handler;
-            return *this;
+            return with_command_handler("", handler);
         }
         void set_fps(int fps) {
             if(fps<1) fps=1;
@@ -64,10 +62,11 @@ class Animator : public Device {
             set_fps(fps);
             return *this;
         }
+
         void show() {
             if(_show_handler) _show_handler();
         }
-        bool measure();
+        virtual bool measure();
 };
 
 

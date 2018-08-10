@@ -9,14 +9,15 @@
 
 #include <DHT.h>
 
-class Dht11 : public Device {
+// should work with autodetect
+class Dht : public Device {
     private:
         DHT _dht;
         uint8_t _pin;
         unsigned long _read_interval = 2000; // only read every interval ms
         unsigned long last_read = millis() - _read_interval;
     public:
-        Dht11(const char* name, uint8_t pin) :
+        Dht(const char* name, uint8_t pin) :
             Device(name) {
             _pin = pin;
             _dht.setup(_pin);
@@ -48,7 +49,7 @@ class Ds18b20 : public Device {
             add_subdevice(new Subdevice("")); // TODO: think about a destructor
             sensors->begin();
             if (!sensors->getAddress(first, 0)) {
-                log("Unable to find address for Device 0. Sensor will not work.");
+                ulog("Unable to find address for Device 0. Sensor will not work.");
             } else {
                 initialized = true;
             }

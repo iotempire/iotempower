@@ -111,6 +111,16 @@ int Ustring::find(const char* pattern) {
     return -1;
 }
 
+void Ustring::strip_param() {
+    strip();
+    int i;
+    for(i=0; i<length(); i++) {
+        if(cstr[i]<=32) break;
+    }
+    remove(0,i);
+}
+
+
 
 
 void reboot() {
@@ -131,15 +141,19 @@ void reboot() {
 }
 
 void controlled_crash(const char * error_message) {
-    log("\nCrash, cause (reboot in 5s): %s", error_message);
+    ulog("\nCrash, cause (reboot in 5s): %s", error_message);
     reboot();
 }
 
-void log(const char *fmt, ...) {
+void ulog(const char *fmt, ...) {
 	char buf[LOG_LINE_MAX_LEN];
 	va_list ap;
 	va_start(ap, fmt);
 	vsnprintf(buf, LOG_LINE_MAX_LEN, fmt, ap);
 	va_end(ap);
 	Serial.println(buf);
+}
+
+long urandom(long from, long upto_exclusive) {
+    return random(from, upto_exclusive);
 }

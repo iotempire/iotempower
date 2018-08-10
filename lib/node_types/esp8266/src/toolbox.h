@@ -10,6 +10,7 @@
 #include <string.h>
 #include <functional>
 #include <Arduino.h>
+#include <ESP8266TrueRandom.h>
 #include "ulnoiot-default.h"
 
 // a simple class for handling fixed-length strings. Ustring stands for
@@ -89,6 +90,9 @@ class Ustring {
         }
 
         void strip();
+        
+        // strip until next blank
+        void strip_param();
 
         int find(const char* pattern);
 
@@ -194,6 +198,20 @@ void reboot();
 
 void controlled_crash(const char * error_message);
 
-void log(const char *fmt, ...);
+void ulog(const char *fmt, ...);
+
+long urandom(long from, long upto_exclusive);
+
+// constrain or limit a number to an interval
+// inline int limit(int nr, int min, int max) {
+//     if(nr < min) nr=min;
+//     else if(nr > max) nr=max;
+//     return nr;
+// }
+inline long limit(long nr, long min, long max) {
+    if(nr < min) nr=min;
+    else if(nr > max) nr=max;
+    return nr;
+}
 
 #endif // _TOOLBOX_H_

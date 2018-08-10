@@ -4,6 +4,27 @@
 #include <toolbox.h>
 #include "animator.h"
 
+void Animator::init() {
+    add_subdevice(new Subdevice("",true))->with_receive_cb(
+        [&] (const Ustring& payload) {
+            measured_value().from(payload); // save it
+            // search for command
+            for(int i=0; i<command_method_counter; i++) {
+                const char* key = command_methods[i].key;
+                ulog("Trying %s",key);
+                int len = strlen(key);
+                if(payload.starts_with(key) && payload.as_cstr()[len] <= 32) {
+                    Ustring command(payload.as_cstr()+len);
+                    command.strip();
+                    command_methods[i].method(command);
+                    break;
+                }
+            }
+            return true;
+        }
+    );
+    set_fps(24);
+}
 
 // measure calls show in the end, so no show in graphics functions.
 bool Animator::measure() {
@@ -25,3 +46,15 @@ bool Animator::measure() {
     }
     return false; // no values are generated here TODO: or true to return last command or frame number?
 }
+
+Animator& Animator::with_command_handler(const char* command_name, ANIMATOR_COMMAND_HANDLER handler) {
+    if(command_method_counter<ULNOIOT_MAX_ANIMATOR_COMMANDS) {
+        command_methods[command_method_counter].key = command_name;
+        command_methods[command_method_counter].method = handler;
+        command_method_counter++;
+    } else {
+        ulog("Too many commands for animator given.");
+    }
+    return *this;
+}
+

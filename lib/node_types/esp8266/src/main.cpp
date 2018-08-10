@@ -3,7 +3,6 @@
 
 ////// Standard libraries
 #include <ArduinoOTA.h>
-#include <ESP8266TrueRandom.h>
 #include <ESP8266WebServer.h> //Local WebServer used to serve the configuration portal
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
@@ -47,7 +46,7 @@ void id_blinker() {
 
     if (long_blinks == 0) { // first time, still unitialized
         // randomness for 25 different blink patterns (5*5)
-        long_blinks = ESP8266TrueRandom.random(1, 6);
+        long_blinks = ESP8266TrueRandom.random(1,6);
         short_blinks = ESP8266TrueRandom.random(1, 6);
         Serial.printf("Blink pattern: %d long_blinks, %d short_blinks\n",
                       long_blinks, short_blinks);
@@ -327,6 +326,10 @@ void setup() {
     Serial.begin(115200);
     Serial.println();
     Serial.println("Booting. Serial port initialized.");
+    long seed_helper=ESP8266TrueRandom.random(0,2000000);
+    Serial.print("Random generator seeded, testnumber: ");
+    Serial.println(seed_helper);
+    randomSeed((unsigned long)seed_helper); // TODO: fix that this crashes later
 
     // // TODO: is this really necessary or is it better just hardcoded?
     // if( ! SPIFFS.begin() ) {
@@ -452,7 +455,7 @@ void loop() {
                     if (transmission_delta > 0 &&
                         current_time - last_transmission >=
                             transmission_delta) {
-                        log("Free memory: %ld",ESP.getFreeHeap());
+                        ulog("Free memory: %ld",ESP.getFreeHeap());
                         if (devices_publish(mqttClient, node_topic, true)) {
                             last_transmission = current_time;
                             last_published = current_time;
@@ -465,7 +468,7 @@ void loop() {
                 } // endif update delay
             } // endif measure delay
         } else {
-            // log("Trouble connecting to mqtt server.");
+            // ulog("Trouble connecting to mqtt server.");
             // Don't block here with delay as other processes might
             // be running in background
             // TODO: wait a bit before trying to reconnect.
