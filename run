@@ -123,7 +123,7 @@ function help() {
                 m="${BASH_REMATCH[1]}"
                 help "$m"
             else
-                echo "[[Cannot parse (call help on micro controller prompt:"
+                echo "[[Cannot parse:"
                 echo "  ${l:2}]]"
             fi
         else

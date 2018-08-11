@@ -5,6 +5,7 @@
 
 ulnoiot help "$@"
 
+if [[ "$@" == "" ]]; then
 cat << EOF
 Also try out the following commands for device management (add help to each of
 them to get a longer description)::
@@ -21,3 +22,4 @@ Commands for interacting via mqtt (node topic is added when in node folder):
 - mqtt_send (directly send payload to specific topic)
 - mqtt_action (react on specific payload on specific mqtt topic)
 EOF
+fi
