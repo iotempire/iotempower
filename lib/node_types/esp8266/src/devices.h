@@ -27,7 +27,6 @@ Output& output(const char* name, const int pinnr,
     CHECK_DEV(dev)
 }
 #define out(...) output(__VA_ARGS__)
-#define switch(...) output(__VA_ARGS__)
 #define led(...) output(__VA_ARGS__)
 #define relais(...) output(__VA_ARGS__)
 
