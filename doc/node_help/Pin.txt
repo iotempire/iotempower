@@ -1,3 +1,0 @@
-This is a class to access and change the behavior of GPIO pins.
-For more information go to:
-http://docs.micropython.org/en/latest/esp8266/esp8266/tutorial/pins.html

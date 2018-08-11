@@ -1,3 +1,6 @@
+still only in micropython - not ported yet - TODO: please help porting
+
+
 d("i2c_connector", name, sda, scl, addr=8):
 
 Create a new controller for an Arduino connected as i2c slave to the given

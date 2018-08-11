@@ -1,6 +1,9 @@
-d("contact", name, pin, report_high="on", report_low="off",
-            pullup=True,threshold=0):
-other names: button, input
+input("name", pin, "high_word", "low_word")
+  [.with_threshold(threshold_value, "high_word", "low_word")]
+  [.with_pull_up(true/false)]
+  [.with_filter(filter_function)]
+  ;
+other names: button, contact
 
 Create a new input port for a contact or a button.
 name will be appended to the mqtt topic and corresponding
@@ -9,13 +12,14 @@ value will be published there.
 Parameters:
 - name: the name it can be addressed under
 - pin: the gpio pin
-- report_high: what to send when respective port high
-- report_low: what to send when respective port low
-- pullup: enable internal pullup (default)
-- threshold: debouncing value (higher -> avarage more
-  measurements)
+- high_word: what to send when respective port high (default on)
+- low_word: what to send when respective port low (default off)
+- pull_up: enable (true) or disable (false) internal pullup (default enabled)
+- threshold: debouncing value (higher -> average more measurements)
+- filter_function: specify a preprocessor for measured values
+  (see uhelp filter).
 
 Example (node name: living room/leds1):
-d("button", "lower", d2, "depressed", "pressed")
+input("lower", D2, "depressed", "pressed")
 
 Now the status button is published as "living room/leds1/lower"

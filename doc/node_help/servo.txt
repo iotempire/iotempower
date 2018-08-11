@@ -1,3 +1,6 @@
+still only in micropython - not ported yet - TODO: please help porting
+
+
 d("servo", name, pin,
   ignore_case=True, on_change=None, report_change=False,
   turn_time_ms=700, freq=50, min_us=600, max_us=2400, angle=180)

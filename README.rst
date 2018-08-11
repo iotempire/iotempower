@@ -2,8 +2,9 @@
 ulnoiot
 =======
 
-Attention: this is ulnoiot-tng (the next generation, not anymore based on micropython, now using platformio as a base to generate firmware and code)
-Most of the following documention still refers to the original micropython based ulnoiot version, if you want to work with this development version contact ulno directly or make youself known in the forum.
+Attention: this is ulnoiot-tng (The Next Generation, not anymore based on 
+micropython, now using `PlatformIO <platform.io>`__ as a base to generate
+firmware and code).
 
 
 Introduction
@@ -12,7 +13,7 @@ Introduction
 *ulnoiot* (pronounced: "You'll know IoT") is a framework and environment
 for making it easy for everyone to explore and develop for the
 Internet of Things (IoT)
--- easy for tinkerers, makers, programmers, hobbyists, students,
+-- easy for tinkerers, makers, programmers, hobbyists, students, artists,
 and professionals alike.
 It has a special focus on education and is intended to support classes to teach
 Internet of Things (IoT) and
@@ -20,7 +21,7 @@ home automation.
 
 However, it also supports existing IoT deployments and brings
 mechanisms for over the air (OTA) updates and automatic
-multi-device deployment.
+multi-device deployment. 
 
 If you are impatient and want to dive into it right now, fast forward to
 `Installation`_ or `First IoT Nodes`_.
@@ -105,8 +106,8 @@ The gateway services have been tested to run on:
 
 We are trying to provide virtualbox images as soon as we find time and/or volunteers.
 
-We are also working on verifying that ulniot works well on Orange-Pi Zero and
-the C.H.I.P. from NextThing to allow more cost-effective solutions to use ulnoiot.
+We are also working on verifying that ulniot works well on Orange-Pi Zero to
+allow more cost-effective solutions to use ulnoiot.
 
 Currently the following esp8266-based devices are supported:
 
@@ -114,16 +115,28 @@ Currently the following esp8266-based devices are supported:
 - NodeMCU
 - Espresso Lite V2
 - Sonoff and Sonoff Touch
-- There is an esp8266 generic opition for other esp8266-based boards.
+- There is an esp8266 generic option for other esp8266-based boards.
+- We expect to support esp32 boards very soon - let us know if you want to help
+  making this possible.
 
-The part of ulnoiot running on the esp8266 is an extension of
-`micropython <http://www.micropython.org/>`__
-enabling IoT classes and easily getting started using
-micropython.
+The part of ulnoiot running on the esp8266 is a standalone C++-based firmware
+managed by `PlatformIO <http://platform.io>`__. However, ulnoiot abstracts a
+lot of the burden of repetitive device management away from the user so that
+attaching a device to a node usually boils down to just writing one line of
+code, which you can adapt from plenty of examples.
+Earlier versions were based one micropython <http://www.micropython.org/>`__,
+however porting some of the C++-based Arduino device driver libraries, managing 
+remote access, updates, dealing with very little memory, and a slightly defunct
+community, made mangement very hard leading us to the decision to switch to an
+admittedly harder to program exosystem, however, we earned the access to a huge
+and active community making problem solving and extensions much easier. We
+don't regret the switch.
 
-There has been some initial effort in creating a starter development kit for
+There was some initial effort in creating a starter development kit for
 the Wemos D1 Mini - you can see more information `here
-</doc/shields/wemosd1mini/devkit1/README.rst>`__.
+</doc/shields/wemosd1mini/devkit1/README.rst>`__. However, we are now more
+focusing on using cheap hardware from various 37 in 1 sensor kits, which can
+still easily be plugged together.
 
 
 
@@ -144,44 +157,19 @@ the ulnoiot command or executing run in the main ulnoiot directory):
 
 - ulnoiot upgrade: get latest version of ulnoiot (inside an existing version)
 
-- shell: starting mpfshell to connect to locally or network connected esp8266
-  device
-
 - install: (re-)install the ulnoiot environment (if you specify clean,
   it re-installs)
 
-- network based commands:
+- ``console_serial``: open a serial console to see debug output of a
+  serially (locally) connected node
 
-  - ``console``: (determines destination via the directory you are in) open a
-    console to the respective node (the one configured with the local
-    directory)
+- ``initialize``: initialize a current node which is in reconfiguration mode or
+  flashes a serially connected node and sets all intial configuration parameters
+  like wifi credentials and security keys
 
-  - ``initialize``: initialize a current node including a serial flash
 
-  - ``flash``: firmware update over the network (OTA) of the currently selected
-    configuration folder (or all it's configuration sub-folders)
-
-  - ``update``: update ulnoiot micropython user-mode (non firmware) extensions
-    over the network of the currently selected
-    configuration folder (or all it's configuration sub-folders)
-
-  - ``deploy``: update ulnoiot micropython node coniguration (non firmware) extensions
-    over the network of the currently selected
-    configuration folder (or all it's configuration sub-folders).
-    If noupdate is specified as option, only update the node-specific files.
-
-- serial connection based commands:
-
-  - ``console_serial``: connect via serial to a locally connected
-    microcontroller
-
-  - ``initialize``: set up (flash, update, and deploy) an ulnoiot node for the first time
-
-  - ``flash_serial``: flash the ulnoiot-modified micropython on a locally connected
-   esp8266
-
-  - ``update_serial [alsodeploy]``: copy or update the modifieable files for the ulnoiot
-    environment to a locally or remotely connected wemosd1mini
+- ``deploy``: updates software of a ulnoiot node after changes. The update
+    is done over the network (OTA) 
 
 
 Installation
@@ -197,7 +185,7 @@ up and running:
    `Installation on Linux`_
 
 Please also check out the tutorial videos for this setup on ulno's youtube
-channel: https://www.youtube.com/results?search_query=ulno.net+ulnoiot
+channel: https://www.youtube.com/results?search_query=ulno.net+ulnoiot+installation
 
 
 Installation on Raspberry Pi from Pre-Prepared Image
@@ -239,9 +227,13 @@ Installation step by step:
   If you have another USB-wifi stick, and want to use Internet via WiFi
   connect this wifi stick to the pi and configure ``uiot_wifi_name``,
   ``uiot_wifi_password``, and ``uiot_wifi_user`` correspondingly
-  to your WiFi network.
-
-  If you have access to ethernet (for example a free ethernet lan port on your
+  to your WiFi network. Careful, lots of WiFi sticks don't work properly on the
+  raspberry pi. Make sure you have verified that it works under the normal
+  raspberry desktop environment.
+  
+  Much preferred is connecting the pi to ethernet. It avoids all the
+  aforementioned potential WiFi problems. If you have access to ethernet 
+  (for example a free ethernet lan port on your
   router), connect the Pi to this ethernet - no extra configuration is necessary
   for this.
 
@@ -288,7 +280,7 @@ Installation step by step:
 If you have trouble following this, make sure to checkout the tutorials on
 youtube.
 
-you can now continue with `First IoT Nodes`_
+You can now continue with `First IoT Nodes`_.
 
 
 Installation on Linux
@@ -297,12 +289,13 @@ Installation on Linux
 - install dependencies:
   ``sudo apt install git mc mosquitto mosquitto-clients virtualenv iptables bridge-utils``
 
-- disable the mosquitto server:
+- disable the mosquitto server (you can skip this if you like the default
+  password-less mosquitto setup, but be warned):
   ``sudo systemctl stop mosquitto; sudo systemctl disable mosquitto``
 
 - setup ulnoiot: clone this repository
 
-  - If you just want read-only access just type in a folder of your choice:
+  - If you just want read-only access type in a folder of your choice:
     ``git clone https://github.com/ulno/ulnoiot``
 
   - If you are a ulnoiot developer, use
@@ -319,7 +312,7 @@ Installation on Linux
 
 - After successfully entering ulnoiot (the prompt should have changed colors and
   show ulnoiot in red, white, and black), start configuring your first IoT node,
-  see `First IoT Nodes`_
+  see `First IoT Nodes`_.
 
 
 First IoT Nodes
@@ -330,7 +323,8 @@ configuration management environment.
 
 - Consider to configure  etc/ulnoiot.conf
   and run ``accesspoint`` and ``mqtt_broker``. If you installed from the
-  Raspberry Pi image, this should not be necessary.
+  Raspberry Pi image, this should not be necessary as they are stated
+  automatically.
 
 - Copy the folder ``lib/system_templates`` to a project directory,
   you can rename
@@ -341,39 +335,27 @@ configuration management environment.
 
 - Adapt and configure system.conf and node.conf. Especialy make sure to add the
   correct board in node.conf. If you use a Wemos D1 Mini (this is the default),
-  no change is necessary here.
+  no change is necessary here, lots of users have the NodeMCU development board.
+  If you wnat to use a NodeMCU change the config to NodeMCU.
 
-- Now change into your node directory, connect an esp8266 based microcontroller
+- Now change into your node directory, connect an (only one) esp8266 based microcontroller
   to your pc or raspberry/orange pi and type ``initialize``. This flashes and
   pre-configures the device.
 
-- Access the command prompt with ``console_serial`` (if only one esp is connected
-  the serial port will be discovered automatically else supply it as usb1 or acm2
-  or an IP address and password as paramaters). If your wifi network is
-  configured correctly, you can just type console. Its ip should now 
-  automatically be discovered, and you get a web-based terminal on it.
+- If you like, access the debug console with ``console_serial`` (if only one esp is connected
+  the serial port will be discovered automatically else supply it as usb1 or 
+  acm2).
 
 If something gets stuck, try to power cycle the esp8266.
 
 ``initialize`` sets up your wifi based on the settings in system.conf and also
-encrypts the network connecting, but if you want to set it up manually,
-call ``wifi`` on the esp8266 node from the serial console.
+encrypts the network connection.
 
-Try typing ``help`` and check the small manual.
-You can setup the wifi with ``wifi( "network-name", "password" )``.
-You can scan
-the existing wifi networks with ``wscan`` and when the wifi is configured,
-you can see the current ip with typing wip.
+At an ulniot-command prompt try typing ``uhelp`` and check the small manual.
 
-If you create an autostart.py file or modify the existing one in your
-nodes/files directory and then call ``deploy noupdate``, you can add your own
-devices to this newly configured node. Don't forget to add ``run()`` add the end
-of your autostart file.
-However, try first to add some devices manually at the console command prompt,
-check and browse the help for available devices. Type ``run()`` to activate
-these devices and then use the ``mqtt_all`` and ``mqtt_send`` tools to watch and
-interact.
-Try also ``help("autostart.py")`` at the console prompt.
+Take a look at the setup.cpp in your node-folder and enable the onboardled.
+
+Try also ``uhelp setup.cpp`` at the ulnoiot prompt.
 
 
 
@@ -384,18 +366,23 @@ This project would not have been possible without a thriving open source
 community around the Internet of Things. We make a lot of use of the following
 tools:
 
+- `PlatformIO <http://platform.io>`__
+- `node-red <https://nodered.org>`__
+- `mosquitto <https://mosquitto.org/>`__.
 - `The Tilde Texteditor <https://os.ghalkes.nl/tilde>`__
 - `create_ap <https://github.com/oblique/create_ap>`__ forked for ulnoiot
   `here <https://github.com/ulno/create_ap>`__.
-- `mosquitto <https://mosquitto.org/>`__.
+- `FastLed rgb-strip library <https://github.com/FastLED/FastLED>`__
+- `rpi-clone <https://github.com/billw2/rpi-clone>`__
+
+Old versions were also using these:
 - `mpfshell <https://github.com/wendlers/mpfshell>`__ forked for ulnoiot
   `here <https://github.com/ulno/mpfshell>`__.
 - `micropython  <https://micropython.org/>`__
-- `node-red <https://nodered.org>`__
-- `rpi-clone <https://github.com/billw2/rpi-clone>`__
+
 
 As ulnoiot relies heavily on MQTT, it also integrates very easily with
-community home automation software like
+other community home automation software like
 `home-assistant <http://home-assistant.io>`__ and
 `openhab <https://openhab.org>`__.
 
@@ -419,8 +406,10 @@ Further Documentation
 ---------------------
 
 - `Some classes where ulnoiot is used <https://ulno.net/teaching/iot/>`__
+- For any problems or just being social, visit us on matrix/riot: `#ulnoiot:matreix.org <https://riot.im/app/#/room/#ulnoiot:matrix.org>`__
+
+Obsolete:
 - `micropython reference
   <https://docs.micropython.org/en/latest/esp8266/esp8266/quickref.html>`__.
 - For a very light introduction in general python, take a look at
   `this <https://docs.python.org/3/tutorial/introduction.html>`__.
-- For any problems or just being social, visit us on matrix/riot: `#ulnoiot:matreix.org <https://riot.im/app/#/room/#ulnoiot:matrix.org>`__

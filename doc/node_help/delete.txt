@@ -1,8 +1,0 @@
-delete(name)
-
-Delete a device, which has been added before.
-
-Example:
->>> trigger("mytrig",d7)
->>> delete("mytrig")
->>>

@@ -1,0 +1,77 @@
+TODO
+
+/* setup.cpp */
+#include <ulnoiot.h>
+
+// Global variables here
+unsigned long frames[4]={0,0,0,0};
+enum anim_type {none, fade, fade_to, scroll};
+anim_type anim_types[4]={none, none, none, none};
+
+void draw_pattern(RGB_Matrix& m, int p, int line, int len) {
+    switch(p) {
+        case 1:
+            m.rainbow(0, line, len, 1);
+            break;
+        case 2:
+            m.gradient_row(CRGB::Green, CRGB::Blue, 0, line, len, 1);
+            break;
+        case 3:
+            m.gradient_row(CRGB::Blue, CRGB::Red, 0, line, len, 1);
+            break;
+        default:
+            break;
+    }
+}
+
+void set_animation(RGB_Matrix& matrix, Ustring& command, anim_type at, int leds, int frame_count) {
+    int stripnr = limit(command.as_int() - 1, 0, 1);
+    command.strip_param();
+    int pattern = limit(command.as_int(), 1, 3);
+    draw_pattern(matrix, pattern, stripnr, -1);
+    anim_types[stripnr] = at;
+    frames[stripnr] = frame_count;
+}
+
+
+
+// The following line needs to always exist for syntactical reasons
+void setup() {
+
+    auto& strip1 = rgb_strip("strip1", 150, WS2811, D6, BRG);
+    auto& strip2 = rgb_strip("strip2", 150, WS2811, D5, BRG);
+
+
+    auto& matrix = rgb_matrix("matrix", 150, 4)
+          .with(strip1, 0, 0)
+          .with(strip4, 0, 1);
+
+    animator("anim", matrix)
+        .with_fps(10)
+        .with_frame_builder( [&] () {
+            for(int i=0; i<4; i++) {
+                if(frames[i]>0 && anim_types[i] != none) {
+                    switch(anim_types[i]) {
+                        case fade:
+                            matrix.fade(8, 0, i, -1, 1);
+                            break;
+                        case scroll:
+                            matrix.scroll_right(false,i);
+                            break;
+                        case fade_to:
+                            matrix.fade_to(CRGB::Red, 16, 0, i, -1, 1);
+                        default:
+                            break; 
+                    }
+                    frames[i] --;
+                }
+            }
+        } ).with_command_handler( "fade", [&] (Ustring& command) {
+            set_animation(matrix, command, fade, -1, 100);
+        } ).with_command_handler( "fade_to", [&] (Ustring& command) {
+            set_animation(matrix, command, fade_to, -1, 50);
+        } ).with_command_handler( "scroll", [&] (Ustring& command) {
+            set_animation(matrix, command, scroll, 5, 150);
+        } );
+
+} // end setup <- This line needs to be kept, too

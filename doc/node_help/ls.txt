@@ -1,7 +1,0 @@
-ls
-
-List files in current (or a given) directory.
-
-Example call:
-ls
-ls("/uiot")

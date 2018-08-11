@@ -1,7 +1,0 @@
-cp("from_file","to_file")
-
-Copy a single file to another file.
-
-Example:
->>> cp("/user.py.example","/usertest.py")
->>> import usertest.py

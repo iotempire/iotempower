@@ -1,3 +1,6 @@
+still only in micropython - not ported yet - TODO: please help porting
+
+
 d("display44780", name, name, sda=None, scl=None,
                  width=16, height=2,
                  addr=0x27)

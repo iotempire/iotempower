@@ -1,3 +1,5 @@
+still only in micropython - not ported yet - TODO: please help porting
+
 d("servo_switch", name, pin, on_angle, off_angle,
   on_command='on', off_command='off',
   back_to_angle=None,

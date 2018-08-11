@@ -1,0 +1,14 @@
+TODO
+
+auto& strip1 = rgb_strip("strip1", 150, WS2811, D6, BRG);
+auto& strip2 = rgb_strip("strip2", 150, WS2811, D5, BRG);
+auto& strip3 = rgb_strip("strip3", 150, WS2811, D4, BRG);
+auto& strip4 = rgb_strip("strip4", 150, WS2811, D1, BRG);
+
+
+auto& matrix = rgb_matrix("matrix", 150, 4)
+        .with(strip1, 0, 0)
+        .with(strip2, 0, 1)
+        .with(strip3, 0, 2)
+        .with(strip4, 0, 3);
+

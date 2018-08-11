@@ -26,6 +26,11 @@ Output& output(const char* name, const int pinnr,
     Output* dev = new Output(name, pinnr, high, low);
     CHECK_DEV(dev)
 }
+#define out(...) output(__VA_ARGS__)
+#define switch(...) output(__VA_ARGS__)
+#define led(...) output(__VA_ARGS__)
+#define relais(...) output(__VA_ARGS__)
+
 
 #include <input.h>
 // can also do with_pullup and with_threshold
@@ -34,6 +39,9 @@ Input& input(const char* name, int pinnr,
     Input* dev = new Input(name, pinnr, high, low);
     CHECK_DEV(dev)
 }
+#define button(...) input(__VA_ARGS__)
+#define contact(...) input(__VA_ARGS__)
+
 
 #include <analog.h>
 Analog& analog(const char* name) {
@@ -46,11 +54,15 @@ Dht& dht(const char* name, int pinnr) {
     Dht* dev = new Dht(name, pinnr);
     CHECK_DEV(dev)
 }
+#define dht11(...) dht(__VA_ARGS__)
+#define dht22(...) dht(__VA_ARGS__)
 
 Ds18b20& ds18b20(const char* name, int pinnr) {
     Ds18b20* dev = new Ds18b20(name, pinnr);
     CHECK_DEV(dev)
 }
+#define dallas(...) ds18b20(__VA_ARGS__)
+
 
 #include <rgb_single.h>
 RGB_Single& rgb(const char* name, int pin_r, int pin_g, int pin_b, 

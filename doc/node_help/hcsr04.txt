@@ -1,3 +1,6 @@
+still only in micropython - not ported yet - TODO: please help porting
+
+
 d("hcsr04", name, trigger_pin, echo_pin, precision=1)
 
 Create a new HC-SR04 ultrasonic distance measuring device.
