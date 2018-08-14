@@ -52,7 +52,7 @@ bool devices_publish(AsyncMqttClient& mqtt_client, Ustring& node_topic, bool pub
         return true; // Continue loop
     } );
     if(!first && !published) {
-        Serial.println("nothing.");
+        Serial.println(" nothing.");
         return true; // If you did send nothing at all, say this publish was successful
     }
     if(published) Serial.println(".");

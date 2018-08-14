@@ -47,6 +47,12 @@ Edge_Counter& edge_counter(const char* name, int pinnr, bool rising=true, bool f
     CHECK_DEV(dev)
 }
 
+#include <hcsr04.h>
+Hcsr04& hcsr04(const char* name, uint8_t trigger_pin, uint8_t echo_pin, 
+        unsigned long timeout_us=30000) {
+    Hcsr04* dev = new Hcsr04(name, trigger_pin, echo_pin, timeout_us);
+    CHECK_DEV(dev)
+}
 
 #include <analog.h>
 Analog& analog(const char* name) {

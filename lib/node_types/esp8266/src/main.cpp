@@ -455,8 +455,8 @@ void loop() {
                     if (transmission_delta > 0 &&
                         current_time - last_transmission >=
                             transmission_delta) {
-                        ulog("Free memory: %ld",ESP.getFreeHeap());
                         if (devices_publish(mqttClient, node_topic, true)) {
+                            ulog("Free memory: %ld",ESP.getFreeHeap());
                             last_transmission = current_time;
                             last_published = current_time;
                         }

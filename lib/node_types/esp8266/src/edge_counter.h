@@ -1,8 +1,8 @@
-// trigger.h
-// Header File for trigger device (interrupt+counter on input)
+// edge_counter.h
+// Header File for edge counter device (interrupt+counter on input edge)
 
-#ifndef _TRIGGER_H_
-#define _TRIGGER_H_
+#ifndef _EDGE_COUNTER_H_
+#define _EDGE_COUNTER_H_
 
 #include <Arduino.h>
 #include <device.h>
@@ -28,4 +28,4 @@ class Edge_Counter : public Device {
 };
 
 
-#endif // _TRIGGER_H_
+#endif // _EDGE_COUNTER_H_

@@ -1,4 +1,5 @@
-// trigger.cc
+// edge_counter.cc
+
 // Important to include Functional Interrupt as else it does not allow to 
 // define a class-based (object specific) interrupt
 #include <FunctionalInterrupt.h>
@@ -6,7 +7,6 @@
 
 
 void Edge_Counter::count(void) {
-    //ulog("bf_counter %d",PIN);
     if(counter < ULNOIOT_MAX_TRIGGER)
         counter++;
     else counter = 0;
