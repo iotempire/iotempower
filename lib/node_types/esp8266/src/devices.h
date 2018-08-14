@@ -41,9 +41,9 @@ Input& input(const char* name, int pinnr,
 #define button(...) input(__VA_ARGS__)
 #define contact(...) input(__VA_ARGS__)
 
-#include <trigger.h>
-Trigger& trigger(const char* name, int pinnr, bool rising=true, bool falling=true) {
-    Trigger* dev = new Trigger(name, pinnr, rising, falling);
+#include <edge_counter.h>
+Edge_Counter& edge_counter(const char* name, int pinnr, bool rising=true, bool falling=true) {
+    Edge_Counter* dev = new Edge_Counter(name, pinnr, rising, falling);
     CHECK_DEV(dev)
 }
 
