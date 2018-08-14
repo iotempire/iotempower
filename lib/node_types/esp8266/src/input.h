@@ -34,7 +34,7 @@ class Input : public Device {
             reinit();
         }
         bool measure();
-        Input& with_pull_up(bool pull_up) {
+        Input& with_pull_up(bool pull_up=true) {
             _pull_up = pull_up;
             reinit();
             return *this;

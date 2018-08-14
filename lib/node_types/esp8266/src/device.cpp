@@ -33,7 +33,10 @@ bool Device::publish(AsyncMqttClient& mqtt_client, Ustring& node_topic) {
                 topic.add("/");
                 topic.add(sd.get_name());
             }
-            if(first) first = false;
+            if(first) {
+                Serial.print(" ");
+                first = false;
+            }
             else Serial.print("|");
             Serial.print(topic.as_cstr()+node_topic.length()+1);
             Serial.print(":");
