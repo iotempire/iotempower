@@ -203,15 +203,7 @@ void ulog(const char *fmt, ...);
 long urandom(long from, long upto_exclusive);
 
 // constrain or limit a number to an interval
-// inline int limit(int nr, int min, int max) {
-//     if(nr < min) nr=min;
-//     else if(nr > max) nr=max;
-//     return nr;
-// }
-inline long limit(long nr, long min, long max) {
-    if(nr < min) nr=min;
-    else if(nr > max) nr=max;
-    return nr;
-}
+#define limit(nr, min, max) \
+    ( (nr) < (min) ? (min):((nr) > (max) ? (max):(nr)) )
 
 #endif // _TOOLBOX_H_

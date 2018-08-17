@@ -1,5 +1,5 @@
-// rgb_multi.cpp
-// control a multicolor led strip
+// rgb_sigle.cpp
+// control a multicolor led
 
 #include "rgb_single.h"
 

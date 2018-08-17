@@ -47,6 +47,12 @@ Edge_Counter& edge_counter(const char* name, int pinnr, bool rising=true, bool f
     CHECK_DEV(dev)
 }
 
+#include <pwm.h>
+Pwm& pwm(const char* name, uint8_t pin, int frequency=1000) {
+    Pwm* dev = new Pwm(name, pin, frequency);
+    CHECK_DEV(dev)
+}
+
 #include <hcsr04.h>
 Hcsr04& hcsr04(const char* name, uint8_t trigger_pin, uint8_t echo_pin, 
         unsigned long timeout_us=30000) {
