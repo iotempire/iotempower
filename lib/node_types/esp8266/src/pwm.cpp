@@ -28,7 +28,7 @@ Pwm::Pwm(const char* name, uint8_t pin, int frequency)
 }
 
 void Pwm::set(int duty, int frequency) {
-    _frequency = limit(frequency,2,20000);
+    _frequency = limit(frequency,2,5000);
     _duty = limit(duty,0,1023);
     measured_value(2).from(_frequency);
     measured_value(0).from(_duty);
