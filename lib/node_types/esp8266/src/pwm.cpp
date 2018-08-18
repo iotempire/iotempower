@@ -3,6 +3,9 @@
 
 #include "pwm.h"
 
+// TODO: remove waveform library folder when this is included in mainline Arduino esp8266
+#include "core_esp8266_waveform.h"
+
 Pwm::Pwm(const char* name, uint8_t pin, int frequency) 
         : Device(name) {
     _pin = pin;

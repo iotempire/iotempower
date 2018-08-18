@@ -5,10 +5,7 @@
 #ifndef _PWM_H_
 #define _PWM_H_
 
-// TODO: take another look at https://github.com/StefanBruens/ESP8266_new_pwm
-// and eventually adapt it -> is GPL, so not usable
-#include <rgb_base.h>
-#include "core_esp8266_waveform.h"
+#include <device.h>
 
 class Pwm : public Device {
     private:
@@ -29,5 +26,7 @@ class Pwm : public Device {
         void set(int duty, int frequency);
 };
 
+// TODO: add device for creating tones (just control by frequency and use duration)
 
-#endif // _RGB_BASE_H_
+
+#endif // _PWM_H_

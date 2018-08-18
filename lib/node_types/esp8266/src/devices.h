@@ -53,6 +53,12 @@ Pwm& pwm(const char* name, uint8_t pin, int frequency=1000) {
     CHECK_DEV(dev)
 }
 
+#include <servo.h>
+Servo& servo(const char* name, uint8_t pin) {
+    Servo* dev = new Servo(name, pin);
+    CHECK_DEV(dev)
+}
+
 #include <hcsr04.h>
 Hcsr04& hcsr04(const char* name, uint8_t trigger_pin, uint8_t echo_pin, 
         unsigned long timeout_us=30000) {
