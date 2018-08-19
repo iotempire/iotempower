@@ -1,6 +1,5 @@
-// uservo.h
+// servo.h
 // control servo motor
-// (u-servo as servo is used by arduino servo class)
 
 
 #ifndef _SERVO_H_
@@ -19,9 +18,11 @@ class Servo : public Device {
         _Servo _servo;
         int _value;
         bool stopped = true;
+        void init(uint8_t pin, int min_us, int max_us, int duration);
+    protected:
         int _duration;
         unsigned long start_time;
-        void init(uint8_t pin, int min_us, int max_us, int duration);
+        virtual void do_register();
     public:
         Servo(const char* name, uint8_t pin, int min_us, int max_us)
             : Device(name) {
@@ -38,8 +39,9 @@ class Servo : public Device {
             init(pin, 554, 2400, duration);
         }
         void stop();
+        void turn_to(int value);
         void set(int value);
-        bool measure(void);
+        virtual bool measure(void);
 };
 
 
