@@ -1,5 +1,5 @@
-d("out", name, pin, high_command='on', low_command='off', ignore_case=True)
-other names: led, output, switch
+output("name", pin, high_command="on", low_command="off");
+other names: led, out, relais
 
 Create a new output port for a simple LED or a relay switch.
 name will be appended to the mqtt topic and a set appended to
@@ -10,10 +10,9 @@ Parameters:
 - pin: the gpiopin
 - high_command: what needs to be sent to turn the respective port high
 - low_command: what needs to be sent to turn the respective port low
-- ignore_case: should case in the command detection be ignored
 
 Example (node name: living room/leds1):
-d("led", "yellow", d7, "turn on", "turn off")
+led("yellow", D7, "turn on", "turn off");
 
 Now the LED can be switched on via sending to the mqtt-broker
 to the topic "living room/leds1/yellow/set" the command
