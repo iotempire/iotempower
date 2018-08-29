@@ -26,6 +26,9 @@ class Ustring {
             cstr[ULNOIOT_MAX_STRLEN]=0;
         }
         bool remove(unsigned int from, unsigned int length);
+        bool remove(unsigned int length) {
+            return remove(0,length);
+        }
         int length() const { return strnlen(cstr,ULNOIOT_MAX_STRLEN); }
         int max_length() const { return ULNOIOT_MAX_STRLEN; }
         // most functions return true, when successful and false if something
@@ -50,16 +53,27 @@ class Ustring {
             return snprintf(cstr, ULNOIOT_MAX_STRLEN+1, "%f", f) <= ULNOIOT_MAX_STRLEN; 
         }
         bool from(const char* _cstr);
-        bool from(const Ustring& other) { 
-            strncpy(cstr,other.cstr,ULNOIOT_MAX_STRLEN);
-            case_adjust();
-            return true;
-        }
         bool from(const byte* payload, unsigned int length);
         bool from(const char* payload, unsigned int length) {
             return from((byte*) payload, length);
         }
-        bool copy(const Ustring& other) { return from(other); }
+        /* ISO C++ says that these are ambiguous */
+        /* really!?! , so use from_ustring*/
+        bool from_ustring(const Ustring& other) { 
+            strncpy(cstr,other.cstr,ULNOIOT_MAX_STRLEN);
+            case_adjust();
+            return true;
+        }
+        bool from_ustring(const Ustring& other, int start, int len) {
+            if(start<other.length()) {
+                return from(other.as_cstr()+start,len);
+            }
+            return false;
+        }
+        bool from_ustring(const Ustring& other, int len) {
+            return from(other.as_cstr(), len);
+        }
+        bool copy(const Ustring& other) { return from_ustring(other); }
         bool add(const Ustring& other);
         int compare(const char* other) const;
         int compare(const Ustring& other) const { return compare(other.cstr); }

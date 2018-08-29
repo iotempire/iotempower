@@ -34,7 +34,7 @@ void Servo_Switch::set(const Ustring& status) {
             needs_return = true;
         }
         turn_to(to_angle);
-        measured_value(0).from(status);
+        measured_value(0).from_ustring(status);
     }
 }
 

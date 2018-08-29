@@ -130,5 +130,36 @@ Animator& animator(const char* name, RGB_Matrix &matrix) {
     CHECK_DEV(dev)
 }
 
+#include <display.h>
+#define font_tiny u8g2_font_4x6_tr
+#define font_medium u8g2_font_5x8_tr
+#define font_large u8g2_font_8x13B_tr
+Display& display(const char* name, U8G2& u8g2_display,
+        const uint8_t* font=font_medium) {
+    Display* dev = new Display(name, u8g2_display, font);
+    CHECK_DEV(dev)
+}
+Display& display(const char* name, 
+        const uint8_t* font=font_medium) {
+    auto* d = new U8G2_SSD1306_128X64_NONAME_1_HW_I2C(U8G2_R0);
+    Display* dev = NULL;
+    if(!d) {
+        ulog("u8g2 creation failed.");
+    } else {
+        dev = new Display(name, *d, font);
+    }
+    CHECK_DEV(dev)
+}
+Display& display(const char* name, uint8_t scl, uint8_t sda,
+        const uint8_t* font=font_medium) {
+    auto* d = new U8G2_SSD1306_128X64_NONAME_1_SW_I2C(U8G2_R0, scl, sda);
+    Display* dev = NULL;
+    if(!d) {
+        ulog("u8g2 creation failed.");
+    } else {
+        dev = new Display(name, *d, font);
+    }
+    CHECK_DEV(dev)
+}
 
 #endif // _DEVICES_H_

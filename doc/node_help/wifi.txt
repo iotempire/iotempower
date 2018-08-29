@@ -1,6 +1,6 @@
 To reconfigure wifi of a previously used ulnoiot node
 (if the node never has been flashed with ulnoiot before, use initialize to
-flash it), make sure you have a flash button connected (usually d3 or pin 0 
+flash it), make sure you have a flash button connected (usually D3 or pin 0 
 against ground). Reset (or power off and on the device), wait until it starts 
 blinking and press the flash button 2 or three times during this first blinking
 five seconds.

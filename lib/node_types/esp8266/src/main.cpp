@@ -414,11 +414,8 @@ void setup() {
         if (mqtt_user[0]) { // auth given
             mqttClient.setCredentials(mqtt_user, mqtt_password);
         }
-    }
-
-    connectToMqtt();
-    if (!reconfig_mode_active) {
         ulnoiot_setup(); // define all devices
+        connectToMqtt(); // only subscribe after setup
     }
 }
 

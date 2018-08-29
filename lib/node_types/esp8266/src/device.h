@@ -169,7 +169,7 @@ class Device {
         virtual bool measure() { return true; }
 
         /* poll_measure
-         * This calls measure and and filters and sets if necessary default values. 
+         * This calls measure and filters and sets if necessary default values. 
          * This will be called very often from event loop
          * Will return if current measurement was successful or invalid. 
          */

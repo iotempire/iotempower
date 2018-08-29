@@ -13,6 +13,8 @@ fi
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
+# TODO: remove dead links
+
 copy_type_through_base() {
     # $1: source directory
     # $2: type (folder to copy)

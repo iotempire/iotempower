@@ -25,7 +25,7 @@ bool Device::publish(AsyncMqttClient& mqtt_client, Ustring& node_topic) {
         const Ustring& val = sd.value();
         if(!val.empty()) {
             // construct full topic
-            topic.from(node_topic);
+            topic.from_ustring(node_topic);
             topic.add("/");
             topic.add(get_name());
             const Ustring& sd_name = sd.get_name();

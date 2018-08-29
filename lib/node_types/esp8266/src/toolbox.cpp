@@ -117,7 +117,7 @@ void Ustring::strip_param() {
     for(i=0; i<length(); i++) {
         if(cstr[i]<=32) break;
     }
-    remove(0,i);
+    remove(0,i+1);
 }
 
 
