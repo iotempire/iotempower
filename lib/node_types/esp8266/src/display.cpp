@@ -24,7 +24,7 @@ void Display::init(U8G2& display, const uint8_t* font) {
                 while(true) {
                     int pos=command.find("&&");
                     if(pos<0) break;
-                    subcommand.from_ustring(command, pos);
+                    subcommand.copy(command, pos);
                     print(subcommand.as_cstr());
                     command.remove(pos+2);
                     if(command.starts_with("nl") || command.starts_with("ln")) {
@@ -49,6 +49,7 @@ void Display::init(U8G2& display, const uint8_t* font) {
                 return true;
             }
         );
+        set_fps(10); // can be low for these type of displays and just showing text
         _display->begin();
     }
 }
@@ -122,16 +123,19 @@ void Display::clear() {
 }
 
 bool Display::measure() {
-    // TODO: restrict framerate
-    char charstr[2]=" ";
-    _display->firstPage();
-    do {
-        for(int y=0; y<lines; y++) {
-            for(int x=0; x<columns; x++) {
-                charstr[0] = textbuffer[y * columns + x];
-                _display->drawStr(x*char_width, (y+1)*char_height-1, charstr);
+    unsigned long current = millis();
+    if(current - last_frame >= frame_len) {
+        char charstr[2]=" ";
+        _display->firstPage();
+        do {
+            for(int y=0; y<lines; y++) {
+                for(int x=0; x<columns; x++) {
+                    charstr[0] = textbuffer[y * columns + x];
+                    _display->drawStr(x*char_width, (y+1)*char_height-1, charstr);
+                }
             }
-        }
-    } while ( _display->nextPage() );
+        } while ( _display->nextPage() );
+        last_frame = current;
+    }
     return false;
 }

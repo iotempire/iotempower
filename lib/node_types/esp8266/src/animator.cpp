@@ -7,7 +7,7 @@
 void Animator::init() {
     add_subdevice(new Subdevice("",true))->with_receive_cb(
         [&] (const Ustring& payload) {
-            measured_value().from_ustring(payload); // save it
+            measured_value().copy(payload); // save it
             // search for command
             for(int i=0; i<command_method_counter; i++) {
                 const char* key = command_methods[i].key;

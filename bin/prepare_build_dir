@@ -31,7 +31,7 @@ copy_type_through_base() {
 
 link_type_through_base() {
     # $1: source directory
-    # $2: type (folder to copy)
+    # $2: type (folder or file to copy/link)
     # $3: destination directory
     # check if there is a base directory/link and recurse into it
     if [[ -d "$1/base" ]]; then
@@ -45,6 +45,10 @@ link_type_through_base() {
             p=$(realpath "$1/$2/$f")
             ln -s -f "$p" "$3/$f"
         done
+    elif [[ -f "$1/$2" ]]; then # if it's a file
+        # just link to that file
+        p=$(realpath "$1/$2")
+        ln -s -f "$p" "$3/$2"
     fi
 }
 
@@ -57,12 +61,12 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
     
     link_type_through_base "$src_dir" src "$dest_dir/src"
     link_type_through_base "$src_dir" lib "$dest_dir/lib"
+    link_type_through_base "$src_dir" platformio.ini "$dest_dir"
+
     ln -s -f "$(realpath setup.cpp)" "$dest_dir/src"
 #    password=$(tail -n1 key.hex|head -c64|basez -x -d|md5sum -b|cut -d\  -f1)
     password=$(tail -n1 key.txt|head -c64|md5sum -b|cut -d\  -f1)
     echo 'const char *keyhash = "'"$password"'";' > "$dest_dir/src/key.h"
-    p=$(realpath "$src_dir/platformio.ini")
-    ln -s -f "$p" "$dest_dir"
 
     # create specific config file.
 cat > "$dest_dir/src/config.h" << EOF

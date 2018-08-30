@@ -73,7 +73,7 @@ bool devices_subscribe(AsyncMqttClient& mqtt_client, Ustring& node_topic) {
         dev.subdevices_for_each( [&] (Subdevice& sd) {
             if(sd.subscribed()) {
                 // construct full topic
-                topic.from_ustring(node_topic);
+                topic.copy(node_topic);
                 topic.add("/");
                 topic.add(dev.get_name());
                 if(sd.get_name().length()>0) {
@@ -103,7 +103,7 @@ bool devices_receive(Ustring& subtopic, Ustring& payload) {
         dev.subdevices_for_each( [&] (Subdevice& sd) {
             if(sd.subscribed()) {
                 // construct full topic
-                topic.from_ustring(dev.get_name());
+                topic.copy(dev.get_name());
                 if(sd.get_name().length()>0) {
                     topic.add("/");
                     topic.add(sd.get_name());

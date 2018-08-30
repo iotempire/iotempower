@@ -16,6 +16,9 @@
 
 class Display : public Device {
     private:
+        int _fps;
+        unsigned long frame_len;
+        unsigned long last_frame=millis();
         U8G2* _display;
         char* textbuffer;
         bool delayed_newline=false;
@@ -43,6 +46,16 @@ class Display : public Device {
         void println(const char* str);
         void cursor(int x, int y);
         void clear();
+        void set_fps(int fps) {
+            if(fps<1) fps=1;
+            if(fps>100) fps=100;
+            _fps = fps;
+            frame_len = 1000 / fps;
+        }
+        Display& with_fps(int fps) {
+            set_fps(fps);
+            return *this;
+        }
         
         virtual bool measure();
 };
