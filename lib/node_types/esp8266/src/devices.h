@@ -136,6 +136,7 @@ Display& display(const char* name, U8G2& u8g2_display,
     Display* dev = new Display(name, u8g2_display, font);
     CHECK_DEV(dev)
 }
+// TODO: do we need to specify default address 0x3c? 
 Display& display(const char* name, 
         const uint8_t* font=font_medium) {
     auto* d = new U8G2_SSD1306_128X64_NONAME_1_HW_I2C(U8G2_R0);
