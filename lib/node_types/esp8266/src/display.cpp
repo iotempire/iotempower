@@ -1,60 +1,56 @@
 // display.cpp
 #include <display.h>
 
-void Display::init(U8G2& display, const uint8_t* font) {
+bool Display_Base::init(int w, int h) {
     set_ignore_case(false); // want to use capital letters
-    _display = &display;
-    _display->setFont(font); // TODO: check if this has to be reset in each frame?
-    char_height = _display->getMaxCharHeight();
-    char_width = _display->getMaxCharWidth();
-    columns = _display->getWidth() / char_width;
-    lines = _display->getHeight() / char_height;
+    columns = w;
+    lines = h;
     ulog("Display with %d columns and %d lines.", columns, lines);
     // create our own textbuffer
     textbuffer = (char *)malloc(lines*columns);
     if(!textbuffer) {
+        return false;
         ulog("Could not allocate textbuffer.");
         // TODO: anything which should be destructed now?
-    } else {
-        clear();
-        add_subdevice(new Subdevice("",true))->with_receive_cb(
-            [&] (const Ustring& payload) {
-                Ustring command(payload);
-                Ustring subcommand;
-                while(true) {
-                    int pos=command.find("&&");
-                    if(pos<0) break;
-                    subcommand.copy(command, pos);
-                    print(subcommand.as_cstr());
-                    command.remove(pos+2);
-                    if(command.starts_with("nl") || command.starts_with("ln")) {
-                        command.strip_param();
-                        println();
-                    } else if(command.starts_with("cl")) {
-                        command.strip_param();
-                        clear();
-                    } else if(command.starts_with("go")) {
-                        command.strip_param();
-                        int x=command.as_int()-1;
-                        command.strip_param();
-                        int y=command.as_int()-1;
-                        command.strip_param();
-                        cursor(x,y);
-                    } else { // unknown
-                        print("&&");
-                    }
-                }
-                // Anything coming here should usually just be printed
-                println(command.as_cstr());
-                return true;
-            }
-        );
-        set_fps(10); // can be low for these type of displays and just showing text
-        _display->begin();
     }
+    add_subdevice(new Subdevice("",true))->with_receive_cb(
+        [&] (const Ustring& payload) {
+            Ustring command(payload);
+            Ustring subcommand;
+            while(true) {
+                int pos=command.find("&&");
+                if(pos<0) break;
+                subcommand.copy(command, pos);
+                print(subcommand.as_cstr());
+                command.remove(pos+2);
+                if(command.starts_with("nl") || command.starts_with("ln")) {
+                    command.strip_param();
+                    println();
+                } else if(command.starts_with("cl")) {
+                    command.strip_param();
+                    clear();
+                    if(command.length()==0) return true; // skip newline at end
+                } else if(command.starts_with("go")) {
+                    command.strip_param();
+                    int x=command.as_int()-1;
+                    command.strip_param();
+                    int y=command.as_int()-1;
+                    command.strip_param();
+                    cursor(x,y);
+                    if(command.length()==0) return true; // skip newline at end
+                } else { // unknown
+                    print("&&");
+                }
+            }
+            // Anything coming here should usually just be printed
+            println(command.as_cstr());
+            return true;
+        }
+    );
+    return true;
 }
 
-void Display::scroll_up(int nr_lines) {
+void Display_Base::scroll_up(int nr_lines) {
     // TODO: add cyclic scrolling
     char* from = textbuffer + nr_lines*columns;
     int block_h = lines-nr_lines;
@@ -62,7 +58,7 @@ void Display::scroll_up(int nr_lines) {
     memset(textbuffer + block_h*columns, ' ', nr_lines*columns);
 }
 
-void Display::print(const char* str) {
+void Display_Base::print(const char* str) {
     // TODO: not capped by maxlen -> should not overflow because of Ustring given, but maybe better cap?
     char ch;
     while(*str) {
@@ -79,9 +75,9 @@ void Display::print(const char* str) {
                 break; 
         }
         if(ch!=0) {
-            if(delayed_newline) {
+            if(delayed_scroll) {
                 scroll_up(1);
-                delayed_newline=false;
+                delayed_scroll=false;
             }
             textbuffer[cursor_y * columns + cursor_x] = ch;
             cursor_x ++;
@@ -91,51 +87,90 @@ void Display::print(const char* str) {
             }
         }
         if(cursor_y >= lines) {
-            if(delayed_newline) {
-                scroll_up(1);
-            }
-            delayed_newline=true;
+            // if(delayed_scroll) {
+            //     scroll_up(1);
+            // }
+            delayed_scroll=true;
             cursor_y = lines-1;
         }
         str++;
     }
 }
 
-void Display::println() {
+void Display_Base::println() {
     print("\n");
 }
 
-void Display::println(const char* str) {
+void Display_Base::println(const char* str) {
     print(str);
     println();
 }
 
-void Display::cursor(int x, int y) {
+void Display_Base::cursor(int x, int y) {
     cursor_x = limit(x, 0, columns-1);
     cursor_y = limit(y, 0, lines-1);
-    delayed_newline = false;
+    delayed_scroll = false;
 }
 
-void Display::clear() {
+void Display_Base::clear() {
     memset(textbuffer, ' ', lines*columns);
     cursor(0,0);
-    delayed_newline = false;
+    delayed_scroll = false;
 }
 
-bool Display::measure() {
+bool Display_Base::measure() {
     unsigned long current = millis();
     if(current - last_frame >= frame_len) {
-        char charstr[2]=" ";
-        _display->firstPage();
-        do {
-            for(int y=0; y<lines; y++) {
-                for(int x=0; x<columns; x++) {
-                    charstr[0] = textbuffer[y * columns + x];
-                    _display->drawStr(x*char_width, (y+1)*char_height-1, charstr);
-                }
-            }
-        } while ( _display->nextPage() );
+        show(textbuffer);
         last_frame = current;
     }
     return false;
+}
+
+
+void Display::init_u8g2(U8G2& display, const uint8_t* font) {
+    _display = &display;
+    _display->setFont(font);
+    char_height = _display->getMaxCharHeight();
+    char_width = _display->getMaxCharWidth();
+    set_fps(10); // can be low for these type of displays and just showing text
+    _display->begin();
+    if(init( _display->getWidth() / char_width, _display->getHeight() / char_height)) {
+        clear();
+    }
+}
+
+void Display::show(const char* buffer) {
+    char charstr[2]=" ";
+    _display->firstPage();
+    do {
+        for(int y=0; y<lines; y++) {
+            for(int x=0; x<columns; x++) {
+                charstr[0] = buffer[y * columns + x];
+                _display->drawStr(x*char_width, (y+1)*char_height-1, charstr);
+            }
+        }
+    } while ( _display->nextPage() );
+}
+
+void Display_HD44780_I2C::init_hd44780_i2c(int w, int h, uint8_t scl, uint8_t sda, int i2c_addr) {
+    _display = new LiquidCrystal_I2C(i2c_addr, w, h);
+    _display->init(sda, scl);
+    if(init(w, h)) {
+        clear();
+        _display->cursor_off();
+        _display->backlight();
+    }
+    set_fps(2); // can be low for these type of displays and just showing text
+}
+
+void Display_HD44780_I2C::show(const char* buffer) {
+    char charstr[2]=" ";
+    for(int y=0; y<lines; y++) {
+        _display->setCursor(0,y);
+        for(int x=0; x<columns; x++) {
+            charstr[0] = buffer[y * columns + x];
+            _display->printstr(charstr);
+        }
+    }
 }

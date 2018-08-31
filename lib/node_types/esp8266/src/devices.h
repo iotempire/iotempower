@@ -131,9 +131,6 @@ Animator& animator(const char* name, RGB_Matrix &matrix) {
 }
 
 #include <display.h>
-#define font_tiny u8g2_font_4x6_tr
-#define font_medium u8g2_font_5x8_tr
-#define font_large u8g2_font_8x13B_tr
 Display& display(const char* name, U8G2& u8g2_display,
         const uint8_t* font=font_medium) {
     Display* dev = new Display(name, u8g2_display, font);
@@ -159,6 +156,16 @@ Display& display(const char* name, uint8_t scl, uint8_t sda,
     } else {
         dev = new Display(name, *d, font);
     }
+    CHECK_DEV(dev)
+}
+Display_HD44780_I2C& display44780(const char* name, int w, int h, 
+        uint8_t scl, uint8_t sda, int i2c_addr=0x27) {
+    Display_HD44780_I2C* dev = new Display_HD44780_I2C(name, w, h, scl, sda, i2c_addr);
+    CHECK_DEV(dev)
+}
+Display_HD44780_I2C& display44780(const char* name, int w, int h, 
+        int i2c_addr=0x27) {
+    Display_HD44780_I2C* dev = new Display_HD44780_I2C(name, w, h, i2c_addr);
     CHECK_DEV(dev)
 }
 
