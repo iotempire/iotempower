@@ -444,6 +444,7 @@ void loop() {
     if (!reconfig_mode_active) {
         if (mqttClient.connected()) {
             current_time = millis();
+            do_later_check(); // work the scheduler
             if (current_time - last_measured >= _measure_delay) {
                 devices_update();
                 last_measured = current_time;

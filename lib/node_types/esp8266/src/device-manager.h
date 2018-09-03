@@ -10,7 +10,14 @@
 #include <toolbox.h>
 #include <device.h>
 
-// ad a device to the static device list
+// scheduler
+typedef void (*DO_LATER_CB_ID)(int16_t);
+bool do_later(unsigned long in_ms, int16_t id, DO_LATER_CB_ID callback);
+typedef void (*DO_LATER_CB_NO_ID)();
+bool do_later(unsigned long in_ms, DO_LATER_CB_NO_ID callback);
+void do_later_check(); // should not be called by user
+
+// add a device to the static device list
 bool add_device(Device& device);
 
 /* out of simplicity reasons, we don't allow the deletion of devices

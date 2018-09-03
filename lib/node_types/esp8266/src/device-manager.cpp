@@ -7,6 +7,120 @@
 #include <toolbox.h>
 #include <device-manager.h>
 
+////// structure and list for scheduler
+union Do_Later_Callback {
+    DO_LATER_CB_ID id;
+    DO_LATER_CB_NO_ID no_id;
+};
+
+typedef struct {
+    unsigned long time;
+    int16_t id;
+    Do_Later_Callback callback;
+} do_later_map_t;
+
+static do_later_map_t do_later_map[ULNOIOT_DO_LATER_MAP_SIZE];
+static int do_later_map_count=0;
+
+bool do_later_is_full() {
+    return do_later_map_count >= ULNOIOT_DO_LATER_MAP_SIZE;
+}
+
+static void do_later_delete(int pos) {
+    if(do_later_map_count<=0) return;
+    pos = limit(pos, 0, do_later_map_count-1);
+    ulog("do_later_delete pos: %d  count: %d",pos,do_later_map_count);
+    memmove(do_later_map+pos, do_later_map+pos+1, sizeof(do_later_map_t)*(do_later_map_count-pos));
+    do_later_map_count --;
+}
+
+static bool do_later_add(unsigned long in_ms, int16_t id, Do_Later_Callback cbu) {
+    bool forgot_one = false;
+    // insert sorted into list
+    unsigned long current = millis();
+    in_ms += current;
+    int pos; // position variable for finding things
+    // if valid id (!=-1) is given, a potential existing position needs 
+    // to be deleted
+    if(id!=-1) {
+        // check if already in there
+        for(pos=0; pos<do_later_map_count; pos++) {
+            if(do_later_map[pos].id == id) break; // found it
+        }
+        if(pos < do_later_map_count) { // loop didn't run out and found
+            do_later_delete(pos); // make space for replacement
+        }
+    }
+    if(do_later_is_full()) { // no space, forget oldest (in beginning)
+        // forget oldest
+        do_later_delete(0);
+        forgot_one = true;
+    }
+    // find position to insert
+    for(pos=0; pos<do_later_map_count; pos++) {
+        unsigned long delta = do_later_map[pos].time-current;
+        // be aware of overrun
+        if(delta >= in_ms && delta <= ULNOIOT_MAX_DO_LATER_INTERVAL) break; // found something scheduled later
+    }
+    // do actual insert at pos
+    if(pos<do_later_map_count) {
+        // move existing elements up
+        memmove(do_later_map+pos+1, do_later_map+pos, sizeof(do_later_map_t)*(do_later_map_count-pos-1));
+    }
+    do_later_map[pos].time = in_ms;
+    do_later_map[pos].id = id;
+    do_later_map[pos].callback = cbu;
+    do_later_map_count ++;
+    ulog("Adding do_later scheduler at %d with time %ld at time %ld",pos,in_ms,current); // TODO: remove debug
+    return !forgot_one;
+}
+
+bool do_later(unsigned long in_ms, int16_t id, DO_LATER_CB_ID callback) {
+    if(id==-1) {
+        ulog("The id -1 is not allowed for id-based do_later callback.");
+    } else {
+        Do_Later_Callback cbu;
+        cbu.id = callback;
+        return do_later_add(in_ms, id, cbu);
+    }
+    return true;
+}
+
+// TODO: call no_id callback different to prevent endless recursion -> use union
+bool do_later(unsigned long in_ms, DO_LATER_CB_NO_ID callback) {
+    Do_Later_Callback cbu;
+    cbu.no_id = callback;
+    return do_later_add(in_ms, -1, cbu);
+}
+
+void do_later_check() {
+    unsigned long next;
+    unsigned long current=millis();
+    unsigned long delta;
+    //ulog("do_later_check: entered"); // TODO: remove debug
+    while(true) {
+        if(do_later_map_count<=0) break;
+        next = do_later_map[0].time;
+        delta = current - next;
+        //ulog("do_later_check: %ld, %ld", delta, ULNOIOT_MAX_DO_LATER_INTERVAL); // TODO: remove debug
+        // pay attention to overrun
+        if(delta>=0 && delta <= ULNOIOT_MAX_DO_LATER_INTERVAL) {
+            int16_t id = do_later_map[0].id;
+            Do_Later_Callback cb = do_later_map[0].callback;
+            // release entry as there might be a new one created
+            do_later_delete(0);
+            ulog("do_later about to execute");
+            // execute without or with id
+            if(id==-1) cb.no_id();
+            else cb.id(id);
+            ulog("do_later executed");
+        } else {
+            break; // we are done
+        }
+    }
+}
+
+////// Device list
 static Fixed_Map<Device, ULNOIOT_MAX_DEVICES> device_list;
 
 /*static Device* find_device(const Ustring& name) {
