@@ -63,7 +63,7 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
     link_type_through_base "$src_dir" lib "$dest_dir/lib"
     link_type_through_base "$src_dir" platformio.ini "$dest_dir"
 
-    ln -s -f "$(realpath setup.cpp)" "$dest_dir/src"
+    ln -s -f "$(realpath setup.cpp)" "$dest_dir/src/setup.h"
 #    password=$(tail -n1 key.hex|head -c64|basez -x -d|md5sum -b|cut -d\  -f1)
     password=$(tail -n1 key.txt|head -c64|md5sum -b|cut -d\  -f1)
     echo 'const char *keyhash = "'"$password"'";' > "$dest_dir/src/key.h"

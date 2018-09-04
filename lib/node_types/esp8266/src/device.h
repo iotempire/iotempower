@@ -17,15 +17,11 @@
 #include <toolbox.h>
 
 
-
 class Subdevice {
     private:
         Ustring name; // subdevice name (added to the device name)
         bool _subscribed = false;
-        void init(const char* subname, bool subscribed) {
-            name.from(subname);
-            _subscribed = subscribed;
-        }
+        void init(const char* subname, bool subscribed);
         #define ULNOIOT_ON_RECEIVE_CALLBACK std::function<bool(const Ustring&)>
         ULNOIOT_ON_RECEIVE_CALLBACK receive_cb = NULL;
     public:
@@ -76,7 +72,7 @@ class Device {
         ULNOIOT_FILTER_CALLBACK _filter_cb=NULL;
 
     public:
-        Device(const char* _name) { name.from(_name); }
+        Device(const char* _name);
         //// Getters & Setters
         Device& with_ignore_case(bool ignore_case) { 
             _ignore_case = ignore_case;
@@ -140,6 +136,7 @@ class Device {
         }
 
         Subdevice* add_subdevice(Subdevice* sd) {
+            ulog("add_subdevice: dev: %s sd: %s",name.as_cstr(), sd->get_name().as_cstr());
             if(subdevices.add(sd)) {
                 return sd;
             } else {

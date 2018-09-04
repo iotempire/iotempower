@@ -5,6 +5,11 @@
 #include <Arduino.h>
 #include "device.h"
 
+void Subdevice::init(const char* subname, bool subscribed) {
+    name.from(subname);
+    _subscribed = subscribed;
+}
+
 bool Subdevice::call_receive_cb(Ustring& payload) {
     Serial.print("Calling receive callback ");
     Serial.print(name.as_cstr());
@@ -15,6 +20,18 @@ bool Subdevice::call_receive_cb(Ustring& payload) {
     }
     Serial.println("!failure!");
     return false;
+}
+
+//#include <device-manager.h>
+// Just define add_device from here - to avoid messed up dependencies
+bool add_device(Device& device);
+
+Device::Device(const char* _name) {
+    name.from(_name);
+    ulog("Device: Adding device: %s", name.as_cstr());
+    if(!add_device(*this)) {
+        ulog("Device %s couldn't be added - max devices reached.", _name);
+    }
 }
 
 bool Device::publish(AsyncMqttClient& mqtt_client, Ustring& node_topic) {
@@ -118,8 +135,7 @@ static Ustring value_error;
 Ustring& Device::value(unsigned long index) {
     Subdevice* sd = subdevice(index);
     if(sd == NULL) {
-        Serial.print("Error in value(). Working on Device: ");
-        Serial.println(name.as_cstr());
+        ulog("Error in value(). Device: %s", name.as_cstr());
         value_error.from("subdevice value error");
         return value_error;
         // TODO: should this crash here?
@@ -130,9 +146,9 @@ Ustring& Device::value(unsigned long index) {
 Ustring& Device::measured_value(unsigned long index) {
     Subdevice* sd = subdevice(index);
     if(sd == NULL) {
-        Serial.print("Error in measured_value(). Working on Device: ");
-        Serial.println(name.as_cstr());
-        controlled_crash("no subdevice");
+        ulog("Error in measured_value(): Device: %s", name.as_cstr());
+        value_error.from("no subdevice");
+        return value_error;
     }
     return sd->measured_value;
 }

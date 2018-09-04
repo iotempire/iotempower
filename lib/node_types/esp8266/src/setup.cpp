@@ -7,4 +7,6 @@
 
 #include <ulnoiot.h>
 
-#include "setup.cpp"
+// That's the user file (called in folder setup.cpp, but linked as setup.h
+// here)
+#include "setup.h"

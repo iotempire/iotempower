@@ -6,6 +6,7 @@
 
 // needs to be included here for color table
 #define FASTLED_INTERRUPT_RETRY_COUNT 0
+#define FASTLED_INTERNAL // ignore pragma messages in FastLED
 #include <FastLED.h>
 
 #include <device.h>

@@ -146,6 +146,15 @@ void controlled_crash(const char * error_message) {
 }
 
 void ulog(const char *fmt, ...) {
+    static bool serial_initialized=false;
+    if(!serial_initialized) {
+        serial_initialized = true;
+        Serial.begin(115200);
+        delay(500); // Wait for serial to get ready
+        Serial.println();
+        Serial.println();
+        Serial.println("Serial ready.");
+    }
 	char buf[LOG_LINE_MAX_LEN];
 	va_list ap;
 	va_start(ap, fmt);

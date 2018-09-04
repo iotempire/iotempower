@@ -15,13 +15,19 @@ class Pwm : public Device {
     public:
         Pwm(const char* name, uint8_t pin, int frequency=1000);
         void set_duty(int duty) {
-            // if(duty>1020) duty=1023; // crashes when set to 1021 or 1022 TODO: why?!
-            // analogWrite(_pin, _duty);
             set(duty,_frequency);
+        }
+        Pwm& with_duty(int duty) {
+            set_duty(duty);
+            return *this;
         }
         void set_frequency(int frequency) {
             // analogWriteFreq(_pin, frequency);
             set(_duty, frequency);
+        }
+        Pwm& with_frequency(int frequency) {
+            set_frequency(frequency);
+            return *this;
         }
         void set(int duty, int frequency);
 };

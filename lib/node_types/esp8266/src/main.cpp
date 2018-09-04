@@ -28,8 +28,7 @@
 #include "wifi-config.h" // will only be filled if progammed via serial
 
 // ulnoiot functions for user modification in setup.cpp
-void ulnoiot_setup();
-// void ulnoiot_loop();
+void start();
 
 int long_blinks = 0, short_blinks;
 
@@ -141,7 +140,7 @@ void reconfigMode() {
               // TODO: go directly to OTA-mode for a while and then quit
 }
 
-bool reconfig_mode_active = false;
+bool reconfig_mode_active=false;
 
 void flash_mode_select() {
     // Check if flash with default password is requested
@@ -323,13 +322,16 @@ void setup() {
     // TODO: setup watchdog
     // TODO: consider not using serial at all and freeing it for other
     // connections
-    Serial.begin(115200);
-    Serial.println();
-    Serial.println("Booting. Serial port initialized.");
+    // Serial.begin(115200);
+    // Serial.println();
+    ulog("Booting.");
+
+    // intialize randomness
     long seed_helper=ESP8266TrueRandom.random(0,2000000);
+    // TODO: fix that calling ESP8266TrueRandom crashes later
     Serial.print("Random generator seeded, testnumber: ");
     Serial.println(seed_helper);
-    randomSeed((unsigned long)seed_helper); // TODO: fix that this crashes later
+    randomSeed((unsigned long)seed_helper); 
 
     // // TODO: is this really necessary or is it better just hardcoded?
     // if( ! SPIFFS.begin() ) {
@@ -414,7 +416,7 @@ void setup() {
         if (mqtt_user[0]) { // auth given
             mqttClient.setCredentials(mqtt_user, mqtt_password);
         }
-        ulnoiot_setup(); // define all devices
+        start(); // define all devices
         connectToMqtt(); // only subscribe after setup
     }
 }

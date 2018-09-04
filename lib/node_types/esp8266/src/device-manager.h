@@ -11,9 +11,11 @@
 #include <device.h>
 
 // scheduler
-typedef void (*DO_LATER_CB_ID)(int16_t);
+//typedef void (*DO_LATER_CB_ID)(int16_t);
+typedef std::function<void(int16_t)> DO_LATER_CB_ID;
 bool do_later(unsigned long in_ms, int16_t id, DO_LATER_CB_ID callback);
-typedef void (*DO_LATER_CB_NO_ID)();
+//typedef void (*DO_LATER_CB_NO_ID)();
+typedef std::function<void()> DO_LATER_CB_NO_ID;
 bool do_later(unsigned long in_ms, DO_LATER_CB_NO_ID callback);
 void do_later_check(); // should not be called by user
 

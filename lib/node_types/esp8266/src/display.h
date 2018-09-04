@@ -62,6 +62,8 @@ class Display_Base : public Device {
         bool measure();
 };
 
+static const char* display_ssd1306_failed = "u8g2 creation of ssd1306 failed.";
+
 // This is based on the U82G displays
 class Display : public Display_Base {
     private:
@@ -69,10 +71,34 @@ class Display : public Display_Base {
     public:
         // this only supports pixel-based (the ones with _1_) displays so far
         Display(const char* name, U8G2& display, 
-            const uint8_t* font=u8g2_font_4x6_mf) // small font by default
+            const uint8_t* font=font_medium) // small font by default
         : Display_Base(name) {
             init_u8g2(display, font);
         }
+        Display(const char* name, const uint8_t* font=font_medium)
+        : Display_Base(name) {
+            // TODO: think to use templates to statically reserve space for display
+            // TODO: do we need to specify default address 0x3c? 
+            auto* d = new U8G2_SSD1306_128X64_NONAME_1_HW_I2C(U8G2_R0);
+            if(d) {
+                init_u8g2(*d, font);
+            } else {
+                ulog(display_ssd1306_failed);
+            }
+        }
+        Display(const char* name, uint8_t scl, uint8_t sda,
+            const uint8_t* font=font_medium)
+        : Display_Base(name) {
+            // TODO: think to use templates to statically reserve space for display
+            // TODO: do we need to specify default address 0x3c? 
+            auto* d = new U8G2_SSD1306_128X64_NONAME_1_HW_I2C(U8G2_R0, scl, sda);
+            if(d) {
+                init_u8g2(*d, font);
+            } else {
+                ulog(display_ssd1306_failed);
+            }
+        }
+
         u8g2_uint_t width_pixels() {
             return _display->getDisplayWidth();
         }

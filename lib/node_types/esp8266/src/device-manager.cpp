@@ -8,10 +8,7 @@
 #include <device-manager.h>
 
 ////// structure and list for scheduler
-union Do_Later_Callback {
-    DO_LATER_CB_ID id;
-    DO_LATER_CB_NO_ID no_id;
-};
+typedef std::function<void()> Do_Later_Callback;
 
 typedef struct {
     unsigned long time;
@@ -29,7 +26,7 @@ bool do_later_is_full() {
 static void do_later_delete(int pos) {
     if(do_later_map_count<=0) return;
     pos = limit(pos, 0, do_later_map_count-1);
-    ulog("do_later_delete pos: %d  count: %d",pos,do_later_map_count);
+//    ulog("do_later_delete pos: %d  count: %d",pos,do_later_map_count);
     memmove(do_later_map+pos, do_later_map+pos+1, sizeof(do_later_map_t)*(do_later_map_count-pos));
     do_later_map_count --;
 }
@@ -71,7 +68,7 @@ static bool do_later_add(unsigned long in_ms, int16_t id, Do_Later_Callback cbu)
     do_later_map[pos].id = id;
     do_later_map[pos].callback = cbu;
     do_later_map_count ++;
-    ulog("Adding do_later scheduler at %d with time %ld at time %ld",pos,in_ms,current); // TODO: remove debug
+//    ulog("Adding do_later scheduler at %d with time %ld at time %ld",pos,in_ms,current); // TODO: remove debug
     return !forgot_one;
 }
 
@@ -79,41 +76,31 @@ bool do_later(unsigned long in_ms, int16_t id, DO_LATER_CB_ID callback) {
     if(id==-1) {
         ulog("The id -1 is not allowed for id-based do_later callback.");
     } else {
-        Do_Later_Callback cbu;
-        cbu.id = callback;
+        Do_Later_Callback cbu = [id,callback] { callback(id); };
         return do_later_add(in_ms, id, cbu);
     }
     return true;
 }
 
-// TODO: call no_id callback different to prevent endless recursion -> use union
 bool do_later(unsigned long in_ms, DO_LATER_CB_NO_ID callback) {
-    Do_Later_Callback cbu;
-    cbu.no_id = callback;
-    return do_later_add(in_ms, -1, cbu);
+    return do_later_add(in_ms, -1, callback);
 }
 
 void do_later_check() {
     unsigned long next;
     unsigned long current=millis();
     unsigned long delta;
-    //ulog("do_later_check: entered"); // TODO: remove debug
     while(true) {
         if(do_later_map_count<=0) break;
         next = do_later_map[0].time;
         delta = current - next;
-        //ulog("do_later_check: %ld, %ld", delta, ULNOIOT_MAX_DO_LATER_INTERVAL); // TODO: remove debug
         // pay attention to overrun
         if(delta>=0 && delta <= ULNOIOT_MAX_DO_LATER_INTERVAL) {
-            int16_t id = do_later_map[0].id;
+            //int16_t id = do_later_map[0].id; hardcoded in callback lambda
             Do_Later_Callback cb = do_later_map[0].callback;
             // release entry as there might be a new one created
             do_later_delete(0);
-            ulog("do_later about to execute");
-            // execute without or with id
-            if(id==-1) cb.no_id();
-            else cb.id(id);
-            ulog("do_later executed");
+            cb();
         } else {
             break; // we are done
         }
@@ -121,7 +108,8 @@ void do_later_check() {
 }
 
 ////// Device list
-static Fixed_Map<Device, ULNOIOT_MAX_DEVICES> device_list;
+static Fixed_Map<Device, ULNOIOT_MAX_DEVICES> 
+    __attribute__((init_priority(65525))) device_list;
 
 /*static Device* find_device(const Ustring& name) {
     return device_list.find(name);
@@ -132,6 +120,7 @@ static Device* find_device(const char* name) {
 }*/
 
 bool add_device(Device &device) {
+    ulog("add_device: Adding device: %s", device.get_name().as_cstr());
     return device_list.add(&device);
 }
 
@@ -183,7 +172,9 @@ bool devices_subscribe(AsyncMqttClient& mqtt_client, Ustring& node_topic) {
     // subscribe to all devices that accept input
     Ustring topic;
 
+    ulog("Debug, subscribe, devices: %d", device_list.length()); // TODO: remove debug
     device_list.for_each( [&] (Device& dev) {
+        ulog("Debug, subscribe: %s", dev.get_name().as_cstr()); // TODO: remove debug
         dev.subdevices_for_each( [&] (Subdevice& sd) {
             if(sd.subscribed()) {
                 // construct full topic
@@ -194,11 +185,9 @@ bool devices_subscribe(AsyncMqttClient& mqtt_client, Ustring& node_topic) {
                     topic.add("/");
                     topic.add(sd.get_name());
                 }
-                Serial.print("Subscribing to: ");
-                Serial.println(topic.as_cstr());
                 uint16_t packetIdSub = mqtt_client.subscribe(topic.as_cstr(), 0);
-                Serial.print("Subscribing at QoS 0, packetId: ");
-                Serial.println(packetIdSub);
+                ulog("Subscribing to %s with id %d.", 
+                    topic.as_cstr(), packetIdSub);
             }
             return true; // continue subdevice loop
         } ); // end foreach - iterate over subdevices

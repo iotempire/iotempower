@@ -222,4 +222,7 @@ long urandom(long from, long upto_exclusive);
 #define limit(nr, min, max) \
     ( (nr) < (min) ? (min):((nr) > (max) ? (max):(nr)) )
 
+// nicer writing of auto& in device definition
+#define udev auto&
+
 #endif // _TOOLBOX_H_
