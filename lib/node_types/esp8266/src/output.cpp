@@ -11,11 +11,7 @@ Output::Output(const char* name, const int pin,
     add_subdevice(new Subdevice(""));
     add_subdevice(new Subdevice("set",true))->with_receive_cb(
         [&] (const Ustring& payload) {
-            if(payload.equals(_high)) high();
-            else {
-                if(payload.equals(_low)) low();
-                else return false;
-            }
+            set(payload.as_cstr());
             return true;
         }
     );

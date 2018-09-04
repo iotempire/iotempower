@@ -90,7 +90,7 @@ bool Device::poll_measure() {
     }
     // a current value is now in measured_value
     // check if it needs to be filtered
-    if(_filter_cb != NULL && ! _filter_cb(*this)) {
+    if(_filter_cb != NULL && ! _filter_cb()) {
         // if filter defined but indicates to ignore the current measurement
         return false; // end here with no update
     }

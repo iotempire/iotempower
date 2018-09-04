@@ -45,7 +45,13 @@ class Analog : public Device {
             _precision = precision;
             return *this;
         }
+        // access measured_value()
+        double read_float() { return measured_value().as_float(); }
+        long read_int() { return measured_value().as_int(); }
+        void write_float(double v) { measured_value().from(v); }
+        void write_int(long v) { measured_value().from(v); }
 };
+
 
 
 #endif // _ANALOG_H_

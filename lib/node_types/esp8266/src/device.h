@@ -56,19 +56,19 @@ class Device {
 
         // This is the callback which is called based on a value change
         // it gets passed the triggering device. Last measured values can be
-        // read from the device.
+        // read from the globally defined device.
         // TODO: commented example
-        #define ULNOIOT_ON_CHANGE_CALLBACK std::function<void(Device&)>
+        #define ULNOIOT_ON_CHANGE_CALLBACK std::function<void()>
         ULNOIOT_ON_CHANGE_CALLBACK _on_change_cb=NULL;
 
         // This is the callback which is used for filtering and influencing values
-        // It gets the current device passed as parameter. Values
-        // modify. So it returns the same or modified value in it. If it wants to
-        // invalidate the current measurement, it needs to return an empty string (
-        // set first char to 0) or return false. To indicate change or validate the
-        // measured value it needs to return true.
+        // It does not get the current device passed as parameter. The value can
+        // be read from measured_value in the globally defined device. This
+        // measure_value can be now modified. It is declared valid via
+        // eturning true and invalid via returning flase or returning an empty 
+        // string (set first char to 0).
         // TODO: commented example
-        #define ULNOIOT_FILTER_CALLBACK std::function<bool(Device&)>
+        #define ULNOIOT_FILTER_CALLBACK std::function<bool()>
         ULNOIOT_FILTER_CALLBACK _filter_cb=NULL;
 
     protected:
@@ -91,7 +91,7 @@ class Device {
 
         void call_on_change_callback() {
             if(_on_change_cb != NULL) {
-                _on_change_cb(*this);
+                _on_change_cb();
             }
         }
 
@@ -199,5 +199,50 @@ class Device {
          * */
         virtual bool measure() { return true; }
 };
+
+
+//// Some filters
+// TODO: check how to turn this in a functor class that does not die when used
+#define filter_average(TYPE, buflen, dev) [&] { \
+        static TYPE sum = 0; \
+        static size_t values_count = 0; \
+        TYPE v; \
+        if(std::is_same<TYPE, double>::value) { \
+            v = dev.measured_value().as_float(); \
+        } else { \
+            v = dev.measured_value().as_int(); \
+        } \
+        sum += v; \
+        values_count ++; \
+        if(values_count >= buflen) { \
+            dev.measured_value().from(sum/values_count); \
+            values_count = 0; \
+            sum = 0; \
+            return true; \
+        } \
+        return false; \
+    }
+
+
+
+/* The Jeff McClintock running median estimate. 
+ * base: https://stackoverflow.com/questions/10930732/c-efficiently-calculating-a-running-median
+ * */
+#define filter_jmc_median(update_ms, dev) [&] { \
+        static double median = 0.0; \
+        static double average = 0.0; \
+        static unsigned long last_time = millis(); \
+        double sample = dev.measured_value().as_float(); \
+        average += ( sample - average ) * 0.1; \
+        median += copysign( average * 0.01, sample - median ); \
+        unsigned long current = millis() ; \
+        if(current - last_time >= update_ms) { \
+            dev.measured_value().from(average); \
+            last_time = current; \
+            return true; \
+        } \
+        return false; \
+    }
+
 
 #endif // _ULNOIOT_DEVICE_H_

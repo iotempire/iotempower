@@ -16,16 +16,18 @@ class Output : public Device {
                 const char* high_command="on",
                 const char* low_command="off" );
         void start();
-        void high() { 
+        Output& high() { 
             if(started()) digitalWrite(_pin, 1);
             measured_value().from(_high);
+            return *this;
         }
-        void on() { high(); }
-        void low() { 
+        Output& on() { return high(); }
+        Output& low() { 
             if(started()) digitalWrite(_pin, 0); 
             measured_value().from(_low);
+            return *this;
         }
-        void off() { low(); }
+        Output& off() { return low(); }
 
         bool is_high() {
             return value().equals(_high);
@@ -33,6 +35,19 @@ class Output : public Device {
         bool is_low() {
             return value().equals(_low);
         }
+        Output& set(const char* value) {
+            Ustring v(value);
+            if(v.equals(_high)) high();
+            else {
+                if(v.equals(_low)) low();
+            }
+            return *this;
+        }
+        void toggle() {
+            if(measured_value().equals(_high)) set(_low);
+            else set(_high);
+        }
+
         // TODO: set output "floating"?
 };
 
