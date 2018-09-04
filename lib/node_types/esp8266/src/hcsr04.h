@@ -32,7 +32,7 @@ class Hcsr04 : public Device {
             _precision = precision;
             return *this;
         }
-
+        void start();
         bool measure();
 };
 

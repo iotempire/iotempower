@@ -16,6 +16,7 @@ class Input : public Device {
         bool _pull_up = true;
         int debouncer = 0;
         void reinit() {
+            if(!started()) return;
             if(_pull_up) {
                 pinMode(_pin, INPUT_PULLUP);
             } else {
@@ -31,6 +32,9 @@ class Input : public Device {
             _pin = pin;
             with_threshold(0);
             add_subdevice(new Subdevice(""));
+        }
+        void start() {
+            _started = true;
             reinit();
         }
         bool measure();

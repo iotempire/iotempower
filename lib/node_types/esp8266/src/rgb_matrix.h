@@ -173,6 +173,10 @@ class RGB_Matrix : public RGB_Base {
             for(int i=0; i<strip_count; i++)
                 strips[i]->show();
         }
+
+        void start() {
+            _started = true;
+        }
 };
 
 

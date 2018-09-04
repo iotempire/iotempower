@@ -124,12 +124,26 @@ bool add_device(Device &device) {
     return device_list.add(&device);
 }
 
+bool devices_start() {
+    bool all_success = true;
+    device_list.for_each( [&] (Device& dev) {
+        dev.start();
+        if(!dev.started()) {
+            all_success = false;
+        }
+        return true; // Continue loop
+    } );
+    return all_success;
+}
+
 
 bool devices_update() {
-    bool changed=false;
+    bool changed = false;
     device_list.for_each( [&] (Device& dev) {
-        if(dev.poll_measure()) {
-            changed |= dev.check_changes();
+        if(dev.started()) {
+            if(dev.poll_measure()) {
+                changed |= dev.check_changes();
+            }
         }
         return true; // Continue loop
     } );
@@ -140,16 +154,18 @@ bool devices_publish(AsyncMqttClient& mqtt_client, Ustring& node_topic, bool pub
     bool published = false;
     bool first = true;
     device_list.for_each( [&] (Device& dev) {
-        if(publish_all || dev.needs_publishing()) {
-            if(first) {
-                Serial.print("Publishing");
-            }
-            if(dev.publish(mqtt_client, node_topic)) {
-                if(!first) Serial.print("; ");
-                published = true;
-            }
-            if(first) {
-                first = false;
+        if(dev.started()) {
+            if(publish_all || dev.needs_publishing()) {
+                if(first) {
+                    Serial.print("Publishing");
+                }
+                if(dev.publish(mqtt_client, node_topic)) {
+                    if(!first) Serial.print("; ");
+                    published = true;
+                }
+                if(first) {
+                    first = false;
+                }
             }
         }
         return true; // Continue loop
@@ -172,25 +188,25 @@ bool devices_subscribe(AsyncMqttClient& mqtt_client, Ustring& node_topic) {
     // subscribe to all devices that accept input
     Ustring topic;
 
-    ulog("Debug, subscribe, devices: %d", device_list.length()); // TODO: remove debug
     device_list.for_each( [&] (Device& dev) {
-        ulog("Debug, subscribe: %s", dev.get_name().as_cstr()); // TODO: remove debug
-        dev.subdevices_for_each( [&] (Subdevice& sd) {
-            if(sd.subscribed()) {
-                // construct full topic
-                topic.copy(node_topic);
-                topic.add("/");
-                topic.add(dev.get_name());
-                if(sd.get_name().length()>0) {
+        if( dev.started() ) {
+            dev.subdevices_for_each( [&] (Subdevice& sd) {
+                if(sd.subscribed()) {
+                    // construct full topic
+                    topic.copy(node_topic);
                     topic.add("/");
-                    topic.add(sd.get_name());
+                    topic.add(dev.get_name());
+                    if(sd.get_name().length() > 0) {
+                        topic.add("/");
+                        topic.add(sd.get_name());
+                    }
+                    uint16_t packetIdSub = mqtt_client.subscribe(topic.as_cstr(), 0);
+                    ulog("Subscribing to %s with id %d.", 
+                        topic.as_cstr(), packetIdSub);
                 }
-                uint16_t packetIdSub = mqtt_client.subscribe(topic.as_cstr(), 0);
-                ulog("Subscribing to %s with id %d.", 
-                    topic.as_cstr(), packetIdSub);
-            }
-            return true; // continue subdevice loop
-        } ); // end foreach - iterate over subdevices
+                return true; // continue subdevice loop
+            } ); // end foreach - iterate over subdevices
+        } // endif dev.started()
         return true; //continue loop device loop
     } ); // end foreach - iterate over devices
     return true; // TODO: decide if error occured

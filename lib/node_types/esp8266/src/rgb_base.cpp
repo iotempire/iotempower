@@ -79,19 +79,6 @@ RGB_Base::RGB_Base(const char* name, int led_count) :
             return true;
         }
     );
-    // add_subdevice(new Subdevice("animate",true))->with_receive_cb(
-    //     [&] (const Ustring& payload) {
-    //         Ustring command(payload);
-    //         for(int i=0; i<(int)command_map_count; i++) {
-    //             if(command.starts_with(command_map[i].key)) {
-    //                 command.remove(0,strlen(command_map[i].key)+1);
-    //                 command_map[i].method(*this, command);
-    //                 break;
-    //             }
-    //         }
-    //         return true;
-    //     }
-    // );
 }
 
 void RGB_Base::set_colorstr(int lednr, const Ustring& color, bool _show) {

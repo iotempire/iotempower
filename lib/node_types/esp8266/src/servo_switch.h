@@ -64,6 +64,7 @@ class Servo_Switch : public Servo {
         }
         void set(const Ustring& status);
         bool measure(void);
+        // void start() //handled in base class
 };
 
 

@@ -25,6 +25,9 @@ class Dht : public Device {
             add_subdevice(new Subdevice("humidity"));
             measure();
         }
+        void start() {
+            _started = true;
+        }
         bool measure();
 };
 
@@ -39,27 +42,28 @@ class Ds18b20 : public Device {
         DallasTemperature *sensors;
         unsigned long _read_interval = 1000; // only read every interval ms
         unsigned long last_read = millis() - _read_interval;
-        bool initialized = false;
     public:
         Ds18b20(const char* name, uint8_t pin) :
             Device(name) {
             _pin = pin;
-            one_wire = new OneWire(_pin); // TODO: think about a destructor
+            add_subdevice(new Subdevice(""));
+        }
+        void start() {
+             // TODO: think about destructor(s)
+            one_wire = new OneWire(_pin);
+            if(!one_wire) return;
             sensors = new DallasTemperature(one_wire);
-            add_subdevice(new Subdevice("")); // TODO: think about a destructor
+            if(!sensors) return;
             sensors->begin();
             if (!sensors->getAddress(first, 0)) {
                 ulog("Unable to find address for Device 0. Sensor will not work.");
-            } else {
-                initialized = true;
-            }
+                return;
+            } 
+            _started = true;
             measure();
         }
-        bool is_initialized() { return initialized; }
         bool measure();
-        ~Ds18b20() {
-
-        }
+        ~Ds18b20() {}
 };
 
 

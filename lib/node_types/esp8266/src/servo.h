@@ -42,6 +42,7 @@ class Servo : public Device {
         void turn_to(int value);
         void set(int value);
         virtual bool measure(void);
+        void start();
 };
 
 

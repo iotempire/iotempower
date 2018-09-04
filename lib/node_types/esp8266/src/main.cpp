@@ -308,7 +308,7 @@ void onMqttMessage(char *topic, char *payload,
     Serial.print(" payload: >");
     Serial.print(upayload.as_cstr());
     Serial.println("<");
-
+    
     devices_receive(utopic, upayload);
 }
 
@@ -416,7 +416,8 @@ void setup() {
         if (mqtt_user[0]) { // auth given
             mqttClient.setCredentials(mqtt_user, mqtt_password);
         }
-        start(); // define all devices
+        devices_start(); // call start of all devices
+        start(); // call user start from setup.cpp
         connectToMqtt(); // only subscribe after setup
     }
 }

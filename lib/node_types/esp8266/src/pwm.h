@@ -30,6 +30,10 @@ class Pwm : public Device {
             return *this;
         }
         void set(int duty, int frequency);
+        void start() {
+            _started = true;
+            set(_duty, _frequency);
+        }
 };
 
 // TODO: add device for creating tones (just control by frequency and use duration)

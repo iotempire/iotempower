@@ -19,6 +19,7 @@ class Edge_Counter : public Device {
         void count();
     public:
         Edge_Counter(const char* name, int pin, bool rising=true, bool falling=true);
+        void start();
         bool measure();
         Edge_Counter& with_pull_up(bool pull_up=true) {
             _pull_up = pull_up;

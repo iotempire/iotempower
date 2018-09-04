@@ -27,6 +27,9 @@ bool add_device(Device& device);
  * micropython to C */
 //bool remove_device(const char* name);
 
+/* Call start on all devices */
+bool devices_start();
+
 /* measure, filter, and check values
  * return true, when any values where updated */
 bool devices_update();

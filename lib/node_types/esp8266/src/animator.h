@@ -66,6 +66,10 @@ class Animator : public Device {
         void show() {
             if(_show_handler) _show_handler();
         }
+        void start() {
+            // does nothing physical
+            _started = true;
+        }
         virtual bool measure();
 };
 

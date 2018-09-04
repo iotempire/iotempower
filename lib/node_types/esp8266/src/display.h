@@ -34,7 +34,6 @@ class Display_Base : public Device {
         // allocate text buffer (return true if successful, false otherwise)
         bool init(int w, int h);
 
-        U8G2* _display;
         int char_height, char_width;
     public:
         Display_Base(const char* name) : Device(name) { }
@@ -57,6 +56,7 @@ class Display_Base : public Device {
             return *this;
         }
 
+        virtual void start() { }; // keep _started false if this was not overwritten
         virtual void show(const char* buffer) {};
         
         bool measure();
@@ -67,36 +67,33 @@ static const char* display_ssd1306_failed = "u8g2 creation of ssd1306 failed.";
 // This is based on the U82G displays
 class Display : public Display_Base {
     private:
-        void init_u8g2(U8G2& display, const uint8_t* font);
+        uint8_t _scl;
+        uint8_t _sda;
+        int start_type = -1;
+        U8G2* _display = NULL;
+        const uint8_t* _font = NULL;
+        bool init_u8g2();
     public:
         // this only supports pixel-based (the ones with _1_) displays so far
         Display(const char* name, U8G2& display, 
             const uint8_t* font=font_medium) // small font by default
         : Display_Base(name) {
-            init_u8g2(display, font);
+            _font = font;
+            _display = &display;
+            start_type = 0;
         }
         Display(const char* name, const uint8_t* font=font_medium)
         : Display_Base(name) {
-            // TODO: think to use templates to statically reserve space for display
-            // TODO: do we need to specify default address 0x3c? 
-            auto* d = new U8G2_SSD1306_128X64_NONAME_1_HW_I2C(U8G2_R0);
-            if(d) {
-                init_u8g2(*d, font);
-            } else {
-                ulog(display_ssd1306_failed);
-            }
+            _font = font;
+            start_type = 1;
         }
         Display(const char* name, uint8_t scl, uint8_t sda,
             const uint8_t* font=font_medium)
         : Display_Base(name) {
-            // TODO: think to use templates to statically reserve space for display
-            // TODO: do we need to specify default address 0x3c? 
-            auto* d = new U8G2_SSD1306_128X64_NONAME_1_HW_I2C(U8G2_R0, scl, sda);
-            if(d) {
-                init_u8g2(*d, font);
-            } else {
-                ulog(display_ssd1306_failed);
-            }
+            _font = font;
+            _scl = scl;
+            _sda = sda;
+            start_type = 2;
         }
 
         u8g2_uint_t width_pixels() {
@@ -106,6 +103,30 @@ class Display : public Display_Base {
             return _display->getDisplayHeight();
         }
 
+        void start() {
+            switch(start_type) {
+                case 0: // display was given and init done outside
+                    _started = init_u8g2();
+                    break;
+                // TODO: think to use templates to statically reserve space for display
+                // TODO: do we need to specify default address 0x3c? 
+                case 1: // display was not given and no i2c ports easer
+                    _display = new U8G2_SSD1306_128X64_NONAME_1_HW_I2C(U8G2_R0);
+                    if(_display) {
+                        _started = init_u8g2();
+                    } else {
+                        ulog(display_ssd1306_failed);
+                    }
+                case 2: // display was not given but i2c ports were
+                    _display = new U8G2_SSD1306_128X64_NONAME_1_HW_I2C(U8G2_R0, 
+                                                _scl, _sda);
+                    if(_display) {
+                        _started = init_u8g2();
+                    } else {
+                        ulog(display_ssd1306_failed);
+                    }
+            }
+        }
         virtual void show(const char* buffer);
 };
 

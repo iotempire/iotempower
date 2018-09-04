@@ -18,6 +18,9 @@ class Analog : public Device {
         Analog(const char* name) :
             Device(name) {
             add_subdevice(new Subdevice(""));
+        }
+        void start() {
+            _started = true;
             measure();
         }
         bool measure();

@@ -8,81 +8,81 @@
 #include <device-manager.h>
 
 // use init_priority to make sure these get initialized last
-#define ULNOIOT_DEVICE(Class_Name, device_name, ...) \
-    Class_Name udev_main_ ## device_name __attribute__((init_priority(65535))) \
-        = Class_Name(#device_name, __VA_ARGS__); \
-    Class_Name& udev_ ## device_name = udev_main_ ## device_name
+#define ULNOIOT_DEVICE(Class_Name, internal_name, mqtt_name_str, ...) \
+    Class_Name ulnoiot_dev_ ## internal_name __attribute__((init_priority(65535))) \
+        = Class_Name(mqtt_name_str, __VA_ARGS__); \
+    Class_Name& internal_name = ulnoiot_dev_ ## internal_name
 
 
 #include <output.h>
-#define output(device_name, ...) \
-    ULNOIOT_DEVICE(Output, device_name, __VA_ARGS__)
+#define output(internal_name, mqtt_name_str, ...) \
+    ULNOIOT_DEVICE(Output, internal_name, mqtt_name_str, __VA_ARGS__)
 #define out(...) output(__VA_ARGS__)
 #define led(...) output(__VA_ARGS__)
 #define relais(...) output(__VA_ARGS__)
 
 
 #include <input.h>
-#define input(device_name, ...) \
-    ULNOIOT_DEVICE(Input, device_name, __VA_ARGS__)
+#define input(internal_name, mqtt_name_str, ...) \
+    ULNOIOT_DEVICE(Input, internal_name, mqtt_name_str, __VA_ARGS__)
 #define button(...) input(__VA_ARGS__)
 #define contact(...) input(__VA_ARGS__)
 
 #include <edge_counter.h>
-#define edge_counter(device_name, ...) \
-    ULNOIOT_DEVICE(Edge_Counter, device_name, __VA_ARGS__)
+#define edge_counter(internal_name, mqtt_name_str, ...) \
+    ULNOIOT_DEVICE(Edge_Counter, internal_name, mqtt_name_str, __VA_ARGS__)
 
 #include <pwm.h>
-#define pwm(device_name, ...) \
-    ULNOIOT_DEVICE(Pwm, device_name, __VA_ARGS__)
+#define pwm(internal_name, mqtt_name_str, ...) \
+    ULNOIOT_DEVICE(Pwm, internal_name, mqtt_name_str, __VA_ARGS__)
 
 #include <servo.h>
-#define servo(device_name, ...) \
-    ULNOIOT_DEVICE(Servo, device_name, __VA_ARGS__)
+#define servo(internal_name, mqtt_name_str, ...) \
+    ULNOIOT_DEVICE(Servo, internal_name, mqtt_name_str, __VA_ARGS__)
 
 #include <servo_switch.h>
-#define servo_switch(device_name, ...) \
-    ULNOIOT_DEVICE(Servo_Switch, device_name, __VA_ARGS__)
+#define servo_switch(internal_name, mqtt_name_str, ...) \
+    ULNOIOT_DEVICE(Servo_Switch, internal_name, mqtt_name_str, __VA_ARGS__)
 
 #include <hcsr04.h>
-#define hcsr04(device_name, ...) \
-    ULNOIOT_DEVICE(Hcsr04, device_name, __VA_ARGS__)
+#define hcsr04(internal_name, mqtt_name_str, ...) \
+    ULNOIOT_DEVICE(Hcsr04, internal_name, mqtt_name_str, __VA_ARGS__)
 
 #include <analog.h>
-#define analog(device_name, ...) \
-    ULNOIOT_DEVICE(Analog, device_name, __VA_ARGS__)
+#define analog(internal_name, mqtt_name_str, ...) \
+    ULNOIOT_DEVICE(Analog, internal_name, mqtt_name_str, __VA_ARGS__)
 
 #include <th.h>
-#define dht(device_name, ...) \
-    ULNOIOT_DEVICE(Dht, device_name, __VA_ARGS__)
+#define dht(internal_name, mqtt_name_str, ...) \
+    ULNOIOT_DEVICE(Dht, internal_name, mqtt_name_str, __VA_ARGS__)
 #define dht11(...) dht(__VA_ARGS__)
 #define dht22(...) dht(__VA_ARGS__)
-#define ds18b20(device_name, ...) \
-    ULNOIOT_DEVICE(Ds18b20, device_name, __VA_ARGS__)
+#define ds18b20(internal_name, mqtt_name_str, ...) \
+    ULNOIOT_DEVICE(Ds18b20, internal_name, mqtt_name_str, __VA_ARGS__)
 #define dallas(...) ds18b20(__VA_ARGS__)
 
 #include <rgb_single.h>
-#define rgb_single(device_name, ...) \
-    ULNOIOT_DEVICE(RGB_Single, device_name, __VA_ARGS__)
+#define rgb_single(internal_name, mqtt_name_str, ...) \
+    ULNOIOT_DEVICE(RGB_Single, internal_name, mqtt_name_str, __VA_ARGS__)
 
 #include <rgb_strip.h>
-#define rgb_strip(device_name, led_count, type, ...) \
+#define rgb_strip(internal_name, mqtt_name_str, led_count, type, ...) \
     CRGB (name ## leds)[led_count]; \
-    ULNOIOT_DEVICE(RGB_Strip, device_name, led_count, \
+    ULNOIOT_DEVICE(RGB_Strip, internal_name, mqtt_name_str, led_count, \
         FastLED.addLeds< type, __VA_ARGS__ >((name ## leds), led_count), __VA_ARGS__)
 
 #include <rgb_matrix.h>
-#define rgb_matrix(device_name, ...) \
-    ULNOIOT_DEVICE(RGB_Matrix, device_name, __VA_ARGS__)
+#define rgb_matrix(internal_name, mqtt_name_str, ...) \
+    ULNOIOT_DEVICE(RGB_Matrix, internal_name, mqtt_name_str, __VA_ARGS__)
 
 #include <animator.h>
-#define animator(device_name, ...) \
-    ULNOIOT_DEVICE(Animator, device_name, __VA_ARGS__)
+#define animator(internal_name, mqtt_name_str, ...) \
+    ULNOIOT_DEVICE(Animator, internal_name, mqtt_name_str, __VA_ARGS__)
 
 #include <display.h>
-#define display(device_name, ...) \
-    ULNOIOT_DEVICE(Display, device_name, __VA_ARGS__)
-#define display44780(device_name, ...) \
-    ULNOIOT_DEVICE(Display44780, device_name, __VA_ARGS__)
+#define display(internal_name, mqtt_name_str, ...) \
+    ULNOIOT_DEVICE(Display, internal_name, mqtt_name_str, __VA_ARGS__)
+#define display44780(internal_name, mqtt_name_str, ...) \
+    ULNOIOT_DEVICE(Display44780, internal_name, mqtt_name_str, __VA_ARGS__)
 
 #endif // _DEVICES_H_

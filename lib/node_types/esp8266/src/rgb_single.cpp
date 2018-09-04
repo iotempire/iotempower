@@ -4,6 +4,7 @@
 #include "rgb_single.h"
 
 void RGB_Single::process_color(int lednr, CRGB color, bool show) {
+    if(!started()) return;
     // ignore show
     // this is a controller for single led, so we ignore lednr
     if(invert) {

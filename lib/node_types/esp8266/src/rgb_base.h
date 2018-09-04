@@ -38,6 +38,7 @@ class RGB_Base : public Device {
         void set_colorstr(const Ustring& color, bool _show=true);
 
         void set_color( int lednr, CRGB color, bool _show=true) {
+            if(!started()) return;
             if(lednr<0) {
                 if(lednr==ALL_LEDS) {
                     for(int nr=0; nr<led_count(); nr++) 
@@ -59,13 +60,19 @@ class RGB_Base : public Device {
         void push_front(CRGB color, bool _show=true);
         void push_back(CRGB color, bool _show=true);
 
-        // these 3 should be re-implemented
+        // these 4 need be re-implemented
+        virtual void start() {
+            // keep _started at false
+        }
+
         virtual void process_color(int lednr, CRGB color, bool _show=true) {
             avg_color = color;
         }
+
         virtual CRGB get_color(int lednr) {
             return avg_color;
         }
+
         virtual void show() {
             // nothing by default
         }

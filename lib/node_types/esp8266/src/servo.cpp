@@ -7,7 +7,11 @@ void Servo::init(uint8_t pin, int min_us, int max_us, int duration) {
     _min_us = min_us;
     _max_us = max_us;
     _duration = duration;
+}
+
+void Servo::start() {
     start_time = millis();
+    _started = true;
 }
 
 void Servo::do_register() {
@@ -22,6 +26,7 @@ void Servo::do_register() {
 }
 
 void Servo::turn_to(int value) {
+    if(!started()) return;
     if(stopped) {
         _servo.attach(_pin, _min_us, _max_us);
         stopped = false;
@@ -44,6 +49,7 @@ bool Servo::measure() {
 }
 
 void Servo::stop() {
+    if(!started()) return;
     _servo.detach();
     stopped = true;
 }

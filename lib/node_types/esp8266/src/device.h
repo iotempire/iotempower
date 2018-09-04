@@ -71,6 +71,9 @@ class Device {
         #define ULNOIOT_FILTER_CALLBACK std::function<bool(Device&)>
         ULNOIOT_FILTER_CALLBACK _filter_cb=NULL;
 
+    protected:
+        bool _started = false;
+
     public:
         Device(const char* _name);
         //// Getters & Setters
@@ -152,6 +155,36 @@ class Device {
             return subdevices.for_each(func);
         }
 
+        bool started() { return _started; }
+
+        /* poll_measure
+         * This calls measure and filters and sets if necessary default values. 
+         * This will be called very often from event loop
+         * Will return if current measurement was successful or invalid. 
+         * */
+        bool poll_measure();
+
+        /* check_changes
+         * returns True if new values were measured and sets the publishing flag
+         * This will be called very often from event loop 
+         * This only reports change when the measured (and filtered) 
+         * value is new (has changed) and report_changes is set.
+         * If a change happened and a callback is set, the callback is called.
+         * */
+        bool check_changes();
+
+        /* start
+         * This usually needs to be overwritten
+         * Any physical initialization has to go here.
+         * This is executed by the system right after all the rest has been 
+         * intialized - right before the first subscription.
+         * If something with the physical initialization goes wrong, started
+         * should stay false. If physical intitialization worked this method
+         * needs to set _started to true;
+         * TODO: make protected?
+         * */
+        virtual void start() { _started = true; }
+
         /* measure
          * Does nothing by default.
          * Usually this needs to be overwritten.
@@ -162,24 +195,9 @@ class Device {
          * If no value can be measured (or has not been), it should return
          * false. If measuring was successful, return True.
          * This is called from update to trigger the actual value generation.
-         */
+         * TODO: make protected?
+         * */
         virtual bool measure() { return true; }
-
-        /* poll_measure
-         * This calls measure and filters and sets if necessary default values. 
-         * This will be called very often from event loop
-         * Will return if current measurement was successful or invalid. 
-         */
-        bool poll_measure();
-
-        /* check_changes
-         * returns True if new values were measured and sets the publishing flag
-         * This will be called very often from event loop 
-         * This only reports change when the measured (and filtered) 
-         * value is new (has changed) and report_changes is set.
-         * If a change happened and a callback is set, the callback is called.
-         */
-        bool check_changes();
 };
 
 #endif // _ULNOIOT_DEVICE_H_

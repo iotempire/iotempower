@@ -19,7 +19,10 @@ class RGB_Strip : public RGB_Base {
         : RGB_Base(name, _led_count) {
             controller = &_controller;
             leds = controller->leds();
-            set_color(ALL_LEDS, CRGB::Black);            
+        }
+        void start() {
+            _started = true;
+            set_color(ALL_LEDS, CRGB::Black);
         }
         virtual void process_color(int lednr, CRGB color, bool _show=true) {
             leds[lednr] = color;
@@ -31,6 +34,7 @@ class RGB_Strip : public RGB_Base {
             return leds[lednr];
         }
         virtual void show() {
+            if(!started()) return;
             controller->showLeds(); // TODO: handle brightness of showLeds?
         }
 };

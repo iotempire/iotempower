@@ -25,21 +25,25 @@ Hcsr04::Hcsr04(const char* name, uint8_t trigger_pin, uint8_t echo_pin,
     
     _timeout_us = timeout_us;
     _echo_pin = echo_pin;
-    pinMode(_echo_pin, INPUT); // no pullup
     _trigger_pin = trigger_pin;
+    add_subdevice(new Subdevice(""));
+}
+
+void Hcsr04::start() {
+    pinMode(_echo_pin, INPUT); // no pullup
     pinMode(_trigger_pin, OUTPUT);
     digitalWrite(_trigger_pin, 0);
     last_triggered = micros()-(ULNOIOT_HCSR04_INTERVAL*1000);
     delay(1);  // let port settle
-
-    add_subdevice(new Subdevice(""));
-
     attachInterrupt(digitalPinToInterrupt(_echo_pin),
          [&] () { echo_changed(); }, CHANGE); 
+    _started = true;
 }
 
 
 bool Hcsr04::measure() {
+    if(!started()) return false;
+
     unsigned long current = micros();
 
     // Eventually trigger new signal

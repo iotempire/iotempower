@@ -119,6 +119,7 @@ void Display_Base::clear() {
 }
 
 bool Display_Base::measure() {
+    if(!started()) return false;
     unsigned long current = millis();
     if(current - last_frame >= frame_len) {
         show(textbuffer);
@@ -128,16 +129,18 @@ bool Display_Base::measure() {
 }
 
 
-void Display::init_u8g2(U8G2& display, const uint8_t* font) {
-    _display = &display;
-    _display->setFont(font);
+bool Display::init_u8g2() {
+    _display->setFont(_font);
     char_height = _display->getMaxCharHeight();
     char_width = _display->getMaxCharWidth();
     set_fps(10); // can be low for these type of displays and just showing text
-    _display->begin();
-    if(init( _display->getWidth() / char_width, _display->getHeight() / char_height)) {
-        clear();
+    if(_display->begin()) {
+        if(init( _display->getWidth() / char_width, _display->getHeight() / char_height)) {
+            clear();
+        }
+        return true;
     }
+    return false;
 }
 
 void Display::show(const char* buffer) {
