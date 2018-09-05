@@ -5,6 +5,8 @@
 # Author: ulno
 # Create date: 2017-07-12
 #
+echo "This is currently broken - need to check with author why."
+exit 1
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 

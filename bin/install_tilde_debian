@@ -50,11 +50,11 @@ if [[ ! -d "$TILDEDIR" || "$*" = "clean" ]]; then
 
     wget http://os.ghalkes.nl/dist/libtranscript-0.3.3.tar.bz2
     wget http://os.ghalkes.nl/dist/libt3config-0.2.11.tar.bz2
-    wget http://os.ghalkes.nl/dist/libt3key-0.2.7.tar.bz2
-    wget http://os.ghalkes.nl/dist/libt3window-0.2.6.tar.bz2
-    wget http://os.ghalkes.nl/dist/libt3widget-0.5.4.tar.bz2
+    wget http://os.ghalkes.nl/dist/libt3key-0.2.9.tar.bz2
+    wget http://os.ghalkes.nl/dist/libt3window-0.3.0.tar.bz2
+    wget http://os.ghalkes.nl/dist/libt3widget-0.6.2.tar.bz2
     wget http://os.ghalkes.nl/dist/libt3highlight-0.4.5.tar.bz2
-    wget http://os.ghalkes.nl/dist/tilde-0.3.9.tar.bz2
+    wget http://os.ghalkes.nl/dist/tilde-0.4.0.tar.bz2
 
     for a in $(ls *.tar.bz2); do
         tar xjf "$a"
