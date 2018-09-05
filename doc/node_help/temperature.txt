@@ -1,7 +1,8 @@
-dht("name", pin);
-or dht11, dht22
-ds18x20("name", pin);
-or dallas
+dht(internal_name, "external_name", pin);
+Other names: dht11, dht22
+
+ds18x20(internal_name, "external_name", pin);
+Other names: dallas
 
 Create a new temperature (+ humidity) sensor device.
 name will be appended to the mqtt topic and corresponding
@@ -11,7 +12,9 @@ Currently the dht11, dht22, and ds18x20 chips are supported. Chose
 the respective creation method.
 
 Parameters:
-- name: the name it can be addressed under
+- internal_name: name of variable to create to address this device inside
+  this file by other devices or helper functions.
+- external_name: the name it can be addressed via MQTT in the network.
 - pin: the gpio pin
 
 With .with_filter a filter function can be specified: (see uhelp filter).

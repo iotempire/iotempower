@@ -8,26 +8,28 @@ supported.
 Name will be appended to the mqtt topic.
 Under the resulting topic will be the following subtopics:
 - set: turn on or off
-- brightnes/status, brightness/set: read and set brightness (0-255)
-- rgb/status, rgb/set: read and set color as colorname, 6-digit hexcode (rrggbb)
-                       or comma separated triplet (r,g,b)
+- brightness/status, brightness/set: read and set brightness (0-255)
+- rgb/status, rgb/set: read and set color as colorname, 6-digit hexcode 
+                       (rrggbb) or comma separated triplet (r,g,b)
                        This also takes a number to just affect one led
                        It also takes the words front and back, which will
                        push the new color into strip (from the front or the
                        back) and move all other led-colors by one
 
 Parameters:
-- name: the name it can be addressed under
+- internal_name: name of variable to create to address this device inside
+  this file by other devices or helper functions.
+- external_name: the name it can be addressed via MQTT in the network.
 - data_pin: the data-pin the led strip is connected to
 - num_led: number of leds on strip
-- ...other FastLed parameters... - data related to chip configuration (use
+- ...other FastLed parameters...: data related to chip configuration (use
   same format as in pointy brackets in FastLED.addLeds<>).
 
 Example (node name: living room/tvlights):
-rgb_strip("rgb2", 10, WS2811, D6, BRG);
+rgb_strip(strip2, "rgb2", 10, WS2811, D6, BRG);
 
 Now the second RGB LED can be switched to red via sending to the mqtt-broker
 to the topic "living room/tvlights/rgb2/rgb/set" the command "2 red" or
-"push red"
+"front red"
 
-check also uhelp rgb_matrix and uhelp animator
+Check also uhelp rgb_matrix and uhelp animator

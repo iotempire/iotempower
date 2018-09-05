@@ -1,4 +1,4 @@
-analog("name")
+analog(internal_name, "external_name")
   [.with_precision(precision)]
   [.with_threshold(threshold_value, "high_word", "low_word")]
   [.with_filter(filter_function)]
@@ -15,17 +15,19 @@ they have been read from the analog port to for example buffer some values
 and build an average, median, or even implement a (fast) fourier transformation.
 
 Parameters:
-- name: the name it can be addressed under
+- internal_name: name of variable to create to address this device inside
+  this file by other devices or helper functions.
+- external_name: the name it can be addressed via MQTT in the network.
 - precision: report only changes with at least this delta
-- threshold: turn into digital sensor, sending high_word when threshold is reached
-  and low_word if not.
+- threshold: turn into digital sensor, sending high_word when threshold is 
+  reached and low_word if not.
 - filter_function: specify a preprocessor for measured values
   (see uhelp filter).
 
 Example:
-nodename: basement/water-sensor01
+Assuming nodename is basement/water-sensor01.
 
-analog("water").with_precision(10).with_threshold(100,"water","dry");
+analog(w0, "water").with_precision(10).with_threshold(100,"water","dry");
 
 Now, a value of water is sent to "basement/water-sensor01/water", when the analog
 port reads a value of more than 90 (threshold - precision). It will start

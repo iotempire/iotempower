@@ -1,4 +1,4 @@
-rgb_single("name", pin_r, pin_g, pin_b);
+rgb_single(internal_name, "external_name", pin_r, pin_g, pin_b);
 
 Create a new rgb device object for an rgb-led connected to the pins
 pin_r (red pin), pin_g (green pin), and pin_b (blue pin).
@@ -10,7 +10,9 @@ Under the resulting topic will be the following subtopics:
                        or comma separated triplet (r,g,b)
 
 Parameters:
-- name: the name it can be addressed under
+- internal_name: name of variable to create to address this device inside
+  this file by other devices or helper functions.
+- external_name: the name it can be addressed via MQTT in the network.
 - pin_r, pin_g, pin_b: the gpiopin for red, green, and blue lines
 - ignore_case: should case in the command detection be ignored
 

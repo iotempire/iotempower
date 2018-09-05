@@ -1,14 +1,18 @@
 TODO
+So far just an example:
 
-auto& strip1 = rgb_strip("strip1", 150, WS2811, D6, BRG);
-auto& strip2 = rgb_strip("strip2", 150, WS2811, D5, BRG);
-auto& strip3 = rgb_strip("strip3", 150, WS2811, D4, BRG);
-auto& strip4 = rgb_strip("strip4", 150, WS2811, D1, BRG);
+/* setup.cpp */
 
+// RGB strips
+rgb_strip(strip1, "strip1", 50, WS2811, D3, BRG);
+rgb_strip(strip2, "strip2", 50, WS2811, D5, BRG);
+rgb_strip(strip3, "strip3", 50, WS2811, D4, BRG);
+rgb_strip(strip4, "strip4", 50, WS2811, D1, BRG);
 
-auto& matrix = rgb_matrix("matrix", 150, 4)
-        .with(strip1, 0, 0)
-        .with(strip2, 0, 1)
-        .with(strip3, 0, 2)
-        .with(strip4, 0, 3);
+// A matrix consisting of several strips
+rgb_matrix(matrix, "matrix", 25, 4)
+        .with(strip1, 0, 0, Right_Down, 25)
+        .with(strip2, 0, 1, Right_Down, 25)
+        .with(strip3, 0, 2, Right_Down, 25)
+        .with(strip4, 0, 3, Right_Down, 25);
 
