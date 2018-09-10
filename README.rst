@@ -124,7 +124,7 @@ managed by `PlatformIO <http://platform.io>`__. However, ulnoiot abstracts a
 lot of the burden of repetitive device management away from the user so that
 attaching a device to a node usually boils down to just writing one line of
 code, which you can adapt from plenty of examples.
-Earlier versions were based on `micropythonmicropython <http://www.micropython.org/>`__,
+Earlier versions were based on `micropython <http://www.micropython.org/>`__,
 however, porting some of the C++-based Arduino device driver libraries, managing 
 remote access, updates, dealing with very little memory, and a slightly defunct
 community, made mangement very hard leading us to the decision to switch to an
