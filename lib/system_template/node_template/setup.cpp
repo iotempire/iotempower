@@ -1,65 +1,74 @@
-/* config.cpp
-This is the configuration code for a ulnoiot node.
-Here, you define all the devices (and eventually their interactions)
-connected to the node specified with this directory.
-*/
+/* setup.cpp
+ * This is the configuration code for a ulnoiot node.
+ * Here, you define all the devices (and eventually their interactions)
+ * connected to the node specified with this directory.
+ * If you want to see more device configuration examples,
+ * check $ULNOIOT_ROOT/examples/running-node-test-setup.cpp
+ * */
 
-// Always start include this to make everything from ulnoiot available.
-// Therefore, do not delete the following line.
-#include <ulnoiot.h>
+// The following is mostly example code, adjust to your needs accordingly.
+// wifi and network and mqtt setup are done automatically
+// based on global system definitions or values set in system.conf
+//
+// For some of the following example explanations, we assume that the current 
+// node-name is test1
+// and that this configuration is located in the folder myroom
 
-// The following is just example code, adjust to your needs accordingly.
+//////// Global Variables ////////
+// You might need in some cases to define global variable here
+// Example:
+// bool my_global_state = false;
 
-// wifi and network connect are done automatically
-// We assume for the example below that node topic is myroom/test1
-
-// You might need to define some callback funtions here (for filters
+//////// Device setup  ////////
+// All device setup/configuration needs to be done here,
+// look for the following commented examples for reference
+// and uncomment and modify as needed
+// check the output of uhelp at the ulnoiot command prompt for other
+// supported devices and options.
+// You might need to define some callback functions here (for filters
 // or interactions).
 
-// The following line needs to always exist for syntactical reasons
-void setup() {
-    // All device setup/configuration needs to be done here,
-    // look for the following commented examples for reference
-    // and uncomment and modify as needed
-    // check the output of uhelp at the ulnoiot command prompt for other
-    // supported devices and options.
+// Led/Output example:
+// The onboard-led is always available on development boards.
+// With this configuration it will report under myroom/test1/blue
+// and can be set via sending off or on to myroom/test1/blue/test.
+// output(blue_led, "blue", ONBOARDLED, "off", "on").set("off");
 
+// Input/button example:
+// Add a button with a slightly higher debounce rate, which will report
+// in the topic myroom/test1/button1.
+// input(b1, "button1", D3, "released", "pressed")
+//     .with_threshold(3)
+//     .with_on_change_callback([&] {
+//         if(b1.is("pressed")) {
+//             blue_led.toggle();
+//         }
+//     });
 
-    // All device setup/configuration needs to be done here,
-    // look for the following commented examples for reference
-    // and uncomment and modify as needed
-    // check the output of uhelp at the ulnoiot command prompt for other
-    // supported devices and options.
+// Examples for analog device:
+// analog(a0, "a0").with_precision(5); //.with_threshold(100, "high", "low");
 
-    // The onboard-led is always available.
-    // With this configuration it will report under myroom/test1/blue
-    // and can be set via sending off or on to myroom/test1/blue/test.
-    // make sure to use aut& as a type to have a rela reference of the object
-    // which can be used in callbacks.
-    // auto& blue = output("blue", onboardled, "off", "on");
-    // blue.low(); // turn on (onboadled is reversed)
-    
-    // Add some other devices (all commented out)
-    // Add a button with a slightly higher debounce rate, which will report
-    // in the topic myroom/test1/button1 and switch the led locally through
-    // a callback.
-    // input("button1", d3, "released", "pressed")
-    //     .with_threshold(2)
-    //     .with_on_change_callback( [&] (Device& dev) {
-    //         if(dev.value().equals("pressed")) {
-    //             if(blue.is_low()) {
-    //                 blue.high();
-    //             } else {
-    //                 blue.low();
-    //             }
-    //         }
-    //     });
-    
-    // Count rising signals on d2=Pin(4) and
-    // report number counted at myroom/test1/shock1.
-    // trigger("shock1", 4);
+// Examples for displays
+//display(display1, "d1", font_medium);
+//display44780(display2, "d2", 16, 2);
 
-    // Send updates of current status every 10s (default is 5)
-    // transmission_interval(10);
+// Example for pulse width modulation
+// pwm(blue_led, "blue", ONBOARDLED).with_frequency(1000);
 
-} // end setup <- This line needs to be kept, too
+// Optional init function, which is called right before device initialization
+// (allows for example the reconnection of the global I2C bus).
+// void init() {
+//      i2c_global(D3,D4);
+// } // end init
+
+// Optional start function, which is called directly after all devices are
+// started. Here you can define everything to get things started, often nothing 
+// void start() { // begin start, uncomment, if you need to start things 
+//
+//     // Trigger first blink
+//     do_later(2000, blink);
+//
+//     // Send updates of current status every 10s (default 5)
+//     transmission_interval(10);
+//
+// } // end start

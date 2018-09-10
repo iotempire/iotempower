@@ -124,13 +124,13 @@ managed by `PlatformIO <http://platform.io>`__. However, ulnoiot abstracts a
 lot of the burden of repetitive device management away from the user so that
 attaching a device to a node usually boils down to just writing one line of
 code, which you can adapt from plenty of examples.
-Earlier versions were based one micropython <http://www.micropython.org/>`__,
-however porting some of the C++-based Arduino device driver libraries, managing 
+Earlier versions were based on `micropythonmicropython <http://www.micropython.org/>`__,
+however, porting some of the C++-based Arduino device driver libraries, managing 
 remote access, updates, dealing with very little memory, and a slightly defunct
 community, made mangement very hard leading us to the decision to switch to an
-admittedly harder to program exosystem, however, we earned the access to a huge
-and active community making problem solving and extensions much easier. We
-don't regret the switch.
+admittedly harder to program environment, however, we earned the access to the huge
+and active Arduino community making problem solving and extensions much easier. We
+do not regret the switch.
 
 There was some initial effort in creating a starter development kit for
 the Wemos D1 Mini - you can see more information `here

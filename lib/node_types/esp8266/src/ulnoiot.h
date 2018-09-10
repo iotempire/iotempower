@@ -13,11 +13,6 @@
 // needs to be last
 #include "pins.h"
 
-// obsoleted through use of start: // TODO: remove at one point
-// allow using more familiar naming scheme for setup and loop
-//#define setup() ulnoiot_setup()
-//#define loop() ulnoiot_loop()
-
 /* Set the amount of seconds to pass before doing full status report.
  * If interval=0, only report changes.
  *  */

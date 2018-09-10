@@ -17,7 +17,8 @@ ulnoiot tilde editor from release installer
 ===========================================
 
 Welcome to the ulnoiot tilde editor for debian-systems installer (it might also
-work for other systems, but does nto automatically install dependencies).
+work for other (non-debian-based) systems, but does not automatically install 
+dependencies for them).
 
 Run as:
 install_tilde [clean]

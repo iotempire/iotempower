@@ -28,7 +28,8 @@
 #include "wifi-config.h" // will only be filled if progammed via serial
 
 // ulnoiot functions for user modification in setup.cpp
-void start();
+void (ulnoiot_init)() __attribute__((weak));
+void (ulnoiot_start)() __attribute__((weak));
 
 int long_blinks = 0, short_blinks;
 
@@ -416,8 +417,9 @@ void setup() {
         if (mqtt_user[0]) { // auth given
             mqttClient.setCredentials(mqtt_user, mqtt_password);
         }
+        if(ulnoiot_init) ulnoiot_init(); // call user init from setup.cpp
         devices_start(); // call start of all devices
-        start(); // call user start from setup.cpp
+        if(ulnoiot_start) ulnoiot_start(); // call user start from setup.cpp
         connectToMqtt(); // only subscribe after setup
     }
 }
