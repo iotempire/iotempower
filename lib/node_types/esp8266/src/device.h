@@ -173,6 +173,13 @@ class Device {
          * */
         bool check_changes();
 
+        /* measure_init
+         * Can be overloaded to allow re-initialization of some hardware
+         * elements. For example a respective i2c bus due to a very weird
+         * implementation of TwoWire in Wire.h
+         * */
+        virtual void measure_init() {}; // usually do nothing here
+
         /* start
          * This usually needs to be overwritten
          * Any physical initialization has to go here.

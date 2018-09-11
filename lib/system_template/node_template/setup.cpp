@@ -56,9 +56,7 @@
 // pwm(blue_led, "blue", ONBOARDLED).with_frequency(1000);
 
 // Optional init function, which is called right before device initialization
-// (allows for example the reconnection of the global I2C bus).
 // void init() {
-//      i2c_global(D3,D4);
 // } // end init
 
 // Optional start function, which is called directly after all devices are

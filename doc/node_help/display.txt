@@ -1,7 +1,9 @@
-display(internal_name, "external_name", u8g2_display, font=font_medium);
-display(internal_name, "external_name", [scl, sda,] font=font_medium);
+display(internal_name, "external_name", u8g2_display, font=font_medium)
+  [.ic2(sda,scl)][.with_address(i2c_address)];
+display(internal_name, "external_name", font=font_medium)
+  [.ic2(sda,scl)][.with_address(i2c_address)];
 display44780(internal_name, "external_name", width, height, 
-  [scl, sda,] font=font_medium, i2c_addr=0x27);
+  font=font_medium, i2c_addr=0x27) [.ic2(sda,scl)][.with_address(i2c_address)];
 
 
 Create a new controller for a "_1_" display supported by the u8g2 display library
@@ -20,18 +22,16 @@ Parameters:
 - internal_name: name of variable to create to address this device inside
   this file by other devices or helper functions.
 - external_name: the name it can be addressed via MQTT in the network.
-- sda: the gpiopin for sda
-- scl: the gpiopin for scl
 - width/height: dimensions of display in pixels
-- addr: the i2c address of the display.
-  For the 44780 with the PCF8574T, it's usually 0x27 (default)
-  but sometimes 0x38.
-  This is usually 0x3c for the SSD1306, but sometimes 0x3d - then the adress
-  needs to be set in the definition of the u8g2 display device. 
-  (on the SSD1306 display it says 0x7a or 0x78 respectively)
+- .i2c(sda,scl): move i2c to given ports - if not specified uses default 
+  i2c ports
+- .with_address(i2c_address): the i2c_address is the address of the display.
+  For the 44780 with the PCF8574T, it is usually 0x27 (default) but sometimes
+  0x38. For the SSD1306 it is usually 0x78 (default) or 0x7a.
+  If omitted, the default address is chosen.
 
 Example:
-display(dp, "dp1", d4, d3)
+display(dp, "dp1").i2c(D4, D3).with_address(0x78);
 
 Now the display can be controlled via sending to the mqtt-broker
 to the topic "node_topic/dp1" different text or commands.

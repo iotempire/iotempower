@@ -107,7 +107,7 @@
 //     frames[stripnr] = frame_count;
 // }
 //
-// // this defines the actial animator object
+// // this defines the actual animator object
 // animator(anim, "anim", matrix)
 //     .with_fps(10)
 //     .with_frame_builder( [&] () {
@@ -137,7 +137,7 @@
 //     } );
 
 // Examples for displays
-//display(display1, "d1", font_medium);
+display(display1, "d1", font_medium);
 //display44780(display2, "d2", 16, 2);
 
 // Example for pulse width modulation
@@ -151,9 +151,7 @@
 // };
 
 // Optional init function, which is called right before device initialization
-// (allows for example the reconnection of the global I2C bus).
 // void init() {
-// i2c_global(1,2);
 // } // end init
 
 // Optional start function, which is called directly after all devices are

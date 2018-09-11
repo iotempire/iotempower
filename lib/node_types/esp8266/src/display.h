@@ -14,13 +14,13 @@
 #include <LiquidCrystal_I2C.h> // support for PCF8574T(i2C adapter) to Hitachi 44780/1602A/LCM1602
 #include <SPI.h>
 #include <Wire.h>
-#include <device.h>
+#include <i2c_device.h>
 
 #define font_tiny u8g2_font_4x6_tr
 #define font_medium u8g2_font_5x8_tr
 #define font_large u8g2_font_8x13B_tr
 
-class Display_Base : public Device {
+class Display_Base : public I2C_Device {
     private:
         int _fps;
         unsigned long frame_len;
@@ -36,7 +36,7 @@ class Display_Base : public Device {
 
         int char_height, char_width;
     public:
-        Display_Base(const char* name) : Device(name) { }
+        Display_Base(const char* name) : I2C_Device(name) { }
 
         void scroll_up(int lines=1);
         void print(const char* str);
@@ -67,8 +67,6 @@ static const char* display_ssd1306_failed = "u8g2 creation of ssd1306 failed.";
 // This is based on the U82G displays
 class Display : public Display_Base {
     private:
-        uint8_t _scl;
-        uint8_t _sda;
         int start_type = -1;
         U8G2* _display = NULL;
         const uint8_t* _font = NULL;
@@ -86,14 +84,7 @@ class Display : public Display_Base {
         : Display_Base(name) {
             _font = font;
             start_type = 1;
-        }
-        Display(const char* name, uint8_t scl, uint8_t sda,
-            const uint8_t* font=font_medium)
-        : Display_Base(name) {
-            _font = font;
-            _scl = scl;
-            _sda = sda;
-            start_type = 2;
+            set_address(0x78);
         }
 
         u8g2_uint_t width_pixels() {
@@ -108,20 +99,18 @@ class Display : public Display_Base {
                 case 0: // display was given and init done outside
                     _started = init_u8g2();
                     break;
-                // TODO: think to use templates to statically reserve space for display
-                // TODO: do we need to specify default address 0x3c? 
-                case 1: // display was not given and no i2c ports easer
-                    _display = new U8G2_SSD1306_128X64_NONAME_1_HW_I2C(U8G2_R0);
+                // TODO: consider to use templates to statically reserve space for display
+                case 1: // display was not given and no i2c ports either
+                    _display = new U8G2_SSD1306_128X64_NONAME_1_SW_I2C(
+                        U8G2_R0, get_scl(), get_sda());
+                    _display->setI2CAddress(get_address());
+                    
+                    // _display = new U8G2_SSD1306_128X64_NONAME_1_HW_I2C(
+                    //     U8G2_R0); works but seems weird as esp8266 should have 
+                    // only sw i2c https://bbs.espressif.com/viewtopic.php?t=1032
                     if(_display) {
                         _started = init_u8g2();
-                    } else {
-                        ulog(display_ssd1306_failed);
-                    }
-                case 2: // display was not given but i2c ports were
-                    _display = new U8G2_SSD1306_128X64_NONAME_1_HW_I2C(U8G2_R0, 
-                                                _scl, _sda);
-                    if(_display) {
-                        _started = init_u8g2();
+                        ulog("SSD1306 address: %x", _display->getU8x8()->i2c_address);
                     } else {
                         ulog(display_ssd1306_failed);
                     }
@@ -137,6 +126,7 @@ class Display_HD44780_I2C : public Display_Base {
     public:
         Display_HD44780_I2C(const char* name, int w, int h, uint8_t scl, uint8_t sda, int i2c_addr=0x27) // or 0x38?
         : Display_Base(name) {
+            i2c(sda, scl);
             init_hd44780_i2c(w, h, scl, sda, i2c_addr);
         }
         Display_HD44780_I2C(const char* name, int w, int h, int i2c_addr=0x27) // sometimes 0x38?

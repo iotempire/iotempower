@@ -74,6 +74,7 @@ bool Device::publish(AsyncMqttClient& mqtt_client, Ustring& node_topic) {
 
 
 bool Device::poll_measure() {
+    measure_init(); // something might have to be executed here to init each time
     if(!measure()) {  // measure new value or trigger physical update
         // re-use last value(s), if measurement not successful
         subdevices.for_each( [](Subdevice& sd) {

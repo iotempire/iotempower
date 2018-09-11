@@ -37,6 +37,8 @@ class RGB_Base : public Device {
         void set_colorstr(int lednr, const Ustring& color, bool _show=true);
         void set_colorstr(const Ustring& color, bool _show=true);
 
+// TODO: implement setting a bar (percentage or number of leds at once)
+
         void set_color( int lednr, CRGB color, bool _show=true) {
             if(!started()) return;
             if(lednr<0) {
