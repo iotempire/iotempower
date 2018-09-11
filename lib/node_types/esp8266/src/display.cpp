@@ -119,7 +119,6 @@ void Display_Base::clear() {
 }
 
 bool Display_Base::measure() {
-    if(!started()) return false;
     unsigned long current = millis();
     if(current - last_frame >= frame_len) {
         show(textbuffer);

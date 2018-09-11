@@ -74,29 +74,32 @@ bool Device::publish(AsyncMqttClient& mqtt_client, Ustring& node_topic) {
 
 
 bool Device::poll_measure() {
-    measure_init(); // something might have to be executed here to init each time
-    if(!measure()) {  // measure new value or trigger physical update
-        // re-use last value(s), if measurement not successful
-        subdevices.for_each( [](Subdevice& sd) {
-            sd.measured_value.copy(sd.current_value);
-            return true; // continue loop
-        } );
-    } else {
-        if(_ignore_case) { // if necessary, lower them all
+    if(started()) { // only if device active
+        measure_init(); // something might have to be executed here to init each time, for example i2c setup
+        if(!measure()) {  // measure new value or trigger physical update
+            // re-use last value(s), if measurement not successful
             subdevices.for_each( [](Subdevice& sd) {
-                sd.measured_value.lower();
+                sd.measured_value.copy(sd.current_value);
                 return true; // continue loop
             } );
+        } else {
+            if(_ignore_case) { // if necessary, lower them all
+                subdevices.for_each( [](Subdevice& sd) {
+                    sd.measured_value.lower();
+                    return true; // continue loop
+                } );
+            }
         }
+        // a current value is now in measured_value
+        // check if it needs to be filtered
+        if(_filter_cb != NULL && ! _filter_cb()) {
+            // if filter defined but indicates to ignore the current measurement
+            return false; // end here with no update
+        }
+        // The measured value is now an actual, valid new measurement
+        return true;
     }
-    // a current value is now in measured_value
-    // check if it needs to be filtered
-    if(_filter_cb != NULL && ! _filter_cb()) {
-        // if filter defined but indicates to ignore the current measurement
-        return false; // end here with no update
-    }
-    // The measured value is now an actual, valid new measurement
-    return true;
+    return false;
 }
 
 bool Device::check_changes() {

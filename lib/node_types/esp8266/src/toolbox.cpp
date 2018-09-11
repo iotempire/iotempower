@@ -120,24 +120,39 @@ void Ustring::strip_param() {
     remove(0,i+1);
 }
 
+Ustring& Ustring::printf(const char *fmt, ...) {
+    va_list ap;
+    va_start(ap, fmt);
+    vsnprintf(cstr, ULNOIOT_MAX_STRLEN, fmt, ap);
+    va_end(ap);
+    return *this;
+}
+
+int Ustring::scanf(const char *fmt, ...) {
+    va_list ap;
+    va_start(ap, fmt);
+    int retval = vsscanf(cstr, fmt, ap);
+    va_end(ap);
+    return retval;
+}
 
 
 
 void reboot() {
-  // TODO: add network debugging
-  Serial.println("Rebooting in 5 seconds.");
-  delay(5000);
-  // TODO: Consider counting in rtc and going into reconfigure after a while
+    // TODO: add network debugging
+    Serial.println("Rebooting in 5 seconds.");
+    delay(5000);
+    // TODO: Consider counting in rtc and going into reconfigure after a while
 
-  // make sure, reset is clean, gpio0 has to be high
-  pinMode(0,OUTPUT);
-  digitalWrite(0,1);
-  yield();
-  delay(10);
-  yield();
-  delay(500); // let things settle a bit
-  ESP.reset(); // fails when serial activity TODO: solve or warn?
-  //ESP.restart(); // fails when serial activity TODO: solve or warn?
+    // make sure, reset is clean, gpio0 has to be high
+    pinMode(0,OUTPUT);
+    digitalWrite(0,1);
+    yield();
+    delay(10);
+    yield();
+    delay(500); // let things settle a bit
+    ESP.reset(); // fails when serial activity TODO: solve or warn?
+    //ESP.restart(); // fails when serial activity TODO: solve or warn?
 }
 
 void controlled_crash(const char * error_message) {

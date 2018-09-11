@@ -85,4 +85,9 @@
 #define display44780(internal_name, ...) \
     ULNOIOT_DEVICE(Display44780, internal_name, __VA_ARGS__)
 
+#include <gyro.h>
+#define gyro6050(internal_name, ...) \
+    ULNOIOT_DEVICE(Gyro_MPU6050, internal_name, __VA_ARGS__)
+
+
 #endif // _DEVICES_H_

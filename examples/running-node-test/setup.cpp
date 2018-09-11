@@ -11,6 +11,10 @@
 //////// Device setup  ////////
 // output example
 // output(blue_led, "blue", ONBOARDLED, "off", "on").set("off");
+// void blink() {
+//     blue_led.toggle();
+//     do_later(2000, blink);
+// };
 
 // input example
 // Add a button with a slightly higher debounce rate, which will report
@@ -137,18 +141,15 @@
 //     } );
 
 // Examples for displays
-display(display1, "d1", font_medium);
+// display(display1, "d1", font_medium);
 //display44780(display2, "d2", 16, 2);
 
 // Example for pulse width modulation
 // pwm(blue_led, "blue", ONBOARDLED).with_frequency(1000);
 
-// //// actual test code
-// output(blue_led, "blue", ONBOARDLED, "off", "on").set("on");
-// void blink() {
-//     blue_led.toggle();
-//     do_later(2000, blink);
-// };
+// Example for gyro
+gyro6050(gyro0, "g0");
+
 
 // Optional init function, which is called right before device initialization
 // void init() {

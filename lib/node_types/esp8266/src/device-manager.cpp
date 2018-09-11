@@ -140,10 +140,8 @@ bool devices_start() {
 bool devices_update() {
     bool changed = false;
     device_list.for_each( [&] (Device& dev) {
-        if(dev.started()) {
-            if(dev.poll_measure()) {
-                changed |= dev.check_changes();
-            }
+        if(dev.poll_measure()) {
+            changed |= dev.check_changes();
         }
         return true; // Continue loop
     } );

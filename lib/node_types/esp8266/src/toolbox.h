@@ -147,6 +147,9 @@ class Ustring {
         Ustring& ignore_case() {
             return ignore_case(true);
         }
+
+        Ustring& printf(const char *fmt, ...);
+        int scanf(const char *fmt, ...);
 };
 
 // small fixed size map with linear search functionality

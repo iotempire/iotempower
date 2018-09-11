@@ -1,4 +1,4 @@
-// hcsr04.cc
+// hcsr04.cpp
 
 // Important to include Functional Interrupt as else it does not allow to 
 // define a class-based (object specific) interrupt
@@ -42,8 +42,6 @@ void Hcsr04::start() {
 
 
 bool Hcsr04::measure() {
-    if(!started()) return false;
-
     unsigned long current = micros();
 
     // Eventually trigger new signal

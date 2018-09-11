@@ -1,8 +1,7 @@
-// th.cc
+// th.cpp
 #include "th.h"
 
 bool Dht::measure() {
-    if(!started()) return false;
     unsigned long current_time = millis();
     if(current_time - last_read < _read_interval) return false;
     last_read = current_time; 
@@ -12,7 +11,6 @@ bool Dht::measure() {
 }
 
 bool Ds18b20::measure() {
-    if(!started()) return false;
     unsigned long current_time = millis();
     if(current_time - last_read < _read_interval) return false;
     last_read = current_time;

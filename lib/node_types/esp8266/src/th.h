@@ -20,13 +20,13 @@ class Dht : public Device {
         Dht(const char* name, uint8_t pin) :
             Device(name) {
             _pin = pin;
-            _dht.setup(_pin);
             add_subdevice(new Subdevice("temperature"));
             add_subdevice(new Subdevice("humidity"));
-            measure();
         }
         void start() {
+            _dht.setup(_pin);
             _started = true;
+            measure();
         }
         bool measure();
 };

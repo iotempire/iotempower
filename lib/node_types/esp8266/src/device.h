@@ -202,6 +202,7 @@ class Device {
          * If no value can be measured (or has not been), it should return
          * false. If measuring was successful, return True.
          * This is called from update to trigger the actual value generation.
+         * If device is not marked as started, measure will not be called.
          * TODO: make protected?
          * */
         virtual bool measure() { return true; }
