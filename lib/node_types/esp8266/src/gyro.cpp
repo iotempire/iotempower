@@ -11,8 +11,8 @@ Gyro_MPU6050::Gyro_MPU6050(const char* name, bool calibrate_on_start) :
 }
 
 void Gyro_MPU6050::start() {
-//    mpu6050 = new MPU6050(get_address());
-    mpu6050 = new MPU6050(0x68);
+    mpu6050 = new MPU6050(get_address());
+//    mpu6050 = new MPU6050(0x68);
 
     if(mpu6050) {
         mpu6050->initialize();

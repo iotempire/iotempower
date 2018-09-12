@@ -67,7 +67,7 @@ if [[ "$2" ]]; then
     key="$2"
 fi
 
-prepare_build_dir
+prepare_build_dir apply_cache
 cd build
 
 echo "Compiling and uploading..."

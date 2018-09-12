@@ -3,7 +3,7 @@ display(internal_name, "external_name", u8g2_display, font=font_medium)
 display(internal_name, "external_name", font=font_medium)
   [.ic2(sda,scl)][.with_address(i2c_address)];
 display44780(internal_name, "external_name", width, height, 
-  font=font_medium, i2c_addr=0x27) [.ic2(sda,scl)][.with_address(i2c_address)];
+  font=font_medium) [.ic2(sda,scl)][.with_address(i2c_address)];
 
 
 Create a new controller for a "_1_" display supported by the u8g2 display library

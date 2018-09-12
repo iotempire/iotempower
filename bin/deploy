@@ -58,7 +58,7 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
         echo "Deploying user files to node $topic with address $address."
         path="$(pwd)"
 
-        prepare_build_dir
+        prepare_build_dir apply_cache
         cd build
         export PLATFORMIO_UPLOAD_PORT="$address"
         export PLATFORMIO_UPLOAD_FLAGS="--progress

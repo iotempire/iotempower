@@ -141,7 +141,7 @@
 //     } );
 
 // Examples for displays
-display(display1, "d1", font_medium);
+display(display1, "d1", font_medium).i2c(D6, D5);
 //display44780(display2, "d2", 16, 2);
 
 // Example for pulse width modulation
