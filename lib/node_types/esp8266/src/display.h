@@ -26,6 +26,7 @@ class Display_Base : public I2C_Device {
         unsigned long frame_len;
         unsigned long last_frame=millis();
         char* textbuffer;
+        bool changed=true;
     protected:
         bool delayed_scroll=false;
         int cursor_x=0, cursor_y=0;

@@ -80,6 +80,7 @@ void Display_Base::print(const char* str) {
                 delayed_scroll=false;
             }
             textbuffer[cursor_y * columns + cursor_x] = ch;
+            changed = true;
             cursor_x ++;
             if(cursor_x >= columns) {
                 cursor_x=0;
@@ -121,7 +122,10 @@ void Display_Base::clear() {
 bool Display_Base::measure() {
     unsigned long current = millis();
     if(current - last_frame >= frame_len) {
-        show(textbuffer);
+        if(changed) {
+            show(textbuffer);
+            changed = false;
+        }
         last_frame = current;
     }
     return false;

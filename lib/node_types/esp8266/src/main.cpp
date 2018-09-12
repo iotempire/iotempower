@@ -453,7 +453,7 @@ void loop() {
             if (current_time - last_measured >= _measure_delay) {
                 devices_update();
                 last_measured = current_time;
-                if (micros() - last_published >= MIN_PUBLISH_TIME) {
+                if (current_time - last_published >= MIN_PUBLISH_TIME_MS) {
                     // go through devices and send reports if necessary
                     if (transmission_delta > 0 &&
                         current_time - last_transmission >=

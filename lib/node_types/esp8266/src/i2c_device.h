@@ -10,7 +10,7 @@
 #include <Wire.h>
 #include <device.h>
 
-#define ULNOIOT_DEFAULT_I2C_CLOCK 100000
+#define ULNOIOT_DEFAULT_I2C_CLOCK 400000
 // seems like esp8266 has only sw i2c
 // compare here: https://bbs.espressif.com/viewtopic.php?t=1032
 
@@ -19,6 +19,7 @@ class I2C_Device : public Device {
         uint8_t sda_pin;
         uint8_t scl_pin;
         uint8_t _i2c_address = 255;
+        bool cleared = false; // bus need to be cleared when we start
         unsigned int clock_speed;
         void init_i2c(uint8_t sda, uint8_t scl, unsigned int clock) {
             sda_pin = sda;
@@ -54,6 +55,20 @@ class I2C_Device : public Device {
         uint8_t get_sda() { return sda_pin; }
         uint8_t get_scl() { return scl_pin; }
         uint8_t get_address() { return _i2c_address; }
+
+        /**
+         * This routine turns off the respective I2C bus and clears it
+         * on return SCA and SCL pins are tri-state inputs.
+         * You need to call Wire.begin() after this to re-enable I2C
+         * This routine does NOT use the Wire library at all.
+         *
+         * returns 0 if bus cleared
+         *         1 if SCL held low.
+         *         2 if SDA held low by slave clock stretch for > 2sec
+         *         3 if SDA held low after 20 clocks.
+         * Check cpp code for copyright notice.
+         */
+        int clear_bus();
 
         /* measure_init
          * all i2c params have to be reinitilized all the time.

@@ -127,6 +127,7 @@ bool add_device(Device &device) {
 bool devices_start() {
     bool all_success = true;
     device_list.for_each( [&] (Device& dev) {
+        dev.measure_init(); // init eventually i2c
         dev.start();
         if(!dev.started()) {
             all_success = false;

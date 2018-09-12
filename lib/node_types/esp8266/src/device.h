@@ -130,11 +130,23 @@ class Device {
         Device& set_on_change_callback(ULNOIOT_ON_CHANGE_CALLBACK on_change_cb) { 
             return with_on_change_callback(on_change_cb);
         }
+        Device& with_on_change(ULNOIOT_ON_CHANGE_CALLBACK on_change_cb) { 
+            return with_on_change_callback(on_change_cb);
+        }
+        Device& set_on_change(ULNOIOT_ON_CHANGE_CALLBACK on_change_cb) { 
+            return with_on_change_callback(on_change_cb);
+        }
         Device& with_filter_callback(ULNOIOT_FILTER_CALLBACK filter_cb) { 
             _filter_cb = filter_cb;
             return *this;
         }
         Device& set_filter_callback(ULNOIOT_FILTER_CALLBACK filter_cb) { 
+            return with_filter_callback(filter_cb);
+        }
+        Device& with_filter(ULNOIOT_FILTER_CALLBACK filter_cb) { 
+            return with_filter_callback(filter_cb);
+        }
+        Device& set_filter(ULNOIOT_FILTER_CALLBACK filter_cb) { 
             return with_filter_callback(filter_cb);
         }
 

@@ -141,14 +141,23 @@
 //     } );
 
 // Examples for displays
-// display(display1, "d1", font_medium);
+display(display1, "d1", font_medium);
 //display44780(display2, "d2", 16, 2);
 
 // Example for pulse width modulation
 // pwm(blue_led, "blue", ONBOARDLED).with_frequency(1000);
 
 // Example for gyro
-gyro6050(gyro0, "g0");
+gyro6050(gyro0, "g0").with_filter( [&] { // fuse accel value into one
+    // ignore angles
+    gyro0.measured_value(0).clear();
+    int a,b,c;
+    if(gyro0.measured_value(1).scanf("%d,%d,%d", &a, &b, &c)!=3)
+        return false;
+    unsigned long d = sqrt((unsigned long)(a*a) + (b*b) + (c*c)) + 0.5;
+    gyro0.measured_value(1).from(d>27?1:0);
+    return true;
+});
 
 
 // Optional init function, which is called right before device initialization

@@ -6,16 +6,18 @@
 
 #include <Arduino.h>
 #include <Wire.h>
-#include <MPU6050_tockn.h>
-
 #include <i2c_device.h>
+
+#include <MPU6050.h> // here only this in cpp MPU6050_6Axis_MotionApps20.h
 
 class Gyro_MPU6050 : public I2C_Device {
     private:
         bool _calibrate = false;
+        unsigned long starttime;
+        bool discard_done = false;
         MPU6050 *mpu6050 = NULL;
-        unsigned long _read_interval = 1000; // only read every interval ms
-        unsigned long last_read = millis() - _read_interval;
+        uint16_t packetSize;
+        uint8_t fifoBuffer[64]; // FIFO storage buffer
     public:
         Gyro_MPU6050(const char* name, bool calibrate_on_start=true);
         void start();

@@ -90,13 +90,13 @@ bool Device::poll_measure() {
                 } );
             }
         }
-        // a current value is now in measured_value
+        // a current value is now in measured_value(s)
         // check if it needs to be filtered
         if(_filter_cb != NULL && ! _filter_cb()) {
             // if filter defined but indicates to ignore the current measurement
             return false; // end here with no update
         }
-        // The measured value is now an actual, valid new measurement
+        // The measured value(s) is/are now an actual, valid new measurement
         return true;
     }
     return false;
