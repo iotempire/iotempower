@@ -108,6 +108,7 @@ else
 
     bash "$ULNOIOT_ROOT/bin/fix_bin"
 
+    update_cache
 
 fi
 
