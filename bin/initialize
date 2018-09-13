@@ -67,8 +67,8 @@ if [[ "$2" ]]; then
     key="$2"
 fi
 
-prepare_build_dir apply_cache
-cd build
+prepare_build_dir cache
+cd "$ULNOIOT_COMPILE_CACHE"
 
 echo "Compiling and uploading..."
 if [[ "$port" ]]; then

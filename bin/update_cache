@@ -20,7 +20,7 @@ cd "$CACHE_ROOT/node"
 echo 'board="esp8266"' > node.conf
 echo "// empty" > setup.cpp
 touch key.txt
-prepare_build_dir # no apply_cache here as this is the cache
+prepare_build_dir # no cache here as this is the cache
 cd build
 echo
 echo "==== Trying to download and build all ===="
