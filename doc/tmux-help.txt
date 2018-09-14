@@ -58,9 +58,9 @@ working directly at the command prompt (of the shell, which is called bash) or
 the command line which might come in handy, so they are listed here for
 reference:
 
-- CTRL-C: in the command line doesn't co[py anything, it interrupts the
+- CTRL-C: in the command line does not copy anything, it interrupts the
   currently running command.
-- CTRL-Z: will suspend the currently runnign program. You can then use
+- CTRL-Z: will suspend the currently running program. You can then use
 - CTRL-X CTRL-E: edit current command line in the editor (very nice, if you
   want to use the mouse and standard CTRL-C, CTRL-X and CTRL-V key bindings
   to handle long commands).
