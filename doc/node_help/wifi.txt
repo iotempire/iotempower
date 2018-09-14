@@ -13,13 +13,13 @@ blinks - you can use them to verify your node in the configuration portal
 later.
 
 Use a phone or tablet (a computer works too) to connect to the wifi.
-The default wifi-password in reconfiguration mode is internetofthings.
+The default wifi-password in reconfiguration mode is iotempire.
 Modern phones will directly go to the configuration page or ask you to sign in
 and then go tho the configuration page. If this is not the case try to manually
 access the coniguration page on http://192.168.4.1
 
 Connect your node to your local WiFi or the ulnoiot raspberry pi WiFi (often
-called iotempire-something, also passowrd internetofthings) and remember the
+called iotempire-something, also password iotempire) and remember the
 hex-code of the device (write it down). Also verify the blink frequency.
 
 After you saved the configuration, you can navigate to your node-directory and
