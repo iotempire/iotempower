@@ -25,7 +25,8 @@ class Input : public Device {
             measure();
         }
     public:
-        Input(const char* name, int pin, const char* high, const char* low ) :
+        Input(const char* name, int pin, 
+            const char* high="on", const char* low="off") :
             Device(name) {
             _high = high;
             _low = low;
