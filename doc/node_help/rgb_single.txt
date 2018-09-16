@@ -17,7 +17,7 @@ Parameters:
 - ignore_case: should case in the command detection be ignored
 
 Example (node name: living room/tvlights):
-rgb_single("rgb1", D3, D4, D2)
+rgb_single(rgb1, "rgb1", D3, D4, D2)
 
 
 Now the RGB LED can be switched to red via sending to the mqtt-broker

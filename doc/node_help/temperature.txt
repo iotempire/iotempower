@@ -20,7 +20,7 @@ Parameters:
 With .with_filter a filter function can be specified: (see uhelp filter).
 
 Example (node name: living room/ht1):
-dht("ht01", D1);
+dht(temp1, "ht01", D1);
 
 Now temperature and humidity are published as "living room/ht1/temperature" and
 "living room/ht1/humidity".
