@@ -39,12 +39,14 @@ class Display_Base : public I2C_Device {
     public:
         Display_Base(const char* name) : I2C_Device(name) { }
 
-        void scroll_up(int lines=1);
-        void print(const char* str);
-        void println();
-        void println(const char* str);
-        void cursor(int x, int y);
-        void clear();
+        Display_Base& scroll_up(int lines=1);
+        Display_Base& print(const char* str);
+        Display_Base& print(Ustring& ustr);
+        Display_Base& println();
+        Display_Base& println(const char* str);
+        Display_Base& println(Ustring& ustr);
+        Display_Base& cursor(int x, int y);
+        Display_Base& clear();
 
         void set_fps(int fps) {
             if(fps<1) fps=1;

@@ -50,15 +50,16 @@ bool Display_Base::init(int w, int h) {
     return true;
 }
 
-void Display_Base::scroll_up(int nr_lines) {
+Display_Base& Display_Base::scroll_up(int nr_lines) {
     // TODO: add cyclic scrolling
     char* from = textbuffer + nr_lines*columns;
     int block_h = lines-nr_lines;
     memmove(textbuffer, from, block_h*columns);
     memset(textbuffer + block_h*columns, ' ', nr_lines*columns);
+    return *this;
 }
 
-void Display_Base::print(const char* str) {
+Display_Base& Display_Base::print(const char* str) {
     // TODO: not capped by maxlen -> should not overflow because of Ustring given, but maybe better cap?
     char ch;
     while(*str) {
@@ -96,27 +97,38 @@ void Display_Base::print(const char* str) {
         }
         str++;
     }
+    return *this;
 }
 
-void Display_Base::println() {
-    print("\n");
+Display_Base& Display_Base::println() {
+    return print("\n");
 }
 
-void Display_Base::println(const char* str) {
+Display_Base& Display_Base::println(const char* str) {
     print(str);
-    println();
+    return println();
 }
 
-void Display_Base::cursor(int x, int y) {
+Display_Base& Display_Base::print(Ustring& ustr) {
+    return println(ustr.as_cstr());
+}
+
+Display_Base& Display_Base::println(Ustring& ustr) {
+    return println(ustr.as_cstr());
+}
+
+Display_Base& Display_Base::cursor(int x, int y) {
     cursor_x = limit(x, 0, columns-1);
     cursor_y = limit(y, 0, lines-1);
     delayed_scroll = false;
+    return *this;
 }
 
-void Display_Base::clear() {
+Display_Base& Display_Base::clear() {
     memset(textbuffer, ' ', lines*columns);
     cursor(0,0);
     delayed_scroll = false;
+    return *this;
 }
 
 bool Display_Base::measure() {
