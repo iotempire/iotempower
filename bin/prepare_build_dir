@@ -64,22 +64,23 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
     
     if [[ "$1" == "cache" ]]; then
         rm -rf "$dest_dir" &> /dev/null
-        ln -s "$ULNOIOT_COMPILE_CACHE" "$dest_dir"
-        if [[ ! -e "$dest_dir/.pioenvs/$board" ]]; then # only create if not there yet
-            rm -rf "$dest_dir/.piolibdeps" &>/dev/null
-            ln -f -s "$ULNOIOT_COMPILE_CACHE/.piolibdeps" "$dest_dir/"
-            if [[ "$board" ]]; then
-                mkdir -p "$dest_dir/.pioenvs/$board"
-                for file in $(ls "$ULNOIOT_COMPILE_CACHE/.pioenvs/$board"); do
-                    if [[ ! "$file" =~ ^(src|firmware.elf|firmware.bin|)$ ]]; then
-                        ln -f -s "$ULNOIOT_COMPILE_CACHE/.pioenvs/$board/$file" \
-                            "$dest_dir/.pioenvs/$board/"
-                    fi
-                done
-                rsync -r "$ULNOIOT_COMPILE_CACHE/.pioenvs/$board/src/" \
-                            "$dest_dir/.pioenvs/$board/src/"
-            fi
-        fi
+        ln -f -s "$ULNOIOT_COMPILE_CACHE" "$dest_dir"
+        # obsolet as we now compile everything in one dir and just update src
+        # if [[ ! -e "$dest_dir/.pioenvs/$board" ]]; then # only create if not there yet
+        #     rm -rf "$dest_dir/.piolibdeps" &>/dev/null
+        #     ln -f -s "$ULNOIOT_COMPILE_CACHE/.piolibdeps" "$dest_dir/"
+        #     if [[ "$board" ]]; then
+        #         mkdir -p "$dest_dir/.pioenvs/$board"
+        #         for file in $(ls "$ULNOIOT_COMPILE_CACHE/.pioenvs/$board"); do
+        #             if [[ ! "$file" =~ ^(src|firmware.elf|firmware.bin|)$ ]]; then
+        #                 ln -f -s "$ULNOIOT_COMPILE_CACHE/.pioenvs/$board/$file" \
+        #                     "$dest_dir/.pioenvs/$board/"
+        #             fi
+        #         done
+        #         rsync -r "$ULNOIOT_COMPILE_CACHE/.pioenvs/$board/src/" \
+        #                     "$dest_dir/.pioenvs/$board/src/"
+        #     fi
+        # fi
     else
         mkdir -p "$dest_dir"
     fi
