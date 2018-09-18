@@ -7,6 +7,7 @@ void Servo::init(uint8_t pin, int min_us, int max_us, int duration) {
     _min_us = min_us;
     _max_us = max_us;
     _duration = duration;
+    do_register();
 }
 
 void Servo::start() {
