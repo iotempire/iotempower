@@ -1,0 +1,43 @@
+#!/bin/bash
+if [[ $# -gt 2 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
+cat << EOF
+Syntax: compile
+
+compile must be called from a node or system directory and reads its 
+configuration(s) from there.
+
+It compiles the respective node or all nodes in the subdirectories.
+
+EOF
+exit 1
+fi
+
+[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+
+if [[ -e "node.conf" ]]; then  # started from node-directory
+    deploy compile
+    if [[ $? -ne 0 ]]; then # error happened
+        echo
+        echo "compile not successfull, check errors above."
+        echo
+    fi
+
+else # started from somewhere else, so search for node.conf in subdirs
+    path="$(pwd)"
+
+    echo "This is not a node, so search sub-folders for node.conf files and"
+    echo "compile all of them."
+    echo
+    # TODO: think about runnning them all in parallel (or batches)
+    find -name node.conf |\
+        while read n; do
+            cd "$path"
+            cd $(dirname "$n")
+            compile # call recursive for node-dir
+        done
+
+    echo
+    echo "compile process for all nodes in $path done."
+
+fi # not in node-dir
+

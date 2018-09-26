@@ -1,7 +1,7 @@
 #!/bin/bash
 if [[ $# -gt 2 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF
-Syntax: initialize [serial_port|6-byte-identifier [key]|ip-address [key]]
+Syntax: initialize [serial [port]|ip-address [key]|[adopt]]
 
 initialize must be called from a node directory and reads its configuration
 from there.
@@ -9,100 +9,31 @@ If called without any parameter or a specific serial port, it looks for a
 locally (i.e. via serial or the respective port) connected board and overwrites
 it (re-flashes), setting all initial parameters.
 
-It flashes the board with ulnoiot. It then sets or overwrites wifi and 
-encryption data, respective to the current node configuration folder.
-If the 6-byte identifier is given, it does the intialization via network.
+It flashes the node with the ulnoiot firmware. It then sets or overwrites 
+wifi and  encryption data, respective to the current node configuration folder.
+If adopt or nothing is specified, it does the intialization via network.
 The respective board has to be in configuration mode and connected to the same
 wifi as ulnoiot currently runs in for this to work.
 
 If key is given it overrides the deduced flash-key.
 
-serial_port: can be empty, usb0, usb1, or acm0, acm1, ...
+port: can be empty, usb0, usb1, or acm0, acm1, ...
 EOF
 exit 1
 fi
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
-source "$ULNOIOT_ROOT/bin/read_node_config"
-export board # for platformio.ini
-
-RECONFIG_KEY="ulnoiot"
-port=""
-remote=""
-key=""
-
-platform_folder="$ULNOIOT_ROOT/lib/node_types/$board"
-
-# check key-file and eventually regenerate
-KEYFILE=key.txt
-key=$(tail -n1 "$KEYFILE")
-if [[ ! ${#key} = 64 ]]; then
-    # TODO: check that haveged is running and maybe check not to overwrite key?
-    echo "Generating new key."
-    # random password must not have chars like $, ", # as bash and platformio
-    # messes that up later (especially $)
-    < /dev/random tr -dc A-Za-z0-9\-\+_\=/@% | head -c64 > "$KEYFILE"
-    #head -c32 /dev/random|od -A n -t x2|tr -d ' \r\n' > "$KEYFILE"
-    key=$(tail -n1 "$KEYFILE")
-fi
-
-
-
-# check if an ID (6 letters and hex) was given
-if [[ "$1" =~ ^[0-9A-Fa-f]{6}$ ]]; then
-    # check if IP was given
-    remote="ulnoiot_$1.local"
-    key="$RECONFIG_KEY"
-elif [[ "$1" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then # IP given
-    remote="$1"
-    key="$RECONFIG_KEY"
+if [[ "$#" -eq 0 ]]; then
+    deploy adopt
 else
-    echo "Trying to select serial port."
-    port=$(find_esp_port "$1")
+    deploy "$@"
 fi
 
-# check if a key was given and eventually overwrite deduced key
-if [[ "$2" ]]; then
-    key="$2"
-fi
-
-prepare_build_dir cache
-cd "$ULNOIOT_COMPILE_CACHE"
-
-echo "Compiling and uploading..."
-if [[ "$port" ]]; then
-    
-    export PLATFORMIO_UPLOAD_PORT="/dev/$port"
-
-    cat > src/wifi-config.h << EOF
-#define WIFI_SSID "$ULNOIOT_AP_NAME"
-#define WIFI_PASSWORD "$ULNOIOT_AP_PASSWORD"
-EOF
-    platformio run -t upload || { echo "Trouble compiling or uploading wifi setup firmware, check errors."; exit 1; }
-    echo "Let device start and set wifi credentials (15s sleep.)"
-    sleep 15
-    echo "Reflash without credentials."
-    echo "// no wifi setup" > src/wifi-config.h
-
-elif [[ "$remote" ]]; then
-    
-    export PLATFORMIO_UPLOAD_PORT="$remote"
-    export PLATFORMIO_UPLOAD_FLAGS="--progress
---port=8266
---auth=$key"
-
-fi
-platformio run -t upload || { echo "Trouble compiling or uploading new firmware, check errors."; exit 1; }
-echo "Uploading done."
-
-
-if [[ "$port" ]]; then
+if [[ $? ]]; then # error happened
     echo
-    echo "IMPORTANT:"
-    echo "Please, disconnect the esp from power now (once) to make OTA updates work."
-    echo "Press enter to continue."
-    read tmp
+    echo "Initializing not successfull, check errors above."
+    exit 1
 fi
 
 echo

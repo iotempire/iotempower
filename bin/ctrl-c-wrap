@@ -1,0 +1,28 @@
+#!/bin/bash
+# wrap given command to trap ctrl-c and kill cleanly
+
+interrupt () {
+    echo
+    echo Interrupted, killing: $wrapped_id
+}
+
+trap interrupt INT TERM HUP
+
+OUTPUT_FILE="$(mktemp /tmp/ctrl-c-wrap.XXXXXXXX)"
+
+#echo -n "" > "$OUTPUT_FILE"
+setsid tail -f "$OUTPUT_FILE" &
+tail_id=$!
+
+"$@" < /dev/null &>>"$OUTPUT_FILE" &
+wrapped_id=$!
+wait $wrapped_id
+result=$?
+
+kill $wrapped_id &> /dev/null
+sleep 0.5
+kill -9 $wrapped_id &> /dev/null
+sleep 0.1
+kill $tail_id &> /dev/null
+rm "$OUTPUT_FILE" &> /dev/null
+exit $result

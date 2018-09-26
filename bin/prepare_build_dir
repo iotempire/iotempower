@@ -102,7 +102,15 @@ cat > "$dest_dir/src/config.h" << EOF
 #define mqtt_password "$mqtt_password"
 EOF
 
-    echo "// no wifi credentials" > "$dest_dir/src/wifi-config.h"
+# we hardcode wifi credentials now to allow easier re-flashing and
+# network migration
+#    echo "// no wifi credentials" > "$dest_dir/src/wifi-config.h"
+
+        cat > "$dest_dir/src/wifi-config.h" << EOF
+#define WIFI_SSID "$ULNOIOT_AP_NAME"
+#define WIFI_PASSWORD "$ULNOIOT_AP_PASSWORD"
+EOF
+
 
 else
     echo "Not in node directory."

@@ -25,57 +25,74 @@
 #include "config.h"
 #include "key.h"
 #include "pins.h"
-#include "wifi-config.h" // will only be filled if progammed via serial
+#include "wifi-config.h"
 
 // ulnoiot functions for user modification in setup.cpp
 void (ulnoiot_init)() __attribute__((weak));
 void (ulnoiot_start)() __attribute__((weak));
 
-int long_blinks = 0, short_blinks;
+int long_blinks = 0, short_blinks = 0;
 
 #define ID_LED LED_BUILTIN
+#define BLINK_OFF_START 2000
 #define BLINK_LONG 800
+#define BLINK_OFF_MID 800
 #define BLINK_SHORT 200
 #define BLINK_OFF 500
 
 void id_blinker() {
-    static int total, pos;
+    static int total, global_pos;
+    int pos;
     static unsigned long lasttime;
     unsigned long currenttime;
     int delta;
 
     if (long_blinks == 0) { // first time, still unitialized
         // randomness for 25 different blink patterns (5*5)
-        long_blinks = ESP8266TrueRandom.random(1,6);
+        long_blinks = ESP8266TrueRandom.random(1, 6);
         short_blinks = ESP8266TrueRandom.random(1, 6);
         Serial.printf("Blink pattern: %d long_blinks, %d short_blinks\n",
                       long_blinks, short_blinks);
-        total = long_blinks * (BLINK_LONG + BLINK_OFF) +
+        total = BLINK_OFF_START +
+                long_blinks * (BLINK_LONG + BLINK_OFF) +
+                BLINK_OFF_MID +
                 short_blinks * (BLINK_SHORT + BLINK_OFF);
         lasttime = millis();
-        pos = 0;
+        global_pos = 0;
         pinMode(ID_LED, OUTPUT);
         digitalWrite(ID_LED, 0); // on - start with a long blink
     }
     // compute where in blink pattern we currently are
     currenttime = millis();
     delta = currenttime - lasttime;
-    pos = (pos + delta) % total;
-    if (pos < long_blinks * (BLINK_LONG + BLINK_OFF)) { // in long blink phase
-        if (pos % (BLINK_LONG + BLINK_OFF) < BLINK_LONG) {
-            digitalWrite(ID_LED, 0); // on - in blink phase
-        } else {
-            digitalWrite(ID_LED, 1); // off - in off phase
+    global_pos = (global_pos + delta) % total;
+    pos = global_pos;
+    if (pos < BLINK_OFF_START) { // still in BLINK_OFF_START
+        digitalWrite(ID_LED, 1); // off - in off phase
+    } else { // already pass BLINK_OFF_START
+        pos -= BLINK_OFF_START;
+        if(pos < long_blinks * (BLINK_LONG + BLINK_OFF)) { // in long blink phase
+            if (pos % (BLINK_LONG + BLINK_OFF) < BLINK_LONG) {
+                digitalWrite(ID_LED, 0); // on - in blink phase
+            } else {
+                digitalWrite(ID_LED, 1); // off - in off phase
+            }
+
+        } else { // in short blink phase
+            pos -= long_blinks * (BLINK_LONG + BLINK_OFF);
+            if(pos < BLINK_OFF_MID) { // still in BLINK_OFF_MID
+                digitalWrite(ID_LED, 1); // off - in off phase
+            } else {
+                pos -= BLINK_OFF_MID;
+                if (pos % (BLINK_SHORT + BLINK_OFF) <
+                    BLINK_SHORT) {
+                    digitalWrite(ID_LED, 0); // on - in blink phase
+                } else {
+                    digitalWrite(ID_LED, 1); // off - in off phase
+                }
+            }
         }
-    } else { // in short blink phase
-        if ((pos - long_blinks * (BLINK_LONG + BLINK_OFF)) %
-                (BLINK_SHORT + BLINK_OFF) <
-            BLINK_SHORT) {
-            digitalWrite(ID_LED, 0); // on - in blink phase
-        } else {
-            digitalWrite(ID_LED, 1); // off - in off phase
-        }
-    }
+    } 
     lasttime = currenttime;
 }
 
@@ -90,7 +107,7 @@ void reconfigMode() {
     sprintf(ap_ssid + strlen(ap_ssid) - 6, "%06x", ESP.getChipId());
     Serial.printf("Connect to %s with password %s.\n", ap_ssid, ap_password);
     WiFiManager wifiManager;
-    wifiManager.setConnectTimeout(600); // 10 min timeout
+    wifiManager.setConnectTimeout(1800); // 30 min timeout
 
     // // parameter test
     // WiFiManagerParameter test_param("tparam", "test parameter", "123",
@@ -101,10 +118,11 @@ void reconfigMode() {
     WiFiManagerParameter custom_text1(blink_pattern.c_str());
     wifiManager.addParameter(&custom_text1);
 
-    String name_display = "<p>Parameter for initialize in ulnoiot: " +
-                          String(ap_ssid + strlen(ap_ssid) - 6) + "</p>";
-    WiFiManagerParameter custom_text2(name_display.c_str());
-    wifiManager.addParameter(&custom_text2);
+    // obsolete now as we only use one name
+    // String name_display = "<p>Parameter for initialize in ulnoiot: " +
+    //                       String(ap_ssid + strlen(ap_ssid) - 6) + "</p>";
+    // WiFiManagerParameter custom_text2(name_display.c_str());
+    // wifiManager.addParameter(&custom_text2);
 
     //  const char * menu[] = {"wifi","param","sep","exit"};
     //  wifiManager.setMenu(menu,4);
@@ -216,9 +234,10 @@ void connectToWifi() {
     // Start WiFi connection and register hostname
     Serial.println("Connecting to Wi-Fi...");
     Serial.print("Registering hostname: ");
-    if (reconfig_mode_active) {
-        my_hostname = (char *)"ulnoiot_xxxxxx";
-        sprintf(my_hostname + strlen(my_hostname) - 6, "%06x", ESP.getChipId());
+    if(reconfig_mode_active) {
+        my_hostname = (char *)"ulnoiot_adoptee"; // TODO: define in defaults
+        // my_hostname = (char *)"ulnoiot_xxxxxx";
+        // sprintf(my_hostname + strlen(my_hostname) - 6, "%06x", ESP.getChipId());
     } else {
         my_hostname = (char *)HOSTNAME;
     }
@@ -226,11 +245,17 @@ void connectToWifi() {
     ArduinoOTA.setHostname(my_hostname);
     Serial.println(my_hostname);
     WiFi.mode(WIFI_STA);
-#ifdef WIFI_SSID
-    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-#else
-    WiFi.begin();
-#endif
+
+//#ifdef WIFI_SSID
+    if(reconfig_mode_active) {
+        WiFi.begin(); // use last known configuration (configured in WifiManager)
+    } else {
+        WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+    }
+// #else
+//     // This part is actually kind of obsolete now. TODO: consider remocal
+//     WiFi.begin();
+// #endif
     MDNS.begin(my_hostname);
 }
 

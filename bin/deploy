@@ -1,7 +1,7 @@
 #!/bin/bash
 if [[ $# -gt 2 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF
-Syntax: deploy [node-address [password]]
+Syntax: deploy compile|serial [port]|adopt|[node-address [key]]
 
 deploy must be called from a node directory (or one of its parent system
 directories) and reads its configuration from there.
@@ -9,68 +9,136 @@ directories) and reads its configuration from there.
 It rebuilds firmwares for the affected nodes and remotely flashes
 the respected nodes.
 
-If a node-address is given (for example as an IP), deploy will falsh the 
-node with that respective address. If also a password is given, then this
-password is used instead of the specific node password. This can be
-important to re-initialize a node configured for a diffrent system.
+If a node-address is given (for example as an IP), deploy will flash the 
+node with that respective address remotely. If also a password is given, then
+this password is used instead of the specific node password. This can be
+important to re-initialize a node configured for a different system.
 
-If deploy is called from a node's parent folder, it updates all nodes in
+If compile is specified, deploy only tries to compile the respective node
+firmware. 
+
+If serial is specified, a locally (via serial) connected node will
+be flashed. With port the serial port can optionally be specified.
+
+If adopt is given, a single node on the network that is in configuration mode
+will be overwritten with the current configuration and adopted as a new node
+in the current network.
+
+If deploy is called from a node's parent folder, it deploys all nodes in
 subdirectories of this parent folder.
 
+If key is given it overrides the deduced flash-key.
+
+port: can be empty, usb0, usb1, or acm0, acm1, ...
 EOF
 exit 1
 fi
-# (updates and) deploys a node
-# can be called from a node folder or from parent folder of node-folders
-#
-# if noupdate as parameter is given only the user-part is deployed
-# (deploy is skipped)
-# configuration files are not updated (TODO: consider making this possible)
-
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+
+RECONFIG_KEY="ulnoiot"
+ADOPTEE_NAME="ulnoiot_adoptee"
+ADOPTEE_NAME="$ADOPTEE_NAME".local
+
+# noupdate=""
+# if [[ "$@" == *noupdate* ]]; then
+#     noupdate=1
+# fi
 
 
 if [[ -e "node.conf" ]]; then  # started from node-directory
     source "$ULNOIOT_ROOT/bin/read_node_config"
     export board # for platformio.ini
 
-    # noupdate=""
-    # if [[ "$@" == *noupdate* ]]; then
-    #     noupdate=1
-    # fi
+    port=""
+    remote=""
+    key=""
+    pio_upload="-t upload"
 
-    if [[ "$1" ]]; then
-        address="$1"
-    else
-#        echo "Getting IP of node $topic for deployment."
-#        address=$(get_ip "$topic" 2>/dev/null|grep "$topic"|cut -d\  -f2)
-        address="$node_name.local"
+    platform_folder="$ULNOIOT_ROOT/lib/node_types/$board"
+
+    # check key-file and eventually regenerate
+    KEYFILE=key.txt
+    key=$(tail -n1 "$KEYFILE")
+    if [[ ! ${#key} = 64 ]]; then
+        # TODO: check that haveged is running and maybe check not to overwrite key?
+        echo "Generating new key."
+        # random password must not have chars like $, ", # as bash and platformio
+        # messes that up later (especially $)
+        < /dev/random tr -dc A-Za-z0-9\-\+_\=/@% | head -c64 > "$KEYFILE"
+        #head -c32 /dev/random|od -A n -t x2|tr -d ' \r\n' > "$KEYFILE"
+        key=$(tail -n1 "$KEYFILE")
     fi
 
-    if [[ "$2" ]]; then
-        password="$2"
+    if [[ "$1" == "compile" ]]; then
+        echo "Just compiling (no remote upload or serial flash)."
+        pio_upload=""
+    elif [[ "$1" == "serial" ]]; then # local flash requested
+        echo "Trying to select serial port."
+        port=$(find_esp_port "$2")
+        echo "Using $port."
     else
-        password=$(tail -n1 key.txt|head -c 64)
-    fi
-
-    if [ "$address" ]; then
-        echo "Deploying user files to node $topic with address $address."
-        path="$(pwd)"
-
-        prepare_build_dir cache
-        cd "$ULNOIOT_COMPILE_CACHE"
-        export PLATFORMIO_UPLOAD_PORT="$address"
+        # obsolete - now default name
+        ## check if an ID (6 letters and hex) was given
+        #if [[ "$1" =~ ^[0-9A-Fa-f]{6}$ ]]; then
+        if [[ "$1" == adopt ]]; then # if we adopt, we have fixed values
+            # check if IP was given
+            remote="$ADOPTEE_NAME"
+            key="$RECONFIG_KEY"
+        elif [[ "$1" ]]; then # address or network name given
+            remote="$1"
+            if [[ "$2" ]]; then
+                key="$3"
+            else
+                key=$(tail -n1 key.txt|head -c 64)
+            fi
+        else 
+            remote="$node_name.local"
+#           obsolete: getting IP from mqtt
+#           echo "Getting IP of node $topic for deployment."
+#           address=$(get_ip "$topic" 2>/dev/null|grep "$topic"|cut -d\  -f2)
+        fi
+        echo "Deploying remotely to node $topic with address $remote."
+        export PLATFORMIO_UPLOAD_PORT="$remote"
         export PLATFORMIO_UPLOAD_FLAGS="--progress
 --port=8266
---auth="\""$password"\"
+--auth="\""$key"\"
+    fi
 
-        platformio run -t upload || { echo "Trouble compiling or uploading new firmware, check errors."; exit 1; }
-        echo "Uploading done."
+    prepare_build_dir cache
+    cd "$ULNOIOT_COMPILE_CACHE"
 
-    else
-        echo "Could not find address of node with topic $topic for deployment. Skipping."
-        exit 1
+# wifi credentails are now always included
+#     if [[ "$port" ]]; then
+#         echo "Flashing locally to node $topic with port $port."
+    
+#         export PLATFORMIO_UPLOAD_PORT="/dev/$port"
+
+#         cat > src/wifi-config.h << EOF
+# #define WIFI_SSID "$ULNOIOT_AP_NAME"
+# #define WIFI_PASSWORD "$ULNOIOT_AP_PASSWORD"
+# EOF
+
+#         ctrl-c-wrap platformio run -t upload || { echo "Trouble compiling or uploading wifi setup firmware, check errors."; exit 1; }
+#         echo "Let device start and set wifi credentials (20s sleep.)"
+#         sleep 20
+#         echo "Reflash without credentials."
+#         echo "// no wifi setup" > src/wifi-config.h
+
+#     fi # $port exists?
+
+    WRAP=""
+    if [[ "$ACTIVE_DIR" ]]; then # if this is running in cloudcmd
+        WRAP=ctrl-c-wrap
+    fi
+    $WRAP platformio run $pio_upload || { echo "Trouble compiling or uploading new firmware, check errors."; exit 1; }
+
+    echo "deploy successfully done."
+
+    if [[ "$port" ]]; then
+        echo
+        echo "IMPORTANT:"
+        echo "Please, disconnect the esp from power now (once) to make OTA updates work."
     fi
 
 else # started from somewhere else, so search for node.conf in subdirs
@@ -79,12 +147,16 @@ else # started from somewhere else, so search for node.conf in subdirs
     echo "This is not a node, so search sub-folders for node.conf files and"
     echo "deploy all of them."
     echo
+    if [[ "$*" ]]; then
+        echo "deploying of multiple nodes only works if no parameters are specified."
+        exit 1
+    fi
     # TODO: think about runnning them all in parallel (or batches)
     find -name node.conf |\
         while read n; do
             cd "$path"
             cd $(dirname "$n")
-            deploy "$@" # call recursive for node-dir
+            deploy # call recursive for node-dir
         done
 
 fi # not in node-dir
