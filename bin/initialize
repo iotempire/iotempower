@@ -30,7 +30,7 @@ else
     deploy "$@"
 fi
 
-if [[ $? ]]; then # error happened
+if [[ $? -eq 1 ]]; then # error happened
     echo
     echo "Initializing not successfull, check errors above."
     exit 1

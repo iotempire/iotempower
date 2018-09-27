@@ -9,3 +9,5 @@ led_(red, D7);
 led_(yellow, D8);
 
 dht_(th, D1);
+
+display_(dp1, font_medium).i2c(4, 14);
