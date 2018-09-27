@@ -41,6 +41,7 @@ int long_blinks = 0, short_blinks = 0;
 #define BLINK_OFF 500
 
 void id_blinker() {
+    static bool init_just_done = false;
     static int total, global_pos;
     int pos;
     static unsigned long lasttime;
@@ -57,10 +58,15 @@ void id_blinker() {
                 long_blinks * (BLINK_LONG + BLINK_OFF) +
                 BLINK_OFF_MID +
                 short_blinks * (BLINK_SHORT + BLINK_OFF);
-        lasttime = millis();
-        global_pos = 0;
         pinMode(ID_LED, OUTPUT);
         digitalWrite(ID_LED, 0); // on - start with a long blink
+        init_just_done = true;
+        return; // finish here first time
+    }
+    if(init_just_done) { //second time go here
+        lasttime = millis();
+        global_pos = 0;
+        init_just_done = false;
     }
     // compute where in blink pattern we currently are
     currenttime = millis();
@@ -99,20 +105,21 @@ void id_blinker() {
 void reconfigMode() {
     // go to access-point and reconfiguration mode
 
-    char *ap_ssid = (char *)(ULNOIOT_AP_RECONFIG_NAME "-xxxxxx");
+    char *ap_ssid = (char *)(ULNOIOT_AP_RECONFIG_NAME "-xx-xx");
     const char *ap_password = ULNOIOT_AP_RECONFIG_PASSWORD;
 
     Serial.println("Reconfiguration requested. Activating AP-mode.");
     WiFi.disconnect(true);
-    sprintf(ap_ssid + strlen(ap_ssid) - 6, "%06x", ESP.getChipId());
+    id_blinker(); //trigger init of random blink pattern
+    sprintf(ap_ssid + strlen(ap_ssid) - 5, "%02x-%02d", ESP.getChipId() & 255,
+                long_blinks * 10 + short_blinks);
     Serial.printf("Connect to %s with password %s.\n", ap_ssid, ap_password);
     WiFiManager wifiManager;
-    wifiManager.setConnectTimeout(1800); // 30 min timeout
+    wifiManager.setConnectTimeout(3600); // 60 min timeout
 
     // // parameter test
     // WiFiManagerParameter test_param("tparam", "test parameter", "123",
     // 5); wifiManager.addParameter(&test_param);
-    id_blinker(); // TODO -> only call random init part;
     String blink_pattern = "<p>Blink pattern: " + String(long_blinks) +
                            " longs, " + String(short_blinks) + " shorts</p>";
     WiFiManagerParameter custom_text1(blink_pattern.c_str());
@@ -134,7 +141,8 @@ void reconfigMode() {
 
     wifiManager.setConfigPortalBlocking(false); // allow interrupts
     // wifiManager.autoConnect(ap_ssid, ap_password);
-    wifiManager.startConfigPortal(ap_ssid, ap_password);
+    //wifiManager.startConfigPortal(ap_ssid, ap_password);
+    wifiManager.startConfigPortal(ap_ssid, "");
 
     while (1) {
         if (wifiManager.process())
@@ -250,10 +258,11 @@ void connectToWifi() {
     if(reconfig_mode_active) {
         WiFi.begin(); // use last known configuration (configured in WifiManager)
     } else {
+        Serial.println("Setting wifi credentials.");
         WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
     }
 // #else
-//     // This part is actually kind of obsolete now. TODO: consider remocal
+//     // This part is actually kind of obsolete now. TODO: consider removal
 //     WiFi.begin();
 // #endif
     MDNS.begin(my_hostname);

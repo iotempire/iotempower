@@ -19,15 +19,14 @@ void Servo::do_register() {
     add_subdevice(new Subdevice(""));
     add_subdevice(new Subdevice("set",true))->with_receive_cb(
         [&] (const Ustring& payload) {
-            int value=payload.as_int();
-            set(value);
+            process(payload);
             return true;
         }
     );
 }
 
-void Servo::turn_to(int value) {
-    if(!started()) return;
+Servo& Servo::turn_to(int value) {
+    if(!started()) return *this;
     if(stopped) {
         _servo.attach(_pin, _min_us, _max_us);
         stopped = false;
@@ -36,10 +35,16 @@ void Servo::turn_to(int value) {
     _servo.write(value);
     _value = value;
     measured_value(0).from(value);
+    return *this;
 }
 
-void Servo::set(int value) {
-    turn_to(value);
+Servo& Servo::set(int value) {
+    return turn_to(value);
+}
+
+void Servo::process(const Ustring& value) {
+    int v = value.as_int();
+    turn_to(v);
 }
 
 bool Servo::measure() {

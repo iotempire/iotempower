@@ -10,7 +10,6 @@
 void (ulnoiot_init)() __attribute__((weak));
 void (ulnoiot_start)() __attribute__((weak));
 
-// This is a hack to check if
 #define init() \
     ulnoiot_start()
 

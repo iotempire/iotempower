@@ -17,8 +17,6 @@ class Servo_Switch : public Servo {
         bool needs_return=false;
         void init(int on_angle, int off_angle, int return_angle,
                 const char* on_command, const char* off_command);
-    protected:
-        virtual void do_register();
     public:
         Servo_Switch(const char* name, uint8_t pin,
                 int on_angle, int off_angle, int return_angle,
@@ -62,7 +60,8 @@ class Servo_Switch : public Servo {
                 : Servo(name, pin) {
             init(0, 180, 90, "on", "off");
         }
-        void set(const Ustring& status);
+        Servo_Switch& set(const Ustring& status);
+        void process(const Ustring& value);
         bool measure(void);
         // void start() //handled in base class
 };

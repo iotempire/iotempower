@@ -11,17 +11,7 @@ void Servo_Switch::init(int on_angle, int off_angle, int return_angle,
     _off_command = off_command;
 }
 
-void Servo_Switch::do_register() {
-    add_subdevice(new Subdevice(""));
-    add_subdevice(new Subdevice("set",true))->with_receive_cb(
-        [&] (const Ustring& payload) {
-            set(payload);
-            return true;
-        }
-    );
-}
-
-void Servo_Switch::set(const Ustring& status) {
+Servo_Switch& Servo_Switch::set(const Ustring& status) {
     int to_angle = -1;
 
     if(status.equals(_on_command)) {
@@ -30,15 +20,22 @@ void Servo_Switch::set(const Ustring& status) {
         to_angle = _off_angle;
     }
     if(to_angle >= 0) {
-        if(_return_angle > 0) {
+        if(_return_angle >= 0) {
             needs_return = true;
         }
         turn_to(to_angle);
         measured_value(0).copy(status);
     }
+    return *this;
+}
+
+void Servo_Switch::process(const Ustring& value) {
+    set(value);
 }
 
 bool Servo_Switch::measure() {
+    // if there is duration left and the duration left is smaller than the 
+    // time that has passed since start of the turn
     if(_duration > 0 && (millis() - start_time > (unsigned long)_duration)) {
         if(needs_return) {
             needs_return = false;

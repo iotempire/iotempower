@@ -19,10 +19,10 @@ class Servo : public Device {
         int _value;
         bool stopped = true;
         void init(uint8_t pin, int min_us, int max_us, int duration);
+        void do_register();
     protected:
         int _duration;
         unsigned long start_time;
-        virtual void do_register();
     public:
         Servo(const char* name, uint8_t pin, int min_us, int max_us)
             : Device(name) {
@@ -39,8 +39,9 @@ class Servo : public Device {
             init(pin, 554, 2400, duration);
         }
         void stop();
-        void turn_to(int value);
-        void set(int value);
+        Servo& turn_to(int value);
+        Servo& set(int value);
+        virtual void process(const Ustring& value);
         virtual bool measure(void);
         void start();
 };

@@ -19,28 +19,28 @@ class RGB_Base : public Device {
         CRGB avg_color;
     public:
         RGB_Base(const char* name, int led_count);
-        void high() { 
-            set_color(CRGB::White);
+        RGB_Base& high() { 
+            return set_color(CRGB::White);
         }
-        void on() { high(); }
-        void low() { 
-            set_color(CRGB::Black);
+        RGB_Base& on() { return high(); }
+        RGB_Base& low() { 
+            return set_color(CRGB::Black);           
         }
-        void off() { low(); }
-        void set_color(CRGB color) {
-            set_color(ALL_LEDS, color, true);
+        RGB_Base& off() { return low(); }
+        RGB_Base& set_color(CRGB color) {
+            return set_color(ALL_LEDS, color, true);
         }
-        void set_color_noshow(CRGB color) {
-            set_color(ALL_LEDS, color, false);
+        RGB_Base& set_color_noshow(CRGB color) {
+            return set_color(ALL_LEDS, color, false);
         }
 
-        void set_colorstr(int lednr, const Ustring& color, bool _show=true);
-        void set_colorstr(const Ustring& color, bool _show=true);
+        RGB_Base& set_colorstr(int lednr, const Ustring& color, bool _show=true);
+        RGB_Base& set_colorstr(const Ustring& color, bool _show=true);
 
 // TODO: implement setting a bar (percentage or number of leds at once)
 
-        void set_color( int lednr, CRGB color, bool _show=true) {
-            if(!started()) return;
+        RGB_Base& set_color( int lednr, CRGB color, bool _show=true) {
+            if(!started()) return *this;
             if(lednr<0) {
                 if(lednr==ALL_LEDS) {
                     for(int nr=0; nr<led_count(); nr++) 
@@ -54,6 +54,7 @@ class RGB_Base : public Device {
             } else {
                 process_color(lednr, color, _show);
             }
+            return *this;
         }
 
         int led_count() {

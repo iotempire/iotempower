@@ -81,13 +81,13 @@ RGB_Base::RGB_Base(const char* name, int led_count) :
     );
 }
 
-void RGB_Base::set_colorstr(int lednr, const Ustring& color, bool _show) {
+RGB_Base& RGB_Base::set_colorstr(int lednr, const Ustring& color, bool _show) {
     // Check if this is a color?
     unsigned int i;
     for(i=0; i<color_map_count; i++) {
         if(color.equals(color_map[i].key)) {
             set_color(lednr, color_map[i].color, _show);
-            return;
+            return *this;
         }
     }
     // we didn't get a match
@@ -97,7 +97,7 @@ void RGB_Base::set_colorstr(int lednr, const Ustring& color, bool _show) {
         long colorval = strtol(color.as_cstr(), &endptr, 16);
         if(endptr - color.as_cstr() == 6) {
             set_color(lednr, CRGB(colorval), _show);
-            return;
+            return *this;
         } 
     }
     // Last chance: see, if we can extract 3 comma seperated integers
@@ -105,9 +105,10 @@ void RGB_Base::set_colorstr(int lednr, const Ustring& color, bool _show) {
     if(sscanf(color.as_cstr(),"%d,%d,%d",&r,&g,&b) == 3) {
         set_color(lednr, CRGB(r,g,b), _show);
     }
+    return *this;
 }
 
-void RGB_Base::set_colorstr(const Ustring& color, bool _show) {
+RGB_Base& RGB_Base::set_colorstr(const Ustring& color, bool _show) {
     Ustring command(color);
     int lednr = ALL_LEDS;
     command.strip();
@@ -130,4 +131,5 @@ void RGB_Base::set_colorstr(const Ustring& color, bool _show) {
     }
     command.strip(); // remove more whitespace
     set_colorstr(lednr, command, _show);
+    return *this;
 }
