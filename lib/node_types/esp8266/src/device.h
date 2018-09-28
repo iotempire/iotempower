@@ -123,6 +123,9 @@ class Device {
         Device& set_report_change(bool report_change) {
             return with_report_change(report_change);
         } 
+        Device& report_change(bool report_change) {
+            return with_report_change(report_change);
+        } 
         Device& with_on_change_callback(ULNOIOT_ON_CHANGE_CALLBACK on_change_cb) { 
             _on_change_cb = on_change_cb;
             return *this;
@@ -136,6 +139,12 @@ class Device {
         Device& set_on_change(ULNOIOT_ON_CHANGE_CALLBACK on_change_cb) { 
             return with_on_change_callback(on_change_cb);
         }
+        Device& on_change(ULNOIOT_ON_CHANGE_CALLBACK on_change_cb) { 
+            return with_on_change_callback(on_change_cb);
+        }
+        Device& on_change_callback(ULNOIOT_ON_CHANGE_CALLBACK on_change_cb) { 
+            return with_on_change_callback(on_change_cb);
+        }
         Device& with_filter_callback(ULNOIOT_FILTER_CALLBACK filter_cb) { 
             _filter_cb = filter_cb;
             return *this;
@@ -147,6 +156,12 @@ class Device {
             return with_filter_callback(filter_cb);
         }
         Device& set_filter(ULNOIOT_FILTER_CALLBACK filter_cb) { 
+            return with_filter_callback(filter_cb);
+        }
+        Device& filter(ULNOIOT_FILTER_CALLBACK filter_cb) { 
+            return with_filter_callback(filter_cb);
+        }
+        Device& filter_calback(ULNOIOT_FILTER_CALLBACK filter_cb) { 
             return with_filter_callback(filter_cb);
         }
 
