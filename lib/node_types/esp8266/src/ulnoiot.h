@@ -11,7 +11,7 @@
 #include "devices.h"
 
 // needs to be last
-#include "pins.h"
+#include "pins-wrapper.h"
 
 /* Set the amount of seconds to pass before doing full status report.
  * If interval=0, only report changes.

@@ -24,7 +24,7 @@
 // node specific code
 #include "config.h"
 #include "key.h"
-#include "pins.h"
+#include "pins-wrapper.h"
 #include "wifi-config.h"
 
 // ulnoiot functions for user modification in setup.cpp
@@ -33,7 +33,12 @@ void (ulnoiot_start)() __attribute__((weak));
 
 int long_blinks = 0, short_blinks = 0;
 
-#define ID_LED LED_BUILTIN
+// TODO: find better solution
+#ifndef ONBOARDLED
+    #pragma "No ONBOARDLED is defined for this board, there will be no indicator led" warning
+#else
+    #define ID_LED ONBOARDLED
+#endif
 #define BLINK_OFF_START 2000
 #define BLINK_LONG 800
 #define BLINK_OFF_MID 800
@@ -58,8 +63,10 @@ void id_blinker() {
                 long_blinks * (BLINK_LONG + BLINK_OFF) +
                 BLINK_OFF_MID +
                 short_blinks * (BLINK_SHORT + BLINK_OFF);
+        #ifdef ID_LED
         pinMode(ID_LED, OUTPUT);
         digitalWrite(ID_LED, 0); // on - start with a long blink
+        #endif // ID_LED
         init_just_done = true;
         return; // finish here first time
     }
@@ -73,11 +80,13 @@ void id_blinker() {
     delta = currenttime - lasttime;
     global_pos = (global_pos + delta) % total;
     pos = global_pos;
+    #ifdef ID_LED
     if (pos < BLINK_OFF_START) { // still in BLINK_OFF_START
         digitalWrite(ID_LED, 1); // off - in off phase
     } else { // already pass BLINK_OFF_START
         pos -= BLINK_OFF_START;
         if(pos < long_blinks * (BLINK_LONG + BLINK_OFF)) { // in long blink phase
+
             if (pos % (BLINK_LONG + BLINK_OFF) < BLINK_LONG) {
                 digitalWrite(ID_LED, 0); // on - in blink phase
             } else {
@@ -99,6 +108,7 @@ void id_blinker() {
             }
         }
     } 
+    #endif // ID_LED
     lasttime = currenttime;
 }
 
@@ -202,9 +212,10 @@ void flash_mode_select() {
         int last = 1, toggles = 0;
         // blink a bit to show that we have booted and waiting for
         // potential input
+
         pinMode(LED_BUILTIN, OUTPUT);
-        pinMode(0, INPUT_PULLUP); // check flash button (d3 on wemos and
-                                  // nodemcu)
+        pinMode(FLASHBUTTON, INPUT_PULLUP); // check flash button (d3 on wemos and
+                                  // nodemcu) 
         for (int i = 0; i < 500; i++) {
             digitalWrite(LED_BUILTIN, (i / 25) % 2);
             int new_state = digitalRead(0);
@@ -215,6 +226,7 @@ void flash_mode_select() {
             delay(10);
         }
 
+ 
         if (toggles >= 4 && toggles <= 8) { // was pressed 2-4 times
             reconfigMode();
         }
@@ -389,6 +401,7 @@ void setup() {
 
     // Try already to bring up WiFi
     connectToWifi();
+
 
     // This reboot and wait might not be necessary
     if (WiFi.waitForConnectResult() != WL_CONNECTED) {

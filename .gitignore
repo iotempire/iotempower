@@ -13,3 +13,5 @@ etc/yaota8266-keys/
 .local
 
 .directory
+.vscode
+build
