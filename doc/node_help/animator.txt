@@ -11,29 +11,29 @@ anim_type anim_types[4]={none, none, none, none};
 
 //////// Device setup  ////////
 // RGB strips
-rgb_strip(strip1, "strip1", 50, WS2811, D3, BRG);
-rgb_strip(strip2, "strip2", 50, WS2811, D5, BRG);
-rgb_strip(strip3, "strip3", 50, WS2811, D4, BRG);
-rgb_strip(strip4, "strip4", 50, WS2811, D1, BRG);
+rgb_strip(strip1, 50, WS2811, D3, BRG);
+rgb_strip(strip2, 50, WS2811, D5, BRG);
+rgb_strip(strip3, 50, WS2811, D4, BRG);
+rgb_strip(strip4, 50, WS2811, D1, BRG);
 
 // A matrix consisting of several strips
 rgb_matrix(matrix, "matrix", 25, 4)
-        .with(strip1, 0, 0, Right_Down, 25)
-        .with(strip2, 0, 1, Right_Down, 25)
-        .with(strip3, 0, 2, Right_Down, 25)
-        .with(strip4, 0, 3, Right_Down, 25);
+        .with(IN(strip1), 0, 0, Right_Down, 25)
+        .with(IN(strip2), 0, 1, Right_Down, 25)
+        .with(IN(strip3), 0, 2, Right_Down, 25)
+        .with(IN(strip4), 0, 3, Right_Down, 25);
 
 // An animator object with support functions (this one animates the matrix)
 void draw_pattern(int p, int line, int len) {
     switch(p) {
         case 1:
-            matrix.rainbow(0, line, len, 1);
+            IN(matrix).rainbow(0, line, len, 1);
             break;
         case 2:
-            matrix.gradient_row(CRGB::Green, CRGB::Blue, 0, line, len, 1);
+            IN(matrix).gradient_row(CRGB::Green, CRGB::Blue, 0, line, len, 1);
             break;
         case 3:
-            matrix.gradient_row(CRGB::Blue, CRGB::Red, 0, line, len, 1);
+            IN(matrix).gradient_row(CRGB::Blue, CRGB::Red, 0, line, len, 1);
             break;
         default:
             break;
@@ -49,20 +49,20 @@ void set_animation(Ustring& command, anim_type at, int leds, int frame_count) {
     frames[stripnr] = frame_count;
 }
 
-animator(anim, "anim", matrix)
+animator(anim, IN(matrix))
     .with_fps(10)
     .with_frame_builder( [&] () {
         for(int i=0; i<4; i++) {
             if(frames[i]>0 && anim_types[i] != none) {
                 switch(anim_types[i]) {
                     case fade:
-                        matrix.fade(8, 0, i, -1, 1);
+                        IN(matrix).fade(8, 0, i, -1, 1);
                         break;
                     case scroll:
-                        matrix.scroll_right(false,i);
+                        IN(matrix).scroll_right(false,i);
                         break;
                     case fade_to:
-                        matrix.fade_to(CRGB::Red, 16, 0, i, -1, 1);
+                        IN(matrix).fade_to(CRGB::Red, 16, 0, i, -1, 1);
                     default:
                         break; 
                 }

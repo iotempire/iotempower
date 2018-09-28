@@ -1,7 +1,7 @@
-dht(internal_name, "external_name", pin);
+dht(name, pin);
 Other names: dht11, dht22
 
-ds18x20(internal_name, "external_name", pin);
+ds18x20(name, pin);
 Other names: dallas
 
 Create a new temperature (+ humidity) sensor device.
@@ -12,15 +12,14 @@ Currently the dht11, dht22, and ds18x20 chips are supported. Chose
 the respective creation method.
 
 Parameters:
-- internal_name: name of variable to create to address this device inside
-  this file by other devices or helper functions.
-- external_name: the name it can be addressed via MQTT in the network.
+- name: the name it can be addressed via MQTT in the network. Inside the code
+  it can be addressed via IN(name).
 - pin: the gpio pin
 
 With .with_filter a filter function can be specified: (see uhelp filter).
 
 Example (node name: living room/ht1):
-dht(temp1, "ht01", D1);
+dht(ht01, D1);
 
 Now temperature and humidity are published as "living room/ht1/temperature" and
 "living room/ht1/humidity".

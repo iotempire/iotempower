@@ -32,28 +32,28 @@
 // The onboard-led is always available on development boards.
 // With this configuration it will report under myroom/test1/blue
 // and can be set via sending off or on to myroom/test1/blue/test.
-// output(blue_led, "blue", ONBOARDLED, "off", "on").set("off");
+// output(blue, ONBOARDLED, "off", "on").set("off");
 
 // Input/button example:
 // Add a button with a slightly higher debounce rate, which will report
 // in the topic myroom/test1/button1.
-// input(b1, "button1", D3, "released", "pressed")
+// input(button1, D3, "released", "pressed")
 //     .with_threshold(3)
 //     .with_on_change_callback([&] {
-//         if(b1.is("pressed")) {
-//             blue_led.toggle();
+//         if(IN(button1).is("pressed")) {
+//             IN(blue).toggle();
 //         }
 //     });
 
 // Examples for analog device:
-// analog(a0, "a0").with_precision(5); //.with_threshold(100, "high", "low");
+// analog(a0).with_precision(5); //.with_threshold(100, "high", "low");
 
 // Examples for displays
-//display(display1, "d1", font_medium);
-//display44780(display2, "d2", 16, 2);
+//display(d1, font_medium);
+//display44780(d2, 16, 2);
 
 // Example for pulse width modulation
-// pwm(blue_led, "blue", ONBOARDLED).with_frequency(1000);
+// pwm(blue, ONBOARDLED).with_frequency(1000);
 
 // Optional init function, which is called right before device initialization
 // void init() {

@@ -1,4 +1,4 @@
-rgb_strip("name", num_leds, Striptype, data_pin, 
+rgb_strip(name, num_leds, Striptype, data_pin, 
     ...other FastLed parameters...);
 
 Create a new rgb strip device object for an rgb-led strip connected to the
@@ -17,19 +17,18 @@ Under the resulting topic will be the following subtopics:
                        back) and move all other led-colors by one
 
 Parameters:
-- internal_name: name of variable to create to address this device inside
-  this file by other devices or helper functions.
-- external_name: the name it can be addressed via MQTT in the network.
+- name: the name it can be addressed via MQTT in the network. Inside the code
+  it can be addressed via IN(name).
 - data_pin: the data-pin the led strip is connected to
 - num_led: number of leds on strip
 - ...other FastLed parameters...: data related to chip configuration (use
   same format as in pointy brackets in FastLED.addLeds<>).
 
 Example (node name: living room/tvlights):
-rgb_strip(strip2, "rgb2", 10, WS2811, D6, BRG);
+rgb_strip(strip2, 10, WS2811, D6, BRG);
 
 Now the second RGB LED can be switched to red via sending to the mqtt-broker
-to the topic "living room/tvlights/rgb2/rgb/set" the command "2 red" or
+to the topic "living room/tvlights/strip2/rgb/set" the command "2 red" or
 "front red"
 
 Check also uhelp rgb_matrix and uhelp animator

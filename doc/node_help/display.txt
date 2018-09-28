@@ -1,8 +1,8 @@
-display(internal_name, "external_name", u8g2_display, font=font_medium)
+display(name, u8g2_display, font=font_medium)
   [.ic2(sda,scl)][.with_address(i2c_address)];
-display(internal_name, "external_name", font=font_medium)
+display(name, font=font_medium)
   [.ic2(sda,scl)][.with_address(i2c_address)];
-display44780(internal_name, "external_name", width, height, 
+display44780(name, width, height, 
   font=font_medium) [.ic2(sda,scl)][.with_address(i2c_address)];
 
 
@@ -19,9 +19,8 @@ HD44780 chip (also called PCF8574T - for the I2C adapter - or 1602A orLCM1602).
 send text and commands to.
 
 Parameters:
-- internal_name: name of variable to create to address this device inside
-  this file by other devices or helper functions.
-- external_name: the name it can be addressed via MQTT in the network.
+- name: the name it can be addressed via MQTT in the network. Inside the code
+  it can be addressed via IN(name).
 - width/height: dimensions of display in pixels
 - .i2c(sda,scl): move i2c to given ports - if not specified uses default 
   i2c ports
@@ -31,7 +30,7 @@ Parameters:
   If omitted, the default address is chosen.
 
 Example:
-display(dp, "dp1").i2c(D4, D3).with_address(0x78);
+display(dp1).i2c(D4, D3).with_address(0x78);
 
 Now the display can be controlled via sending to the mqtt-broker
 to the topic "node_topic/dp1" different text or commands.

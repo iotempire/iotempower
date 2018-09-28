@@ -1,2 +1,2 @@
-//led_(l0, ONBOARDLED).off();
-relais(r1, "relais", RELAIS, "closed", "open").off();
+//led(l0, ONBOARDLED).off();
+relais_(r1, "relais", RELAIS, "closed", "open").off();

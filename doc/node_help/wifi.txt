@@ -6,13 +6,13 @@ the flash button 2 or 3 times during this first blinking five seconds.
 
 Then, the node is in reconfiguration mode, and starts its own WiFi accesspoint.
 It will show up in the list of WiFi networks called something like
-ulnoiot-abcdef (the last 6 characters vary). The onboard led will blink in some
-kind of Morse code (several long blinks and several short blinks). Count the
-blinks - you can use them to verify your node in the configuration portal
-later.
+ulnoiot-ab-mn (ab, mn vary - m is number of long blinks, n number of short 
+blinks). The onboard led will blink in some kind of Morse code (several long
+blinks and several short blinks). Count the blinks - you can use them to verify
+your node.
 
 Use a phone or tablet (a computer works too) to connect to this wifi network.
-The default wifi-password in reconfiguration mode is iotempire.
+The network is open and requires no password.
 Modern phones will directly go to the configuration page or ask you to sign in
 and then go to the configuration page. If this is not the case, try to manually
 access the configuration page on http://192.168.4.1

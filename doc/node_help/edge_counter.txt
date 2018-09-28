@@ -1,4 +1,4 @@
-edge_counter(internal_name, "external_name", pin, rising=true, falling=true );
+edge_counter(name, pin, rising=true, falling=true );
 
 Create a new input port for an edge_counter,
 measuring either a falling or rising edge on the
@@ -7,9 +7,8 @@ name will be appended to the mqtt topic and
 a trigger count will be published there.
 
 Parameters:
-- internal_name: name of variable to create to address this device inside
-  this file by other devices or helper functions.
-- external_name: the name it can be addressed via MQTT in the network.
+- name: the name it can be addressed via MQTT in the network. Inside the code
+  it can be addressed via IN(name).
 - pin: the gpio pin
 - rising: if true, count rising edges
 - falling: if true, count falling edges

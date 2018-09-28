@@ -10,26 +10,27 @@
 
 //////// Device setup  ////////
 // output example
-output(blue_led, "blue", ONBOARDLED, "off", "on").set("on");
+output(blue, ONBOARDLED, "off", "on").set("on");
 // void blink() {
-//     blue_led.toggle();
+//     IN(blue).toggle();
 //     do_later(2000, blink);
 // };
 
 // input example
 // Add a button with a slightly higher debounce rate, which will report
 // in the topic myroom/test1/button1.
-// input(b1, "button1", D3, "released", "pressed")
+// input(button1, D3, "released", "pressed")
 //     .with_threshold(3)
 //     .with_on_change_callback([&] {
-//         if(b1.is("pressed")) {
-//             blue_led.toggle();
+//         if(IN(button1).is("pressed")) {
+//             IN(blue).toggle();
 //         }
 //     });
 
 // Examples for analog device:
-// analog(a0, "a0").with_precision(5); //.with_threshold(100, "high", "low");
-// analog(a0, "a0").with_filter_callback([&] {
+// analog(a0).with_precision(5); //.with_threshold(100, "high", "low");
+// Using _ in end of device allows giving internal name and "external name"
+// analog_(a0, "a0").with_filter_callback([&] {
 //     const int buflen = 100;
 //     static long sum = 0;
 //     static long values_count = 0;
@@ -44,34 +45,34 @@ output(blue_led, "blue", ONBOARDLED, "off", "on").set("on");
 //     }
 //     return false;
 // });
-// analog(a0, "a0").with_filter_callback(filter_average(int, 100, a0));
+// analog(a0).with_filter_callback(filter_average(int, 100, IN(a0));
 
 // edge_counter example
 // Count rising and falling signals on D2=Pin(4) and
 // report number counted at myroom/test1/shock1.
-// edge_counter(ecounter1, "shock1", D2);
+// edge_counter(shock1, D2);
 
 // Examples for temperature (and humidity) measurement
-// dht(temp1, "th", D7);
-// ds18b20(temp2, "ds", D2);
+// dht(th1 D7);
+// ds18b20(temp1, D2);
 
 // Servo motor
-// servo(m1, "servo", D5);
+servo(m1, D6, 800);
 
 // Distance sensor
-// hcsr04(dist, "distance", D6, D5).with_precision(5);
+// hcsr04(distance, D6, D5).with_precision(5);
 
 // Example for single RGB-led
-// rgb(rgb_led, "r0", D6, D5, D0, true);
+// rgb(r0, D6, D5, D0, true);
 
 // RGB strips
-// rgb_strip(strip1, "strip1", 50, WS2811, D3, BRG);
-// // rgb_strip(strip2, "strip2", 50, WS2811, D5, BRG);
-// // rgb_strip(strip3, "strip3", 50, WS2811, D4, BRG);
-// // rgb_strip(strip4, "strip4", 50, WS2811, D1, BRG);
+// rgb_strip_(strip1, "strip1", 50, WS2811, D3, BRG);
+// // rgb_strip_(strip2, "strip2", 50, WS2811, D5, BRG);
+// // rgb_strip_(strip3, "strip3", 50, WS2811, D4, BRG);
+// // rgb_strip_(strip4, "strip4", 50, WS2811, D1, BRG);
 
 // A matrix consiting of several strips
-// rgb_matrix(matrix, "matrix", 25, 2)
+// rgb_matrix_(matrix, "matrix", 25, 2)
 //        .with(strip1, 0, 0, Right_Down, 25);
 // //       .with(strip2, 0, 1)
 // //       .with(strip3, 0, 2)
@@ -112,7 +113,7 @@ output(blue_led, "blue", ONBOARDLED, "off", "on").set("on");
 // }
 //
 // // this defines the actual animator object
-// animator(anim, "anim", matrix)
+// animator(anim, matrix)
 //     .with_fps(10)
 //     .with_frame_builder( [&] () {
 //         for(int i=0; i<4; i++) {
@@ -141,23 +142,25 @@ output(blue_led, "blue", ONBOARDLED, "off", "on").set("on");
 //     } );
 
 // Examples for displays
-//display(display1, "d1", font_medium).i2c(D6, D5);
-//display44780(display2, "d2", 16, 2);
+//display(d1, font_medium).i2c(D6, D5); // standard ssd1306
+// U8G2_SSD1306_128X64_NONAME_1_HW_I2C u8g2d(U8G2_R0); // small ssd1306 as wemos shield
+// display(d1, u8g2d);
+//display44780(d2, 16, 2);
 
 // Example for pulse width modulation
-// pwm(blue_led, "blue", ONBOARDLED).with_frequency(1000);
+// pwm(blue, ONBOARDLED).with_frequency(1000);
 
 // Example for gyro
-//gyro6050(gyro0, "g0").with_filter( [&] { // fuse accel value into one
+// gyro6050(g0).with_filter( [&] { // fuse accel value into one
 //    // ignore angles
-//    gyro0.measured_value(0).clear();
+//    IN(g0).measured_value(0).clear();
 //    int a,b,c;
-//    if(gyro0.measured_value(1).scanf("%d,%d,%d", &a, &b, &c)!=3)
+//    if(IN(g0).measured_value(1).scanf("%d,%d,%d", &a, &b, &c)!=3)
 //        return false;
 //    unsigned long d = sqrt((unsigned long)(a*a) + (b*b) + (c*c)) + 0.5;
-//    gyro0.measured_value(1).from(d>27?1:0);
+//    IN(g0).measured_value(1).from(d>27?1:0);
 //    return true;
-//});
+// });
 
 
 // Optional init function, which is called right before device initialization
