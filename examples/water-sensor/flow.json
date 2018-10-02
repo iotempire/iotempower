@@ -1,0 +1,190 @@
+[
+  {
+    "id": "760cfbd1.5efac4",
+    "type": "mqtt in",
+    "z": "485b2d9f.f00784",
+    "name": "",
+    "topic": "water01/a0",
+    "qos": "2",
+    "broker": "d8e40824.42143",
+    "x": 150,
+    "y": 120,
+    "wires": [
+      [
+        "39262306.0d269c",
+        "6b898349.fdcd9c"
+      ]
+    ]
+  },
+  {
+    "id": "77dba5f1.d55efc",
+    "type": "delay",
+    "z": "485b2d9f.f00784",
+    "name": "",
+    "pauseType": "rate",
+    "timeout": "5",
+    "timeoutUnits": "seconds",
+    "rate": "1",
+    "nbRateUnits": "10",
+    "rateUnits": "second",
+    "randomFirst": "1",
+    "randomLast": "5",
+    "randomUnits": "seconds",
+    "drop": true,
+    "x": 500,
+    "y": 120,
+    "wires": [
+      [
+        "beb71b76.081058",
+        "2dcb1a95.ebc626"
+      ]
+    ]
+  },
+  {
+    "id": "beb71b76.081058",
+    "type": "file in",
+    "z": "485b2d9f.f00784",
+    "name": "alarm file",
+    "filename": "/home/ulno/ulnoiot/examples/water-sensor/248211__jomellejager__alarm-1.m4a",
+    "format": "",
+    "chunk": false,
+    "sendError": false,
+    "x": 740,
+    "y": 60,
+    "wires": [
+      [
+        "b54f50b3.70d0b"
+      ]
+    ]
+  },
+  {
+    "id": "39262306.0d269c",
+    "type": "switch",
+    "z": "485b2d9f.f00784",
+    "name": "only wet",
+    "property": "payload",
+    "propertyType": "msg",
+    "rules": [
+      {
+        "t": "eq",
+        "v": "wet",
+        "vt": "str"
+      }
+    ],
+    "checkall": "true",
+    "repair": false,
+    "outputs": 1,
+    "x": 320,
+    "y": 120,
+    "wires": [
+      [
+        "77dba5f1.d55efc"
+      ]
+    ]
+  },
+  {
+    "id": "b54f50b3.70d0b",
+    "type": "ui_audio",
+    "z": "485b2d9f.f00784",
+    "name": "",
+    "group": "41613568.b32efc",
+    "voice": "",
+    "always": true,
+    "x": 900,
+    "y": 60,
+    "wires": []
+  },
+  {
+    "id": "f95ab89b.1b7498",
+    "type": "ui_toast",
+    "z": "485b2d9f.f00784",
+    "position": "top right",
+    "displayTime": "3",
+    "highlight": "",
+    "outputs": 0,
+    "ok": "OK",
+    "cancel": "",
+    "topic": "Water status",
+    "name": "",
+    "x": 900,
+    "y": 280,
+    "wires": []
+  },
+  {
+    "id": "2dcb1a95.ebc626",
+    "type": "change",
+    "z": "485b2d9f.f00784",
+    "name": "Water detected!",
+    "rules": [
+      {
+        "t": "set",
+        "p": "payload",
+        "pt": "msg",
+        "to": "Water detected!",
+        "tot": "str"
+      }
+    ],
+    "action": "",
+    "property": "",
+    "from": "",
+    "to": "",
+    "reg": false,
+    "x": 680,
+    "y": 280,
+    "wires": [
+      [
+        "f95ab89b.1b7498"
+      ]
+    ]
+  },
+  {
+    "id": "6b898349.fdcd9c",
+    "type": "ui_text",
+    "z": "485b2d9f.f00784",
+    "group": "41613568.b32efc",
+    "order": 0,
+    "width": 0,
+    "height": 0,
+    "name": "",
+    "label": "water sensor status",
+    "format": "{{msg.payload}}",
+    "layout": "row-spread",
+    "x": 660,
+    "y": 400,
+    "wires": []
+  },
+  {
+    "id": "d8e40824.42143",
+    "type": "mqtt-broker",
+    "z": "",
+    "broker": "localhost",
+    "port": "1883",
+    "clientid": "",
+    "usetls": false,
+    "compatmode": true,
+    "keepalive": "60",
+    "cleansession": true,
+    "birthTopic": "",
+    "birthQos": "0",
+    "birthPayload": "",
+    "willTopic": "",
+    "willQos": "0",
+    "willPayload": ""
+  },
+  {
+    "id": "41613568.b32efc",
+    "type": "ui_group",
+    "z": "",
+    "name": "Default",
+    "tab": "50a481b9.5d8a1",
+    "disp": true,
+    "width": "6"
+  },
+  {
+    "id": "50a481b9.5d8a1",
+    "type": "ui_tab",
+    "z": "",
+    "name": "Home",
+    "icon": "dashboard"
+  }
+]

@@ -1,0 +1,113 @@
+[
+  {
+    "id": "d4d31ab8.b99b18",
+    "type": "mqtt in",
+    "z": "7f7ae577.61f1cc",
+    "name": "",
+    "topic": "cgi/#",
+    "qos": "2",
+    "broker": "b1120509.0e9838",
+    "x": 160,
+    "y": 140,
+    "wires": [
+      [
+        "cbedf176.e1b1a",
+        "22240a36.f7d716"
+      ]
+    ]
+  },
+  {
+    "id": "cbedf176.e1b1a",
+    "type": "change",
+    "z": "7f7ae577.61f1cc",
+    "name": "",
+    "rules": [
+      {
+        "t": "set",
+        "p": "payload",
+        "pt": "msg",
+        "to": "colors",
+        "tot": "str"
+      }
+    ],
+    "action": "",
+    "property": "",
+    "from": "",
+    "to": "",
+    "reg": false,
+    "x": 460,
+    "y": 160,
+    "wires": [
+      [
+        "e33cea10.2d30e8"
+      ]
+    ]
+  },
+  {
+    "id": "e33cea10.2d30e8",
+    "type": "mqtt out",
+    "z": "7f7ae577.61f1cc",
+    "name": "",
+    "topic": "owl/anim",
+    "qos": "",
+    "retain": "",
+    "broker": "d8e40824.42143",
+    "x": 710,
+    "y": 160,
+    "wires": []
+  },
+  {
+    "id": "22240a36.f7d716",
+    "type": "debug",
+    "z": "7f7ae577.61f1cc",
+    "name": "",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "false",
+    "x": 700,
+    "y": 80,
+    "wires": []
+  },
+  {
+    "id": "b1120509.0e9838",
+    "type": "mqtt-broker",
+    "z": "",
+    "name": "ulno.net via port forward",
+    "broker": "localhost",
+    "port": "1884",
+    "clientid": "ulno-x230",
+    "usetls": false,
+    "compatmode": true,
+    "keepalive": "60",
+    "cleansession": true,
+    "birthTopic": "",
+    "birthQos": "0",
+    "birthPayload": "",
+    "closeTopic": "",
+    "closeQos": "0",
+    "closePayload": "",
+    "willTopic": "",
+    "willQos": "0",
+    "willPayload": ""
+  },
+  {
+    "id": "d8e40824.42143",
+    "type": "mqtt-broker",
+    "z": "",
+    "broker": "localhost",
+    "port": "1883",
+    "clientid": "",
+    "usetls": false,
+    "compatmode": true,
+    "keepalive": "60",
+    "cleansession": true,
+    "birthTopic": "",
+    "birthQos": "0",
+    "birthPayload": "",
+    "willTopic": "",
+    "willQos": "0",
+    "willPayload": ""
+  }
+]

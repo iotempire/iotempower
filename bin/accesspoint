@@ -11,6 +11,9 @@ fi
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
+ufw_active=""
+sudo ufw status| grep "Status: active" &>/dev/null && ufw_active="true"
+
 while true; do
 
     # find input network device (device connected to internet)
@@ -119,6 +122,10 @@ EOF
         sudo iptables -t nat -D POSTROUTING 1
         sudo iptables -t nat -A POSTROUTING -s $ULNOIOT_AP_IP/24 \
                 -o "$INPUT_DEVICE" -j MASQUERADE
+    fi
+    # make sure to restore firewall
+    if [[ "$ufw_active" ]]; then
+        sudo ufw enable
     fi
     wait $ap_id
 done

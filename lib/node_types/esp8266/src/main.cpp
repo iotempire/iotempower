@@ -213,11 +213,15 @@ void flash_mode_select() {
         // blink a bit to show that we have booted and waiting for
         // potential input
 
-        pinMode(LED_BUILTIN, OUTPUT);
+        #ifdef ID_LED
+        pinMode(ID_LED, OUTPUT);
+        #endif
         pinMode(FLASHBUTTON, INPUT_PULLUP); // check flash button (d3 on wemos and
                                   // nodemcu) 
         for (int i = 0; i < 500; i++) {
-            digitalWrite(LED_BUILTIN, (i / 25) % 2);
+            #ifdef ID_LED
+            digitalWrite(ID_LED, (i / 25) % 2);
+            #endif
             int new_state = digitalRead(0);
             if (new_state != last) {
                 last = new_state;
