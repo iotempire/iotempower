@@ -19,13 +19,13 @@ output(blue, ONBOARDLED, "off", "on").set("on");
 // input example
 // Add a button with a slightly higher debounce rate, which will report
 // in the topic myroom/test1/button1.
-// input(button1, D3, "released", "pressed")
-//     .with_threshold(3)
-//     .with_on_change_callback([&] {
-//         if(IN(button1).is("pressed")) {
-//             IN(blue).toggle();
-//         }
-//     });
+input(button1, D3, "released", "pressed")
+    .with_threshold(3)
+    .with_on_change_callback([&] {
+         if(IN(button1).is("pressed")) {
+             IN(blue).toggle();
+         }
+     });
 
 // Examples for analog device:
 // analog(a0).with_precision(5); //.with_threshold(100, "high", "low");
@@ -57,7 +57,7 @@ output(blue, ONBOARDLED, "off", "on").set("on");
 // ds18b20(temp1, D2);
 
 // Servo motor
-servo(m1, D6, 800);
+// servo(m1, D6, 800);
 
 // Distance sensor
 // hcsr04(distance, D6, D5).with_precision(5);

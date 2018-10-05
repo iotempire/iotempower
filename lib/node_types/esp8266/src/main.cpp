@@ -407,11 +407,11 @@ void setup() {
     connectToWifi();
 
 
-    // This reboot and wait might not be necessary
-    if (WiFi.waitForConnectResult() != WL_CONNECTED) {
-        Serial.println("Connection Failed! Rebooting...");
-        reboot();
-    }
+    // // This reboot and wait might not be necessary
+    // if (WiFi.waitForConnectResult() != WL_CONNECTED) {
+    //     Serial.println("Connection Failed! Rebooting...");
+    //     reboot();
+    // }
 
     // Port defaults to 8266
     // ArduinoOTA.setPort(8266);
@@ -498,12 +498,12 @@ void loop() {
     // TODO: make sure nothing weird happens -> watchdog
     ArduinoOTA.handle();
     if (!reconfig_mode_active) {
-        if (mqttClient.connected()) {
-            current_time = millis();
-            do_later_check(); // work the scheduler
-            if (current_time - last_measured >= _measure_delay) {
-                devices_update();
-                last_measured = current_time;
+        current_time = millis();
+        do_later_check(); // work the scheduler
+        if (current_time - last_measured >= _measure_delay) {
+            devices_update();
+            last_measured = current_time;
+            if (mqttClient.connected()) {
                 if (current_time - last_published >= MIN_PUBLISH_TIME_MS) {
                     // go through devices and send reports if necessary
                     if (transmission_delta > 0 &&
