@@ -2,6 +2,7 @@
 *.bin
 *.pyc
 key.txt
+system.conf
 
 examples/private/
 tmp/
