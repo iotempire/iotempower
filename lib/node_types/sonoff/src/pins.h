@@ -8,7 +8,7 @@
 #define REDLED2 5
 
 // d2 Pin(4)
-#define RELAIS 4
+#define RELAIS3 4
 #define REDLED3 4
 
 // d3 Pin(0)
@@ -27,6 +27,7 @@
 
 // d6 Pin(12)
 #define RELAIS1 12
+#define RELAIS 12
 #define REDLED1 12
 
 // d7 Pin(13)
