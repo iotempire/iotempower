@@ -17,5 +17,5 @@ The frequency can be set via the suptopic frequency/set
 Example:
 pwm(blue, ONBOARDLED, frequency=2000);
 
-Now you cen set the brightness of onboardled to 50% sending 512 to
+Now you can set the brightness of onboardled to 50% sending 512 to
 [nodename]/blue/set
