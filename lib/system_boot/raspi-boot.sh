@@ -27,13 +27,15 @@ if [[ "ULNOIOT_AP_PASSWORD" ]]; then # pw was given, so start an accesspoint
     # start accesspoint and mqtt_broker
     (
         sleep 15 # let network devices start
+        cd "$ULNOIOT_ROOT"
+        export PATH="$ULNOIOT_ROOT/bin:$PATH"
         tmux new-session -d -n AP -s UIoTSvrs \
-                "$ULNOIOT_ROOT/run" exec accesspoint \; \
+                "./run" exec accesspoint \; \
             new-window -d -n MQTT  \
-                "$ULNOIOT_ROOT/run" exec mqtt_broker \; \
+                "./run" exec mqtt_broker \; \
             new-window -d -n nodered  \
-                "$ULNOIOT_ROOT/run" exec su - $ULNOIOT_USER -c nodered_starter \; \
+                su - $ULNOIOT_USER -c 'ulnoiot exec nodered_starter' \; \
             new-window -d -n cloudcmd  \
-                "$ULNOIOT_ROOT/run" exec su - $ULNOIOT_USER -c cloudcmd_starter \;
+                su - $ULNOIOT_USER -c 'ulnoiot exec cloudcmd_starter' \;
     ) &
 fi # accesspoint check
