@@ -21,14 +21,18 @@
 
 source "$ULNOIOT_ROOT/bin/read_boot_config"
 
-ULNOIOT_USER=ulnoiot
+# Try to guess user
+if [[ $ULNOIOT_ROOT =~ '/home/([!/]+)/ulnoiot' ]]; then
+    ULNOIOT_USER=${BASH_REMATCH[1]}
+else
+    ULNOIOT_USER=ulnoiot
+fi
 
 if [[ "ULNOIOT_AP_PASSWORD" ]]; then # pw was given, so start an accesspoint
     # start accesspoint and mqtt_broker
     (
         sleep 15 # let network devices start
         cd "$ULNOIOT_ROOT"
-        export PATH="$ULNOIOT_ROOT/bin:$PATH"
         tmux new-session -d -n AP -s UIoTSvrs \
                 "./run" exec accesspoint \; \
             new-window -d -n MQTT  \
