@@ -32,8 +32,8 @@ if [[ "ULNOIOT_AP_PASSWORD" ]]; then # pw was given, so start an accesspoint
             new-window -d -n MQTT  \
                 "$ULNOIOT_ROOT/run" exec mqtt_broker \; \
             new-window -d -n nodered  \
-                "$ULNOIOT_ROOT/run" exec su - $ULNOIOT_USER -c nodered_starter \
+                "$ULNOIOT_ROOT/run" exec su - $ULNOIOT_USER -c nodered_starter \; \
             new-window -d -n cloudcmd  \
-                "$ULNOIOT_ROOT/run" exec su - $ULNOIOT_USER -c cloudcmd_starter
+                "$ULNOIOT_ROOT/run" exec su - $ULNOIOT_USER -c cloudcmd_starter \;
     ) &
 fi # accesspoint check
