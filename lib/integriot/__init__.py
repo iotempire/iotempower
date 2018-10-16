@@ -71,7 +71,7 @@ def stop():
 
 def process(*args):
     """
-    Process one step in workign on mqtt events
+    Process one step in working on mqtt events
     :param args: a list of Thingi-objects (if empty try to use global devices)
     :return:
     """

@@ -18,9 +18,16 @@ class ThingConnector():
         self.mqtt_host = mqtt_host
         self.thingis = {}
         self.topic_prefix = None  # can be set from outside
+        self.connected = False
 
     def connect(self):
-        return self.client.connect(self.mqtt_host)
+        retval = None
+        try:
+            retval = self.client.connect(self.mqtt_host)
+            self.connected = True
+        except:
+            self.connected = False
+        return retval
 
     def _device_full_topic(self, topic):
         if self.topic_prefix:
