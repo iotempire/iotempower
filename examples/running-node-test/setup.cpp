@@ -66,7 +66,7 @@ input(button1, D3, "released", "pressed")
 // rgb(r0, D6, D5, D0, true);
 
 // RGB strips
-// rgb_strip_(strip1, "strip1", 50, WS2811, D3, BRG);
+rgb_strip(strip1, 90, WS2811, D2, BRG);
 // // rgb_strip_(strip2, "strip2", 50, WS2811, D5, BRG);
 // // rgb_strip_(strip3, "strip3", 50, WS2811, D4, BRG);
 // // rgb_strip_(strip4, "strip4", 50, WS2811, D1, BRG);

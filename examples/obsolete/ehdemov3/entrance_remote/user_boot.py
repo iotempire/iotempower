@@ -1,3 +1,0 @@
-import handler
-
-handler.run()

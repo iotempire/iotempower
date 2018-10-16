@@ -39,19 +39,6 @@ class ThingConnector():
         t = self._device_full_topic(topic)
         del self.thingis[t]
 
-    def remote_actor(self, topic, qos=0):
-        """
-        Create new external (remote) actor device.
-        A remote actor usually does not need any callbacks/subscriptions.
-
-        :param topic:
-        :return:
-        """
-        t = self._device_full_topic(topic)
-        d = thingi.Thingi(self.client, t, qos)
-        self._add_thingi(d, t)
-        return d
-
     def thingi(self, topic, subscriptions={}, qos=0):
         """
         Create new thing interface.
@@ -72,7 +59,7 @@ class ThingConnector():
                topics
         :return:
         """
-        d = self.remote_actor(topic, qos)
+        d = self.publisher(topic, qos)
         if callable(subscriptions):
             d.subscribe("", subscriptions)
         else:
@@ -89,9 +76,22 @@ class ThingConnector():
                         d.subscribe_data(t, data, item[data])
         return d
 
-    def remote_sensor(self, topic, subscriptions={}, qos=0):
+    def publisher(self, topic, qos=0):
         """
-        Create new external (remote) sensor device.
+        Create a thing interface to report values to or set values in (publish).
+        A publisher usually does not need any callbacks/subscriptions.
+
+        :param topic:
+        :return:
+        """
+        t = self._device_full_topic(topic)
+        d = thingi.Thingi(self.client, t, qos)
+        self._add_thingi(d, t)
+        return d
+
+    def subscriber(self, topic, subscriptions={}, qos=0):
+        """
+        Create a thing interface for receiving values (subscribe).
 
         :param topic:
         :param subscriptions: {"subtopic1":callback1[, "subtopic2":callback2]...}
@@ -111,8 +111,22 @@ class ThingConnector():
         """
         return self.thingi(topic, subscriptions, qos=qos)
 
-    def remote_switch(self, topic, on_command="on", off_command="off",
-                      set_topic="set", state_topic="", init_state=None, qos=0):
+    def switch_publisher(self, topic, on_command="on", off_command="off",
+                         set_topic="set", state_topic="", init_state=None, qos=0):
+        """
+        Create a thing interface to publish values as a switch (reporting on and
+        off depending on status). This also supports a toggle method resulting
+        in publishing the correct method based on an internal state.
+
+        :param topic:
+        :param on_command:
+        :param off_command:
+        :param set_topic:
+        :param state_topic:
+        :param init_state:
+        :param qos:
+        :return:
+        """
         t = self._device_full_topic(topic)
         d = thingi.ThingiSwitch(self.client, t, on_command, off_command,
                               set_topic, state_topic, init_state, qos)

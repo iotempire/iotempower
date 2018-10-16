@@ -1,1 +1,0 @@
-../../device_types/devkit1/handler.py

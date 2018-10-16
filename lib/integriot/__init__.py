@@ -22,19 +22,19 @@ def thingi(t, cb={}):
     :return:
     '''
     global _main_devices
-    return _main_devices.remote_sensor(t, cb)
+    return _main_devices.subscriber(t, cb)
 
 
 # Careful: all the following have to be understood as being remotely connected
 # to network nodes
-def sensor(t, cb={}):
+def subscriber(t, cb={}):
     global _main_devices
-    return _main_devices.remote_sensor(t, cb)
+    return _main_devices.subscriber(t, cb)
 
 
-def actor(t):
+def publisher(t):
     global _main_devices
-    return _main_devices.remote_actor(t)
+    return _main_devices.publisher(t)
 
 
 def device_list():
@@ -42,14 +42,11 @@ def device_list():
     return _main_devices.device_list
 
 
-def switch(t, on_command="on", off_command="off", set_topic="set",
+def switch_publisher(t, on_command="on", off_command="off", set_topic="set",
            state_topic="", init_state=None):
     global _main_devices
-    return _main_devices.remote_switch(t, on_command, off_command, set_topic,
-                                       state_topic, init_state)
-
-led = switch
-relay = switch
+    return _main_devices.switch_publisher(t, on_command, off_command, set_topic,
+                                          state_topic, init_state)
 
 
 def init(mqtt_host):

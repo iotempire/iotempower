@@ -1,1 +1,0 @@
-../../device_types/servo_switch/servo_switch_handler.py
