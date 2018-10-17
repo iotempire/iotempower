@@ -4,11 +4,15 @@
 from neopixel import * # led strip code by https://github.com/jgarff/rpi_ws281x
 
 
+LED_COUNT = 90
+LED_GPIO = 12
 LED_FREQ = 800000  # LED signal frequency in hertz (usually 800khz)
-LED_BRIGHTNESS = 63 # Set to 0 for darkest and 255 for brightest
+LED_DMA = 10
+LED_INVERT = False
+LED_BRIGHTNESS = 255 # Set to 0 for darkest and 255 for brightest
+LED_CHANNEL = 0
 LED_STRIP_TYPE = ws.WS2811_STRIP_BRG
-STRIP_COUNT=4
-strip = Adafruit_NeoPixel(20, 21, LED_FREQ, 5, False, LED_BRIGHTNESS, 0, LED_STRIP_TYPE)
+strip = Adafruit_NeoPixel(LED_COUNT, LED_GPIO, LED_FREQ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL, LED_STRIP_TYPE)
 
 matrix_map = [
 [ 72, 73, 74, 75, 76, 77, 78, 79, 80 ],
@@ -26,19 +30,24 @@ matrix_map = [
 MATRIX_HEIGHT=len(matrix_map)
 MATRIX_WIDTH=len(matrix_map[0])
 
-def set_pixel( x, y, color ):
+def set_pixel(x, y, color):
     global strip, matrix_map
     nr = matrix_map[y][x]
     strip.setPixelColor( nr, color )
 
-def fill( color ):
+def get_pixel(x, y):
+    global strip, matrix_map
+    nr = matrix_map[y][x]
+    return strip.getPixelColor(nr)
+
+def fill(color):
     global strip, matrix_map
     for line in matrix_map:
         for nr in line:
             strip.setPixelColor( nr, color )
 
 def clear():
-    fill( Color(0,0,0) )
+    fill(Color(0,0,0))
 
 def show():
     global strip
@@ -98,7 +107,7 @@ def blue( _ ):
 
 def yellow( _ ):
     animation_stop()
-    fill(Color(255,40,5))
+    fill(Color(255,50,5))
     show()
 
 
