@@ -5,7 +5,7 @@ from neopixel import * # led strip code by https://github.com/jgarff/rpi_ws281x
 
 
 LED_COUNT = 90
-LED_GPIO = 12
+LED_GPIO = 21
 LED_FREQ = 800000  # LED signal frequency in hertz (usually 800khz)
 LED_DMA = 10
 LED_INVERT = False
