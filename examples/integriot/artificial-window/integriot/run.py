@@ -27,13 +27,13 @@ MATRIX_HEIGHT=len(matrix_map)
 MATRIX_WIDTH=len(matrix_map[0])
 
 def set_pixel( x, y, color ):
-    global strip
-    nr = matrix[y][x]
+    global strip, matrix_map
+    nr = matrix_map[y][x]
     strip.setPixelColor( nr, color )
 
 def fill( color ):
-    global strip, matrix
-    for line in matrix:
+    global strip, matrix_map
+    for line in matrix_map:
         for nr in line:
             strip.setPixelColor( nr, color )
 
