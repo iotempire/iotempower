@@ -68,6 +68,7 @@ def begin():
 from integriot import *
 
 animation = None
+animation_frames = 0
 
 def animation_stop():
     global animation
@@ -78,11 +79,12 @@ lasttime=clock()
 
 def animation_next():
     global animation, lasttime
-    if animation:
-        while clock()-lasttime >= framelen:
+    while clock()-lasttime >= framelen:
+        if animation and animation_frames > 0:
             animation()
-            lasttime += framelen
-        show()
+            show()
+        lasttime += framelen
+        animation_frames -= 1
     else:
         lasttime=clock()
 
@@ -177,8 +179,6 @@ def animation_lightning():
     set_color("darkgray")
     if animation_frames>10:
         draw_lightning(lightning_column)
-    animation_frames -= 1
-    if animation_frames<=0: animation = None
 
 
 def command_lightning(_):
@@ -252,7 +252,7 @@ command_list = {
 # "command":method
     "row": command_row,
     "column": command_column,
-    "ligthning": command_lightning,
+    "lightning": command_lightning,
     "halloween": command_halloween,
     "blood_smear": command_blood_smear,
     "fireplace": command_fireplace,
