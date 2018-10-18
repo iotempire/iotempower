@@ -177,14 +177,14 @@ def draw_lightning(x):
 def animation_lightning():
     global animation, animation_frames, lightning_column
     set_color("darkgray")
-    if animation_frames>fps/4:
+    if animation_frames>1:  # last turn gray again
         draw_lightning(lightning_column)
 
 
 def command_lightning(_):
     global animation, animation_frames, lightning_column
     lightning_column = randint(0, MATRIX_WIDTH)
-    animation_frames = fps
+    animation_frames = randint(fps//3, fps)
     animation = animation_lightning
 
 
