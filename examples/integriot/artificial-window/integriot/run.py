@@ -74,17 +74,19 @@ def animation_stop():
     global animation
     animation = None
 
-framelen=1.0/25
-lasttime=clock()
+fps = 25
+framelen = 1.0/fps
+lasttime = clock()
 
 def animation_next():
     global animation, lasttime
     while clock()-lasttime >= framelen:
-        if animation and animation_frames > 0:
+        if animation is not None and animation_frames > 0:
+            print("Calling animation.")  # TODO: remove
             animation()
             show()
+            animation_frames -= 1
         lasttime += framelen
-        animation_frames -= 1
     else:
         lasttime=clock()
 
