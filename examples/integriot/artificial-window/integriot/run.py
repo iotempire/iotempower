@@ -165,18 +165,19 @@ def command_column(params):
     return 2
 
 def draw_lightning(x):
+    c=color_map["white"]
     for y in range(MATRIX_HEIGHT):
         r = randint(0, 2)
         x += r - 1
         if x<0: x=0
-        elif x>=MATRIX_WIDTH: x = MATRIX_WIDTH - 1;
-        set_pixel(x,y,color_map["white"])
+        elif x>=MATRIX_WIDTH: x = MATRIX_WIDTH - 1
+        set_pixel(x,y,c)
 
 
 def animation_lightning():
     global animation, animation_frames, lightning_column
     set_color("darkgray")
-    if animation_frames>fps/2:
+    if animation_frames>fps/4:
         draw_lightning(lightning_column)
 
 
