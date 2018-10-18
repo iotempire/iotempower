@@ -107,7 +107,7 @@ def set_color(color, x=-1, y=-1):
             else:
                 if(len(color) == 6): # 6 digit hex?
                     try:
-                        rgb = int("0x"+color)
+                        rgb = int("0x"+color, 16)
                     except:
                         pass
                     else:
