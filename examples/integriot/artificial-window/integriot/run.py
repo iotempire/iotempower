@@ -118,7 +118,7 @@ def set_color(color, x=-1, y=-1):
                         r = rgb
                         color = Color(r,g,b)
     if isinstance(color, Color):
-        if x == -1 || y == -1:
+        if x == -1 or y == -1:
             fill(color)
         else:
             set_pixel(x, y, color)
