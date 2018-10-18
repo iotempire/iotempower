@@ -74,21 +74,18 @@ def animation_stop():
     global animation
     animation = None
 
-fps = 25
+fps = 50
 framelen = 1.0/fps
 lasttime = clock()
 
 def animation_next():
-    global animation, lasttime
+    global animation, lasttime, animation_frames
     while clock()-lasttime >= framelen:
         if animation is not None and animation_frames > 0:
-            print("Calling animation.")  # TODO: remove
             animation()
             show()
             animation_frames -= 1
         lasttime += framelen
-    else:
-        lasttime=clock()
 
 color_map = {
     "bright": Color(255,255,255),
@@ -179,14 +176,14 @@ def draw_lightning(x):
 def animation_lightning():
     global animation, animation_frames, lightning_column
     set_color("darkgray")
-    if animation_frames>10:
+    if animation_frames>fps/2:
         draw_lightning(lightning_column)
 
 
 def command_lightning(_):
     global animation, animation_frames, lightning_column
     lightning_column = randint(0, MATRIX_WIDTH)
-    animation_frames = 20
+    animation_frames = fps
     animation = animation_lightning
 
 
