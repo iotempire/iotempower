@@ -125,7 +125,7 @@ def set_color(color, x=-1, y=-1):
 
 
 def command_row(params):
-    if len(params<2):
+    if len(params)<2:
         return len(params)
     try:
         y = int(params[0])
@@ -138,7 +138,7 @@ def command_row(params):
 
 
 def command_column(params):
-    if len(params<2):
+    if len(params)<2:
         return len(params)
     try:
         x = int(params[0])
