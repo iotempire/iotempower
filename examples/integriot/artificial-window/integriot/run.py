@@ -124,10 +124,36 @@ def set_color(color, x=-1, y=-1):
             set_pixel(x, y, color)
 
 
+def command_row(params):
+    if len(params<2):
+        return len(params)
+    try:
+        y = int(params[0])
+    except:
+        pass
+    else:
+        for x in range(MATRIX_WIDTH):
+            set_pixel(x, y, params[1])
+    return 2
+
+
+def command_column(params):
+    if len(params<2):
+        return len(params)
+    try:
+        x = int(params[0])
+    except:
+        pass
+    else:
+        for y in range(MATRIX_HEIGHT):
+            set_pixel(x, y, params[1])
+    return 2
 
 
 command_list = {
 # "command":method
+    "row": command_row,
+    "column": command_column,
 }
 
 def matrix_cb(msg):
