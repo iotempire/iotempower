@@ -133,7 +133,7 @@ def command_row(params):
         pass
     else:
         for x in range(MATRIX_WIDTH):
-            set_pixel(x, y, params[1])
+            set_color(params[1], x, y)
     return 2
 
 
@@ -146,7 +146,7 @@ def command_column(params):
         pass
     else:
         for y in range(MATRIX_HEIGHT):
-            set_pixel(x, y, params[1])
+            set_color(params[1], x, y)
     return 2
 
 
