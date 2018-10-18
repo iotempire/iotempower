@@ -172,10 +172,10 @@ def draw_lightning(x):
 
 
 def animation_lightning():
-    global animation
+    global animation, lightning_column
     set_color("darkgray")
-    if(animation_frames>10)
-        draw_lightning(lightnning_column)
+    if animation_frames>10:
+        draw_lightning(lightning_column)
     animation_frames -= 1
     animation = None
 
