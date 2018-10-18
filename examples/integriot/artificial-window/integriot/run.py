@@ -85,7 +85,7 @@ color_map = {
     "red"   : Color(255,0,0),
     "green" : Color(0,255,0),
     "blue"  : Color(0,0,255),
-    "yellow": Color(255,50,10),
+    "yellow": Color(255,80,0),
 }
 
 def set_color(color, x=-1, y=-1):
