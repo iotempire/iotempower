@@ -117,7 +117,7 @@ def set_color(color, x=-1, y=-1):
                         rgb //= 256
                         r = rgb
                         color = Color(r,g,b)
-    if isinstance(color, Color):
+    if isinstance(color, int):
         if x == -1 or y == -1:
             fill(color)
         else:
