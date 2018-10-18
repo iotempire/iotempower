@@ -35,6 +35,8 @@ MATRIX_WIDTH=len(matrix_map[0])
 
 def set_pixel(x, y, color):
     global strip, matrix_map
+    x = min(MATRIX_WIDTH,max(0,x))
+    y = min(MATRIX_HEIGHT,max(0,y))
     nr = matrix_map[y][x]
     strip.setPixelColor( nr, color )
 
