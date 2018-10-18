@@ -75,7 +75,7 @@ def animation_stop():
     animation = None
 
 fps = 50
-framelen = 1.0/fps
+framelen = 1.0/1000/fps
 lasttime = clock()
 
 def animation_next():
