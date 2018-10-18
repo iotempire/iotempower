@@ -82,6 +82,7 @@ def animation_next():
         while clock()-lasttime >= framelen:
             animation()
             lasttime += framelen
+        show()
     else:
         lasttime=clock()
 
@@ -177,7 +178,7 @@ def animation_lightning():
     if animation_frames>10:
         draw_lightning(lightning_column)
     animation_frames -= 1
-    animation = None
+    if animation_frames<=0: animation = None
 
 
 def command_lightning(_):
