@@ -2,8 +2,8 @@
 # the artificial window
 
 from neopixel import * # led strip code by https://github.com/jgarff/rpi_ws281x
-
-import re
+from random import randint
+from time import clock
 
 LED_COUNT = 90
 LED_GPIO = 21
@@ -73,10 +73,17 @@ def animation_stop():
     global animation
     animation = None
 
+framelen=1.0/25
+lasttime=clock()
+
 def animation_next():
-    global animation
+    global animation, lasttime
     if animation:
-        animation()
+        while clock()-lasttime >= framelen:
+            animation()
+            lasttime += framelen
+    else:
+        lasttime=clock()
 
 color_map = {
     "bright": Color(255,255,255),
@@ -88,6 +95,10 @@ color_map = {
     "green" : Color(0,255,0),
     "blue"  : Color(0,0,255),
     "yellow": Color(255,80,0),
+    "gray"  : Color(127,90,65),
+    "grey"  : Color(127,90,65),
+    "darkgray": Color(32, 22, 16),
+    "darkgrey": Color(23, 22, 16),
 }
 
 def set_color(color, x=-1, y=-1):
@@ -151,12 +162,104 @@ def command_column(params):
             set_color(params[1], x, y)
     return 2
 
+def draw_lightning(x):
+    for y in range(MATRIX_HEIGHT):
+        r=randint(0,2)
+        x += r - 1
+        if x<0: x=0
+        elif x>=MATRIX_WIDTH: x = MATRIX_WIDTH - 1;
+        set_pixel(x,y,color_map["white"])
+
+
+def animation_lightning():
+    global animation
+    set_color("darkgray")
+    if(animation_frames>10)
+        draw_lightning(lightnning_column)
+    animation_frames -= 1
+    animation = None
+
+
+def command_lightning(_):
+    global animation, animation_frames, lightning_column
+    lightning_column = randint(0,MATRIX_WIDTH)
+    animation_frames = 20
+    animation = animation_lightning
+
+
+def animation_blood_smear():
+    global animation
+    animation = None
+
+
+def command_blood_smear(_):
+    global animation
+    animation = animation_blood_smear
+
+
+def animation_halloween():
+    global animation
+    animation = None
+
+
+def command_halloween(_):
+    global animation
+    animation = animation_halloween
+
+
+def animation_fireplace():
+    global animation
+    animation = None
+
+
+def command_fireplace(_):
+    global animation
+    animation = animation_fireplace
+
+
+def animation_sunrise():
+    global animation
+    animation = None
+
+
+def command_sunrise(_):
+    global animation
+    animation = animation_sunrise
+
+
+def animation_sunset():
+    global animation
+    animation = None
+
+
+def command_sunset(_):
+    global animation
+    animation = animation_sunset
+
+
+def animation_daytime():
+    global animation
+    animation = None
+
+
+def command_daytime():
+    global animation
+    animation = animation_daytime
+
 
 command_list = {
 # "command":method
     "row": command_row,
     "column": command_column,
+    "ligthning": command_lightning,
+    "halloween": command_halloween,
+    "blood_smear": command_blood_smear,
+    "fireplace": command_fireplace,
+    "sunrise": command_sunrise,
+    "sunset": command_sunset,
+    "daytime": command_daytime,
 }
+
 
 def matrix_cb(msg):
     animation_stop()
@@ -168,6 +271,8 @@ def matrix_cb(msg):
         if first in command_list:
             del command[0]
             processed = command_list[first](command)
+            if processed is None:
+                processed = 0
             command = command[processed:]
         else: # color with coordinates given?
             x = -1
