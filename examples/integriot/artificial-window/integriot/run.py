@@ -263,21 +263,22 @@ def command_blood_smear(_):
 
 imagelist = []
 image_calibration = white
+images_loop = False
 
 
 def animation_images():
-    global animation_frames, imagelist, animation_frame_show_count
+    global animation_frames, imagelist, animation_frame_show_count, images_loop
     l = len(imagelist)
     if animation_frames % animation_frame_show_count == 0:
         im = imagelist[l - animation_frames//animation_frame_show_count]
         draw_image(im, calibrate=image_calibration)
-    if animation_frames <= 1:
-        animation_frames = l
+    if images_loop and animation_frames <= 1:
+        animation_frames = l*animation_frame_show_count+1
 
 
 
 def command_images(args):
-    global imagelist, image_calibration, animation_frame_show_count
+    global imagelist, image_calibration, animation_frame_show_count, images_loop
     consumed = 0
     # check if we got a calibration color first
     if len(args) == 0:
@@ -319,6 +320,14 @@ def command_images(args):
         animation_frame_show_count = int(animation_cycle_length*animation_fps/len(imagelist)+0.1)
     consumed += 1
     animation_start(animation_images, len(imagelist)*animation_frame_show_count+1)  # we will keep this higher to refill when down
+    images_loop = True
+    # check if we get a noloop
+    if len(args) == 0:
+        return consumed
+    else:
+        if args[0].lower() == "noloop":
+            images_loop = False
+            consumed += 1
     return consumed  # consume arguments
 
 
