@@ -4,7 +4,7 @@ if [[ "$1" == loop ]]; then
     stop_play  # stop others when loop requested
     loop="-loop -1"
     shift
-else if [[ "$1" == stop ]]; then
+elif [[ "$1" == stop ]]; then
     stop_play  # also stop when stop requested
     shift
 fi
