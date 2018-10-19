@@ -4,7 +4,7 @@
 from PIL import Image # Pillow library
 from neopixel import * # led strip code by https://github.com/jgarff/rpi_ws281x
 from random import randint
-from time import clock
+from time import time
 import os
 
 LED_COUNT = 90
@@ -105,13 +105,13 @@ def animation_stop():
     global animation
     animation = None
 
-fps = 50
-framelen = 1.0/1000/fps
-lasttime = clock()
+fps = 30
+framelen = 1.0/fps
+lasttime = time()
 
 def animation_next():
     global animation, lasttime, animation_frames
-    while clock()-lasttime >= framelen:
+    while time()-lasttime >= framelen:
         if animation is not None and animation_frames > 0:
             animation()
             show()
