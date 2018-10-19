@@ -69,7 +69,7 @@ def draw_image(im, startx=0, starty=0, calibrate=white):
         imx = startx
         imy = starty+y
         for x in range(MATRIX_WIDTH):
-            set_pixel(x, y, CColor(*im.getpixel((imx%imw, imy%imh))),calibrate=calibrate)
+            set_pixel(x, y, CColor(*im.getpixel((imx%imw, imy%imh)),calibrate=calibrate))
             imx += 1
 
 
