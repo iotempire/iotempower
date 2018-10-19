@@ -267,8 +267,8 @@ image_calibration = white
 
 def animation_images():
     global animation_frames, imagelist, animation_frame_show_count
+    l = len(imagelist)
     if animation_frames % animation_frame_show_count == 0:
-        l = len(imagelist)
         im = imagelist[l - animation_frames//animation_frame_show_count]
         draw_image(im, calibrate=image_calibration)
     if animation_frames <= 1:
