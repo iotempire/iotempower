@@ -81,7 +81,7 @@ def get_image():
     im = Image.new("RGB",(MATRIX_WIDTH,MATRIX_HEIGHT))
     for y in range(MATRIX_HEIGHT):
         for x in range(MATRIX_WIDTH):
-            im.putpixel((x, y), get_pixel((x, y)))
+            im.putpixel((x, y), get_pixel(x, y))
     return im
 
 
