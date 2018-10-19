@@ -2,10 +2,10 @@
 loop=""
 if [[ "$1" == loop ]]; then
     stop_play  # stop others when loop requested
-    loop="-loop -1"
+    loop="--loop -1"
     shift
 elif [[ "$1" == stop ]]; then
     stop_play  # also stop when stop requested
     shift
 fi
-mpg123 $loop -a plughw:CARD=AUDIO,DEV=0 -q "/home/pi/sounds/$@.mp3"
+mpg123 $loop -q --no-control -a dmix:CARD=AUDIO,DEV=0 "/home/pi/sounds/$@.mp3"
