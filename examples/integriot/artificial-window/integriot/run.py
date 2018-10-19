@@ -119,6 +119,8 @@ animation_image_backup = None
 def animation_stop():
     global animation
     animation = None
+    # restore image before animation
+    draw_image(animation_image_backup)
 
 
 def animation_next():
@@ -224,10 +226,8 @@ def animation_lightning():
     global animation, animation_frames, lightning_column
 #    set_color("darkgray")
     draw_image(animation_image_backup, calibrate=(64, 64, 64))
-    if animation_frames>1:
-        draw_lightning(lightning_column)
-    else:  # last: restore image
-        draw_image(animation_image_backup)
+    draw_lightning(lightning_column)
+
 
 
 def command_lightning(_):
