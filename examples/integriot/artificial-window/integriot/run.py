@@ -58,7 +58,7 @@ def set_pixel(x, y, color):
     x = min(MATRIX_WIDTH,max(0,x))
     y = min(MATRIX_HEIGHT,max(0,y))
     nr = matrix_map[y][x]
-    strip.setPixelColor( nr, color )
+    strip.setPixelColor(nr, color)
 
 
 def get_pixel(x, y):
@@ -81,7 +81,7 @@ def get_image():
     im = Image.new("RGB",(MATRIX_WIDTH,MATRIX_HEIGHT))
     for y in range(MATRIX_HEIGHT):
         for x in range(MATRIX_WIDTH):
-            im.putpixel((x, y), get_pixel(x, y))
+            im.putpixel((x, y), int2rgb(get_pixel(x, y)))
     return im
 
 
