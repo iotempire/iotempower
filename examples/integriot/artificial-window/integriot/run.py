@@ -42,12 +42,12 @@ white=(255,180,130)
 def CColor(r, g=-1, b=-1):
     global white
     if g==-1:
-        b = r&255
-        r //= 256
-        g = r&255
-        r //= 256
+        b = r & 255
+        r >>= 8
+        g = r & 255
+        r >>= 8
     # calibrated color
-    return Color(r*white[0]//255, g*white[1]//255, b*white[2]/255)
+    return Color(r*white[0]//255, g*white[1]//255, b*white[2]//255)
 
 
 def set_pixel(x, y, color):
@@ -160,9 +160,9 @@ def set_color(color, x=-1, y=-1):
                         pass
                     else:
                         b = rgb & 255
-                        rgb //=  256
+                        rgb >>=  8
                         g = rgb & 255
-                        rgb //= 256
+                        rgb >>= 8
                         r = rgb
                         color = Color(r,g,b)
     if isinstance(color, int):
