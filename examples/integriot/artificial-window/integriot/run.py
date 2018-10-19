@@ -113,6 +113,7 @@ animation_lasttime = time()
 
 animation = None
 animation_frames = 0
+animation_frame_show_count = 1
 animation_image_backup = None
 
 
@@ -265,39 +266,58 @@ image_calibration = white
 
 
 def animation_images():
-    global animation_frames, imagelist
-    l = len(imagelist)
-    im = imagelist[l - animation_frames]
-    draw_image(im, calibrate=image_calibration)
+    global animation_frames, imagelist, animation_frame_show_count
+    if animation_frames % animation_frame_show_count == 0:
+        l = len(imagelist)
+        im = imagelist[l - animation_frames//animation_frame_show_count]
+        draw_image(im, calibrate=image_calibration)
     if animation_frames <= 1:
         animation_frames = l
 
 
 
-def command_images(commands):
-    global imagelist, image_calibration
+def command_images(args):
+    global imagelist, image_calibration, animation_frame_show_count
     consumed = 0
-    if len(commands)<1:
+    # check if we got a calibration color first
+    if len(args) == 0:
         return consumed
-    color = read_color(commands[0])
+    color = read_color(args[0])
     if color is None:  # did we get a calibration color?
         image_calibration = white
     else:
         image_calibration = int2rgb(color)
         consumed += 1
-        commands = commands[1:]
-    if len(commands) < 1:
+        args = args[1:]
+    # check if we get a playlength in s as integer next
+    if len(args) == 0:
+        return consumed
+    animation_cycle_length = None
+    try:
+        animation_cycle_length = float(args[0])
+    except:
+        pass
+    if animation_cycle_length is not None:
+        consumed += 1
+        args = args[1:]
+    # check for folder
+    if len(args) == 0:
         return consumed
     # this should be a folder
-    folder = commands[0]
+    folder = args[0]
     imagelist=[]
     try:
         for f in os.listdir(folder):
             imagelist.append(Image.open(os.path.join(folder, f)))
     except:
         pass
-    animation_start(animation_images, len(imagelist)+1)  # we will keep this higher to refill when down
-    return 1 # consume command
+    if animation_cycle_length is None:
+        animation_frame_show_count = 1  # show each frame once
+    else:
+        animation_frame_show_count = int(animation_cycle_length*fps/animation_frames+0.1)
+    consumed += 1
+    animation_start(animation_images, len(imagelist)*animation_frame_show_count+1)  # we will keep this higher to refill when down
+    return consumed  # consume arguments
 
 
 def animation_halloween():
