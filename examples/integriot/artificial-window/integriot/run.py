@@ -77,6 +77,14 @@ def draw_image(im, startx=0, starty=0, calibrate=white):
             imx += 1
 
 
+def get_image():
+    im = Image.new("RGB",(MATRIX_WIDTH,MATRIX_HEIGHT))
+    for y in range(MATRIX_HEIGHT):
+        for x in range(MATRIX_WIDTH):
+            im.putpixel((x, y), get_pixel((x, y)))
+    return im
+
+
 def fill(color):
     global strip, matrix_map
     for line in matrix_map:
@@ -99,19 +107,19 @@ def begin():
     strip.begin()
 
 
-# use integriot for mqtt integration
-from integriot import *
+fps = 30
+framelen = 1.0/fps
+lasttime = time()
 
 animation = None
 animation_frames = 0
+animation_image_backup = None
+
 
 def animation_stop():
     global animation
     animation = None
 
-fps = 30
-framelen = 1.0/fps
-lasttime = time()
 
 def animation_next():
     global animation, lasttime, animation_frames
@@ -214,9 +222,12 @@ def draw_lightning(x):
 
 def animation_lightning():
     global animation, animation_frames, lightning_column
-    set_color("darkgray")
-    if animation_frames>1:  # last turn gray again
+#    set_color("darkgray")
+    draw_image(animation_image_backup, calibrate=(64, 64, 64))
+    if animation_frames>1:
         draw_lightning(lightning_column)
+    else:  # last: restore image
+        draw_image(animation_image_backup)
 
 
 def command_lightning(_):
@@ -344,7 +355,9 @@ command_list = {
 
 
 def matrix_cb(msg):
+    global animation_image_backup
     animation_stop()
+    animation_image_backup = get_image()
     # Accept commands to change what is displayed on the matrix
     command=msg.split()
     print("received: ", command)
@@ -370,6 +383,9 @@ def matrix_cb(msg):
             del command[0]
     show()
 
+
+# use integriot for mqtt integration
+from integriot import *
 
 # init and run integriot
 init("localhost")
