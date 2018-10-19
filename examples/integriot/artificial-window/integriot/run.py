@@ -117,10 +117,12 @@ animation_image_backup = None
 
 
 def animation_stop():
-    global animation
+    global animation, animation_image_backup
     animation = None
     # restore image before animation
-    draw_image(animation_image_backup)
+    if animation_image_backup is not None:
+        draw_image(animation_image_backup)
+    animation_image_backup = None
 
 
 def animation_next():
