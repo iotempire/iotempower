@@ -255,13 +255,13 @@ def command_images(commands):
     consumed = 0
     if len(commands)<1:
         return consumed
-    image_calibration = read_color(command[0])
+    image_calibration = read_color(commands[0])
     if image_calibration is None:  # did we get a calibration color?
         image_calibration = white
     else:
         consumed += 1
         commands = commands[1:]
-    if len(commands)<1:
+    if len(commands) < 1:
         return consumed
     # this should be a folder
     folder = commands[0]
