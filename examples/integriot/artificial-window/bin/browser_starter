@@ -1,0 +1,11 @@
+#!/bin/bash
+export DISPLAY=:0
+while true; do
+    sleep 10
+    #midori -e Fullscreen -a http://localhost:1880/ui
+    # now immutable
+#    sed -i 's/"exited_cleanly":false/"exited_cleanly":true/' ~/.config/chromium/Default/Preferences
+#    sed -i 's/"exit_type": "Crashed"/"exit_type": "Normal"/' ~/.config/chromium/Default/Preferences
+#    chromium-browser --kiosk --disable-infobars --app http://localhost:1880/ui
+    chromium-browser --kiosk --app http://localhost:1880/ui
+done

@@ -1,0 +1,5 @@
+#!/bin/bash
+pkill mpg123 &> /dev/null
+sleep 0.1
+pkill -9 mpg123 &> /dev/null
+sleep 0.1

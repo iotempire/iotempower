@@ -33,6 +33,14 @@ matrix_map = [
 MATRIX_HEIGHT=len(matrix_map)
 MATRIX_WIDTH=len(matrix_map[0])
 
+
+white=(255,180,130)
+
+def CColor(r,g,b):
+    global white
+    # calibrated color
+    return Color(r*white[0]//255,g*white[1]//255,b*white[2]/255)
+
 def set_pixel(x, y, color):
     global strip, matrix_map
     x = min(MATRIX_WIDTH,max(0,x))
@@ -96,7 +104,7 @@ color_map = {
     "red"   : Color(255,0,0),
     "green" : Color(0,255,0),
     "blue"  : Color(0,0,255),
-    "yellow": Color(255,80,0),
+    "yellow": Color(255,90,0),
     "gray"  : Color(127,90,65),
     "grey"  : Color(127,90,65),
     "darkgray": Color(32, 22, 16),
@@ -249,7 +257,7 @@ def command_daytime():
 
 
 command_list = {
-# "command":method
+    # "command":method
     "row": command_row,
     "column": command_column,
     "lightning": command_lightning,
