@@ -1,9 +1,11 @@
 # offer some commands via mqtt to interact with the led grid of
 # the artificial window
 
+from PIL import Image # Pillow library
 from neopixel import * # led strip code by https://github.com/jgarff/rpi_ws281x
 from random import randint
 from time import clock
+import os
 
 LED_COUNT = 90
 LED_GPIO = 21
@@ -39,7 +41,8 @@ white=(255,180,130)
 def CColor(r,g,b):
     global white
     # calibrated color
-    return Color(r*white[0]//255,g*white[1]//255,b*white[2]/255)
+    return Color(r*white[0]//255, g*white[1]//255, b*white[2]/255)
+
 
 def set_pixel(x, y, color):
     global strip, matrix_map
@@ -48,23 +51,38 @@ def set_pixel(x, y, color):
     nr = matrix_map[y][x]
     strip.setPixelColor( nr, color )
 
+
 def get_pixel(x, y):
     global strip, matrix_map
     nr = matrix_map[y][x]
     return strip.getPixelColor(nr)
 
+
+def draw_image(im, startx=0, starty=0):
+    imw,imh = im.size
+    for y in range(MATRIX_HEIGHT):
+        imx = startx
+        imy = starty+y
+        for x in range(MATRIX_WIDTH):
+            set_pixel(x, y, Color(*im.getpixel((imx%imw, imy%imh))))
+            imx += 1
+
+
 def fill(color):
     global strip, matrix_map
     for line in matrix_map:
         for nr in line:
-            strip.setPixelColor( nr, color )
+            strip.setPixelColor(nr, color)
+
 
 def clear():
     fill(Color(0,0,0))
 
+
 def show():
     global strip
     strip.show()
+
 
 # Intialize the library (must be called once before other functions).
 def begin():
@@ -99,8 +117,8 @@ color_map = {
     "bright": Color(255,255,255),
     "black" : Color(0,0,0),
     "off"   : Color(0,0,0),
-    "white" : Color(255,180,130),
-    "on"    : Color(255,180,130),
+    "white" : white,
+    "on"    : white,
     "red"   : Color(255,0,0),
     "green" : Color(0,255,0),
     "blue"  : Color(0,0,255),
@@ -110,6 +128,7 @@ color_map = {
     "darkgray": Color(32, 22, 16),
     "darkgrey": Color(23, 22, 16),
 }
+
 
 def set_color(color, x=-1, y=-1):
     if isinstance(color, str):
@@ -206,6 +225,30 @@ def command_blood_smear(_):
     animation = animation_blood_smear
 
 
+imagelist=[]
+def animation_images():
+    global animation, animation_frames, imagelist
+    l = len(imagelist)
+    im = imagelist[l - animation_frames]
+    draw_image(im)
+    if animation_frames <= 1:
+        animation_frames = l
+
+
+
+def command_images(commands):
+    global animation, animation_frames, imagelist
+    if len(commands)<1:
+        return 0
+    # this should be a folder
+    folder = commands[0]
+    imagelist=[]
+    for f in os.listdir(command):
+        imagelist.append(im.open(f))
+    animation_frames = len(imagelist)+1  # we will keep this higher to refill when down
+    return 1 # consume command
+
+
 def animation_halloween():
     global animation
     animation = None
@@ -256,6 +299,7 @@ def command_daytime():
     animation = animation_daytime
 
 
+
 command_list = {
     # "command":method
     "row": command_row,
@@ -267,6 +311,7 @@ command_list = {
     "sunrise": command_sunrise,
     "sunset": command_sunset,
     "daytime": command_daytime,
+    "images": command_images,
 }
 
 
