@@ -140,9 +140,9 @@ def animation_next():
             animation()
             show()
             animation_frames -= 1
+            if animation_frames <= 0:
+                animation_stop()
         lasttime += framelen
-    if animation_frames <=0:
-        animation_stop()
 
 
 color_map = {
