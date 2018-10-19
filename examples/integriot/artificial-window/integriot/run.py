@@ -126,8 +126,8 @@ color_map = {
     "bright": Color(255,255,255),
     "black" : Color(0,0,0),
     "off"   : Color(0,0,0),
-    "white" : white,
-    "on"    : white,
+    "white" : Color(*white),
+    "on"    : Color(*white),
     "red"   : Color(255,0,0),
     "green" : Color(0,255,0),
     "blue"  : Color(0,0,255),
@@ -203,7 +203,7 @@ def command_column(params):
     return 2
 
 def draw_lightning(x):
-    c=color_map["white"]
+    c=Color(*white)
     for y in range(MATRIX_HEIGHT):
         r = randint(0, 2)
         x += r - 1
