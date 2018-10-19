@@ -36,18 +36,17 @@ MATRIX_HEIGHT=len(matrix_map)
 MATRIX_WIDTH=len(matrix_map[0])
 
 
-white=(255,180,130)
+white = (255, 180, 130)
 
 
-def CColor(r, g=-1, b=-1):
-    global white
+def CColor(r, g=-1, b=-1, calibrate=white):
     if g==-1:
         b = r & 255
         r >>= 8
         g = r & 255
         r >>= 8
     # calibrated color
-    return Color(r*white[0]//255, g*white[1]//255, b*white[2]//255)
+    return Color(r*calibrate[0]//255, g*calibrate[1]//255, b*calibrate[2]//255)
 
 
 def set_pixel(x, y, color):
@@ -64,13 +63,13 @@ def get_pixel(x, y):
     return strip.getPixelColor(nr)
 
 
-def draw_image(im, startx=0, starty=0):
+def draw_image(im, startx=0, starty=0, calibrate=white):
     imw,imh = im.size
     for y in range(MATRIX_HEIGHT):
         imx = startx
         imy = starty+y
         for x in range(MATRIX_WIDTH):
-            set_pixel(x, y, CColor(im.getpixel((imx%imw, imy%imh))))
+            set_pixel(x, y, CColor(*im.getpixel((imx%imw, imy%imh))),calibrate=calibrate)
             imx += 1
 
 
@@ -135,8 +134,7 @@ color_map = {
     "darkgrey": Color(23, 22, 16),
 }
 
-
-def set_color(color, x=-1, y=-1):
+def read_color(color):
     if isinstance(color, str):
         color = color.lower()
         if color in color_map:
@@ -166,6 +164,13 @@ def set_color(color, x=-1, y=-1):
                         r = rgb
                         color = Color(r,g,b)
     if isinstance(color, int):
+        return color
+    return None
+
+
+def set_color(color, x=-1, y=-1):
+    color = read_color(color)
+    if  color is not None:
         if x == -1 or y == -1:
             fill(color)
         else:
@@ -231,21 +236,33 @@ def command_blood_smear(_):
     animation = animation_blood_smear
 
 
-imagelist=[]
+imagelist = []
+image_calibration = white
+
+
 def animation_images():
     global animation, animation_frames, imagelist
     l = len(imagelist)
     im = imagelist[l - animation_frames]
-    draw_image(im)
+    draw_image(im, calibrate=image_calibration)
     if animation_frames <= 1:
         animation_frames = l
 
 
 
 def command_images(commands):
-    global animation, animation_frames, imagelist
+    global animation, animation_frames, imagelist, image_calibration
+    consumed = 0
     if len(commands)<1:
-        return 0
+        return consumed
+    image_calibration = read_color(command[0])
+    if image_calibration is None:  # did we get a calibration color?
+        image_calibration = white
+    else:
+        consumed += 1
+        commands = commands[1:]
+    if len(commands)<1:
+        return consumed
     # this should be a folder
     folder = commands[0]
     imagelist=[]
