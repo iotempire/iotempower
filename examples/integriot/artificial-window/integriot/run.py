@@ -278,6 +278,12 @@ def animation_images():
 
 
 def command_images(args):
+    """
+    send command: images [calibration-color] [length ins] path [reverse] [noloop]
+
+    :param args:
+    :return:
+    """
     global imagelist, image_calibration, animation_frame_show_count, images_loop
     consumed = 0
     # check if we got a calibration color first
@@ -319,8 +325,19 @@ def command_images(args):
     else:
         animation_frame_show_count = int(animation_cycle_length*animation_fps/len(imagelist)+0.1)
     consumed += 1
+    args = args[1:]
     animation_start(animation_images, len(imagelist)*animation_frame_show_count+1)  # we will keep this higher to refill when down
     images_loop = True
+    # check if we get a reverse
+    if len(args) == 0:
+        return consumed
+    else:
+        if args[0].lower() == "reverse":
+            images_loop = False
+            consumed += 1
+            args = args[1:]
+            # actually reverse list
+            imagelist = imagelist[::-1]
     # check if we get a noloop
     if len(args) == 0:
         return consumed
