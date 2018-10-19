@@ -243,7 +243,7 @@ def command_images(commands):
     # this should be a folder
     folder = commands[0]
     imagelist=[]
-    for f in os.listdir(command):
+    for f in os.listdir(folder):
         imagelist.append(im.open(f))
     animation_frames = len(imagelist)+1  # we will keep this higher to refill when down
     return 1 # consume command
