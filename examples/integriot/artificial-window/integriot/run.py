@@ -117,12 +117,20 @@ animation_image_backup = None
 
 
 def animation_stop():
-    global animation, animation_image_backup
+    global animation, animation_image_backup, animation_frames
     animation = None
+    animation_frames = 0
     # restore image before animation
     if animation_image_backup is not None:
         draw_image(animation_image_backup)
     animation_image_backup = None
+
+
+def animation_start(animation_cb, length):
+    global animation, animation_image_backup, animation_frames
+    animation = animation_cb
+    animation_frames = length
+    animation_image_backup = get_image()
 
 
 def animation_next():
@@ -133,6 +141,9 @@ def animation_next():
             show()
             animation_frames -= 1
         lasttime += framelen
+    if animation_frames <=0:
+        animation_stop()
+
 
 color_map = {
     "bright": Color(255,255,255),
@@ -149,6 +160,7 @@ color_map = {
     "darkgray": Color(32, 22, 16),
     "darkgrey": Color(23, 22, 16),
 }
+
 
 def read_color(color):
     if isinstance(color, str):
@@ -225,7 +237,7 @@ def draw_lightning(x):
 
 
 def animation_lightning():
-    global animation, animation_frames, lightning_column
+    global animation_frames, lightning_column
 #    set_color("darkgray")
     draw_image(animation_image_backup, calibrate=(64, 64, 64))
     draw_lightning(lightning_column)
@@ -233,20 +245,17 @@ def animation_lightning():
 
 
 def command_lightning(_):
-    global animation, animation_frames, lightning_column
+    global lightning_column
     lightning_column = randint(0, MATRIX_WIDTH)
-    animation_frames = randint(fps//3, fps)
-    animation = animation_lightning
+    animation_start(animation_lightning, randint(fps//3, fps))
 
 
 def animation_blood_smear():
-    global animation
-    animation = None
+    pass
 
 
 def command_blood_smear(_):
-    global animation
-    animation = animation_blood_smear
+    animation_start(animation_blood_smear, 0)
 
 
 imagelist = []
@@ -254,7 +263,7 @@ image_calibration = white
 
 
 def animation_images():
-    global animation, animation_frames, imagelist
+    global animation_frames, imagelist
     l = len(imagelist)
     im = imagelist[l - animation_frames]
     draw_image(im, calibrate=image_calibration)
@@ -264,7 +273,7 @@ def animation_images():
 
 
 def command_images(commands):
-    global animation, animation_frames, imagelist, image_calibration
+    global imagelist, image_calibration
     consumed = 0
     if len(commands)<1:
         return consumed
@@ -285,59 +294,39 @@ def command_images(commands):
             imagelist.append(Image.open(os.path.join(folder, f)))
     except:
         pass
-    animation_frames = len(imagelist)+1  # we will keep this higher to refill when down
-    animation = animation_images
+    animation_start(animation_images, len(imagelist)+1)  # we will keep this higher to refill when down
     return 1 # consume command
 
 
 def animation_halloween():
-    global animation
-    animation = None
+    pass
 
 
 def command_halloween(_):
-    global animation
-    animation = animation_halloween
-
-
-def animation_fireplace():
-    global animation
-    animation = None
-
-
-def command_fireplace(_):
-    global animation
-    animation = animation_fireplace
+    animation_start(animation_halloween, 0)
 
 
 def animation_sunrise():
-    global animation
-    animation = None
-
+    pass
 
 def command_sunrise(_):
-    global animation
-    animation = animation_sunrise
+    animation_start(animation_sunrise, 0)
 
 
 def animation_sunset():
-    global animation
-    animation = None
+    pass
 
 
 def command_sunset(_):
-    global animation
-    animation = animation_sunset
+    animation_start(animation_sunset, 0 )
 
 
 def animation_daytime():
-    global animation
-    animation = None
+    pass
 
 
 def command_daytime(_):
-    global animation
-    animation = animation_daytime
+    animation_start(animation_daytime, 0)
 
 
 
@@ -348,7 +337,6 @@ command_list = {
     "lightning": command_lightning,
     "halloween": command_halloween,
     "blood_smear": command_blood_smear,
-    "fireplace": command_fireplace,
     "sunrise": command_sunrise,
     "sunset": command_sunset,
     "daytime": command_daytime,
@@ -357,9 +345,7 @@ command_list = {
 
 
 def matrix_cb(msg):
-    global animation_image_backup
     animation_stop()
-    animation_image_backup = get_image()
     # Accept commands to change what is displayed on the matrix
     command=msg.split()
     print("received: ", command)
