@@ -38,9 +38,10 @@ MATRIX_WIDTH=len(matrix_map[0])
 
 white=(255,180,130)
 
-def CColor(r,g,b=-1):
+
+def CColor(r, g=-1, b=-1):
     global white
-    if b=-1:
+    if g==-1:
         b = r&255
         r //= 256
         g = r&255
