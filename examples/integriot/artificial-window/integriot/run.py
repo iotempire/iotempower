@@ -38,8 +38,13 @@ MATRIX_WIDTH=len(matrix_map[0])
 
 white=(255,180,130)
 
-def CColor(r,g,b):
+def CColor(r,g,b=-1):
     global white
+    if b=-1:
+        b = r&255
+        r //= 256
+        g = r&255
+        r //= 256
     # calibrated color
     return Color(r*white[0]//255, g*white[1]//255, b*white[2]/255)
 
@@ -64,7 +69,7 @@ def draw_image(im, startx=0, starty=0):
         imx = startx
         imy = starty+y
         for x in range(MATRIX_WIDTH):
-            set_pixel(x, y, Color(*im.getpixel((imx%imw, imy%imh))))
+            set_pixel(x, y, CColor(im.getpixel((imx%imw, imy%imh))))
             imx += 1
 
 
@@ -243,9 +248,13 @@ def command_images(commands):
     # this should be a folder
     folder = commands[0]
     imagelist=[]
-    for f in os.listdir(folder):
-        imagelist.append(Image.open(os.path.join(folder, f)))
+    try:
+        for f in os.listdir(folder):
+            imagelist.append(Image.open(os.path.join(folder, f)))
+    except:
+        pass
     animation_frames = len(imagelist)+1  # we will keep this higher to refill when down
+    animation = animation_images
     return 1 # consume command
 
 
