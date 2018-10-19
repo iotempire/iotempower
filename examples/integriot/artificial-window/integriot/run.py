@@ -314,7 +314,7 @@ def command_images(args):
     if animation_cycle_length is None:
         animation_frame_show_count = 1  # show each frame once
     else:
-        animation_frame_show_count = int(animation_cycle_length*fps/animation_frames+0.1)
+        animation_frame_show_count = int(animation_cycle_length*animation_fps/animation_frames+0.1)
     consumed += 1
     animation_start(animation_images, len(imagelist)*animation_frame_show_count+1)  # we will keep this higher to refill when down
     return consumed  # consume arguments
