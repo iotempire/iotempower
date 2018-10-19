@@ -307,7 +307,9 @@ def command_images(args):
     folder = args[0]
     imagelist=[]
     try:
-        for f in os.listdir(folder):
+        l = os.listdir(folder)
+        l.sort()
+        for f in l:
             imagelist.append(Image.open(os.path.join(folder, f)))
     except:
         pass
