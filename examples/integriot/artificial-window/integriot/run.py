@@ -322,7 +322,7 @@ def animation_daytime():
     animation = None
 
 
-def command_daytime():
+def command_daytime(_):
     global animation
     animation = animation_daytime
 
