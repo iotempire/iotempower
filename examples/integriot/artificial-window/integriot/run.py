@@ -67,7 +67,7 @@ def get_pixel(x, y):
     return strip.getPixelColor(nr)
 
 
-def draw_image(im, startx=0, starty=0, calibrate=white):
+def draw_image(im, startx=0, starty=0, calibrate=(255,255,255)):
     imw,imh = im.size
     for y in range(MATRIX_HEIGHT):
         imx = startx
@@ -101,15 +101,15 @@ def show():
     strip.show()
 
 
-# Intialize the library (must be called once before other functions).
+# Initialize the LED-Strip library (must be called once before other functions).
 def begin():
     global strip
     strip.begin()
 
 
-fps = 30
-framelen = 1.0/fps
-lasttime = time()
+animation_fps = 30
+animation_framelen = 1.0 / animation_fps
+animation_lasttime = time()
 
 animation = None
 animation_frames = 0
@@ -120,9 +120,10 @@ def animation_stop():
     global animation, animation_image_backup, animation_frames
     animation = None
     animation_frames = 0
-    # restore image before animation
+    # restore image after animation
     if animation_image_backup is not None:
         draw_image(animation_image_backup)
+        show()
     animation_image_backup = None
 
 
@@ -134,15 +135,15 @@ def animation_start(animation_cb, length):
 
 
 def animation_next():
-    global animation, lasttime, animation_frames
-    while time()-lasttime >= framelen:
+    global animation, animation_lasttime, animation_frames
+    while time()-animation_lasttime >= animation_framelen:
         if animation is not None and animation_frames > 0:
             animation()
             show()
             animation_frames -= 1
             if animation_frames <= 0:
                 animation_stop()
-        lasttime += framelen
+        animation_lasttime += animation_framelen
 
 
 color_map = {
@@ -226,6 +227,7 @@ def command_column(params):
             set_color(params[1], x, y)
     return 2
 
+
 def draw_lightning(x):
     c=Color(*white)
     for y in range(MATRIX_HEIGHT):
@@ -237,9 +239,9 @@ def draw_lightning(x):
 
 
 def animation_lightning():
-    global animation_frames, lightning_column
+    global lightning_column, animation_image_backup
 #    set_color("darkgray")
-    draw_image(animation_image_backup, calibrate=(64, 64, 64))
+    draw_image(animation_image_backup, calibrate=(64, 64, 64))  # draw current background in dark
     draw_lightning(lightning_column)
 
 
@@ -247,7 +249,7 @@ def animation_lightning():
 def command_lightning(_):
     global lightning_column
     lightning_column = randint(0, MATRIX_WIDTH)
-    animation_start(animation_lightning, randint(fps//3, fps))
+    animation_start(animation_lightning, randint(animation_fps // 3, animation_fps))
 
 
 def animation_blood_smear():
