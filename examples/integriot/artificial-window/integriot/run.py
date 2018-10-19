@@ -38,13 +38,17 @@ MATRIX_WIDTH=len(matrix_map[0])
 
 white = (255, 180, 130)
 
+def int2rgb(colint):
+    b = colint & 255
+    colint >>= 8
+    g = colint & 255
+    colint >>= 8
+    return colint, g, b
+
 
 def CColor(r, g=-1, b=-1, calibrate=white):
     if g==-1:
-        b = r & 255
-        r >>= 8
-        g = r & 255
-        r >>= 8
+        r, g, b = int2rgb(r)
     # calibrated color
     return Color(r*calibrate[0]//255, g*calibrate[1]//255, b*calibrate[2]//255)
 
@@ -157,11 +161,7 @@ def read_color(color):
                     except:
                         pass
                     else:
-                        b = rgb & 255
-                        rgb >>=  8
-                        g = rgb & 255
-                        rgb >>= 8
-                        r = rgb
+                        r, g, b = int2rgb(rgb)
                         color = Color(r,g,b)
     if isinstance(color, int):
         return color
@@ -255,10 +255,11 @@ def command_images(commands):
     consumed = 0
     if len(commands)<1:
         return consumed
-    image_calibration = read_color(commands[0])
-    if image_calibration is None:  # did we get a calibration color?
+    color = read_color(commands[0])
+    if color is None:  # did we get a calibration color?
         image_calibration = white
     else:
+        image_calibration = int2rgb(color)
         consumed += 1
         commands = commands[1:]
     if len(commands) < 1:
