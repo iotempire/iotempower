@@ -253,12 +253,33 @@ def command_lightning(_):
     animation_start(animation_lightning, randint(animation_fps // 3, animation_fps))
 
 
-def animation_blood_smear():
-    pass
+def draw_smear(column, line, progress):
+    for y in range(MATRIX_HEIGHT):
+        if y/MATRIX_HEIGHT < progress:
+            red_strength = y/MATRIX_HEIGHT/progress
+        else:  # >= progress
+            red_strength = (MATRIX_HEIGHT-y)/progress
+        if y+line >= MATRIX_HEIGHT:
+            break;
+        r,g,b = int2rgb(get_pixel(column, y+line))
+        r = int(r*(1.0 + progress))
+        g = int(g*(1.0 - progress/2))
+        b = int(b*(1.0 - progress/2))
+        set_pixel(column,y+line,Color(r,g,b))
 
+
+blood_smear_column = None
+blood_smear_line = None
+def animation_blood_smear():
+    global blood_smear_column, blood_smear_line
+    draw_image(animation_image_backup)  # draw current background
+    draw_smear(blood_smear_column, blood_smear_line, animation_frame_show_count // animation_frames)
 
 def command_blood_smear(_):
-    animation_start(animation_blood_smear, 0)
+    global blood_smear_column, blood_smear_line
+    blood_smear_column = randint(0, MATRIX_WIDTH)
+    blood_smear_line = randint(0,MATRIX_HEIGHT//3)
+    animation_start(animation_blood_smear, animation_fps*20)
 
 
 imagelist = []
