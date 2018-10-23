@@ -256,7 +256,7 @@ def command_lightning(_):
 def draw_smear(column, line, progress):
     progress_line = progress * (MATRIX_HEIGHT-1)
     for y in range(MATRIX_HEIGHT):
-        if y <= progress_line:
+        if y < progress_line:
             red_strength = y/progress_line
         else:  # > progress_line
             red_strength = 1-((y-progress_line)/(MATRIX_HEIGHT-progress_line))
