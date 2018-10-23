@@ -9,12 +9,20 @@
 #include <Arduino.h>
 #include <device.h>
 
-// only sent out signal every 100ms
-#define ULNOIOT_HCSR04_INTERVAL 100
+// only sent out signal every 50ms (when using 40ms there is too much stray)
+#define ULNOIOT_HCSR04_INTERVAL 50
+// should be odd for true median finding
+#define ULNOIOT_HCSR04_BUFFER_SIZE 9
+#define ULNOIOT_HCSR04_MAX_DISTANCE 4000 // 4m maximum distance
 
 class Hcsr04 : public Device {
     private:
+        const unsigned long timeout_us = 30000; // 30 ms timeout default
+        unsigned int distance_buffer[ULNOIOT_HCSR04_BUFFER_SIZE];
+        int distance_buffer_fill = 0;
+        unsigned long distance_sum = 0;
         bool triggered = false;
+        bool trigger_started = false;
         bool measured = false;
         unsigned long _timeout_us;
         unsigned long interval_start;
@@ -25,8 +33,7 @@ class Hcsr04 : public Device {
         uint8_t _trigger_pin;
         void echo_changed();
     public:
-        Hcsr04(const char* name, uint8_t trigger_pin, uint8_t echo_pin,  
-            unsigned long timeout_us = 30000);
+        Hcsr04(const char* name, uint8_t trigger_pin, uint8_t echo_pin);
         Hcsr04& with_precision(int precision) {
             if(precision < 1) precision = 1;
             _precision = precision;

@@ -279,5 +279,42 @@ class Device {
         return false; \
     }
 
+/* Derivation of jmc median over small time intervals */
+#define filter_jmc_interval_median(interval, dev) [&] { \
+        static double median; \
+        static double average; \
+        static bool undefined = true; \
+        static unsigned long start_time; \
+        if(undefined) { \
+            start_time = millis(); \
+            median = 0.0; \
+            average = 0.0; \
+            undefined = false; \
+        } \
+        double sample = dev.measured_value().as_float(); \
+        average += ( sample - average ) * 0.1; \
+        median += copysign( average * 0.01, sample - median ); \
+        unsigned long current = millis() ; \
+        if(current - start_time >= interval) { \
+            dev.measured_value().from(average); \
+            undefined = true; /* trigger reset */ \
+            return true; \
+        } \
+        return false; \
+    }
+
+/* Turn analog values into binary with a threshold level */
+#define binarize(cutoff, high, low, dev) [&] { \
+        if(dev.measured_value().equals(low)) return false; \
+        if(dev.measured_value().equals(high)) return false; \
+        double sample = dev.measured_value().as_float(); \
+        if(sample>=cutoff) { \
+            dev.measured_value().from(high); \
+        } else { \
+            dev.measured_value().from(low); \
+        } \
+        return true; \
+    }
+
 
 #endif // _ULNOIOT_DEVICE_H_

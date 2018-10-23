@@ -60,13 +60,15 @@ input(button1, D3, "released", "pressed")
 // servo(m1, D6, 800);
 
 // Distance sensor
-// hcsr04(distance, D6, D5).with_precision(5);
+//hcsr04(distance, D1, D2).with_precision(50);
+hcsr04(distance, D1, D2)
+    .with_filter_callback(binarize(200, "off", "on", IN(distance)));
 
 // Example for single RGB-led
 // rgb(r0, D6, D5, D0, true);
 
 // RGB strips
-rgb_strip(strip1, 90, WS2811, D2, BRG);
+//rgb_strip(strip1, 90, WS2811, D2, BRG);
 // // rgb_strip_(strip2, "strip2", 50, WS2811, D5, BRG);
 // // rgb_strip_(strip3, "strip3", 50, WS2811, D4, BRG);
 // // rgb_strip_(strip4, "strip4", 50, WS2811, D1, BRG);
