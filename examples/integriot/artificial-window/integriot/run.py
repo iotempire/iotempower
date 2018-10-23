@@ -356,30 +356,6 @@ def command_halloween(_):
     animation_start(animation_halloween, 0)
 
 
-def animation_sunrise():
-    pass
-
-def command_sunrise(_):
-    animation_start(animation_sunrise, 0)
-
-
-def animation_sunset():
-    pass
-
-
-def command_sunset(_):
-    animation_start(animation_sunset, 0 )
-
-
-def animation_daytime():
-    pass
-
-
-def command_daytime(_):
-    animation_start(animation_daytime, 0)
-
-
-
 command_list = {
     # "command":method
     "row": command_row,
@@ -387,9 +363,6 @@ command_list = {
     "lightning": command_lightning,
     "halloween": command_halloween,
     "blood_smear": command_blood_smear,
-    "sunrise": command_sunrise,
-    "sunset": command_sunset,
-    "daytime": command_daytime,
     "images": command_images,
 }
 
