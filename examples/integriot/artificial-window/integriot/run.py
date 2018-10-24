@@ -253,19 +253,23 @@ def command_lightning(_):
     animation_start(animation_lightning, randint(animation_fps // 3, animation_fps))
 
 
-def draw_smear(column, line, progress):
-    progress_line = progress * (MATRIX_HEIGHT-1)
-    for y in range(MATRIX_HEIGHT):
+def draw_blood_smear(column, line, progress):
+    # 0 <= progress <= 1
+    height = MATRIX_HEIGHT * 3 // 2
+    progress_line = progress * (height-1)
+    for y in range(height):
+        if y+line >= MATRIX_HEIGHT:
+            break;
         if y < progress_line:
             red_strength = y/progress_line
         else:  # > progress_line
-            red_strength = 1-((y-progress_line)/(MATRIX_HEIGHT-progress_line))
-        if y+line >= MATRIX_HEIGHT:
-            break;
+            red_strength = 1-((y-progress_line)/(height-progress_line))
         r,g,b = int2rgb(get_pixel(column, y+line))
-        r = int(r*(1.0 + red_strength))
+        red_strength **= 4
+        r = int(min(255,510*red_strength))
         g = int(g*(1.0 - red_strength/2))
         b = int(b*(1.0 - red_strength/2))
+        print(column, y, progress_line, red_strength, r, g, b)
         set_pixel(column,y+line,Color(r,g,b))
 
 
@@ -274,7 +278,8 @@ blood_smear_line = None
 def animation_blood_smear():
     global blood_smear_column, blood_smear_line
     draw_image(animation_image_backup)  # draw current background
-    draw_smear(blood_smear_column, blood_smear_line, animation_frame_show_count // animation_frames)
+    draw_blood_smear(blood_smear_column, blood_smear_line,
+                     1.0 - (animation_frames / animation_fps / 20))
 
 def command_blood_smear(_):
     global blood_smear_column, blood_smear_line
