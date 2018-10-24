@@ -265,11 +265,9 @@ def draw_blood_smear(column, line, progress):
         else:  # > progress_line
             red_strength = 1-((y-progress_line)/(height-progress_line))
         r,g,b = int2rgb(get_pixel(column, y+line))
-        red_strength **= 4
-        r = int(min(255,510*red_strength))
+        r = int(min(255, 510 * red_strength**4))
         g = int(g*(1.0 - red_strength/2))
         b = int(b*(1.0 - red_strength/2))
-        print(column, y, progress_line, red_strength, r, g, b)
         set_pixel(column,y+line,Color(r,g,b))
 
 
