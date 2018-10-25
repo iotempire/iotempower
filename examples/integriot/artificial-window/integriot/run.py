@@ -1,8 +1,8 @@
 # offer some commands via mqtt to interact with the led grid of
 # the artificial window
 
-from PIL import Image # Pillow library
-from neopixel import * # led strip code by https://github.com/jgarff/rpi_ws281x
+from PIL import Image  # Pillow library
+from neopixel import *  # led strip code by https://github.com/jgarff/rpi_ws281x
 from random import randint
 from time import time
 import os
@@ -265,9 +265,9 @@ def draw_blood_smear(column, line, progress):
         else:  # > progress_line
             red_strength = 1-((y-progress_line)/(height-progress_line))
         r,g,b = int2rgb(get_pixel(column, y+line))
-        r = int(min(255, 510 * red_strength**4))
-        g = int(g*(1.0 - red_strength/2))
-        b = int(b*(1.0 - red_strength/2))
+        r = int(min(255, 1023 * red_strength**5))
+        g = int(g*(1.0 - red_strength))
+        b = int(b*(1.0 - red_strength))
         set_pixel(column,y+line,Color(r,g,b))
 
 
@@ -373,20 +373,12 @@ def command_images(args):
     return consumed  # consume arguments
 
 
-def animation_halloween():
-    pass
-
-
-def command_halloween(_):
-    animation_start(animation_halloween, 0)
-
 
 command_list = {
     # "command":method
     "row": command_row,
     "column": command_column,
     "lightning": command_lightning,
-    "halloween": command_halloween,
     "blood_smear": command_blood_smear,
     "images": command_images,
 }
