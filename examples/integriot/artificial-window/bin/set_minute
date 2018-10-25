@@ -1,0 +1,4 @@
+#!/bin/bash
+h=$(date "+%H")
+sudo date -s "$h:$1"
+sudo hwclock -wu
