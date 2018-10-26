@@ -94,10 +94,10 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
             fi
         else
             # normalize node_name from topic
-            ## only needed for transition of old systems:
+            ## only needed for transition of old systems: (TODO: remove)
             #node_name=$(echo -n "$topic"|tr [:upper:][:space:]\\/ [:lower:]___)
             remote="$node_name.local"
-            ## only needed for transition of old systems:
+            ## only needed for transition of old systems: (TODO: remove)
             #node_name=$(echo -n "$topic"|tr [:upper:][:space:]_\\/ [:lower:]----)
 #           obsolete: getting IP from mqtt
 #           echo "Getting IP of node $topic for deployment."
