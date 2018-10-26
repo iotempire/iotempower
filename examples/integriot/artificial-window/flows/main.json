@@ -1,0 +1,167 @@
+[
+    {
+        "id": "66e81296.be48cc",
+        "type": "ui_button",
+        "z": "9d80881d.b2b8f8",
+        "name": "",
+        "group": "9de02e9f.86cd2",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "White",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "white",
+        "payloadType": "str",
+        "topic": "",
+        "x": 190,
+        "y": 80,
+        "wires": [
+            [
+                "c3dc813.de08d8"
+            ]
+        ]
+    },
+    {
+        "id": "c3dc813.de08d8",
+        "type": "mqtt out",
+        "z": "9d80881d.b2b8f8",
+        "name": "",
+        "topic": "led-matrix",
+        "qos": "",
+        "retain": "",
+        "broker": "26c14f1.c6555b",
+        "x": 540,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "1df75151.ce238f",
+        "type": "ui_button",
+        "z": "9d80881d.b2b8f8",
+        "name": "",
+        "group": "9de02e9f.86cd2",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Black/Off",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "off",
+        "payloadType": "str",
+        "topic": "",
+        "x": 180,
+        "y": 220,
+        "wires": [
+            [
+                "c3dc813.de08d8"
+            ]
+        ]
+    },
+    {
+        "id": "a7896399.193f",
+        "type": "ui_button",
+        "z": "9d80881d.b2b8f8",
+        "name": "",
+        "group": "9de02e9f.86cd2",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Skyblue",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "bright",
+        "payloadType": "str",
+        "topic": "",
+        "x": 180,
+        "y": 140,
+        "wires": [
+            [
+                "c3dc813.de08d8"
+            ]
+        ]
+    },
+    {
+        "id": "16334e65.ab2f42",
+        "type": "ui_button",
+        "z": "9d80881d.b2b8f8",
+        "name": "",
+        "group": "9de02e9f.86cd2",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Meadows",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "1",
+        "payloadType": "str",
+        "topic": "",
+        "x": 200,
+        "y": 300,
+        "wires": [
+            [
+                "d88f7c0.c79a388"
+            ]
+        ]
+    },
+    {
+        "id": "d88f7c0.c79a388",
+        "type": "link out",
+        "z": "9d80881d.b2b8f8",
+        "name": "",
+        "links": [
+            "732bd6c9.453a08"
+        ],
+        "x": 480,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "9de02e9f.86cd2",
+        "type": "ui_group",
+        "z": "",
+        "name": "Home",
+        "tab": "613a87a8.e1c408",
+        "disp": false,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "26c14f1.c6555b",
+        "type": "mqtt-broker",
+        "z": "",
+        "name": "",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": true,
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    },
+    {
+        "id": "613a87a8.e1c408",
+        "type": "ui_tab",
+        "z": "",
+        "name": "Home",
+        "icon": "dashboard",
+        "order": 1
+    }
+]

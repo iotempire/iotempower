@@ -1,0 +1,329 @@
+[
+    {
+        "id": "58d3d8ce.f444d8",
+        "type": "ui_button",
+        "z": "12ca7bc7.3efda4",
+        "name": "",
+        "group": "25639587.99494a",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Waterfall+Birds",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "Waterfall-Birds",
+        "payloadType": "str",
+        "topic": "",
+        "x": 140,
+        "y": 280,
+        "wires": [
+            [
+                "970b5732.15da18"
+            ]
+        ]
+    },
+    {
+        "id": "970b5732.15da18",
+        "type": "exec",
+        "z": "12ca7bc7.3efda4",
+        "command": "play loop ",
+        "addpay": true,
+        "append": "",
+        "useSpawn": "true",
+        "timer": "",
+        "oldrc": false,
+        "name": "play and loop",
+        "x": 630,
+        "y": 200,
+        "wires": [
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "a446584.29e02a8",
+        "type": "ui_button",
+        "z": "12ca7bc7.3efda4",
+        "name": "Stop",
+        "group": "e64255ff.5a90d8",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "<i class=\"fa fa-stop fa-2x\"></i>",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "stop",
+        "payloadType": "str",
+        "topic": "",
+        "x": 130,
+        "y": 620,
+        "wires": [
+            [
+                "d1159ee5.49a17"
+            ]
+        ]
+    },
+    {
+        "id": "d1159ee5.49a17",
+        "type": "exec",
+        "z": "12ca7bc7.3efda4",
+        "command": "stop_play",
+        "addpay": false,
+        "append": "",
+        "useSpawn": "true",
+        "timer": "",
+        "oldrc": false,
+        "name": "stop play",
+        "x": 720,
+        "y": 620,
+        "wires": [
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "3165d1f8.9cdc5e",
+        "type": "ui_button",
+        "z": "12ca7bc7.3efda4",
+        "name": "",
+        "group": "25639587.99494a",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Rainstorm Ocean Waves",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "Rainstorm-Ocean-Waves",
+        "payloadType": "str",
+        "topic": "",
+        "x": 170,
+        "y": 340,
+        "wires": [
+            [
+                "970b5732.15da18"
+            ]
+        ]
+    },
+    {
+        "id": "2a436ec8.716f32",
+        "type": "ui_button",
+        "z": "12ca7bc7.3efda4",
+        "name": "Birds",
+        "group": "e64255ff.5a90d8",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Birds",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "Birds",
+        "payloadType": "str",
+        "topic": "",
+        "x": 290,
+        "y": 80,
+        "wires": [
+            [
+                "970b5732.15da18"
+            ]
+        ]
+    },
+    {
+        "id": "43a2be9a.b786b",
+        "type": "ui_button",
+        "z": "12ca7bc7.3efda4",
+        "name": "",
+        "group": "e64255ff.5a90d8",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Haunted House",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "Haunted-House",
+        "payloadType": "str",
+        "topic": "",
+        "x": 280,
+        "y": 200,
+        "wires": [
+            [
+                "970b5732.15da18"
+            ]
+        ]
+    },
+    {
+        "id": "9a9bdbe1.2463f8",
+        "type": "ui_slider",
+        "z": "12ca7bc7.3efda4",
+        "name": "Volume",
+        "label": "<i class=\"fa fa-volume-up fa-2x\"></i>",
+        "group": "25639587.99494a",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "topic": "",
+        "min": 0,
+        "max": 10,
+        "step": 1,
+        "x": 280,
+        "y": 480,
+        "wires": [
+            [
+                "7feacfb2.3c302"
+            ]
+        ]
+    },
+    {
+        "id": "8770805f.973c9",
+        "type": "inject",
+        "z": "12ca7bc7.3efda4",
+        "name": "",
+        "topic": "",
+        "payload": "8",
+        "payloadType": "str",
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "x": 130,
+        "y": 480,
+        "wires": [
+            [
+                "9a9bdbe1.2463f8"
+            ]
+        ]
+    },
+    {
+        "id": "7feacfb2.3c302",
+        "type": "range",
+        "z": "12ca7bc7.3efda4",
+        "minin": "0",
+        "maxin": "10",
+        "minout": "0",
+        "maxout": "100",
+        "action": "scale",
+        "round": true,
+        "property": "payload",
+        "name": "",
+        "x": 440,
+        "y": 480,
+        "wires": [
+            [
+                "bd178291.36eb1"
+            ]
+        ]
+    },
+    {
+        "id": "bd178291.36eb1",
+        "type": "change",
+        "z": "12ca7bc7.3efda4",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "$.payload & \"%\"",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 600,
+        "y": 480,
+        "wires": [
+            [
+                "cb9d006c.2fc9e"
+            ]
+        ]
+    },
+    {
+        "id": "cb9d006c.2fc9e",
+        "type": "exec",
+        "z": "12ca7bc7.3efda4",
+        "command": "amixer --quiet sset PCM ",
+        "addpay": true,
+        "append": "",
+        "useSpawn": "true",
+        "timer": "",
+        "oldrc": false,
+        "name": "set volume",
+        "x": 710,
+        "y": 400,
+        "wires": [
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "9f43f11b.378",
+        "type": "ui_button",
+        "z": "12ca7bc7.3efda4",
+        "name": "Fireplace",
+        "group": "e64255ff.5a90d8",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Fireplace",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "fireplace",
+        "payloadType": "str",
+        "topic": "",
+        "x": 300,
+        "y": 160,
+        "wires": [
+            [
+                "970b5732.15da18"
+            ]
+        ]
+    },
+    {
+        "id": "25639587.99494a",
+        "type": "ui_group",
+        "z": "",
+        "name": "Audio-Left",
+        "tab": "2244172b.4fdeb8",
+        "order": 1,
+        "disp": false,
+        "width": "4",
+        "collapse": false
+    },
+    {
+        "id": "e64255ff.5a90d8",
+        "type": "ui_group",
+        "z": "",
+        "name": "Audio-Right",
+        "tab": "2244172b.4fdeb8",
+        "order": 2,
+        "disp": false,
+        "width": "3",
+        "collapse": false
+    },
+    {
+        "id": "2244172b.4fdeb8",
+        "type": "ui_tab",
+        "z": "",
+        "name": "Audio",
+        "icon": "speaker",
+        "order": 3
+    }
+]

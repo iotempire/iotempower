@@ -1,0 +1,288 @@
+[
+    {
+        "id": "d93aff84.89645",
+        "type": "ui_button",
+        "z": "8ae77cc1.b4b28",
+        "name": "",
+        "group": "7b4538b.14096c8",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "power off",
+        "color": "",
+        "bgcolor": "",
+        "icon": "power",
+        "payload": "Are you sure?",
+        "payloadType": "str",
+        "topic": "",
+        "x": 80,
+        "y": 140,
+        "wires": [
+            [
+                "12e002c1.1056bd"
+            ]
+        ]
+    },
+    {
+        "id": "a88ef6b2.bea918",
+        "type": "exec",
+        "z": "8ae77cc1.b4b28",
+        "command": "sudo poweroff",
+        "addpay": false,
+        "append": "",
+        "useSpawn": "true",
+        "timer": "",
+        "oldrc": false,
+        "name": "",
+        "x": 680,
+        "y": 140,
+        "wires": [
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "12e002c1.1056bd",
+        "type": "ui_toast",
+        "z": "8ae77cc1.b4b28",
+        "position": "dialog",
+        "displayTime": "10",
+        "highlight": "",
+        "outputs": 1,
+        "ok": "Yes, power off",
+        "cancel": "Cancel",
+        "topic": "Really power off the system?",
+        "name": "Confirm",
+        "x": 280,
+        "y": 140,
+        "wires": [
+            [
+                "70c5e33f.59907c"
+            ]
+        ]
+    },
+    {
+        "id": "70c5e33f.59907c",
+        "type": "switch",
+        "z": "8ae77cc1.b4b28",
+        "name": "confirmed?",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "cont",
+                "v": "power",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 450,
+        "y": 140,
+        "wires": [
+            [
+                "a88ef6b2.bea918"
+            ]
+        ]
+    },
+    {
+        "id": "eeac5f21.1c9da",
+        "type": "ui_numeric",
+        "z": "8ae77cc1.b4b28",
+        "name": "",
+        "label": "Hours (24)",
+        "group": "7b4538b.14096c8",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "topic": "",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "23",
+        "step": 1,
+        "x": 810,
+        "y": 320,
+        "wires": [
+            [
+                "21163e4c.ee9df2"
+            ]
+        ]
+    },
+    {
+        "id": "9ac012ab.042d9",
+        "type": "ui_numeric",
+        "z": "8ae77cc1.b4b28",
+        "name": "",
+        "label": "Minutes",
+        "group": "7b4538b.14096c8",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "topic": "",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "59",
+        "step": 1,
+        "x": 800,
+        "y": 400,
+        "wires": [
+            [
+                "54431f29.6d2da"
+            ]
+        ]
+    },
+    {
+        "id": "adc9f9c8.a69518",
+        "type": "change",
+        "z": "8ae77cc1.b4b28",
+        "name": "",
+        "rules": [
+            {
+                "t": "move",
+                "p": "myhour",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 590,
+        "y": 320,
+        "wires": [
+            [
+                "eeac5f21.1c9da"
+            ]
+        ]
+    },
+    {
+        "id": "8f874867.5e8088",
+        "type": "simpletime",
+        "z": "8ae77cc1.b4b28",
+        "name": "",
+        "x": 350,
+        "y": 360,
+        "wires": [
+            [
+                "adc9f9c8.a69518",
+                "d789f709.60b748"
+            ]
+        ]
+    },
+    {
+        "id": "d789f709.60b748",
+        "type": "change",
+        "z": "8ae77cc1.b4b28",
+        "name": "",
+        "rules": [
+            {
+                "t": "move",
+                "p": "myminute",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 580,
+        "y": 400,
+        "wires": [
+            [
+                "9ac012ab.042d9"
+            ]
+        ]
+    },
+    {
+        "id": "88f253f3.55359",
+        "type": "ui_button",
+        "z": "8ae77cc1.b4b28",
+        "name": "",
+        "group": "7b4538b.14096c8",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Get current system time",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "1",
+        "payloadType": "str",
+        "topic": "",
+        "x": 130,
+        "y": 360,
+        "wires": [
+            [
+                "8f874867.5e8088"
+            ]
+        ]
+    },
+    {
+        "id": "21163e4c.ee9df2",
+        "type": "exec",
+        "z": "8ae77cc1.b4b28",
+        "command": "set_hour ",
+        "addpay": true,
+        "append": "",
+        "useSpawn": "true",
+        "timer": "",
+        "oldrc": false,
+        "name": "",
+        "x": 1000,
+        "y": 320,
+        "wires": [
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "54431f29.6d2da",
+        "type": "exec",
+        "z": "8ae77cc1.b4b28",
+        "command": "set_minute ",
+        "addpay": true,
+        "append": "",
+        "useSpawn": "true",
+        "timer": "",
+        "oldrc": false,
+        "name": "",
+        "x": 1010,
+        "y": 400,
+        "wires": [
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "7b4538b.14096c8",
+        "type": "ui_group",
+        "z": "",
+        "name": "System",
+        "tab": "fbbc9287.1e3f2",
+        "disp": false,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "fbbc9287.1e3f2",
+        "type": "ui_tab",
+        "z": "",
+        "name": "System",
+        "icon": "power",
+        "order": 5
+    }
+]

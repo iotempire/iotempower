@@ -1,0 +1,307 @@
+[
+    {
+        "id": "28e5a0be.83a45",
+        "type": "mqtt out",
+        "z": "19569d59.310743",
+        "name": "",
+        "topic": "led-matrix",
+        "qos": "",
+        "retain": "",
+        "broker": "26c14f1.c6555b",
+        "x": 620,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "bf2a44f1.0b8678",
+        "type": "ui_button",
+        "z": "19569d59.310743",
+        "name": "",
+        "group": "c84c2d81.9413e",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Black/Off",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "off",
+        "payloadType": "str",
+        "topic": "",
+        "x": 160,
+        "y": 60,
+        "wires": [
+            [
+                "28e5a0be.83a45"
+            ]
+        ]
+    },
+    {
+        "id": "a0a23695.16af98",
+        "type": "ui_button",
+        "z": "19569d59.310743",
+        "name": "",
+        "group": "c84c2d81.9413e",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "label": "Meadows",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "1",
+        "payloadType": "str",
+        "topic": "",
+        "x": 140,
+        "y": 200,
+        "wires": [
+            [
+                "cba018b5.060798"
+            ]
+        ]
+    },
+    {
+        "id": "e7a4287a.b88308",
+        "type": "ui_button",
+        "z": "19569d59.310743",
+        "name": "",
+        "group": "c84c2d81.9413e",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Sunrise",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "row 9 black row 8 black row 7 85,120,40 row 6 85,60,40 row 5 255,20,20 row 4 140,50,70 row 3 170,50,90 row 2 180,50,100 row 1 200,50,130 row 0 190,50,150",
+        "payloadType": "str",
+        "topic": "",
+        "x": 180,
+        "y": 140,
+        "wires": [
+            [
+                "28e5a0be.83a45"
+            ]
+        ]
+    },
+    {
+        "id": "d7569975.446e08",
+        "type": "ui_colour_picker",
+        "z": "19569d59.310743",
+        "name": "Pick Color",
+        "label": "Color",
+        "group": "707d7326.5aa82c",
+        "format": "hex",
+        "outformat": "string",
+        "showSwatch": false,
+        "showPicker": true,
+        "showValue": false,
+        "showHue": false,
+        "showAlpha": false,
+        "showLightness": true,
+        "dynOutput": "true",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "topic": "",
+        "x": 170,
+        "y": 340,
+        "wires": [
+            [
+                "28e5a0be.83a45"
+            ]
+        ]
+    },
+    {
+        "id": "71203f85.61522",
+        "type": "ui_slider",
+        "z": "19569d59.310743",
+        "name": "Brightness",
+        "label": "Brightness",
+        "group": "707d7326.5aa82c",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "topic": "",
+        "min": 0,
+        "max": "20",
+        "step": 1,
+        "x": 170,
+        "y": 420,
+        "wires": [
+            [
+                "61a3c3b7.51628c"
+            ]
+        ]
+    },
+    {
+        "id": "61a3c3b7.51628c",
+        "type": "function",
+        "z": "19569d59.310743",
+        "name": "transform to brightness rgb",
+        "func": "v = parseInt(msg.payload);\nmsg.payload= \"\" + Math.floor(v*255/20) + \",\" + Math.floor(v*160/20) + \",\" + Math.floor(v*130/20);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 460,
+        "y": 420,
+        "wires": [
+            [
+                "28e5a0be.83a45"
+            ]
+        ]
+    },
+    {
+        "id": "a01bd100.d718",
+        "type": "ui_dropdown",
+        "z": "19569d59.310743",
+        "name": "Color dropdown",
+        "label": "",
+        "place": "Color",
+        "group": "c84c2d81.9413e",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "options": [
+            {
+                "label": "",
+                "value": "white",
+                "type": "str"
+            },
+            {
+                "label": "",
+                "value": "red",
+                "type": "str"
+            },
+            {
+                "label": "",
+                "value": "blue",
+                "type": "str"
+            },
+            {
+                "label": "",
+                "value": "green",
+                "type": "str"
+            },
+            {
+                "label": "",
+                "value": "yellow",
+                "type": "str"
+            },
+            {
+                "label": "",
+                "value": "gray",
+                "type": "str"
+            }
+        ],
+        "payload": "",
+        "topic": "",
+        "x": 180,
+        "y": 280,
+        "wires": [
+            [
+                "28e5a0be.83a45"
+            ]
+        ]
+    },
+    {
+        "id": "732bd6c9.453a08",
+        "type": "link in",
+        "z": "19569d59.310743",
+        "name": "Meadows",
+        "links": [
+            "d88f7c0.c79a388",
+            "30888427.90afdc"
+        ],
+        "x": 35,
+        "y": 200,
+        "wires": [
+            [
+                "a0a23695.16af98"
+            ]
+        ]
+    },
+    {
+        "id": "cba018b5.060798",
+        "type": "change",
+        "z": "19569d59.310743",
+        "name": "set meadows",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "row 9 30,180,10 row 8 20,127,10 row 7 40,127,50 row 6 bright row 5 bright row 4 bright row 3 white row 2 white row 1 bright row 0 bright",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 290,
+        "y": 200,
+        "wires": [
+            [
+                "28e5a0be.83a45"
+            ]
+        ]
+    },
+    {
+        "id": "26c14f1.c6555b",
+        "type": "mqtt-broker",
+        "z": "",
+        "name": "",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": true,
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    },
+    {
+        "id": "c84c2d81.9413e",
+        "type": "ui_group",
+        "z": "",
+        "name": "Colors-Right",
+        "tab": "efa8e174.40f51",
+        "order": 2,
+        "disp": false,
+        "width": "2",
+        "collapse": false
+    },
+    {
+        "id": "707d7326.5aa82c",
+        "type": "ui_group",
+        "z": "",
+        "name": "Colors-Left",
+        "tab": "efa8e174.40f51",
+        "disp": false,
+        "width": "4",
+        "collapse": false
+    },
+    {
+        "id": "efa8e174.40f51",
+        "type": "ui_tab",
+        "z": "",
+        "name": "Colors",
+        "icon": "color_lens",
+        "order": 2
+    }
+]

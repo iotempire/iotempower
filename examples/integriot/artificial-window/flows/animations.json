@@ -1,0 +1,816 @@
+[
+    {
+        "id": "2e788176.f8845e",
+        "type": "mqtt out",
+        "z": "64d84279.66e7dc",
+        "name": "",
+        "topic": "led-matrix",
+        "qos": "",
+        "retain": "",
+        "broker": "26c14f1.c6555b",
+        "x": 520,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "541e3db7.a355b4",
+        "type": "inject",
+        "z": "64d84279.66e7dc",
+        "name": "sunrise at 7:45a",
+        "topic": "",
+        "payload": "sunrise",
+        "payloadType": "str",
+        "repeat": "",
+        "crontab": "45 07 * * 1,2,3,4,5",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 130,
+        "y": 60,
+        "wires": [
+            [
+                "3878f8cb.f92f88"
+            ]
+        ]
+    },
+    {
+        "id": "bf06e99.bc7be18",
+        "type": "inject",
+        "z": "64d84279.66e7dc",
+        "name": "switch off at 8p",
+        "topic": "",
+        "payload": "black",
+        "payloadType": "str",
+        "repeat": "",
+        "crontab": "00 20 * * *",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 120,
+        "y": 240,
+        "wires": [
+            [
+                "2e788176.f8845e",
+                "c0fb7c98.c82de"
+            ]
+        ]
+    },
+    {
+        "id": "163ba153.1ffb6f",
+        "type": "inject",
+        "z": "64d84279.66e7dc",
+        "name": "sunset at 5p",
+        "topic": "",
+        "payload": "sunset",
+        "payloadType": "str",
+        "repeat": "",
+        "crontab": "00 17 * * 1,2,3,4,5",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 120,
+        "y": 180,
+        "wires": [
+            [
+                "740c9835.8e15e8"
+            ]
+        ]
+    },
+    {
+        "id": "3878f8cb.f92f88",
+        "type": "ui_button",
+        "z": "64d84279.66e7dc",
+        "name": "",
+        "group": "8c774199.7460f",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "label": "Sunrise",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "1",
+        "payloadType": "str",
+        "topic": "",
+        "x": 320,
+        "y": 60,
+        "wires": [
+            [
+                "30888427.90afdc",
+                "c38a5027.3eb34"
+            ]
+        ]
+    },
+    {
+        "id": "740c9835.8e15e8",
+        "type": "ui_button",
+        "z": "64d84279.66e7dc",
+        "name": "",
+        "group": "8c774199.7460f",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "label": "Sunset",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "1",
+        "payloadType": "str",
+        "topic": "",
+        "x": 280,
+        "y": 180,
+        "wires": [
+            [
+                "120918e4.8a4257"
+            ]
+        ]
+    },
+    {
+        "id": "518198c.3ad2c68",
+        "type": "ui_button",
+        "z": "64d84279.66e7dc",
+        "name": "",
+        "group": "8c774199.7460f",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Daytime",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "daytime",
+        "payloadType": "str",
+        "topic": "",
+        "x": 300,
+        "y": 120,
+        "wires": [
+            [
+                "30888427.90afdc"
+            ]
+        ]
+    },
+    {
+        "id": "eb41a98b.88b7b8",
+        "type": "ui_button",
+        "z": "64d84279.66e7dc",
+        "name": "",
+        "group": "8c774199.7460f",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Fireplace",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "images 55,20,10 /home/pi/images/fire",
+        "payloadType": "str",
+        "topic": "",
+        "x": 140,
+        "y": 360,
+        "wires": [
+            [
+                "2e788176.f8845e",
+                "750ab1a3.26035"
+            ]
+        ]
+    },
+    {
+        "id": "a08bbeb1.01cf1",
+        "type": "ui_button",
+        "z": "64d84279.66e7dc",
+        "name": "",
+        "group": "721017bd.3bb748",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Lightning",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "",
+        "x": 100,
+        "y": 480,
+        "wires": [
+            [
+                "d5b73b40.84fe88"
+            ]
+        ]
+    },
+    {
+        "id": "345c1e28.42e7c2",
+        "type": "ui_button",
+        "z": "64d84279.66e7dc",
+        "name": "",
+        "group": "721017bd.3bb748",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Halloween",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "6,3,2",
+        "payloadType": "str",
+        "topic": "",
+        "x": 130,
+        "y": 760,
+        "wires": [
+            [
+                "2e788176.f8845e",
+                "c1d3073f.018c78",
+                "296b3908.b1fab6"
+            ]
+        ]
+    },
+    {
+        "id": "8744173e.c2acf8",
+        "type": "ui_button",
+        "z": "64d84279.66e7dc",
+        "name": "",
+        "group": "721017bd.3bb748",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Off",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "off",
+        "payloadType": "str",
+        "topic": "",
+        "x": 250,
+        "y": 420,
+        "wires": [
+            [
+                "2e788176.f8845e",
+                "c0fb7c98.c82de",
+                "29ba2bab.5505b4"
+            ]
+        ]
+    },
+    {
+        "id": "894df6d.32b3808",
+        "type": "exec",
+        "z": "64d84279.66e7dc",
+        "command": "play loop ",
+        "addpay": true,
+        "append": "",
+        "useSpawn": "true",
+        "timer": "",
+        "oldrc": false,
+        "name": "play and loop",
+        "x": 690,
+        "y": 760,
+        "wires": [
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "c0fb7c98.c82de",
+        "type": "exec",
+        "z": "64d84279.66e7dc",
+        "command": "stop_play",
+        "addpay": false,
+        "append": "",
+        "useSpawn": "true",
+        "timer": "",
+        "oldrc": false,
+        "name": "stop play",
+        "x": 680,
+        "y": 420,
+        "wires": [
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "c1d3073f.018c78",
+        "type": "change",
+        "z": "64d84279.66e7dc",
+        "name": "Haunted House",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "Haunted-House",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 380,
+        "y": 760,
+        "wires": [
+            [
+                "894df6d.32b3808"
+            ]
+        ]
+    },
+    {
+        "id": "625079be.85d388",
+        "type": "exec",
+        "z": "64d84279.66e7dc",
+        "command": "play",
+        "addpay": true,
+        "append": "",
+        "useSpawn": "true",
+        "timer": "",
+        "oldrc": false,
+        "name": "play once",
+        "x": 700,
+        "y": 620,
+        "wires": [
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "f316993a.d46188",
+        "type": "change",
+        "z": "64d84279.66e7dc",
+        "name": "Thunder",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "\"thunder\" & msg.payload",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 520,
+        "y": 560,
+        "wires": [
+            [
+                "625079be.85d388"
+            ]
+        ]
+    },
+    {
+        "id": "fcac8a27.b5d878",
+        "type": "random",
+        "z": "64d84279.66e7dc",
+        "name": "random 1-10",
+        "low": "1",
+        "high": "10",
+        "inte": "true",
+        "property": "payload",
+        "x": 350,
+        "y": 560,
+        "wires": [
+            [
+                "f316993a.d46188"
+            ]
+        ]
+    },
+    {
+        "id": "750ab1a3.26035",
+        "type": "change",
+        "z": "64d84279.66e7dc",
+        "name": "Fireplace-sound",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "fireplace",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 680,
+        "y": 360,
+        "wires": [
+            [
+                "894df6d.32b3808"
+            ]
+        ]
+    },
+    {
+        "id": "30888427.90afdc",
+        "type": "link out",
+        "z": "64d84279.66e7dc",
+        "name": "",
+        "links": [
+            "732bd6c9.453a08"
+        ],
+        "x": 475,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "a820ecb7.96982",
+        "type": "inject",
+        "z": "64d84279.66e7dc",
+        "name": "daytime at 8:30a",
+        "topic": "",
+        "payload": "1",
+        "payloadType": "str",
+        "repeat": "",
+        "crontab": "30 08 * * 1,2,3,4,5",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 130,
+        "y": 120,
+        "wires": [
+            [
+                "518198c.3ad2c68"
+            ]
+        ]
+    },
+    {
+        "id": "120918e4.8a4257",
+        "type": "change",
+        "z": "64d84279.66e7dc",
+        "name": "sunset msg",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "black images 255,160,160 1800 /home/pi/images/sunrise reverse noloop",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 450,
+        "y": 180,
+        "wires": [
+            [
+                "2e788176.f8845e"
+            ]
+        ]
+    },
+    {
+        "id": "e103b546.3245b8",
+        "type": "change",
+        "z": "64d84279.66e7dc",
+        "name": "sunrise msg",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "images 255,200,180 1200 /home/pi/images/sunrise noloop",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 690,
+        "y": 140,
+        "wires": [
+            [
+                "2e788176.f8845e"
+            ]
+        ]
+    },
+    {
+        "id": "c38a5027.3eb34",
+        "type": "delay",
+        "z": "64d84279.66e7dc",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "200",
+        "timeoutUnits": "milliseconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 550,
+        "y": 60,
+        "wires": [
+            [
+                "e103b546.3245b8"
+            ]
+        ]
+    },
+    {
+        "id": "296b3908.b1fab6",
+        "type": "delay",
+        "z": "64d84279.66e7dc",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "200",
+        "timeoutUnits": "milliseconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 130,
+        "y": 820,
+        "wires": [
+            [
+                "29ba2bab.5505b4"
+            ]
+        ]
+    },
+    {
+        "id": "2ee10f8c.51748",
+        "type": "ui_button",
+        "z": "64d84279.66e7dc",
+        "name": "",
+        "group": "721017bd.3bb748",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Blood Smear",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "darkgrey blood_smear",
+        "payloadType": "str",
+        "topic": "",
+        "x": 110,
+        "y": 620,
+        "wires": [
+            [
+                "8098241b.b25ba8"
+            ]
+        ]
+    },
+    {
+        "id": "7c9793fd.29dfec",
+        "type": "change",
+        "z": "64d84279.66e7dc",
+        "name": "Scream",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "\"screams/\" & msg.payload",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 520,
+        "y": 680,
+        "wires": [
+            [
+                "625079be.85d388"
+            ]
+        ]
+    },
+    {
+        "id": "107d6372.43480d",
+        "type": "random",
+        "z": "64d84279.66e7dc",
+        "name": "random 1-12",
+        "low": "1",
+        "high": "12",
+        "inte": "true",
+        "property": "payload",
+        "x": 370,
+        "y": 680,
+        "wires": [
+            [
+                "7c9793fd.29dfec"
+            ]
+        ]
+    },
+    {
+        "id": "29ba2bab.5505b4",
+        "type": "trigger",
+        "z": "64d84279.66e7dc",
+        "op1": "1",
+        "op2": "0",
+        "op1type": "str",
+        "op2type": "str",
+        "duration": "-30",
+        "extend": false,
+        "units": "s",
+        "reset": "off",
+        "bytopic": "all",
+        "name": "",
+        "x": 350,
+        "y": 920,
+        "wires": [
+            [
+                "1a4d7b5f.305155"
+            ]
+        ]
+    },
+    {
+        "id": "1a4d7b5f.305155",
+        "type": "delay",
+        "z": "64d84279.66e7dc",
+        "name": "delay randomly 0-10s",
+        "pauseType": "random",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "0",
+        "randomLast": "10",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 140,
+        "y": 980,
+        "wires": [
+            [
+                "50bccace.01d264"
+            ]
+        ]
+    },
+    {
+        "id": "50bccace.01d264",
+        "type": "random",
+        "z": "64d84279.66e7dc",
+        "name": "1 or 2",
+        "low": "1",
+        "high": "2",
+        "inte": "true",
+        "property": "payload",
+        "x": 370,
+        "y": 980,
+        "wires": [
+            [
+                "24ae4ac6.83a4e6"
+            ]
+        ]
+    },
+    {
+        "id": "24ae4ac6.83a4e6",
+        "type": "switch",
+        "z": "64d84279.66e7dc",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "1",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "2",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 530,
+        "y": 980,
+        "wires": [
+            [
+                "d5b73b40.84fe88"
+            ],
+            [
+                "8098241b.b25ba8"
+            ]
+        ]
+    },
+    {
+        "id": "d5b73b40.84fe88",
+        "type": "change",
+        "z": "64d84279.66e7dc",
+        "name": "set lightning",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "6,3,2 lightning",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 130,
+        "y": 560,
+        "wires": [
+            [
+                "2e788176.f8845e",
+                "fcac8a27.b5d878"
+            ]
+        ]
+    },
+    {
+        "id": "8098241b.b25ba8",
+        "type": "change",
+        "z": "64d84279.66e7dc",
+        "name": "set blood_smear",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "6,3,2 blood_smear",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 150,
+        "y": 680,
+        "wires": [
+            [
+                "107d6372.43480d",
+                "2e788176.f8845e"
+            ]
+        ]
+    },
+    {
+        "id": "26c14f1.c6555b",
+        "type": "mqtt-broker",
+        "z": "",
+        "name": "",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": true,
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    },
+    {
+        "id": "8c774199.7460f",
+        "type": "ui_group",
+        "z": "",
+        "name": "Amimations-Left",
+        "tab": "ef8bf86b.bb4f48",
+        "order": 1,
+        "disp": false,
+        "width": "3",
+        "collapse": false
+    },
+    {
+        "id": "721017bd.3bb748",
+        "type": "ui_group",
+        "z": "",
+        "name": "Animations-Right",
+        "tab": "ef8bf86b.bb4f48",
+        "order": 2,
+        "disp": false,
+        "width": "3",
+        "collapse": false
+    },
+    {
+        "id": "ef8bf86b.bb4f48",
+        "type": "ui_tab",
+        "z": "",
+        "name": "Animations",
+        "icon": "toys",
+        "order": 4
+    }
+]
