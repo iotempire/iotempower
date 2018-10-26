@@ -22,4 +22,4 @@ board=$(echo -n "$board"|tr [:upper:][:space:] [:lower:]_)
 # normalize node_name from topic
 # turns out that you should not use underscores in hostnames, but can use hyphen
 #node_name=$(echo -n "$topic"|tr [:upper:][:space:]\\/ [:lower:]___)
-node_name=$(echo -n "$topic"|tr [:upper:][:space:]\\/ [:lower:]---)
+node_name=$(echo -n "$topic"|tr [:upper:][:space:]_\\/ [:lower:]----)
