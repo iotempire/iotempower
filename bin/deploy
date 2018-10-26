@@ -92,7 +92,10 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
             else
                 key=$(tail -n1 key.txt|head -c 64)
             fi
-        else 
+        else
+            # only needed for transition of old systems:
+            # normalize node_name from topic
+            #node_name=$(echo -n "$topic"|tr [:upper:][:space:]\\/ [:lower:]___)
             remote="$node_name.local"
 #           obsolete: getting IP from mqtt
 #           echo "Getting IP of node $topic for deployment."
@@ -151,7 +154,7 @@ else # started from somewhere else, so search for node.conf in subdirs
         echo "deploying of multiple nodes only works if no parameters are specified."
         exit 1
     fi
-    # TODO: think about runnning them all in parallel (or batches)
+    # TODO: think about running them all in parallel (or batches)
     find -name node.conf |\
         while read n; do
             cd "$path"

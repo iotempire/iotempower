@@ -20,4 +20,6 @@ source "node.conf" || { echo "Can't read node.conf. Aborting." 1>&2;exit 1; }
 board=$(echo -n "$board"|tr [:upper:][:space:] [:lower:]_)
 
 # normalize node_name from topic
-node_name=$(echo -n "$topic"|tr [:upper:][:space:]\\/ [:lower:]___)
+# turns out that you should not use underscores in hostnames, but can use hyphen
+#node_name=$(echo -n "$topic"|tr [:upper:][:space:]\\/ [:lower:]___)
+node_name=$(echo -n "$topic"|tr [:upper:][:space:]\\/ [:lower:]---)
