@@ -259,8 +259,8 @@ void connectToWifi() {
     Serial.println("Connecting to Wi-Fi...");
     Serial.print("Registering hostname: ");
     if(reconfig_mode_active) {
-        my_hostname = (char *)"ulnoiot_adoptee"; // TODO: define in defaults
-        // my_hostname = (char *)"ulnoiot_xxxxxx";
+        my_hostname = (char *)"ulnoiot-adoptee"; // TODO: define in defaults
+        // my_hostname = (char *)"ulnoiot-xxxxxx";
         // sprintf(my_hostname + strlen(my_hostname) - 6, "%06x", ESP.getChipId());
     } else {
         my_hostname = (char *)HOSTNAME;
