@@ -53,11 +53,20 @@ source $ULNOIOT_ROOT/bin/read_boot_config
 
 ULNOIOT_VERSION=$(cat "$ULNOIOT_ROOT/VERSION")
 
+ULNOIOT_AP_NAME_FULL="$ULNOIOT_AP_NAME"
+if [ "$ULNOIOT_AP_ADDID" = "yes" ]; then
+    # add prefix to essid based on network adapter for unique class setup
+    OUTPUT_MAC=$(ip link show "$OUTPUT_WIFI"|tail -n1|\
+            cut -d\  -f6|sed s/://g|cut -b7-)
+    ULNOIOT_AP_NAME_FULL="${ULNOIOT_AP_NAME}-$OUTPUT_MAC"
+fi
+
 # export all
 export ULNOIOT_VERSION
 export ULNOIOT_MQTT_HOST
 export ULNOIOT_AP_DEVICES
 export ULNOIOT_AP_NAME
+export ULNOIOT_AP_NAME_FULL
 export ULNOIOT_AP_ADDID
 export ULNOIOT_AP_PASSWORD
 export ULNOIOT_AP_CHANNEL

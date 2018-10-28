@@ -24,12 +24,4 @@ source "system.conf" || { echo "Can't read system.conf. Aborting." 1>&2;exit 1; 
 # read boot_config for special settings on pi
 source "$ULNOIOT_ROOT/bin/read_boot_config"
 
-ULNOIOT_AP_NAME_FULL="$ULNOIOT_AP_NAME"
-if [ "$ULNOIOT_AP_ADDID" = "yes" ]; then
-    # add prefix to essid based on network adapter for unique class setup
-    OUTPUT_MAC=$(ip link show "$OUTPUT_WIFI"|tail -n1|\
-            cut -d\  -f6|sed s/://g|cut -b7-)
-    ULNOIOT_AP_NAME_FULL="${ULNOIOT_AP_NAME}-$OUTPUT_MAC"
-fi
-
 cd "$path" # return to original path
