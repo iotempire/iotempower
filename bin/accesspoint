@@ -1,7 +1,7 @@
 #!/bin/bash
 if [[ "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF
-Syntax: accesspoint
+Syntax: accesspoint [show]
 
 accesspoint creates a local accespoint corresponding to parameters set
 in ulnoiot/etc/ulnoiot.conf.
@@ -11,8 +11,10 @@ fi
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
-ufw_active=""
-sudo ufw status| grep "Status: active" &>/dev/null && ufw_active="true"
+if [[ "$1" != "show" ]]; then
+    ufw_active=""
+    sudo ufw status| grep "Status: active" &>/dev/null && ufw_active="true"
+fi
 
 while true; do
 
@@ -35,6 +37,14 @@ while true; do
     else
         # Take first available
         OUTPUT_WIFI=$(ip link show|cut -d: -f2|grep " wl"|cut -b2-|tail -n1)
+    fi
+
+    ULNOIOT_AP_NAME_FULL="$ULNOIOT_AP_NAME"
+    if [ "$ULNOIOT_AP_ADDID" = "yes" ]; then
+        # add prefix to essid based on network adapter for unique class setup
+        OUTPUT_MAC=$(ip link show "$OUTPUT_WIFI"|tail -n1|\
+                cut -d\  -f6|sed s/://g|cut -b7-)
+        ULNOIOT_AP_NAME_FULL="${ULNOIOT_AP_NAME}-$OUTPUT_MAC"
     fi
 
     # add network extension for making essid more unique
@@ -118,8 +128,10 @@ EOF
                 -o "$INPUT_DEVICE" -j MASQUERADE
     fi
     # make sure to restore firewall
-    if [[ "$ufw_active" ]]; then
-        sudo ufw enable
+    if [[ "$1" != "show" ]]; then
+        if [[ "$ufw_active" ]]; then
+            sudo ufw enable
+        fi
+        wait $ap_id
     fi
-    wait $ap_id
 done
