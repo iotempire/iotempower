@@ -114,15 +114,7 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
     cd "$ULNOIOT_COMPILE_CACHE"
 
 # wifi credentails are now always included
-#     if [[ "$port" ]]; then
-#         echo "Flashing locally to node $topic with port $port."
-    
-#         export PLATFORMIO_UPLOAD_PORT="/dev/$port"
-
-#         cat > src/wifi-config.h << EOF
-# #define WIFI_SSID "$ULNOIOT_AP_NAME"
-# #define WIFI_PASSWORD "$ULNOIOT_AP_PASSWORD"
-# EOF
+# see prepare_build_dir
 
 #         ctrl-c-wrap platformio run -t upload || { echo "Trouble compiling or uploading wifi setup firmware, check errors."; exit 1; }
 #         echo "Let device start and set wifi credentials (20s sleep.)"
