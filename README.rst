@@ -102,7 +102,7 @@ D1 Mini, ESP8266, NodeMCU, 37-in-1 Arduino sensor kit.
 The gateway services have been tested to run on:
 
 - Raspberry Pi 1 (B and B+), 2, 3, and Zero W
-- Linux laptop running Ubuntu 17.04
+- Laptops running Ubuntu Linux 17.04 and 18.04
 
 We are trying to provide virtualbox images as soon as we find time and/or volunteers.
 
@@ -208,7 +208,7 @@ Installation step by step:
 
 - Make sure the sha256-checksum of the image is correct. It should be:
 
-  bd0383eb82bcd9fcf6e6ca83c6b34a524af8e6225065a8576da592cb91ecf0e7
+  4ae0334419ab29c810c2592a9c95e0fa82a9571268c2c017923f4bf74203b19b
 
   On Linux and MacOS, you can use ``sha256sum`` or ``shasum -a 256`` to verify
   the image, on Windows you can use
@@ -227,7 +227,7 @@ Installation step by step:
   If you have another USB-wifi stick, and want to use Internet via WiFi
   connect this wifi stick to the pi and configure ``uiot_wifi_name``,
   ``uiot_wifi_password``, and ``uiot_wifi_user`` correspondingly
-  to your WiFi network. Careful, lots of WiFi sticks don't work properly on the
+  to your WiFi network. Careful, lots of WiFi sticks do not work properly on the
   raspberry pi. Make sure you have verified that it works under the normal
   raspberry desktop environment.
   
@@ -241,41 +241,61 @@ Installation step by step:
   a Raspberry Pi Zero W, however there are some advanced configuration options
   You need to use to make that work fluently).
 
-- In Windows, install `Moba xterm <https://mobaxterm.mobatek.net/>`__. On MacOS,
-  make sure, you have `iTerm2 <https://iterm2.com/>`__ and
-  `XQuartz <https://www.xquartz.org/>`__ installed. Linux
-  will work out of the box.
-
 - You should now see your ulnoiot wifi network as specified in ``uiot_ap_name``.
   Connect your computer (laptop or desktop pc) to this wifi network
   (use the password set in
   ``uiot_ap_password``). If everything was configured correctly you should still
   have internet on your computer.
 
-- Connect to the ulnoiotgw via ssh. Make sure to enable X forwarding to have
-  the clipboard working transparently.
+- You can now connect to the pi gateway via a web browser or ssh
+  
+  - Point your browser at https://ulnoiotgw (or https://ulnoiotgw.local). Accept
+    the security exception for the locally generated security certificate. You
+    should now see a link to the filesystem through cloud commander
+    and an IoT testsystem on the pi,
+    as well as links to the Node-RED installation.
+    
+    Cloudcmd allows you to open a small console through typing '
+    
+  - If you are asked for a user, use ``ulnoiot``, if you are asked for a password
+    use ``iotempire``.
 
-  The command for Mac and Linux is:
+  - For ssh access in Windows, install `Moba xterm <https://mobaxterm.mobatek.net/>`__. 
+  
+  - On MacOS,
+    make sure, you have `iTerm2 <https://iterm2.com/>`__ and
+    `XQuartz <https://www.xquartz.org/>`__ installed.
+    
+  - Linux will work out of the box.
+  
+  - On Android use termux.
 
-  ``ssh -X pi@ulnoiotgw``
+  - For Mac or Linux you can use the built in ssh commands in the terminal.
+    Make sure to enable X forwarding to have
+    the clipboard working transparently.
 
-  The command on Windows will be (and can be graphically configured in MobaSSH):
+    The command for Mac and Linux is:
 
-  ``ssh -X pi@192.168.12.1``
+    ``ssh -X ulnoiot@ulnoiotgw``
 
-  The default password for the user pi is ``ulnoiot``
+    The command on Windows will be (and can be graphically configured in MobaSSH):
 
-  Consider changing it immediately entering the command ``passwd``
+    ``ssh -X ulnoiot@192.168.12.1``
 
-- Enter (and run = hit enter) the command ``ulnoiot upgrade`` to make sure that
+    The default password for the user ulnoiot is ``iotempire``
+
+    Consider changing it immediately entering the command ``passwd``
+
+  - At one point, also make sure to run ``sudo raspi-config`` and chose to resize the
+    hd in the advanced options.
+
+  - Check out the `short tmux help </doc/tmux-help.txt>`__,
+    pressing the ctrl-key and a-key simultanously,
+    releasing them and then pressing the h-key.
+
+- Run in ssh or the console (type and hit enter) the command ``ulnoiot upgrade`` to make sure that
   you have the latest version of ulnoiot.
 
-- At one point, also make sure to run ``sudo raspi-config`` and chose to resize the
-  hd in the advanced options.
-
-- Check out the `short tmux help </doc/tmux-help.txt>`__,
-  pressing the ctrl-key and a-key simultanously,
-  releasing them and then pressing the h-key.
 
 If you have trouble following this, make sure to checkout the tutorials on
 youtube.
@@ -323,7 +343,7 @@ configuration management environment.
 
 - Consider to configure  etc/ulnoiot.conf
   and run ``accesspoint`` and ``mqtt_broker``. If you installed from the
-  Raspberry Pi image, this should not be necessary as they are stated
+  Raspberry Pi image, this should not be necessary as they are started
   automatically.
 
 - Copy the folder ``lib/system_templates`` to a project directory,
@@ -339,8 +359,10 @@ configuration management environment.
   If you wnat to use a NodeMCU change the config to NodeMCU.
 
 - Now change into your node directory, connect an (only one) esp8266 based microcontroller
-  to your pc or raspberry/orange pi and type ``initialize``. This flashes and
-  pre-configures the device.
+  to your pc or raspberry/orange pi and type ``initialize serial``. This flashes and
+  pre-configures the device. If you use the inbuilt wifi configuration (like
+  described in uhelp wifi), just use ``initialize``
+  to adopt the node via the network.
 
 - If you like, access the debug console with ``console_serial`` (if only one esp is connected
   the serial port will be discovered automatically else supply it as usb1 or 
@@ -351,7 +373,7 @@ If something gets stuck, try to power cycle the esp8266.
 ``initialize`` sets up your wifi based on the settings in system.conf and also
 encrypts the network connection.
 
-At an ulniot-command prompt try typing ``uhelp`` and check the small manual.
+At an ulnoiot-command prompt try typing ``uhelp`` and check the small manual.
 
 Take a look at the setup.cpp in your node-folder and enable the onboardled.
 
@@ -374,6 +396,7 @@ tools:
   `here <https://github.com/ulno/create_ap>`__.
 - `FastLed rgb-strip library <https://github.com/FastLED/FastLED>`__
 - `rpi-clone <https://github.com/billw2/rpi-clone>`__
+- `cloudcmd <https://github.com/coderaiser/cloudcmd>`__
 
 Old versions were also using these:
 - `mpfshell <https://github.com/wendlers/mpfshell>`__ forked for ulnoiot
