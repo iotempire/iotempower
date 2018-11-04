@@ -359,7 +359,7 @@ configuration management environment.
 - Adapt and configure system.conf and node.conf. Especialy make sure to add the
   correct board in node.conf. If you use a Wemos D1 Mini (this is the default),
   no change is necessary here, lots of users have the NodeMCU development board.
-  If you wnat to use a NodeMCU change the config to NodeMCU.
+  If you want to use a NodeMCU, change the config to NodeMCU.
 
 - Now change into your node directory, connect an (only one) esp8266 based microcontroller
   to your pc or raspberry/orange pi and type ``initialize serial``. This flashes and
@@ -432,10 +432,11 @@ Further Documentation
 ---------------------
 
 - `Some classes where ulnoiot is used <https://ulno.net/teaching/iot/>`__
-- For any problems or just being social, visit us on matrix/riot: `#ulnoiot:matreix.org <https://riot.im/app/#/room/#ulnoiot:matrix.org>`__
+- For any problems or just being social, visit us on matrix/riot: `#ulnoiot:matrix.org <https://riot.im/app/#/room/#ulnoiot:matrix.org>`__
 
 Obsolete:
 - `micropython reference
   <https://docs.micropython.org/en/latest/esp8266/esp8266/quickref.html>`__.
 - For a very light introduction in general python, take a look at
   `this <https://docs.python.org/3/tutorial/introduction.html>`__.
+  
