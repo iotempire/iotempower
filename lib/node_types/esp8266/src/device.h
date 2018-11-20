@@ -161,15 +161,17 @@ class Device {
         Device& filter(ULNOIOT_FILTER_CALLBACK filter_cb) { 
             return with_filter_callback(filter_cb);
         }
-        Device& filter_calback(ULNOIOT_FILTER_CALLBACK filter_cb) { 
+        Device& filter_callback(ULNOIOT_FILTER_CALLBACK filter_cb) { 
             return with_filter_callback(filter_cb);
         }
 
         Subdevice* add_subdevice(Subdevice* sd) {
-            ulog("add_subdevice: dev: %s sd: %s",name.as_cstr(), sd->get_name().as_cstr());
+            ulog("add_subdevice: device: %s subdev: >%s<", name.as_cstr(), sd->get_name().as_cstr());
             if(subdevices.add(sd)) {
+                ulog("add_subdevice >%s< succeeded.", sd->get_name().as_cstr());
                 return sd;
             } else {
+                ulog("add_subdevice >%s< failed.", sd->get_name().as_cstr());
                 return NULL;
             }
         }

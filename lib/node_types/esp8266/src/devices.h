@@ -126,7 +126,7 @@
 #define display(name, ...) ULNOIOT_DEVICE(name, display_, ##__VA_ARGS__)
 
 #define display44780_(internal_name, ...) \
-    ULNOIOT_DEVICE_(Display44780, internal_name, ##__VA_ARGS__)
+    ULNOIOT_DEVICE_(Display_HD44780_I2C, internal_name, ##__VA_ARGS__)
 #define display44780(name, ...) ULNOIOT_DEVICE(name, display44780_, ##__VA_ARGS__)
 
 

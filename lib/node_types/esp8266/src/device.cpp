@@ -6,6 +6,7 @@
 #include "device.h"
 
 void Subdevice::init(const char* subname, bool subscribed) {
+    ulog("subdevice init: subname: >%s< subscribed: %d", subname, subscribed);
     name.from(subname);
     _subscribed = subscribed;
 }

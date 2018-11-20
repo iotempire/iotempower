@@ -136,6 +136,10 @@ class Display_HD44780_I2C : public Display_Base {
         : Display_Base(name) {
             init_hd44780_i2c(w, h, SCL, SDA, i2c_addr);
         }
+        void start() {
+            // TODO: check if i2c start was successful
+            _started = true;
+        }
 
         // TODO: check what happens when we use this together with the I2C hardware pins
 
