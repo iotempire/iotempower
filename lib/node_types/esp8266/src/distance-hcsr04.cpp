@@ -3,8 +3,7 @@
 // Important to include Functional Interrupt as else it does not allow to 
 // define a class-based (object specific) interrupt
 #include <FunctionalInterrupt.h>
-#include "hcsr04.h"
-
+#include "distance-hcsr04.h"
 
 void Hcsr04::echo_changed(void) {
     unsigned long current = micros();  // directly read time to be as precise as possible

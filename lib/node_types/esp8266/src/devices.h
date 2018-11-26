@@ -66,10 +66,16 @@
 #define servo_switch(name, ...) ULNOIOT_DEVICE(name, servo_switch_, ##__VA_ARGS__)
 
 
-#include <hcsr04.h>
+#include <distance-hcsr04.h>
 #define hcsr04_(internal_name, ...) \
     ULNOIOT_DEVICE_(Hcsr04, internal_name, ##__VA_ARGS__)
 #define hcsr04(name, ...) ULNOIOT_DEVICE(name, hcsr04_, ##__VA_ARGS__)
+
+
+#include <distance-vl53l0x.h>
+#define vl53l0x_(internal_name, ...) \
+    ULNOIOT_DEVICE_(Distance_Vl53l0x, internal_name, ##__VA_ARGS__)
+#define vl53l0x(name, ...) ULNOIOT_DEVICE(name, vl53l0x_, ##__VA_ARGS__)
 
 
 #include <analog.h>
