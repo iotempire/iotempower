@@ -26,6 +26,13 @@ class I2C_Device : public Device {
             scl_pin = scl;
             clock_speed = clock;
         }
+        /* start is now private, check i2c_start for overwrite
+         * */
+        void start() {
+            clear_bus(); 
+            measure_init();
+            i2c_start();
+        }
     public:
         I2C_Device(const char* name, uint8_t address) : Device(name) {
             init_i2c(SDA, SCL, ULNOIOT_DEFAULT_I2C_CLOCK);
@@ -71,15 +78,13 @@ class I2C_Device : public Device {
         int clear_bus();
 
         /* measure_init
-         * all i2c params have to be reinitilized all the time.
+         * all i2c params have to be reinitialized all the time.
          * */
         void measure_init(); 
 
-        // keep this as in device
-        /* start
-         * TODO: make protected?
-         * */
-        virtual void start() { _started = true; }
+        // i2c devices need to overwrite i2c_start instead of start
+        virtual void i2c_start() { _started = true; }
+
 
         // keep this as in device
         /* measure

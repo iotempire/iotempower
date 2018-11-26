@@ -812,6 +812,7 @@ void VL53L0X::stopContinuous(void)
 // single-shot range measurement)
 uint16_t VL53L0X::readRangeContinuousMillimeters(void)
 {
+  // TODO: This is busy waiting and needs to be changed to polling
   startTimeout();
   while ((readReg(RESULT_INTERRUPT_STATUS) & 0x07) == 0)
   {

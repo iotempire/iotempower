@@ -11,13 +11,10 @@ Distance_Vl53l0x::Distance_Vl53l0x(const char* name,
     set_address(0b0101001); // TODO: careful if address is changed.
 }
 
-void Distance_Vl53l0x::start() {
+void Distance_Vl53l0x::i2c_start() {
     sensor = new VL53L0X();
 
     if(sensor) {
-        measure_init(); // set correct i2c params
-        clear_bus(); // TODO: move this initialization in i2c-device start
-
         sensor->init();
         sensor->setTimeout(500); // TODO: should this be adjusted?
 

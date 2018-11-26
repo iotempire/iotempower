@@ -59,7 +59,7 @@ class Display_Base : public I2C_Device {
             return *this;
         }
 
-        virtual void start() { }; // keep _started false if this was not overwritten
+        virtual void i2c_start() { }; // keep _started false if this was not overwritten
         virtual void show(const char* buffer) {};
         
         bool measure();
@@ -97,7 +97,7 @@ class Display : public Display_Base {
             return _display->getDisplayHeight();
         }
 
-        void start() {
+        void i2c_start() {
             switch(start_type) {
                 case 0: // display was given and init done outside
                     _started = init_u8g2();
@@ -136,7 +136,7 @@ class Display_HD44780_I2C : public Display_Base {
         : Display_Base(name) {
             init_hd44780_i2c(w, h, SCL, SDA, i2c_addr);
         }
-        void start() {
+        void i2c_start() {
             // TODO: check if i2c start was successful
             _started = true;
         }

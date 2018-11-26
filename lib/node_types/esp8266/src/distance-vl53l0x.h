@@ -29,7 +29,7 @@ class Distance_Vl53l0x : public I2C_Device {
             return *this;
         }
 
-        void start();
+        void i2c_start();
         bool measure();
 };
 
