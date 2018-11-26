@@ -5,12 +5,13 @@
 # Author: ulno
 # Create date: 2017-07-12
 #
-echo "This is currently broken - need to check with author why."
-exit 1
+#echo "This is currently broken - need to check with author why."
+#exit 1
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
-MAKEFLAGS="BUILDVERSION=release LCFLAGS=-DT3_DONT_CHECK_VERSION LCXXFLAGS=-DT3_DONT_CHECK_VERSION -j4"
+#MAKEFLAGS="BUILDVERSION=release LCFLAGS=-DT3_DONT_CHECK_VERSION LCXXFLAGS=-DT3_DONT_CHECK_VERSION -j4"
+MAKEFLAGS="LCFLAGS=-DT3_DONT_CHECK_VERSION LCXXFLAGS=-DT3_DONT_CHECK_VERSION -j4"
 #MAKEFLAGS=""
 
 if [[ $# -gt 1 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
@@ -22,7 +23,7 @@ Welcome to the ulnoiot tilde editor for debian-systems installer (it might also
 work for other systems, but does nto automatically install dependencies).
 
 Run as:
-install_tilde [clean]
+install_tilde_git [clean]
 
 Specifying clean as option will clear the cache and re-download everything.
 
