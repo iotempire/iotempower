@@ -19,7 +19,16 @@ while [[ ! -e "system.conf" ]]; do
     parent_levels=$(( $parent_levels - 1 ))
     cd ..
 done
+
+_ULNOIOT_TMP="$ULNOIOT_AP_NAME"
+ULNOIOT_AP_NAME="__ULNOIOT_TEST__"
 source "system.conf" || { echo "Can't read system.conf. Aborting." 1>&2;exit 1; }
+if [[ "$ULNOIOT_AP_NAME" != "__ULNOIOT_TEST__" ]]; then # was overwritten
+    ULNOIOT_AP_NAME_FULL="$ULNOIOT_AP_NAME"
+else # not overwritten, restore
+    ULNOIOT_AP_NAME="$_ULNOIOT_TMP"
+fi 
+unset _ULNOIOT_TMP
 
 # read boot_config for special settings on pi
 source "$ULNOIOT_ROOT/bin/read_boot_config"
