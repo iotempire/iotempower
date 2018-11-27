@@ -152,9 +152,10 @@ function run() {
             git pull
             #git submodule update --remote --recursive --init
             fix_bin # prints out Fixing links
-            #echo "Downloading latest firmware."
-            #download_firmware
-            #echo "Upgrade finished."
+            echo "Cleaning source files from cache to regenerate."
+            rm -rf "$ULNOIOT_COMPILE_CACHE/src"
+            rm -rf "$ULNOIOT_COMPILE_CACHE/lib"
+            echo "Upgrade finished."
             ;;
         exec | x | run | -x | -c | --exec)
             shift
