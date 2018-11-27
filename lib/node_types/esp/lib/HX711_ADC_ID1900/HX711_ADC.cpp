@@ -44,11 +44,15 @@ void HX711_ADC::begin(uint8_t gain)
 *   Running this for 1-5s before tare() seems to improve the tare accuracy */
 void HX711_ADC::start(unsigned int t)
 {
+	unsigned long current = millis();
 	t += 400;
-	while(millis() < t) {
+	while(millis() - current < t) {
 		getData();
+		yield();
 	}
+	Serial.println("hello1");
 	tare();
+	Serial.println("hello2");
 	tareStatus = 0;
 }	
 
@@ -83,8 +87,13 @@ void HX711_ADC::tare()
 	uint8_t rdy = 0;
 	doTare = 1;
 	tareTimes = 0;
+	unsigned long current = millis();
 	while(rdy != 2) {
 		rdy = update();
+		if(millis()-current>2) {
+			yield();
+			current = millis();
+		}
 	}
 }
 
@@ -158,6 +167,7 @@ uint8_t HX711_ADC::conversion24bit()  //read 24 bit data and start the next conv
 	unsigned long data = 0;
 	uint8_t dout;
 	convRslt = 0;
+	Serial.println("conversion");
 	for (uint8_t i = 0; i < (24 + GAIN); i++) { //read 24 bit data + set gain and start next conversion
 		delayMicroseconds(1); // required for faster mcu's?
 		digitalWrite(sckPin, 1);

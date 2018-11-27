@@ -65,7 +65,7 @@ input(button1, D3, "released", "pressed")
 //    .with_filter_callback(binarize(200, "off", "on", IN(distance)));
 
 // HX711 weight sensor
-hx711(weight, D6, D7, 694.0, true);
+//hx711(weight, D6, D7, 694.0, true);
 
 // Example for single RGB-led
 // rgb(r0, D6, D5, D0, true);
