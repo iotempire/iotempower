@@ -78,6 +78,12 @@
 #define vl53l0x(name, ...) ULNOIOT_DEVICE(name, vl53l0x_, ##__VA_ARGS__)
 
 
+#include <hx711.h>
+#define hx711_(internal_name, ...) \
+    ULNOIOT_DEVICE_(Hx711, internal_name, ##__VA_ARGS__)
+#define hx711(name, ...) ULNOIOT_DEVICE(name, hx711_, ##__VA_ARGS__)
+
+
 #include <analog.h>
 #define analog_(internal_name, ...) \
     ULNOIOT_DEVICE_(Analog, internal_name, ##__VA_ARGS__)

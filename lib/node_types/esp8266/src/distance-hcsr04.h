@@ -1,5 +1,5 @@
 // hcsr04.h
-// Header File for trigger device (interrupt+counter on input)
+// ultrasonic distance sensor
 //
 // Refer to: https://cdn.sparkfun.com/datasheets/Sensors/Proximity/HCSR04.pdf
 

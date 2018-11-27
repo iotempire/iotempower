@@ -1,5 +1,5 @@
 // distance-vl53l0x.h
-// I2C Time of flight sensor
+// I2C Time of flight distance sensor
 
 #ifndef _ULNOIOT_VL53L0X_H_
 #define _ULNOIOT_VL53L0X_H_

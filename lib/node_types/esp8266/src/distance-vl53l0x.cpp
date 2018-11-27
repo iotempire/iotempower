@@ -25,7 +25,7 @@ void Distance_Vl53l0x::i2c_start() {
             sensor->setVcselPulsePeriod(VL53L0X::VcselPeriodFinalRange, 14);
         }
 
-        // THis might only work with clean bus
+        // This might only work with clean bus (had random crashes here before)
         if(_high_accuracy_slow) {
             // increase timing budget to 200 ms
             sensor->setMeasurementTimingBudget(200000);
