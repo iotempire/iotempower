@@ -39,7 +39,7 @@ Hx711::Hx711(const char* name, uint8_t sck_pin, uint8_t dt_pin,
 #define stabilizing_time 2000 // for better tare precision
 
 void Hx711::start() {
-    ulog("Starting HX711 initialization, this will block 3s.");
+    ulog("Starting HX711 initialization, this will block 2s.");
     sensor = new HX711_ADC(_dt_pin, _sck_pin);
     if(sensor) {
         sensor->start(stabilizing_time);

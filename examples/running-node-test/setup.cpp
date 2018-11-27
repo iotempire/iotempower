@@ -61,8 +61,11 @@ input(button1, D3, "released", "pressed")
 
 // Distance sensor
 //hcsr04(distance, D1, D2).with_precision(50);
-hcsr04(distance, D1, D2)
-    .with_filter_callback(binarize(200, "off", "on", IN(distance)));
+//hcsr04(distance, D1, D2)
+//    .with_filter_callback(binarize(200, "off", "on", IN(distance)));
+
+// HX711 weight sensor
+hx711(weight, D6, D7, 694.0, true);
 
 // Example for single RGB-led
 // rgb(r0, D6, D5, D0, true);
