@@ -1,7 +1,7 @@
 dht(name, pin);
 Other names: dht11, dht22
 
-ds18x20(name, pin);
+ds18b20(name, pin);
 Other names: dallas
 
 Create a new temperature (+ humidity) sensor device.

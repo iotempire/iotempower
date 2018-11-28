@@ -1,8 +1,11 @@
-rgb_single(name, pin_r, pin_g, pin_b);
+rgb_single(name, pin_r, pin_g, pin_b, invert=false);
 
 Create a new rgb device object for an rgb-led connected to the pins
 pin_r (red pin), pin_g (green pin), and pin_b (blue pin).
 Name will be appended to the mqtt topic.
+If invert parameter is set to true, the outputs are inverted, for example
+255,0,127 becomes 0,255,128.
+
 Under the resulting topic will be the following subtopics:
 - set: turn on or off
 - brightness/status, brightness/set: read and set brightness (0-255)

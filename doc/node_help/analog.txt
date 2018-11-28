@@ -26,7 +26,7 @@ Parameters:
 Example:
 Assuming nodename is basement/water-sensor01.
 
-analog("water").with_precision(10).with_threshold(100, "wet", "dry");
+analog(water).with_precision(10).with_threshold(100, "wet", "dry");
 
 Now, a value of wet is sent to "basement/water-sensor01/water", when the analog
 port reads a value of more than 90 (threshold - precision). It will start

@@ -145,7 +145,10 @@
 #include <gyro.h>
 #define gyro6050_(internal_name, ...) \
     ULNOIOT_DEVICE_(Gyro_MPU6050, internal_name, ##__VA_ARGS__)
-#define gyro(name, ...) ULNOIOT_DEVICE(name, gyro, ##__VA_ARGS__)
+#define gyro6050(name, ...) ULNOIOT_DEVICE(name, gyro6050_, ##__VA_ARGS__)
+#define gyro_(internal_name, ...) \
+    ULNOIOT_DEVICE_(Gyro_MPU6050, internal_name, ##__VA_ARGS__)
+#define gyro(name, ...) ULNOIOT_DEVICE(name, gyro_, ##__VA_ARGS__)
 
 
 #endif // _DEVICES_H_

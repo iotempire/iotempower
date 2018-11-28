@@ -15,7 +15,7 @@ Pwm allows to call set to set a duty cycle from 0 to 1023
 The frequency can be set via the suptopic frequency/set
 
 Example:
-pwm(blue, ONBOARDLED, frequency=2000);
+pwm(blue, ONBOARDLED, 2000);
 
 Now you can set the brightness of onboardled to 50% sending 512 to
 [nodename]/blue/set
