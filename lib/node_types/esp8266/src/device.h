@@ -306,7 +306,7 @@ class Device {
     }
 
 /* Turn analog values into binary with a threshold level */
-#define binarize(cutoff, high, low, dev) [&] { \
+#define filter_binarize(cutoff, high, low, dev) [&] { \
         if(dev.measured_value().equals(low)) return false; \
         if(dev.measured_value().equals(high)) return false; \
         double sample = dev.measured_value().as_float(); \
@@ -316,6 +316,25 @@ class Device {
             dev.measured_value().from(low); \
         } \
         return true; \
+    }
+
+/* round to the next multiple of base */
+#define filter_round(base, dev) [&] { \
+        long v = (long)(dev.measured_value().as_float()/(base)+0.5); \
+        dev.measured_value().from(v*(base)); \
+        return true; \
+    }
+
+/* return maximum one value per time interval (interval in ms) */
+#define filter_limit_time(interval, dev) [&] { \
+        static unsigned long last_time; \
+        unsigned long current = millis() ; \
+        if(!dev.measured_value().empty() \
+           && current - last_time >= interval) { \
+            last_time = current; \
+            return true; \
+        } \
+        return false; \
     }
 
 

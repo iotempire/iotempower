@@ -16,10 +16,25 @@ analog(a0).with_filter_callback( [&] {
     return false;
 });
 
-There are two filters available:
+There some pre-defined filters available:
 
-analog(a0).with_filter_callback(filter_average(int, 100, IN(a0)));
-That's the same as above.
+filter: filter_average(TYPE, buflen, dev)
+example: analog(a0).with_filter_callback(filter_average(int, 100, IN(a0)));
+description: That's the same as above.
 
-analog(a0).with_filter_callback(filter_jmc_median(500, IN(a0)));
-That's an estimated median giving a new value every 500ms.
+filter: filter_jmc_median(update_ms, dev)
+example: analog(a0).with_filter_callback(filter_jmc_median(500, IN(a0)));
+description: That's an estimated median giving a new value every 500ms.
+(The Jeff McClintock running median estimate.)
+
+filter: filter_jmc_interval_median(interval, dev)
+description: Derivation of jmc median over small time intervals
+
+filter: filter_binarize(cutoff, high, low, dev)
+description: Turn analog values into binary with a threshold level.
+
+filter: filter_round(base, dev)
+description: Round to the next multiple of base.
+
+filter: filter_limit_time(interval, dev)
+description: Return maximum one value per time interval (interval in ms).
