@@ -1,0 +1,21 @@
+hx711(name, scx_pin, dout_pin, calfactor=450, calibration=false);
+
+Create a new load cell driver for a scale.
+
+Parameters:
+- name: the name it can be addressed via MQTT in the network. Inside the code
+  it can be addressed via IN(name).
+- scx_pin: scx driver gpio pin
+- dout_pin: dout or dt gpio pin
+- calfactor: calibration factor
+- calibration: If true, an extra calfactor subtopic is created.
+  This topic can receive +delta, -delta, or =newfactor as payload to change
+  the calfactor.
+
+This driver always creates a subtopic tare. If any payload is sent to this
+topic, the tare process on the scale is executed.
+
+Example:
+hx711(weight, D6, D7, 419.0, true);
+
+This example will report weight in g on the topic node_topic/weight.

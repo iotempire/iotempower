@@ -20,7 +20,7 @@ class Hx711 : public Device {
         unsigned long last_read;
     public:
         Hx711(const char* name, uint8_t sck_pin, uint8_t doutpin,
-            float calfactor=696.0, bool calibration=false);
+            float calfactor=450.0, bool calibration=false);
         Hx711& with_precision(int precision) {
             if(precision < 1) precision = 1;
             _precision = precision;
