@@ -82,6 +82,18 @@ bool do_later(unsigned long in_ms, int16_t id, DO_LATER_CB_ID callback) {
     return true;
 }
 
+void deep_sleep(unsigned long time_from_now_ms, unsigned long duration_ms) {
+    do_later(time_from_now_ms, [&] {
+        ulog("About to fall into deepsleep for %d s", duration_ms/1000);
+        delay(100);
+        delay(100);
+        delay(100);
+        ESP.deepSleep(duration_ms*1000); 
+    });
+    // TODO: make sure, that at wake-up time the 5s reset is not triggered
+}
+
+
 bool do_later(unsigned long in_ms, DO_LATER_CB_NO_ID callback) {
     return do_later_add(in_ms, -1, callback);
 }

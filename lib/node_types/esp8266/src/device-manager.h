@@ -19,6 +19,9 @@ typedef std::function<void()> DO_LATER_CB_NO_ID;
 bool do_later(unsigned long in_ms, DO_LATER_CB_NO_ID callback);
 void do_later_check(); // should not be called by user
 
+// send device soon to deep_sleep
+void deep_sleep(unsigned long time_from_now_ms, unsigned long duration_ms);
+
 // add a device to the static device list
 bool add_device(Device& device);
 
