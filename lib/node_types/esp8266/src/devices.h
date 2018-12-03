@@ -99,11 +99,27 @@
 #define dht11(gcc_va_args...) dht(gcc_va_args)
 #define dht22(gcc_va_args...) dht(gcc_va_args)
 
+
 #define ds18b20_(internal_name, ...) \
     ULNOIOT_DEVICE_(Ds18b20, internal_name, ##__VA_ARGS__)
 #define dallas_(gcc_va_args...) ds18b20_(gcc_va_args)
 #define ds18b20(name, ...) ULNOIOT_DEVICE(name, ds18b20_, ##__VA_ARGS__)
 #define dallas(gcc_va_args...) ds18b20(gcc_va_args)
+
+
+#include <barometer-bmp180.h>
+#define bmp180_(internal_name, ...) \
+    ULNOIOT_DEVICE_(Barometer_BMP180, internal_name, ##__VA_ARGS__)
+#define bmp180(name, ...) ULNOIOT_DEVICE(name, bmp180_, ##__VA_ARGS__)
+#define bmp085_(internal_name, ...) \
+    ULNOIOT_DEVICE_(Barometer_BMP180, internal_name, ##__VA_ARGS__)
+#define bmp085(name, ...) ULNOIOT_DEVICE(name, bmp085_, ##__VA_ARGS__)
+
+
+#include <barometer-bmp280.h>
+#define bmp280_(internal_name, ...) \
+    ULNOIOT_DEVICE_(Barometer_BMP280, internal_name, ##__VA_ARGS__)
+#define bmp280(name, ...) ULNOIOT_DEVICE(name, bmp280_, ##__VA_ARGS__)
 
 
 #include <rgb_single.h>
