@@ -84,7 +84,7 @@ bool do_later(unsigned long in_ms, int16_t id, DO_LATER_CB_ID callback) {
 
 void deep_sleep(unsigned long time_from_now_ms, unsigned long duration_ms) {
     do_later(time_from_now_ms, [&] {
-        ulog("About to fall into deepsleep for %d s", duration_ms/1000);
+        ulog("About to fall into deepsleep for %ld s", duration_ms/1000);
         delay(100);
         delay(100);
         delay(100);
