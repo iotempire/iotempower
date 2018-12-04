@@ -1,10 +1,13 @@
-deep_sleep(time_from_now_ms, duration_ms);
+deep_sleep(time_from_now_ms, duration_ms=0);
 
 Fall in time_from_now_ms ms into deep_sleep mode for duration_ms ms.
 Remember to wire RST to D0 (or internal pin nr 16).
+If duration_ms is 0 (default) the microcontroller can only be woken up
+by the reset line.
 deep_sleep has to be specified in the start method.
 
-Careful: any status of an actor is forgotten.
+Careful: any status of an actor is forgotten. Also the OTA update functionality
+(and deply) only works when the device is woken up and currently not sleeping.
 
 example:
 void start() {
