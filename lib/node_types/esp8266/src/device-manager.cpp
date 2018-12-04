@@ -83,12 +83,15 @@ bool do_later(unsigned long in_ms, int16_t id, DO_LATER_CB_ID callback) {
 }
 
 void deep_sleep(unsigned long time_from_now_ms, unsigned long duration_ms) {
+    static unsigned long duration_ms_backup;
+
+    duration_ms_backup = duration_ms; // static to save for lambda
     do_later(time_from_now_ms, [&] {
-        ulog("About to fall into deepsleep for %ld s", duration_ms/1000);
+        ulog("About to fall into deepsleep for %lu s", duration_ms_backup/1000);
         delay(100);
         delay(100);
         delay(100);
-        ESP.deepSleep(duration_ms*1000); 
+        ESP.deepSleep(duration_ms_backup*1000); 
     });
     // TODO: make sure, that at wake-up time the 5s reset is not triggered
 }

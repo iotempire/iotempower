@@ -70,7 +70,7 @@ input(button1, D3, "released", "pressed")
 
 
 // barometer
-bmp180(bmp1);
+//bmp180(bmp1);
 //bmp280(bmp2);
 
 // Example for single RGB-led
@@ -185,15 +185,15 @@ bmp180(bmp1);
 // Things like initial do_later calls should go here
 // as well as a call to transmission_interval if something else than
 // the initial 5s is preferred.
-// void start() { // begin start, uncomment, if you need to start things 
+void start() { // begin start, uncomment, if you need to start things 
 //
 //     // Trigger first blink
 //     do_later(2000, blink);
 //
-//     // fall into deep sleep in 15s for 60s
-//     deep_sleep(15000, 60000);
+     // fall into deep sleep in 15s for 60s
+     deep_sleep(15000, 20000);
 // 
 //     // Send updates of current status every 10s (default 5)
 //     transmission_interval(10);
 //
-// } // end start
+} // end start
