@@ -108,7 +108,7 @@ function check_install() {
 function install() {
     echo "Installing now."
     echo
-    bash "$ULNOIOT_ROOT/bin/install"
+    bash "$ULNOIOT_ROOT/bin/install_ulnoiot"
     run upgrade
 }
 
