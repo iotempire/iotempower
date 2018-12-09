@@ -73,6 +73,9 @@ input(button1, D3, "released", "pressed")
 //bmp180(bmp1);
 //bmp280(bmp2);
 
+// light sensitivity sensors
+bh1750(lux1);
+
 // Example for single RGB-led
 // rgb(r0, D6, D5, D0, true);
 

@@ -122,6 +122,13 @@
 #define bmp280(name, ...) ULNOIOT_DEVICE(name, bmp280_, ##__VA_ARGS__)
 
 
+#include <lux-bh1750.h>
+#define bh1750_(internal_name, ...) \
+    ULNOIOT_DEVICE_(Lux_BH1750, internal_name, ##__VA_ARGS__)
+#define bh1750(name, ...) ULNOIOT_DEVICE(name, bh1750_, ##__VA_ARGS__)
+
+
+
 #include <rgb_single.h>
 #define rgb_single_(internal_name, ...) \
     ULNOIOT_DEVICE_(RGB_Single, internal_name, ##__VA_ARGS__)
