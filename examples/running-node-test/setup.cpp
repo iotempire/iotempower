@@ -74,7 +74,8 @@ input(button1, D3, "released", "pressed")
 //bmp280(bmp2);
 
 // light sensitivity sensors
-bh1750(lux1);
+// bh1750(lux1);
+tsl2561(lux2);
 
 // Example for single RGB-led
 // rgb(r0, D6, D5, D0, true);
@@ -193,8 +194,8 @@ void start() { // begin start, uncomment, if you need to start things
 //     // Trigger first blink
 //     do_later(2000, blink);
 //
-     // fall into deep sleep in 15s for 60s
-     deep_sleep(15000, 20000);
+    //  // fall into deep sleep in 15s for 60s
+    //  deep_sleep(15000, 20000);
 // 
 //     // Send updates of current status every 10s (default 5)
 //     transmission_interval(10);

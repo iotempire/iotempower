@@ -128,6 +128,11 @@
 #define bh1750(name, ...) ULNOIOT_DEVICE(name, bh1750_, ##__VA_ARGS__)
 
 
+#include <lux-tsl2561.h>
+#define tsl2561_(internal_name, ...) \
+    ULNOIOT_DEVICE_(Lux_TSL2561, internal_name, ##__VA_ARGS__)
+#define tsl2561(name, ...) ULNOIOT_DEVICE(name, tsl2561_, ##__VA_ARGS__)
+
 
 #include <rgb_single.h>
 #define rgb_single_(internal_name, ...) \
