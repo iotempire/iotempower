@@ -13,6 +13,7 @@ void Lux_BH1750::start() {
 
     if(sensor) {
         sensor->begin(); // TODO: timeout
+        last_read = millis();
         _started = true;
     } else {
         ulog("Can't reserve memory for BH1750.");
@@ -21,6 +22,9 @@ void Lux_BH1750::start() {
 
 
 bool Lux_BH1750::measure() {
+    unsigned long current_time = millis();
+    if(current_time - last_read < 1000) return false;
+    last_read = current_time; 
 
     float lux = sensor->readLightLevel();
 

@@ -13,6 +13,7 @@
 class Lux_BH1750 : public I2C_Device {
     private:
         BH1750 *sensor = NULL;
+        unsigned long last_read;
     public:
         Lux_BH1750(const char* name);
         void start();
