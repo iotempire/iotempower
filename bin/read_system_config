@@ -1,7 +1,7 @@
 #@IgnoreInspection BashAddShebang
 # Read system configuration
 
-# search source.conf in parent directories and build a respective path to self
+# search system.conf in parent directories and build a respective path to self
 # this search goes the following number of levels up max
 parent_levels=5
 path="$(pwd)"
@@ -22,7 +22,7 @@ done
 
 _ULNOIOT_TMP="$ULNOIOT_AP_NAME"
 ULNOIOT_AP_NAME="__ULNOIOT_TEST__"
-source "system.conf" || { echo "Can't read system.conf. Aborting." 1>&2;exit 1; }
+source "system.conf" &> /dev/null || { echo "Can't read system.conf. Aborting." 1>&2;exit 1; }
 if [[ "$ULNOIOT_AP_NAME" != "__ULNOIOT_TEST__" ]]; then # was overwritten
     ULNOIOT_AP_NAME_FULL="$ULNOIOT_AP_NAME"
 else # not overwritten, restore

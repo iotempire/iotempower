@@ -23,6 +23,10 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
     fi
 
 else # started from somewhere else, so search for node.conf in subdirs
+
+    # first search if there is a system.conf, exit if not
+    source "$ULNOIOT_ROOT/bin/read_system_config"
+
     path="$(pwd)"
 
     echo "This is not a node, so search sub-folders for node.conf files and"
