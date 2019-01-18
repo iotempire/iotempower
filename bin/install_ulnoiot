@@ -73,8 +73,9 @@ else
     pip install pyserial
     pip install colorama
     pip install websocket_client
+    pip install restview  # for looking at documentation
     # for later development
-    pip install paho-mqtt
+    pip install paho-mqtt  # also for integriot
     pip install ipython
     pushd . &> /dev/null
     # TODO: fix more dependencies
