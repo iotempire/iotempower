@@ -17,7 +17,7 @@ while true; do
     # make doc directory
     mkdir -p "$ULNOIOT_LOCAL/webdoc"
     ln -f -s "$ULNOIOT_ROOT/doc" "$ULNOIOT_LOCAL/webdoc/doc"
-    cd "$ULNOIOT_ROOT/doc"
+    cd "$ULNOIOT_ROOT"
     restview -l 3000 -B . 
     sleep 1
 done
