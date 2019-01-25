@@ -11,9 +11,6 @@
 # if parameters are given and the first is "exec", ulnoiot will execute
 # the rest of the parameters as command in ulnoiot environment
 
-HELP_PATH=doc/node_help
-# TODO: adjust path to different selected micro controllers depending on node
-
 function welcome() {
 cat << EOF
 ulnoiot
@@ -46,29 +43,29 @@ The following commands are possible:
   Display help on a specific command given in cmd. If cmd is empty,
   show this help.
   After entering the ulnoiot environment, this help is also available just via
-  typing uhelp.
+  typing uhelp. Calling uhelp with no parameters will list all available
+  commands.
 
 - [command]:
   Execute ulnoiot_[command] with the given parameters.
-  
+
 
 If no command is given, execute the bash shell in the ulnoiot environment.
 The first time this is run, external dependencies are downloaded and
 installed here too.
 
-cmd in help [cmd] can be any of the following:
-EOF
-comma=""
-ls "$ULNOIOT_ROOT/$HELP_PATH/"*.txt | while read f; do
-    f=$(basename "$f")
-    if [[ ${f:0:1} != "_" ]]; then
-        echo -n $comma${f:0:-4}
-    fi
-    comma=", "
-done
-echo
-echo
+Also try out the following commands for device management (add help to each of
+them to get a longer description):
+- initialize (reflashing device)
+- deploy (update a device remotely)
+- console_serial show serial output of connected node
 
+Commands for interacting via mqtt (node topic is added when in node folder):
+- mqtt_all (show all mqtt messages_
+- mqtt_listen (listen for a specific topic)
+- mqtt_send (directly send payload to specific topic)
+- mqtt_action (react on specific payload on specific mqtt topic)
+EOF
 }
 
 function check_files() {
@@ -116,26 +113,6 @@ function install() {
     run upgrade
 }
 
-function help() {
-    local m
-    local p
-    local l
-    p="$ULNOIOT_ROOT/$HELP_PATH/$1.txt"
-    { cat "$p"; echo; } | while read l; do
-        if [[ "$l" = "!!"* ]]; then
-            if [[ "$l" =~ '!!help("'(.*)'")' ]]; then
-                m="${BASH_REMATCH[1]}"
-                help "$m"
-            else
-                echo "[[Cannot parse:"
-                echo "  ${l:2}]]"
-            fi
-        else
-            echo "$l"
-        fi
-    done
-}
-
 function run() {
     case "$1" in
         welcome)
@@ -144,30 +121,28 @@ function run() {
         help | -h | --help)
             shift
             if [[ "$1" ]]; then
-                help "$1"
+                exec "$ULNOIOT_LOCAL/bin/ulnoiot_help" "$@"
             else
                 usage
             fi
             ;;
-        upgrade)
-            cd "$ULNOIOT_ROOT"
-            echo "Upgrading ulnoiot."
-            echo "Getting changes from git."
-            git pull
-            #git submodule update --remote --recursive --init
-            fix_bin # prints out Fixing links
-            echo "Cleaning source files from cache to regenerate."
-            rm -rf "$ULNOIOT_COMPILE_CACHE/src"
-            rm -rf "$ULNOIOT_COMPILE_CACHE/lib"
-            echo "Upgrade finished."
+        "")
+            welcome
+            exec bash
             ;;
         exec | x | run | -x | -c | --exec)
             shift
             exec "$@"
             ;;
         *)
-            welcome
-            exec bash
+            # try to execute that with ulnoiot_ prefix
+            cmd="$ULNOIOT_LOCAL/bin/ulnoiot_$1"
+            if [[ -x "$cmd" ]]; then
+                shift
+                exec "$cmd" "$@"
+            else
+                usage
+            fi
     esac
 }
 

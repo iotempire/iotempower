@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 if [[ $# -gt 0 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
-function usage() {
 cat << EOF
 Syntax: ulnoiot_upgrade
 
@@ -9,6 +8,8 @@ Update current version ulnoiot with newest version from git repository.
 This means, pulling a new version from the git repository, fixing shebangs
 in binaries, building new view of web documentation, and cleaning up the cache.
 EOF
+exit 1
+fi
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
@@ -27,5 +28,8 @@ fix_bin # prints out Fixing links
 echo "Cleaning source files from cache to regenerate."
 rm -rf "$ULNOIOT_COMPILE_CACHE/src"
 rm -rf "$ULNOIOT_COMPILE_CACHE/lib"
+
+# Create web-viewable documentation
+ulnoiot makedoc
 
 echo "Upgrade finished."

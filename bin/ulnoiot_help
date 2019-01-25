@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+
+[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+
+HELP_PATH=doc/node_help
+# TODO: adjust path to different selected micro controllers depending on node
+
+if [[ $# -eq 0 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
+cat << EOF
+Syntax: ulnoiot_help|uhelp [cmd]
+
+Display help on a specific command given in cmd. If cmd is empty, show this
+help. After entering the ulnoiot environment, this help is also available
+just via typing uhelp.
+
+[cmd] can be any of the following:
+EOF
+comma=""
+ls "$ULNOIOT_ROOT/$HELP_PATH/"*.txt | while read f; do
+    f=$(basename "$f")
+    if [[ ${f:0:1} != "_" ]]; then
+        echo -n $comma${f:0:-4}
+    fi
+    comma=", "
+done
+echo
+echo
+cat << EOF
+EOF
+exit 1
+fi
+
+
+cd "$ULNOIOT_ROOT"
+
+function help() {
+    local m
+    local p
+    local l
+    p="$ULNOIOT_ROOT/$HELP_PATH/$1.txt"
+    { cat "$p"; echo; } | while read l; do
+        if [[ "$l" = "!!"* ]]; then
+            if [[ "$l" =~ '!!help("'(.*)'")' ]]; then
+                m="${BASH_REMATCH[1]}"
+                help "$m"
+            else
+                echo "[[Cannot parse:"
+                echo "  ${l:2}]]"
+            fi
+        else
+            echo "$l"
+        fi
+    done
+}
+
+help "$1"

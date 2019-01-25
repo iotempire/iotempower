@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+if [[ $# -gt 0 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
+cat << EOF
+Syntax: ulnoiot_makedoc
+
+Create or update the web-viewable documentation.
+EOF
+exit 1
+fi
+
+[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+
+
+cd "$ULNOIOT_ROOT/doc"
+echo "Creating web-viewable documentation."
+make html
+make man
+
+echo "Documentation creation finished."
