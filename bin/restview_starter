@@ -1,4 +1,6 @@
 #!/bin/bash
+# TUDO: as ulnoiot documentation is now creasted in sphinx, consider retiring this
+
 if [[ $# -gt 0 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF
 Syntax: restview_starter

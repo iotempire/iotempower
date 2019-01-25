@@ -157,7 +157,7 @@ the ulnoiot command or executing run in the main ulnoiot directory):
 
 - ulnoiot upgrade: get latest version of ulnoiot (inside an existing version)
 
-- ``install_ulnoiot`` or ulnoiot install: (re-)install the ulnoiot environment 
+- ``ulnoiot_install`` or ulnoiot install: (re-)install the ulnoiot environment 
   (if you specify clean, it re-installs)
 
 - ``console_serial``: open a serial console to see debug output of a

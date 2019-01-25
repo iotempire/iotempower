@@ -32,6 +32,9 @@ Syntax: ulnoiot [command command_parameters]
 
 The following commands are possible:
 
+- welcome:
+  Print the welcome message again.
+  
 - exec [cmd+arguments]:
   Execute cmd inside the ulnoiot environment. Check out all the helper scripts
   in ulnoiot/bin
@@ -39,14 +42,15 @@ The following commands are possible:
 - upgrade:
   Update current version ulnoiot with newest version from git repository.
 
-- welcome:
-  Print the welcome message (again).
-
 - help [cmd]:
   Display help on a specific command given in cmd. If cmd is empty,
   show this help.
   After entering the ulnoiot environment, this help is also available just via
   typing uhelp.
+
+- [command]:
+  Execute ulnoiot_[command] with the given parameters.
+  
 
 If no command is given, execute the bash shell in the ulnoiot environment.
 The first time this is run, external dependencies are downloaded and
@@ -108,7 +112,7 @@ function check_install() {
 function install() {
     echo "Installing now."
     echo
-    bash "$ULNOIOT_ROOT/bin/install_ulnoiot"
+    bash "$ULNOIOT_ROOT/bin/ulnoiot_install"
     run upgrade
 }
 
