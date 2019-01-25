@@ -15,3 +15,5 @@ Here are some navigational links for you to get you working quickly:
 Use uhelp in the console for help or read the respective help files
 `right here <https://github.com/ulno/ulnoiot/tree/master/doc/node_help>`__ or in the 
 `filesystem </cloudcmd/fs/home/user/ulnoiot/doc/node_help>`__.
+
+The web documentation is here: `/doc/index.rst`
