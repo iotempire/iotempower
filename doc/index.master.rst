@@ -10,7 +10,10 @@ Welcome to the UlnoIoT Documentation
    :maxdepth: 2
    :caption: Contents:
 
+   
 
+- `Main documentation </doc/index.rst>`__
+- :doc:`/doc/shields/wemosd1mini/devkit1/README`
 
 Indices and tables
 ==================
