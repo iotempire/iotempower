@@ -12,8 +12,8 @@ Welcome to the UlnoIoT Documentation
 
    
 
-- `Main documentation </doc/index.rst>`__
-- :doc:`/doc/shields/wemosd1mini/devkit1/README`
+- `Main documentation </doc/index.master>`_
+- `Shields </doc/shields/wemosd1mini/devkit1/README>`_
 
 Indices and tables
 ==================
