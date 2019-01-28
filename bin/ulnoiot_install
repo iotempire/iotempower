@@ -72,11 +72,12 @@ else
     # dependencies
     pip install pyserial
     pip install colorama
+    pip install websocket_client
     #pip install restview  # for looking at documentation
     # documentaion viewer
-    pip install websocket_client
     pip install sphinx
     pip install sphinx_bootstrap_theme
+    pip install recommonmark
     # for later development
     pip install paho-mqtt  # also for integriot
     pip install ipython

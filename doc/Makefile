@@ -26,6 +26,6 @@ help:
 	@ mkdir -p "$(SOURCEDIR)"
 	@ ln -n -s -f "$(ULNOIOT_ROOT)/doc" "$(SOURCEDIR)/doc"
 	@ ln -s -f "$(ULNOIOT_ROOT)/doc/conf.py" "$(SOURCEDIR)/conf.py"
-	@ ln -s -f "$(ULNOIOT_ROOT)/doc/index.master.rst" "$(SOURCEDIR)/index.rst"
+	@ ln -s -f "$(ULNOIOT_ROOT)/doc/index-doc.rst" "$(SOURCEDIR)/index-doc.rst"
 	@ mkdir -p "$(BUILDDIR)"
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)

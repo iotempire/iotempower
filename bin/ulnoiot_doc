@@ -2,7 +2,7 @@
 
 if [[ $# -gt 0 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF
-Syntax: ulnoiot_makedoc
+Syntax: ulnoiot_doc [make|clean|serve]
 
 Create or update the web-viewable documentation.
 EOF

@@ -12,6 +12,11 @@ Here are some navigational links for you to get you working quickly:
 - `node-red </nodered/>`__
 - `node-red ui </nodered/ui>`__
 
+  .. code-block:: bash
+    
+     test1
+     # test2
+
 Use uhelp in the console for help or read the respective help files
 `right here <https://github.com/ulno/ulnoiot/tree/master/doc/node_help>`__ or in the 
 `filesystem </cloudcmd/fs/home/user/ulnoiot/doc/node_help>`__.
