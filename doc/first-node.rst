@@ -62,8 +62,8 @@ Setting up the WiFi credentials on the node
     WiFi settings menu. The node will show up in the list of WiFi networks
     called something like ``ulnoiot-ab-mn``. ``ab`` are unique identifiers and
     ``mn`` is relative to the unique blinking pattern where ``m`` is the number
-    of long blinks and ``n`` number of short blinks).
-    For example ``uiot-node-ab-12`` means 1 long and 2 short blinks).
+    of long blinks and ``n`` number of short blinks.
+    For example ``uiot-node-ab-12`` means 1 long and 2 short blinks.
 
 -   Click or tap to connect to the Node's WiFi network.
 
@@ -139,3 +139,6 @@ Adopting the Node in the UlnoIoT environment on the Raspberry Pi
 Congratulations!! Your node is now connect to UlnIoT and the onboard-led can
 be controlled with Node-RED using the button on this page
 `<https://ulnoiotgw/nodered/ui/#/1>`_
+
+Top: `ToC <index-doc.rst>`_, Previous: `Installation <installation.rst>`_,
+Next: `External Resources <resources.rst>`_.
