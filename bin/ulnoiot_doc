@@ -25,7 +25,7 @@ cd "$ULNOIOT_ROOT/doc"
 
 case "$1" in
     "" | make)
-        echo "generating web-viewable documentation."
+        echo "Generating web-viewable documentation."
         make html
         make man
         # TODO: do eventually a maching specific version here

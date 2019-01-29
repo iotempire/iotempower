@@ -2,8 +2,8 @@
 ulnoiot
 =======
 
-Attention: this is ulnoiot-tng (The Next Generation, not anymore based on 
-micropython, now using `PlatformIO <platform.io>`__ as a base to generate
+Attention: this is ulnoiot-tng (The Next Generation, not anymore based on
+Micropython, now using `PlatformIO <platform.io>`__ as a base to generate
 firmware and code).
 
 
@@ -26,16 +26,18 @@ multi-device deployment.
 If you are impatient and want to dive into it right now, fast forward to
 `Installation`_ or `First IoT Nodes`_.
 
-ulnoiot is based on a multi-layered network architecture. This means for this project
-that each IoT-system (small network of connected sensors and actors) has its own
-gateway - usually running an MQTT-broker. These gateways can be connected to cloud
+ulnoiot is based on a multi-layered network architecture. 
+This means for this project
+that each IoT-system (small network of connected sensors and actors)
+has its own gateway - usually running an MQTT-broker. 
+These gateways can be connected to cloud
 resources, other cloud or Internet based MQTT brokers or interconnected among
 themselves. Security and privacy can be selectively controlled at each layer
 border (everywhere, where a gateway connects two layers).
 In a teaching context these gateways are usally based on a modified Raspbian
 running on a Raspberry Pi of a
-newer generation (wifi on board - both the Raspberry Pi 3 and the Raspberry Pi Zero W
-can be easily used as an ulnoiot gateway at this point)
+newer generation (wifi on board - both the Raspberry Pi 3 and 
+the Raspberry Pi Zero W have support for this)
 to allow them to work as wifi routers.
 
 
@@ -226,13 +228,6 @@ Installation step by step:
   remember the password
   you set in ``uiot_ap_password``. This configures the pi as a wifi-router.
   Make sure that ``uiot_ap_password`` is longer than 8 characters.
-
-
-.. code-block:: bash
-   
-   test1
-   # test2
-
 
 - If you have another USB-wifi stick, and want to use Internet via WiFi
   connect this wifi stick to the pi and configure ``uiot_wifi_name``,

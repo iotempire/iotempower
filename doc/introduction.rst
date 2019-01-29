@@ -1,6 +1,5 @@
-=======
-ulnoiot
-=======
+Introduction
+------------
 
 *ulnoiot* (pronounced: "You'll know IoT") is a framework and environment
 for making it easy for everyone to explore and develop for the
@@ -15,10 +14,4 @@ However, it also supports existing IoT deployments and brings
 mechanisms for over the air (OTA) updates and automatic
 multi-device deployment. 
 
-If you are impatient and want to dive into it right now, fast forward to
-`Installation </doc/installation.rst>`_ or `First IoT Node </doc/first-node.rst>`_.
-
-Or dive into the `full documentation </doc/index-doc.rst>`_.
-
-We are currently rewriting the documentation.
-`The old readme is here </doc/README-old.rst>`_.
+Top: `ToC <index-doc.rst>`_, Next: `Architecture <architecture.rst>`_

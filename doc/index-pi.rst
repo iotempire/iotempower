@@ -17,7 +17,7 @@ tutorials:
 
 Here are some navigational links:
 
-- `More extensive local documentation </doc/index-doc.rst>`_.
+- `More extensive local documentation </index-doc.rst>`_.
 - `IoT system example configuration folder </cloudcmd/fs/home/user/iot-test>`_
 - `node-red (visual IoT system configuration) </nodered/>`_
 - `node-red user interface page </nodered/ui>`_
