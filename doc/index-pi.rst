@@ -3,22 +3,29 @@ UlnoIoT Local Web Portal
 ========================
 
 Welcome to your personal `UlnoIoT <https://github.com/ulno/ulnoiot>`__
-installation.
+installation on a UlnoIoT gateway.
 
-Here are some navigational links for you to get you working quickly:
+If you just connected and want to dive right in, use one of these quick start
+tutorials:
 
-- `Your home-directory </cloudcmd/fs/home/user>`__
-- `IoT system template example </cloudcmd/fs/home/user/iot-test>`__
-- `node-red </nodered/>`__
-- `node-red ui </nodered/ui>`__
+- For adding your first IoT node to your IoT system, follow
+  the `First Node Tutorial <first-node.rst>`_.
 
-  .. code-block:: bash
-    
-     test1
-     # test2
+- If you want to change your WiFi name and password of your gateway,
+  follow the `Gateway Credentials Tutorial <gateway-credentials.rst>`_
 
+
+Here are some navigational links:
+
+- `More extensive local documentation </doc/index.rst>`_.
+- `IoT system example configuration folder </cloudcmd/fs/home/user/iot-test>`_
+- `node-red (visual IoT system configuration) </nodered/>`_
+- `node-red user interface page </nodered/ui>`_
+- `Your home-directory </cloudcmd/fs/home/user>`_
+
+Obsolete (will be removed soon)
 Use uhelp in the console for help or read the respective help files
-`right here <https://github.com/ulno/ulnoiot/tree/master/doc/node_help>`__ or in the 
+`right here <https://github.com/ulno/ulnoiot/tree/master/doc/node_help>`__ 
+or in the 
 `filesystem </cloudcmd/fs/home/user/ulnoiot/doc/node_help>`__.
 
-The web documentation is here: `/doc/index.rst`

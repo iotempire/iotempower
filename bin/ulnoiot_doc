@@ -1,20 +1,49 @@
 #!/usr/bin/env bash
 
-if [[ $# -gt 0 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
+function usage() {
 cat << EOF
 Syntax: ulnoiot_doc [make|clean|serve]
 
-Create or update the web-viewable documentation.
+Manage the web-viewable documentation.
+
+The following arguments are possible:
+- make or no argument generates the documentation.
+- clean removes the generated documentation.
+- serve starts a local webserver on port 8000 in the documentation folder.
+
 EOF
-exit 1
+}
+
+if [[ $# -gt 1 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
+    usage
+    exit 1
 fi
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
-
 cd "$ULNOIOT_ROOT/doc"
-echo "Creating web-viewable documentation."
-make html
-make man
 
-echo "Documentation creation finished."
+case "$1" in
+    "" | make)
+        echo "generating web-viewable documentation."
+        make html
+        make man
+        # TODO: do eventually a maching specific version here
+        ln -s -f "$ULNOIOT_LOCAL/doc/html/doc/index-pi.html" \
+            "$ULNOIOT_LOCAL/doc/html/index.html"
+        echo "Documentation creation finished."
+        ;;
+    clean)
+        echo "Removing generated documentation."
+        make clean
+        echo "Cleaning finished."
+        ;;
+    serve)
+        echo "Starting webserver for documentation. ctrl-c to stop."
+        cd "$ULNOIOT_LOCAL/doc/html"
+        exec python "$ULNOIOT_ROOT/bin/docserver.py"
+        ;;
+    *)
+        usage
+        exit 1
+esac
