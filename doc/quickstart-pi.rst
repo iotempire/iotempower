@@ -36,13 +36,12 @@ Setting up the wifi on the Pi
   Connect your computer (laptop or desktop pc) to this wifi network
   (use the password set as before for ``Password``). 
 
-- You can now connect to your Pi via a web browser.
+- You can now access UlnoIoT via a web browser.
   
   - Point your browser at https://ulnoiotgw (or https://ulnoiotgw.local). Accept
     the security exception for the locally generated security certificate. You
     should now see a link to the filesystem through cloud commander
-    and an IoT testsystem on the pi,
-    as well as links to the Node-RED installation.
+    and an IoT testsystem on the pi, as well as links to the Node-RED installation.
     
     TODO: change! Cloudcmd allows you to open a small console through typing '
     

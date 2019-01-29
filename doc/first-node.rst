@@ -17,36 +17,60 @@ You will need a smart phone or a computer for this first node setup.
 If you use a Wemos D1 Mini Mini as your first node (this is the default),
 no change is necessary. If you want to use a NodeMCU, change the config to NodeMCU.
 
-TODO: Insert the link to the serial flash page! If you are in the classroom your devices will be pre-flashed with UlnIoT OTA on them. 
-If not please go to this page `First Flash page`_ on your Raspberry Pi to pre-flash your device. 
+TODO: Insert the link to the serial flash page! If you are in the classroom your devices will be pre-flashed with UlnoIoT OTA on them. 
+If not please go to this page `First Flash page <pre-flash.rst>`_ on your Raspberry Pi to pre-flash your device. 
 
 
 
 Setting up the WiFi credentials on the node
 -------------------------------------------
 
-- TODO: Insert image of the button shield! Connect the button to the D3 and ground or a button shield (see image) on top of the Wemos D1 Mini.
+TODO: Adapt and link a tutorial for serial initalization! Note that this instructions are for reconfiguring the WiFi credentials on nodes
+that have been pre-installed with UlnIoT and can be flashed via OTA (the ones used in the classroom are).
+If your node has never been flashed with UlnoIoT before, follow this tutorial here `First Flash page <pre-flash.rst>`_ for the first flash. 
 
-- Power up your microcontroller via battery or usb power supply. The onboard_led
-  will blink for 5 seconds. While that is happening press the button 3 times. The blinking 
-  pattern should change. If the Led is continously on, restart your board by powering it off
+- TODO: Insert image of the button shield! Connect a button usually to D3 (or pin 0 depending on the board) against ground or a button shield (see image) on top of the Wemos D1 Mini. This will be used to set the node on Adopting mode. 
+
+- Power up your microcontroller via battery or usb power supply. Wait until the onboard_led starts blinking and press 
+  the button 2 or 3 times during this first blinking 5 seconds. While that is happening press the button 3 times. If the Led is continously on, restart your board by powering it off
   and back on and try the process again. 
   
-- If you have done previous step correctly, the onboard_led should be now blinking
-  in a unique patttern (for exemple 3 long and 2 short blinks). Pay attention to
-  pattern as it will be use to identify the boards WiFi network.
+- If you have done previous step correctly, the node is in reconfiguration
+  mode and the onboard_led should be now blinking in a unique patttern 
+  (The onboard led will blink in some kind of Morse code several long
+  blinks and several short blinks, for exemple 1 long and 2 short blinks.
+  Count the blinks pattern as it will be use to identify your node's 
+  WiFi network on the next step. 
 
-- Adopting process for one Node from the phone. Describe 
+- Now on your smart phone or tablet (a computer works too) go to the 
+  WiFi settings menu. The node will show up in the list of WiFi networks
+  called something like ulnoiot-ab-mn (ab are unique indetifiers and mn relative to
+  the unique blinking pattern where m is the number of long blinks, n number of short blinks)
+  For example **uiot-node-ab-12**, this means 1 long and 2 short blinks).
 
-- Change the WiFi credentials to match the WiFi of the Raspberry Pi's WiFi 
-  network credentials the ``WiFi Name`` and ``Password`` that was setup 
-  previously on `<quickstart-pi.rst>`_
+-  Click to connect to the Node's WiFi network.
 
-- Restart your microcontroller by powering it off and back on again.
+- If there is an **Internet may not be available** waring click **OK**.
+
+- TODO: Insert image of wifi credentials on the smart phone! You should be automatically prompt to a web page like the one on the image.
+  If that does not happen automatically, open any web browser on your phone and type http://192.168.4.1 in the Url.
+
+- Click on **Configure WiFi** and connect to the Raspberry Pi's WiFi 
+  network using the ``WiFi Name`` and ``Password`` that was setup 
+  previously on `<quickstart-pi.rst>`_ and click on **save**. 
+
+- If you have done it correctly, the node will reboot and the led will stay on continously.
+  If it starts blinking the unique pattern again it means you have not configured it correctly 
+  so repeat the previous step.
+
+- Now the node is in adoption mode and ready to be initialized. Move on to next part.
+
+
+Adopting the Node in the UlnoIoT enviroment on th Raspberry Pi
+--------------------------------------------------------------
 
 - If you have not done already, connect now your computer (laptop or 
-  desktop pc) to Pi's WiFi network (use the password set as before 
-  for ``Password``). 
+  desktop pc) to Pi's WiFi network. 
 
 - You can now connect to UlnoIoT via a web browser.
   
@@ -70,51 +94,19 @@ Setting up the WiFi credentials on the node
 
 - TODO: provide image of the Folder 1! You should be seen a page like the one bellow. 
 
-- TODO: provide image of the weird button! When inside the `folder 1`_ click on the console button located on the bottom
+- TODO: provide image of the weird button! When inside the  **folder 1** click on the console button located on the bottom
   right corner your screen.  
 
 - TODO: provide image of the button menu for initializing! You will now see a menu link this one on the image bellow.
 
 - Click on the button initialize.
 
-- 
+- TODO: Create a troubleshouting file!  Wait until the proccess is done and make sure it was successful.
+  You should see this msg *deploy successfully done.* and *Done initializing.* 
+  If it says *Initializing not successfull, check errors above.* please refer to the troubleshouting. 
 
 
-
-- Consider to configure  etc/ulnoiot.conf
-  and run ``accesspoint`` and ``mqtt_broker``. If you installed from the
-  Raspberry Pi image, this should not be necessary as they are started
-  automatically.
-
-- Copy the folder ``lib/system_templates`` to a project directory,
-  you can rename
-  system_templates to a project name (i.e. iot-test-project)
-
-- Rename the included node_template to a name for the node you want to
-  configure (i.e. onboard_blinker)
-
-- Adapt and configure system.conf and node.conf. Especialy make sure to add the
-  correct board in node.conf. 
-
-- Now change into your node directory, connect an (only one) esp8266 based microcontroller
-  to your pc or raspberry/orange pi and type ``initialize serial``. This flashes and
-  pre-configures the device. If you use the inbuilt WiFi configuration (like
-  described in uhelp WiFi), just use ``initialize``
-  to adopt the node via the network.
-
-- If you like, access the debug console with ``console_serial`` (if only one esp is connected
-  the serial port will be discovered automatically else supply it as usb1 or 
-  acm2).
-
-If something gets stuck, try to power cycle the esp8266.
-
-``initialize`` sets up your WiFi based on the settings in system.conf and also
-encrypts the network connection.
-
-At an ulnoiot-command prompt try typing ``uhelp`` and check the small manual.
-
-Take a look at the setup.cpp in your node-folder and enable the onboardled.
-
-Try also ``uhelp setup.cpp`` at the ulnoiot prompt.
+Congratulations!! Your node is now connect to UlnIoT and the onboard_led can be controled with Node red 
+using the button on this page `<https://ulnoiotgw/nodered/ui/#/1>`_
 
 
