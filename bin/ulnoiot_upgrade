@@ -30,6 +30,6 @@ rm -rf "$ULNOIOT_COMPILE_CACHE/src"
 rm -rf "$ULNOIOT_COMPILE_CACHE/lib"
 
 # Create web-viewable documentation
-ulnoiot makedoc
+ulnoiot doc make
 
 echo "Upgrade finished."
