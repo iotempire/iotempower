@@ -28,7 +28,7 @@ on your Raspberry Pi to pre-flash your device.
 Setting up the WiFi credentials on the node
 -------------------------------------------
 
--    TODO: Adapt and link a tutorial for serial initialization!
+-   TODO: Adapt and link a tutorial for serial initialization!
 
     Note that this instructions are for reconfiguring
     the WiFi credentials on nodes
@@ -50,7 +50,7 @@ Setting up the WiFi credentials on the node
     While that is happening press the button 3 times. If the led is
     continuously on (or continuously off), restart your board by powering
     it off and back on and try the process again.
-  
+
 -   If you have done previous step correctly, the node is in reconfiguration
     mode and the onboard_led should be now blinking in a unique pattern
     (The onboard led will blink in some kind of Morse code several long
