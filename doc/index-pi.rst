@@ -9,7 +9,7 @@ If you just connected and want to dive right in, use one of these quick start
 tutorials:
 
 - For adding your first IoT node to your IoT system, follow
-  the `First Node Tutorial <first-node.rst>`_.
+  the `First Node Tutorial </doc/first-node.rst>`_.
 
 - If you want to change your WiFi name and password of your gateway,
   follow the `Gateway Credentials Tutorial <gateway-credentials.rst>`_

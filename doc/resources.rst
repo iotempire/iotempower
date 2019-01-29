@@ -9,7 +9,7 @@ tools:
 - `node-red <https://nodered.org>`__
 - `mosquitto <https://mosquitto.org/>`__.
 - `The Tilde Texteditor <https://os.ghalkes.nl/tilde>`__
-- `create_ap <https://github.com/oblique/create_ap>`__ forked for ulnoiot
+- `create_ap <https://github.com/oblique/create_ap>`__ forked for UlnoIoT
   `here <https://github.com/ulno/create_ap>`__.
 - `FastLed rgb-strip library <https://github.com/FastLED/FastLED>`__
 - `rpi-clone <https://github.com/billw2/rpi-clone>`__
@@ -17,15 +17,15 @@ tools:
 
 Old versions were also using these:
 
-- `mpfshell <https://github.com/wendlers/mpfshell>`__ forked for ulnoiot
+- `mpfshell <https://github.com/wendlers/mpfshell>`__ forked for UlnoIoT
   `here <https://github.com/ulno/mpfshell>`__.
 - `micropython  <https://micropython.org/>`__
 
 
-As ulnoiot relies heavily on MQTT, it also integrates very easily with
+As UlnoIoT relies heavily on MQTT, it also integrates very easily with
 other community home automation software like
 `home-assistant <http://home-assistant.io>`__ and
 `openhab <https://openhab.org>`__.
 
 Top: `ToC <index-doc.rst>`_, Previous: `First IoT Node <first-node.rst>`_,
-Next: `Support <support.rst>`_ 
+Next: `Support <support.rst>`_
