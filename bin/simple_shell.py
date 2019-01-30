@@ -2,6 +2,9 @@
 """
 A simple shell replacement for doing the most important tasks in ulnoiot
 in combination with cloudcmd.
+Turns out anything using ncurses in python on raspberry pi is way to slow
+and pypy3 is not supported in raspbian
+TODO: retire this
 """
 from __future__ import unicode_literals
 from prompt_toolkit import HTML
@@ -106,6 +109,10 @@ style = Style([
     ('text-area focused', 'bg:#ff0000'),
 ])
 
+# does not work either in before_render nor in after_render
+#def hide_cursor(_):
+#    global application
+#    application.output.hide_cursor()
 
 # Build a main application object.
 application = Application(
@@ -113,11 +120,11 @@ application = Application(
     key_bindings=kb,
     style=style,
     mouse_support=True,
-    full_screen=True)
+    full_screen=True,
+    max_render_postpone_time=0.5)
 
 
 def main():
-# does not work    application.output.hide_cursor()
     application.run()
 
 
