@@ -51,9 +51,10 @@ Setting up the WiFi credentials on the node
     continuously on (or continuously off), restart your board by powering
     it off and back on and try the process again.
 
--   If you have done previous step correctly, the node is in reconfiguration
-    mode and the onboard_led should be now blinking in a unique pattern
-    (The onboard led will blink in some kind of Morse code several long
+-   If you have done the previous step correctly, the node is
+    in reconfiguration
+    mode and the onboard_led should be now blinking in a unique pattern:
+    The onboard led will blink in some kind of Morse code several long
     blinks and several short blinks, for example 1 long and 2 short blinks.
     Count the blinks in the pattern as it will be used to identify your node's
     WiFi network in the next step.
