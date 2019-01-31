@@ -18,24 +18,36 @@ from prompt_toolkit.widgets import Button, Box, TextArea, Label, Frame
 
 import os
 
+result = None
+
 # Event handlers for all the buttons.
 def button1_clicked():
-    text_area.text = 'Button 1 clicked'
+    global result
+    result = 'Button 1 clicked'
+    get_app().exit()
 
 
 def button2_clicked():
-    text_area.text = 'Button 2 clicked'
+    global result
+    result = 'Button 2 clicked'
+    get_app().exit()
 
 
 def button3_clicked():
-    text_area.text = 'Button 3 clicked'
+    global result
+    result = 'Button 3 clicked'
+    get_app().exit()
 
 
 def button4_clicked():
-    text_area.text = 'Button 4 clicked'
+    global result
+    result = 'Button 4 clicked'
+    get_app().exit()
 
 
 def exit_clicked():
+    global result
+    result = 'Exit clicked'
     get_app().exit()
 
 
@@ -123,10 +135,15 @@ application = Application(
     full_screen=True,
     max_render_postpone_time=0.5)
 
+# This does hide the cursor, tip from Jonathan Lenders:
+# https://github.com/prompt-toolkit/python-prompt-toolkit/issues/827
+application.output.show_cursor = lambda:None
+
 
 def main():
+    global result
     application.run()
-
+    print("Result:", result)
 
 if __name__ == '__main__':
     main()

@@ -2,14 +2,17 @@ var term = require( 'terminal-kit' ).terminal ;
 term.grabInput( { mouse: 'button' } ) ;
 term.hideCursor(true);
 
-term.bgBrightWhite.black( 'ul^r^+no^-^kiot^: Simple Shell\n' ) ;
+//term.clear();
+term("\n\n");
+term.bgBrightWhite.black( '^+ul^rno^-^kiot^: Simple Shell\n\n' ) ;
+term('Use mouse, arrow keys, enter, or shortcut key to select.\n')
 
 var items = [
     "Deploy (D)", 
     "Initialize (I)",
     "Upgrade (U)",
     "Advanced (A)",
-    "Exit (E,ESC)"
+    "Exit (X,ESC)"
 ];
 
 var button_padding = 4;
@@ -46,20 +49,20 @@ for(var i=0; i<items.length; i++) {
 formatted_items[items.length-1] = "\n" + formatted_items[items.length-1]
 
 term.singleColumnMenu( formatted_items , 
-        { 
-            leftPadding: "",
-            selectedLeftPadding: "",
-            cancelable: true,
-            selectedIndex: 4,
-            itemMaxWidth: 2*(button_padding+1)+longest,
-            extraLines: 2
-        }, 
+    { 
+        leftPadding: "",
+        selectedLeftPadding: "",
+        cancelable: true,
+        selectedIndex: 4,
+        itemMaxWidth: 2*(button_padding+1)+longest,
+        extraLines: 2
+    }, 
     function( error , response ) {
-	term( '\n' ).eraseLineAfter.green(
-		"#%s selected: %s\n" ,
-        response.selectedIndex ,
-        items[response.selectedIndex]
-    );
-    term.hideCursor(false);
-	process.exit();
-} ) ;
+        term( '\n' ).eraseLineAfter.green(
+            "#%s selected: %s\n" ,
+            response.selectedIndex ,
+            items[response.selectedIndex]
+        );
+        term.hideCursor(false);
+        process.exit();
+    });
