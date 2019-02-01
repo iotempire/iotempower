@@ -24,11 +24,13 @@ Welcome to the ulnoiot environment installer. You are just a couple of steps
 from setting up a very simple and accessible system to deploy your own
 Internet of Things (IoT).
 
-You need build-essential, virtualenv, git, hostapd, dnsmasq, 
+You need build-essential, virtualenv, git, hostapd, dnsmasq, nodejs,
 and haveged installed.
 
 On Ubuntu or Debian systems install these with:
-sudo apt install build-essential virtualenv git hostapd dnsmasq
+sudo apt install build-essential virtualenv git hostapd dnsmasq nodejs
+
+(On raspberry pi, installing nodejs is more difficult. Search the web, how.)
 
 Do you want to set it up? (Y/n)
 EOF
@@ -115,6 +117,9 @@ else
 #    cd "$ULNOIOT_EXTERNAL/firmware"
 #    "$ULNOIOT_ROOT/bin/download_firmware"
 #    "$ULNOIOT_ROOT/bin/firmware" download
+
+    cd "$ULNOIOT_LOCAL"
+    npm install terminal-kit
 
     popd  &> /dev/null
 

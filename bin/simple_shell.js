@@ -63,7 +63,7 @@ async function choice(items, pre_select=0, pad_last=0) {
     }
 
     // if negative count back from the last
-    if(pre_select<0) pre_select = formatted_items.length - pre_select;
+    if(pre_select<0) pre_select = formatted_items.length + pre_select;
 
     const extra_lines = 2
     menu_height += extra_lines;
@@ -73,6 +73,12 @@ async function choice(items, pre_select=0, pad_last=0) {
         term("\n");
     // go up again
     term.previousLine(menu_height);
+
+    function clean_up() {
+        term_release();
+        term.up(menu_height-extra_lines); // why is extra_lines needed here?
+        term.eraseDisplayBelow();
+    }
 
     term.singleColumnMenu( formatted_items, 
         { 
@@ -85,6 +91,7 @@ async function choice(items, pre_select=0, pad_last=0) {
             style: term.bgBrightWhite.black,
             selectedStyle: term.bgGreen.black,
             submittedStyle: term.bgWhite.black,
+            exitOnUnexpectedKey: true, // catch other keys
             continueOnSubmit: false
         } ,
         function( error , response ) {
@@ -92,16 +99,35 @@ async function choice(items, pre_select=0, pad_last=0) {
             //     "#%s" ,
             //     response.selectedIndex
             // );
-            term_release();
-            term.up(menu_height-extra_lines); // why is extra_lines needed here?
-            term.eraseDisplayBelow();
-            // TODO: on cancel or key indicate the implicit selection
-            // and remove green bar
-            if(response.selectedIndex == undefined) terminate();
-            else {
-                var cb = items[response.selectedIndex][2];
-                if(cb == undefined) { terminate(); }
-                else { cb(); }
+            clean_up();
+            if(response.unexpectedKey != undefined) {
+                function check_key(name, key, cb) {
+                    if(name.toUpperCase() === key.toUpperCase()) {
+                        cb();
+                        return true;
+                    }
+                    return false;
+                }
+                
+                var name = response.unexpectedKey;
+                for(var i=0; i<items.length; i++) {
+                    if(items[i][1] instanceof Array) {
+                        for(var k of items[i][1]) {
+                            if(check_key(name, k, items[i][2])) return; // match found
+                        }
+                    } else {
+                        if(check_key(name, items[i][1], items[i][2])) return; // match found
+                    }
+                } // end for
+                // not returned, so wo need to end as not matched
+                terminate();
+            } else {
+                if(response.selectedIndex == undefined) terminate();
+                else {
+                    var cb = items[response.selectedIndex][2];
+                    if(cb == undefined) { terminate(); }
+                    else { cb(); }
+                }
             }
         }
     ) ;
@@ -126,7 +152,7 @@ function deploy() {
     choice([
         ["Yes, deploy (Y)", "Y", terminate],
         ["No, go back (N)", "N", terminate]
-    ]);
+    ], pre_select=-1);
 }
 
 function initialize() {
@@ -136,6 +162,12 @@ function upgrade() {
 }
 
 function advanced() {
+    choice([
+        ["Initialize Serial (I)", "I", terminate], 
+        ["PreFlash Wemos (P)", "P", terminate],
+        ["Shell Escape (S)", "S", terminate],
+        ["Back (B,X,ESC)", ["B","X"], terminate]
+    ], pre_select=-1, pad_last=1);
 }
 
 
