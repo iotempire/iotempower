@@ -1,70 +1,159 @@
 var term = require( 'terminal-kit' ).terminal ;
-term.grabInput( { mouse: 'button' } ) ;
-term.hideCursor(true);
 
-//term.clear();
-term("\n\n");
-term.bgBrightWhite.black( '^+ul^rno^-^kiot^: Simple Shell\n\n' ) ;
-term('Use mouse, arrow keys, enter, or shortcut key to select.\n')
-
-var items = [
-    "Deploy (D)", 
-    "Initialize (I)",
-    "Upgrade (U)",
-    "Advanced (A)",
-    "Exit (X,ESC)"
-];
-
-var button_padding = 4;
-var top_left = "┌";
-var top_bar = "─";
-var top_right = "┐";
-var bar_left = "│";
-var bar_right = "│";
-var bottom_left = "└";
-var bottom_bar = "─";
-var bottom_right = "┘";
-
-// get longest word
-var longest = 0;
-for(var i=0; i<items.length; i++) {
-    if(items[i].length > longest) longest = items[i].length;
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
-longest += 6; // Add button inside padding
 
-// create formatted_items
-var formatted_items = [];
-for(var i=0; i<items.length; i++) {
-    var padlength = longest - items[i].length;
-    var fstr = 
-            " ".repeat(button_padding) + top_left + top_bar.repeat(longest) 
-                + top_right + "\n" +
-            " ".repeat(button_padding) + bar_left + " ".repeat(Math.floor(padlength/2)) + items[i] 
-                + " ".repeat(Math.floor((padlength+1)/2)) + bar_right + "\n" +
-            " ".repeat(button_padding) + bottom_left + bottom_bar.repeat(longest) 
-                + bottom_right + " ".repeat(button_padding);
-    formatted_items.push(fstr);
+function term_grab() {
+    term.grabInput( { mouse: 'motion' } ) ;
+    term.hideCursor(true);    
 }
-// add line before last
-formatted_items[items.length-1] = "\n" + formatted_items[items.length-1]
 
-term.singleColumnMenu( formatted_items , 
-    { 
-        leftPadding: "",
-        selectedLeftPadding: "",
-        cancelable: true,
-        selectedIndex: 4,
-        itemMaxWidth: 2*(button_padding+1)+longest,
-        extraLines: 2
-    }, 
-    function( error , response ) {
-        term( '\n' ).eraseLineAfter.green(
-            "#%s selected: %s\n" ,
-            response.selectedIndex ,
-            items[response.selectedIndex]
-        );
-        term.hideCursor(false);
-        process.exit();
-    });
+function term_release() {
+    term.hideCursor( false );
+    term.grabInput( false ) ;
+}
 
+function terminate() {
+    term_release();
+    // Add a 100ms delay, so the terminal will be ready when the process effectively exit, preventing bad escape sequences drop
+    setTimeout( function() { process.exit() ; } , 100 ) ;
+}
+
+async function choice(items, pre_select=0, pad_last=0) {
+
+    term_grab();
+
+    var button_padding = 4;
+    var top_left = "┌";
+    var top_bar = "─";
+    var top_right = "┐";
+    var bar_left = "│";
+    var bar_right = "│";
+    var bottom_left = "└";
+    var bottom_bar = "─";
+    var bottom_right = "┘";
+
+    // get longest word
+    var longest = 0;
+    for(var i=0; i<items.length; i++) {
+        if(items[i][0].length > longest) longest = items[i][0].length;
+    }
+    longest += 6; // Add button inside padding
+
+    // create formatted_items
+    var menu_height = 0;
+    var formatted_items = [];
+    for(var i=0; i<items.length; i++) {
+        var padlength = longest - items[i][0].length;
+        var fstr = 
+                " ".repeat(button_padding) + top_left + top_bar.repeat(longest) 
+                    + top_right + "\n" +
+                " ".repeat(button_padding) + bar_left + " ".repeat(Math.floor(padlength/2)) + items[i][0] 
+                    + " ".repeat(Math.floor((padlength+1)/2)) + bar_right + "\n" +
+                " ".repeat(button_padding) + bottom_left + bottom_bar.repeat(longest) 
+                    + bottom_right + " ".repeat(button_padding);
+        formatted_items.push(fstr);
+        menu_height += 3;
+    }
+    for( var i=0; i<pad_last; i++) {
+        // add line before last
+        formatted_items[items.length-1] = "\n" + formatted_items[items.length-1];
+        menu_height ++;
+    }
+
+    // if negative count back from the last
+    if(pre_select<0) pre_select = formatted_items.length - pre_select;
+
+    const extra_lines = 2
+    menu_height += extra_lines;
+
+    // make space for menu (term.nextLine seems to be buggy or not scroll correctly)
+    for(var i=0; i<menu_height; i++)
+        term("\n");
+    // go up again
+    term.previousLine(menu_height);
+
+    term.singleColumnMenu( formatted_items, 
+        { 
+            leftPadding: "",
+            selectedLeftPadding: "",
+            cancelable: true,
+            selectedIndex: pre_select,
+            itemMaxWidth: 2*(button_padding+1)+longest,
+            extraLines: extra_lines,
+            style: term.bgBrightWhite.black,
+            selectedStyle: term.bgGreen.black,
+            submittedStyle: term.bgWhite.black,
+            continueOnSubmit: false
+        } ,
+        function( error , response ) {
+            // term( '\n' ).eraseLineAfter.green(
+            //     "#%s" ,
+            //     response.selectedIndex
+            // );
+            term_release();
+            term.up(menu_height-extra_lines); // why is extra_lines needed here?
+            term.eraseDisplayBelow();
+            // TODO: on cancel or key indicate the implicit selection
+            // and remove green bar
+            if(response.selectedIndex == undefined) terminate();
+            else {
+                var cb = items[response.selectedIndex][2];
+                if(cb == undefined) { terminate(); }
+                else { cb(); }
+            }
+        }
+    ) ;
+    // Attention: this is Javascript, so execution directly continues here,
+    // so everything needs to be done in callbacks and via recursion if
+    // deterministic behavior is expected
+    // Careful: while menu is running, cursor changes all the time, so
+    // nothing can decently be printed (maybe modal)
+}
+
+function deploy() {
+    term('\n\nYou want to deploy in the following path:\n') ;
+    var d = process.env.ACTIVE_DIR;
+    if(!d) {
+        d = process.cwd();
+    }
+    // Strip home directory
+    var home = process.env.HOME;
+    if(d.startsWith(home)) d = d.slice(home.length+1);
+    term(d, "\n\nAre you sure?\n");
     
+    choice([
+        ["Yes, deploy (Y)", "Y", terminate],
+        ["No, go back (N)", "N", terminate]
+    ]);
+}
+
+function initialize() {
+}
+
+function upgrade() {
+}
+
+function advanced() {
+}
+
+
+function menu_default() {
+    //term.clear();
+    term("\n\n");
+    term.bgBrightWhite.black( '^+ul^rno^-^kiot^: Simple Shell\n' ) ;
+    term("\n");
+    term('Use mouse, arrow keys, enter, or shortcut key to select.\n')
+    term("\n");
+
+    choice([
+        ["Deploy (D)", "D", deploy], 
+        ["Initialize (I)", "I", initialize],
+        ["Upgrade (U)", "U", upgrade],
+        ["Advanced (A)", "A", advanced],
+    //    "Exit (X,ESC)"
+    ], pre_select=0, pad_last=0);
+}
+
+menu_default();
