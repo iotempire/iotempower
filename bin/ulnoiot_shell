@@ -4,7 +4,8 @@ function usage() {
 cat << EOF
 Syntax: ulnoiot_shell
 
-Allow to execute common actions with tect-user interface interface for ulnoiot.
+Allow to execute common actions with text/terminal-user-interface interface
+for ulnoiot.
 
 EOF
 }

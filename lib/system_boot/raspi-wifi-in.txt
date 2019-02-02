@@ -1,0 +1,18 @@
+# Add the following into the boot/wifi-in.txt file of a raspberry pi
+# ulnoiotgw.
+
+# Connect to wireless on wlan1 (external wifi adapter on pi 3 or zero w).
+# If at least wifi_name and wifi_password are set, try to connect to wpa
+# wifi network on wlan1.
+# If wifi_user is set (and uncommented), try to connect to enterprise network
+# without extra certificate (for example to an eduroam university network)
+
+# Wifi Name/SSID
+#wifi-id
+
+# WiFi Password
+#secretpassword
+
+# WiFi business network user (i.e. on eduroam)
+#testuser@business.network
+

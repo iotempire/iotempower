@@ -2,13 +2,24 @@
 # Read extra configuration from /boot/config.txt
 
 _BOOT_CONFIG="/boot/config.txt"
+_WIFI_CONFIG="/boot/wifi.cfg"
+_WIFI_IN_CONFIG="/boot/wifi-in.cfg"
 
 if [[ -e "$_BOOT_CONFIG" ]]; then
     # check if otg-mode was enabled
     sed 's/\r$//' /boot/config.txt|egrep '^\s*dtoverlay=dwc2\s*' &> /dev/null && otg_on=1
+fi
 
-    # read boot/config.txt and evaluate uiot-part in there
-    eval "$(sed 's/\r$//' /boot/config.txt|egrep '^\s*uiot_.*=')"
+if [[ -e "$_WIFI_CONFIG" ]]; then
+    mapfile -t lines < <(egrep -v '\w*#|^$' "$_BOOT_CONFIG")
+    count=${#lines[@]}
+    if [[ $count -eq 1 ]]; then  # only one param given -> ULNOIOT_AP_PASSWORD
+        add_id=1
+        uiot_ap_password="${lines[0]}"
+    elif [[ $count -eq 2 ]]; then
+        uiot_ap_name="${lines[1]}"
+        uiot_ap_password="${lines[1]}"
+    fi
 
     if [[ "$uiot_ap_password" ]]; then # pw was given, so start an accesspoint
         if [[ ! "$uiot_ap_name" ]]; then # no ap name, so make one up
@@ -31,5 +42,19 @@ if [[ -e "$_BOOT_CONFIG" ]]; then
         export ULNOIOT_AP_PASSWORD="$uiot_ap_password"
 
         # channel, bridge, and mqtt data taken straight from ulnoiot.conf
+    fi
+    # no accesspoint if file empty or not existant
+fi
+
+if [[ -e "$_WIFI_IN_CONFIG" ]]; then
+    mapfile -t lines < <(egrep -v '\w*#|^$' "$_WIFI_IN_CONFIG")
+    count=${#lines[@]}
+    if [[ $count -eq 2 ]]; then  # only one param given -> ULNOIOT_AP_PASSWORD
+        uiot_wifi_name="${lines[0]}"
+        uiot_wifi_password="${lines[1]}"
+    elif [[ $count -eq 3 ]]; then
+        uiot_wifi_name="${lines[0]}"
+        uiot_wifi_password="${lines[1]}"
+        uiot_wifi_user="${lines[2]}"
     fi
 fi

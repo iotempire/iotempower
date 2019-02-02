@@ -1,0 +1,8 @@
+# Add the following into the boot/wifi.txt file of a raspberry pi
+# ulnoiotgw.
+
+### Wifi Name (avoid blanks) ###
+iotempire-123456
+
+### Password (at least 8 characters, max 32, avoid blanks) ###
+iotempire

@@ -17,22 +17,6 @@
 #   the local ethernet port.
 #dtoverlay=dwc2
 
-# Start an accesspoint on wlan0 with following essid.
-# If ap_name empty or commented iotempire+wlan-mac will be used.
-# If ap_password empty, no ap will be started.
-# The ap_password needs to be at least 8 characters long.
-#uiot_ap_name=iotempire
-uiot_ap_password=internetofthings
-
-# Connect to wireless on wlan1 (external wifi adapter on pi 3 or zero w).
-# If at least wifi_name and wifi_password are set, try to connect to wpa
-# wifi network on wlan1.
-# If wifi_user is set (and uncommented), try to connect to enterprise network
-# without extra certificate (for example to an eduroam university network)
-#uiot_wifi_name="wifi-id"
-#uiot_wifi_password="secretpassword"
-#uiot_wifi_user=testuser@business.network
-
 ################################
 #### end: ulnoiotgw options ####
 ################################
