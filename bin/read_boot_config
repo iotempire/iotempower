@@ -7,11 +7,11 @@ _WIFI_IN_CONFIG="/boot/wifi-in.txt"
 
 if [[ -e "$_BOOT_CONFIG" ]]; then
     # check if otg-mode was enabled
-    sed 's/\r$//' /boot/config.txt|egrep '^\s*dtoverlay=dwc2\s*' &> /dev/null && otg_on=1
+    sed 's/\r$//' "$_BOOT_CONFIG"|egrep '^\s*dtoverlay=dwc2\s*' &> /dev/null && otg_on=1
 fi
 
 if [[ -e "$_WIFI_CONFIG" ]]; then
-    mapfile -t lines < <(egrep -v '\w*#|^$' "$_BOOT_CONFIG")
+    mapfile -t lines < <(egrep -v '\w*#|^$' "$_WIFI_CONFIG")
     count=${#lines[@]}
     if [[ $count -eq 1 ]]; then  # only one param given -> ULNOIOT_AP_PASSWORD
         add_id=1
