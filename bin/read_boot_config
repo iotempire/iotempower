@@ -2,8 +2,8 @@
 # Read extra configuration from /boot/config.txt
 
 _BOOT_CONFIG="/boot/config.txt"
-_WIFI_CONFIG="/boot/wifi.cfg"
-_WIFI_IN_CONFIG="/boot/wifi-in.cfg"
+_WIFI_CONFIG="/boot/wifi.txt"
+_WIFI_IN_CONFIG="/boot/wifi-in.txt"
 
 if [[ -e "$_BOOT_CONFIG" ]]; then
     # check if otg-mode was enabled
@@ -17,7 +17,7 @@ if [[ -e "$_WIFI_CONFIG" ]]; then
         add_id=1
         uiot_ap_password="${lines[0]}"
     elif [[ $count -eq 2 ]]; then
-        uiot_ap_name="${lines[1]}"
+        uiot_ap_name="${lines[0]}"
         uiot_ap_password="${lines[1]}"
     fi
 
@@ -43,7 +43,7 @@ if [[ -e "$_WIFI_CONFIG" ]]; then
 
         # channel, bridge, and mqtt data taken straight from ulnoiot.conf
     fi
-    # no accesspoint if file empty or not existant
+    # no accesspoint if file empty or not existent
 fi
 
 if [[ -e "$_WIFI_IN_CONFIG" ]]; then
