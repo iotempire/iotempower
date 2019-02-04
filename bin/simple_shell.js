@@ -158,13 +158,17 @@ function deploy() {
 function initialize() {
 }
 
+function create_node_template() {
+}
+
 function upgrade() {
 }
 
 function advanced() {
     choice([
-        ["Initialize Serial (I)", "I", terminate], 
         ["PreFlash Wemos (P)", "P", terminate],
+        ["Initialize Serial (I)", "I", terminate], 
+        ["Upgrade (U)", "U", upgrade],
         ["Shell Escape (S)", "S", terminate],
         ["Back (B,X,ESC)", ["B","X"], terminate]
     ], pre_select=-1, pad_last=1);
@@ -182,7 +186,7 @@ function menu_default() {
     choice([
         ["Deploy (D)", "D", deploy], 
         ["Initialize (I)", "I", initialize],
-        ["Upgrade (U)", "U", upgrade],
+        ["Create Node Template (N)", "N", create_node_template],
         ["Advanced (A)", "A", advanced],
     //    "Exit (X,ESC)"
     ], pre_select=0, pad_last=0);
