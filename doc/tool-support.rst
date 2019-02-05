@@ -11,11 +11,17 @@ starting the ulnoiot command or executing run in the main ulnoiot directory):
   system variables and virtual python environments). To run a command, prefix
   it by the exec keyword, i.e.: ``ulnoiot exec accesspoint``
 
-- accesspoint: start an accesspoint on a free WiFi interface
+- ``ulnoiot shell``: Bundling most of the frequently used ulnoiot tools
+  under one convenient text based menu. Just try it out, but still look at
+  the description below.
 
-- ulnoiot upgrade: get latest version of ulnoiot (inside an existing version)
+- accesspoint: start an accesspoint on a free WiFi interface (this is
+  done by default on the ulnoiot Raspberry Pi image). 
 
-- ``ulnoiot_install`` or ulnoiot install: (re-)install the ulnoiot environment
+- ``ulnoiot upgrade``: get latest version of ulnoiot
+  (inside an existing version)
+
+- ``ulnoiot install``: (re-)install the ulnoiot environment
   (if you specify clean, it re-installs)
 
 - ``console_serial``: open a serial console to see debug output of a

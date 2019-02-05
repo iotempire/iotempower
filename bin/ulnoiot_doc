@@ -23,15 +23,20 @@ fi
 
 cd "$ULNOIOT_ROOT/doc"
 
+create_doc() {
+    echo "Generating web-viewable documentation."
+    make man
+    make html
+    # TODO: do eventually a matching specific version here
+    ln -s -f "$ULNOIOT_LOCAL/doc/html/doc/index-pi.html" \
+        "$ULNOIOT_LOCAL/doc/html/index.html"
+    echo "Documentation creation finished."
+}
+
+
 case "$1" in
     "" | make)
-        echo "Generating web-viewable documentation."
-        make html
-        make man
-        # TODO: do eventually a maching specific version here
-        ln -s -f "$ULNOIOT_LOCAL/doc/html/doc/index-pi.html" \
-            "$ULNOIOT_LOCAL/doc/html/index.html"
-        echo "Documentation creation finished."
+        create_doc
         ;;
     clean)
         echo "Removing generated documentation."
@@ -39,6 +44,7 @@ case "$1" in
         echo "Cleaning finished."
         ;;
     serve)
+        create_doc
         echo "Starting webserver for documentation. ctrl-c to stop."
         cd "$ULNOIOT_LOCAL/doc/html"
         exec python "$ULNOIOT_ROOT/bin/docserver.py"

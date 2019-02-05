@@ -11,13 +11,13 @@ tutorials:
 - For adding your first IoT node to your IoT system, follow
   the `First Node Tutorial </doc/first-node.rst>`_.
 
-- If you want to change your WiFi name and password of your gateway,
-  follow the `Gateway Credentials Tutorial <gateway-credentials.rst>`_
+- As you are here, you might have done this already, but for reference:
+  `Pi Quickstart Tutorial </doc/quickstart-pi.rst>`_.
 
 
 Here are some navigational links:
 
-- `More extensive local documentation </index-doc.rst>`_.
+- `More extensive local documentation </index-doc.rst>`_
 - `IoT system example configuration folder </cloudcmd/fs/home/ulnoiot/iot-test>`_
 - `node-red (visual IoT system configuration) </nodered/>`_
 - `node-red user interface page </nodered/ui>`_

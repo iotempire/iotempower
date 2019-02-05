@@ -290,7 +290,7 @@ function menu_default() {
 
     choice([
         ["Deploy (D)", "D", deploy], 
-        ["Initialize (I)", "I", initialize],
+        ["Adopt/Initialize (I)", "I", initialize],
         ["Create New Node Folder (N)", "N", create_node_template],
         ["Advanced (A)", "A", advanced],
     //    "Exit (X,ESC)"

@@ -28,7 +28,8 @@ You need build-essential, virtualenv, git, hostapd, dnsmasq, nodejs,
 and haveged installed.
 
 On Ubuntu or Debian systems install these with:
-sudo apt install build-essential virtualenv git hostapd dnsmasq nodejs
+sudo apt install git mc mosquitto mosquitto-clients virtualenv \
+         iptables bridge-utils hostapd dnsmasq nodejs
 
 (On raspberry pi, installing nodejs is more difficult. Search the web, how.)
 

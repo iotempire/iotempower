@@ -8,7 +8,7 @@ endif
 
 
 # You can set these variables from the command line.
-SPHINXOPTS    =
+SPHINXOPTS    = -Q
 SPHINXBUILD   = sphinx-build
 BUILDDIR      = "$(ULNOIOT_LOCAL)/doc"
 SOURCEDIR     = "$(BUILDDIR)/_src"
