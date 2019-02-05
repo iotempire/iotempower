@@ -144,6 +144,7 @@ function run_command(command, directory = null) {
     var args = ['-q', '-e', '-c', command, '/dev/null' ];
 //    if(directory)
 //        cmd = 'cd "' + directory + '"; ' + cmd;
+    term.wrap("\nRunning ", command, "\n\n");
     var result = child_process.spawnSync("script", args,
                     { stdio: [0,0,0], cwd: directory });
     if( result.status == 0) {
