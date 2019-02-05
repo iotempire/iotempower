@@ -253,8 +253,16 @@ function shell_escape() {
 
 function poweroff() {
     shell_command("This will cleanly shut down the gateway. "
-        + "Are you sure you want to shutdown and poweroff the gateway?",
+        + "Are you sure you want to shutdown and power off the gateway?",
         "sudo poweroff");
+}
+
+function wifi_config() {
+    shell_command("This will open an editor with the WiFi-router configuration."
+        + " Please make corresponding changes. You will have to power off and on"
+        + " the gateway after this edit to activate the new configuration. "
+        + "\nDo you want to continue editing the WiFi-router configuration?",
+        "sudo /usr/bin/mcedit /boot/wifi.txt");
 }
 
 
@@ -264,6 +272,7 @@ function advanced() {
         ["Initialize Serial (I)", "I", initialize_serial], 
         // confusing - better through shell ["Compile (C)", "C", compile], 
         ["Upgrade (U)", "U", upgrade],
+        ["Change Wifi-Router Configuration (W)", "W", wifi_config],
         ["Shell Escape (S)", "S", shell_escape],
         ["Shutdown/Poweroff (O)", "O", poweroff],
         ["Back (B,X,ESC)", ["B","X"], menu_default]
