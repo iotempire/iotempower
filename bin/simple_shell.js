@@ -1,4 +1,6 @@
 var term = require( 'terminal-kit' ).terminal ;
+var child_process = require('child_process');
+
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -138,38 +140,121 @@ async function choice(items, pre_select=0, pad_last=0) {
     // nothing can decently be printed (maybe modal)
 }
 
-function deploy() {
-    term('\n\nYou want to deploy in the following path:\n') ;
+function run_command(command, directory = null) {
+    var args = ['-q', '-e', '-c', command, '/dev/null' ];
+//    if(directory)
+//        cmd = 'cd "' + directory + '"; ' + cmd;
+    var result = child_process.spawnSync("script", args,
+                    { stdio: [0,0,0], cwd: directory });
+    if( result.status == 0) {
+        term.green.wrap('\nThe command ',command,' seems to have completed successful. OK to continue.\n');
+        choice([
+            ["OK, continue (O, Enter)", "O", terminate]
+        ], pre_select=-1);
+    } else {
+        term.green.wrap('\nAn error occurred running ',command,'. Check output, continue, and eventually try again later.\n');
+        choice([
+            ["Continue (C, Enter)", "C", terminate]
+        ], pre_select=-1);
+    }
+}
+
+
+function shell_command(question, command, directory = null) {
+    if(question) {
+        term.wrap("\n", question, "\n");
+        
+        choice([
+            ["Yes, run " + command + " (Y)", "Y", function() { run_command(command, directory); } ],
+            ["No, go back (N)", "N", terminate]
+        ], pre_select=-1);
+    } else {
+        term("\n\n");
+        run_command(command, directory);
+    }
+}
+
+
+function shell_command_in_path(before_path, after_path, command) {
+    term.wrap('\n\n', before_path, '\n');
     var d = process.env.ACTIVE_DIR;
+    var fulldir = d;
     if(!d) {
         d = process.cwd();
+        fulldir = d;
     }
     // Strip home directory
     var home = process.env.HOME;
     if(d.startsWith(home)) d = d.slice(home.length+1);
-    term(d, "\n\nAre you sure?\n");
-    
-    choice([
-        ["Yes, deploy (Y)", "Y", terminate],
-        ["No, go back (N)", "N", terminate]
-    ], pre_select=-1);
+    term.wrap(d,'\n');
+
+    shell_command(after_path, command, fulldir);
 }
+
+
+function deploy() {
+    shell_command_in_path('You are about to deploy from the following path:',
+        'Are you sure?', "deploy");
+}
+
+
+function compile() {
+    shell_command_in_path('You are about to run compile in the following path:',
+        'Are you sure?', "compile");
+}
+
 
 function initialize() {
+    shell_command_in_path('You are about to initialize from the following path:',
+        'Are you sure and have you successfully put one node in adoption mode?',
+        "initialize");
 }
+
 
 function create_node_template() {
+    shell_command_in_path('You are about to create a folder called node_template in the following path:',
+        'Are you sure?',
+        "create_node_template");
 }
 
+
 function upgrade() {
+    shell_command("This will get the newest version of ulnoiot out of the internet."
+        + " Are you sure you want to run this?", "upgrade");
 }
+
+
+function initialize_serial() {
+    shell_command_in_path('You are about to initialize'
+        + ' a device that is locally connected to the gateway via usb or serial'
+        + ' from the following path:',
+        'Are you sure, and have you connected only one node to the gateway?',
+        "initialize serial");
+}
+
+
+function pre_flash_wemos() {
+    shell_command('You are about to flash a connected Wemos D1 mini with'
+        + ' a default ulnoiot firmware. Are you sure, and have you connected '
+        + 'exactly one Wemos D1 mini via USB to the gateway?',
+        "pre_flash_wemos");
+}
+
+
+function shell_escape() {
+    shell_command_in_path("Starting the shell (bash) now. "
+        + "Remember to type exit to leave. Initial path will be:",
+        null, "bash");
+}
+
 
 function advanced() {
     choice([
-        ["PreFlash Wemos (P)", "P", terminate],
-        ["Initialize Serial (I)", "I", terminate], 
+        ["Pre-Flash Wemos D1 mini (P)", "P", pre_flash_wemos],
+        ["Initialize Serial (I)", "I", initialize_serial], 
+        ["Compile (C)", "C", compile], 
         ["Upgrade (U)", "U", upgrade],
-        ["Shell Escape (S)", "S", terminate],
+        ["Shell Escape (S)", "S", shell_escape],
         ["Back (B,X,ESC)", ["B","X"], terminate]
     ], pre_select=-1, pad_last=1);
 }
@@ -178,9 +263,9 @@ function advanced() {
 function menu_default() {
     //term.clear();
     term("\n\n");
-    term.bgBrightWhite.black( '^+ul^rno^-^kiot^: Simple Shell\n' ) ;
+    term.bgBrightWhite.black.wrap( '^+ul^rno^-^kiot^: Simple Shell\n' ) ;
     term("\n");
-    term('Use mouse, arrow keys, enter, or shortcut key to select.\n')
+    term.wrap('Use mouse, arrow keys, enter, or shortcut key to select.\n')
     term("\n");
 
     choice([

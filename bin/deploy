@@ -125,9 +125,10 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
 #     fi # $port exists?
 
     WRAP=""
-    if [[ "$ACTIVE_DIR" ]]; then # if this is running in cloudcmd
-        WRAP=ctrl-c-wrap
-    fi
+# Not necessary anymore with new usermenu in gritty terminal
+#    if [[ "$ACTIVE_DIR" ]]; then # if this is running in cloudcmd
+#        WRAP=ctrl-c-wrap
+#    fi
     $WRAP platformio run $pio_upload || { echo "Trouble compiling or uploading new firmware, check errors."; exit 1; }
 
     echo "deploy successfully done."

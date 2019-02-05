@@ -20,6 +20,7 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
         echo
         echo "compile not successfull, check errors above."
         echo
+        exit 1
     fi
 
 else # started from somewhere else, so search for node.conf in subdirs

@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+if [[ $# -gt 1 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
+cat << EOF
+Syntax: create_node_template [name]
+
+Create a new node template in the current path.
+If name is given, it is called new-node else the given name.
+EOF
+exit 1
+fi
+
+[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+
+name="new-node"
+if [[ "$1" ]]; then
+    name="$1"
+    echo "Trying to create new node with name $name."
+else
+    echo "Trying to create new node with name $name. Remember to rename later."
+fi
+
+if [[ -e "$name" ]]; then
+    echo "Folder $name (or a file with that name) already exists, please rename first."
+    exit 1
+else
+    cp -a "$ULNOIOT_ROOT/lib/system_template/node_template" "$name" && echo "Successfully created."
+fi
