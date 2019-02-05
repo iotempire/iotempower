@@ -152,7 +152,7 @@ function run_command(command, directory = null) {
             ["OK, continue (O, Enter)", "O", terminate]
         ], pre_select=-1);
     } else {
-        term.green.wrap('\nAn error occurred running ',command,'. Check output, continue, and eventually try again later.\n');
+        term.red.wrap('\nAn error occurred running ',command,'. Check output, continue, and eventually try again later.\n');
         choice([
             ["Continue (C, Enter)", "C", terminate]
         ], pre_select=-1);
