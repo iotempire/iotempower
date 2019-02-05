@@ -248,6 +248,12 @@ function shell_escape() {
         null, "bash");
 }
 
+function poweroff() {
+    shell_command("This will cleanly shut down the gateway. "
+        + "Are you sure you want to shutdown and poweroff the gateway?",
+        "sudo poweroff");
+}
+
 
 function advanced() {
     choice([
@@ -256,6 +262,7 @@ function advanced() {
         ["Compile (C)", "C", compile], 
         ["Upgrade (U)", "U", upgrade],
         ["Shell Escape (S)", "S", shell_escape],
+        ["Shutdown/Poweroff (O)", "O", poweroff],
         ["Back (B,X,ESC)", ["B","X"], terminate]
     ], pre_select=-1, pad_last=1);
 }
