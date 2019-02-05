@@ -213,7 +213,10 @@ function initialize() {
 
 
 function create_node_template() {
-    shell_command_in_path('You are about to create a folder called node_template in the following path:',
+    shell_command_in_path("You are about to create a folder called new-node"
+        + " to configure a new node. Do not forget to rename this folder after"
+        + " this creation. you might have to refresh cloudcmd to see the newly"
+        + " created folder after this action. It will be created in the following path:",
         'Are you sure?',
         "create_node_template");
 }
@@ -259,11 +262,11 @@ function advanced() {
     choice([
         ["Pre-Flash Wemos D1 mini (P)", "P", pre_flash_wemos],
         ["Initialize Serial (I)", "I", initialize_serial], 
-        ["Compile (C)", "C", compile], 
+        // confusing - better through shell ["Compile (C)", "C", compile], 
         ["Upgrade (U)", "U", upgrade],
         ["Shell Escape (S)", "S", shell_escape],
         ["Shutdown/Poweroff (O)", "O", poweroff],
-        ["Back (B,X,ESC)", ["B","X"], terminate]
+        ["Back (B,X,ESC)", ["B","X"], menu_default]
     ], pre_select=-1, pad_last=1);
 }
 
@@ -279,7 +282,7 @@ function menu_default() {
     choice([
         ["Deploy (D)", "D", deploy], 
         ["Initialize (I)", "I", initialize],
-        ["Create Node Template (N)", "N", create_node_template],
+        ["Create New Node Folder (N)", "N", create_node_template],
         ["Advanced (A)", "A", advanced],
     //    "Exit (X,ESC)"
     ], pre_select=0, pad_last=0);
