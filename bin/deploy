@@ -59,7 +59,7 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
 
     # check key-file and eventually regenerate
     KEYFILE=key.txt
-    key=$(tail -n1 "$KEYFILE")
+    key=$(tail -n1 "$KEYFILE" 2>/dev/null)
     if [[ ! ${#key} = 64 ]]; then
         # TODO: check that haveged is running and maybe check not to overwrite key?
         echo "Generating new key."
@@ -67,7 +67,7 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
         # messes that up later (especially $)
         < /dev/random tr -dc A-Za-z0-9\-\+_\=/@% | head -c64 > "$KEYFILE"
         #head -c32 /dev/random|od -A n -t x2|tr -d ' \r\n' > "$KEYFILE"
-        key=$(tail -n1 "$KEYFILE")
+        key=$(tail -n1 "$KEYFILE" 2>/dev/null)
     fi
 
     if [[ "$1" == "compile" ]]; then
@@ -90,7 +90,7 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
             if [[ "$2" ]]; then
                 key="$3"
             else
-                key=$(tail -n1 key.txt|head -c 64)
+                key=$(tail -n1 key.txt 2>/dev/null|head -c 64)
             fi
         else
             # normalize node_name from topic
