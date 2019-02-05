@@ -44,7 +44,7 @@ Setting up the WiFi credentials on the node
 
     Connect a button usually to D3 (or pin 0 depending on the board) against
     ground or a button shield (see image) on top of the Wemos D1 Mini.
-    This will be used to set the node into *adopt mode*.
+    This will be used to set the node into *adoption mode*.
 
 -   Power up your microcontroller via battery or usb power supply
     (connect it with a USB cable to either of these).
@@ -55,7 +55,7 @@ Setting up the WiFi credentials on the node
     it off and back on and try the process again.
 
 -   If you have done the previous step correctly, the node is
-    in adopt (or reconfiguration)
+    in adoption (or reconfiguration)
     mode and the onboard_led should be now blinking in a unique pattern:
     The onboard led will blink in some kind of Morse code: several long
     blinks and several short blinks, for example 1 long and 2 short blinks.
@@ -111,10 +111,9 @@ Adopting the Node in the UlnoIoT environment on the Raspberry Pi
 
   - Point your browser at https://ulnoiotgw (or https://ulnoiotgw.local,
     or if both don't work at https://192.168.12.1).
-    
-    If not already done previously, accept the security exception for the 
-    locally generated security
-    certificate.
+
+    If not already done previously, accept the security exception for the
+    locally generated security certificate.
 
   - If you are asked for a user, use ``ulnoiot``,
     if you are asked for a password
