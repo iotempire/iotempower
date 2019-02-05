@@ -1,1 +1,1 @@
-!!help("temperature")
+temperature.rst

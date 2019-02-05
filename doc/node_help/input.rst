@@ -41,6 +41,6 @@ Example
 
 ..  code-block:: cpp
     
-    input(lower, D2, "depressed", "pressed")
+    input(lower, D2, "depressed", "pressed");
 
 Now the status button is published as ``living room/leds1/lower``.

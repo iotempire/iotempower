@@ -1,4 +1,4 @@
-still only in micropython - not ported yet - TODO: please help porting
+**still only in micropython - not ported yet - TODO: please help porting**
 
 
 d("i2c_connector", name, sda, scl, addr=8):
@@ -9,12 +9,17 @@ name will be appended to the mqtt topic to report i2c output of the Arduino
 and a set appended to send messages as input to the Arduino.
 
 Parameters:
+
 - name: the name it can be addressed under
+
 - sda: the gpiopin for sda
+
 - scl: the gpiopin for scl
+
 - addr: the i2c address (8 by default)
 
 Example:
+
 d("i2c_connector", "scale1", d3, d4)
 
 Now the commands can be sent to the connected Arduino via the topic

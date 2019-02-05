@@ -1,23 +1,38 @@
-hcsr04(name, trigger_pin, echo_pin, timeout_us=30000);
+hcsr04
+======
+
+..  code-block:: cpp
+
+    hcsr04(name, trigger_pin, echo_pin, timeout_us=30000);
 
 Create a new HC-SR04 ultrasonic distance measuring device.
 It reads the distance in mm.
 
-Parameters:
-- name: the name it can be addressed via MQTT in the network. Inside the code
+Parameters
+----------
+
+- ``name``: the name it can be addressed via MQTT in the network. Inside the code
   it can be addressed via IN(name).
-- trigger_pin: where the trigger pin is connected to
-- echo_pin: where the echo pin is connected to
-- timeout_us: how long to max wait for a return signal (usually no need to 
+
+- ``trigger_pin``: where the trigger pin is connected to
+
+- ``echo_pin``: where the echo pin is connected to
+
+- ``timeout_us``: how long to max wait for a return signal (usually no need to 
   change default)
-- .with_precision(precision): can be used to only react for changes in
+
+- ``.with_precision(precision)``: can be used to only react for changes in
   measuring that are bigger or equal to this value
 
-WARNING:
+**WARNING:**
 This device usually needs 5V input voltage. To read the Echo Pin with a 3.3V
 device like the esp8266 or a Raspberry Pi zero, you must use a level shifter 
 or setup a voltage divider for the echo-pin (for example echo pin via 1kOhm to 
 the GPIO-Echo-Input and 2kOhm to ground).
 
-Example:
-hcsr04(distance, D2, D1).with_precision(10);
+Example
+-------
+
+..  code-block:: cpp
+
+    hcsr04(distance, D2, D1).with_precision(10);

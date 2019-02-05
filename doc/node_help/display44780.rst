@@ -1,1 +1,1 @@
-!!help("display")
+display.rst

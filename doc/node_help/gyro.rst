@@ -1,1 +1,1 @@
-!!help("gyroscope")
+gyroscope.rst
