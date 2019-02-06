@@ -8,9 +8,9 @@ Short manual to use:
 Install:
 - ulnoiot (create ulnoiot, starter script) 
 - unclutter
-- node-red
-- node-red-dashboard
-- node-red-simpletime
+- Node-RED
+- Node-RED-dashboard
+- Node-RED-simpletime
 
 Add artificial-window-bin to path.
 Add autostart of artificial window to .config/lxsession/LXDE-pi/autostart (with an @ in front).

@@ -18,4 +18,4 @@ Functionality
 -------------
 
 Water detection is communicated via mqtt to the mqtt-broker. Another server
-(for example node-red) reacts to the raised detection signal.
+(for example Node-RED) reacts to the raised detection signal.
