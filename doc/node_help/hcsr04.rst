@@ -1,11 +1,11 @@
-hcsr04
-======
+hcsr04/rcwl-1601
+================
 
 ..  code-block:: cpp
 
     hcsr04(name, trigger_pin, echo_pin, timeout_us=30000);
 
-Create a new HC-SR04 ultrasonic distance measuring device.
+Create a new HC-SR04 (or RCWL-1601) ultrasonic distance measuring device.
 It reads the distance in mm.
 
 Parameters
@@ -25,10 +25,15 @@ Parameters
   measuring that are bigger or equal to this value
 
 **WARNING:**
-This device usually needs 5V input voltage. To read the Echo Pin with a 3.3V
+The HCSR04 usually needs 5V input voltage (some though also work with 3.3V,
+test first on 3.3V, if it doesn't work build teh voltage divider and
+try with 5V). To read the Echo Pin with a 3.3V
 device like the esp8266 or a Raspberry Pi zero, you must use a level shifter 
 or setup a voltage divider for the echo-pin (for example echo pin via 1kOhm to 
 the GPIO-Echo-Input and 2kOhm to ground).
+
+The RCWL-1601 is specified for 3.3V and does not need the voltage
+divider, do not connect it to 5V!
 
 Example
 -------
