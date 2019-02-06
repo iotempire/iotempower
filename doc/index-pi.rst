@@ -30,9 +30,9 @@ Here are some *navigational links*:
 
 - `Your home-directory </cloudcmd/fs/home/ulnoiot>`_
 
-Here are links to the local *node-red*
+Here are links to the local *Node-RED*
 (visual IoT system configuration) installation:
 
-- `node-red </nodered/>`_
+- `Node-RED </nodered/>`_
 
-- `node-red user interface page </nodered/ui>`_
+- `Node-RED user interface page </nodered/ui>`_

@@ -6,7 +6,7 @@ community around the Internet of Things. We make a lot of use of the following
 tools:
 
 - `PlatformIO <http://platform.io>`__
-- `node-red <https://nodered.org>`__
+- `Node-RED <https://nodered.org>`__
 - `mosquitto <https://mosquitto.org/>`__.
 - `The Tilde Texteditor <https://os.ghalkes.nl/tilde>`__
 - `create_ap <https://github.com/oblique/create_ap>`__ forked for UlnoIoT

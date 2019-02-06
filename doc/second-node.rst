@@ -8,7 +8,7 @@ have set-up your `first node <first-node.rst>`_ and can control its onboard
 led via the node-RED web gui.
 
 The goal of this tutorial is to show you how to adopt and initialize a second
-node and then wire these to together via node-red.
+node and then connect them together over the air (OTA) via Node-RED.
 
 Let's get started...
 
@@ -29,7 +29,7 @@ New Node
     In the user menu, select ``Create New Node Folder``, and after verifying
     the destination path (which should be ``iot-test/``), select
     ``Yes, run create_node_template``. Confirm a (hopefully) successful
-    creation, and you wil lbe back in cloudcmd's web file panel.
+    creation, and you wil be back in cloudcmd's web file panel.
 
     You should see there a new folder called new-node (next to the old folder
     ``node1``, the ``README.rst`` and ``system.conf``).
@@ -47,7 +47,7 @@ New Node
     reference. And open from there the
     `command reference </doc/node_help/commands.rst>`_.
 
--   in the file view, select ``setup.cpp``
+-   In the file view, select ``setup.cpp``
     and edit it (with edit button or F4 key).
 
     You should see a small explanation comment block. You should now
@@ -73,10 +73,10 @@ New Node
 Visually Programming the Wires
 ------------------------------
 
--   After successful adoption, open the `node-red </nodered/>`_ page. Here you
+-   After successful adoption, open the `Node-RED </nodered/>`_ page. Here you
     have to probably enter username (*ulnoiot*) and password (*iotempire*) again.
 
-    You should see a node-red flow with five nodes.
+    You should see a Node-RED flow with five nodes.
 
 -   Notable here are the two pink nodes at the sides, one labeled ``node1/b1``
     and one ``node1/blue/set``
