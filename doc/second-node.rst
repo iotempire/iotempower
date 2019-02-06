@@ -10,7 +10,10 @@ led via the node-RED web gui.
 The goal of this tutorial is to show you how to adopt and initialize a second
 node and then wire these to together via node-red.
 
-Let's get started:
+Let's get started...
+
+New Node
+--------
 
 -   Navigate back to your `IoT system example configuration folder
     <https://ulnoiotgw.local/cloudcmd/fs/home/ulnoiot/iot-test/>`_
@@ -40,135 +43,79 @@ Let's get started:
 -   If you are not using a Wemos D1 Mini as new node, edit ``node.conf`` and
     enter the new board.
 
--   Select ``setup.cpp`` and edit it (with edit button or F4 key). 
+-   Make sure to open another `ulnoiot documentation web-page </>`_ for
+    reference. And open from there the
+    `command reference </doc/node_help/commands.rst>`_.
+
+-   in the file view, select ``setup.cpp``
+    and edit it (with edit button or F4 key).
+
+    You should see a small explanation comment block. You should now
+    completely remove it to have an empty configuration file.
+
+-   In the command reference open the button help and copy from there the
+    example configuration (including semicolon),
+    something like this: ``input(lower, D2, "depressed", "pressed");``
+
+    Paste this into the setup.cpp editor.
+
+-   Change it to ``input(b1, D3, "up", "down");``
+
+-   Leave the editor (press ok or by mouse the x in the upper right corner)
+    and agree to save the file.
+
+-   Like in the `first node tutorial <first-node.rst>`_ described, adopt now
+    node2. (attach button, activate adoption mode, count Morse blinks, 
+    use phone to set own WiFi network credentials, finish calling
+    adopt/initialize from user menu in ``node2`` folder).
 
 
--   Note that this instructions are for reconfiguring
-    the WiFi credentials on nodes
-    that have been pre-installed with UlnIoT and can be flashed over wireless
-    (over the air - OTA - the ones used in the classroom should be ready).
-    If your node has never been flashed with UlnoIoT before,
-    follow this tutorial here `First Flash page <pre-flash.rst>`_
-    for the first preparation.
+Visually Programming the Wires
+------------------------------
 
--   TODO: Insert image of the button shield!
+-   After successful adoption, open the `node-red </nodered/>`_ page. Here you
+    have to probably enter username (*ulnoiot*) and password (*iotempire*) again.
 
-    Connect a button usually to D3 (or pin 0 depending on the board) against
-    ground or a button shield (see image) on top of the Wemos D1 Mini.
-    This will be used to set the node into *adoption mode*.
+    You should see a node-red flow with five nodes.
 
--   Power up your microcontroller via battery or usb power supply
-    (connect it with a USB cable to either of these).
-    Wait until the onboard_led starts blinking and press
-    the button 2 or 3 times during these first blinking 5 seconds.
-    If the led is continuously on (or continuously off), 
-    restart your board by powering
-    it off and back on and try the process again.
+-   Notable here are the two pink nodes at the sides, one labeled ``node1/b1``
+    and one ``node1/blue/set``
 
--   If you have done the previous step correctly, the node is
-    in adoption (or reconfiguration)
-    mode and the onboard_led should be now blinking in a unique pattern:
-    The onboard led will blink in some kind of Morse code: several long
-    blinks and several short blinks, for example 1 long and 2 short blinks.
-    Count the blinks in the pattern as it will be used to identify your node's
-    WiFi network in the next step.
+    These are so called mqtt (Message Queuing Telemetry Transport) nodes.
+    They are our bridge to the IoT communication language.
 
--   Now, on your smart phone or tablet (a computer works too), go to the
-    WiFi settings menu. The node will show up in the list of WiFi networks
-    called something like ``ulnoiot-ab-mn``. ``ab`` are unique identifiers and
-    ``mn`` is relative to the unique blinking pattern where ``m`` is the number
-    of long blinks and ``n`` number of short blinks.
-    For example ``uiot-node-ab-12`` means 1 long and 2 short blinks.
+-   The new node, we just configured, is sending data on the topic
+    ``node2/b1``
 
-    There might be quite a lot of networks (in a class setting). make sure you
-    find the one matching your pattern (if there are several matches,
-    chose the one with the strongest signal)
+-   Therefore, create a new mqtt input node, by dragging it from the left into
+    the current flow. Double click it and set its topic to ``node2/b1``.
 
--   Click or tap to connect to the Node's WiFi network.
+-   Also create a debug output node (drag it into the pane) and draw a wire
+    from the mqtt-node port to the debug-port.
 
--   If there is an *Internet may not be available* warning click *OK*.
+-   Press the red deploy button (in the upper right) corner.
 
--   TODO: Insert image of WiFi credentials on the smart phone!
-    You should be automatically forwarded to a web page like the one on the
-    image (similar to logging into an open WiFi in a cafe or an airport).
-    If that does not happen automatically, open any web browser on your phone
-    and type http://192.168.4.1 into the URL selection box and click on
-    ``Configure WiFi``.
+-   Under the red deploy button is a little column with the symbol of a
+    little bug, activate it and press the button connected to your new node
+    several times.
 
--   Now enter network name and password of your Raspberry Pi's WiFi
-    network (the one you configured for your UlnoIoT gateway)
-    using the ``WiFi Name`` and ``Password`` that was setup
-    previously like described in the
-    `Pi Quickstart tutorial <quickstart-pi.rst>`_ and click on *save*.
+    You should see several up and down messages in the debug log.
 
--   If you have done this correctly, the node will reboot and
-    the led will stay on continuously.
-    If it starts blinking the unique pattern again,
-    it means you have not configured it correctly.
-    Then you have to repeat the previous step.
+-   Add a ``change``-node and configure it so that it replaces `up` with
+    `off` and `down` with `on`.
 
--   Now the node is in adoption mode and ready to be initialized.
-    Move on to next part.
+-   Wire this ``change``-node between the new mqtt input node for
+    our ``node2`` button controller and the mqtt output labeled
+    ``node1/blue/set``.
+
+-   Deploy and press the button on ``node2``, observer the onboard led on
+    ``node1``.
+
+Congratulations!! You can remote control your led!
+
+If you still have some time, try to use this new button to actually toggle
+the led. Study for this the rbe and toggle node. What is happening in them?
 
 
-Adopting the Node in the UlnoIoT environment on the Raspberry Pi
-----------------------------------------------------------------
-
-- If you have not done already, connect now your computer (laptop or
-  desktop pc) to the Raspberry Pi's WiFi network (as described in the
-  `Pi Quickstart tutorial <quickstart-pi.rst>`_).
-
-- Connect to UlnoIoT via a web browser.
-
-  - Point your browser at https://ulnoiotgw (or https://ulnoiotgw.local,
-    or if both don't work at https://192.168.12.1).
-
-    If not already done previously, accept the security exception for the
-    locally generated security certificate.
-
-  - If you are asked for a user, use ``ulnoiot``,
-    if you are asked for a password
-    use ``iotempire``.
-
-  - TODO: provide image of home page!
-    You should now see the home page for your local UlnoIoT installation.
-
-- Click on the link `IoT system example configuration folder
-  <https://ulnoiotgw.local/cloudcmd/fs/home/ulnoiot/iot-test/>`_ to navigate to
-  the folder where the templates are.
-
-- TODO: provide image of the Iot system example page!
-  You should see a page like the one bellow.
-
-- Navigate into the `node1
-  <https://ulnoiotgw.local/cloudcmd/fs/home/ulnoiot/iot-test/node1/>`_ folder.
-
-- TODO: provide image of the Folder node1!
-  You should be seen a page like the one bellow.
-
-- TODO: provide image of the weird button!
-  When inside the ``node1`` folder click on the user menu button located on
-  the bottom right corner of your web screen.
-
-- TODO: provide image of the button menu for initializing!
-  You will now see a menu with several buttons as options.
-
-- Click on the button called ``Adopt/Initialize``
-  and verify again that you are in the
-  ``node1`` folder, then agree to start the process via selecting the 
-  ``Yes, run initialize``
-  button.
-
-- TODO: Create a troubleshooting file!
-  Wait until the process is done and make sure it was successful.
-  You should see this msg *deploy successfully done.* and *Done initializing.*
-  If it says *Initializing not successful, check errors above.* please refer
-  to `troubleshooting <troubleshooting.rst>`_.
-
-
-Congratulations!! Your node is now connect to UlnIoT and the onboard-led can
-be controlled with Node-RED using the button on this page
-`<https://ulnoiotgw/nodered/ui/#/1>`_
-
-Top: `ToC <index-doc.rst>`_, Previous: `Installation <installation.rst>`_,
+Top: `ToC <index-doc.rst>`_, Previous: `First Node <first-node.rst>`_,
 Next: `External Resources <resources.rst>`_.

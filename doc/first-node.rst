@@ -40,9 +40,9 @@ Setting up the WiFi credentials on the node
     follow this tutorial here `First Flash page <pre-flash.rst>`_
     for the first preparation.
 
--   TODO: Insert image of the button shield!
+..   TODO: Insert image of the button shield!
 
-    Connect a button usually to D3 (or pin 0 depending on the board) against
+-   Connect a button usually to D3 (or pin 0 depending on the board) against
     ground or a button shield (see image) on top of the Wemos D1 Mini.
     This will be used to set the node into *adoption mode*.
 
@@ -119,28 +119,33 @@ Adopting the Node in the UlnoIoT environment on the Raspberry Pi
     if you are asked for a password
     use ``iotempire``.
 
-  - TODO: provide image of home page!
-    You should now see the home page for your local UlnoIoT installation.
+.. TODO: provide image of home page!
+  
+  -  You should now see the home page for your local UlnoIoT installation.
 
 - Click on the link `IoT system example configuration folder
   <https://ulnoiotgw.local/cloudcmd/fs/home/ulnoiot/iot-test/>`_ to navigate to
   the folder where the templates are.
 
-- TODO: provide image of the Iot system example page!
-  You should see a page like the one bellow.
+.. TODO: provide image of the Iot system example page!
+
+- You should see a page like the one bellow.
 
 - Navigate into the `node1
   <https://ulnoiotgw.local/cloudcmd/fs/home/ulnoiot/iot-test/node1/>`_ folder.
 
-- TODO: provide image of the Folder node1!
-  You should be seen a page like the one bellow.
+.. TODO: provide image of the Folder node1!
 
-- TODO: provide image of the weird button!
-  When inside the ``node1`` folder click on the user menu button located on
+- You should be seen a page like the one bellow.
+
+.. TODO: provide image of the weird button!
+
+- When inside the ``node1`` folder click on the user menu button located on
   the bottom right corner of your web screen.
 
-- TODO: provide image of the button menu for initializing!
-  You will now see a menu with several buttons as options.
+.. TODO: provide image of the button menu for initializing!
+
+- You will now see a menu with several buttons as options.
 
 - Click on the button called ``Adopt/Initialize``
   and verify again that you are in the
@@ -148,8 +153,9 @@ Adopting the Node in the UlnoIoT environment on the Raspberry Pi
   ``Yes, run initialize``
   button.
 
-- TODO: Create a troubleshooting file!
-  Wait until the process is done and make sure it was successful.
+.. TODO: Create a troubleshooting file!
+
+- Wait until the process is done and make sure it was successful.
   You should see this msg *deploy successfully done.* and *Done initializing.*
   If it says *Initializing not successful, check errors above.* please refer
   to `troubleshooting <troubleshooting.rst>`_.
@@ -160,4 +166,4 @@ be controlled with Node-RED using the button on this page
 `<https://ulnoiotgw/nodered/ui/#/1>`_
 
 Top: `ToC <index-doc.rst>`_, Previous: `Installation <installation.rst>`_,
-Next: `External Resources <resources.rst>`_.
+Next: `Second Node <second-node.rst>`_.
