@@ -88,8 +88,6 @@ Acessando os serviços locais no Raspberry Pi
 
 Agora você pode continuar com seu `Primeiro Node IoT <first-node-pt.rst>`_.
 
-Este configuração também está disponível em inglês aqui `<quickstart-pi.rst>`_.
-
 .. rubric:: Notas de rodapé
 
 .. [#f1] Se seu Raspberry Pi não estiver conectado à internet, um computador 
@@ -100,3 +98,4 @@ Este configuração também está disponível em inglês aqui `<quickstart-pi.rs
 
 Topo: `ToC <index-doc.rst>`_, Anterior: `Installation <installation.rst>`_,
 Próximo: `Primeiro Node IoT <first-node-pt.rst>`_.
+`English version of this page is here <quickstart-pi.rst>`_.

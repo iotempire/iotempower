@@ -120,7 +120,7 @@ Adopting the Node in the UlnoIoT environment on the Raspberry Pi
     use ``iotempire``.
 
 .. TODO: provide image of home page!
-  
+
   -  You should now see the home page for your local UlnoIoT installation.
 
 - Click on the link `IoT system example configuration folder
@@ -129,19 +129,20 @@ Adopting the Node in the UlnoIoT environment on the Raspberry Pi
 
 .. TODO: provide image of the Iot system example page!
 
-- You should see a page like the one bellow.
-
-- Navigate into the `node1
+- Then, navigate into the `node1
   <https://ulnoiotgw.local/cloudcmd/fs/home/ulnoiot/iot-test/node1/>`_ folder.
 
 .. TODO: provide image of the Folder node1!
 
-- You should be seen a page like the one bellow.
-
-.. TODO: provide image of the weird button!
+  You should see the folder view of the node1 folder, containing
+  ``README.rst``, ``node.conf``, and ``setup.cpp``.
 
 - When inside the ``node1`` folder click on the user menu button located on
   the bottom right corner of your web screen.
+  The button to press is
+  depicted below.
+
+  .. image:: /doc/images/user-menu-button.png
 
 .. TODO: provide image of the button menu for initializing!
 
@@ -163,7 +164,8 @@ Adopting the Node in the UlnoIoT environment on the Raspberry Pi
 
 Congratulations!! Your node is now connect to UlnIoT and the onboard-led can
 be controlled with Node-RED using the button on this page
-`<https://ulnoiotgw/nodered/ui/#/1>`_
+`<https://ulnoiotgw/nodered/ui/#/1>`_.
 
 Top: `ToC <index-doc.rst>`_, Previous: `Installation <installation.rst>`_,
 Next: `Second Node <second-node.rst>`_.
+`Versão em português aqui <first-node-pt.rst>`_.

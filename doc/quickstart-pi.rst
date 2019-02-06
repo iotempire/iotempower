@@ -75,8 +75,6 @@ Accessing the Local Services on the Raspberry Pi
 
 You can now continue with `First IoT Node <first-node.rst>`_.
 
-This quickstart is also available in Portuguese `<quickstart-pi-pt.rst>`_.
-
 .. rubric:: Footnotes
 
 .. [#f1] If the Pi is not connected to the internet, a computer logged into its
@@ -87,3 +85,4 @@ This quickstart is also available in Portuguese `<quickstart-pi-pt.rst>`_.
 
 Top: `ToC <index-doc.rst>`_, Previous: `Installation <installation.rst>`_,
 Next: `First IoT Node <first-node.rst>`_.
+`Versão em português aqui <quickstart-pi-pt.rst>`_.

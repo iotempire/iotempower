@@ -9,7 +9,7 @@ Também como presumimos que você já tenha configurado seu primeiro no
 placa microcontroladora através do node-RED web gui.
 
 O objetivo deste tutorial é mostrar como adotar e inicializar um segundo
-node e depois conectá-lo ao primeiro sem fio ``Over the Air (OTA)``
+node e depois conectá-lo ao primeiro sem fio *Over the Air (OTA)*
 via Node-RED.
 
 Vamos começar então...
@@ -31,8 +31,8 @@ Novo Node
     `example system configuration` pasta e ative novamente o menu do usuário.
 
     No menu do usuário,
-    selecione `` Create New Node Folder`` e depois de verificar
-    o caminho de destino (que deve ser `` iot-test / ``), selecione
+    selecione ``Create New Node Folder`` e depois de verificar
+    o caminho de destino (que deve ser ``iot-test/``), selecione
     ``Yes, run create_node_template``. Certifique a a criação teve sucesso
     e aperte ``OK`` e você voltará ao painel de arquivos do cloudcmd.
 
@@ -142,4 +142,5 @@ o estado do LED. Para isso estude os nós `rbe` e `toggle` no Node-RED.
 
 Topo: `ToC <index-doc.rst>`_ , Anterior: `Primeiro Node <first-node-pt.rst>`_ ,
 Próximo: `External Resourses <resources.rst>`_.
+`English version of this page is here <second-node.rst>`_.
 

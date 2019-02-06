@@ -136,7 +136,11 @@ para gerar o certificado de segurança local.
 
 - Quando estiver dentro da pasta `node1
   <https://ulnoiotgw.local/cloudcmd/fs/home/ulnoiot/iot-test/node1/>`_
-  clique no botão ``=>`` localizado no canto inferior direito da sua tela.
+  clique no botão localizado no canto inferior direito da sua tela.
+  O botão está ilustrado abaixo.
+
+  .. image:: /doc/images/user-menu-button.png
+
 
 - Você deverá está vendo agora um menu com alguns botões.
 
@@ -157,3 +161,4 @@ controlado usando o botão desse programa Node-RED
 
 Topo: `ToC <index-doc.rst>`_, Anterior: `Installation <installation.rst>`_,
 Próximo: `Segundo Node <second-node-pt.rst>`_.
+`English version of this page is here <first-node.rst>`_.

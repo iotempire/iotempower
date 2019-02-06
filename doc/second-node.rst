@@ -8,7 +8,7 @@ have set-up your `first node <first-node.rst>`_ and can control its onboard
 led via the node-RED web gui.
 
 The goal of this tutorial is to show you how to adopt and initialize a second
-node and then connect them together over the air (OTA) via Node-RED.
+node and then connect them together *over the air (OTA)* via Node-RED.
 
 Let's get started...
 
@@ -119,3 +119,4 @@ the led. Study for this the rbe and toggle node. What is happening in them?
 
 Top: `ToC <index-doc.rst>`_, Previous: `First Node <first-node.rst>`_,
 Next: `External Resources <resources.rst>`_.
+`Versão em português aqui <second-node-pt.rst>`_.
