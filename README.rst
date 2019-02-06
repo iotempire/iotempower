@@ -13,7 +13,7 @@ home automation.
 
 However, it also supports existing IoT deployments and brings
 mechanisms for over the air (OTA) updates and automatic
-multi-device deployment. 
+multi-device deployment.
 
 If you are impatient and want to dive into it right now, fast forward to
 one of the following:
