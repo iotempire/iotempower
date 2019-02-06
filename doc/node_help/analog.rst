@@ -35,7 +35,7 @@ Parameters
   reached and low_word if not.
 
 - ``filter_function``: specify a preprocessor for measured values
-  (`filter <filter.rst>`_).
+  (see `filter <filter.rst>`_).
 
 Example
 -------

@@ -16,9 +16,12 @@ mechanisms for over the air (OTA) updates and automatic
 multi-device deployment. 
 
 If you are impatient and want to dive into it right now, fast forward to
-`Installation </doc/installation.rst>`_ or `First IoT Node </doc/first-node.rst>`_.
+one of the following:
+
+- `Raspberry Pi Quickstart </doc/quickstart-pi.rst>`_
+- `First IoT Node </doc/first-node.rst>`_.
+- `Installation </doc/installation.rst>`_
 
 Or dive into the `full documentation </doc/index-doc.rst>`_.
 
-We are currently rewriting the documentation.
-`The old readme is here </doc/README-old.rst>`_.
+Here are all the 

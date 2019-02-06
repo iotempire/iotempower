@@ -1,3 +1,6 @@
+filter
+======
+
 Example for filter-function:
 
 ..  code-block:: cpp

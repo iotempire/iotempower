@@ -32,7 +32,7 @@ Parameters
 - ``threshold``: debouncing value (higher -> average more measurements)
 
 - ``filter_function``: specify a preprocessor for measured values
-  (see uhelp filter).
+  (`filter <filter.rst>`_).
 
 Example
 -------
