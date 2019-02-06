@@ -55,7 +55,7 @@ Installation step by step:
 - https://ulnoiotgw (or https://ulnoiotgw.local or
   sometimes https://192.168.12.1). Accept
   the security exception for the locally generated security certificate. You
-  should now see a link to the filesystem through cloud commander
+  should now see a link to the filesystem through cloud commander (cloudcmd)
   and an IoT testsystem on the pi,
   as well as links to the Node-RED installation.
 
