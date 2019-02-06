@@ -24,8 +24,9 @@ fi
 cd "$ULNOIOT_ROOT/doc"
 
 create_doc() {
-    echo "Generating web-viewable documentation."
+    echo "Generating man pages."
     make man
+    echo "Generating web-viewable documentation."
     make html
     # TODO: do eventually a matching specific version here
     ln -s -f "$ULNOIOT_LOCAL/doc/html/doc/index-pi.html" \

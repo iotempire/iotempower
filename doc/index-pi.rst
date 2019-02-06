@@ -2,30 +2,37 @@
 UlnoIoT Local Web Portal
 ========================
 
-Welcome to your personal `UlnoIoT <https://github.com/ulno/ulnoiot>`__
-installation on a UlnoIoT gateway.
+Welcome to your personal `UlnoIoT <https://github.com/ulno/ulnoiot>`_
+installation on the UlnoIoT gateway.
 
 If you just connected and want to dive right in, use one of these quick start
-tutorials:
+*tutorials*:
 
 - For adding your first IoT node to your IoT system, follow
   the `First Node Tutorial </doc/first-node.rst>`_.
 
+- After your first IoT node continue with
+  the `Second Node Tutorial </doc/second-node.rst>`_.
+
 - As you are here, you might have done this already, but for reference:
   `Pi Quickstart Tutorial </doc/quickstart-pi.rst>`_.
 
+Here is *more documentation*:
 
-Here are some navigational links:
+- `Local documentation table of contents </index-doc.rst>`_
 
-- `More extensive local documentation </index-doc.rst>`_
+- `Command reference for nodes </doc/node_help/commands.rst>`_
+
+
+Here are some *navigational links*:
+
 - `IoT system example configuration folder </cloudcmd/fs/home/ulnoiot/iot-test>`_
-- `node-red (visual IoT system configuration) </nodered/>`_
-- `node-red user interface page </nodered/ui>`_
+
 - `Your home-directory </cloudcmd/fs/home/ulnoiot>`_
 
-Obsolete (will be removed soon)
-Use uhelp in the console for help or read the respective help files
-`right here <https://github.com/ulno/ulnoiot/tree/master/doc/node_help>`__ 
-or in the 
-`filesystem </cloudcmd/fs/home/user/ulnoiot/doc/node_help>`__.
+Here are links to the local *node-red*
+(visual IoT system configuration) installation:
 
+- `node-red </nodered/>`_
+
+- `node-red user interface page </nodered/ui>`_

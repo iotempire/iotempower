@@ -21,7 +21,7 @@ import sphinx_bootstrap_theme  # bootstrap support
 import os
 assert "ULNOIOT_ROOT" in os.environ, "Not in ulnoiot environment, aborting."
 
-sphinx_root = os.path.join(os.environ["ULNOIOT_LOCAL"], "doc/html")
+#sphinx_root = os.path.join(os.environ["ULNOIOT_LOCAL"], "doc/html")
 
 
 # -- Project information -----------------------------------------------------
@@ -60,6 +60,16 @@ templates_path = ['_templates']
 source_suffix = ['.rst', '.md']
 # source_suffix = '.rst'
 #source_suffix = { '.rst': 'restructuredtext', '.md': 'markdown' }
+
+all_docs = []
+# get all relevant doc files
+for root, dirs, files in os.walk(".", followlinks=True):
+    for file in files:
+        for suffix in source_suffix:
+            if file.endswith(suffix):
+                f = file[0:-len(suffix)]
+                p = os.path.join(root, f)[2:]
+                all_docs.append((p,f))
 
 # The master toctree document.
 master_doc = 'index-doc'
@@ -113,15 +123,16 @@ html_theme_options = {
     # Note the "1" or "True" value above as the third argument to indicate
     # an arbitrary url.
     'navbar_links': [
-        ("Home", "/", 1),
-        ("ToC", "/index-doc.rst", 1),
+        ("Top", "/", 1),
+        # already in main ("ToC", "/index-doc.rst", 1),
+        ("Commands", "/doc/node_help/commands.rst", 1),
     ],
 
     # Render the next and previous page links in navbar. (Default: true)
     'navbar_sidebarrel': True,
 
     # Render the current pages TOC in the navbar. (Default: true)
-    'navbar_pagenav': True,
+    'navbar_pagenav': False,
 
     # Tab name for the current pages TOC. (Default: "Page")
     'navbar_pagenav_name': "Page",
@@ -222,7 +233,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'UlnoIoTDocumentation.tex', 'UlnoIoT Documentation Documentation',
+    (master_doc, 'UlnoIoTDocumentation.tex', 'UlnoIoT Documentation',
      'UlnoIoT Community', 'manual'),
 ]
 
@@ -232,10 +243,14 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'ulnoiotdocumentation', 'UlnoIoT Documentation Documentation',
-     [author], 1)
+#    (master_doc, 'ulnoiot', 'UlnoIoT Table of Contents', [author], 1),
+#    ("doc/node_help/commands", 'commands', 'Command Reference', [author], 1)
 ]
 
+for p,f in all_docs:
+    man_pages.append(
+        (p, f, f, [author], 1)
+    )
 
 # -- Options for Texinfo output ----------------------------------------------
 

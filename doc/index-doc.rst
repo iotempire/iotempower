@@ -29,6 +29,9 @@ Table of Contents
 
 - `Further Documentation </doc/further-doc.rst>`_
 
+- `Command reference </doc/node_help/commands.rst>`_
+
+
 Obsolete:
 
 - `Shields </doc/shields/wemosd1mini/devkit1/README.rst>`_

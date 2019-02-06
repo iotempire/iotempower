@@ -5,7 +5,7 @@ output
 
     output(name, pin, high_command="on", low_command="off");
 
-**other names:** ``led``, ``out``, ``relais``
+**other names:** ``led``, ``out``, ``relais``, ``relay``
 
 Create a new output port for a simple LED or a relay switch.
 name will be appended to the mqtt topic and a set appended to
