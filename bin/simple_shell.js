@@ -224,7 +224,7 @@ function create_node_template() {
 
 function upgrade() {
     shell_command("This will get the newest version of ulnoiot out of the internet."
-        + " Are you sure you want to run this?", "upgrade");
+        + " Are you sure you want to run this?", "ulnoiot upgrade");
 }
 
 
