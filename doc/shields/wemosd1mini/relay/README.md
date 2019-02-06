@@ -1,5 +1,5 @@
 # the relay shield
-This is a ready available shield for the wemos d1 mini.
+This is a ready available shield for the Wemos D1 Mini.
 
 You can use this shield to switch higher voltage.
 However, do not use voltages over 20V. Higher voltages can be really dangerous.

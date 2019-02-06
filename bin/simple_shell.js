@@ -238,9 +238,9 @@ function initialize_serial() {
 
 
 function pre_flash_wemos() {
-    shell_command('You are about to flash a connected Wemos D1 mini with'
+    shell_command('You are about to flash a connected Wemos D1 Mini with'
         + ' a default ulnoiot firmware. Are you sure, and have you connected '
-        + 'exactly one Wemos D1 mini via USB to the gateway?',
+        + 'exactly one Wemos D1 Mini via USB to the gateway?',
         "pre_flash_wemos");
 }
 
@@ -268,7 +268,7 @@ function wifi_config() {
 
 function advanced() {
     choice([
-        ["Pre-Flash Wemos D1 mini (P)", "P", pre_flash_wemos],
+        ["Pre-Flash Wemos D1 Mini (P)", "P", pre_flash_wemos],
         ["Initialize Serial (I)", "I", initialize_serial], 
         // confusing - better through shell ["Compile (C)", "C", compile], 
         ["Upgrade (U)", "U", upgrade],

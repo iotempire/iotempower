@@ -10,7 +10,7 @@ and modifications back with the community, teacher, or colleagues.
 To build such a smart lock from the ulno development kit shields
 is very straight forward.
 You just need the follwing:
-- wemos d1 mini base
+- Wemos D1 Mini base
 - a [relay shield](../../shields/relay/README.md)
 - a way to power the wemos (this might be just the usb port of your computer, 
   a phone charger battery, or a simple phone charger power supply).
@@ -29,7 +29,7 @@ ip address in the future as MQTT_SERVER) and have already set-up wifi on your
 wifi network as well as toyed and understood at least the 
 [devel shield](../../shields/devel/Readme.md).
 
-1. First, just plug the relay shield into the wemos d1 mini base
+1. First, just plug the relay shield into the Wemos D1 Mini base
    (if you want, you can plug the display shield in between - first
    the display, then the relay on top).
 2. Power the wemos and login into your wemos via webrepl.

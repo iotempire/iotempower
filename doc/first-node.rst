@@ -50,7 +50,7 @@ Setting up the WiFi credentials on the node
     (connect it with a USB cable to either of these).
     Wait until the onboard_led starts blinking and press
     the button 2 or 3 times during these first blinking 5 seconds.
-    If the led is continuously on (or continuously off), 
+    If the led is continuously on (or continuously off),
     restart your board by powering
     it off and back on and try the process again.
 
@@ -149,7 +149,7 @@ Adopting the Node in the UlnoIoT environment on the Raspberry Pi
 
 - Click on the button called ``Adopt/Initialize``
   and verify again that you are in the
-  ``node1`` folder, then agree to start the process via selecting the 
+  ``node1`` folder, then agree to start the process via selecting the
   ``Yes, run initialize``
   button.
 

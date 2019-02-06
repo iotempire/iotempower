@@ -1,4 +1,4 @@
-wemos d1 mini - rfid-rc522 board
+Wemos D1 Mini - rfid-rc522 board
 
 3v3 - 3.3V
 d8  - sda

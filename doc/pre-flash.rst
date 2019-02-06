@@ -6,7 +6,7 @@ UlnoIoT. We have to manually write an initial firmware to our microcontrollers
 at least once. Later, we can use the adoption method to re-configure
 UlnoIoT nodes. We call this initialization process pre-flash.
 
-If you want to pre-flash a Wemos D1 mini, this process is very easy. Connect
+If you want to pre-flash a Wemos D1 Mini, this process is very easy. Connect
 the device, you want to pre-flash with a USB cable to the Pi gateway (or the
 PC that runs ulnoiot) and call the user menu (or on PC ``ulnoiot shell``).
 The user menu contains in the advance section a ``Pre-flash Wemos D1 Mini``
