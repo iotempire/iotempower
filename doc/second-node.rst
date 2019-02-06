@@ -70,8 +70,8 @@ New Node
     adopt/initialize from user menu in ``node2`` folder).
 
 
-Visually Programming the Wires
-------------------------------
+Visually Programming the Connections
+------------------------------------
 
 -   After successful adoption, open the `Node-RED </nodered/>`_ page. Here you
     have to probably enter username (*ulnoiot*) and password (*iotempire*) again.
