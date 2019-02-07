@@ -3,7 +3,7 @@
 
 ////// Standard libraries
 #include <ArduinoOTA.h>
-#include <ESP8266WebServer.h> //Local WebServer used to serve the configuration portal
+#include <ESP8266WebServer.h> // Local WebServer used to serve the configuration portal
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
 #include <FS.h>
@@ -26,6 +26,8 @@
 #include "key.h"
 #include "pins-wrapper.h"
 #include "wifi-config.h"
+
+#include <output.h>
 
 // ulnoiot functions for user modification in setup.cpp
 void (ulnoiot_init)() __attribute__((weak));
@@ -171,13 +173,17 @@ void reconfigMode() {
         char rtcData[magicSize];
         strncpy(rtcData, ULNOIOT_RECONFIG_MAGIC, magicSize);
         ESP.rtcUserMemoryWrite(0, (uint32_t *)rtcData, magicSize);
-    } // TODO: consider going back to configuration mode if not successful
+    } // TODO: consider going back to configuration mode if not successful <- seems to already work
     reboot(); // Always reboot after this to free all eventually not freed
               // memory used by WiFiManager
               // TODO: go directly to OTA-mode for a while and then quit
 }
 
-bool reconfig_mode_active=false;
+static bool reconfig_mode_active=false;
+
+bool get_reconfig_mode_active() {
+    return reconfig_mode_active; 
+}
 
 void flash_mode_select() {
     // Check if flash with default password is requested
@@ -187,8 +193,8 @@ void flash_mode_select() {
     ESP.rtcUserMemoryRead(0, (uint32_t *)rtcData, magicSize);
     if (memcmp(rtcData, ULNOIOT_RECONFIG_MAGIC, magicSize) == 0) {
         reconfig_mode_active = true;
-        Serial.println("Reconfiguration mode requested.");
-        // reset request
+        Serial.println("Adaption/reconfiguration mode with default credentials requested.");
+        // cancel the reset request
         rtcData[0] = 0;
         rtcData[1] = 0;
         ESP.rtcUserMemoryWrite(0, (uint32_t *)rtcData, magicSize);
@@ -281,7 +287,7 @@ void connectToWifi() {
 //     // This part is actually kind of obsolete now. TODO: consider removal
 //     WiFi.begin();
 // #endif
-    MDNS.begin(my_hostname);
+    MDNS.begin(my_hostname); // TODO: think, shall we take rather a fixed IP here?
 }
 
 void onWifiDisconnect(const WiFiEventStationModeDisconnected &event) {
@@ -368,6 +374,18 @@ void onMqttPublish(uint16_t packetId) {
     Serial.print("  packetId: ");
     Serial.println(packetId);
 }
+
+
+#ifdef ID_LED
+// create a rapidly flashing output object for adopt mode
+static Output* adopt_flash_led;
+bool output_flasher(int16_t id) {
+    adopt_flash_led->toggle();
+    do_later(100, id, output_flasher);
+    return true;
+}
+#endif
+
 
 void setup() {
     // TODO: setup watchdog
@@ -472,6 +490,13 @@ void setup() {
         devices_start(); // call start of all devices
         if(ulnoiot_start) ulnoiot_start(); // call user start from setup.cpp
         connectToMqtt(); // only subscribe after setup
+    } else {  // do something to show that we are in adopt mode
+        #ifdef ID_LED
+        reconfig_mode_active = false; // allow adding this device now
+        adopt_flash_led = new Output("adopt_light", ID_LED);
+        adopt_flash_led->start(); // start the device
+        do_later(100, 1, output_flasher );
+        #endif
     }
 }
 

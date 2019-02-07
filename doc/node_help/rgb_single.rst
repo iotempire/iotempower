@@ -41,7 +41,7 @@ Example
 
 ..  code-block:: cpp
 
-    rgb_single(rgb1, D3, D4, D2)
+    rgb_single(rgb1, D3, D4, D2);
 
 
 Now the RGB LED can be switched to red via sending to the mqtt-broker

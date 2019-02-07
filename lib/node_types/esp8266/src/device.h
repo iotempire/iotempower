@@ -65,7 +65,7 @@ class Device {
         // It does not get the current device passed as parameter. The value can
         // be read from measured_value in the globally defined device. This
         // measure_value can be now modified. It is declared valid via
-        // eturning true and invalid via returning flase or returning an empty 
+        // returning true and invalid via returning false or returning an empty 
         // string (set first char to 0).
         // TODO: commented example
         #define ULNOIOT_FILTER_CALLBACK std::function<bool()>

@@ -7,7 +7,7 @@ rgb_strip
         ...other FastLed parameters...);
 
 Create a new rgb strip device object for an rgb-led strip connected to the
-given ``data_pin`` (or ``data`` and ``clock_pin``) with ``num_leds`` rgb leds. 
+given ``data_pin`` (or ``data`` and ``clock_pin``) with ``num_leds`` rgb leds.
 All led chips supported by FastLED (https://github.com/FastLED/FastLED) are
 supported.
 
@@ -23,8 +23,8 @@ Under the resulting topic will be the following subtopics:
 - ``brightness/status``, ``brightness/set``: read and set brightness (0-255)
 
 - ``rgb/status``, ``rgb/set``:
-  read and set color as colorname, 6-digit hexcode 
-  (rrggbb) or comma separated triplet (r,g,b)
+  read and set color as colorname, 6-digit hexcode
+  ``rrggbb`` or comma separated triplet ``r,g,b``
 
   This also takes a number to just affect one led
   It also takes the words front and back, which will
@@ -34,7 +34,8 @@ Under the resulting topic will be the following subtopics:
 Parameters
 ----------
 
-- ``name``: the name it can be addressed via MQTT in the network. Inside the code
+- ``name``: the name it can be addressed via MQTT in the network.
+  Inside the code
   it can be addressed via IN(name).
 
 - ``data_pin``: the data-pin the led strip is connected to

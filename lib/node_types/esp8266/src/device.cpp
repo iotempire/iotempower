@@ -5,6 +5,10 @@
 #include <Arduino.h>
 #include "device.h"
 
+// import from main
+bool get_reconfig_mode_active();
+
+
 void Subdevice::init(const char* subname, bool subscribed) {
     ulog("subdevice init: subname: >%s< subscribed: %d", subname, subscribed);
     name.from(subname);
@@ -28,10 +32,12 @@ bool Subdevice::call_receive_cb(Ustring& payload) {
 bool add_device(Device& device);
 
 Device::Device(const char* _name) {
-    name.from(_name);
-    ulog("Device: Adding device: %s", name.as_cstr());
-    if(!add_device(*this)) {
-        ulog("Device %s couldn't be added - max devices reached.", _name);
+    if(!get_reconfig_mode_active()) { // ignore when in adopt mode
+        name.from(_name);
+        ulog("Device: Adding device: %s", name.as_cstr());
+        if(!add_device(*this)) {
+            ulog("Device %s couldn't be added - max devices reached.", _name);
+        }
     }
 }
 
