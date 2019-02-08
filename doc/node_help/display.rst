@@ -38,6 +38,7 @@ Parameters
   0x38. For the SSD1306 it is usually 0x78 (default) or 0x7a.
   If omitted, the default address is chosen.
 
+
 Examples
 ========
 
@@ -45,6 +46,8 @@ Examples
 
     display(dp1).i2c(D4, D3).with_address(0x78);
     display44780(display2, 16, 2);
+
+    TODO: add small display shield example
 
 Now the first display can be controlled via sending to the mqtt-broker
 to the topic ``node_topic/dp1`` different text or commands (second one

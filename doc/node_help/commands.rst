@@ -20,6 +20,7 @@ Alphabetic list
 - `dht <dht.rst>`_
 - `display44780 <display44780.rst>`_
 - `display <display.rst>`_
+- `do_later <do_later.rst>`_
 - `ds18b20 <ds18b20.rst>`_
 - `edge_counter <edge_counter.rst>`_
 - `filter <filter.rst>`_

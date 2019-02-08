@@ -32,7 +32,7 @@ Example
 
 ..  code-block:: cpp
 
-    edge_counter(left, "left", D3)
+    edge_counter(left, D3);
 
 Now, the number of rising and falling edges is published as 
 ``living room/shock1/left``
