@@ -91,8 +91,9 @@ Setting up the WiFi credentials on the node
     `Pi Quickstart tutorial <quickstart-pi.rst>`_ and click on *save*.
 
 -   If you have done this correctly, the node will reboot and
-    the led will stay on continuously.
-    If it starts blinking the unique pattern again,
+    the led will start blinking very rapidly continuously.
+    If it starts blinking the unique pattern again
+    or stays on or off all the time off,
     it means you have not configured it correctly.
     Then you have to repeat the previous step.
 
