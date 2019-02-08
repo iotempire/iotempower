@@ -3,7 +3,7 @@
 
 ////// Standard libraries
 #include <ArduinoOTA.h>
-#include <ESP8266WebServer.h> // Local WebServer used to serve the configuration portal
+#include <ESP8266WebServer.h> //Local WebServer used to serve the configuration portal
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
 #include <FS.h>
@@ -27,13 +27,13 @@
 #include "pins-wrapper.h"
 #include "wifi-config.h"
 
-#include <output.h>
-
 // ulnoiot functions for user modification in setup.cpp
 void (ulnoiot_init)() __attribute__((weak));
 void (ulnoiot_start)() __attribute__((weak));
 
 int long_blinks = 0, short_blinks = 0;
+
+bool wifi_connected = false;
 
 // TODO: find better solution
 #ifndef ONBOARDLED
@@ -173,17 +173,14 @@ void reconfigMode() {
         char rtcData[magicSize];
         strncpy(rtcData, ULNOIOT_RECONFIG_MAGIC, magicSize);
         ESP.rtcUserMemoryWrite(0, (uint32_t *)rtcData, magicSize);
-    } // TODO: consider going back to configuration mode if not successful <- seems to already work
+    } // TODO: consider going back to configuration mode if not successful
     reboot(); // Always reboot after this to free all eventually not freed
               // memory used by WiFiManager
               // TODO: go directly to OTA-mode for a while and then quit
 }
 
 static bool reconfig_mode_active=false;
-
-bool get_reconfig_mode_active() {
-    return reconfig_mode_active; 
-}
+static bool adopt_flash_toggle = false;
 
 void flash_mode_select() {
     // Check if flash with default password is requested
@@ -193,8 +190,8 @@ void flash_mode_select() {
     ESP.rtcUserMemoryRead(0, (uint32_t *)rtcData, magicSize);
     if (memcmp(rtcData, ULNOIOT_RECONFIG_MAGIC, magicSize) == 0) {
         reconfig_mode_active = true;
-        Serial.println("Adaption/reconfiguration mode with default credentials requested.");
-        // cancel the reset request
+        Serial.println("Reconfiguration mode requested.");
+        // reset request
         rtcData[0] = 0;
         rtcData[1] = 0;
         ESP.rtcUserMemoryWrite(0, (uint32_t *)rtcData, magicSize);
@@ -276,24 +273,24 @@ void connectToWifi() {
     Serial.println(my_hostname);
     WiFi.mode(WIFI_STA);
 
-//#ifdef WIFI_SSID
     if(reconfig_mode_active) {
-        WiFi.begin(); // use last known configuration (configured in WifiManager)
+        // use last known configuration (configured in WifiManager)
+        Serial.println("Using last wifi credentials in adopt mode.");
+        WiFi.begin();
     } else {
         Serial.println("Setting wifi credentials.");
         WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
     }
-// #else
-//     // This part is actually kind of obsolete now. TODO: consider removal
-//     WiFi.begin();
-// #endif
-    MDNS.begin(my_hostname); // TODO: think, shall we take rather a fixed IP here?
+    MDNS.begin(my_hostname);
 }
 
 void onWifiDisconnect(const WiFiEventStationModeDisconnected &event) {
+    wifi_connected = false;
     Serial.println("Disconnected from Wi-Fi.");
-    mqttReconnectTimer.detach(); // ensure we don't reconnect to MQTT while
-                                 // reconnecting to Wi-Fi
+    if(!reconfig_mode_active) {
+        mqttReconnectTimer.detach(); // ensure we don't reconnect to MQTT while
+                                     // reconnecting to Wi-Fi
+    }
     wifiReconnectTimer.once(2, connectToWifi);
 }
 
@@ -305,7 +302,12 @@ void connectToMqtt() {
 }
 
 void onWifiConnect(const WiFiEventStationModeGotIP &event) {
-    Serial.println("Connected to Wi-Fi.");
+    Serial.print("Connected to Wi-Fi with IP: ");
+    Serial.println(WiFi.localIP());
+    // start ota
+    ArduinoOTA.begin();
+    Serial.println("OTA Ready.");
+    wifi_connected = true;
     connectToMqtt();
 }
 
@@ -375,18 +377,6 @@ void onMqttPublish(uint16_t packetId) {
     Serial.println(packetId);
 }
 
-
-#ifdef ID_LED
-// create a rapidly flashing output object for adopt mode
-static Output* adopt_flash_led;
-bool output_flasher(int16_t id) {
-    adopt_flash_led->toggle();
-    do_later(100, id, output_flasher);
-    return true;
-}
-#endif
-
-
 void setup() {
     // TODO: setup watchdog
     // TODO: consider not using serial at all and freeing it for other
@@ -422,6 +412,8 @@ void setup() {
     WiFi.setSleepMode(WIFI_NONE_SLEEP); // TODO: check if this works
 
     // Try already to bring up WiFi
+    wifiConnectHandler = WiFi.onStationModeGotIP(onWifiConnect);
+    wifiDisconnectHandler = WiFi.onStationModeDisconnected(onWifiDisconnect);
     connectToWifi();
 
 
@@ -464,15 +456,11 @@ void setup() {
         else if (error == OTA_END_ERROR)
             Serial.println("End Failed");
     });
-    ArduinoOTA.begin();
-    Serial.println("OTA Ready.");
-    Serial.print("IP address: ");
-    Serial.println(WiFi.localIP());
+    // now in wifi
+    // ArduinoOTA.begin();
+    // Serial.println("OTA Ready.");
 
     // TODO: check if port is configurable
-
-    wifiConnectHandler = WiFi.onStationModeGotIP(onWifiConnect);
-    wifiDisconnectHandler = WiFi.onStationModeDisconnected(onWifiDisconnect);
 
     if (!reconfig_mode_active) {
         mqttClient.onConnect(onMqttConnect);
@@ -491,11 +479,10 @@ void setup() {
         if(ulnoiot_start) ulnoiot_start(); // call user start from setup.cpp
         connectToMqtt(); // only subscribe after setup
     } else {  // do something to show that we are in adopt mode
+        // enable flashing that light
         #ifdef ID_LED
-        reconfig_mode_active = false; // allow adding this device now
-        adopt_flash_led = new Output("adopt_light", ID_LED);
-        adopt_flash_led->start(); // start the device
-        do_later(100, 1, output_flasher );
+        pinMode(ID_LED, OUTPUT);
+        digitalWrite(ID_LED, adopt_flash_toggle);
         #endif
     }
 }
@@ -522,8 +509,8 @@ void loop() {
     unsigned long current_time;
     // TODO: make sure nothing weird happens -> watchdog
     ArduinoOTA.handle();
+    current_time = millis();
     if (!reconfig_mode_active) {
-        current_time = millis();
         do_later_check(); // work the scheduler
         if (current_time - last_measured >= _measure_delay) {
             devices_update();
@@ -556,5 +543,14 @@ void loop() {
         // ulnoiot_loop(); // TODO: think if this can actually be
         // skipped in the ulnoiot-philosophy -> maybe move to driver
         // callbacks
+    } else { // reconfig mode is active
+        #ifdef ID_LED
+        // flashing very rapidly
+        if (wifi_connected && current_time - last_measured >= 80) {
+            adopt_flash_toggle = !adopt_flash_toggle;
+            digitalWrite(ID_LED, adopt_flash_toggle);
+            last_measured = current_time;
+        }
+        #endif
     } // endif !reconfig_mode_active
 }

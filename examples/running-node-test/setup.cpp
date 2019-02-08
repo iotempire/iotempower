@@ -75,7 +75,7 @@ input(button1, D3, "released", "pressed")
 
 // light sensitivity sensors
 // bh1750(lux1);
-tsl2561(lux2);
+//tsl2561(lux2);
 
 // Example for single RGB-led
 // rgb(r0, D6, D5, D0, true);
