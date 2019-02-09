@@ -16,21 +16,35 @@ Setting up the WiFi-Router on the Pi
   ``Wifi Name`` (#iotempire-123456) and ``Password`` (iotempire) to your own
   values. Make sure that ``Password`` is longer than 8 characters.
 
-  .. code-block:: bash
+  ..  code-block:: bash
 
-     ### WiFi Name (avoid blanks) ###
-     #iotempire-123456
-     ### Password (at least 8 characters, max 32, avoid blanks) ###
-     iotempire
+      ### WiFi Name (avoid blanks) ###
+      #iotempire-123456
+      ### Password (at least 8 characters, max 32, avoid blanks) ###
+      iotempire
+
+  After your changes, it might for example look like this:
+  
+  ..  code-block:: bash
+
+      ### WiFi Name (avoid blanks) ###
+      my-iot-network
+      ### Password (at least 8 characters, max 32, avoid blanks) ###
+      secretpassword
 
   This configures the pi as a WiFi-router.
   Remember the ``WiFi Name`` and ``Password`` so you can log in to
   the WiFi network of the Pi from your computer.
 
-- If you have access to ethernet (for example a free ethernet lan port on your
+- If you have access to ethernet (for example a free ethernet lan port/socket
+  on your
   router), connect the Pi to this ethernet port so that your Pi can access the
   internet - no extra configuration is necessary for this.
-  If you do not have access to an ethernet port just move to the next step.
+  You can also connect an Android-phone with its charging cable to one of
+  the USB ports of the pi and enable USB-tethering (if the Android phone) was
+  connected to wifi before it forward its ethernet to the pi gateway.
+  If you do not have access to an ethernet port or an Android phone
+  just move to the next step.
   [#f1]_
 
 - Put the sd-card into a Raspberry Pi 3 and power it up.
@@ -44,8 +58,10 @@ Accessing the Local Services on the Raspberry Pi
 
 - You can now access UlnoIoT via a web browser.
 
-- Point your browser at https://ulnoiotgw (or https://ulnoiotgw.local or
-  sometimes https://192.168.12.1). Accept
+- Point your browser at https://192.168.12.1, https://ulnoiotgw,
+  or https://ulnoiotgw.local. One of them should open the homepage of
+  your ulnoiot pi gateway installation.
+  Accept
   the security exception for the locally generated security certificate. You
   should now see a link to the filesystem through cloud commander
   and an IoT system example configuration folder on the pi,
@@ -55,8 +71,20 @@ Accessing the Local Services on the Raspberry Pi
 - If you are asked for a user, use ``ulnoiot``, if you are asked for a password
   use ``iotempire``.
 
+- Keep this home-page for for later (remember or bookmark).
+
+- Now open in another tab this documentation locally on the gateway:
+
+  This will be either https://192.168.12.1/doc/quickstart-pi.rst,
+  https://ulnoiotgw/doc/quickstart-pi.rst,
+  or https://ulnoiotgw.local/doc/quickstart-pi.rst.
+
+  Continue to read the documentation from there.
+
 - Open the link to the `IoT system example configuration folder
-  </cloudcmd/fs/home/ulnoiot/iot-test>`_, you should now see you filesystem
+  </cloudcmd/fs/home/ulnoiot/iot-test>`_ (this link only works if you
+  opened it from the previously opened local documentation),
+  you should now see your filesystem
   inside the IoT-test folder, listing a ``node1``-folder, a ``README.rst`` and
   a ``system.conf`` file. For now, ignore a potential second file panel to
   the right, we will first just concentrate here on the active panel.

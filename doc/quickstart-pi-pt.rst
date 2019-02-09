@@ -13,8 +13,8 @@ Configurando o roteador WiFi no seu Raspberry Pi
 - Encontre o arquivo chamado ``wifi-setup.txt`` (no Windows a extensão
   ``.txt`` talvez não apareça). 
 
-- Abra o arquivo ``wifi.txt`` e modifique os valores 
-  (#iotempire-123456 e iotempire) abaixo do ``Wifi Name`` e ``Password`` 
+- Abra o arquivo ``wifi.txt`` e modifique os valores
+  (#iotempire-123456 e iotempire) abaixo do ``Wifi Name`` e ``Password``
   por um nome e password de sua preferência. Certifique-se que seu password
   tenha mais de 8 caractéres. 
 
@@ -47,17 +47,16 @@ Acessando os serviços locais no Raspberry Pi
 
 - Conecte ao UlnoIoT através de um navegador web.
 
-  - No seu navegador acesse o endereço https://ulnoiotgw 
-    (ou https://ulnoiotgw.local se os dois não funcionarem 
-    tente https://192.168.12.1).
+  - No seu navegador acesse o endereço https://192.168.12.1, https://ulnoiotgw,
+    ou https://ulnoiotgw.local.
 
     Se não aceitou a exceção de segurança anteriormente aceite-a agora
-    para gerar o certificado de segurança local. 
+    para gerar o certificado de segurança local.
 
   - Se for pedido um nome de usuário e password, use ``ulnoiot`` como nome e
     ``iotempire`` como password.
 
-  - Você deverá ver agora a home page do seu UlnIoT local.  
+  - Você deverá ver agora a home page do seu UlnIoT local.
 
 - Abra o link `IoT system example configuration folder
   </cloudcmd/fs/home/ulnoiot/iot-test>`_,
@@ -90,7 +89,7 @@ Agora você pode continuar com seu `Primeiro Node IoT <first-node-pt.rst>`_.
 
 .. rubric:: Notas de rodapé
 
-.. [#f1] Se seu Raspberry Pi não estiver conectado à internet, um computador 
+.. [#f1] Se seu Raspberry Pi não estiver conectado à internet, um computador
    logado em sua Rede Wi-Fi pode mudar de volta para outra rede Wi-Fi
    automaticamente por preferir redes com conexão com à internet.
    Certifique-se de verificar se você está conectado à rede de Pi

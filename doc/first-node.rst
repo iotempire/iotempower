@@ -79,8 +79,9 @@ Also note that the board does not have a display so we will use the blue LED
 
 -   If there is an *Internet may not be available* warning click *OK*.
 
--   TODO: Insert image of WiFi credentials on the smart phone!
-    You should be automatically forwarded to a web page like the one on the
+..   TODO: Insert image of WiFi credentials on the smart phone!
+
+-   You should be automatically forwarded to a web page like the one on the
     image (similar to logging into an open WiFi in a cafe or an airport).
     If that does not happen automatically, open any web browser on your phone
     and type http://192.168.4.1 into the URL selection box and click on
@@ -95,7 +96,7 @@ Also note that the board does not have a display so we will use the blue LED
 -   If you have done this correctly, the node will reboot and
     the led will start blinking very rapidly continuously.
     If it starts blinking the unique pattern again
-    or stays on or off all the time off,
+    or stays on or off all the time,
     it means you have not configured it correctly.
     Then you have to repeat the previous step.
 
@@ -127,13 +128,13 @@ Adopting the Node in the UlnoIoT environment on the Raspberry Pi
   -  You should now see the home page for your local UlnoIoT installation.
 
 - Click on the link `IoT system example configuration folder
-  <https://ulnoiotgw.local/cloudcmd/fs/home/ulnoiot/iot-test/>`_ to navigate to
+  </cloudcmd/fs/home/ulnoiot/iot-test/>`_ to navigate to
   the folder where the templates are.
 
 .. TODO: provide image of the Iot system example page!
 
 - Then, navigate into the `node1
-  <https://ulnoiotgw.local/cloudcmd/fs/home/ulnoiot/iot-test/node1/>`_ folder.
+  </cloudcmd/fs/home/ulnoiot/iot-test/node1/>`_ folder.
 
 .. TODO: provide image of the Folder node1!
 
@@ -167,7 +168,7 @@ Adopting the Node in the UlnoIoT environment on the Raspberry Pi
 
 Congratulations!! Your node is now connect to UlnIoT and the onboard-led can
 be controlled with Node-RED using the button on this page
-`<https://ulnoiotgw/nodered/ui/#/1>`_.
+`</nodered/ui/#/1>`_.
 
 Top: `ToC <index-doc.rst>`_, Previous: `Installation <installation.rst>`_,
 Next: `Second Node <second-node.rst>`_.

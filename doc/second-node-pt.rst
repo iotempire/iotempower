@@ -18,16 +18,18 @@ Novo Node
 ---------
 
 -   Navegue de volta para a sua `IoT system example configuration folder
-    <https://ulnoiotgw.local/cloudcmd/fs/home/ulnoiot/iot-test/>`_.
+    </cloudcmd/fs/home/ulnoiot/iot-test/>`_.
 
     Como você pode notar, cada Node tem sua própria pasta de configuração
     no UlnoIoT.
 
 -   Precisamos, portanto, criar outra pasta para o segundo Node.
-    Nós podemos rapidamente crie uma pasta usando como modelo o `node-template`.
+    Nós podemos rapidamente crie uma pasta usando como modelo
+    o `node-template`.
 
     Para isso, certifique-se de que você ainda esteja na pasta
-    `example system configuration` e ative novamente o menu do usuário clicando neste botão:
+    `example system configuration` e ative novamente o menu do usuário
+    clicando neste botão:
 
     .. image:: /doc/images/user-menu-button.png
 
@@ -42,7 +44,8 @@ Novo Node
 
 -   Selecione a nova pasta usando o mouse ou o teclado
     e pressione o botão renomear
-    `rename button` na parte de baixo da tela (ou a tecla F2) e renomeie a pasta para ``node2``.
+    `rename button` na parte de baixo da tela (ou a tecla F2) e
+    renomeie a pasta para ``node2``.
 
 -   Navegue até a pasta ``node2``, você deverá ver agora os seguintes arquivos:
     ``README.rst``, ``key.txt``, ``node.conf`` e ``setup.cpp``.
@@ -143,6 +146,6 @@ o estado do LED. Para isso estude os nós `rbe` e `toggle` no Node-RED.
 
 
 Topo: `ToC <index-doc.rst>`_ , Anterior: `Primeiro Node <first-node-pt.rst>`_ ,
-Próximo: `External Resourses <resources.rst>`_.
+Próximo: `External Resources <resources.rst>`_.
 `English version of this page is here <second-node.rst>`_.
 
