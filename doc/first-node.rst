@@ -32,13 +32,15 @@ on your Raspberry Pi to pre-flash your device.
 Setting up the WiFi credentials on the node
 -------------------------------------------
 
--   Note that this instructions are for reconfiguring
-    the WiFi credentials on nodes
-    that have been pre-installed with UlnIoT and can be flashed over wireless
-    (over the air - OTA - the ones used in the classroom should be ready).
-    If your node has never been flashed with UlnoIoT before,
-    follow this tutorial here `First Flash page <pre-flash.rst>`_
-    for the first preparation.
+Note that this instructions are for reconfiguring the WiFi credentials on nodes
+that have been pre-installed with UlnIoT and can be flashed over wireless 
+(over the air - OTA - the ones used in the classroom should be ready).
+If your node has never been flashed with UlnoIoT before,
+follow this tutorial here `First Flash page <pre-flash.rst>`_
+for the first preparation.
+
+Also note that the board does not have a display so we will use the blue LED
+(the onboard light) to indicate the different configuration states. Pay attention on LED during the whole process, whether it is on or off and how it is blinking because this will indicate if the steps are successfully wroking or not.
 
 ..   TODO: Insert image of the button shield!
 

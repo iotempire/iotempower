@@ -13,7 +13,7 @@ Configurando o roteador WiFi no seu Raspberry Pi
 - Encontre o arquivo chamado ``wifi-setup.txt`` (no Windows a extensão
   ``.txt`` talvez não apareça). 
 
-- Abra o arquivo ``wifi-setup.txt`` e modifique os valores 
+- Abra o arquivo ``wifi.txt`` e modifique os valores 
   (#iotempire-123456 e iotempire) abaixo do ``Wifi Name`` e ``Password`` 
   por um nome e password de sua preferência. Certifique-se que seu password
   tenha mais de 8 caractéres. 

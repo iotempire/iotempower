@@ -24,25 +24,25 @@ Novo Node
     no UlnoIoT.
 
 -   Precisamos, portanto, criar outra pasta para o segundo Node.
-    Nós podemos rapidamente
-    crie uma pasta usando como modelo o `node-template`.
+    Nós podemos rapidamente crie uma pasta usando como modelo o `node-template`.
 
     Para isso, certifique-se de que você ainda esteja na pasta
-    `example system configuration` pasta e ative novamente o menu do usuário.
+    `example system configuration` e ative novamente o menu do usuário clicando neste botão:
+
+    .. image:: /doc/images/user-menu-button.png
 
     No menu do usuário,
-    selecione ``Create New Node Folder`` e depois de verificar
-    o caminho de destino (que deve ser ``iot-test/``), selecione
+    selecione ``Create New Node Folder`` e depois de verifique se
+    o caminho de destino está correto (ele deve ser ``iot-test/``), selecione
     ``Yes, run create_node_template``. Certifique a a criação teve sucesso
-    e aperte ``OK`` e você voltará ao painel de arquivos do cloudcmd.
+    e aperte ``OK`` e você voltará ao painel de arquivos do cloudcmd no navegador.
 
     Você deve ver lá uma nova pasta chamada `new-node`
-    (em baixo da pasta antiga
-    ``node1``, do ``README.rst`` do ``system.conf``).
+    (em baixo da pasta ``node1``, do ``README.rst`` do ``system.conf``).
 
 -   Selecione a nova pasta usando o mouse ou o teclado
     e pressione o botão renomear
-    `rename button` (ou a tecla F2) e renomeie a pasta para ``node2``.
+    `rename button` na parte de baixo da tela (ou a tecla F2) e renomeie a pasta para ``node2``.
 
 -   Navegue até a pasta ``node2``, você deverá ver agora os seguintes arquivos:
     ``README.rst``, ``key.txt``, ``node.conf`` e ``setup.cpp``.
@@ -51,12 +51,14 @@ Novo Node
     *Wemos D1 Mini* como um novo Node, edite o
     ``node.conf`` trocando o nome
     `Wemos D1 Mini` pelo nome da placa que irá usar.
+    Se estiver usando *Wemos D1 Mini* não é preciso fazer nada.
 
 -   Certifique-se de abrir outra `ulnoiot documentation web-page </>`_ para
     referência. Abra a `command reference </doc/node_help/commands.rst>`_.
 
     Nos arquivos, selecione ``setup.cpp``
-    e edite-o (com o botão de edição `edit button` ou a tecla F4).
+    e edite-o (com o botão de edição `edit button` 
+    na parte inferior da tela  ou a tecla F4).
 
     Você deve ver um pequeno bloco de comentários explicativos.
     Você deverá agora
@@ -84,8 +86,8 @@ Novo Node
     credenciais de rede WiFi do Node e dentro da pasta ``Node 2``
     aperte o botão `adopt/initialize` localizado no menu do usuário).
 
-Programando as conexões visualmente
-------------------------------------
+Programando as conexões visualmente no Node-RED
+-----------------------------------------------
 
 -   Após a adoção bem-sucedida, abra a página `Node-RED </nodered/>`_.
     Aqui, você
