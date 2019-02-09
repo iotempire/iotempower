@@ -47,16 +47,26 @@ Acessando os serviços locais no Raspberry Pi
 
 - Conecte ao UlnoIoT através de um navegador web.
 
-  - No seu navegador acesse o endereço https://192.168.12.1, https://ulnoiotgw,
-    ou https://ulnoiotgw.local.
+- No seu navegador acesse o endereço https://192.168.12.1, https://ulnoiotgw,
+  ou https://ulnoiotgw.local.
 
-    Se não aceitou a exceção de segurança anteriormente aceite-a agora
-    para gerar o certificado de segurança local.
+  Se não aceitou a exceção de segurança anteriormente aceite-a agora
+  para gerar o certificado de segurança local.
 
-  - Se for pedido um nome de usuário e password, use ``ulnoiot`` como nome e
-    ``iotempire`` como password.
+- Se for pedido um nome de usuário e password, use ``ulnoiot`` como nome e
+  ``iotempire`` como password.
 
-  - Você deverá ver agora a home page do seu UlnIoT local.
+- Você deverá ver agora a home page do seu UlnIoT local.
+
+- Guarde esta home page para mais tarde (lembre-se ou use os favoritos).
+
+- Agora abra uma outra aba esta documentação localmente no gateway:
+
+  Este será https://192.168.12.1/doc/quickstart-pi.rst,
+  https: //ulnoiotgw/doc/quickstart-pi.rst
+  ou https: //ulnoiotgw.local/doc/quickstart-pi.rst .
+
+- Continue a ler a documentação de lá.
 
 - Abra o link `IoT system example configuration folder
   </cloudcmd/fs/home/ulnoiot/iot-test>`_,
