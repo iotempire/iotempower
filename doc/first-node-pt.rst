@@ -33,13 +33,15 @@ para saber como instalar pela primeira vez o UlnIoT em uma placa.
 Configurando as credenciais do WiFi no seu primeiro node
 --------------------------------------------------------
 
-- Note que essa instruções são para reconfigurar os dados WiFi em nodes
-  onde o firmware do UlnIoT já pré-instalado e por isso podem ser
-  configurados sem fio ( com *over the air - OTA* - os nodes usados em sala
-  de aula já estão configurados para tal).
-  Se o seu node nunca foi instalado com UlnIoT antes siga as instrução desse
-  tutorial aqui `First Flash page <pre-flash.rst>`_
-  para a primeira instalação.
+Note que essa instruções são para reconfigurar os dados WiFi em nodes
+onde o firmware do UlnIoT já pré-instalado e por isso podem ser
+configurados sem fio ( com *over the air - OTA* - os nodes usados em sala
+de aula já estão configurados para tal).
+Se o seu node nunca foi instalado com UlnIoT antes siga as instrução desse
+tutorial aqui `First Flash page <pre-flash.rst>`_
+para a primeira instalação.
+
+Note também que a placa não tem uma tela então usaremos LED azul (a luzinha de sua placa) para indicar os diferentes estados de configuração. Então, preste atenção no LED durante todo processo, se ele está aceso ou apagado e como está piscando pois ele é o indicativo se o processo está dando certo ou não. 
 
 - Agora vamos começar. Conecte um botão, no caso do Wemos D1 Mini, ao pino
   D3 (outras placas costumam ser no pino 0) e o Ground (terra) ou conecte
@@ -57,7 +59,7 @@ Configurando as credenciais do WiFi no seu primeiro node
 - Se você executou o passo anterior corretamente o node deverá está agora
   no modo de adoção e o LED da node deverá estar piscando em um padrão
   único com se fosse um código Morse: Algumas piscadas longas e outras
-  curtas, por exemplo 3 piscada longa e 2 curtas.
+  curtas, por exemplo 3 piscadas longas e 2 curtas.
   Preste atenção neste padrão e conte quantas piscadas longas e curtas ele
   tem pois esse numero será usado para identificar a rede WiFi da seu node
   no próximo passo.
@@ -67,21 +69,21 @@ Configurando as credenciais do WiFi no seu primeiro node
   de redes WiFi e terá um nome parecido com ``ulnoiot-ab-mn``. ``ab``
   representam um identificar único e ``mn`` representa justamente o número de
   piscadas longas e curtas respectivamente referente ao padrão do seu node.
-  Por exemplo ``uiot-node-ab-12`` seriam 1 piscada longa e 2 curtas.
+  Por exemplo em ``uiot-node-ab-12`` o ``12``no fim significa 1 piscada longa e 2 curtas.
 
 Em sala de aula poderemos ter muitas redes WiFi com nomes parecidos.
 Certifique-se que o padrão da rede que irá escolher corresponda ao
 padrão de piscadas do seu node (se existe outras redes com o mesmo padrão
 escolha a rede com o sinal mais forte das duas).
 
-- Clique na rede certa para conectar com o WiFi do seu node.
+- Clique na rede certa e conecte com o WiFi do seu node.
 
 - Se aparecer uma mensagem de alerta dizendo
   *Internet pode não está disponível* não tem problema. Click *OK*.
 
 - Você deverá ser levado automaticamente a uma página web (parecida com
   aquelas quando conectamos ao WiFi de aeroportos ou alguns cafés).
-  Se esta página não aparecer automaticamente abra um navegador
+  Se esta página não aparecer automaticamente abra um navegador web
   (chrome por exemplo) e digite o url http://192.168.4.1 na caixa de endereço
 
 - Clique no botão ``Configure WiFi``.
@@ -92,10 +94,11 @@ escolha a rede com o sinal mais forte das duas).
   com o ``WiFi Name`` e ``Password`` e clique no botão *save*.
 
 - Se você executou o passo anterior corretamente, o seu node deverá
-  reiniciar automaticamente e o LED deverá acender continuamente.
+  reiniciar automaticamente e o LED deverá começar a piscar muito rapidamente.
   Se o LED começar a piscar em um padrão único novamente de piscadas
-  longas e curtas significa que o passo anterior falhou e você terá que
-  repeti-lo.
+  longas e curtas (código Morse), tiver aceso ou apagado significa que os 
+  passos anterioriores falharam e você terá que repeti-los novamente.
+  Se falhar novamente tente usar outro node pois este pode estar com defeito.
 
 - Agora o seu node está pronto para ser adotado pelo sistema UlnoIoT
   no Raspberry Pi.
@@ -119,7 +122,7 @@ para gerar o certificado de segurança local.
 - Se for pedido um nome de usuário e password, use ``ulnoiot`` como nome e
   ``iotempire`` como password.
 
-- Você deverá ver agora a home page do seu UlnIoT local.
+- Você deverá ver agora a home page do seu UlnoIoT local.
 
 - Abra o link `IoT system example configuration folder
   </cloudcmd/fs/home/ulnoiot/iot-test>`_, você deve ver
@@ -142,7 +145,7 @@ para gerar o certificado de segurança local.
   .. image:: /doc/images/user-menu-button.png
 
 
-- Você deverá está vendo agora um menu com alguns botões.
+- Você deverá está vendo agora o menu do usuário com alguns botões.
 
 - Clique no botão chamado ``Adopt/Initialize`` e verifique novamente se você
   está na pasta``node1``. Agora aperte no botão ``Yes, run initialize`` para
@@ -155,8 +158,7 @@ para gerar o certificado de segurança local.
   significa que processo falhou. Neste caso, por favor acesse o arquivo
   `troubleshooting <troubleshooting.rst>`_ para mais informações.
 
-Parabéns! Seu node agora está conectado ao UlnIoT e o LED da placa pode ser
-controlado usando o botão desse programa Node-RED
+Parabéns! Seu node agora está conectado ao UlnIoT. Você pode ligar e desligar o LED da placa pode usando esse programa Node-RED do link
 `<https://ulnoiotgw/nodered/ui/#/1>`_
 
 Topo: `ToC <index-doc.rst>`_, Anterior: `Installation <installation.rst>`_,

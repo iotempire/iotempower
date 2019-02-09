@@ -12,7 +12,7 @@ Setting up the WiFi-Router on the Pi
 - Find the ``wifi-setup.txt`` file
   (Windows might not show the ``.txt`` extension)
 
-- Edit this ``wifi-setup.txt`` file. Change the default values under
+- Edit this ``wifi.txt`` file. Change the default values under
   ``Wifi Name`` (#iotempire-123456) and ``Password`` (iotempire) to your own
   values. Make sure that ``Password`` is longer than 8 characters.
 
