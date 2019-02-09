@@ -44,10 +44,17 @@ Examples
 
 ..  code-block:: cpp
 
+    // default ssd1306 128x64 i2c display
     display(dp1).i2c(D4, D3).with_address(0x78);
+
+    // small Wemos D1 Mini SSD1306 64x48 display shield
+    U8G2_SSD1306_64X48_ER_F_HW_I2C u8g2(U8G2_R0); // R0 no rotation, R1 - 90°
+    display(oled, u8g2, u8g2_font_profont29_mf);
+
+    // Relatively large two line display in many sensor-kits
     display44780(display2, 16, 2);
 
-    TODO: add small display shield example
+
 
 Now the first display can be controlled via sending to the mqtt-broker
 to the topic ``node_topic/dp1`` different text or commands (second one
