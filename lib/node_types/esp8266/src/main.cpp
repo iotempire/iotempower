@@ -274,6 +274,8 @@ void connectToWifi() {
     Serial.println(my_hostname);
     WiFi.mode(WIFI_STA);
 
+    Serial.println("OTA Ready.");
+
     if(reconfig_mode_active) {
         // use last known configuration (configured in WifiManager)
         Serial.println("Using last wifi credentials in adopt mode.");
@@ -282,7 +284,6 @@ void connectToWifi() {
         Serial.println("Setting wifi credentials.");
         WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
     }
-    MDNS.begin(my_hostname);
 }
 
 void onWifiDisconnect(const WiFiEventStationModeDisconnected &event) {
@@ -305,9 +306,9 @@ void connectToMqtt() {
 void onWifiConnect(const WiFiEventStationModeGotIP &event) {
     Serial.print("Connected to Wi-Fi with IP: ");
     Serial.println(WiFi.localIP());
+    MDNS.begin(my_hostname);
     // start ota
     ArduinoOTA.begin();
-    Serial.println("OTA Ready.");
     wifi_connected = true;
     connectToMqtt();
 }
@@ -412,10 +413,11 @@ void setup() {
 
     WiFi.setSleepMode(WIFI_NONE_SLEEP); // TODO: check if this works
 
+    WiFi.disconnect();
+
     // Try already to bring up WiFi
     wifiConnectHandler = WiFi.onStationModeGotIP(onWifiConnect);
     wifiDisconnectHandler = WiFi.onStationModeDisconnected(onWifiDisconnect);
-    connectToWifi();
 
 
     // // This reboot and wait might not be necessary
@@ -460,6 +462,9 @@ void setup() {
     // now in wifi
     // ArduinoOTA.begin();
     // Serial.println("OTA Ready.");
+
+    // ota prepared, trigger connect
+    connectToWifi();
 
     // TODO: check if port is configurable
 
