@@ -413,8 +413,9 @@ void setup() {
 
     WiFi.setSleepMode(WIFI_NONE_SLEEP); // TODO: check if this works
 
-    WiFi.disconnect();
-
+    WiFi.disconnect(true); // reall force disconnect
+    delay(100);
+    
     // Try already to bring up WiFi
     wifiConnectHandler = WiFi.onStationModeGotIP(onWifiConnect);
     wifiDisconnectHandler = WiFi.onStationModeDisconnected(onWifiDisconnect);
