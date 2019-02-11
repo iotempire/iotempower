@@ -106,11 +106,10 @@ EOF
 # network migration
 #    echo "// no wifi credentials" > "$dest_dir/src/wifi-config.h"
 
-        cat > "$dest_dir/src/wifi-config.h" << EOF
+cat > "$dest_dir/src/wifi-config.h" << EOF
 #define WIFI_SSID "$ULNOIOT_AP_NAME_FULL"
 #define WIFI_PASSWORD "$ULNOIOT_AP_PASSWORD"
 EOF
-
 
 else
     echo "Not in node directory."

@@ -259,7 +259,8 @@ static char *my_hostname;
 
 void connectToWifi() {
     // Start WiFi connection and register hostname
-    Serial.println("Connecting to Wi-Fi...");
+    Serial.print("Trying to connect to Wi-Fi with name ");
+    Serial.println(WIFI_SSID);
     Serial.print("Registering hostname: ");
     if(reconfig_mode_active) {
         my_hostname = (char *)"ulnoiot-adoptee"; // TODO: define in defaults
