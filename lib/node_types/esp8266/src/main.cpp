@@ -306,7 +306,7 @@ void connectToMqtt() {
 void onWifiConnect(const WiFiEventStationModeGotIP &event) {
     Serial.print("Connected to Wi-Fi with IP: ");
     Serial.println(WiFi.localIP());
-    MDNS.begin(my_hostname);
+//    MDNS.begin(my_hostname); // just include necessary?
     // start ota
     ArduinoOTA.begin();
     wifi_connected = true;
