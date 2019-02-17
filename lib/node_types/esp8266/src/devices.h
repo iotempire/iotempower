@@ -154,6 +154,13 @@
 #define rgb_matrix(name, ...) ULNOIOT_DEVICE(name, rgb_matrix_, ##__VA_ARGS__)
 
 
+// after rgb because of WAIT macro overload
+#include <gesture-apds9960.h>
+#define gesture_apds9960_(internal_name, ...) \
+    ULNOIOT_DEVICE_(Gesture_Apds9960, internal_name, ##__VA_ARGS__)
+#define gesture_apds9960(name, ...) ULNOIOT_DEVICE(name, gesture_apds9960_, ##__VA_ARGS__)
+
+
 #include <animator.h>
 #define animator_(internal_name, ...) \
     ULNOIOT_DEVICE_(Animator, internal_name, ##__VA_ARGS__)

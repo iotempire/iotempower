@@ -47,6 +47,9 @@ input(button1, D3, "released", "pressed")
 // });
 // analog(a0).with_filter_callback(filter_average(int, 100, IN(a0));
 
+// gestue/color/proximity
+gesture_apds9960(gesture);
+
 // edge_counter example
 // Count rising and falling signals on D2=Pin(4) and
 // report number counted at myroom/test1/shock1.
