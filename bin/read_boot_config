@@ -11,7 +11,7 @@ if [[ -e "$_BOOT_CONFIG" ]]; then
 fi
 
 if [[ -e "$_WIFI_CONFIG" ]]; then
-    mapfile -t lines < <(egrep -v '\w*#|^$' "$_WIFI_CONFIG")
+    mapfile -t lines < <(sed 's/\r$//' "$_WIFI_CONFIG"| egrep -v '\w*#|^$')
     count=${#lines[@]}
     if [[ $count -eq 1 ]]; then  # only one param given -> ULNOIOT_AP_PASSWORD
         add_id=1
@@ -47,7 +47,7 @@ if [[ -e "$_WIFI_CONFIG" ]]; then
 fi
 
 if [[ -e "$_WIFI_IN_CONFIG" ]]; then
-    mapfile -t lines < <(egrep -v '\w*#|^$' "$_WIFI_IN_CONFIG")
+    mapfile -t lines < <(sed 's/\r$//' "$_WIFI_IN_CONFIG" | egrep -v '\w*#|^$')
     count=${#lines[@]}
     if [[ $count -eq 2 ]]; then  # only one param given -> ULNOIOT_AP_PASSWORD
         uiot_wifi_name="${lines[0]}"
