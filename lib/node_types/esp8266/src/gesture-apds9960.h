@@ -18,8 +18,9 @@ class Gesture_Apds9960 : public I2C_Device {
     private:
         SparkFun_APDS9960 *sensor = NULL;
         unsigned long last_read;
+        uint8_t _proximity_threshold; 
     public:
-        Gesture_Apds9960(const char* name);
+        Gesture_Apds9960(const char* name, uint8_t proximity_threshold=50);
         void start();
         bool measure();
 };

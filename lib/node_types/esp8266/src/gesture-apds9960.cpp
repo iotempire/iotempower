@@ -1,9 +1,10 @@
 // gesture-apds9960.cpp
 #include "gesture-apds9960.h"
 
-Gesture_Apds9960::Gesture_Apds9960(const char* name) :
+Gesture_Apds9960::Gesture_Apds9960(const char* name, uint8_t proximity_threshold) :
     I2C_Device(name) {
     
+    _proximity_threshold = proximity_threshold;
     add_subdevice(new Subdevice("color")); // 0
     add_subdevice(new Subdevice("proximity")); // 1
     add_subdevice(new Subdevice("gesture")); // 2
@@ -23,7 +24,7 @@ void Gesture_Apds9960::start() {
             ulog("Something went wrong during APDS-9960 init!");
             return;
         }
-        if (sensor->enableGestureSensor(true)) {
+        if (sensor->enableGestureSensor(false)) {
             ulog("Gesture sensor is now running");
         } else {
             ulog("Something went wrong during gesture sensor init!");
@@ -44,7 +45,7 @@ void Gesture_Apds9960::start() {
         }
         
         // Start running the APDS-9960 proximity sensor (interrupts)
-        if ( sensor->enableProximitySensor(true) ) {
+        if ( sensor->enableProximitySensor(false) ) {
             ulog("Proximity sensor is now running");
         } else {
             ulog("Something went wrong during sensor init!");
@@ -83,7 +84,10 @@ bool Gesture_Apds9960::measure() {
     if ( !sensor->readProximity(proximity_data) ) {
         ulog("Error reading proximity value");
     } else {
-        measured_value(1).from((int)proximity_data);
+        if(proximity_data > _proximity_threshold)
+            measured_value(1).from(1);
+        else if(proximity_data < 1)
+            measured_value(1).from(0);
     }
     
     if ( sensor->isGestureAvailable() ) {
