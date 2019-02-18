@@ -24,14 +24,6 @@ class Analog : public Device {
             measure();
         }
         bool measure();
-        Analog& with_threshold(int threshold) {
-            _high = "on";
-            _low = "off";
-            if(threshold > 1024) threshold=1024;
-            else if(threshold < 0) threshold=0;
-            _threshold = threshold;
-            return *this;
-        }
         Analog& with_threshold(int threshold, const char* high, const char* low) {
             _high = high;
             _low = low;
@@ -39,6 +31,9 @@ class Analog : public Device {
             else if(threshold < 0) threshold=0;
             _threshold = threshold;
             return *this;
+        }
+        Analog& with_threshold(int threshold) {
+            return with_threshold(threshold, "on", "off");
         }
         Analog& with_precision(int precision) {
             if(precision < 1) precision = 1;

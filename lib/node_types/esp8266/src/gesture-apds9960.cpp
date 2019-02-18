@@ -1,10 +1,9 @@
 // gesture-apds9960.cpp
 #include "gesture-apds9960.h"
 
-Gesture_Apds9960::Gesture_Apds9960(const char* name, uint8_t proximity_threshold) :
+Gesture_Apds9960::Gesture_Apds9960(const char* name) :
     I2C_Device(name) {
     
-    _proximity_threshold = proximity_threshold;
     add_subdevice(new Subdevice("color")); // 0
     add_subdevice(new Subdevice("proximity")); // 1
     add_subdevice(new Subdevice("gesture")); // 2
@@ -84,10 +83,14 @@ bool Gesture_Apds9960::measure() {
     if ( !sensor->readProximity(proximity_data) ) {
         ulog("Error reading proximity value");
     } else {
-        if(proximity_data > _proximity_threshold)
-            measured_value(1).from(1);
-        else if(proximity_data < 1)
-            measured_value(1).from(0);
+        if(_threshold == 0) {
+            measured_value(1).from((unsigned int)proximity_data);
+        } else {
+            if(proximity_data <= _threshold)
+                measured_value(1).from(_high);
+            else
+                measured_value(1).from(_low);
+        }
     }
     
     if ( sensor->isGestureAvailable() ) {
