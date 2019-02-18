@@ -23,14 +23,8 @@ void Gesture_Apds9960::start() {
             ulog("Something went wrong during APDS-9960 init!");
             return;
         }
-        if (sensor->enableGestureSensor(false)) {
-            ulog("Gesture sensor is now running");
-        } else {
-            ulog("Something went wrong during gesture sensor init!");
-            return;
-        }
 
-        // Start running the APDS-9960 light sensor (no interrupts)
+        // Start light sensor
         if ( sensor->enableLightSensor(false) ) {
             ulog("Light sensor is now running");
         } else {
@@ -38,16 +32,25 @@ void Gesture_Apds9960::start() {
             return;
         }
 
+        // Proximity sensor
         // Adjust the Proximity sensor gain
         if ( !sensor->setProximityGain(PGAIN_2X) ) {
             ulog("Something went wrong trying to set PGAIN");
-        }
-        
+        }        
         // Start running the APDS-9960 proximity sensor (interrupts)
         if ( sensor->enableProximitySensor(false) ) {
             ulog("Proximity sensor is now running");
         } else {
             ulog("Something went wrong during sensor init!");
+            return;
+        }
+
+        // init gesture (after proximity?)
+        if (sensor->enableGestureSensor(false)) {
+            //sensor->setLEDBoost(LED_BOOST_100); // comment from https://github.com/jonn26/SparkFun_APDS-9960_Sensor_Arduino_Library
+            ulog("Gesture sensor is now running");
+        } else {
+            ulog("Something went wrong during gesture sensor init!");
             return;
         }
 
@@ -60,7 +63,7 @@ void Gesture_Apds9960::start() {
 
 bool Gesture_Apds9960::measure() {
     unsigned long current_time = millis();
-    if(current_time - last_read < 100) return false;
+    if(current_time - last_read < 250) return false;
     last_read = current_time; 
 
     uint16_t ambient_light = 0;
