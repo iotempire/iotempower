@@ -3,7 +3,7 @@
 
 ////// Standard libraries
 #include <ArduinoOTA.h>
-#include <ESP8266WebServer.h> //Local WebServer used to serve the configuration portal
+//#include <ESP8266WebServer.h> //Local WebServer used to serve the configuration portal
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
 #include <FS.h>
@@ -11,19 +11,24 @@
 
 ////// adapted libraries
 #include <Ticker.h>
-#include <WiFiManager.h>
+//#include <WiFiManager.h>
 
 // PubSubClient.h and ArduinoMqtt unstable
+// TODO: recheck PubSubClient
 #include <AsyncMqttClient.h>
 
-//// configuration
+// helpers
 #include <device-manager.h>
 #include <toolbox.h>
+
+//// default configuration
 #include <ulnoiot-default.h>
 
+// TODO: move this in own file to shorten compilation time
 // node specific code
 #include "config.h"
-#include "key.h"
+#include "key.h"//// configuration
+
 #include "pins-wrapper.h"
 #include "wifi-config.h"
 
@@ -35,7 +40,7 @@ int long_blinks = 0, short_blinks = 0;
 
 bool wifi_connected = false;
 
-// TODO: find better solution
+// TODO: find better solution (add display support?)
 #ifndef ONBOARDLED
     #pragma "No ONBOARDLED is defined for this board, there will be no indicator led" warning
 #else
@@ -114,136 +119,125 @@ void id_blinker() {
     lasttime = currenttime;
 }
 
+void setup_ota() {
+        // Port defaults to 8266
+    // ArduinoOTA.setPort(8266);
+
+    // TODO: only enter OTA when requested
+
+    ArduinoOTA.onStart([]() {
+        String type;
+        if (ArduinoOTA.getCommand() == U_FLASH)
+            type = "sketch";
+        else // U_SPIFFS
+            type = "filesystem";
+
+        // NOTE: if updating SPIFFS this would be the place to unmount
+        // SPIFFS using SPIFFS.end()
+        Serial.println("Start updating " + type);
+    });
+    ArduinoOTA.onEnd([]() { Serial.println("\nEnd"); });
+    ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
+        Serial.printf("Progress: %u%%\r", progress * 100 / total);
+        // blink led, toggle every percent
+        #ifdef ID_LED
+        digitalWrite(ID_LED, (progress * 100 / total) % 2);
+        #endif
+    });
+    ArduinoOTA.onError([](ota_error_t error) {
+        Serial.printf("Error[%u]: ", error);
+        if (error == OTA_AUTH_ERROR)
+            Serial.println("Auth Failed");
+        else if (error == OTA_BEGIN_ERROR)
+            Serial.println("Begin Failed");
+        else if (error == OTA_CONNECT_ERROR)
+            Serial.println("Connect Failed");
+        else if (error == OTA_RECEIVE_ERROR)
+            Serial.println("Receive Failed");
+        else if (error == OTA_END_ERROR)
+            Serial.println("End Failed");
+    });
+}
+
+
 void reconfigMode() {
-    // go to access-point and reconfiguration mode
+    // go to access-point and reconfiguration mode to allow a new
+    // firmware to be uploaded
 
     char *ap_ssid = (char *)(ULNOIOT_AP_RECONFIG_NAME "-xx-xx");
     const char *ap_password = ULNOIOT_AP_RECONFIG_PASSWORD;
 
-    Serial.println("Reconfiguration requested. Activating AP-mode.");
+    Serial.println("Reconfiguration requested. Activating open AP-mode.");
     WiFi.disconnect(true);
     id_blinker(); //trigger init of random blink pattern
     sprintf(ap_ssid + strlen(ap_ssid) - 5, "%02x-%02d", ESP.getChipId() & 255,
                 long_blinks * 10 + short_blinks);
     Serial.printf("Connect to %s with password %s.\n", ap_ssid, ap_password);
-    WiFiManager wifiManager;
-    wifiManager.setConnectTimeout(3600); // 60 min timeout
+    
+    const char *flash_default_password = ULNOIOT_FLASH_DEFAULT_PASSWORD;
+    Serial.printf("Setting flash default password to %s.\n",
+                    flash_default_password);
+    setup_ota();
+    ArduinoOTA.setPassword(flash_default_password);
+    ArduinoOTA.setHostname(ap_ssid);
 
-    // // parameter test
-    // WiFiManagerParameter test_param("tparam", "test parameter", "123",
-    // 5); wifiManager.addParameter(&test_param);
-    String blink_pattern = "<p>Blink pattern: " + String(long_blinks) +
-                           " longs, " + String(short_blinks) + " shorts</p>";
-    WiFiManagerParameter custom_text1(blink_pattern.c_str());
-    wifiManager.addParameter(&custom_text1);
+   	WiFi.softAP(ap_ssid, ap_password);
+    ArduinoOTA.begin();
+    Serial.println("AP and OTA Ready, waiting 10min for new firmware.");
 
-    // obsolete now as we only use one name
-    // String name_display = "<p>Parameter for initialize in ulnoiot: " +
-    //                       String(ap_ssid + strlen(ap_ssid) - 6) + "</p>";
-    // WiFiManagerParameter custom_text2(name_display.c_str());
-    // wifiManager.addParameter(&custom_text2);
-
-    //  const char * menu[] = {"wifi","param","sep","exit"};
-    //  wifiManager.setMenu(menu,4);
-    //  wifiManager.setShowInfoErase(true); // disable info-field
-
-    // make sure, we head directly to wifi config, when configuration mode
-    // activated
-    wifiManager.setCaptivePortalWifiRedirect(true);
-
-    wifiManager.setConfigPortalBlocking(false); // allow interrupts
-    // wifiManager.autoConnect(ap_ssid, ap_password);
-    //wifiManager.startConfigPortal(ap_ssid, ap_password);
-    wifiManager.startConfigPortal(ap_ssid, "");
-
-    while (1) {
-        if (wifiManager.process())
-            break;
+    unsigned long start_time = millis();
+    while (millis()-start_time < 600000) { // try for 10 minutes
+        ArduinoOTA.handle();
         id_blinker();
-        yield();
+        yield(); // let WiFi do what it needs to do
     }
-    wifiManager.stopWebPortal();
-    WiFi.softAPdisconnect(false); // stop accesspoint mode
-    if (wifiManager.getLastConxResult() ==
-        WL_CONNECTED) { // there was a connection made
-        // trigger reconfigurability (flash with default password) after
-        // next reboot
-        Serial.println("Requesting password reset on next boot.");
-        int magicSize = sizeof(ULNOIOT_RECONFIG_MAGIC);
-        char rtcData[magicSize];
-        strncpy(rtcData, ULNOIOT_RECONFIG_MAGIC, magicSize);
-        ESP.rtcUserMemoryWrite(0, (uint32_t *)rtcData, magicSize);
-    } // TODO: consider going back to configuration mode if not successful
-    //WiFi.disconnect(true); // free WiFi
+    // Serial.println("Requesting password reset on next boot.");
+    // int magicSize = sizeof(ULNOIOT_RECONFIG_MAGIC);
+    // char rtcData[magicSize];
+    // strncpy(rtcData, ULNOIOT_RECONFIG_MAGIC, magicSize);
+    // ESP.rtcUserMemoryWrite(0, (uint32_t *)rtcData, magicSize);
     reboot(); // Always reboot after this to free all eventually not freed
-              // memory used by WiFiManager
-              // TODO: go directly to OTA-mode for a while and then quit
+              // memory
 }
 
 static bool reconfig_mode_active=false;
 static bool adopt_flash_toggle = false;
 
 void flash_mode_select() {
-    // Check if flash with default password is requested
-    int magicSize = sizeof(ULNOIOT_RECONFIG_MAGIC);
-    char rtcData[magicSize];
-    rtcData[magicSize] = 0;
-    ESP.rtcUserMemoryRead(0, (uint32_t *)rtcData, magicSize);
-    if (memcmp(rtcData, ULNOIOT_RECONFIG_MAGIC, magicSize) == 0) {
-        reconfig_mode_active = true;
-        Serial.println("Reconfiguration mode requested.");
-        // reset request
-        rtcData[0] = 0;
-        rtcData[1] = 0;
-        ESP.rtcUserMemoryWrite(0, (uint32_t *)rtcData, magicSize);
+    // Check specific GPIO port if pressed and unpressed 2-4 times
+    // to enter reconfiguration mode (allow generic reflash in AP
+    // mode)
+    Serial.println("Allow 5s to check if reconfiguration and AP "
+                    "mode is requested.");
+    int last = 1, toggles = 0;
+    // blink a bit to show that we have booted and waiting for
+    // potential input
 
-        // // debug read back
-        // ESP.rtcUserMemoryRead(0, (uint32_t*) rtcData, magicSize);
-        // Serial.print("Another comparison yields: ");
-        // Serial.println(memcmp(rtcData,ULNOIOT_RECONFIG_MAGIC,magicSize));
-
-        const char *flash_default_password = ULNOIOT_FLASH_DEFAULT_PASSWORD;
-        Serial.printf("Setting flash default password to %s.\n",
-                      flash_default_password);
-        ArduinoOTA.setPassword(flash_default_password);
-    } else { // do not check for special config mode, when just rebooted out
-             // of it
-        // Check specific GPIO port if pressed and unpressed 2-4 times
-        // to enter reconfiguration mode (allow generic reflash in AP
-        // mode)
-        Serial.println("Allow 5s to check if reconfiguration and AP "
-                       "mode is requested.");
-        int last = 1, toggles = 0;
-        // blink a bit to show that we have booted and waiting for
-        // potential input
-
+    #ifdef ID_LED
+    pinMode(ID_LED, OUTPUT);
+    #endif
+    pinMode(FLASHBUTTON, INPUT_PULLUP); // check flash button (d3 on wemos and
+                                // nodemcu) 
+    for (int i = 0; i < 500; i++) {
         #ifdef ID_LED
-        pinMode(ID_LED, OUTPUT);
+        digitalWrite(ID_LED, (i / 25) % 2);
         #endif
-        pinMode(FLASHBUTTON, INPUT_PULLUP); // check flash button (d3 on wemos and
-                                  // nodemcu) 
-        for (int i = 0; i < 500; i++) {
-            #ifdef ID_LED
-            digitalWrite(ID_LED, (i / 25) % 2);
-            #endif
-            int new_state = digitalRead(0);
-            if (new_state != last) {
-                last = new_state;
-                toggles++;
-            }
-            delay(10);
+        int new_state = digitalRead(0);
+        if (new_state != last) {
+            last = new_state;
+            toggles++;
         }
+        delay(10);
+    }
 
- 
-        if (toggles >= 4 && toggles <= 8) { // was pressed 2-4 times
-            reconfigMode();
-        }
 
-        Serial.println("Continue to boot normally.");
-        // register password-hash for uploading
-        ArduinoOTA.setPasswordHash(keyhash);
+    if (toggles >= 4 && toggles <= 8) { // was pressed 2-4 times
+        reconfigMode();
+    }
 
-    } // endif default password flash mode
+    Serial.println("Continue to boot normally.");
+    // register password-hash for uploading
+    ArduinoOTA.setPasswordHash(keyhash);
 }
 
 ////////////// mqtt
@@ -393,6 +387,7 @@ void onMqttPublish(uint16_t packetId) {
     Serial.println(packetId);
 }
 
+
 void setup() {
     // TODO: setup watchdog
     // TODO: consider not using serial at all and freeing it for other
@@ -408,64 +403,11 @@ void setup() {
     Serial.println(seed_helper);
     randomSeed((unsigned long)seed_helper); 
 
-    // // TODO: is this really necessary or is it better just hardcoded?
-    // if( ! SPIFFS.begin() ) {
-    //   // not formatted?
-    //   Serial.println("Spiff not accessible, formatting...");
-    //   if( SPIFFS.format() ) {
-    //     if( ! SPIFFS.begin() ) {
-    //       Serial.println("Can't format SPIFFS.");
-    //       reboot();
-    //     } else {
-    //       Serial.println("Format successful.");
-    //     }
-    //   }
-    // }
-    // // TODO: read configuration from SPIFFS -> necessary? or better rtc?
-
     flash_mode_select();
 
-    WiFi.setSleepMode(WIFI_NONE_SLEEP); // TODO: check if this works
+    WiFi.setSleepMode(WIFI_NONE_SLEEP); // TODO: check if this works -> for better led-smoothness
 
-    // // This reboot and wait might not be necessary
-    // if (WiFi.waitForConnectResult() != WL_CONNECTED) {
-    //     Serial.println("Connection Failed! Rebooting...");
-    //     reboot();
-    // }
-
-    // Port defaults to 8266
-    // ArduinoOTA.setPort(8266);
-
-    // TODO: only enter OTA when requested
-
-    ArduinoOTA.onStart([]() {
-        String type;
-        if (ArduinoOTA.getCommand() == U_FLASH)
-            type = "sketch";
-        else // U_SPIFFS
-            type = "filesystem";
-
-        // NOTE: if updating SPIFFS this would be the place to unmount
-        // SPIFFS using SPIFFS.end()
-        Serial.println("Start updating " + type);
-    });
-    ArduinoOTA.onEnd([]() { Serial.println("\nEnd"); });
-    ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
-        Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
-    });
-    ArduinoOTA.onError([](ota_error_t error) {
-        Serial.printf("Error[%u]: ", error);
-        if (error == OTA_AUTH_ERROR)
-            Serial.println("Auth Failed");
-        else if (error == OTA_BEGIN_ERROR)
-            Serial.println("Begin Failed");
-        else if (error == OTA_CONNECT_ERROR)
-            Serial.println("Connect Failed");
-        else if (error == OTA_RECEIVE_ERROR)
-            Serial.println("Receive Failed");
-        else if (error == OTA_END_ERROR)
-            Serial.println("End Failed");
-    });
+    setup_ota();
 
 //    WiFi.disconnect(true);
 //    delay(10);

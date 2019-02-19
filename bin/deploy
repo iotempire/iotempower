@@ -88,7 +88,7 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
         elif [[ "$1" ]]; then # address or network name given
             remote="$1"
             if [[ "$2" ]]; then
-                key="$3"
+                key="$2"
             else
                 key=$(tail -n1 key.txt 2>/dev/null|head -c 64)
             fi

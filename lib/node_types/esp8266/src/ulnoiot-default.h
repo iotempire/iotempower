@@ -5,7 +5,7 @@
 
 #define ULNOIOT_RECONFIG_MAGIC "uiotpassreset"
 #define ULNOIOT_AP_RECONFIG_NAME "uiot-node"
-#define ULNOIOT_AP_RECONFIG_PASSWORD "iotempire"
+#define ULNOIOT_AP_RECONFIG_PASSWORD ""
 #define ULNOIOT "ulnoiot"
 #define ULNOIOT_FLASH_DEFAULT_PASSWORD ULNOIOT
 #define ULNOIOT_MAX_DEVICES 32
