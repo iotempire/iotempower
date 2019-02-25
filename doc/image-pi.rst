@@ -1,11 +1,8 @@
 Install UlnoIoT image onto an SD-card
 =====================================
 
-- Download the Raspberry Pi image from here: https://goo.gl/bVgLMr
-  (you might later want to use ssh and upgrade Node-RED dashboard
-  on this image, turns out it is buggy in using the charts. Do:
-  ``sudo npm install -g --unsafe-perm Node-RED-dashboard``)
-
+- Download the Raspberry Pi image from here: https://goo.gl/bVgLMr.
+  
 - Make sure the sha256-checksum of the image is correct. It should be:
 
   ``d49706b299bf95b41813906f9d8eff4e5f1604f0ffc9e9e1bfbb95ef472c0883``
