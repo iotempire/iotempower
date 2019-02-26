@@ -164,14 +164,14 @@ void reconfigMode() {
     // go to access-point and reconfiguration mode to allow a new
     // firmware to be uploaded
 
-    char *ap_ssid = (char *)(ULNOIOT_AP_RECONFIG_NAME "-xx-xx");
+    char *ap_ssid = (char *)(ULNOIOT_AP_RECONFIG_NAME "-xx-xL-xS");
     const char *ap_password = ULNOIOT_AP_RECONFIG_PASSWORD;
 
     Serial.println("Reconfiguration requested. Activating open AP-mode.");
     WiFi.disconnect(true);
     id_blinker(); //trigger init of random blink pattern
-    sprintf(ap_ssid + strlen(ap_ssid) - 5, "%02x-%02d", ESP.getChipId() & 255,
-                long_blinks * 10 + short_blinks);
+    sprintf(ap_ssid + strlen(ap_ssid) - 8, "%02x-%01dL-%01dS", ESP.getChipId() & 255,
+                long_blinks, short_blinks);
     Serial.printf("Connect to %s with password %s.\n", ap_ssid, ap_password);
     
     const char *flash_default_password = ULNOIOT_FLASH_DEFAULT_PASSWORD;
@@ -228,10 +228,11 @@ void flash_mode_select() {
             toggles++;
         }
         delay(10);
+        if (toggles >= 4) break;
     }
 
 
-    if (toggles >= 4 && toggles <= 8) { // was pressed 2-4 times
+    if (toggles >= 4) { // was pressed (and released) at least 2 times
         reconfigMode();
     }
 
