@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+function usage() {
+cat << EOF
+Syntax: ulnoiot_shell
+
+Allow to execute common actions with text/terminal-user-interface interface
+for ulnoiot.
+
+EOF
+}
+
+if [[ $# -gt 0 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
+    usage
+    exit 1
+fi
+
+[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+
+export NODE_PATH="/usr/lib/node_modules:$ULNOIOT_LOCAL/node_modules"
+exec node "$ULNOIOT_ROOT/bin/simple_shell.js"

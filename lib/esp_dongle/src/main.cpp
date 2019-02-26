@@ -1,4 +1,7 @@
-// ESP dongle for ulnoiot
+// firmware for ulnoiot ESP dongle (UED)
+//
+// author: ulno
+// created: 2019-02-22
 
 #define BUFFER_LEN 1460
 #define DISPLAY_BUFFER_LEN 128
@@ -118,7 +121,7 @@ void show() {
 }
 
 void prompt() {
-    Serial.print("CMD>");
+    Serial.print("UED>"); // ulnoiot esp dongle
 }
 
 bool ota_serve(int firmware_size, const char* firmware_md5) {

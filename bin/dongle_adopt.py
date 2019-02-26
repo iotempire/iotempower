@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 #
+# ulnoiot esp dongle adopt/ota driver
+# based on espota.py, modified by ulno
+#
 # Original espota.py by Ivan Grokhotkov:
 # https://gist.github.com/igrr/d35ab8446922179dc58c
 #
@@ -14,8 +17,6 @@
 # Use it like this: python dongle_adopt.py -p <usbport> -f <firmware.bin>
 
 
-from __future__ import print_function
-import socket
 import sys
 import os
 import optparse
@@ -56,15 +57,15 @@ def update_progress(progress):
     sys.stderr.write('.')
     sys.stderr.flush()
 
-def serve(filename, port):
+def serve(node_network, filename, port):
     # Create a serial connection
     ser = serial.Serial(port, 2000000, timeout=15);
     logging.info('Starting on %s.', port)
     ser.read_all()  # discard all
     ser.write(b"\n")
     ser.flush()
-    answer = ser.read_until(b"CMD>").decode()
-    if not answer.endswith("CMD>"):
+    answer = ser.read_until(b"UED>")
+    if not answer.endswith(b"UED>"):
         sys.stderr.write("Trouble communicating with dongle.")
         return 1
 
@@ -75,54 +76,7 @@ def serve(filename, port):
 
     logging.info('Upload size: %d', content_size)
 
-    # show options
-    print("Scanning for devices that can be adopted... ", end='', flush=True)
-    ser.write(b"scan\n")
-    ser.flush()
-    if not ser.read_until(b"!network_scan start\r\n"):
-        sys.stderr.write("Network scan failed.\n")
-        return 1
-
-    node_list = []
-    while(True):
-        l = ser.readline().decode().strip()
-        if (not " " in l) or (l == "!network_scan end"):
-            break
-        strength, name = l.split(" ", 1)
-        strength = int(strength)  # TODO: catch potential error here
-        if name.startswith("uiot-node-"):
-            node_list.append((name[10:], strength))
-
-    print(" done.")
-
-    if len(node_list) == 0:
-        sys.stderr.write("No nodes that can be adopted found.\n")
-        return 1
-
-    # sort by strength
-    node_list.sort(key=lambda x: (x[1],x[0]))
-
-    print("Following nodes found (ranked by strength):")
-    n=1
-    for name,s in node_list:
-        print("%d. %s (%d)"%(n,name,s))
-        n += 1
-
-    while True:
-        n = input("Which one should be adopted? (enter number, default=1) ")
-        if not n:
-            n = 1
-        else:
-            try:
-                n = int(n)
-            except ValueError:
-                n = -1
-        n -= 1
-
-        if n>=0 and n<len(node_list):
-            break
-
-    ser.write(("adopt uiot-node-%s %d %s\n"%(node_list[n][0], content_size, file_md5)).encode())
+    ser.write(("adopt %s %d %s\n"%(node_network, content_size, file_md5)).encode())
     ser.flush()
 
     while(True):
@@ -196,8 +150,14 @@ def parser(unparsed_args):
   group.add_option("-p", "--port",
     dest = "esp_port",
     type = "str",
-    help = "ESP8266 serial port. Default /dev/ttyUSB0",
+    help = "ulnoiot esp dongle serial port (where the dongle is connected). Default /dev/ttyUSB0",
     default = "/dev/ttyUSB0"
+  )
+  group.add_option("-n", "--node",
+    dest = "node_network",
+    type = "str",
+    help = "Node network name to adopt (use scan to list). Must be supplied.",
+    default = None
   )
   parser.add_option_group(group)
 
@@ -205,7 +165,7 @@ def parser(unparsed_args):
   group = optparse.OptionGroup(parser, "Image")
   group.add_option("-f", "--file",
     dest = "image",
-    help = "Image file.",
+    help = "Image file. Must be supplied.",
     metavar="FILE",
     default = None
   )
@@ -251,13 +211,13 @@ def main(args):
   # check options
   global PROGRESS
   PROGRESS = options.progress
-  if not options.image:
-    logging.critical("Not enough arguments.")
+  if not options.image or not options.node_network:
+    logging.critical("Not enough arguments. Image and node have to be supplied.")
 
     return 1
   # end if
 
-  return serve(options.image, options.esp_port)
+  return serve(options.node_network, options.image, options.esp_port)
 # end main
 
 
