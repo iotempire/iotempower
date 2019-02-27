@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# run different ulnoiot esp dongle programs
+#
+
+[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+
+daemon_fifo=/var/tmp/ulnoiot_dongle
+
+command="$1"
+shift 1
+
+if [[ "$command" = daemon ]]; then
+    if [[ -e "$daemon_fifo" ]]; then
+        echo quit >"$daemon_fifo" & # stop old daemon
+        sleep 0.5 # let it stop
+        rm "$daemon_fifo"
+    fi
+    mkfifo -m 600 "$daemon_fifo"
+#    python3 "$ULNOIOT_ROOT/bin/dongle_daemon.py" "$@" <"$daemon_fifo"
+    # not sure why I have to use tail for the fifo and not <$daemon_fifo
+    tail -f "$daemon_fifo" | python3 "$ULNOIOT_ROOT/bin/dongle_daemon.py" "$@"
+    rm "$daemon_fifo"
+elif [[ "$command" = quit ]]; then
+    if [[ -e "$daemon_fifo" ]]; then
+        echo "Sending quit to daemon."
+        echo quit >"$daemon_fifo" & # stop old daemon
+        sleep 0.5 # let it stop
+        rm "$daemon_fifo" &> /dev/null  # should be already deleted
+    fi
+else
+    if [[ -e "$daemon_fifo" ]]; then
+        echo release >"$daemon_fifo" & # release serial
+        sleep 0.1
+    fi
+    python3 "$ULNOIOT_ROOT/bin/dongle_$command.py" "$@"
+    if [[ -e "$daemon_fifo" ]]; then
+        echo connect >"$daemon_fifo" & # connect and resume daemon again
+    fi
+fi

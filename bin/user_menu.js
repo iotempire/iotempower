@@ -175,20 +175,28 @@ function shell_command(question, command, directory = null) {
     }
 }
 
-
-function shell_command_in_path(before_path, after_path, command) {
-    term.wrap('\n\n', before_path, '\n');
+function get_active_dir() {
     var d = process.env.ACTIVE_DIR;
     var fulldir = d;
     if(!d) {
         d = process.cwd();
         fulldir = d;
     }
+    return fulldir;
+}
+
+function get_short_dir(fulldir) {
     // Strip home directory
+    var d = fulldir;
     var home = process.env.HOME;
     if(d.startsWith(home)) d = d.slice(home.length+1);
-    term.wrap(d,'\n');
+    return d;
+}
 
+function shell_command_in_path(before_path, after_path, command) {
+    term.wrap('\n\n', before_path, '\n');
+    var fulldir = get_active_dir();
+    term.wrap(get_short_dir(fulldir),'\n');
     shell_command(after_path, command, fulldir);
 }
 
@@ -204,11 +212,80 @@ function compile() {
         'Are you sure?', "compile");
 }
 
+function function_factory_reduce_param( f, param ) {
+    return function() {f(param);};
+}
 
-function initialize() {
-    shell_command_in_path('You are about to initialize from the following path:',
-        'Are you sure and have you successfully put one node in adoption mode?',
-        "initialize");
+function adopt_selection(node_list, original_list, start) {
+    var fulldir = get_active_dir();
+    var shortdir = get_short_dir(fulldir);
+
+    var choice_list = []
+    const max_entries = 5
+
+    var counter = 1
+    for(var index=start; index<start+max_entries && index<node_list.length; index++) {
+        choice_list.push(["(" + counter +") " + node_list[index], "" + counter, 
+        function_factory_reduce_param(function(selection){
+            selection = selection.split(" ")[0]
+            shell_command_in_path("You are about to adopt the node " +
+                + selection + " from the following path:",
+                "Are you sure that this is the right node and path?",
+                "adopt " + selection);
+        }, original_list[index])]);
+        counter ++;
+    }
+    if(start+max_entries < node_list.length) { // couldn't show all -> add next button
+        choice_list.push(["(M) More nodes", "M", 
+            function_factory_reduce_param( function(p){ 
+                adopt_selection(p[0], p[1], p[2]); 
+            }, [node_list, original_list, start + max_entries]) ]);
+    }
+    if(start > 0) {
+        choice_list.push(["(P) Previous nodes", "P", 
+        function_factory_reduce_param( function(p){ 
+            adopt_selection(p[0], p[1], p[2]); 
+        }, [node_list, original_list, Math.max(start - max_entries, 0)]) ]);
+    } else {
+        choice_list.push(["(B,X) Back", ["B", "X"], terminate]);
+    }
+    choice(choice_list, pre_select=0);
+    
+}
+
+
+function adopt() {
+    term.wrap("\nScanning for adoptable nodes... ");
+    var result = child_process.spawnSync('dongle', [ 'scan' ], {
+//        cwd: fulldir,
+        env: process.env,
+        stdio: 'pipe',
+        encoding: 'utf-8'
+    });
+    //{ stdio: [0,0,0], cwd: directory });
+    var savedOutput = result.stdout.toString().split('\n');;
+    term.wrap("ok\n");
+
+    var ap_list = [];
+    for (let item of savedOutput) {
+        if(item) {
+            var space_split = item.split(" ");
+            // var strength = space_split[-1]
+            item = space_split[0].split("-")
+            ap_list.push( "node " + item[2] + ": " 
+                + item[3][0] + " long, " 
+                + item[4][0] + " short blinks");
+        }
+    }
+
+    if(ap_list.length > 0) {
+        adopt_selection(ap_list, savedOutput, 0)
+    } else { // no node to adopt found
+        term.red.wrap('\nNo node to adopt found, make sure you have at least one node in adoption mode.\n');
+        choice([
+            ["Continue (C, Enter)", "C", terminate]
+        ], pre_select=-1);
+    }
 }
 
 
@@ -290,9 +367,9 @@ function menu_default() {
 
     choice([
         ["Deploy (D)", "D", deploy], 
-        ["Adopt/Initialize (I)", "I", initialize],
+        ["Adopt (A)", "A", adopt],
         ["Create New Node Folder (N)", "N", create_node_template],
-        ["Advanced (A)", "A", advanced],
+        ["Advanced (V)", "V", advanced],
     //    "Exit (X,ESC)"
     ], pre_select=0, pad_last=0);
 }

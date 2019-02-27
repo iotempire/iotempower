@@ -1,19 +1,23 @@
 #!/bin/bash
-if [[ $# -gt 2 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
+if [[ $# -gt 2 || $# -eq 0 ||"$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF
-Syntax: initialize [serial [port]|ip-address [key]|[adopt]]
+Syntax: initialize|adopt uiot-node-id-nL-mS|serial [port]
 
-initialize must be called from a node directory and reads its configuration
-from there.
-If called without any parameter or a specific serial port, it looks for a 
-locally (i.e. via serial or the respective port) connected board and overwrites
-it (re-flashes), setting all initial parameters.
+initialize/adopt must be called from a node directory and reads 
+its configuration from there.
 
 It flashes the node with the ulnoiot firmware. It then sets or overwrites 
 wifi and  encryption data, respective to the current node configuration folder.
-If adopt or nothing is specified, it does the intialization via network.
-The respective board has to be in configuration mode and connected to the same
-wifi as ulnoiot currently runs in for this to work.
+
+If called with serial as parameter (and an optional serial port), it will adopt
+a locally (via serial or given port) connected node. It will overwrite
+(re-flashes) all its settings and initial parameters.
+
+If a network-name (SSID) is specified, it does the intialization via network.
+For this it is using a locally connected ulnoiot esp dongle/
+The respective board has to be in configuration/adopt mode (this mode
+is usually triggerd via pressing and releasing the flash key twice during
+its five second power-up phase).
 
 If key is given it overrides the deduced flash-key.
 
@@ -24,17 +28,13 @@ fi
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
-if [[ "$#" -eq 0 ]]; then
-    deploy adopt
-else
-    deploy "$@"
-fi
+deploy adopt "$@"
 
 if [[ $? -eq 1 ]]; then # error happened
     echo
-    echo "Initializing not successfull, check errors above."
+    echo "Initializing/adopting not successfull, check errors above."
     exit 1
 fi
 
 echo
-echo "Done initializing."
+echo "Done initializing/adopting."

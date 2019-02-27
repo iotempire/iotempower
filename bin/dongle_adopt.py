@@ -35,27 +35,27 @@ PROGRESS = False
 ## A value under 0 represents a 'halt'.
 ## A value at 1 or bigger represents 100%
 def update_progress(progress):
-  if (PROGRESS):
-    barLength = 40 # Modify this to change the length of the progress bar
-    status = ""
-    if isinstance(progress, int):
-      progress = float(progress)
-    if not isinstance(progress, float):
-      progress = 0
-      status = "error: progress var must be float\r\n"
-    if progress < 0:
-      progress = 0
-      status = "Halt...\r\n"
-    if progress >= 1:
-      progress = 1
-      status = "Done...\r\n"
-    block = int(round(barLength*progress))
-    text = "\rUploading: [{0}] {1}% {2}".format( "="*block + " "*(barLength-block), int(progress*100), status)
-    sys.stderr.write(text)
-    sys.stderr.flush()
-  else:
-    sys.stderr.write('.')
-    sys.stderr.flush()
+    if (PROGRESS):
+        barLength = 40 # Modify this to change the length of the progress bar
+        status = ""
+        if isinstance(progress, int):
+            progress = float(progress)
+        if not isinstance(progress, float):
+            progress = 0
+            status = "error: progress var must be float\r\n"
+        if progress < 0:
+            progress = 0
+            status = "Halt...\r\n"
+        if progress >= 1:
+            progress = 1
+            status = "Done...\r\n"
+        block = int(round(barLength*progress))
+        text = "\rUploading: [{0}] {1}% {2}".format( "="*block + " "*(barLength-block), int(progress*100), status)
+        sys.stderr.write(text)
+        sys.stderr.flush()
+    else:
+        sys.stderr.write('.')
+        sys.stderr.flush()
 
 def serve(node_network, filename, port):
     # Create a serial connection
@@ -67,6 +67,7 @@ def serve(node_network, filename, port):
     answer = ser.read_until(b"UED>")
     if not answer.endswith(b"UED>"):
         sys.stderr.write("Trouble communicating with dongle.")
+        ser.close()
         return 1
 
     content_size = os.path.getsize(filename)
@@ -83,14 +84,17 @@ def serve(node_network, filename, port):
         answer = ser.readline()
         if not answer:
             sys.stderr.write("Trouble with dongle communication.\n")
+            ser.close()
+            f.close()
             return 1
         answer = answer.strip()
         if answer.startswith(b"!error"):
             sys.stderr.write("Error:%s\n", answer[7:].decode())
+            ser.close()
             return 1
         if answer.startswith(b"!upload"):
             break
-        print(answer)
+        logging.info(answer)
 
     received_ok = False
 
@@ -110,16 +114,20 @@ def serve(node_network, filename, port):
         answer = ser.readline()
         if not answer:
             sys.stderr.write('Error uploading')
+            ser.close()
             f.close()
             return 1
         answer = answer.strip()
         if answer.startswith(b"!error"):
             sys.stderr.write("Error:%s\n", answer[7:].decode())
+            ser.close()
+            f.close()
             return 1
 
     f.close()
     sys.stderr.write('\n')
     answer = ser.readline()
+    ser.close()
     if not answer:
         sys.stderr.write('Error finishing upload\n')
         return 1
@@ -140,87 +148,86 @@ def serve(node_network, filename, port):
 
 
 def parser(unparsed_args):
-  parser = optparse.OptionParser(
-    usage = "%prog [options]",
-    description = "Transmit initial image over the air over a dongle to the esp8266 module with OTA support."
-  )
+    parser = optparse.OptionParser(
+        usage = "%prog [options]",
+        description = "Transmit initial image over the air over a dongle to the esp8266 module with OTA support."
+    )
 
-  # usb port
-  group = optparse.OptionGroup(parser, "Destination")
-  group.add_option("-p", "--port",
-    dest = "esp_port",
-    type = "str",
-    help = "ulnoiot esp dongle serial port (where the dongle is connected). Default /dev/ttyUSB0",
-    default = "/dev/ttyUSB0"
-  )
-  group.add_option("-n", "--node",
-    dest = "node_network",
-    type = "str",
-    help = "Node network name to adopt (use scan to list). Must be supplied.",
-    default = None
-  )
-  parser.add_option_group(group)
+    # usb port
+    group = optparse.OptionGroup(parser, "Destination")
+    group.add_option("-p", "--port",
+        dest = "esp_port",
+        type = "str",
+        help = "ulnoiot esp dongle serial port (where the dongle is connected). Default /dev/ttyUSB0",
+        default = "/dev/ttyUSB0"
+    )
+    group.add_option("-n", "--node",
+        dest = "node_network",
+        type = "str",
+        help = "Node network name to adopt (use scan to list). Must be supplied.",
+        default = None
+    )
+    parser.add_option_group(group)
 
-  # image
-  group = optparse.OptionGroup(parser, "Image")
-  group.add_option("-f", "--file",
-    dest = "image",
-    help = "Image file. Must be supplied.",
-    metavar="FILE",
-    default = None
-  )
-  parser.add_option_group(group)
+    # image
+    group = optparse.OptionGroup(parser, "Image")
+    group.add_option("-f", "--file",
+        dest = "image",
+        help = "Image file. Must be supplied.",
+        metavar="FILE",
+        default = None
+    )
+    parser.add_option_group(group)
 
-  # output group
-  group = optparse.OptionGroup(parser, "Output")
-  group.add_option("-d", "--debug",
-    dest = "debug",
-    help = "Show debug output. And override loglevel with debug.",
-    action = "store_true",
-    default = False
-  )
-  group.add_option("-r", "--progress",
-    dest = "progress",
-    help = "Show progress output. Does not work for ArduinoIDE",
-    action = "store_true",
-    default = False
-  )
-  parser.add_option_group(group)
+    # output group
+    group = optparse.OptionGroup(parser, "Output")
+    group.add_option("-d", "--debug",
+        dest = "debug",
+        help = "Show debug output. And override loglevel with debug.",
+        action = "store_true",
+        default = False
+    )
+    group.add_option("-r", "--progress",
+        dest = "progress",
+        help = "Show progress output. Does not work for ArduinoIDE",
+        action = "store_true",
+        default = False
+    )
+    parser.add_option_group(group)
 
-  (options, args) = parser.parse_args(unparsed_args)
+    (options, args) = parser.parse_args(unparsed_args)
 
-  return options
+    return options
 # end parser
 
 
 def main(args):
-  # get options
-  options = parser(args)
+    # get options
+    options = parser(args)
 
-  # adapt log level
-  loglevel = logging.WARNING
-  if (options.debug):
-    loglevel = logging.DEBUG
-  # end if
+    # adapt log level
+    loglevel = logging.WARNING
+    if (options.debug):
+        loglevel = logging.DEBUG
+    # end if
 
-  # logging
-  logging.basicConfig(level = loglevel, format = '%(asctime)-8s [%(levelname)s]: %(message)s', datefmt = '%H:%M:%S')
+    # logging
+    logging.basicConfig(level = loglevel, format = '%(asctime)-8s [%(levelname)s]: %(message)s', datefmt = '%H:%M:%S')
 
-  logging.debug("Options: %s", str(options))
+    logging.debug("Options: %s", str(options))
 
-  # check options
-  global PROGRESS
-  PROGRESS = options.progress
-  if not options.image or not options.node_network:
-    logging.critical("Not enough arguments. Image and node have to be supplied.")
+    # check options
+    global PROGRESS
+    PROGRESS = options.progress
+    if not options.image or not options.node_network:
+        logging.critical("Not enough arguments. Image and node have to be supplied.")
 
-    return 1
-  # end if
+        return 1
+    # end if
 
-  return serve(options.node_network, options.image, options.esp_port)
+    return serve(options.node_network, options.image, options.esp_port)
 # end main
 
 
 if __name__ == '__main__':
-  sys.exit(main(sys.argv))
-# end if
+      sys.exit(main(sys.argv))

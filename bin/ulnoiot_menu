@@ -18,4 +18,4 @@ fi
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
 export NODE_PATH="/usr/lib/node_modules:$ULNOIOT_LOCAL/node_modules"
-exec node "$ULNOIOT_ROOT/bin/simple_shell.js"
+exec node "$ULNOIOT_ROOT/bin/user_menu.js"

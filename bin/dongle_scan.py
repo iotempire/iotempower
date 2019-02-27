@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # Communicate with the ulnoiot esp dongle
-# scan for uit-node networks to scan
+# and scan for uiot-node networks
 
 import sys
 import os
@@ -77,65 +77,64 @@ def do_scan(port, cutoff):
 
 
 def parser(unparsed_args):
-  parser = optparse.OptionParser(
-    usage = "%prog [options]",
-    description = "Use a ulnoiot esp dongle to scan for adoptable nodes and" + \
-                "list them in oder from strongest to weakest."
-  )
+    parser = optparse.OptionParser(
+        usage = "%prog [options]",
+        description = "Use a ulnoiot esp dongle to scan for adoptable nodes and" + \
+                    "list them in oder from strongest to weakest."
+    )
 
-  # Configuration
-  group = optparse.OptionGroup(parser, "Configuration")
-  group.add_option("-p", "--port",
-    dest = "esp_port",
-    type = "str",
-    help = "ulnoiot esp dongle serial port (where the dongle is connected). Default /dev/ttyUSB0",
-    default = "/dev/ttyUSB0"
-  )
-  group.add_option("-c", "--cutoff",
-    dest = "cutoff",
-    type = "int",
-    help = "Decimal-value to use as detection of too weak networks. " + \
-        "Anything weaker than this will be ignored. Default: -85",
-    default = "-85"
-  )
-  parser.add_option_group(group)
+    # Configuration
+    group = optparse.OptionGroup(parser, "Configuration")
+    group.add_option("-p", "--port",
+        dest = "esp_port",
+        type = "str",
+        help = "ulnoiot esp dongle serial port (where the dongle is connected). Default /dev/ttyUSB0",
+        default = "/dev/ttyUSB0"
+    )
+    group.add_option("-c", "--cutoff",
+        dest = "cutoff",
+        type = "int",
+        help = "Decimal-value to use as detection of too weak networks. " + \
+            "Anything weaker than this will be ignored. Default: -85",
+        default = "-85"
+    )
+    parser.add_option_group(group)
 
 
-  # output group
-  group = optparse.OptionGroup(parser, "Output")
-  group.add_option("-d", "--debug",
-    dest = "debug",
-    help = "Show debug output. And override loglevel with debug.",
-    action = "store_true",
-    default = False
-  )
-  parser.add_option_group(group)
+    # output group
+    group = optparse.OptionGroup(parser, "Output")
+    group.add_option("-d", "--debug",
+        dest = "debug",
+        help = "Show debug output. And override loglevel with debug.",
+        action = "store_true",
+        default = False
+    )
+    parser.add_option_group(group)
 
-  (options, args) = parser.parse_args(unparsed_args)
+    (options, args) = parser.parse_args(unparsed_args)
 
-  return options
-# end parser
+    return options
+    # end parser
 
 
 def main(args):
-  # get options
-  options = parser(args)
+    # get options
+    options = parser(args)
 
-  # adapt log level
-  loglevel = logging.WARNING
-  if (options.debug):
-    loglevel = logging.DEBUG
-  # end if
+    # adapt log level
+    loglevel = logging.WARNING
+    if (options.debug):
+        loglevel = logging.DEBUG
+    # end if
 
-  # logging
-  logging.basicConfig(level = loglevel, format = '%(asctime)-8s [%(levelname)s]: %(message)s', datefmt = '%H:%M:%S')
+    # logging
+    logging.basicConfig(level = loglevel, format = '%(asctime)-8s [%(levelname)s]: %(message)s', datefmt = '%H:%M:%S')
 
-  logging.debug("Options: %s", str(options))
+    logging.debug("Options: %s", str(options))
 
-  return do_scan(options.esp_port, options.cutoff)
+    return do_scan(options.esp_port, options.cutoff)
 # end main
 
 
 if __name__ == '__main__':
-  sys.exit(main(sys.argv))
-# end if
+      sys.exit(main(sys.argv))

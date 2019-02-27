@@ -1,7 +1,10 @@
 #!/bin/bash
-if [[ $# -gt 2 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
+if [[ $# -gt 3 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF
-Syntax: deploy compile|serial [port]|adopt|[node-address [key]]
+Syntax: deploy [<node-address> [key]
+               |compile
+               |adopt <uiot-node-id-nL-mS>
+               |[adopt] serial [port]]
 
 deploy must be called from a node directory (or one of its parent system
 directories) and reads its configuration from there.
@@ -17,12 +20,18 @@ important to re-initialize a node configured for a different system.
 If compile is specified, deploy only tries to compile the respective node
 firmware. 
 
-If serial is specified, a locally (via serial) connected node will
-be flashed. With port the serial port can optionally be specified.
+If adopt serial is specified, a locally (via serial) connected node will
+be flashed. With port the serial port can optionally be specified. It will
+overwrite (re-flash) all its settings and initial parameters.
 
-If adopt is given, a single node on the network that is in configuration mode
+If adopt is given with a network in of the form uiot-node-id-nL-mS, 
+a single node on the network that is in configuration mode
 will be overwritten with the current configuration and adopted as a new node
 in the current network.
+For this it is using a locally conencted ulnoiot esp dongle/
+The respective board has to be in configuration/adopt mode (this mode
+is usually triggerd via pressing and releasing the flash key twice during
+its five second power-up phase).
 
 If deploy is called from a node's parent folder, it deploys all nodes in
 subdirectories of this parent folder.
@@ -36,15 +45,6 @@ fi
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
-RECONFIG_KEY="ulnoiot"
-ADOPTEE_NAME="ulnoiot-adoptee"
-ADOPTEE_NAME="$ADOPTEE_NAME".local
-
-# noupdate=""
-# if [[ "$@" == *noupdate* ]]; then
-#     noupdate=1
-# fi
-
 
 if [[ -e "node.conf" ]]; then  # started from node-directory
     source "$ULNOIOT_ROOT/bin/read_node_config"
@@ -54,6 +54,7 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
     remote=""
     key=""
     pio_upload="-t upload"
+    adopt=""
 
     platform_folder="$ULNOIOT_ROOT/lib/node_types/$board"
 
@@ -78,13 +79,17 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
         port=$(find_esp_port "$2")
         echo "Using $port."
     else
-        # obsolete - now default name
-        ## check if an ID (6 letters and hex) was given
-        #if [[ "$1" =~ ^[0-9A-Fa-f]{6}$ ]]; then
         if [[ "$1" == adopt ]]; then # if we adopt, we have fixed values
-            # check if IP was given
-            remote="$ADOPTEE_NAME"
-            key="$RECONFIG_KEY"
+            if [[ "$2" == serial ]]; then # adopt locally connected
+                echo "Trying to select serial port."
+                port=$(find_esp_port "$2")
+                echo "Using $port."
+            else
+                # now network name should be given
+                # we should only compile and then adopt
+                pio_upload=""
+                adopt="dongle adopt -f .pioenvs/$board/firmware.bin -n $2"
+            fi
         elif [[ "$1" ]]; then # address or network name given
             remote="$1"
             if [[ "$2" ]]; then
@@ -113,23 +118,10 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
     prepare_build_dir cache
     cd "$ULNOIOT_COMPILE_CACHE"
 
-# wifi credentails are now always included
-# see prepare_build_dir
-
-#         ctrl-c-wrap platformio run -t upload || { echo "Trouble compiling or uploading wifi setup firmware, check errors."; exit 1; }
-#         echo "Let device start and set wifi credentials (20s sleep.)"
-#         sleep 20
-#         echo "Reflash without credentials."
-#         echo "// no wifi setup" > src/wifi-config.h
-
-#     fi # $port exists?
-
-    WRAP=""
-# Not necessary anymore with new usermenu in gritty terminal
-#    if [[ "$ACTIVE_DIR" ]]; then # if this is running in cloudcmd
-#        WRAP=ctrl-c-wrap
-#    fi
-    $WRAP platformio run $pio_upload || { echo "Trouble compiling or uploading new firmware, check errors."; exit 1; }
+    platformio run $pio_upload || { echo "Trouble compiling or uploading new firmware, check errors."; exit 1; }
+    if [[ "$adopt" ]]; then
+        $adopt || { echo "Trouble uploading new firmware, check errors."; exit 1; }
+    fi 
 
     echo "deploy successfully done."
 
