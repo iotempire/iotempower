@@ -145,8 +145,10 @@ function run_command(command, directory = null) {
 //    if(directory)
 //        cmd = 'cd "' + directory + '"; ' + cmd;
     term.wrap("\nRunning ", command, "\n\n");
+    term_release()
     var result = child_process.spawnSync("script", args,
                     { stdio: [0,0,0], cwd: directory });
+    term_grab()
     if( result.status == 0) {
         term.green.wrap('\nThe command ',command,' seems to have completed successful. OK to continue.\n');
         choice([
@@ -172,6 +174,7 @@ function shell_command(question, command, directory = null) {
     } else {
         term("\n\n");
         run_command(command, directory);
+        term("\n\n");
     }
 }
 
@@ -217,15 +220,12 @@ function function_factory_reduce_param( f, param ) {
 }
 
 function adopt_selection(node_list, original_list, start) {
-    var fulldir = get_active_dir();
-    var shortdir = get_short_dir(fulldir);
-
     var choice_list = []
     const max_entries = 5
 
     var counter = 1
     for(var index=start; index<start+max_entries && index<node_list.length; index++) {
-        choice_list.push(["(" + counter +") " + node_list[index], "" + counter, 
+        choice_list.push([node_list[index] + " (" + counter +")", "" + counter, 
         function_factory_reduce_param(function(selection){
             selection = selection.split(" ")[0]
             shell_command_in_path("You are about to adopt the node " +
@@ -236,13 +236,13 @@ function adopt_selection(node_list, original_list, start) {
         counter ++;
     }
     if(start+max_entries < node_list.length) { // couldn't show all -> add next button
-        choice_list.push(["(M) More nodes", "M", 
+        choice_list.push(["More nodes (M)", "M", 
             function_factory_reduce_param( function(p){ 
                 adopt_selection(p[0], p[1], p[2]); 
             }, [node_list, original_list, start + max_entries]) ]);
     }
     if(start > 0) {
-        choice_list.push(["(P) Previous nodes", "P", 
+        choice_list.push(["Previous nodes (P)", "P", 
         function_factory_reduce_param( function(p){ 
             adopt_selection(p[0], p[1], p[2]); 
         }, [node_list, original_list, Math.max(start - max_entries, 0)]) ]);

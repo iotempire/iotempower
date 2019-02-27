@@ -105,49 +105,19 @@ int i2c_clear_bus() {
     return 0; // all ok
 }
 
-//std::function<void()> show_func = NULL;
+std::function<void()> show_func = NULL;
 
-void show(std::function<void()> show_func) {
+void show_init() {
+    u8g2.setFont(u8g2_font_7x14B_tr);
+    u8g2.drawStr(7, 18, "UlnoIoT");
+    u8g2.drawStr(10, 42, "Dongle");
+}
+
+void show() {
     u8g2.firstPage();
     do {
         if(show_func) show_func();
     } while ( u8g2.nextPage() );
-}
-
-void show_init() {
-    show( [&] {
-        u8g2.setFont(u8g2_font_7x14B_tr);
-        u8g2.drawStr(7, 18, "UlnoIoT");
-        u8g2.drawStr(10, 42, "Dongle");
-    });
-}
-
-
-void show_text(const char* text) {
-    int8_t char_height = u8g2.getMaxCharHeight();
-    int8_t char_width = u8g2.getMaxCharWidth();
-    char charstr[2]=" ";
-    u8g2.setFont(u8g2_font_profont12_mf);
-    u8g2.firstPage();
-    do {
-        int x = 0;
-        int y = char_height-1;
-        while(*text) {
-            if(text[0]=='\\' && text[1]=='n') {
-                text++;
-                x=0;
-                y+=char_height;
-            } else if(text[0]=='\n') {
-                x=0;
-                y+=char_height;
-            } else {
-                charstr[0] = text[0];
-                u8g2.drawStr(x, y, charstr);
-                x+=char_width;
-            }
-            text++;
-        }
-    } while ( u8g2.nextPage() );   
 }
 
 void prompt() {
@@ -317,24 +287,11 @@ bool ota_serve(int firmware_size, const char* firmware_md5) {
     bool something_received;
     bool ok_found = false;
 
-    //show_text("*Adoption*\n\nSending\n0%");
-    unsigned long last_action = millis();
-    unsigned long current;
     while(bytes_sent < firmware_size) {
-        current = millis();
-        if(current - last_action > 10000) {
-            Serial.print("!error not receiving enough firmware data. bytes_read: ");
-            Serial.print(bytes_read);
-            Serial.print(" bytes_sent: ");
-            Serial.println(bytes_sent);
-            wifi_server.stop();
-            return false;
-        }
         if(bytes_read < firmware_size) { // if not read all, read more
             if(buffer_fill < BUFFER_LEN) { // but only if still space in buffer
                 if(Serial.available() > 0) {
                     next_char = Serial.read();
-                    last_action = current;
                     if(next_char >=0) {
                         buffer[buffer_fill] = (unsigned char)next_char;
                         buffer_fill ++;
@@ -345,15 +302,12 @@ bool ota_serve(int firmware_size, const char* firmware_md5) {
         }
         // time to send it out
         if(buffer_fill == BUFFER_LEN || bytes_read == firmware_size) {
-            Serial.print("Block: ");
-            Serial.println(bytes_sent);
             // trigger send
             if(!client.write(buffer, buffer_fill)) {
                 Serial.println("!error problems sending firmware data");
                 wifi_server.stop();
                 return false;
             }
-            last_action = current;
             bytes_sent += buffer_fill;
             // try to receive something for max 10s
             something_received = false;
@@ -383,9 +337,6 @@ bool ota_serve(int firmware_size, const char* firmware_md5) {
             }
             buffer_fill = 0;
         }
-        // snprintf(display_string, 128, "*Adoption*\n\nSending\n%d%%",
-        //     100-(firmware_size*100/bytes_sent));
-        // show_text(display_string);
     } // end (bytes_sent < firmware_size)
     something_received = false;
     if(!ok_found) { // try for 15s longer to get the final ok
@@ -434,7 +385,6 @@ void adopt(Cmd* cmd) {
     Serial.printf("Connecting to reconfig node network %s.", node_network);
     WiFi.begin(node_network, node_ap_password);
 
-    //show_text("*Adoption*\n\nTrying to\nconnect.");
     // Try for 15 seconds
     for(int i=0; i<15; i++) {
         delay(1000);
@@ -442,7 +392,6 @@ void adopt(Cmd* cmd) {
         Serial.print(".");
     }
     if(WiFi.status() != WL_CONNECTED) {
-        //show_text("*Adoption*\n\nConnect\nfailed.");
         Serial.println("failure.");
         Serial.println("!error adopt connect");
         return;
@@ -452,12 +401,7 @@ void adopt(Cmd* cmd) {
     Serial.println(WiFi.localIP());
     // when successfully connected start OTA handshake
     cmd->getArg(2)->getValue().toCharArray(md5sum, 33);
-    bool result = ota_serve(cmd->getArg(1)->getValue().toInt(), md5sum);
-    // if(!result) {
-    //     show_text("*Adoption*\n\nFailure");
-    // } else {
-    //     show_text("*Adoption*\n\nSuccess");
-    // }
+    ota_serve(cmd->getArg(1)->getValue().toInt(), md5sum);
 };
 
 void setup_cli() {
@@ -493,7 +437,7 @@ void setup_cli() {
         Serial.print("Display got: ");
         cmd->getArg(0)->getValue().toCharArray(display_string, DISPLAY_BUFFER_LEN);
         Serial.println(display_string);
-        show_text(display_string);
+        show_func = [cmd]{u8g2.drawStr(0,16,display_string);};
     });
     display_cmd->addArg(new AnonymOptArg()); // text
     cli->addCmd(display_cmd);
@@ -542,11 +486,11 @@ void setup_cli() {
 }
 
 void setup() {
-    // TODO: check on which wemoses, we can be faster
-    Serial.begin(460800);  // let's be "fast", should work on a Wemos D1 mini
 //    Serial.begin(921600);  // let's be "fast", should work on a Wemos D1 mini
-//    Serial.begin(2000000);  // let's be "fast", should work on a Wemos D1 mini
+    Serial.begin(2000000);  // let's be "fast", should work on a Wemos D1 mini
 
+    i2c_clear_bus();
+    u8g2.begin();
 
     // flush some garbage
     for( int i=0; i<20; i++) {
@@ -558,15 +502,11 @@ void setup() {
     // print init message
     Serial.println("Starting UlnoIoT Dongle.");
     Serial.println();
+    show_func = show_init;
+    show();
     // initially no WiFi switched on, TODO: later be in ESP-Now mode and initialize LORA
     WiFi.softAPdisconnect (true);
     WiFi.disconnect(true);
-
-    i2c_clear_bus();
-    u8g2.begin();
-    // show_func = show_init;
-    // show();
-    show_init();
 
     setup_cli();
 }
@@ -596,10 +536,9 @@ void loop() {
             }
         }
     }
-    // seems not necessary to be refreshed
-    // if(current_time - last_time >= 50) {
-    //     last_time = current_time;
-    //     show();
-    // }
+    if(current_time - last_time >= 50) {
+        last_time = current_time;
+        show();
+    }
     yield();
 }

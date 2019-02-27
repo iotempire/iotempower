@@ -82,7 +82,7 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
         if [[ "$1" == adopt ]]; then # if we adopt, we have fixed values
             if [[ "$2" == serial ]]; then # adopt locally connected
                 echo "Trying to select serial port."
-                port=$(find_esp_port "$2")
+                port=$(find_esp_port "$3")
                 echo "Using $port."
             else
                 # now network name should be given
@@ -97,22 +97,23 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
             else
                 key=$(tail -n1 key.txt 2>/dev/null|head -c 64)
             fi
-        else
-            # normalize node_name from topic
-            ## only needed for transition of old systems: (TODO: remove)
-            #node_name=$(echo -n "$topic"|tr [:upper:][:space:]\\/ [:lower:]___)
+        else # nothing given, deploy was just called without parameters
             remote="$node_name.local"
-            ## only needed for transition of old systems: (TODO: remove)
-            #node_name=$(echo -n "$topic"|tr [:upper:][:space:]_\\/ [:lower:]----)
 #           obsolete: getting IP from mqtt
 #           echo "Getting IP of node $topic for deployment."
 #           address=$(get_ip "$topic" 2>/dev/null|grep "$topic"|cut -d\  -f2)
         fi
-        echo "Deploying remotely to node $topic with address $remote."
-        export PLATFORMIO_UPLOAD_PORT="$remote"
-        export PLATFORMIO_UPLOAD_FLAGS="--progress
+        if [[ "$remote" ]]; then
+            echo "Deploying remotely to node $topic with address $remote."
+            export PLATFORMIO_UPLOAD_PORT="$remote"
+            export PLATFORMIO_UPLOAD_FLAGS="--progress
 --port=8266
 --auth="\""$key"\"
+        fi
+    fi
+
+    if [[ $port ]]; then
+        export PLATFORMIO_UPLOAD_PORT="/dev/$port"
     fi
 
     prepare_build_dir cache

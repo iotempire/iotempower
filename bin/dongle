@@ -33,7 +33,9 @@ else
         sleep 0.1
     fi
     python3 "$ULNOIOT_ROOT/bin/dongle_$command.py" "$@"
+    result=$?
     if [[ -e "$daemon_fifo" ]]; then
         echo connect >"$daemon_fifo" & # connect and resume daemon again
     fi
+    exit $result
 fi

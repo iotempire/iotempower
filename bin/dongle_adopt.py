@@ -59,13 +59,15 @@ def update_progress(progress):
 
 def serve(node_network, filename, port):
     # Create a serial connection
-    ser = serial.Serial(port, 2000000, timeout=15);
+#    ser = serial.Serial(port, 2000000, timeout=15);
+    ser = serial.Serial(port, 460800, timeout=15);
     logging.info('Starting on %s.', port)
     ser.read_all()  # discard all
     ser.write(b"\n")
     ser.flush()
     answer = ser.read_until(b"UED>")
     if not answer.endswith(b"UED>"):
+        logging.debug(answer)
         sys.stderr.write("Trouble communicating with dongle.")
         ser.close()
         return 1
@@ -82,6 +84,7 @@ def serve(node_network, filename, port):
 
     while(True):
         answer = ser.readline()
+        logging.debug(answer)
         if not answer:
             sys.stderr.write("Trouble with dongle communication.\n")
             ser.close()
@@ -89,56 +92,64 @@ def serve(node_network, filename, port):
             return 1
         answer = answer.strip()
         if answer.startswith(b"!error"):
-            sys.stderr.write("Error:%s\n", answer[7:].decode())
+            sys.stderr.write("Error 10 from dongle: %s\n"%answer[7:].decode())
             ser.close()
             return 1
         if answer.startswith(b"!upload"):
             break
-        logging.info(answer)
 
     received_ok = False
 
     f = open(filename, "rb")
+    logging.info("Starting upload.")
+    sys.stderr.write('\n')
     if (PROGRESS):
         update_progress(0)
     else:
-        sys.stderr.write('Uploading')
+        sys.stderr.write('\nUploading')
         sys.stderr.flush()
         offset = 0
     while offset < content_size:
         chunk = f.read(1460)
         if not chunk: break
+        logging.debug("Sending chunk of size %d, offset %d, content_size %d.",
+            len(chunk), offset, content_size)
         offset += len(chunk)
         update_progress(offset/float(content_size))
         ser.write(chunk)
-        answer = ser.readline()
-        if not answer:
-            sys.stderr.write('Error uploading')
-            ser.close()
-            f.close()
-            return 1
-        answer = answer.strip()
-        if answer.startswith(b"!error"):
-            sys.stderr.write("Error:%s\n", answer[7:].decode())
-            ser.close()
-            f.close()
-            return 1
+        ser.flush()
+        while True:
+            answer = ser.readline()
+            logging.debug(answer)
+            if not answer:
+                sys.stderr.write('Error uploading, no answer from dongle.')
+                ser.close()
+                f.close()
+                return 1
+            answer = answer.strip()
+            if answer.startswith(b"!send more"):
+                break;
+            if answer.startswith(b"!error"):
+                sys.stderr.write("Error 20 from dongle: %s\n"%answer[7:].decode())
+                ser.close()
+                f.close()
+                return 1
 
     f.close()
     sys.stderr.write('\n')
     answer = ser.readline()
     ser.close()
     if not answer:
-        sys.stderr.write('Error finishing upload\n')
+        sys.stderr.write('\nError finishing upload\n')
         return 1
     answer = answer.strip()
     if answer.startswith(b"!success"):
-        sys.stderr.write('Success uploading\n')
+        sys.stderr.write('\nSuccess uploading\n')
     else:
         if answer.startswith(b"!error"):
-            sys.stderr.write("Error:%s\n", answer[7:].decode())
+            sys.stderr.write("\nError 30 from dongle: %s\n", answer[7:].decode())
         else:
-            sys.stderr.write('Error uploading\n')
+            sys.stderr.write('\nError uploading\n')
         return 1
 
     logging.info('Result: OK')
