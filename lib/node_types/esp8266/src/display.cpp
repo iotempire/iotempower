@@ -132,6 +132,7 @@ Display_Base& Display_Base::clear() {
 }
 
 bool Display_Base::measure() {
+    // TODO: only update when changed?
     unsigned long current = millis();
     if(current - last_frame >= frame_len) {
         if(changed) {
