@@ -7,6 +7,7 @@
 #define DISPLAY_BUFFER_LEN 128
 #define SERVER_PORT 28266
 #define RXBUFFER_SIZE 1024
+#define SMALL_STRING_LEN 33
 
 #define FLASH 0
 #define SPIFFS 100
@@ -34,8 +35,10 @@ SimpleCLI* cli;
 char buffer[BUFFER_LEN];
 int buffer_fill = 0;
 
-char display_string[DISPLAY_BUFFER_LEN];
-
+char gw_ssid[SMALL_STRING_LEN+1]={0};
+char gw_uptime[SMALL_STRING_LEN+1]={0};
+char gw_mem_free[SMALL_STRING_LEN+1]={0};
+char gw_load[SMALL_STRING_LEN+1]={0};
 
 // small display shield for Wemos
 U8G2_SSD1306_64X48_ER_F_HW_I2C u8g2(U8G2_R0); // R0 no rotation, R1 - 90°
@@ -120,13 +123,14 @@ void show_init() {
     show( [&] {
         u8g2.setFont(u8g2_font_7x14B_tr);
         u8g2.drawStr(7, 18, "UlnoIoT");
-        u8g2.drawStr(10, 42, "Dongle");
+        u8g2.drawStr(10, 39, "Dongle");
     });
 }
 
 
 void show_text(const char* text) {
-    u8g2.setFont(u8g2_font_profont12_mf);
+//    u8g2.setFont(u8g2_font_profont12_mf);
+    u8g2.setFont(u8g2_font_5x8_mf);
     int8_t char_height = u8g2.getMaxCharHeight();
     int8_t char_width = u8g2.getMaxCharWidth();
     char charstr[2]=" ";
@@ -153,6 +157,43 @@ void show_text(const char* text) {
     } while ( u8g2.nextPage() );   
 }
 
+
+void show_text(const String& text) {
+    char display_text[128];
+    display_text[127] = 0;
+    text.toCharArray(display_text, 127);
+    show_text(display_text);
+}
+
+
+void show_ulnoiot() {
+    String display_string = "  UlnoIoT\n  Dongle\n\n";
+    String ssid = String(gw_ssid);
+
+    if(gw_ssid[0]) {
+        show_text(display_string 
+            + "\nWiFi: " + ssid.substring(0,7) + "\n" + ssid.substring(7));
+    } else {
+        show_text( display_string + "No gateway\ndetected.");
+    }
+}
+
+void show_gw_info() {
+    String display_string = "UlnoIoTDongle\n";
+    String ssid = String(gw_ssid);
+
+    if(gw_ssid[0]) {
+        show_text(display_string 
+            + "MFr: " + String(gw_mem_free)
+            + "\nUP: " + String(gw_uptime) 
+            + "\nLD: " + String(gw_load)
+            + "\nWiFi: " + ssid.substring(0,8) + "\n" + ssid.substring(8));
+    } else {
+        show_text(display_string 
+            + "\nNo gateway\ndetected.\nMake sure it\nis running.");
+    }
+}
+
 void prompt() {
     Serial.print("UED>"); // ulnoiot esp dongle
     Serial.flush();
@@ -167,6 +208,7 @@ bool ota_serve(int firmware_size, const char* firmware_md5) {
     WiFiUDP invite_client;
     const int send_buffer_len = 128;
     char send_buffer[send_buffer_len];
+    char display_string[128];
 
     // Start local server listening for image request
     wifi_server.begin();
@@ -321,7 +363,7 @@ bool ota_serve(int firmware_size, const char* firmware_md5) {
     bool something_received;
     bool ok_found = false;
 
-    show_text("*Adoption*\n\nSending\n0%");
+    show_text(" *Adoption*\n\nSending\n0%");
     unsigned long last_action = millis();
     unsigned long current;
     while(bytes_sent < firmware_size) {
@@ -431,6 +473,7 @@ bool ota_serve(int firmware_size, const char* firmware_md5) {
     return true; // success
 }
 
+
 void adopt(Cmd* cmd) {
     const int ssid_maxlen = 32;
     char node_network[ssid_maxlen+1];
@@ -447,7 +490,7 @@ void adopt(Cmd* cmd) {
     Serial.printf("Connecting to reconfig node network %s.", node_network);
     WiFi.begin(node_network, node_ap_password);
 
-    show_text("*Adoption*\n\nTrying to\nconnect.");
+    show_text(" *Adoption*\n\nTrying to\nconnect.");
     // Try for 15 seconds
     for(int i=0; i<15; i++) {
         delay(1000);
@@ -455,7 +498,7 @@ void adopt(Cmd* cmd) {
         Serial.print(".");
     }
     if(WiFi.status() != WL_CONNECTED) {
-        show_text("*Adoption*\n\nConnect\nfailed.");
+        show_text(" *Adoption*\n\nConnect\nfailed.");
         Serial.println("failure.");
         Serial.println("!error adopt connect");
         return;
@@ -467,11 +510,24 @@ void adopt(Cmd* cmd) {
     cmd->getArg(2)->getValue().toCharArray(md5sum, 33);
     bool result = ota_serve(cmd->getArg(1)->getValue().toInt(), md5sum);
     if(!result) {
-        show_text("*Adoption*\n\nFailure");
+        show_text(" *Adoption*\n\nFailure");
     } else {
-        show_text("*Adoption*\n\nSuccess");
+        show_text(" *Adoption*\n\nSuccess");
     }
 };
+
+
+void daemon_info(Cmd* cmd) {
+    cmd->getArg(0)->getValue().toCharArray(gw_ssid, SMALL_STRING_LEN);
+    gw_ssid[SMALL_STRING_LEN] = 0;
+    cmd->getArg(1)->getValue().toCharArray(gw_uptime, SMALL_STRING_LEN);
+    gw_uptime[SMALL_STRING_LEN] = 0;
+    cmd->getArg(2)->getValue().toCharArray(gw_mem_free, SMALL_STRING_LEN);
+    gw_mem_free[SMALL_STRING_LEN] = 0;
+    cmd->getArg(3)->getValue().toCharArray(gw_load, SMALL_STRING_LEN);
+    gw_load[SMALL_STRING_LEN] = 0;
+}
+
 
 void setup_cli() {
     cli = new SimpleCLI();
@@ -491,7 +547,8 @@ void setup_cli() {
             "- scan: scan wifi networks\n"
             "- adopt NODE SIZE MD5: adopt NODE and send initial firmware,\n"
             "    SIZE and MD5 are part of following espota protocal\n"
-            "- reset: resets the dongle\n");
+            "- reset: resets the dongle\n"
+            "- $info ssid uptime mem_free load: resets the dongle\n");
     }));
 
     //// help
@@ -504,9 +561,8 @@ void setup_cli() {
     //// display
     Command* display_cmd = new Command("display", [](Cmd* cmd) {
         Serial.print("Display got: ");
-        cmd->getArg(0)->getValue().toCharArray(display_string, DISPLAY_BUFFER_LEN);
-        Serial.println(display_string);
-        //show_text(display_string);
+        Serial.println(cmd->getArg(0)->getValue());
+        show_text(cmd->getArg(0)->getValue());
     });
     display_cmd->addArg(new AnonymOptArg()); // text
     cli->addCmd(display_cmd);
@@ -517,6 +573,8 @@ void setup_cli() {
         WiFi.mode(WIFI_STA);
         WiFi.disconnect();
 
+        show_text("WiFi Scan\n\nScanning");
+
         Serial.println("!network_scan start");
         int count = WiFi.scanNetworks();
         for (int i = 0; i < count; ++i) {
@@ -525,6 +583,8 @@ void setup_cli() {
             Serial.println(WiFi.SSID(i));
         }
         Serial.println("!network_scan end");
+        Serial.flush();
+        show_text("WiFi Scan\n\nDone.");
     }));
 
     //// adopt
@@ -533,6 +593,15 @@ void setup_cli() {
     adopt_cmd->addArg(new AnonymOptArg()); // size
     adopt_cmd->addArg(new AnonymOptArg()); // md5
     cli->addCmd(adopt_cmd);
+
+    // dongle daemon responses
+    Command* info_cmd = new Command("$info", daemon_info);
+    info_cmd->addArg(new AnonymOptArg()); // ap-name/ssid
+    info_cmd->addArg(new AnonymOptArg()); // gw uptime
+    info_cmd->addArg(new AnonymOptArg()); // mem free
+    info_cmd->addArg(new AnonymOptArg()); // load
+    cli->addCmd(info_cmd);
+
 
     // // TODO: remove =========== Add ping command =========== //
     // // ping                 => pong
@@ -587,8 +656,8 @@ void setup() {
 }
 
 void loop() {
-    static unsigned long last_time = millis();
-    unsigned long current_time = millis();
+    static unsigned long last_action = millis();
+    static int current_menu = 0;
     int next_char;
 
     if(Serial.available() > 0) {
@@ -606,15 +675,26 @@ void loop() {
                 cli->parse(buffer);
                 buffer_fill = 0;
                 prompt();
+                last_action = millis();
             } else {
                 buffer_fill ++;
             }
         }
     }
-    // seems not necessary to be refreshed
-    // if(current_time - last_time >= 50) {
-    //     last_time = current_time;
-    //     show();
-    // }
-    //yield();
+    
+    if(millis() - last_action > 15000) { // every 15 s do status update
+        Serial.write("!daemon_check\n");
+        // answer received above
+        current_menu ++;
+        current_menu %= 2;
+        switch(current_menu) {
+            case 0: // info menu
+                show_gw_info();
+                break;
+            case 1:
+                show_ulnoiot();
+                break;
+        }
+        last_action = millis();
+    }
 }

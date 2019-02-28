@@ -14,6 +14,7 @@ import logging
 import serial
 import time
 import threading
+import psutil
 
 
 class UED_Listener(threading.Thread):
@@ -57,14 +58,42 @@ class UED_Listener(threading.Thread):
 
     def send_info(self):
         sys.stderr.write("Sending info.\n")
-        self.ser.write("!info start\n")
+        # send in format: $info ssid uptime mem_free load
+        self.ser.write("$info ".encode())
         env="ULNOIOT_AP_NAME"
         if env in os.environ:
-            self.ser.write("AP: %s"%os.environ(env))
-        env="ULNOIOT_AP_IP"
-        if env in os.environ:
-            self.ser.write("IP: %s"%os.environ(env))
-        self.ser.write("!info end\n")
+            self.ser_write("\"%s\" " %os.environ[env])
+        else:
+            self.ser_write("N/A ")
+
+        # env="ULNOIOT_AP_IP"
+        # if env in os.environ:
+        #     self.ser.write("%s"%os.environ[env])
+
+        uptime = time.time() - psutil.boot_time()
+        if uptime < 3600:
+            uptime = "%dmin" % ((uptime+30)//60)
+        elif uptime < 3600 * 24 * 2:
+            uptime = "%.1fh" % (uptime/3600)
+        elif uptime < 3600 * 24 * 200:
+            uptime = "%.1fd" % (uptime/3600/24)
+        else:
+            uptime = "%.1fy" % (uptime/3600/24/365.25)
+        self.ser_write("%s "%uptime)
+
+        memory = psutil.virtual_memory().available//1024//1024
+        if memory > 1024:
+            memory = "%.1fG" % (memory/1024)
+        else:
+            memory = "%dM" % memory
+        self.ser_write("%s "%memory)
+
+        load = os.getloadavg()[0]
+        self.ser_write("%.1f\n"%load)
+        self.ser.flush()
+
+    def ser_write(self, text):
+        self.ser.write(text.encode())
 
     def listen(self):
         while self.running:
@@ -76,10 +105,12 @@ class UED_Listener(threading.Thread):
                         self.quit()
                         return
                     answer = answer.strip()
-                    if answer == "!daemon_check":
+                    if answer == b"!daemon_check":
                         self.send_info()
-                    elif answer == "!shutdown":
+                    elif answer == b"!shutdown":
                         pass # TODO: call shutdown
+                    else:
+                        logging.debug(answer)                        
                 if self.request_release:
                     self.request_release = False
                     self.ser.close()
