@@ -14,7 +14,7 @@ import time
 
 def do_scan(port, cutoff):
     # Create a serial connection
-    ser = serial.Serial(port, 460800, timeout=15);
+    ser = serial.Serial(port, 2000000, timeout=15);
     logging.info('Starting on %s.', port)
     ser.read_all()  # discard all
     ser.write(b"\n")

@@ -59,8 +59,8 @@ def update_progress(progress):
 
 def serve(node_network, filename, port):
     # Create a serial connection
-#    ser = serial.Serial(port, 2000000, timeout=15);
-    ser = serial.Serial(port, 460800, timeout=15);
+    ser = serial.Serial(port, 2000000, timeout=15);
+#    ser = serial.Serial(port, 115200, timeout=15);
     logging.info('Starting on %s.', port)
     ser.read_all()  # discard all
     ser.write(b"\n")
@@ -108,9 +108,12 @@ def serve(node_network, filename, port):
     else:
         sys.stderr.write('\nUploading')
         sys.stderr.flush()
-        offset = 0
+    offset = 0
+    success = False
     while offset < content_size:
-        chunk = f.read(1460)
+#        chunk = f.read(1460)
+#        chunk = f.read(256) # bigger blocks crash the serial communication due to rxbuffersize
+        chunk = f.read(1024) # make sure RXBuffer is at least this size
         if not chunk: break
         logging.debug("Sending chunk of size %d, offset %d, content_size %d.",
             len(chunk), offset, content_size)
@@ -122,34 +125,27 @@ def serve(node_network, filename, port):
             answer = ser.readline()
             logging.debug(answer)
             if not answer:
-                sys.stderr.write('Error uploading, no answer from dongle.')
+                sys.stderr.write('Error uploading, no answer from dongle.\n')
                 ser.close()
                 f.close()
                 return 1
             answer = answer.strip()
             if answer.startswith(b"!send more"):
                 break;
-            if answer.startswith(b"!error"):
+            elif answer.startswith(b"!error"):
                 sys.stderr.write("Error 20 from dongle: %s\n"%answer[7:].decode())
                 ser.close()
                 f.close()
                 return 1
+            elif answer.startswith(b"!success"):
+                success = True
+                break;
 
     f.close()
-    sys.stderr.write('\n')
-    answer = ser.readline()
     ser.close()
-    if not answer:
+    sys.stderr.write('\n')
+    if not success:
         sys.stderr.write('\nError finishing upload\n')
-        return 1
-    answer = answer.strip()
-    if answer.startswith(b"!success"):
-        sys.stderr.write('\nSuccess uploading\n')
-    else:
-        if answer.startswith(b"!error"):
-            sys.stderr.write("\nError 30 from dongle: %s\n", answer[7:].decode())
-        else:
-            sys.stderr.write('\nError uploading\n')
         return 1
 
     logging.info('Result: OK')

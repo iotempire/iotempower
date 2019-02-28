@@ -6,6 +6,7 @@
 #define BUFFER_LEN 1460
 #define DISPLAY_BUFFER_LEN 128
 #define SERVER_PORT 28266
+#define RXBUFFER_SIZE 1024
 
 #define FLASH 0
 #define SPIFFS 100
@@ -110,6 +111,7 @@ int i2c_clear_bus() {
 void show(std::function<void()> show_func) {
     u8g2.firstPage();
     do {
+        yield();
         if(show_func) show_func();
     } while ( u8g2.nextPage() );
 }
@@ -124,12 +126,13 @@ void show_init() {
 
 
 void show_text(const char* text) {
+    u8g2.setFont(u8g2_font_profont12_mf);
     int8_t char_height = u8g2.getMaxCharHeight();
     int8_t char_width = u8g2.getMaxCharWidth();
     char charstr[2]=" ";
-    u8g2.setFont(u8g2_font_profont12_mf);
     u8g2.firstPage();
     do {
+        //yield();
         int x = 0;
         int y = char_height-1;
         while(*text) {
@@ -152,6 +155,7 @@ void show_text(const char* text) {
 
 void prompt() {
     Serial.print("UED>"); // ulnoiot esp dongle
+    Serial.flush();
 }
 
 bool ota_serve(int firmware_size, const char* firmware_md5) {
@@ -317,10 +321,11 @@ bool ota_serve(int firmware_size, const char* firmware_md5) {
     bool something_received;
     bool ok_found = false;
 
-    //show_text("*Adoption*\n\nSending\n0%");
+    show_text("*Adoption*\n\nSending\n0%");
     unsigned long last_action = millis();
     unsigned long current;
     while(bytes_sent < firmware_size) {
+        //yield();
         current = millis();
         if(current - last_action > 10000) {
             Serial.print("!error not receiving enough firmware data. bytes_read: ");
@@ -339,6 +344,10 @@ bool ota_serve(int firmware_size, const char* firmware_md5) {
                         buffer[buffer_fill] = (unsigned char)next_char;
                         buffer_fill ++;
                         bytes_read ++;
+                        if(bytes_read < firmware_size && (bytes_read % RXBUFFER_SIZE) == 0) {
+                            Serial.println("!send more");
+                            Serial.flush();
+                        }
                     }
                 }
             }
@@ -347,17 +356,27 @@ bool ota_serve(int firmware_size, const char* firmware_md5) {
         if(buffer_fill == BUFFER_LEN || bytes_read == firmware_size) {
             Serial.print("Block: ");
             Serial.println(bytes_sent);
+            Serial.flush();
             // trigger send
             if(!client.write(buffer, buffer_fill)) {
                 Serial.println("!error problems sending firmware data");
                 wifi_server.stop();
                 return false;
             }
+            //yield(); 
+            // delay(1); // let things finish - delay crashes serial???
             last_action = current;
             bytes_sent += buffer_fill;
+            snprintf(display_string, 128, "*Adoption*\n\nSending\n%d%%",
+                (int)(bytes_sent*100/firmware_size));
+            show_text(display_string);
             // try to receive something for max 10s
             something_received = false;
-            for(int i=0; i<1000; i++) {
+            unsigned long start = millis(); 
+            while(true) {
+                if(millis() - start > 10000) break;
+                //Serial.flush()
+                //optimistic_yield(100);
                 int available = client.available();
                 if(available>=0) {
                     something_received = true;
@@ -370,12 +389,8 @@ bool ota_serve(int firmware_size, const char* firmware_md5) {
                     }
                     break;
                 }
-                delay(10);
             }
-            if(something_received) {
-                Serial.println("!send more");
-                Serial.flush();
-            } else {
+            if(!something_received) {
                 Serial.println("!error no confirmation data");
                 Serial.flush();
                 wifi_server.stop();
@@ -383,13 +398,12 @@ bool ota_serve(int firmware_size, const char* firmware_md5) {
             }
             buffer_fill = 0;
         }
-        // snprintf(display_string, 128, "*Adoption*\n\nSending\n%d%%",
-        //     100-(firmware_size*100/bytes_sent));
-        // show_text(display_string);
     } // end (bytes_sent < firmware_size)
     something_received = false;
     if(!ok_found) { // try for 15s longer to get the final ok
-        for(int i=0; i<1500; i++) {
+        unsigned long start=millis();
+        while(true) {
+            if(millis()-start > 15000) break;
             int available = client.available();
             if(available>0) {
                 something_received = true;
@@ -402,7 +416,6 @@ bool ota_serve(int firmware_size, const char* firmware_md5) {
                 }
                 if(ok_found) break;
             }
-            delay(10);
         }
     }
     if(!ok_found) {
@@ -434,7 +447,7 @@ void adopt(Cmd* cmd) {
     Serial.printf("Connecting to reconfig node network %s.", node_network);
     WiFi.begin(node_network, node_ap_password);
 
-    //show_text("*Adoption*\n\nTrying to\nconnect.");
+    show_text("*Adoption*\n\nTrying to\nconnect.");
     // Try for 15 seconds
     for(int i=0; i<15; i++) {
         delay(1000);
@@ -442,7 +455,7 @@ void adopt(Cmd* cmd) {
         Serial.print(".");
     }
     if(WiFi.status() != WL_CONNECTED) {
-        //show_text("*Adoption*\n\nConnect\nfailed.");
+        show_text("*Adoption*\n\nConnect\nfailed.");
         Serial.println("failure.");
         Serial.println("!error adopt connect");
         return;
@@ -453,11 +466,11 @@ void adopt(Cmd* cmd) {
     // when successfully connected start OTA handshake
     cmd->getArg(2)->getValue().toCharArray(md5sum, 33);
     bool result = ota_serve(cmd->getArg(1)->getValue().toInt(), md5sum);
-    // if(!result) {
-    //     show_text("*Adoption*\n\nFailure");
-    // } else {
-    //     show_text("*Adoption*\n\nSuccess");
-    // }
+    if(!result) {
+        show_text("*Adoption*\n\nFailure");
+    } else {
+        show_text("*Adoption*\n\nSuccess");
+    }
 };
 
 void setup_cli() {
@@ -493,7 +506,7 @@ void setup_cli() {
         Serial.print("Display got: ");
         cmd->getArg(0)->getValue().toCharArray(display_string, DISPLAY_BUFFER_LEN);
         Serial.println(display_string);
-        show_text(display_string);
+        //show_text(display_string);
     });
     display_cmd->addArg(new AnonymOptArg()); // text
     cli->addCmd(display_cmd);
@@ -541,11 +554,13 @@ void setup_cli() {
     prompt();
 }
 
+
 void setup() {
-    // TODO: check on which wemoses, we can be faster
-    Serial.begin(460800);  // let's be "fast", should work on a Wemos D1 mini
-//    Serial.begin(921600);  // let's be "fast", should work on a Wemos D1 mini
-//    Serial.begin(2000000);  // let's be "fast", should work on a Wemos D1 mini
+    Serial.setRxBufferSize(RXBUFFER_SIZE); // HW-Buffer seems to be only 256 Bytes (TODO: recheck best value)
+    // let's be "fast", should work on a Wemos D1 mini
+ //    Serial.begin(115200); 
+//    Serial.begin(921600);
+    Serial.begin(2000000);  // let's be "fast", should work on a Wemos D1 mini
 
 
     // flush some garbage
@@ -601,5 +616,5 @@ void loop() {
     //     last_time = current_time;
     //     show();
     // }
-    yield();
+    //yield();
 }
