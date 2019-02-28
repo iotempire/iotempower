@@ -40,6 +40,8 @@ if [[ "ULNOIOT_AP_PASSWORD" ]]; then # pw was given, so start an accesspoint
             new-window -d -n nodered  \
                 su - $ULNOIOT_USER -c 'ulnoiot exec nodered_starter' \; \
             new-window -d -n cloudcmd  \
-                su - $ULNOIOT_USER -c 'ulnoiot exec cloudcmd_starter' \;
+                su - $ULNOIOT_USER -c 'ulnoiot exec cloudcmd_starter' \; \
+            new-window -d -n dongle  \
+                su - $ULNOIOT_USER -c 'ulnoiot exec dongle_starter' \;
     ) &
 fi # accesspoint check
