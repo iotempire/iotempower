@@ -91,9 +91,14 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
     ln -s -f "$(realpath setup.cpp)" "$dest_dir/src/setup.h"
 #    password=$(tail -n1 key.hex|head -c64|basez -x -d|md5sum -b|cut -d\  -f1)
     password=$(tail -n1 key.txt|head -c64|md5sum -b|cut -d\  -f1)
-    echo 'const char *keyhash = "'"$password"'";' > "$dest_dir/src/key.h"
+    fname="$dest_dir/src/key.h"
+    echo 'const char *keyhash = "'"$password"'";' > "$fname.new"
+    # only replace if it's new
+    diff -q -f "$fname.new" "$fname" || mv "$fname.new" "$fname"
+    rm -f "$fname.new"
 
-    # create specific config file.
+
+    # create node-specific config file.
     fname="$dest_dir/src/config.h"
 cat > "$fname.new" << EOF
 #define HOSTNAME "$node_name"
