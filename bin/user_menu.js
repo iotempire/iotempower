@@ -150,7 +150,7 @@ function run_command(command, directory = null) {
                     { stdio: [0,0,0], cwd: directory });
     term_grab()
     if( result.status == 0) {
-        term.green.wrap('\nThe command ',command,' seems to have completed successful. OK to continue.\n');
+        term.green.wrap('\nThe command ', command, ' has completed successful. OK to continue.\n');
         choice([
             ["OK, continue (O, Enter)", "O", terminate]
         ], pre_select=-1);

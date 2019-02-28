@@ -88,7 +88,7 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
                 # now network name should be given
                 # we should only compile and then adopt
                 pio_upload=""
-                adopt="dongle adopt -f .pioenvs/$board/firmware.bin -n $2"
+                adopt="dongle adopt -r -f .pioenvs/$board/firmware.bin -n "\""$2"\"
             fi
         elif [[ "$1" ]]; then # address or network name given
             remote="$1"
