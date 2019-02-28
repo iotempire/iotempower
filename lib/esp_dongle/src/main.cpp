@@ -657,6 +657,7 @@ void setup() {
 
 void loop() {
     static unsigned long last_action = millis();
+    static unsigned long last_gw_action = millis();
     static int current_menu = 0;
     int next_char;
 
@@ -676,6 +677,7 @@ void loop() {
                 buffer_fill = 0;
                 prompt();
                 last_action = millis();
+                last_gw_action = millis();
             } else {
                 buffer_fill ++;
             }
@@ -696,5 +698,14 @@ void loop() {
                 break;
         }
         last_action = millis();
+    }
+
+    if(millis() - last_gw_action > 31000) {
+        // expire information from pi
+        gw_ssid[SMALL_STRING_LEN] = 0;
+        gw_uptime[SMALL_STRING_LEN] = 0;
+        gw_mem_free[SMALL_STRING_LEN] = 0;
+        gw_load[SMALL_STRING_LEN] = 0;
+        show_text("  UlnoIoT\n  Dongle\n\nConnection to\ngateway lost.");
     }
 }
