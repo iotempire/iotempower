@@ -65,7 +65,7 @@ class UED_Listener(threading.Thread):
         sys.stderr.write("Sending info.\n")
         # send in format: $info ssid uptime mem_free load
         self.ser.write("$info ".encode())
-        env="ULNOIOT_AP_NAME"
+        env="ULNOIOT_AP_NAME_FULL"
         if env in os.environ:
             self.ser_write("\"%s\" " %os.environ[env])
         else:
