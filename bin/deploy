@@ -74,18 +74,23 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
         key=$(tail -n1 "$KEYFILE" 2>/dev/null)
     fi
 
+    port_find_option=""
+    if [[ "$*" == *force ]]; then
+        port_find_option="nodongle"
+    fi
+
     if [[ "$1" == "compile" ]]; then
         echo "Just compiling (no remote upload or serial flash)."
         pio_upload=""
     elif [[ "$1" == "serial" ]]; then # local flash requested
         echo "Trying to select serial port."
-        port=$(find_esp_port "$2")
+        port=$(find_esp_port "$2" $port_find_option)
         echo "Using $port."
     else
         if [[ "$1" == adopt ]]; then # if we adopt, we have fixed values
             if [[ "$2" == serial ]]; then # adopt locally connected
                 echo "Trying to select serial port."
-                port=$(find_esp_port "$3")
+                port=$(find_esp_port "$3" $port_find_option)
                 echo "Using $port."
             else
                 # now network name should be given
@@ -117,7 +122,7 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
 
     if [[ $port ]]; then
         export PLATFORMIO_UPLOAD_PORT="/dev/$port"
-        if [[ ! $@ == *force ]]; then # usually check dongle
+        if [[ ! "$*" == *force ]]; then # usually check dongle
             dongle probe -p "$PLATFORMIO_UPLOAD_PORT" && {
                 echo "There is a ulnoiot esp dongle connected at $port."
                 echo "Refusing to overwrite."

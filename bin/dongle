@@ -26,13 +26,19 @@ function dongle_connect() {
 }
 
 if [[ "$command" = flash ]]; then
-    port=/dev/$(find_esp_port "$2" nodongle)
+    dongle_release
+    port=""
+    port=$(cat "$daemon_port" 2>/dev/null)
+    if [[ ! "$port" ]]; then
+        port=/dev/$(find_esp_port "$2" nodongle)
+    fi
     echo "Flashing dongle on port $port..."
     cd "$ULNOIOT_ROOT/lib/esp_dongle"
     export PLATFORMIO_UPLOAD_PORT="$port"
-    dongle_release
     platformio run -t upload
     result=$?
+    echo "Waiting for reboot before reconnect"
+    sleep 4 # allow reboot
     dongle_connect
     exit $result
 elif [[ "$command" = daemon ]]; then

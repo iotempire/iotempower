@@ -95,7 +95,7 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
     fname="$dest_dir/src/key.h"
     echo 'const char *keyhash = "'"$password"'";' > "$fname.new"
     # only replace if it's new
-    diff -q -f "$fname.new" "$fname" || mv "$fname.new" "$fname"
+    diff -q -f "$fname.new" "$fname" 2>/dev/null || mv "$fname.new" "$fname"
     rm -f "$fname.new"
 
 

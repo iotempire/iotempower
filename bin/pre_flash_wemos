@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-if [[ $# -gt 1 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
+if [[ $# -gt 2 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF
-Syntax: pre_flash_wemos [serial port]
+Syntax: pre_flash_wemos [serial port] [force]
 
 pre_flash_wemos writes an initial firmware to a locally connected Wemos D1
 mini.

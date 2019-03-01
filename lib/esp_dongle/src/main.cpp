@@ -169,10 +169,12 @@ void show_text(const String& text) {
 void show_ulnoiot() {
     String display_string = "  UlnoIoT\n  Dongle\n\n";
     String ssid = String(gw_ssid);
+    int l = (int)ssid.length();
 
     if(gw_ssid[0]) {
         show_text(display_string 
-            + "\nWiFi: " + ssid.substring(0,7) + "\n" + ssid.substring(7));
+            + "\nWiFi: " + ssid.substring(0,max(8,l-13)) 
+            + "\n" + ssid.substring(max(0,l-13)));
     } else {
         show_text( display_string + "No gateway\ndetected.");
     }
@@ -181,13 +183,15 @@ void show_ulnoiot() {
 void show_gw_info() {
     String display_string = "UlnoIoTDongle\n";
     String ssid = String(gw_ssid);
+    int l = (int)ssid.length();
 
     if(gw_ssid[0]) {
         show_text(display_string 
             + "MFr: " + String(gw_mem_free)
             + "\nUP: " + String(gw_uptime) 
             + "\nLD: " + String(gw_load)
-            + "\nWiFi: " + ssid.substring(0,8) + "\n" + ssid.substring(8));
+            + "\nWiFi: " + ssid.substring(0,max(8,l-13)) 
+            + "\n" + ssid.substring(max(0,l-13)));
     } else {
         show_text(display_string 
             + "\nNo gateway\ndetected.\nMake sure it\nis running.");
