@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # run different ulnoiot esp dongle programs
 #
+# TODO: help
+#
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
@@ -9,7 +11,30 @@ daemon_fifo=/var/tmp/ulnoiot_dongle
 command="$1"
 shift 1
 
-if [[ "$command" = daemon ]]; then
+function dongle_release() {
+    if [[ -e "$daemon_fifo" ]]; then
+        echo release >"$daemon_fifo" & # release serial
+        sleep 0.1
+    fi
+}
+
+function dongle_conncet() {
+    if [[ -e "$daemon_fifo" ]]; then
+        echo connect >"$daemon_fifo" & # connect and resume daemon again
+    fi
+}
+
+if [[ "$command" = flash ]]; then
+    port=/dev/$(find_esp_port "$2" nodongle)
+    echo "Flashing dongle on port $port..."
+    cd "$ULNOIOT_ROOT/lib/esp_dongle"
+    export PLATFORMIO_UPLOAD_PORT="$port"
+    dongle_release
+    platformio run -t upload
+    result=$?
+    dongle_connect
+    exit $result
+elif [[ "$command" = daemon ]]; then
     if [[ -e "$daemon_fifo" ]]; then
         echo quit >"$daemon_fifo" & # stop old daemon
         sleep 0.5 # let it stop
@@ -28,14 +53,9 @@ elif [[ "$command" = quit ]]; then
         rm "$daemon_fifo" &> /dev/null  # should be already deleted
     fi
 else
-    if [[ -e "$daemon_fifo" ]]; then
-        echo release >"$daemon_fifo" & # release serial
-        sleep 0.1
-    fi
+    dongle_release
     python3 "$ULNOIOT_ROOT/bin/dongle_$command.py" "$@"
     result=$?
-    if [[ -e "$daemon_fifo" ]]; then
-        echo connect >"$daemon_fifo" & # connect and resume daemon again
-    fi
+    dongle_connect
     exit $result
 fi

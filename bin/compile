@@ -3,12 +3,10 @@ if [[ $# -gt 2 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF
 Syntax: compile
 
-compile must be called from a node or system directory and reads its 
-configuration(s) from there.
-
-It compiles the respective node or all nodes in the subdirectories.
-
+compile calls deploy compile, its help is listed now:
+==== help of deploy ===
 EOF
+deploy help
 exit 1
 fi
 

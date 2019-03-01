@@ -370,8 +370,8 @@ function menu_default() {
         ["Adopt (A)", "A", adopt],
         ["Create New Node Folder (N)", "N", create_node_template],
         ["Advanced (V)", "V", advanced],
-    //    "Exit (X,ESC)"
-    ], pre_select=0, pad_last=0);
+        ["Exit (X,ESC)", "X", terminate]
+    ], pre_select=0, pad_last=1);
 }
 
 menu_default();

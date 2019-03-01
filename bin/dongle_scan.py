@@ -74,6 +74,7 @@ def do_scan(port, cutoff):
     #         break
 
     ser.close()
+    return 0
 
 
 def parser(unparsed_args):

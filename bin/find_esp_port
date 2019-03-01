@@ -4,13 +4,22 @@
 # scan ports to see if there is an esp
 #
 # $1 can be a usb0-usb9 or acm0-acm9 as suggestion
+# $1 or $2 can be nodongle to skip the dongle test
+#
 default_port=ttyUSB0
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
-if [[ "$1" = "" ]]; then # no port given
-  port="$default_port"
-elif [[ "$1" = ws* || "$1" = tty* ]]; then # already found, no conversion necessary
+skip_dongletest=""
+
+if [[ "$1" == nodongle ]]; then
+    skip_dongletest="yes"
+    set "$2" "" # switch params
+elif [[ "$2" == nodongle ]]; then
+    skip_dongletest="yes"
+fi
+
+if [[ "$1" = ws* || "$1" = tty* ]]; then # already given, no search necessary
   port="$1"
 elif [[ "$1" =~ ^[Uu][Ss][Bb][0-9]$ ]]; then
   port=ttyUSB${1:3:1}
@@ -19,18 +28,34 @@ elif [[ "$1" =~ ^[Aa][Cc][Mm][0-9]$ ]]; then
 elif ping -c 2 -i 0.5 "$1" -W 2 &> /dev/null; then
   port="ws:$1,$2"
 else
-    port="$default_port"
-    # as no port is given, try to find one locally
-    for p in USB0 USB1 USB2 USB3 USB4 USB5 USB6 USB7 USB8 USB9 \
-             ACM0 ACM1 ACM2 ACM3 ACM4 ACM5 ACM6 ACM7 ACM8 ACM9; do
-        # probe=$(esptool --port "/dev/tty$port" chip_id 2>/dev/null | grep "Chip ID:") # probe with reset
-        probe=$(ls "/dev/tty$p" 2>/dev/null) # softprobe -> no reset
-        if [[ "$probe" ]]; then
-            port="tty$p"
-            break
+    # port="$default_port"
+    # # as no port is given, try to find one locally
+    # for p in USB0 USB1 USB2 USB3 USB4 USB5 USB6 USB7 USB8 USB9 \
+    #          ACM0 ACM1 ACM2 ACM3 ACM4 ACM5 ACM6 ACM7 ACM8 ACM9; do
+    #     # probe=$(esptool --port "/dev/tty$port" chip_id 2>/dev/null | grep "Chip ID:") # probe with reset
+    #     probe=$(ls "/dev/tty$p" 2>/dev/null) # softprobe -> no reset
+    #     if [[ "$probe" ]]; then
+    #         port="tty$p"
+    #         break
+    #     fi
+    # done
+    ports=$(platformio device list --serial|egrep '^/dev/tty'|sort) # get available serial ports
+    port=""
+    for p in $ports; do
+        if [[ "$skip_dongletest" ]]; then # take first
+            port="$p"
+            break 
+        fi
+        if ! dongle probe -p "$p"; then
+            port="$p"
+            break;
         fi
     done
-    # sleep 1 # let the scan settle - when reset is executed
+    if [[ "$port" ]]; then
+        port=$(echo $port|cut -b6-)
+    else
+        port="NO_SERIAL_DEVICE_FOUND"
+    fi    
 fi
 
 echo $port

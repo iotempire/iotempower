@@ -98,35 +98,49 @@ class UED_Listener(threading.Thread):
     def listen(self):
         while self.running:
             if self.connected:
-                if self.ser.in_waiting>0:
-                    answer = self.ser.readline()
-                    if not answer:  # timeout
-                        sys.stderr.write("Trouble communicating with dongle.")
-                        self.quit()
-                        return
-                    answer = answer.strip()
-                    if answer == b"!daemon_check":
-                        self.send_info()
-                    elif answer == b"!shutdown":
-                        pass # TODO: call shutdown
-                    else:
-                        logging.debug(answer)                        
+                try:                    
+                    if self.ser.in_waiting>0:
+                        answer = self.ser.readline()
+                        if not answer:  # timeout
+                            sys.stderr.write("Trouble communicating with dongle.")
+                            self.quit()
+                            return
+                        answer = answer.strip()
+                        if answer == b"!daemon_check":
+                            self.send_info()
+                        elif answer == b"!shutdown":
+                            pass # TODO: call shutdown
+                        else:
+                            logging.debug(answer)
+                except:
+                    logging.error("Lost serial connection.")
+                    self.quit()
+                    self.release()
+                    sys.stderr.write("Lost serial connection exiting...\n")
+                    os.kill(os.getpid(), 2) # send external ctrl-c to interrupt input
+
                 if self.request_release:
                     self.request_release = False
                     self.ser.close()
                     self.ser = None
                     self.connected = False
         self.release()
-        sys.stderr.write("Exiting...\n")
+        sys.stderr.write("Exiting.\n")
 
     def run(self):
         self.running = True
         self.listen()
 
 
+
 def stdin_listener(ser_listener):
     while True:
-        l = input("c)onnect, r)elease, q)uit:\n")
+        try:
+            l = input("c)onnect, r)elease, q)uit:\n")
+        except KeyboardInterrupt:
+            print()
+            sys.stderr.write("Input interrupted.\n")
+            break
         l = l.lower()
         if l.startswith("c"):
             ser_listener.connect()
@@ -135,7 +149,6 @@ def stdin_listener(ser_listener):
         elif l.startswith("q"):
             ser_listener.quit()
             break
-    return True
 
 
 def parser(unparsed_args):
@@ -192,7 +205,10 @@ def main(args):
     ser_listener.connect()
     ser_listener.start()
 
-    return stdin_listener(ser_listener)
+    stdin_listener(ser_listener) # this might be interrupted by ctrl-c
+    ser_listener.quit()
+
+    return 0
 # end main
 
 

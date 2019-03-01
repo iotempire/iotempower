@@ -1,28 +1,12 @@
 #!/bin/bash
-if [[ $# -gt 2 || $# -eq 0 ||"$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
+if [[ $# -gt 3 || $# -eq 0 ||"$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF
-Syntax: initialize|adopt uiot-node-id-nL-mS|serial [port]
+Syntax: initialize|adopt uiot-node-id-nL-mS|serial [port] [force]
 
-initialize/adopt must be called from a node directory and reads 
-its configuration from there.
-
-It flashes the node with the ulnoiot firmware. It then sets or overwrites 
-wifi and  encryption data, respective to the current node configuration folder.
-
-If called with serial as parameter (and an optional serial port), it will adopt
-a locally (via serial or given port) connected node. It will overwrite
-(re-flashes) all its settings and initial parameters.
-
-If a network-name (SSID) is specified, it does the intialization via network.
-For this it is using a locally connected ulnoiot esp dongle/
-The respective board has to be in configuration/adopt mode (this mode
-is usually triggerd via pressing and releasing the flash key twice during
-its five second power-up phase).
-
-If key is given it overrides the deduced flash-key.
-
-port: can be empty, usb0, usb1, or acm0, acm1, ...
+This calls deploy adopt, its help is listed now:
+==== help of deploy ===
 EOF
+deploy help
 exit 1
 fi
 

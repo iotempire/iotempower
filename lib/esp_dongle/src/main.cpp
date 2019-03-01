@@ -625,7 +625,7 @@ void setup_cli() {
 
 
 void setup() {
-    Serial.setRxBufferSize(RXBUFFER_SIZE); // HW-Buffer seems to be only 256 Bytes (TODO: recheck best value)
+    Serial.setRxBufferSize(RXBUFFER_SIZE+256); // HW-Buffer seems to be only 256 Bytes (TODO: recheck best value)
     // let's be "fast", should work on a Wemos D1 mini
  //    Serial.begin(115200); 
 //    Serial.begin(921600);
@@ -707,5 +707,6 @@ void loop() {
         gw_mem_free[SMALL_STRING_LEN] = 0;
         gw_load[SMALL_STRING_LEN] = 0;
         show_text("  UlnoIoT\n  Dongle\n\nConnection to\ngateway lost.");
+        last_gw_action = millis(); // prevent triggering display all the time
     }
 }
