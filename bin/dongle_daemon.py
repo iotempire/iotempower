@@ -55,6 +55,11 @@ class UED_Listener(threading.Thread):
 
     def quit(self):
         self.running = False
+        self.ser.close()
+        try:
+            os.kill(os.getpid(), 2) # send external ctrl-c to interrupt input
+        except KeyboardInterrupt:
+            pass
 
     def send_info(self):
         sys.stderr.write("Sending info.\n")
@@ -98,12 +103,12 @@ class UED_Listener(threading.Thread):
     def listen(self):
         while self.running:
             if self.connected:
-                try:                    
+                try:
                     if self.ser.in_waiting>0:
                         answer = self.ser.readline()
                         if not answer:  # timeout
                             sys.stderr.write("Trouble communicating with dongle.")
-                            self.quit()
+                            #self.quit()
                             return
                         answer = answer.strip()
                         if answer == b"!daemon_check":
@@ -113,11 +118,9 @@ class UED_Listener(threading.Thread):
                         else:
                             logging.debug(answer)
                 except:
-                    logging.error("Lost serial connection.")
-                    self.quit()
-                    self.release()
-                    sys.stderr.write("Lost serial connection exiting...\n")
-                    os.kill(os.getpid(), 2) # send external ctrl-c to interrupt input
+                   logging.error("Lost serial connection.")
+                   sys.stderr.write("Lost serial connection exiting...\n")
+                   self.quit()
 
                 if self.request_release:
                     self.request_release = False
@@ -133,10 +136,13 @@ class UED_Listener(threading.Thread):
 
 
 
-def stdin_listener(ser_listener):
+def stdin_listener(ser_listener, input_file):
     while True:
         try:
-            l = input("c)onnect, r)elease, q)uit:\n")
+            if input_file == "-":
+                l = input("c)onnect, r)elease, q)uit:\n")
+            else:
+                l = open(input_file).readline()
         except KeyboardInterrupt:
             print()
             sys.stderr.write("Input interrupted.\n")
@@ -145,6 +151,7 @@ def stdin_listener(ser_listener):
         if l.startswith("c"):
             ser_listener.connect()
         elif l.startswith("r"):
+            # TODO: start timer to automatically reconnect if host application died 
             ser_listener.release()
         elif l.startswith("q"):
             ser_listener.quit()
@@ -163,8 +170,14 @@ def parser(unparsed_args):
     group.add_option("-p", "--port",
         dest = "esp_port",
         type = "str",
-        help = "ulnoiot esp dongle serial port (where the dongle is connected). Default /dev/ttyUSB0",
+        help = "UlnoIoT Esp Dongle serial port (where the dongle is connected). Default /dev/ttyUSB0",
         default = "/dev/ttyUSB0"
+    )
+    group.add_option("-i", "--input",
+        dest = "input",
+        type = "str",
+        help = "Redirect input from given file. Default: stdin",
+        default = "-"
     )
     parser.add_option_group(group)
 
@@ -202,11 +215,17 @@ def main(args):
 
     ser_listener = UED_Listener(options.esp_port)
 
-    ser_listener.connect()
-    ser_listener.start()
+    if ser_listener.connect():
+        ser_listener.start()
 
-    stdin_listener(ser_listener) # this might be interrupted by ctrl-c
-    ser_listener.quit()
+        stdin_listener(ser_listener, options.input) # this might be interrupted by ctrl-c
+        try:
+            ser_listener.quit()
+        except KeyboardInterrupt:
+            pass
+    else:
+        sys.stderr.write("Cannot connect to dongle.\n")
+        return 1
 
     return 0
 # end main

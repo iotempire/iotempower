@@ -7,20 +7,21 @@
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
 daemon_fifo=/var/tmp/ulnoiot_dongle
+daemon_port="$daemon_fifo.port"
 
 command="$1"
 shift 1
 
 function dongle_release() {
     if [[ -e "$daemon_fifo" ]]; then
-        echo release >"$daemon_fifo" & # release serial
+        echo release > "$daemon_fifo" & # release serial
         sleep 0.1
     fi
 }
 
-function dongle_conncet() {
+function dongle_connect() {
     if [[ -e "$daemon_fifo" ]]; then
-        echo connect >"$daemon_fifo" & # connect and resume daemon again
+        echo connect > "$daemon_fifo" & # connect and resume daemon again
     fi
 }
 
@@ -38,23 +39,46 @@ elif [[ "$command" = daemon ]]; then
     if [[ -e "$daemon_fifo" ]]; then
         echo quit >"$daemon_fifo" & # stop old daemon
         sleep 0.5 # let it stop
-        rm "$daemon_fifo"
+        rm -f "$daemon_fifo" "$daemon_port"
     fi
-    mkfifo -m 600 "$daemon_fifo"
-#    python3 "$ULNOIOT_ROOT/bin/dongle_daemon.py" "$@" <"$daemon_fifo"
-    # not sure why I have to use tail for the fifo and not <$daemon_fifo
-    tail -f "$daemon_fifo" | python3 "$ULNOIOT_ROOT/bin/dongle_daemon.py" "$@"
-    rm "$daemon_fifo"
+    # probe where dongle is running
+    echo "Searching dongle..."
+    port=""
+    ports=$(platformio device list --serial|egrep '^/dev/tty'|sort) # get available serial ports
+    for p in $ports; do
+        if dongle probe -p "$p"; then
+            port="$p"
+            break;
+        fi
+    done
+    if [[ "$port" ]]; then
+        echo "$port" > "$daemon_port"
+        echo "Starting daemon on $port."
+        mkfifo -m 600 "$daemon_fifo"
+    #    python3 "$ULNOIOT_ROOT/bin/dongle_daemon.py" "$@" <"$daemon_fifo"
+        # not sure why I have to use tail for the fifo and not <$daemon_fifo
+        python3 "$ULNOIOT_ROOT/bin/dongle_daemon.py" -i "$daemon_fifo" -p "$port" "$@"
+        rm -f "$daemon_fifo" "$daemon_port"
+    else
+        echo "Dongle not found."
+        exit 1
+    fi
 elif [[ "$command" = quit ]]; then
     if [[ -e "$daemon_fifo" ]]; then
         echo "Sending quit to daemon."
         echo quit >"$daemon_fifo" & # stop old daemon
         sleep 0.5 # let it stop
-        rm "$daemon_fifo" &> /dev/null  # should be already deleted
+        rm -f "$daemon_fifo" "$daemon_port" # should be already deleted
     fi
 else
     dongle_release
-    python3 "$ULNOIOT_ROOT/bin/dongle_$command.py" "$@"
+    port=""
+    port=$(cat "$daemon_port" 2>/dev/null)
+    if [[ "$port" ]]; then
+        python3 "$ULNOIOT_ROOT/bin/dongle_$command.py" -p "$port" "$@"
+    else
+        python3 "$ULNOIOT_ROOT/bin/dongle_$command.py" "$@"
+    fi
     result=$?
     dongle_connect
     exit $result

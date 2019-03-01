@@ -17,6 +17,7 @@ fi
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
 # TODO: remove dead links
+# TODO: only do it when no other process is active on that dir
 
 copy_type_through_base() {
     # $1: source directory
