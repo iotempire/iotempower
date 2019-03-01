@@ -109,7 +109,7 @@ cat > "$fname.new" << EOF
 #define mqtt_password "$mqtt_password"
 EOF
     # only replace if it's new
-    diff -q -f "$fname.new" "$fname" || mv "$fname.new" "$fname"
+    diff -q -f "$fname.new" "$fname" 2>/dev/null || mv "$fname.new" "$fname"
     rm -f "$fname.new"
 
 # we hardcode wifi credentials now to allow easier re-flashing and
@@ -121,7 +121,7 @@ cat > "$fname.new" << EOF
 #define WIFI_PASSWORD "$ULNOIOT_AP_PASSWORD"
 EOF
     # only replace if it's new
-    diff -q -f "$fname.new" "$fname" || mv "$fname.new" "$fname"
+    diff -q -f "$fname.new" "$fname" 2>/dev/null || mv "$fname.new" "$fname"
     rm -f "$fname.new"
 
 else
