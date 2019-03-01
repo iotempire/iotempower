@@ -227,9 +227,10 @@ function adopt_selection(node_list, original_list, start) {
     for(var index=start; index<start+max_entries && index<node_list.length; index++) {
         choice_list.push([node_list[index] + " (" + counter +")", "" + counter, 
         function_factory_reduce_param(function(selection){
-            selection = selection.split(" ")[0]
-            shell_command_in_path("You are about to adopt the node " +
-                + selection + " from the following path:",
+            selection = selection.split(" ")[0];
+            var subsel = selection.substring(10);
+            shell_command_in_path("You are about to adopt the node "
+                + subsel + " from the following path:",
                 "Are you sure that this is the right node and path?",
                 "adopt " + selection);
         }, original_list[index])]);
