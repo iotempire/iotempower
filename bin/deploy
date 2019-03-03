@@ -48,105 +48,20 @@ fi
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
+export ULNOIOT_DEPLOY=active
+
+# use tmp directory as refreshed at restart/crash
+LOCK="/tmp/.net.ulno.ulnoiot.deploy_lock"
 
 if [[ -e "node.conf" ]]; then  # started from node-directory
-    source "$ULNOIOT_ROOT/bin/read_node_config"
-    export board # for platformio.ini
-
-    port=""
-    remote=""
-    key=""
-    pio_upload="-t upload"
-    adopt=""
-
-    platform_folder="$ULNOIOT_ROOT/lib/node_types/$board"
-
-    # check key-file and eventually regenerate
-    KEYFILE=key.txt
-    key=$(tail -n1 "$KEYFILE" 2>/dev/null)
-    if [[ ! ${#key} = 64 ]]; then
-        # TODO: check that haveged is running and maybe check not to overwrite key?
-        echo "Generating new key."
-        # random password must not have chars like $, ", # as bash and platformio
-        # messes that up later (especially $)
-        < /dev/random tr -dc A-Za-z0-9\-\+_\=/@% | head -c64 > "$KEYFILE"
-        #head -c32 /dev/random|od -A n -t x2|tr -d ' \r\n' > "$KEYFILE"
-        key=$(tail -n1 "$KEYFILE" 2>/dev/null)
+    flock -n -e -E 50 "$LOCK" deploy_single "$@"
+    result=$?
+    if [[ $resulth -eq 50 ]]; then
+        echo "Only one deploy proces can be run at the same time,"
+        echo "make sure the other process finishes first."
+        exit 1
     fi
-
-    port_find_option=""
-    if [[ "$*" == *force ]]; then
-        port_find_option="nodongle"
-    fi
-
-    if [[ "$1" == "compile" ]]; then
-        echo "Just compiling (no remote upload or serial flash)."
-        pio_upload=""
-    elif [[ "$1" == "serial" ]]; then # local flash requested
-        echo "Trying to select serial port."
-        port=$(find_esp_port "$2" $port_find_option)
-        echo "Using $port."
-    else
-        if [[ "$1" == adopt ]]; then # if we adopt, we have fixed values
-            if [[ "$2" == serial ]]; then # adopt locally connected
-                echo "Trying to select serial port."
-                port=$(find_esp_port "$3" $port_find_option)
-                echo "Using $port."
-            else
-                # now network name should be given
-                # we should only compile and then adopt
-                pio_upload=""
-                adopt="dongle adopt -r -f .pioenvs/$board/firmware.bin -n "\""$2"\"
-            fi
-        elif [[ "$1" ]]; then # address or network name given
-            remote="$1"
-            if [[ "$2" ]]; then
-                key="$2"
-            else
-                key=$(tail -n1 key.txt 2>/dev/null|head -c 64)
-            fi
-        else # nothing given, deploy was just called without parameters
-            remote="$node_name.local"
-#           obsolete: getting IP from mqtt
-#           echo "Getting IP of node $topic for deployment."
-#           address=$(get_ip "$topic" 2>/dev/null|grep "$topic"|cut -d\  -f2)
-        fi
-        if [[ "$remote" ]]; then
-            echo "Deploying remotely to node $topic with address $remote."
-            export PLATFORMIO_UPLOAD_PORT="$remote"
-            export PLATFORMIO_UPLOAD_FLAGS="--progress
---port=8266
---auth="\""$key"\"
-        fi
-    fi
-
-    if [[ $port ]]; then
-        export PLATFORMIO_UPLOAD_PORT="/dev/$port"
-        if [[ ! "$*" == *force ]]; then # usually check dongle
-            dongle probe -p "$PLATFORMIO_UPLOAD_PORT" && {
-                echo "There is a ulnoiot esp dongle connected at $port."
-                echo "Refusing to overwrite."
-                echo "If you are sure, specify force as last parameter."
-                exit 1
-            }
-        fi
-    fi
-
-    prepare_build_dir cache
-    cd "$ULNOIOT_COMPILE_CACHE"
-
-    platformio run $pio_upload || { echo "Trouble compiling or uploading new firmware, check errors."; exit 1; }
-    if [[ "$adopt" ]]; then
-        $adopt || { echo "Trouble uploading new firmware, check errors."; exit 1; }
-    fi 
-
-    echo "deploy successfully done."
-
-    if [[ "$port" ]]; then
-        echo
-        echo "IMPORTANT:"
-        echo "Please, disconnect the esp from power now (once) to make OTA updates work."
-    fi
+    exit $result
 
 else # started from somewhere else, so search for node.conf in subdirs
 
