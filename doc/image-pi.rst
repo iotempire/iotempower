@@ -5,7 +5,7 @@ Install UlnoIoT image onto an SD-card
   
 - Make sure the sha256-checksum of the image is correct. It should be:
 
-  ``d49706b299bf95b41813906f9d8eff4e5f1604f0ffc9e9e1bfbb95ef472c0883``
+  ``b10c3ade65489ad4096e30c9537ba2c7c664cb8ad878fee54016531941f20be7``
 
   On Linux and MacOS, you can use ``sha256sum`` or ``shasum -a 256`` to verify
   the image, on Windows you can use
