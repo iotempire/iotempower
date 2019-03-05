@@ -130,9 +130,11 @@ void display_init() {
     });
 }
 
+int current_menu = -1;
 
 void display_text(const char* text) {
     if(!display_present) return;
+    current_menu = -1; // clear menu shown
 //    u8g2.setFont(u8g2_font_profont12_mf);
     u8g2.setFont(u8g2_font_5x8_mf);
     int8_t char_height = u8g2.getMaxCharHeight();
@@ -186,6 +188,7 @@ void display_ulnoiot() {
     }
 }
 
+
 void display_gw_info() {
     if(!display_present) return;
     String display_string = "UlnoIoTDongle\n";
@@ -203,6 +206,54 @@ void display_gw_info() {
         display_text(display_string 
             + "\nNo gateway\ndetected.\nMake sure it\nis running.");
     }
+}
+
+
+void display_esp_info() {
+    if(!display_present) return;
+    String display_string = "Internal Info\n";
+
+    display_text(display_string 
+        + "\nMFM: " + String(ESP.getFreeHeap())
+        + "\nMFB: " + String(ESP.getMaxFreeBlockSize())
+        + "\nID: " + String(ESP.getChipId(), HEX)
+        );
+}
+
+
+int display_menu(int current_menu, int menu_pos, int menu_advance) {
+    if(!display_present || current_menu<0) return 0;
+
+    int menu_length=0;
+
+    menu_pos += menu_advance;
+    if(menu_pos<=0) menu_pos=0;
+    
+    switch(current_menu) {
+        case 0: // main menu
+            menu_length = 3;
+            if(menu_pos>=menu_length) menu_pos=0;
+            display_text(String("*Dongle Menu*\n") 
+                + (menu_pos==0?">":" ") + "Show info\n"
+                + (menu_pos==1?">":" ") + "Show intern\n"
+                + (menu_pos==2?">":" ") + "Shutdown gw\n"
+                + "<down select>");
+            break;
+        case 1: // shut_down menu
+            menu_length = 3;
+            if(menu_pos>=menu_length) menu_pos=0;
+            display_text(String("Shutdown gw?\n") 
+                + (menu_pos==0?">":" ") + "Cancel, back\n"
+                + (menu_pos==1?">":" ") + "No\n"
+                + (menu_pos==2?">":" ") + "Shutdown gw!\n"
+                + "<down select>");
+            break;
+        default:
+            menu_pos = 0;
+            break;
+    }
+
+    return menu_pos;
 }
 
 void prompt() {
@@ -666,17 +717,53 @@ void setup() {
         display_present = true;
         u8g2.begin();
         display_init();
+        pinMode(D4, INPUT); // only floating as else potential trouble with onboard-led
+        pinMode(D3, INPUT_PULLUP);
     } else {
         Serial.println("No display shield found.");
+        // TODO: add some onboard-led blink patterns
     }
 
     setup_cli();
 }
 
+int read_buttons() {
+    const int debounce = 8;
+    static int b1_count = 0;
+    static int b2_count = 0;
+    int state = 0;
+
+    pinMode(D4, INPUT); // only floating as else potential trouble with onboard-led
+
+    if(!digitalRead(D3)) {
+        b1_count ++;
+        if(b1_count > debounce*2) b1_count = debounce*2;
+    }
+    else {
+        b1_count--;
+        if(b1_count < 0) b1_count = 0;
+    }
+    if(b1_count >= debounce) state |= 1;
+
+    if(!digitalRead(D4)) {
+        b2_count ++;
+        if(b2_count > debounce*2) b2_count = debounce*2;
+    }
+    else {
+        b2_count--;
+        if(b2_count < 0) b2_count = 0;
+    }
+    if(b2_count >= debounce) state |= 2;
+
+    return state;
+}
+
+
 void loop() {
     static unsigned long last_action = millis();
-    static unsigned long last_gw_action = millis();
-    static int current_menu = 0;
+    static unsigned long last_button = last_action;
+    static unsigned long last_gw_action = last_action;
+    static int current_info_screen = 0;
     int next_char;
 
     if(Serial.available() > 0) {
@@ -701,13 +788,84 @@ void loop() {
             }
         }
     }
-    
+
+    static int last_state=0;
+    static int menu_pos=0;
+    static int current_menu = -1;
+    if(display_present && millis() - last_button > 20) { // 50 times per second do button reading
+        int state = read_buttons();
+        if(state != last_state) {
+            last_state = state;
+            if(state) { // only trigger with press, not with release
+                if(current_menu >= 0) {
+                    if(state & 1) { // left pressed
+                        menu_pos = display_menu(current_menu, menu_pos, 1);
+                        last_action = millis();
+                    } else if(state & 2) { // right pressed
+                        Serial.print("Selected in dongle menu: ");
+                        Serial.print(current_menu);
+                        Serial.print(" at pos: ");
+                        Serial.println(menu_pos);
+                        switch(current_menu) {
+                            case 0: // default user menu:
+                                switch(menu_pos) {
+                                    case 0: // show info
+                                        current_menu = -1;
+                                        current_info_screen = 0;
+                                        display_gw_info();
+                                        break;
+                                    case 1: // show esp info
+                                        current_menu = -1;
+                                        display_esp_info();
+                                        break;
+                                    case 2: // shutdown
+                                        current_menu = 1;
+                                        menu_pos = 0;
+                                        display_menu(current_menu, menu_pos, 0);
+                                        break;
+                                }
+                                last_action = millis();
+                                break;
+                            case 1: // shutdown menu
+                                switch(menu_pos) {
+                                    case 0: // back
+                                        current_menu = 0;
+                                        menu_pos = 2;
+                                        display_menu(current_menu, menu_pos, 0);
+                                        break;
+                                    case 1: // no
+                                        current_menu = -1;
+                                        current_info_screen = 0;
+                                        display_gw_info();
+                                        break;
+                                    case 2: // shutdown
+                                        Serial.println("");
+                                        Serial.println("!shutdown");
+                                        current_menu = -1;
+                                        display_text("Shutting\ndown\ngateway...");
+                                        break;
+                                }
+                                last_action = millis();
+                                break;
+                        }
+                    }
+                } else { // not shown, so show menu
+                    current_menu = 0;
+                    menu_pos = 0;
+                    display_menu(current_menu, menu_pos, 0);
+                    last_action = millis();
+                }
+            }
+        }
+    }
+
     if(millis() - last_action > 15000) { // every 15 s do status update
         Serial.write("!daemon_check\n");
+        current_menu = -1;
         // answer received above
-        current_menu ++;
-        current_menu %= 2;
-        switch(current_menu) {
+        current_info_screen ++;
+        current_info_screen %= 2;
+        switch(current_info_screen) {
             case 0: // info menu
                 display_gw_info();
                 break;
@@ -719,12 +877,15 @@ void loop() {
     }
 
     if(millis() - last_gw_action > 31000) {
-        // expire information from pi
-        gw_ssid[SMALL_STRING_LEN] = 0;
-        gw_uptime[SMALL_STRING_LEN] = 0;
-        gw_mem_free[SMALL_STRING_LEN] = 0;
-        gw_load[SMALL_STRING_LEN] = 0;
-        display_text("  UlnoIoT\n  Dongle\n\nConnection to\ngateway lost.");
+        if(gw_ssid[0] != 0) { // only show, if it was set before
+            // expire information from pi
+            gw_ssid[SMALL_STRING_LEN] = 0;
+            gw_uptime[SMALL_STRING_LEN] = 0;
+            gw_mem_free[SMALL_STRING_LEN] = 0;
+            gw_load[SMALL_STRING_LEN] = 0;
+            if(current_menu >= 0)
+                display_text("  UlnoIoT\n  Dongle\n\nConnection to\ngateway lost.");
+        }
         last_gw_action = millis(); // prevent triggering display all the time
     }
 }

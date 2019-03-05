@@ -15,6 +15,7 @@ import serial
 import time
 import threading
 import psutil
+import subprocess
 
 
 class UED_Listener(threading.Thread):
@@ -114,7 +115,8 @@ class UED_Listener(threading.Thread):
                         if answer == b"!daemon_check":
                             self.send_info()
                         elif answer == b"!shutdown":
-                            pass # TODO: call shutdown
+                            subprocess.run(["sudo","poweroff"],timeout=60)
+                            self.quit()
                         else:
                             logging.debug(answer)
                 except:
@@ -148,7 +150,7 @@ def stdin_listener(ser_listener, input_file):
             sys.stderr.write("Input interrupted.\n")
             break
         l = l.lower()
-        if l.startswith("c"):destroyed
+        if l.startswith("c"):
             ser_listener.connect()
         elif l.startswith("r"):
             # TODO: start timer to automatically reconnect if host application died 
