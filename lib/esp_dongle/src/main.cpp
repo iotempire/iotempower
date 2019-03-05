@@ -42,6 +42,7 @@ char gw_load[SMALL_STRING_LEN+1]={0};
 
 // small display shield for Wemos
 U8G2_SSD1306_64X48_ER_F_HW_I2C u8g2(U8G2_R0); // R0 no rotation, R1 - 90°
+bool display_present = false;
 
 // The following is taken from: http://www.forward.com.au/pfod/ArduinoProgramming/I2C_ClearBus/index.html
 // Matthew Ford 1st August 2017 (original 28th September 2014)
@@ -109,18 +110,20 @@ int i2c_clear_bus() {
     return 0; // all ok
 }
 
-//std::function<void()> show_func = NULL;
+//std::function<void()> display_func = NULL;
 
-void show(std::function<void()> show_func) {
+void display(std::function<void()> display_func) {
+    if(!display_present) return;
     u8g2.firstPage();
     do {
         yield();
-        if(show_func) show_func();
+        if(display_func) display_func();
     } while ( u8g2.nextPage() );
 }
 
-void show_init() {
-    show( [&] {
+void display_init() {
+    if(!display_present) return;
+    display( [&] {
         u8g2.setFont(u8g2_font_7x14B_tr);
         u8g2.drawStr(7, 18, "UlnoIoT");
         u8g2.drawStr(10, 39, "Dongle");
@@ -128,7 +131,8 @@ void show_init() {
 }
 
 
-void show_text(const char* text) {
+void display_text(const char* text) {
+    if(!display_present) return;
 //    u8g2.setFont(u8g2_font_profont12_mf);
     u8g2.setFont(u8g2_font_5x8_mf);
     int8_t char_height = u8g2.getMaxCharHeight();
@@ -158,42 +162,45 @@ void show_text(const char* text) {
 }
 
 
-void show_text(const String& text) {
-    char display_text[128];
-    display_text[127] = 0;
-    text.toCharArray(display_text, 127);
-    show_text(display_text);
+void display_text(const String& text) {
+    if(!display_present) return;
+    char display_buffer[128];
+    display_buffer[127] = 0;
+    text.toCharArray(display_buffer, 127);
+    display_text(display_buffer);
 }
 
 
-void show_ulnoiot() {
+void display_ulnoiot() {
+    if(!display_present) return;
     String display_string = "  UlnoIoT\n  Dongle\n\n";
     String ssid = String(gw_ssid);
     int l = (int)ssid.length();
 
     if(gw_ssid[0]) {
-        show_text(display_string 
+        display_text(display_string 
             + "\nWiFi: " + ssid.substring(0,max(8,l-13)) 
             + "\n" + ssid.substring(max(0,l-13)));
     } else {
-        show_text( display_string + "No gateway\ndetected.");
+        display_text( display_string + "No gateway\ndetected.");
     }
 }
 
-void show_gw_info() {
+void display_gw_info() {
+    if(!display_present) return;
     String display_string = "UlnoIoTDongle\n";
     String ssid = String(gw_ssid);
     int l = (int)ssid.length();
 
     if(gw_ssid[0]) {
-        show_text(display_string 
+        display_text(display_string 
             + "MFr: " + String(gw_mem_free)
             + "\nUP: " + String(gw_uptime) 
             + "\nLD: " + String(gw_load)
             + "\nWiFi: " + ssid.substring(0,max(8,l-13)) 
             + "\n" + ssid.substring(max(0,l-13)));
     } else {
-        show_text(display_string 
+        display_text(display_string 
             + "\nNo gateway\ndetected.\nMake sure it\nis running.");
     }
 }
@@ -367,7 +374,7 @@ bool ota_serve(int firmware_size, const char* firmware_md5) {
     bool something_received;
     bool ok_found = false;
 
-    show_text(" *Adoption*\n\nSending\n0%");
+    display_text(" *Adoption*\n\nSending\n0%");
     unsigned long last_action = millis();
     unsigned long current;
     while(bytes_sent < firmware_size) {
@@ -415,7 +422,7 @@ bool ota_serve(int firmware_size, const char* firmware_md5) {
             bytes_sent += buffer_fill;
             snprintf(display_string, 128, "*Adoption*\n\nSending\n%d%%",
                 (int)(bytes_sent*100/firmware_size));
-            show_text(display_string);
+            display_text(display_string);
             // try to receive something for max 10s
             something_received = false;
             unsigned long start = millis(); 
@@ -494,7 +501,7 @@ void adopt(Cmd* cmd) {
     Serial.printf("Connecting to reconfig node network %s.", node_network);
     WiFi.begin(node_network, node_ap_password);
 
-    show_text(" *Adoption*\n\nTrying to\nconnect.");
+    display_text(" *Adoption*\n\nTrying to\nconnect.");
     // Try for 15 seconds
     for(int i=0; i<15; i++) {
         delay(1000);
@@ -502,7 +509,7 @@ void adopt(Cmd* cmd) {
         Serial.print(".");
     }
     if(WiFi.status() != WL_CONNECTED) {
-        show_text(" *Adoption*\n\nConnect\nfailed.");
+        display_text(" *Adoption*\n\nConnect\nfailed.");
         Serial.println("failure.");
         Serial.println("!error adopt connect");
         return;
@@ -514,9 +521,9 @@ void adopt(Cmd* cmd) {
     cmd->getArg(2)->getValue().toCharArray(md5sum, 33);
     bool result = ota_serve(cmd->getArg(1)->getValue().toInt(), md5sum);
     if(!result) {
-        show_text(" *Adoption*\n\nFailure");
+        display_text(" *Adoption*\n\nFailure");
     } else {
-        show_text(" *Adoption*\n\nSuccess");
+        display_text(" *Adoption*\n\nSuccess");
     }
 };
 
@@ -566,7 +573,7 @@ void setup_cli() {
     Command* display_cmd = new Command("display", [](Cmd* cmd) {
         Serial.print("Display got: ");
         Serial.println(cmd->getArg(0)->getValue());
-        show_text(cmd->getArg(0)->getValue());
+        display_text(cmd->getArg(0)->getValue());
     });
     display_cmd->addArg(new AnonymOptArg()); // text
     cli->addCmd(display_cmd);
@@ -577,7 +584,7 @@ void setup_cli() {
         WiFi.mode(WIFI_STA);
         WiFi.disconnect();
 
-        show_text("WiFi Scan\n\nScanning");
+        display_text("WiFi Scan\n\nScanning");
 
         Serial.println("!network_scan start");
         int count = WiFi.scanNetworks();
@@ -588,7 +595,7 @@ void setup_cli() {
         }
         Serial.println("!network_scan end");
         Serial.flush();
-        show_text("WiFi Scan\n\nDone.");
+        display_text("WiFi Scan\n\nDone.");
     }));
 
     //// adopt
@@ -651,10 +658,17 @@ void setup() {
     WiFi.disconnect(true);
 
     i2c_clear_bus();
-    u8g2.begin();
-    // show_func = show_init;
-    // show();
-    show_init();
+    // probe image shield
+    Wire.begin(); // check default i2c
+    Wire.beginTransmission(0x3c);
+    if (Wire.endTransmission() == 0) {
+        Serial.println("Display shield found.");
+        display_present = true;
+        u8g2.begin();
+        display_init();
+    } else {
+        Serial.println("No display shield found.");
+    }
 
     setup_cli();
 }
@@ -695,10 +709,10 @@ void loop() {
         current_menu %= 2;
         switch(current_menu) {
             case 0: // info menu
-                show_gw_info();
+                display_gw_info();
                 break;
             case 1:
-                show_ulnoiot();
+                display_ulnoiot();
                 break;
         }
         last_action = millis();
@@ -710,7 +724,7 @@ void loop() {
         gw_uptime[SMALL_STRING_LEN] = 0;
         gw_mem_free[SMALL_STRING_LEN] = 0;
         gw_load[SMALL_STRING_LEN] = 0;
-        show_text("  UlnoIoT\n  Dongle\n\nConnection to\ngateway lost.");
+        display_text("  UlnoIoT\n  Dongle\n\nConnection to\ngateway lost.");
         last_gw_action = millis(); // prevent triggering display all the time
     }
 }
