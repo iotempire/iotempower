@@ -148,7 +148,7 @@ def stdin_listener(ser_listener, input_file):
             sys.stderr.write("Input interrupted.\n")
             break
         l = l.lower()
-        if l.startswith("c"):
+        if l.startswith("c"):destroyed
             ser_listener.connect()
         elif l.startswith("r"):
             # TODO: start timer to automatically reconnect if host application died 
