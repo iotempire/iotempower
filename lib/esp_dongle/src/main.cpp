@@ -234,8 +234,11 @@ void display_info_screen() {
         case 0: // info menu
             display_gw_info();
             break;
-        case 1:
+        case 1: // general ulnoiot dongle info screen
             display_ulnoiot();
+            break;
+        case 10: // internal info screen
+            display_esp_info();
             break;
     }
 }
@@ -838,11 +841,12 @@ void loop() {
                                     case 0: // show info
                                         current_menu = -1;
                                         current_info_screen = 0;
-                                        display_gw_info();
+                                        display_info_screen();
                                         break;
                                     case 1: // show esp internal info
                                         current_menu = -1;
-                                        display_esp_info();
+                                        current_info_screen = 10;
+                                        display_info_screen();
                                         break;
                                     case 2: // shutdown
                                         current_menu = 1;
@@ -901,10 +905,10 @@ void loop() {
     if(current - last_gw_action > 31000) {
         if(gw_ssid[0] != 0) { // only show, if it was set before
             // expire information from pi
-            gw_ssid[SMALL_STRING_LEN] = 0;
-            gw_uptime[SMALL_STRING_LEN] = 0;
-            gw_mem_free[SMALL_STRING_LEN] = 0;
-            gw_load[SMALL_STRING_LEN] = 0;
+            gw_ssid[0] = 0;
+            gw_uptime[0] = 0;
+            gw_mem_free[0] = 0;
+            gw_load[0] = 0;
             if(current_menu >= 0)
                 display_text("  UlnoIoT\n  Dongle\n\nConnection to\ngateway lost.");
         }

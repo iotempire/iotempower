@@ -40,8 +40,9 @@ if [[ "$command" = flash ]]; then
     platformio run -t upload
     result=$?
     if [[ "$result" -eq 0 ]]; then
-        echo "Waiting for reboot before reconnect"
-        sleep 4 # allow reboot
+        echo "Waiting 5s for reboot before reconnect..."
+        sleep 5 # allow reboot
+        echo "Successfully flashed dongle."
     else
         echo "Error compiling or flashing. Check errors."
     fi
