@@ -21,7 +21,7 @@ def do_scan(port, cutoff):
     ser.flush()
     answer = ser.read_until(b"UED>")
     if not answer.endswith(b"UED>"):
-        sys.stderr.write("Trouble communicating with dongle.")
+        sys.stderr.write("Trouble communicating with dongle.\n")
         return 1
 
     # show options

@@ -57,7 +57,7 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
     flock -n -e -E 50 "$LOCK" deploy_single "$@"
     result=$?
     if [[ $resulth -eq 50 ]]; then
-        echo "Only one deploy proces can be run at the same time,"
+        echo "Only one deploy process can be run at the same time,"
         echo "make sure the other process finishes first."
         exit 1
     fi

@@ -63,7 +63,7 @@ class UED_Listener(threading.Thread):
             pass
 
     def send_info(self):
-        sys.stderr.write("Sending info.\n")
+        sys.stderr.write("Answering info request.\n")
         # send in format: $info ssid uptime mem_free load
         self.ser.write("$info ".encode())
         env="ULNOIOT_AP_NAME_FULL"
@@ -94,8 +94,9 @@ class UED_Listener(threading.Thread):
             memory = "%dM" % memory
         self.ser_write("%s "%memory)
 
-        load = os.getloadavg()[0]
-        self.ser_write("%.1f\n"%load)
+        # TODO: send cpu utilization instead of load
+        cpu_util = round(psutil.cpu_percent())
+        self.ser_write("%d%%\n"%cpu_util)
         self.ser.flush()
 
     def ser_write(self, text):

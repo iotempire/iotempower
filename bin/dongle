@@ -33,12 +33,18 @@ if [[ "$command" = flash ]]; then
         port=/dev/$(find_esp_port "$2" nodongle)
     fi
     echo "Flashing dongle on port $port..."
+    python3 "$ULNOIOT_ROOT/bin/dongle_display.py" -p "$port" \
+        "Updating\\\\nfirmware...\\\\n\\\\nPlease wait."
     cd "$ULNOIOT_ROOT/lib/esp_dongle"
     export PLATFORMIO_UPLOAD_PORT="$port"
     platformio run -t upload
     result=$?
-    echo "Waiting for reboot before reconnect"
-    sleep 4 # allow reboot
+    if [[ "$result" -eq 0 ]]; then
+        echo "Waiting for reboot before reconnect"
+        sleep 4 # allow reboot
+    else
+        echo "Error compiling or flashing. Check errors."
+    fi
     dongle_connect
     exit $result
 elif [[ "$command" = daemon ]]; then

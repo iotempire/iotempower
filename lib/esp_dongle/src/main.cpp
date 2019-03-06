@@ -44,6 +44,11 @@ char gw_load[SMALL_STRING_LEN+1]={0};
 U8G2_SSD1306_64X48_ER_F_HW_I2C u8g2(U8G2_R0); // R0 no rotation, R1 - 90°
 bool display_present = false;
 
+// menu management
+int current_menu = -1; // only info screens shown
+int current_info_screen = 0;
+unsigned long last_display_change = millis();
+
 // The following is taken from: http://www.forward.com.au/pfod/ArduinoProgramming/I2C_ClearBus/index.html
 // Matthew Ford 1st August 2017 (original 28th September 2014)
 // (c) Forward Computing and Control Pty. Ltd. NSW Australia
@@ -119,6 +124,7 @@ void display(std::function<void()> display_func) {
         yield();
         if(display_func) display_func();
     } while ( u8g2.nextPage() );
+    last_display_change = millis();
 }
 
 void display_init() {
@@ -128,9 +134,9 @@ void display_init() {
         u8g2.drawStr(7, 18, "UlnoIoT");
         u8g2.drawStr(10, 39, "Dongle");
     });
+    last_display_change = millis();
 }
 
-int current_menu = -1;
 
 void display_text(const char* text) {
     if(!display_present) return;
@@ -161,6 +167,7 @@ void display_text(const char* text) {
             text++;
         }
     } while ( u8g2.nextPage() );   
+    last_display_change = millis();
 }
 
 
@@ -199,7 +206,7 @@ void display_gw_info() {
         display_text(display_string 
             + "MFr: " + String(gw_mem_free)
             + "\nUP: " + String(gw_uptime) 
-            + "\nLD: " + String(gw_load)
+            + "\nCPU: " + String(gw_load)
             + "\nWiFi: " + ssid.substring(0,max(8,l-13)) 
             + "\n" + ssid.substring(max(0,l-13)));
     } else {
@@ -221,10 +228,24 @@ void display_esp_info() {
 }
 
 
-int display_menu(int current_menu, int menu_pos, int menu_advance) {
+void display_info_screen() {
+    if(!display_present || current_menu>=0) return;
+    switch(current_info_screen) {
+        case 0: // info menu
+            display_gw_info();
+            break;
+        case 1:
+            display_ulnoiot();
+            break;
+    }
+}
+
+
+int display_menu(int menu_pos, int menu_advance) {
     if(!display_present || current_menu<0) return 0;
 
     int menu_length=0;
+    int save_menu = current_menu; // display_text resets menu to -1
 
     menu_pos += menu_advance;
     if(menu_pos<=0) menu_pos=0;
@@ -253,6 +274,7 @@ int display_menu(int current_menu, int menu_pos, int menu_advance) {
             break;
     }
 
+    current_menu = save_menu;
     return menu_pos;
 }
 
@@ -588,6 +610,10 @@ void daemon_info(Cmd* cmd) {
     gw_mem_free[SMALL_STRING_LEN] = 0;
     cmd->getArg(3)->getValue().toCharArray(gw_load, SMALL_STRING_LEN);
     gw_load[SMALL_STRING_LEN] = 0;
+    
+    unsigned long timer_backup = last_display_change;
+    display_info_screen(); // redisplay current screen, when no other menu open
+    last_display_change = timer_backup; // only refresh, but do not prevent screen switching
 }
 
 
@@ -598,7 +624,6 @@ void setup_cli() {
     cli->onNotFound = [](String str) {
                           Serial.println("\"" + str + "\" command not found, try help.");
                       };
-
 
     //// help
     cli->addCmd(new Command("help", [](Cmd* cmd) {
@@ -613,7 +638,7 @@ void setup_cli() {
             "- $info ssid uptime mem_free load: resets the dongle\n");
     }));
 
-    //// help
+    //// reset
     cli->addCmd(new Command("reset", [](Cmd* cmd) {
         Serial.println("Reset in 2s.\n");
         delay(2000);
@@ -760,12 +785,13 @@ int read_buttons() {
 
 
 void loop() {
-    static unsigned long last_action = millis();
-    static unsigned long last_button = last_action;
-    static unsigned long last_gw_action = last_action;
-    static int current_info_screen = 0;
+    static unsigned long last_button = millis();
+    static unsigned long last_gw_action = millis();
+    static unsigned long last_gw_check = millis();
     int next_char;
+    unsigned long current = millis();
 
+    current = millis();
     if(Serial.available() > 0) {
         next_char= Serial.read();
         if(next_char > 0) {
@@ -781,8 +807,8 @@ void loop() {
                 cli->parse(buffer);
                 buffer_fill = 0;
                 prompt();
-                last_action = millis();
-                last_gw_action = millis();
+                current = millis();
+                last_gw_action = current;
             } else {
                 buffer_fill ++;
             }
@@ -791,16 +817,16 @@ void loop() {
 
     static int last_state=0;
     static int menu_pos=0;
-    static int current_menu = -1;
-    if(display_present && millis() - last_button > 20) { // 50 times per second do button reading
+    if(display_present && current - last_button > 20) { // 50 times per second do button reading
         int state = read_buttons();
         if(state != last_state) {
             last_state = state;
             if(state) { // only trigger with press, not with release
                 if(current_menu >= 0) {
                     if(state & 1) { // left pressed
-                        menu_pos = display_menu(current_menu, menu_pos, 1);
-                        last_action = millis();
+                        menu_pos = display_menu(menu_pos, 1);
+                        current = millis();
+                        last_display_change = current;
                     } else if(state & 2) { // right pressed
                         Serial.print("Selected in dongle menu: ");
                         Serial.print(current_menu);
@@ -814,24 +840,24 @@ void loop() {
                                         current_info_screen = 0;
                                         display_gw_info();
                                         break;
-                                    case 1: // show esp info
+                                    case 1: // show esp internal info
                                         current_menu = -1;
                                         display_esp_info();
                                         break;
                                     case 2: // shutdown
                                         current_menu = 1;
                                         menu_pos = 0;
-                                        display_menu(current_menu, menu_pos, 0);
+                                        display_menu(menu_pos, 0);
                                         break;
                                 }
-                                last_action = millis();
+                                current = millis();
                                 break;
                             case 1: // shutdown menu
                                 switch(menu_pos) {
                                     case 0: // back
                                         current_menu = 0;
                                         menu_pos = 2;
-                                        display_menu(current_menu, menu_pos, 0);
+                                        display_menu(menu_pos, 0);
                                         break;
                                     case 1: // no
                                         current_menu = -1;
@@ -845,38 +871,34 @@ void loop() {
                                         display_text("Shutting\ndown\ngateway...");
                                         break;
                                 }
-                                last_action = millis();
+                                current = millis();
                                 break;
                         }
                     }
-                } else { // not shown, so show menu
-                    current_menu = 0;
+                } else { // (current_menu<0) not shown, so show menu
+                    current_menu = 0; // main user menu
                     menu_pos = 0;
-                    display_menu(current_menu, menu_pos, 0);
-                    last_action = millis();
+                    display_menu(menu_pos, 0);
+                    current = millis();
                 }
             }
         }
     }
 
-    if(millis() - last_action > 15000) { // every 15 s do status update
+    if(current - last_gw_check > 5000) { // every 5s trigger check
         Serial.write("!daemon_check\n");
+        last_gw_check = current;
+    }
+
+    if(current - last_display_change > 15000) { // every 15s consider switching info screen
         current_menu = -1;
         // answer received above
         current_info_screen ++;
         current_info_screen %= 2;
-        switch(current_info_screen) {
-            case 0: // info menu
-                display_gw_info();
-                break;
-            case 1:
-                display_ulnoiot();
-                break;
-        }
-        last_action = millis();
+        display_info_screen();
     }
 
-    if(millis() - last_gw_action > 31000) {
+    if(current - last_gw_action > 31000) {
         if(gw_ssid[0] != 0) { // only show, if it was set before
             // expire information from pi
             gw_ssid[SMALL_STRING_LEN] = 0;
