@@ -12,6 +12,8 @@ fi
 
 [ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
 
+MAX_UPLOAD_TRIES=3
+ESPOTAPY="$HOME/.platformio/packages/tool-espotapy/espota.py"
 
 if [[ -e "node.conf" ]]; then  # started from node-directory
     source "$ULNOIOT_ROOT/bin/read_node_config"
@@ -57,7 +59,7 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
                 port=$(find_esp_port "$3" $port_find_option)
                 echo "Using $port."
             else
-                # now network name should be given
+                # no network name should be given
                 # we should only compile and then adopt
                 pio_upload=""
                 adopt="dongle adopt -r -f .pioenvs/$board/firmware.bin -n "\""$2"\"
@@ -79,10 +81,11 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
         # needing to compile once
         if [[ "$remote" ]]; then
             echo "Deploying remotely to node $topic with address $remote."
-            export PLATFORMIO_UPLOAD_PORT="$remote"
-            export PLATFORMIO_UPLOAD_FLAGS="--progress
---port=8266
---auth="\""$key"\"
+            pio_upload=""
+#            export PLATFORMIO_UPLOAD_PORT="$remote"
+#            export PLATFORMIO_UPLOAD_FLAGS="--progress
+# --port=8266
+# --auth="\""$key"\"
         fi
     fi
 
@@ -101,11 +104,38 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
     prepare_build_dir cache
     cd "$ULNOIOT_COMPILE_CACHE"
 
-    platformio run $pio_upload || { echo "Trouble compiling or uploading new firmware, check errors."; exit 1; }
-    if [[ "$adopt" ]]; then
-        $adopt || { echo "Trouble uploading new firmware, check errors."; exit 1; }
-    fi 
-
+    platformio run $pio_upload || { echo "Trouble compiling or flashing new firmware, check errors."; exit 1; }
+    
+    if [[ "$remote" || "$adopt" ]]; then
+        i=1
+        waittime=5
+        while true; do
+            echo "Trying upload $i/$MAX_UPLOAD_TRIES."
+            if [[ "$remote" ]]; then
+                waittime=15
+                python "$ESPOTAPY" --progress "--auth="\""$key"\" \
+                    --port=8266 --ip="$remote" --file=".pioenvs/$board/firmware.bin"
+            else
+                waittime=45
+                $adopt
+            fi 
+            if [[ $? -eq 0 ]]; then
+                break
+            else
+                echo
+                echo "Upload try $i/$MAX_UPLOAD_TRIES failed."
+                if [[ "$i" -eq "$MAX_UPLOAD_TRIES" ]]; then
+                    echo "Upload ultimately failed after $MAX_UPLOAD_TRIES."
+                    echo "Check errors above."
+                    exit 1
+                else
+                    echo "Trying again in ${waittime}s (press ctrl-c to interrupt)."
+                    sleep ${waittime}
+                fi
+            fi
+            i=$(( $i + 1 ))
+        done
+    fi
     echo "deploy successfully done."
 
     if [[ "$port" ]]; then

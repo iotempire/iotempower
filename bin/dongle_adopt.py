@@ -68,7 +68,7 @@ def serve(node_network, filename, port):
     answer = ser.read_until(b"UED>")
     if not answer.endswith(b"UED>"):
         logging.debug(answer)
-        sys.stderr.write("Trouble communicating with dongle.")
+        sys.stderr.write("Trouble communicating with dongle.\n")
         ser.close()
         return 1
 
@@ -139,7 +139,15 @@ def serve(node_network, filename, port):
                 return 1
             elif answer.startswith(b"!success"):
                 success = True
-                break;
+                break
+            elif answer.startswith(b"Block"):
+                pass # ignore
+            else:  # unknown answer
+                sys.stderr.write('Error uploading, wrong answer from dongle.\n')
+                ser.close()
+                f.close()
+                return 1
+
 
     f.close()
     ser.close()
@@ -216,7 +224,7 @@ def main(args):
     loglevel = logging.WARNING
     if (options.debug):
         loglevel = logging.DEBUG
-    # end if
+    loglevel = logging.DEBUG  # TODO: remove
 
     # logging
     logging.basicConfig(level = loglevel, format = '%(asctime)-8s [%(levelname)s]: %(message)s', datefmt = '%H:%M:%S')

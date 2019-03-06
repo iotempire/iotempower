@@ -712,7 +712,7 @@ void setup_cli() {
 
 
 void setup() {
-    Serial.setRxBufferSize(RXBUFFER_SIZE+256); // HW-Buffer seems to be only 256 Bytes (TODO: recheck best value)
+    Serial.setRxBufferSize(RXBUFFER_SIZE+512); // HW-Buffer seems to be only 256 Bytes (TODO: recheck best value)
     // let's be "fast", should work on a Wemos D1 mini
  //    Serial.begin(115200); 
 //    Serial.begin(921600);

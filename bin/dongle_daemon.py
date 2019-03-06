@@ -94,7 +94,6 @@ class UED_Listener(threading.Thread):
             memory = "%dM" % memory
         self.ser_write("%s "%memory)
 
-        # TODO: send cpu utilization instead of load
         cpu_util = round(psutil.cpu_percent())
         self.ser_write("%d%%\n"%cpu_util)
         self.ser.flush()
@@ -154,7 +153,8 @@ def stdin_listener(ser_listener, input_file):
         if l.startswith("c"):
             ser_listener.connect()
         elif l.startswith("r"):
-            # TODO: start timer to automatically reconnect if host application died 
+            # TODO: start timer to automatically reconnect if host application died
+             
             ser_listener.release()
         elif l.startswith("q"):
             ser_listener.quit()

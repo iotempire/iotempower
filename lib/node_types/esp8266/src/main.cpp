@@ -39,6 +39,7 @@ void (ulnoiot_start)() __attribute__((weak));
 int long_blinks = 0, short_blinks = 0;
 
 bool wifi_connected = false;
+bool ota_failed = false;
 
 // TODO: find better solution (add display support?)
 #ifndef ONBOARDLED
@@ -156,6 +157,7 @@ void setup_ota() {
             Serial.println("Receive Failed");
         else if (error == OTA_END_ERROR)
             Serial.println("End Failed");
+        ota_failed = true;
     });
 }
 
@@ -188,8 +190,13 @@ void reconfigMode() {
     unsigned long start_time = millis();
     while (millis()-start_time < 600000) { // try for 10 minutes
         ArduinoOTA.handle();
-        id_blinker();
-        yield(); // let WiFi do what it needs to do
+        if(ota_failed) {
+            WiFi.softAP(ap_ssid, ap_password);
+            ota_failed = false;
+            ArduinoOTA.begin();
+        }
+        id_blinker(); // todo: check why not blinking after crash
+        yield(); // let WiFi do what it needs to do (if not present -> crash)
     }
     // Serial.println("Requesting password reset on next boot.");
     // int magicSize = sizeof(ULNOIOT_RECONFIG_MAGIC);
@@ -406,7 +413,7 @@ void setup() {
 
     flash_mode_select();
 
-    WiFi.setSleepMode(WIFI_NONE_SLEEP); // TODO: check if this works -> for better led-smoothness
+    WiFi.setSleepMode(WIFI_NONE_SLEEP); // TODO: check if this works -> for better rgb-strip-smoothness
 
     setup_ota();
 
