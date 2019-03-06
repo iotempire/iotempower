@@ -113,7 +113,7 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
             echo "Trying upload $i/$MAX_UPLOAD_TRIES."
             if [[ "$remote" ]]; then
                 waittime=15
-                python "$ESPOTAPY" --progress "--auth="\""$key"\" \
+                python "$ESPOTAPY" --progress -a "$key" \
                     --port=8266 --ip="$remote" --file=".pioenvs/$board/firmware.bin"
             else
                 waittime=45
@@ -125,7 +125,7 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
                 echo
                 echo "Upload try $i/$MAX_UPLOAD_TRIES failed."
                 if [[ "$i" -eq "$MAX_UPLOAD_TRIES" ]]; then
-                    echo "Upload ultimately failed after $MAX_UPLOAD_TRIES."
+                    echo "Upload ultimately failed after $MAX_UPLOAD_TRIES tries."
                     echo "Check errors above."
                     exit 1
                 else
