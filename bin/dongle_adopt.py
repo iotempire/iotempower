@@ -223,7 +223,7 @@ def main(args):
     loglevel = logging.WARNING
     if (options.debug):
         loglevel = logging.DEBUG
-    loglevel = logging.DEBUG  # TODO: remove
+#    loglevel = logging.DEBUG  # force debug
 
     # logging
     logging.basicConfig(level = loglevel, format = '%(asctime)-8s [%(levelname)s]: %(message)s', datefmt = '%H:%M:%S')
