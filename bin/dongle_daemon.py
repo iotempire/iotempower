@@ -33,7 +33,7 @@ class UED_Listener(threading.Thread):
     def connect(self):
         if not self.connected:
             # Create a serial connection
-            self.ser = serial.Serial(self.port, 2000000, timeout=1);
+            self.ser = serial.Serial(self.port, 115200, timeout=1);
             logging.info('Starting on %s.', self.port)
             self.ser.read_all()  # discard all
             self.ser.write(b"\n")

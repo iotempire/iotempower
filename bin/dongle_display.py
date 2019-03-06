@@ -14,7 +14,7 @@ import time
 
 def display_text(port, text):
     # Create a serial connection
-    ser = serial.Serial(port, 2000000, timeout=15);
+    ser = serial.Serial(port, 115200, timeout=15);
     logging.info('Starting on %s.', port)
     ser.read_all()  # discard all
     ser.write(b"\n")

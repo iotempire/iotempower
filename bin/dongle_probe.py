@@ -13,7 +13,7 @@ import time
 
 def do_probe(port):
     # Create a serial connection
-    ser = serial.Serial(port, 2000000, timeout=1);
+    ser = serial.Serial(port, 115200, timeout=1);
     logging.info('Starting on %s.', port)
     ser.read_all()  # discard all
     ser.write(b"\n")
