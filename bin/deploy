@@ -90,9 +90,10 @@ else # started from somewhere else, so search for node.conf in subdirs
             cd "$path"
             cd $(dirname "$n")
             deploy # call recursive for node-dir
+            result=$?
             cd "$path"
-            if [[ $? -ne 0 ]]; then # failed
-                echo "$n" >> "$FAILED_NODES"
+            if [[ $result -ne 0 ]]; then # failed
+                echo $(dirname "$n") >> "$FAILED_NODES"
             fi
         done
 
