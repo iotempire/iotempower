@@ -167,7 +167,12 @@ void setup_ota() {
             Serial.printf("Progress: %d%%\r", percent);
             // blink led, toggle every percent
             #ifdef ID_LED
-            digitalWrite(ID_LED, percent % 2);
+            if(percent % 2) {
+                pinMode(ID_LED, INPUT); // floating -> off
+            } else {
+                pinMode(ID_LED, OUTPUT);
+                digitalWrite(ID_LED, 0);
+            }
             #endif
             if(ota_display_present) {
                 ota_display->clear();
