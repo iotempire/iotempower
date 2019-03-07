@@ -361,7 +361,7 @@ function advanced() {
 function menu_default() {
     //term.clear();
     term("\n\n");
-    term.bgBrightWhite.black.wrap( '^+ul^rno^-^kiot^: Simple Shell\n' ) ;
+    term.bgBrightWhite.black.wrap( '^+ul^rno^-^kiot^: User Menu\n' ) ;
     term("\n");
     term.wrap('Use mouse, arrow keys, enter, or shortcut key to select.\n')
     term("\n");
