@@ -62,9 +62,9 @@ void id_blinker() {
     int delta;
 
     if (long_blinks == 0) { // first time, still unitialized
-        // randomness for 25 different blink patterns (5*5)
+        // randomness for 30 different blink patterns (5*6)
         long_blinks = ESP8266TrueRandom.random(1, 6);
-        short_blinks = ESP8266TrueRandom.random(1, 6);
+        short_blinks = ESP8266TrueRandom.random(1, 7);
         Serial.printf("Blink pattern: %d long_blinks, %d short_blinks\n",
                       long_blinks, short_blinks);
         total = BLINK_OFF_START +
@@ -90,28 +90,34 @@ void id_blinker() {
     pos = global_pos;
     #ifdef ID_LED
     if (pos < BLINK_OFF_START) { // still in BLINK_OFF_START
-        digitalWrite(ID_LED, 1); // off - in off phase
+        pinMode(ID_LED, INPUT); // floating (as onboard led)
+        //digitalWrite(ID_LED, 1); // off - in off phase
     } else { // already pass BLINK_OFF_START
         pos -= BLINK_OFF_START;
         if(pos < long_blinks * (BLINK_LONG + BLINK_OFF)) { // in long blink phase
 
             if (pos % (BLINK_LONG + BLINK_OFF) < BLINK_LONG) {
+                pinMode(ID_LED, OUTPUT);
                 digitalWrite(ID_LED, 0); // on - in blink phase
             } else {
-                digitalWrite(ID_LED, 1); // off - in off phase
+                pinMode(ID_LED, INPUT); // floating (as onboard led)
+                // digitalWrite(ID_LED, 1); // off - in off phase
             }
 
         } else { // in short blink phase
             pos -= long_blinks * (BLINK_LONG + BLINK_OFF);
             if(pos < BLINK_OFF_MID) { // still in BLINK_OFF_MID
-                digitalWrite(ID_LED, 1); // off - in off phase
+                pinMode(ID_LED, INPUT); // floating (as onboard led)
+                // digitalWrite(ID_LED, 1); // off - in off phase
             } else {
                 pos -= BLINK_OFF_MID;
                 if (pos % (BLINK_SHORT + BLINK_OFF) <
                     BLINK_SHORT) {
+                    pinMode(ID_LED, OUTPUT);
                     digitalWrite(ID_LED, 0); // on - in blink phase
                 } else {
-                    digitalWrite(ID_LED, 1); // off - in off phase
+                    pinMode(ID_LED, INPUT); // floating (as onboard led)
+                    // digitalWrite(ID_LED, 1); // off - in off phase
                 }
             }
         }
@@ -119,6 +125,11 @@ void id_blinker() {
     #endif // ID_LED
     lasttime = currenttime;
 }
+
+
+#include <display.h>
+Display* ota_display=NULL;
+bool ota_display_present = false;
 
 void setup_ota() {
         // Port defaults to 8266
@@ -135,15 +146,38 @@ void setup_ota() {
 
         // NOTE: if updating SPIFFS this would be the place to unmount
         // SPIFFS using SPIFFS.end()
+        Serial.println();
         Serial.println("Start updating " + type);
     });
-    ArduinoOTA.onEnd([]() { Serial.println("\nEnd"); });
+    ArduinoOTA.onEnd([]() { 
+        Serial.println("\nOTA End, success.");
+        if(ota_display_present) {
+            ota_display->i2c_start();
+            ota_display->clear();
+            ota_display->measure();
+            delay(100);
+            ota_display->clear_bus();            
+        }
+    });
     ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
-        Serial.printf("Progress: %u%%\r", progress * 100 / total);
-        // blink led, toggle every percent
-        #ifdef ID_LED
-        digitalWrite(ID_LED, (progress * 100 / total) % 2);
-        #endif
+        static int last_percent = -1;
+        Ustring s;
+        int percent = (int)(progress * 100 / total);
+        if(percent != last_percent) {
+            Serial.printf("Progress: %d%%\r", percent);
+            // blink led, toggle every percent
+            #ifdef ID_LED
+            digitalWrite(ID_LED, percent % 2);
+            #endif
+            if(ota_display_present) {
+                ota_display->clear();
+                ota_display->print("Adoption\nactive\n\nProgress:\n");
+                s.printf("%d%%", percent);
+                ota_display->print(s);
+                ota_display->measure();
+            }
+            last_percent = percent;
+        }
     });
     ArduinoOTA.onError([](ota_error_t error) {
         Serial.printf("Error[%u]: ", error);
@@ -157,6 +191,12 @@ void setup_ota() {
             Serial.println("Receive Failed");
         else if (error == OTA_END_ERROR)
             Serial.println("End Failed");
+        if(ota_display_present) {
+            ota_display->i2c_start();
+            ota_display->clear();
+            ota_display->print("OTA Error.");
+            ota_display->measure();
+        }
         ota_failed = true;
     });
 }
@@ -166,6 +206,7 @@ void reconfigMode() {
     // go to access-point and reconfiguration mode to allow a new
     // firmware to be uploaded
 
+    Ustring s;
     char *ap_ssid = (char *)(ULNOIOT_AP_RECONFIG_NAME "-xx-xL-xS");
     const char *ap_password = ULNOIOT_AP_RECONFIG_PASSWORD;
 
@@ -174,6 +215,20 @@ void reconfigMode() {
     id_blinker(); //trigger init of random blink pattern
     sprintf(ap_ssid + strlen(ap_ssid) - 8, "%02x-%01dL-%01dS", ESP.getChipId() & 255,
                 long_blinks, short_blinks);
+
+    // check if a display is present
+    Wire.begin(); // check default i2c
+    Wire.beginTransmission(0x3c);
+    if (Wire.endTransmission() == 0) {
+        Serial.println("Display shield found.");
+        U8G2_SSD1306_64X48_ER_F_HW_I2C u8g2(U8G2_R0);
+        ota_display = new Display("testdisplay", u8g2);
+        if(ota_display) {
+            ota_display_present = true;
+            ota_display->i2c_start();
+        }
+    }
+
     Serial.printf("Connect to %s with password %s.\n", ap_ssid, ap_password);
     
     const char *flash_default_password = ULNOIOT_FLASH_DEFAULT_PASSWORD;
@@ -188,15 +243,54 @@ void reconfigMode() {
     Serial.println("AP and OTA Ready, waiting 10min for new firmware.");
 
     unsigned long start_time = millis();
-    while (millis()-start_time < 600000) { // try for 10 minutes
+    const unsigned long wait_time = 10 * 60 * 1000; // 10 minutes
+    int seconds_left;
+    int last_seconds_left=-1;
+    while (millis()-start_time < wait_time) { // try for 10 minutes
+        seconds_left = (int)((wait_time - (millis() - start_time))/1000);
         ArduinoOTA.handle();
         if(ota_failed) {
             WiFi.softAP(ap_ssid, ap_password);
             ota_failed = false;
+            start_time = millis(); // restart time
             ArduinoOTA.begin();
+            // done in error
+            // if(ota_display_present) {
+            //     ota_display->i2c_start();
+            // }
         }
-        id_blinker(); // todo: check why not blinking after crash
+        id_blinker(); // TODO: check why not blinking after crash
+        yield();
+        if(last_seconds_left != seconds_left) {
+            Serial.print("Seconds left for adoption: ");
+            Serial.print(seconds_left);
+            Serial.print("\r");
+            last_seconds_left = seconds_left;
+            if(ota_display_present) {
+                ota_display->clear();
+                ota_display->print("ReconfigMode");
+                ota_display->cursor(0,2);
+                s.printf("node %02x", ESP.getChipId() & 255);
+                ota_display->print(s);
+                s.printf("blinks %dL-%dS", long_blinks, short_blinks);
+                ota_display->print(s);
+                ota_display->cursor(0,4);
+                s.printf("%ds left", seconds_left);
+                ota_display->print(s);
+                ota_display->cursor(0,5);
+                ota_display->print("for adoption");
+                ota_display->measure(); // trigger drawing
+            }
+        }
         yield(); // let WiFi do what it needs to do (if not present -> crash)
+    }
+
+    Serial.println();
+    Serial.println("No adoption request done, rebooting...");
+    if(ota_display_present) {
+        ota_display->clear();
+        ota_display->measure();
+        delay(100);
     }
     // Serial.println("Requesting password reset on next boot.");
     // int magicSize = sizeof(ULNOIOT_RECONFIG_MAGIC);
@@ -221,13 +315,18 @@ void flash_mode_select() {
     // potential input
 
     #ifdef ID_LED
-    pinMode(ID_LED, OUTPUT);
+    pinMode(ID_LED, INPUT); // floating -> off
     #endif
     pinMode(FLASHBUTTON, INPUT_PULLUP); // check flash button (d3 on wemos and
                                 // nodemcu) 
     for (int i = 0; i < 500; i++) {
         #ifdef ID_LED
-        digitalWrite(ID_LED, (i / 25) % 2);
+        if((i / 25) % 2) {
+            pinMode(ID_LED, INPUT); // floating -> off
+        } else {
+            pinMode(ID_LED, OUTPUT);
+            digitalWrite(ID_LED, 0);
+        }
         #endif
         int new_state = digitalRead(0);
         if (new_state != last) {

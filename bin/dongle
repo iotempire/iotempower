@@ -15,13 +15,14 @@ shift 1
 function dongle_release() {
     if [[ -e "$daemon_fifo" ]]; then
         echo release > "$daemon_fifo" & # release serial
-        sleep 0.1
+        sleep 0.5
     fi
 }
 
 function dongle_connect() {
     if [[ -e "$daemon_fifo" ]]; then
         echo connect > "$daemon_fifo" & # connect and resume daemon again
+        sleep 0.5
     fi
 }
 
