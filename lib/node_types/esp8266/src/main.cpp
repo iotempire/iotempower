@@ -288,9 +288,10 @@ void reconfigMode() {
     Serial.println();
     Serial.println("No adoption request done, rebooting...");
     if(ota_display_present) {
+        ota_display->i2c_start();
         ota_display->clear();
         ota_display->measure();
-        delay(100);
+        ota_display->clear_bus();
     }
     // Serial.println("Requesting password reset on next boot.");
     // int magicSize = sizeof(ULNOIOT_RECONFIG_MAGIC);
