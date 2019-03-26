@@ -1,8 +1,10 @@
-=======
-ulnoiot
-=======
+=====================
+ulnoiot / IoT Empower
+=====================
 
-*ulnoiot* (pronounced: "You'll know IoT") is a framework and environment
+*ulnoiot* (pronounced: "You'll know IoT", we are currently re-branding
+ulnoiot as *IoT Empower* part of our IoT Empire community approach) is a
+framework and environment
 for making it easy for everyone to explore and develop for the
 Internet of Things (IoT)
 -- easy for tinkerers, makers, programmers, hobbyists, students, artists,
@@ -22,6 +24,4 @@ one of the following:
 - `First IoT Node </doc/first-node.rst>`_.
 - `Installation </doc/installation.rst>`_
 
-Or dive into the `full documentation </doc/index-doc.rst>`_.
-
-Here are all the 
+Or directly dive into the `full documentation </doc/index-doc.rst>`_.

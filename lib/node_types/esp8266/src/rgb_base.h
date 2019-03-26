@@ -4,9 +4,11 @@
 #ifndef _RGB_BASE_H_
 #define _RGB_BASE_H_
 
-// needs to be included here for color table
-#define FASTLED_INTERRUPT_RETRY_COUNT 0
+#define FASTLED_ESP8266_RAW_PIN_ORDER // solve issues with D4
+//#define FASTLED_INTERRUPT_RETRY_COUNT 0 or better 1 or 2?
+#define FASTLED_INTERRUPT_RETRY_COUNT 1
 #define FASTLED_INTERNAL // ignore pragma messages in FastLED
+// needs to be included here for color table
 #include <FastLED.h>
 
 #include <device.h>

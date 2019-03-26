@@ -22,6 +22,10 @@ class RGB_Strip : public RGB_Base {
         }
         void start() {
             _started = true;
+            controller->init(); // re-init, might be important if using onboard-led
+            delay(50); // let things settle
+            set_color(ALL_LEDS, CRGB::Black);
+            delay(100); // let things settle (total 100 is too small)
             set_color(ALL_LEDS, CRGB::Black);
         }
         virtual void process_color(int lednr, CRGB color, bool _show=true) {

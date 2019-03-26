@@ -24,19 +24,19 @@ void Gesture_Apds9960::start() {
             return;
         }
 
-        // Start light sensor
-        if ( sensor->enableLightSensor(false) ) {
-            ulog("Light sensor is now running");
-        } else {
-            ulog("Something went wrong during light sensor init!");
-            return;
-        }
+        // // Start light sensor
+        // if ( sensor->enableLightSensor(false) ) {
+        //     ulog("Light sensor is now running");
+        // } else {
+        //     ulog("Something went wrong during light sensor init!");
+        //     return;
+        // }
 
         // Proximity sensor
         // Adjust the Proximity sensor gain
-        if ( !sensor->setProximityGain(PGAIN_2X) ) {
-            ulog("Something went wrong trying to set PGAIN");
-        }        
+        // if ( !sensor->setProximityGain(PGAIN_2X) ) {
+        //     ulog("Something went wrong trying to set PGAIN");
+        // }        
         // Start running the APDS-9960 proximity sensor (interrupts)
         if ( sensor->enableProximitySensor(false) ) {
             ulog("Proximity sensor is now running");
@@ -71,15 +71,15 @@ bool Gesture_Apds9960::measure() {
     uint16_t green_light = 0;
     uint16_t blue_light = 0;
 
-    if (  !sensor->readAmbientLight(ambient_light) ||
-            !sensor->readRedLight(red_light) ||
-            !sensor->readGreenLight(green_light) ||
-            !sensor->readBlueLight(blue_light) ) {
-        ulog("Error reading light values");
-    } else { // success
-        measured_value(0).printf("%d,%d,%d,%d", 
-            ambient_light, red_light, green_light, blue_light);
-    }
+    // if (  !sensor->readAmbientLight(ambient_light) ||
+    //         !sensor->readRedLight(red_light) ||
+    //         !sensor->readGreenLight(green_light) ||
+    //         !sensor->readBlueLight(blue_light) ) {
+    //     ulog("Error reading light values");
+    // } else { // success
+    //     measured_value(0).printf("%d,%d,%d,%d", 
+    //         ambient_light, red_light, green_light, blue_light);
+    // }
 
     uint8_t proximity_data = 0;
 
