@@ -17,15 +17,15 @@ EOF
 exit 1
 fi
 
-[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoT empower not active, aborting." 1>&2;exit 1; }
 
-FLASH_PATH="$ULNOIOT_ROOT/tmp/pre-flash"
+FLASH_PATH="$IOTEMPOWER_ROOT/tmp/pre-flash"
 mkdir -p "$FLASH_PATH/node"
 cd "$FLASH_PATH"
-ln -s -f "$ULNOIOT_ROOT/lib/system_template/system.conf" .
+ln -s -f "$IOTEMPOWER_ROOT/lib/system_template/system.conf" .
 cd "node"
-ln -s -f "$ULNOIOT_ROOT/lib/node_types/wemos_d1_mini/pre-flash/node.conf" .
-ln -s -f "$ULNOIOT_ROOT/lib/node_types/wemos_d1_mini/pre-flash/setup.cpp" .
+ln -s -f "$IOTEMPOWER_ROOT/lib/node_types/wemos_d1_mini/pre-flash/node.conf" .
+ln -s -f "$IOTEMPOWER_ROOT/lib/node_types/wemos_d1_mini/pre-flash/setup.cpp" .
 # TODO: think about regenerating key each time
 # TODO: think about selecting random wifi
 initialize serial "$@"  # build it

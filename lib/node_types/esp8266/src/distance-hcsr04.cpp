@@ -31,7 +31,7 @@ void Hcsr04::start() {
     pinMode(_echo_pin, INPUT); // no pullup
     pinMode(_trigger_pin, OUTPUT);
     digitalWrite(_trigger_pin, 0);
-    last_triggered = micros()-(ULNOIOT_HCSR04_INTERVAL*1000);
+    last_triggered = micros()-(IOTEMPOWER_HCSR04_INTERVAL*1000);
     delay(1);  // let port settle
     attachInterrupt(digitalPinToInterrupt(_echo_pin),
          [&] () { echo_changed(); }, CHANGE); 
@@ -59,7 +59,7 @@ bool Hcsr04::measure() {
     } else { // not triggered -> trigger new
         // Eventually trigger new signal
         if(!trigger_started) {
-            if(delta >= ULNOIOT_HCSR04_INTERVAL*1000) {
+            if(delta >= IOTEMPOWER_HCSR04_INTERVAL*1000) {
                 last_triggered = current;
                 digitalWrite(_trigger_pin,1); // start signal
                 trigger_started = true;
@@ -77,16 +77,16 @@ bool Hcsr04::measure() {
         delta = interval_end - interval_start;
         measured = false; // release lock
         unsigned int d = (unsigned int)(delta*100/582);
-        if(d<=ULNOIOT_HCSR04_MAX_DISTANCE) {
-            if(distance_buffer_fill < ULNOIOT_HCSR04_BUFFER_SIZE) {
+        if(d<=IOTEMPOWER_HCSR04_MAX_DISTANCE) {
+            if(distance_buffer_fill < IOTEMPOWER_HCSR04_BUFFER_SIZE) {
                 // let buffer fill first
                 distance_buffer[distance_buffer_fill] = d;
                 distance_sum += d;
                 distance_buffer_fill ++;
             } else { // we start returning values, when the buffer is full
                 // add new distance to buffer start
-                distance_sum -= distance_buffer[ULNOIOT_HCSR04_BUFFER_SIZE-1]; // this is replaced
-                for(int i=ULNOIOT_HCSR04_BUFFER_SIZE-1; i>=1; i--) {
+                distance_sum -= distance_buffer[IOTEMPOWER_HCSR04_BUFFER_SIZE-1]; // this is replaced
+                for(int i=IOTEMPOWER_HCSR04_BUFFER_SIZE-1; i>=1; i--) {
                     distance_buffer[i] = distance_buffer[i-1];
                 }
                 distance_buffer[0] = d;
@@ -94,20 +94,20 @@ bool Hcsr04::measure() {
                 // do some median/average thing over buffer (discard values that are too far off from average)
                 // unsigned long valid_sum = 0;
                 // unsigned int valid_count = 0;
-                // for(int i=ULNOIOT_HCSR04_BUFFER_SIZE-1; i>=0; i--) {
+                // for(int i=IOTEMPOWER_HCSR04_BUFFER_SIZE-1; i>=0; i--) {
                 //     unsigned int d = distance_buffer[i];
-                //     if(abs(d * ULNOIOT_HCSR04_BUFFER_SIZE - distance_sum)
-                //         <= ULNOIOT_HCSR04_BUFFER_SIZE*ULNOIOT_HCSR04_MAX_DISTANCE / 5) { // less than 20% derivation from average
+                //     if(abs(d * IOTEMPOWER_HCSR04_BUFFER_SIZE - distance_sum)
+                //         <= IOTEMPOWER_HCSR04_BUFFER_SIZE*IOTEMPOWER_HCSR04_MAX_DISTANCE / 5) { // less than 20% derivation from average
                 //         valid_sum += d;
                 //         valid_count ++; 
                 //     }
                 // }
-                // if(valid_count > ULNOIOT_HCSR04_BUFFER_SIZE/2) {
+                // if(valid_count > IOTEMPOWER_HCSR04_BUFFER_SIZE/2) {
                 // d = (valid_sum + valid_count/2) / valid_count;
                 
                 // real median
-                unsigned int median_buffer[ULNOIOT_HCSR04_BUFFER_SIZE];
-                for(int i=0; i<ULNOIOT_HCSR04_BUFFER_SIZE; i++) {
+                unsigned int median_buffer[IOTEMPOWER_HCSR04_BUFFER_SIZE];
+                for(int i=0; i<IOTEMPOWER_HCSR04_BUFFER_SIZE; i++) {
                     int j;
                     for(j=i; j>0; j--) { // swap it down to right position
                         if(distance_buffer[i]<median_buffer[j-1])
@@ -116,7 +116,7 @@ bool Hcsr04::measure() {
                     }
                     median_buffer[j]=distance_buffer[i]; // add at right position
                 }
-                d = median_buffer[ULNOIOT_HCSR04_BUFFER_SIZE/2];
+                d = median_buffer[IOTEMPOWER_HCSR04_BUFFER_SIZE/2];
                 if(measured_value().empty() 
                         || abs(measured_value().as_int() - d) >= _precision ) {
                     measured_value().from(d);

@@ -8,7 +8,7 @@
 #echo "This is currently broken - need to check with author why."
 #exit 1
 
-[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoT empower not active, aborting." 1>&2;exit 1; }
 
 #MAKEFLAGS="BUILDVERSION=release LCFLAGS=-DT3_DONT_CHECK_VERSION LCXXFLAGS=-DT3_DONT_CHECK_VERSION -j4"
 MAKEFLAGS="LCFLAGS=-DT3_DONT_CHECK_VERSION LCXXFLAGS=-DT3_DONT_CHECK_VERSION -j4"
@@ -32,7 +32,7 @@ exit 1
 fi
 
 
-TILDEDIR="$ULNOIOT_EXTERNAL/tilde"
+TILDEDIR="$IOTEMPOWER_EXTERNAL/tilde"
 #gitver="-git$(date +%Y%m%d)"
 gitver=""
 #libp="lib"
@@ -101,14 +101,14 @@ export CFLAGS="-O2 -D_POSIX_C_SOURCE=200809L"
 cd "$TILDEDIR/llnextgen"
 ./configure --prefix=/usr CFLAGS="$CFLAGS"
 make $MAKEFLAGS
-strip -s -o "$ULNOIOT_LOCAL/bin/LLnextgen" "LLnextgen"
+strip -s -o "$IOTEMPOWER_LOCAL/bin/LLnextgen" "LLnextgen"
 
 cd "$TILDEDIR"
 echo "Building tilde."
 ./t3shared/doall make $MAKEFLAGS -C src
 
 echo "Installing tilde."
-strip -s -o "$ULNOIOT_LOCAL/bin/tilde" "$TILDEDIR/tilde/src/.objects/edit"
+strip -s -o "$IOTEMPOWER_LOCAL/bin/tilde" "$TILDEDIR/tilde/src/.objects/edit"
 # TODO consider:
 # link to /usr/local/bin/tilde
 # update-alternatives --install /usr/bin/editor editor /usr/local/bin/tilde 50

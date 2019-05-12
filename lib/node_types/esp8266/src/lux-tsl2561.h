@@ -1,8 +1,8 @@
 // lux-tsl2561.h
 // light sensor based on tsl2561 i2c chip
 
-#ifndef _ULNOIOT_TSL2561_H_
-#define _ULNOIOT_TSL2561_H_
+#ifndef _IOTEMPOWER_TSL2561_H_
+#define _IOTEMPOWER_TSL2561_H_
 
 #include <Arduino.h>
 #include <Wire.h>
@@ -22,4 +22,4 @@ class Lux_TSL2561 : public I2C_Device {
         bool measure();
 };
 
-#endif // _ULNOIOT_BH1750_H_
+#endif // _IOTEMPOWER_BH1750_H_

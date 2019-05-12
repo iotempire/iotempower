@@ -6,7 +6,7 @@
 # Create date: 2017-07-12
 #
 
-[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoT empower not active, aborting." 1>&2;exit 1; }
 
 MAKEFLAGS="BUILDVERSION=release LCFLAGS=-DT3_DONT_CHECK_VERSION LCXXFLAGS=-DT3_DONT_CHECK_VERSION -j4"
 #MAKEFLAGS=""
@@ -29,7 +29,7 @@ EOF
 exit 1
 fi
 
-TILDEDIR="$ULNOIOT_EXTERNAL/tilde"
+TILDEDIR="$IOTEMPOWER_EXTERNAL/tilde"
 
 if [[ ! -d "$TILDEDIR" || "$*" = "clean" ]]; then
     /usr/bin/dpkg --search /usr/bin/dpkg &>/dev/null && {

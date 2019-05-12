@@ -1,0 +1,11 @@
+#!/bin/bash
+# Example script for starting the IoT Empower environment
+# Modify IOTEMPOWER_ROOT accordingly to your setup
+#
+# If you run in termux, apply termux-fix shebang onto this script
+
+# if this should run as root make sure to fix $HOME like this:
+# HOME=/home/pi
+
+export IOTEMPOWER_ROOT="$HOME/iot"
+exec bash "$IOTEMPOWER_ROOT/run" "$@"

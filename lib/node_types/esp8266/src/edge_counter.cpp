@@ -7,7 +7,7 @@
 
 
 void Edge_Counter::count(void) {
-    if(counter < ULNOIOT_MAX_TRIGGER)
+    if(counter < IOTEMPOWER_MAX_TRIGGER)
         counter++;
     else counter = 0;
     triggered = true;

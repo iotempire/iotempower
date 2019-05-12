@@ -3,9 +3,9 @@
 #
 # network pre-up script -> more documentation in raspi-boot.sh
 
-[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoT empower not active, aborting." 1>&2;exit 1; }
 
-source "$ULNOIOT_ROOT/bin/read_boot_config"
+source "$IOTEMPOWER_ROOT/bin/read_boot_config"
 
 if [[ ! "$otg_on" = 1 ]]; then
     # otg is not activated, so we need to try eventually to get our
@@ -16,7 +16,7 @@ if [[ ! "$otg_on" = 1 ]]; then
         # else try to connect to wpa network
         rm /run/wpa_supplicant/wlan1 &> /dev/null # makes problems sometimes
         cfg="/run/uiot_wpa_supplicant.conf"
-        cp "$ULNOIOT_ROOT/etc/ulnoiot_wpa_supplicant.conf.base" "$cfg"
+        cp "$IOTEMPOWER_ROOT/etc/ulnoiot_wpa_supplicant.conf.base" "$cfg"
         chown root.root "$cfg"
         chmod 600 "$cfg"
         if [[ "$uiot_wifi_user" ]]; then # a user was given, so try enterprise network

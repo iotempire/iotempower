@@ -1,23 +1,23 @@
 #!/bin/bash
 # Fix binary links to trick shebang
 
-[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoT empower not active, aborting." 1>&2;exit 1; }
 
 echo "Fixing binary links."
 
 #### create the fixed binary directory
-MYBIN="$ULNOIOT_LOCAL/bin"
+MYBIN="$IOTEMPOWER_LOCAL/bin"
 rm -rf "$MYBIN" &> /dev/null
 mkdir -p "$MYBIN"
 # create the fixed runner
 SBRUN="$MYBIN/shebang_run"
 rm "$SBRUN" &> /dev/null
 echo "#!$(which bash)" > "$SBRUN"
-tail -n+2 "$ULNOIOT_ROOT/bin/shebang_run" >> "$SBRUN"
+tail -n+2 "$IOTEMPOWER_ROOT/bin/shebang_run" >> "$SBRUN"
 chmod a+x "$SBRUN"
 
 # create representative links for all files from the bin drectory
-find "$ULNOIOT_ROOT/bin" -print0 | while read -d $'\0' file; do
+find "$IOTEMPOWER_ROOT/bin" -print0 | while read -d $'\0' file; do
     b=$(basename "$file")
     # if executable and not the shebang_run itself
     if [ "$b" != "shebang_run" \

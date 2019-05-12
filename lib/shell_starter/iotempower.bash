@@ -1,37 +1,37 @@
 #@IgnoreInspection BashAddShebang
 # needs to be sourced from a bash configuration
-# then, when new shell is started and ULNOIOT_ROOT set then environment is
+# then, when new shell is started and IOTEMPOWER_ROOT set then environment is
 # activated
 #
 # if this is sourced from $HOME/.bashrc, it makes the prompt work in tmux
 # and byobu
 
-if [[ "$ULNOIOT_ROOT" ]]; then # only load when ULNOIOT_ROOT is defined
-if [[ ! "$ULNOIOT_ACTIVE" = "yes" ]]; then # only import once
+if [[ "$IOTEMPOWER_ROOT" ]]; then # only load when IOTEMPOWER_ROOT is defined
+if [[ ! "$IOTEMPOWER_ACTIVE" = "yes" ]]; then # only import once
 
-source "$ULNOIOT_ROOT/lib/shell_starter/config.bash" \
+source "$IOTEMPOWER_ROOT/lib/shell_starter/config.bash" \
         || echo "trouble initializing, environment might not work." 1>&2
 
-export PYTHONPATH="$PYTHONPATH:$ULNOIOT_ROOT/lib"
+export PYTHONPATH="$PYTHONPATH:$IOTEMPOWER_ROOT/lib"
 
 ## if you type cd you go to ulnoiot-root
 #ulnoiot_cd() {
-#    ULNOIOT_HOMEBACK="$HOME"
-#    HOME="$ULNOIOT_ROOT"
+#    IOTEMPOWER_HOMEBACK="$HOME"
+#    HOME="$IOTEMPOWER_ROOT"
 #    cd "$@"
-#    HOME="$ULNOIOT_HOMEBACK"
-#    unset ULNOIOT_HOMEBACK
+#    HOME="$IOTEMPOWER_HOMEBACK"
+#    unset IOTEMPOWER_HOMEBACK
 #}
 #
 #alias cd=ulnoiot_cd
 #
 #cd
 
-fi # ending: if [[ ! "$ULNOIOT_ACTIVE" = "yes"]]; then
+fi # ending: if [[ ! "$IOTEMPOWER_ACTIVE" = "yes"]]; then
 
 if [[ "$TERM" ]]; then # only mess with the prompt if there is TERM
 
-##### always reset prompt, when ULNOIOT_ROOT defined and sourced
+##### always reset prompt, when IOTEMPOWER_ROOT defined and sourced
 PSGREEN="\[$(tput setaf 2 2>/dev/null)\]"
 PSLBLUE="\[$(tput setaf 14 2>/dev/null)\]"
 PSWHITE="\[$(tput setaf 15 2>/dev/null)\]"
@@ -59,7 +59,7 @@ _UIOT_PMT="\$${PSRESET} "
 
 # start is always the same (colored ulnoiot - when ulnoiot defined)
 PS1="$_UIOT_UIOT"
-PS1='$( [[ "$ULNOIOT_ACTIVE" = "yes" ]] && echo "'"$PS1"'")'
+PS1='$( [[ "$IOTEMPOWER_ACTIVE" = "yes" ]] && echo "'"$PS1"'")'
 
 ## allow recording of pwd in byobu/tmux
 ## (from https://stackoverflow.com/questions/19200589/auto-update-tmux-status-bar-with-active-pane-pwd#19205087)
@@ -69,7 +69,7 @@ PS1="${PS1}${_UIOT_PMT}"
 
 # disable prompt command output and save prompt-changes, when in ulnoiot
 # but still execute it
-PROMPT_COMMAND='if [[ "$ULNOIOT_ACTIVE" ]]; then
+PROMPT_COMMAND='if [[ "$IOTEMPOWER_ACTIVE" ]]; then
 _UIOT_BKUP="$PS1"
 {
 '"$PROMPT_COMMAND"'
@@ -89,4 +89,4 @@ export PS1
 
 fi # does TERM exist
 
-fi # ending: if [[ "$ULNOIOT_ROOT" ]]; then
+fi # ending: if [[ "$IOTEMPOWER_ROOT" ]]; then

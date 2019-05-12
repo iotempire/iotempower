@@ -134,7 +134,7 @@ Installation on Linux
 - make ulnoiot runnable -> copy examples/scripts/ulnoiot into your bin folder
   and adapt
   the path in it to reflect the location where you cloned ulnoiot. If you use
-  tmux or byobu with bash consider sourcing ``lib/shell_starter/ulnoiot.bash``
+  tmux or byobu with bash consider sourcing ``lib/shell_starter/iotempower.bash``
   in your .bashrc.
 
 - start ulnoiot and agree and wait for dependencies to be downloaded

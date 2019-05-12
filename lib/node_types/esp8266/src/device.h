@@ -7,8 +7,8 @@
 // General note, in ulnoiot, we pass as convenience all values as strings.
 // So other types have to be converted in such a as string or from one.
 
-#ifndef _ULNOIOT_DEVICE_H_
-#define _ULNOIOT_DEVICE_H_
+#ifndef _IOTEMPOWER_DEVICE_H_
+#define _IOTEMPOWER_DEVICE_H_
 
 #include <functional>
 #include <AsyncMqttClient.h>
@@ -22,14 +22,14 @@ class Subdevice {
         Ustring name; // subdevice name (added to the device name)
         bool _subscribed = false;
         void init(const char* subname, bool subscribed);
-        #define ULNOIOT_ON_RECEIVE_CALLBACK std::function<bool(const Ustring&)>
-        ULNOIOT_ON_RECEIVE_CALLBACK receive_cb = NULL;
+        #define IOTEMPOWER_ON_RECEIVE_CALLBACK std::function<bool(const Ustring&)>
+        IOTEMPOWER_ON_RECEIVE_CALLBACK receive_cb = NULL;
     public:
         Ustring measured_value; // the just measured value (after calling measure)
         Ustring current_value;
         Ustring& value() { return current_value; }
         Ustring& get() { return current_value; }
-        Subdevice& with_receive_cb(ULNOIOT_ON_RECEIVE_CALLBACK cb) {
+        Subdevice& with_receive_cb(IOTEMPOWER_ON_RECEIVE_CALLBACK cb) {
             receive_cb = cb;
             return *this;
         }
@@ -47,7 +47,7 @@ class Subdevice {
 
 class Device {
     protected:
-        Fixed_Map<Subdevice, ULNOIOT_MAX_SUBDEVICES> subdevices;
+        Fixed_Map<Subdevice, IOTEMPOWER_MAX_SUBDEVICES> subdevices;
     private:
         Ustring name; // device name and mqtt-topic extension
         bool _ignore_case = true;
@@ -58,8 +58,8 @@ class Device {
         // it gets passed the triggering device. Last measured values can be
         // read from the globally defined device.
         // TODO: commented example
-        #define ULNOIOT_ON_CHANGE_CALLBACK std::function<void()>
-        ULNOIOT_ON_CHANGE_CALLBACK _on_change_cb=NULL;
+        #define IOTEMPOWER_ON_CHANGE_CALLBACK std::function<void()>
+        IOTEMPOWER_ON_CHANGE_CALLBACK _on_change_cb=NULL;
 
         // This is the callback which is used for filtering and influencing values
         // It does not get the current device passed as parameter. The value can
@@ -68,8 +68,8 @@ class Device {
         // returning true and invalid via returning false or returning an empty 
         // string (set first char to 0).
         // TODO: commented example
-        #define ULNOIOT_FILTER_CALLBACK std::function<bool()>
-        ULNOIOT_FILTER_CALLBACK _filter_cb=NULL;
+        #define IOTEMPOWER_FILTER_CALLBACK std::function<bool()>
+        IOTEMPOWER_FILTER_CALLBACK _filter_cb=NULL;
 
     protected:
         bool _started = false;
@@ -126,42 +126,42 @@ class Device {
         Device& report_change(bool report_change) {
             return with_report_change(report_change);
         } 
-        Device& with_on_change_callback(ULNOIOT_ON_CHANGE_CALLBACK on_change_cb) { 
+        Device& with_on_change_callback(IOTEMPOWER_ON_CHANGE_CALLBACK on_change_cb) { 
             _on_change_cb = on_change_cb;
             return *this;
         }
-        Device& set_on_change_callback(ULNOIOT_ON_CHANGE_CALLBACK on_change_cb) { 
+        Device& set_on_change_callback(IOTEMPOWER_ON_CHANGE_CALLBACK on_change_cb) { 
             return with_on_change_callback(on_change_cb);
         }
-        Device& with_on_change(ULNOIOT_ON_CHANGE_CALLBACK on_change_cb) { 
+        Device& with_on_change(IOTEMPOWER_ON_CHANGE_CALLBACK on_change_cb) { 
             return with_on_change_callback(on_change_cb);
         }
-        Device& set_on_change(ULNOIOT_ON_CHANGE_CALLBACK on_change_cb) { 
+        Device& set_on_change(IOTEMPOWER_ON_CHANGE_CALLBACK on_change_cb) { 
             return with_on_change_callback(on_change_cb);
         }
-        Device& on_change(ULNOIOT_ON_CHANGE_CALLBACK on_change_cb) { 
+        Device& on_change(IOTEMPOWER_ON_CHANGE_CALLBACK on_change_cb) { 
             return with_on_change_callback(on_change_cb);
         }
-        Device& on_change_callback(ULNOIOT_ON_CHANGE_CALLBACK on_change_cb) { 
+        Device& on_change_callback(IOTEMPOWER_ON_CHANGE_CALLBACK on_change_cb) { 
             return with_on_change_callback(on_change_cb);
         }
-        Device& with_filter_callback(ULNOIOT_FILTER_CALLBACK filter_cb) { 
+        Device& with_filter_callback(IOTEMPOWER_FILTER_CALLBACK filter_cb) { 
             _filter_cb = filter_cb;
             return *this;
         }
-        Device& set_filter_callback(ULNOIOT_FILTER_CALLBACK filter_cb) { 
+        Device& set_filter_callback(IOTEMPOWER_FILTER_CALLBACK filter_cb) { 
             return with_filter_callback(filter_cb);
         }
-        Device& with_filter(ULNOIOT_FILTER_CALLBACK filter_cb) { 
+        Device& with_filter(IOTEMPOWER_FILTER_CALLBACK filter_cb) { 
             return with_filter_callback(filter_cb);
         }
-        Device& set_filter(ULNOIOT_FILTER_CALLBACK filter_cb) { 
+        Device& set_filter(IOTEMPOWER_FILTER_CALLBACK filter_cb) { 
             return with_filter_callback(filter_cb);
         }
-        Device& filter(ULNOIOT_FILTER_CALLBACK filter_cb) { 
+        Device& filter(IOTEMPOWER_FILTER_CALLBACK filter_cb) { 
             return with_filter_callback(filter_cb);
         }
-        Device& filter_callback(ULNOIOT_FILTER_CALLBACK filter_cb) { 
+        Device& filter_callback(IOTEMPOWER_FILTER_CALLBACK filter_cb) { 
             return with_filter_callback(filter_cb);
         }
 
@@ -338,4 +338,4 @@ class Device {
     }
 
 
-#endif // _ULNOIOT_DEVICE_H_
+#endif // _IOTEMPOWER_DEVICE_H_

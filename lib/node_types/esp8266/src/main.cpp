@@ -212,8 +212,8 @@ void reconfigMode() {
     // firmware to be uploaded
 
     Ustring s;
-    char *ap_ssid = (char *)(ULNOIOT_AP_RECONFIG_NAME "-xx-xL-xS");
-    const char *ap_password = ULNOIOT_AP_RECONFIG_PASSWORD;
+    char *ap_ssid = (char *)(IOTEMPOWER_AP_RECONFIG_NAME "-xx-xL-xS");
+    const char *ap_password = IOTEMPOWER_AP_RECONFIG_PASSWORD;
 
     Serial.println("Reconfiguration requested. Activating open AP-mode.");
     WiFi.disconnect(true);
@@ -236,7 +236,7 @@ void reconfigMode() {
 
     Serial.printf("Connect to %s with password %s.\n", ap_ssid, ap_password);
     
-    const char *flash_default_password = ULNOIOT_FLASH_DEFAULT_PASSWORD;
+    const char *flash_default_password = IOTEMPOWER_FLASH_DEFAULT_PASSWORD;
     Serial.printf("Setting flash default password to %s.\n",
                     flash_default_password);
     setup_ota();
@@ -299,9 +299,9 @@ void reconfigMode() {
         ota_display->clear_bus();
     }
     // Serial.println("Requesting password reset on next boot.");
-    // int magicSize = sizeof(ULNOIOT_RECONFIG_MAGIC);
+    // int magicSize = sizeof(IOTEMPOWER_RECONFIG_MAGIC);
     // char rtcData[magicSize];
-    // strncpy(rtcData, ULNOIOT_RECONFIG_MAGIC, magicSize);
+    // strncpy(rtcData, IOTEMPOWER_RECONFIG_MAGIC, magicSize);
     // ESP.rtcUserMemoryWrite(0, (uint32_t *)rtcData, magicSize);
     reboot(); // Always reboot after this to free all eventually not freed
               // memory

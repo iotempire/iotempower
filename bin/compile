@@ -10,7 +10,7 @@ deploy help
 exit 1
 fi
 
-[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoT empower not active, aborting." 1>&2;exit 1; }
 
 if [[ -e "node.conf" ]]; then  # started from node-directory
     deploy compile
@@ -24,7 +24,7 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
 else # started from somewhere else, so search for node.conf in subdirs
 
     # first search if there is a system.conf, exit if not
-    source "$ULNOIOT_ROOT/bin/read_system_config"
+    source "$IOTEMPOWER_ROOT/bin/read_system_config"
 
     path="$(pwd)"
 

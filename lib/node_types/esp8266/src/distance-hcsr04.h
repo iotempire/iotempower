@@ -10,15 +10,15 @@
 #include <device.h>
 
 // only sent out signal every 50ms (when using 40ms there is too much stray)
-#define ULNOIOT_HCSR04_INTERVAL 50
+#define IOTEMPOWER_HCSR04_INTERVAL 50
 // should be odd for true median finding
-#define ULNOIOT_HCSR04_BUFFER_SIZE 9
-#define ULNOIOT_HCSR04_MAX_DISTANCE 4000 // 4m maximum distance
+#define IOTEMPOWER_HCSR04_BUFFER_SIZE 9
+#define IOTEMPOWER_HCSR04_MAX_DISTANCE 4000 // 4m maximum distance
 
 class Hcsr04 : public Device {
     private:
         const unsigned long timeout_us = 30000; // 30 ms timeout default
-        unsigned int distance_buffer[ULNOIOT_HCSR04_BUFFER_SIZE];
+        unsigned int distance_buffer[IOTEMPOWER_HCSR04_BUFFER_SIZE];
         int distance_buffer_fill = 0;
         unsigned long distance_sum = 0;
         bool triggered = false;

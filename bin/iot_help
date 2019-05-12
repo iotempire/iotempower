@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoT empower not active, aborting." 1>&2;exit 1; }
 
 HELP_PATH=doc/node_help
 # TODO: adjust path to different selected micro controllers depending on node
@@ -17,12 +17,12 @@ EOF
 # [cmd] can be any of the following:
 fi
 
-man -l "$ULNOIOT_LOCAL/doc/man/$1.1" 2>/dev/null || \
-    man -l "$ULNOIOT_LOCAL/doc/man/commands.1"
+man -l "$IOTEMPOWER_LOCAL/doc/man/$1.1" 2>/dev/null || \
+    man -l "$IOTEMPOWER_LOCAL/doc/man/commands.1"
 
 # obsolete
 # comma=""
-# ls "$ULNOIOT_ROOT/$HELP_PATH/"*.txt | while read f; do
+# ls "$IOTEMPOWER_ROOT/$HELP_PATH/"*.txt | while read f; do
 #     f=$(basename "$f")
 #     if [[ ${f:0:1} != "_" ]]; then
 #         echo -n $comma${f:0:-4}
@@ -37,13 +37,13 @@ man -l "$ULNOIOT_LOCAL/doc/man/$1.1" 2>/dev/null || \
 # fi
 
 
-# cd "$ULNOIOT_ROOT"
+# cd "$IOTEMPOWER_ROOT"
 
 # function help() {
 #     local m
 #     local p
 #     local l
-#     p="$ULNOIOT_ROOT/$HELP_PATH/$1.txt"
+#     p="$IOTEMPOWER_ROOT/$HELP_PATH/$1.txt"
 #     { cat "$p"; echo; } | while read l; do
 #         if [[ "$l" = "!!"* ]]; then
 #             if [[ "$l" =~ '!!help("'(.*)'")' ]]; then

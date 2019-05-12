@@ -3,7 +3,7 @@
  * Here, you define all the devices (and eventually their interactions)
  * connected to the node specified with this directory.
  * If you want to see more device configuration examples,
- * check $ULNOIOT_ROOT/examples/running-node-test-setup.cpp
+ * check $IOTEMPOWER_ROOT/examples/running-node-test-setup.cpp
  *
  * Or check out the command reference for potential devices you can add.
  * 

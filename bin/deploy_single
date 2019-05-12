@@ -1,5 +1,5 @@
 #!/bin/bash
-if [[ $# -gt 4 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" || "$ULNOIOT_DEPLOY" != active ]]; then
+if [[ $# -gt 4 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" || "$IOTEMPOWER_DEPLOY" != active ]]; then
 cat << EOF
 Syntax: deploy_single
 
@@ -10,13 +10,13 @@ EOF
 exit 1
 fi
 
-[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoT empower not active, aborting." 1>&2;exit 1; }
 
 MAX_UPLOAD_TRIES=3
 ESPOTAPY="$HOME/.platformio/packages/tool-espotapy/espota.py"
 
 if [[ -e "node.conf" ]]; then  # started from node-directory
-    source "$ULNOIOT_ROOT/bin/read_node_config"
+    source "$IOTEMPOWER_ROOT/bin/read_node_config"
     export board # for platformio.ini
 
     port=""
@@ -25,7 +25,7 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
     pio_upload="-t upload"
     adopt=""
 
-    platform_folder="$ULNOIOT_ROOT/lib/node_types/$board"
+    platform_folder="$IOTEMPOWER_ROOT/lib/node_types/$board"
 
     # check key-file and eventually regenerate
     KEYFILE=key.txt
@@ -102,7 +102,7 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
     fi
 
     prepare_build_dir cache
-    cd "$ULNOIOT_COMPILE_CACHE"
+    cd "$IOTEMPOWER_COMPILE_CACHE"
 
     platformio run $pio_upload || { echo "Trouble compiling or flashing new firmware, check errors."; exit 1; }
     

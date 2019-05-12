@@ -14,7 +14,7 @@ EOF
 exit 1
 fi
 
-[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoT empower not active, aborting." 1>&2;exit 1; }
 
 # TODO: remove dead links
 # TODO: only do it when no other process is active on that dir
@@ -57,28 +57,28 @@ link_type_through_base() {
 }
 
 if [[ -e "node.conf" ]]; then  # started from node-directory
-    source "$ULNOIOT_ROOT/bin/read_node_config"
+    source "$IOTEMPOWER_ROOT/bin/read_node_config"
     node_type="$board"
     
-    src_dir="$ULNOIOT_ROOT/lib/node_types/$node_type"
+    src_dir="$IOTEMPOWER_ROOT/lib/node_types/$node_type"
     dest_dir="build"
     
     if [[ "$1" == "cache" ]]; then
         rm -rf "$dest_dir" &> /dev/null
-        ln -f -s "$ULNOIOT_COMPILE_CACHE" "$dest_dir"
+        ln -f -s "$IOTEMPOWER_COMPILE_CACHE" "$dest_dir"
         # obsolet as we now compile everything in one dir and just update src
         # if [[ ! -e "$dest_dir/.pioenvs/$board" ]]; then # only create if not there yet
         #     rm -rf "$dest_dir/.piolibdeps" &>/dev/null
-        #     ln -f -s "$ULNOIOT_COMPILE_CACHE/.piolibdeps" "$dest_dir/"
+        #     ln -f -s "$IOTEMPOWER_COMPILE_CACHE/.piolibdeps" "$dest_dir/"
         #     if [[ "$board" ]]; then
         #         mkdir -p "$dest_dir/.pioenvs/$board"
-        #         for file in $(ls "$ULNOIOT_COMPILE_CACHE/.pioenvs/$board"); do
+        #         for file in $(ls "$IOTEMPOWER_COMPILE_CACHE/.pioenvs/$board"); do
         #             if [[ ! "$file" =~ ^(src|firmware.elf|firmware.bin|)$ ]]; then
-        #                 ln -f -s "$ULNOIOT_COMPILE_CACHE/.pioenvs/$board/$file" \
+        #                 ln -f -s "$IOTEMPOWER_COMPILE_CACHE/.pioenvs/$board/$file" \
         #                     "$dest_dir/.pioenvs/$board/"
         #             fi
         #         done
-        #         rsync -r "$ULNOIOT_COMPILE_CACHE/.pioenvs/$board/src/" \
+        #         rsync -r "$IOTEMPOWER_COMPILE_CACHE/.pioenvs/$board/src/" \
         #                     "$dest_dir/.pioenvs/$board/src/"
         #     fi
         # fi
@@ -117,8 +117,8 @@ EOF
 #    echo "// no wifi credentials" > "$dest_dir/src/wifi-config.h"
     fname="$dest_dir/src/wifi-config.h"
 cat > "$fname.new" << EOF
-#define WIFI_SSID "$ULNOIOT_AP_NAME_FULL"
-#define WIFI_PASSWORD "$ULNOIOT_AP_PASSWORD"
+#define WIFI_SSID "$IOTEMPOWER_AP_NAME_FULL"
+#define WIFI_PASSWORD "$IOTEMPOWER_AP_PASSWORD"
 EOF
     # only replace if it's new
     diff -q -f "$fname.new" "$fname" 2>/dev/null || mv "$fname.new" "$fname"

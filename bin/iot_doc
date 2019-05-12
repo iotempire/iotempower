@@ -19,9 +19,9 @@ if [[ $# -gt 1 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
     exit 1
 fi
 
-[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoT empower not active, aborting." 1>&2;exit 1; }
 
-cd "$ULNOIOT_ROOT/doc"
+cd "$IOTEMPOWER_ROOT/doc"
 
 create_doc() {
     echo "Generating man pages."
@@ -29,8 +29,8 @@ create_doc() {
     echo "Generating web-viewable documentation."
     make html
     # TODO: do eventually a matching specific version here
-    ln -s -f "$ULNOIOT_LOCAL/doc/html/doc/index-pi.html" \
-        "$ULNOIOT_LOCAL/doc/html/index.html"
+    ln -s -f "$IOTEMPOWER_LOCAL/doc/html/doc/index-pi.html" \
+        "$IOTEMPOWER_LOCAL/doc/html/index.html"
     echo "Documentation creation finished."
 }
 
@@ -47,8 +47,8 @@ case "$1" in
     serve)
         create_doc
         echo "Starting webserver for documentation. ctrl-c to stop."
-        cd "$ULNOIOT_LOCAL/doc/html"
-        exec python "$ULNOIOT_ROOT/bin/docserver.py"
+        cd "$IOTEMPOWER_LOCAL/doc/html"
+        exec python "$IOTEMPOWER_ROOT/bin/docserver.py"
         ;;
     *)
         usage

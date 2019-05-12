@@ -1,8 +1,8 @@
 // barometer-bmp280.h
 // Header File for controlling the BMP280 barometer
 
-#ifndef _ULNOIOT_GYRO_H_
-#define _ULNOIOT_GYRO_H_
+#ifndef _IOTEMPOWER_GYRO_H_
+#define _IOTEMPOWER_GYRO_H_
 
 #include <Arduino.h>
 #include <Wire.h>
@@ -19,4 +19,4 @@ class Barometer_BMP280 : public I2C_Device {
         bool measure();
 };
 
-#endif // _ULNOIOT_GYRO_H_
+#endif // _IOTEMPOWER_GYRO_H_

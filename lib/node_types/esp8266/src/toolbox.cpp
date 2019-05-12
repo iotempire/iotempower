@@ -8,8 +8,8 @@ bool Ustring::add(const Ustring& other) {
     int otherlen = other.length();
     bool untruncated = true;
 
-    if( ownlen+otherlen > ULNOIOT_MAX_STRLEN ) {
-        otherlen = ULNOIOT_MAX_STRLEN - ownlen;
+    if( ownlen+otherlen > IOTEMPOWER_MAX_STRLEN ) {
+        otherlen = IOTEMPOWER_MAX_STRLEN - ownlen;
         untruncated = false;
     }
     strncpy(cstr+ownlen, other.cstr, otherlen);
@@ -18,21 +18,21 @@ bool Ustring::add(const Ustring& other) {
 }
 
 bool Ustring::from(const char* _cstr) {
-    int otherlen = strnlen(_cstr,ULNOIOT_MAX_STRLEN+1);
+    int otherlen = strnlen(_cstr,IOTEMPOWER_MAX_STRLEN+1);
     bool untruncated = true;
-    if(otherlen > ULNOIOT_MAX_STRLEN) {
-        otherlen = ULNOIOT_MAX_STRLEN;
+    if(otherlen > IOTEMPOWER_MAX_STRLEN) {
+        otherlen = IOTEMPOWER_MAX_STRLEN;
         untruncated = false;
     }
-    strncpy(cstr,_cstr,ULNOIOT_MAX_STRLEN);
+    strncpy(cstr,_cstr,IOTEMPOWER_MAX_STRLEN);
     case_adjust();
     return untruncated;
 }
 
 bool Ustring::from(const byte* payload, unsigned int length) {
     bool untruncated = true;
-    if(length > ULNOIOT_MAX_STRLEN) {
-        length = ULNOIOT_MAX_STRLEN;
+    if(length > IOTEMPOWER_MAX_STRLEN) {
+        length = IOTEMPOWER_MAX_STRLEN;
         untruncated = false;
     }
     strncpy(cstr, (const char *)payload, length); // TODO: think about proper decoding
@@ -63,7 +63,7 @@ int Ustring::compare(const char* other) const {
         }
         return 0;
     } else {
-        return strncmp(cstr, other, ULNOIOT_MAX_STRLEN);
+        return strncmp(cstr, other, IOTEMPOWER_MAX_STRLEN);
     }
 }
 
@@ -123,7 +123,7 @@ void Ustring::strip_param() {
 Ustring& Ustring::printf(const char *fmt, ...) {
     va_list ap;
     va_start(ap, fmt);
-    vsnprintf(cstr, ULNOIOT_MAX_STRLEN, fmt, ap);
+    vsnprintf(cstr, IOTEMPOWER_MAX_STRLEN, fmt, ap);
     va_end(ap);
     return *this;
 }

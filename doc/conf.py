@@ -19,9 +19,9 @@ import sphinx_bootstrap_theme  # bootstrap support
 
 # -- ulnoiot related stuff ------------
 import os
-assert "ULNOIOT_ROOT" in os.environ, "Not in ulnoiot environment, aborting."
+assert "IOTEMPOWER_ROOT" in os.environ, "Not in ulnoiot environment, aborting."
 
-#sphinx_root = os.path.join(os.environ["ULNOIOT_LOCAL"], "doc/html")
+#sphinx_root = os.path.join(os.environ["IOTEMPOWER_LOCAL"], "doc/html")
 
 
 # -- Project information -----------------------------------------------------

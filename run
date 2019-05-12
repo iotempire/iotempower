@@ -13,11 +13,11 @@
 
 function welcome() {
 cat << EOF
-ulnoiot
-=======
+IoT empower
+===========
 
 Your friendly and affordable Internet of Things environment.
-More at http://github.com/ulno/ulnoiot
+More at http://github.com/iotempire/iotempower
 
 EOF
 }
@@ -25,7 +25,7 @@ EOF
 function usage() {
 welcome
 cat << EOF
-Syntax: ulnoiot [command command_parameters]
+Syntax: iot [command command_parameters]
 
 The following commands are possible:
 
@@ -80,17 +80,17 @@ function check_files() {
 
 
 function check_root() {
-    if [ -e "$ULNOIOT_ROOT/lib/shell_starter/ulnoiot.bash" ]; then
-        cd "$ULNOIOT_ROOT"
+    if [ -e "$IOTEMPOWER_ROOT/lib/shell_starter/iotempower.bash" ]; then
+        cd "$IOTEMPOWER_ROOT"
     fi
     # else we should assume that we were started from the root-directory
     #echo -n "Checking now that we are in the ulnoiot root directory. "
-    check_files "lib/shell_starter/ulnoiot.bash" \
+    check_files "lib/shell_starter/iotempower.bash" \
         "bin/shebang_run" \
         "etc/ulnoiot.conf.example"
     if [ $? -ne 0 ]; then
         echo
-        echo "Cannot find ulnoiot files."
+        echo "Cannot find IoT empower files."
         echo "Stopping now."
         return 1
     fi
@@ -109,7 +109,7 @@ function check_install() {
 function install() {
     echo "Installing now."
     echo
-    bash "$ULNOIOT_ROOT/bin/ulnoiot_install"
+    bash "$IOTEMPOWER_ROOT/bin/iot_install"
     run upgrade
 }
 
@@ -121,7 +121,7 @@ function run() {
         help | -h | --help)
             shift
             if [[ "$1" ]]; then
-                exec "$ULNOIOT_LOCAL/bin/ulnoiot_help" "$@"
+                exec "$IOTEMPOWER_LOCAL/bin/iot_help" "$@"
             else
                 usage
             fi
@@ -135,8 +135,8 @@ function run() {
             exec "$@"
             ;;
         *)
-            # try to execute that with ulnoiot_ prefix
-            cmd="$ULNOIOT_LOCAL/bin/ulnoiot_$1"
+            # try to execute that with iot_ prefix
+            cmd="$IOTEMPOWER_LOCAL/bin/iot_$1"
             if [[ -x "$cmd" ]]; then
                 shift
                 exec "$cmd" "$@"
@@ -150,8 +150,8 @@ function run() {
 ######## Main #########
 current_path="$(pwd)" # save to restore later
 if check_root; then
-    export ULNOIOT_ROOT=$(realpath "$(pwd)")
-    source "$ULNOIOT_ROOT/lib/shell_starter/ulnoiot.bash" \
+    export IOTEMPOWER_ROOT=$(realpath "$(pwd)")
+    source "$IOTEMPOWER_ROOT/lib/shell_starter/iotempower.bash" \
         || { echo "Can't read configuration. Aborting."; exit 1; }
     check_install
     installed=$?

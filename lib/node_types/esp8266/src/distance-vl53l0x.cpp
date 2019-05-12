@@ -56,8 +56,8 @@ bool Distance_Vl53l0x::measure() {
         ulog("VL53L0X TIMEOUT or invalid distance");
         return false; 
     }
-    if(distance > ULNOIOT_VL53L0X_MAXDIST) {
-        distance = ULNOIOT_VL53L0X_MAXDIST;
+    if(distance > IOTEMPOWER_VL53L0X_MAXDIST) {
+        distance = IOTEMPOWER_VL53L0X_MAXDIST;
     }
     if(measured_value().empty() 
             || abs(measured_value().as_int() - distance) >= _precision ) {

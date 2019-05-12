@@ -364,7 +364,7 @@ bool ota_serve(int firmware_size, const char* firmware_md5) {
         char passmd5[33];
         MD5Builder passmd5_md5;
         passmd5_md5.begin();
-        passmd5_md5.add(ULNOIOT_FLASH_DEFAULT_PASSWORD); 
+        passmd5_md5.add(IOTEMPOWER_FLASH_DEFAULT_PASSWORD); 
         passmd5_md5.calculate(); 
         passmd5_md5.getChars(passmd5);
         // Serial.print("passmd5: ");
@@ -566,7 +566,7 @@ void adopt(Cmd* cmd) {
     char node_network[ssid_maxlen+1];
     char md5sum[33];
     md5sum[32]=0;
-    const char *node_ap_password = ULNOIOT_AP_RECONFIG_PASSWORD;
+    const char *node_ap_password = IOTEMPOWER_AP_RECONFIG_PASSWORD;
 // debug   const char *node_ap_password = "mypassword";
 
     node_network[ssid_maxlen] = 0 ; // terminate

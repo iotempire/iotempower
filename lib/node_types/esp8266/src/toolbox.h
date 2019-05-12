@@ -17,13 +17,13 @@
 // Ulnoiot-String
 class Ustring {
     protected:
-        char cstr[ULNOIOT_MAX_STRLEN+1];
+        char cstr[IOTEMPOWER_MAX_STRLEN+1];
         bool _ignore_case = false;
     public:
         void clear() {
             // make it empty and always terminated
             cstr[0]=0;
-            cstr[ULNOIOT_MAX_STRLEN]=0;
+            cstr[IOTEMPOWER_MAX_STRLEN]=0;
         }
 
         // most functions return true, when successful and false if something
@@ -34,26 +34,26 @@ class Ustring {
         bool remove(unsigned int length) {
             return remove(0,length);
         }
-        int length() const { return strnlen(cstr,ULNOIOT_MAX_STRLEN); }
-        int max_length() const { return ULNOIOT_MAX_STRLEN; }
+        int length() const { return strnlen(cstr,IOTEMPOWER_MAX_STRLEN); }
+        int max_length() const { return IOTEMPOWER_MAX_STRLEN; }
         bool from(int i) { 
-            return snprintf(cstr, ULNOIOT_MAX_STRLEN+1, "%d", i) <= ULNOIOT_MAX_STRLEN; 
+            return snprintf(cstr, IOTEMPOWER_MAX_STRLEN+1, "%d", i) <= IOTEMPOWER_MAX_STRLEN; 
         }
         bool from(long i) { 
-            return snprintf(cstr, ULNOIOT_MAX_STRLEN+1, "%ld", i) <= ULNOIOT_MAX_STRLEN; 
+            return snprintf(cstr, IOTEMPOWER_MAX_STRLEN+1, "%ld", i) <= IOTEMPOWER_MAX_STRLEN; 
         }
         bool from(unsigned int i) { 
-            return snprintf(cstr, ULNOIOT_MAX_STRLEN+1, "%u", i) <= ULNOIOT_MAX_STRLEN; 
+            return snprintf(cstr, IOTEMPOWER_MAX_STRLEN+1, "%u", i) <= IOTEMPOWER_MAX_STRLEN; 
         }
         bool from(unsigned long i) { 
-            return snprintf(cstr, ULNOIOT_MAX_STRLEN+1, "%lu", i) <= ULNOIOT_MAX_STRLEN; 
+            return snprintf(cstr, IOTEMPOWER_MAX_STRLEN+1, "%lu", i) <= IOTEMPOWER_MAX_STRLEN; 
         }
         bool from(float f) { 
             // TODO: check if float is actually now supported in sprintf
-            return snprintf(cstr, ULNOIOT_MAX_STRLEN+1, "%f", f) <= ULNOIOT_MAX_STRLEN; 
+            return snprintf(cstr, IOTEMPOWER_MAX_STRLEN+1, "%f", f) <= IOTEMPOWER_MAX_STRLEN; 
         }
         bool from(double f) { 
-            return snprintf(cstr, ULNOIOT_MAX_STRLEN+1, "%f", f) <= ULNOIOT_MAX_STRLEN; 
+            return snprintf(cstr, IOTEMPOWER_MAX_STRLEN+1, "%f", f) <= IOTEMPOWER_MAX_STRLEN; 
         }
         bool from(const char* _cstr);
         bool from(const byte* payload, unsigned int length);
@@ -63,7 +63,7 @@ class Ustring {
         /* ISO C++ says that these are ambiguous */
         /* really!?! , so use copy - not from*/
         bool copy(const Ustring& other) { 
-            strncpy(cstr,other.cstr,ULNOIOT_MAX_STRLEN);
+            strncpy(cstr,other.cstr,IOTEMPOWER_MAX_STRLEN);
             case_adjust();
             return true;
         }
@@ -117,14 +117,14 @@ class Ustring {
         }
 
         bool starts_with(const char* pattern) const {
-            unsigned long len = strnlen(pattern, ULNOIOT_MAX_STRLEN);
+            unsigned long len = strnlen(pattern, IOTEMPOWER_MAX_STRLEN);
             return memcmp(cstr,pattern,len) == 0;
         }
 
         Ustring() { clear (); }
         Ustring(const char *initstr) {
             clear();
-            strncpy(cstr,initstr,ULNOIOT_MAX_STRLEN);
+            strncpy(cstr,initstr,IOTEMPOWER_MAX_STRLEN);
             case_adjust();
         }
         Ustring(int i) { clear(); from(i); case_adjust();}

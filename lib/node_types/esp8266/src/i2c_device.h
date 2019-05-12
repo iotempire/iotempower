@@ -4,13 +4,13 @@
 //
 // adding a way to support multiple i2c busses
 
-#ifndef _ULNOIOT_I2C_DEVICE_H_
-#define _ULNOIOT_I2C_DEVICE_H_
+#ifndef _IOTEMPOWER_I2C_DEVICE_H_
+#define _IOTEMPOWER_I2C_DEVICE_H_
 
 #include <Wire.h>
 #include <device.h>
 
-#define ULNOIOT_DEFAULT_I2C_CLOCK 400000
+#define IOTEMPOWER_DEFAULT_I2C_CLOCK 400000
 // seems like esp8266 has only sw i2c
 // compare here: https://bbs.espressif.com/viewtopic.php?t=1032
 
@@ -35,16 +35,16 @@ class I2C_Device : public Device {
         }
     public:
         I2C_Device(const char* name, uint8_t address) : Device(name) {
-            init_i2c(SDA, SCL, ULNOIOT_DEFAULT_I2C_CLOCK);
+            init_i2c(SDA, SCL, IOTEMPOWER_DEFAULT_I2C_CLOCK);
             set_address(address);
         }
 
         I2C_Device(const char* name) : Device(name) {
-            init_i2c(SDA, SCL, ULNOIOT_DEFAULT_I2C_CLOCK);
+            init_i2c(SDA, SCL, IOTEMPOWER_DEFAULT_I2C_CLOCK);
         }
 
         I2C_Device& i2c(uint8_t sda, uint8_t scl) {
-            init_i2c(sda, scl, ULNOIOT_DEFAULT_I2C_CLOCK);
+            init_i2c(sda, scl, IOTEMPOWER_DEFAULT_I2C_CLOCK);
             return *this;
         }
         I2C_Device& i2c(uint8_t sda, uint8_t scl, unsigned int clock) {
@@ -93,4 +93,4 @@ class I2C_Device : public Device {
         virtual bool measure() { return true; }
 };
 
-#endif // _ULNOIOT_I2C_DEVICE_H_
+#endif // _IOTEMPOWER_I2C_DEVICE_H_

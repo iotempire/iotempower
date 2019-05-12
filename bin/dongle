@@ -4,7 +4,7 @@
 # TODO: help
 #
 
-[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoT empower not active, aborting." 1>&2;exit 1; }
 
 daemon_fifo=/var/tmp/ulnoiot_dongle
 daemon_port="$daemon_fifo.port"
@@ -34,9 +34,9 @@ if [[ "$command" = flash ]]; then
         port=/dev/$(find_esp_port "$2" nodongle)
     fi
     echo "Flashing dongle on port $port..."
-    python3 "$ULNOIOT_ROOT/bin/dongle_display.py" -p "$port" \
+    python3 "$IOTEMPOWER_ROOT/bin/dongle_display.py" -p "$port" \
         "Updating\\\\nfirmware...\\\\n\\\\nPlease wait."
-    cd "$ULNOIOT_ROOT/lib/esp_dongle"
+    cd "$IOTEMPOWER_ROOT/lib/esp_dongle"
     export PLATFORMIO_UPLOAD_PORT="$port"
     platformio run -t upload
     result=$?
@@ -69,9 +69,9 @@ elif [[ "$command" = daemon ]]; then
         echo "$port" > "$daemon_port"
         echo "Starting daemon on $port."
         mkfifo -m 600 "$daemon_fifo"
-    #    python3 "$ULNOIOT_ROOT/bin/dongle_daemon.py" "$@" <"$daemon_fifo"
+    #    python3 "$IOTEMPOWER_ROOT/bin/dongle_daemon.py" "$@" <"$daemon_fifo"
         # not sure why I have to use tail for the fifo and not <$daemon_fifo
-        python3 "$ULNOIOT_ROOT/bin/dongle_daemon.py" -i "$daemon_fifo" -p "$port" "$@"
+        python3 "$IOTEMPOWER_ROOT/bin/dongle_daemon.py" -i "$daemon_fifo" -p "$port" "$@"
         rm -f "$daemon_fifo" "$daemon_port"
     else
         echo "Dongle not found."
@@ -89,9 +89,9 @@ else
     port=""
     port=$(cat "$daemon_port" 2>/dev/null)
     if [[ "$port" ]]; then
-        python3 "$ULNOIOT_ROOT/bin/dongle_$command.py" -p "$port" "$@"
+        python3 "$IOTEMPOWER_ROOT/bin/dongle_$command.py" -p "$port" "$@"
     else
-        python3 "$ULNOIOT_ROOT/bin/dongle_$command.py" "$@"
+        python3 "$IOTEMPOWER_ROOT/bin/dongle_$command.py" "$@"
     fi
     result=$?
     dongle_connect

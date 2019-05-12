@@ -10,7 +10,7 @@ EOF
 exit 1
 fi
 
-[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoT empower not active, aborting." 1>&2;exit 1; }
 
 name="new-node"
 if [[ "$1" ]]; then
@@ -24,5 +24,5 @@ if [[ -e "$name" ]]; then
     echo "Folder $name (or a file with that name) already exists, please rename first."
     exit 1
 else
-    cp -a "$ULNOIOT_ROOT/lib/system_template/node_template" "$name" && echo "Successfully created."
+    cp -a "$IOTEMPOWER_ROOT/lib/system_template/node_template" "$name" && echo "Successfully created."
 fi

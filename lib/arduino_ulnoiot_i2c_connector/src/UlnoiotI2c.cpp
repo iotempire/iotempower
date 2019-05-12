@@ -38,11 +38,11 @@ UlnoiotI2c::UlnoiotI2c(int init_time, int addr) {
 }
 
 UlnoiotI2c::UlnoiotI2c(int init_time) {
-  init(init_time, ULNOIOT_I2C_ADDRESS, NULL);
+  init(init_time, IOTEMPOWER_I2C_ADDRESS, NULL);
 }
 
 UlnoiotI2c::UlnoiotI2c(int init_time, ulnoiot_i2c_receive_callback_type callback) {
-  init(init_time, ULNOIOT_I2C_ADDRESS, callback);
+  init(init_time, IOTEMPOWER_I2C_ADDRESS, callback);
 }
 
 void UlnoiotI2c::request() {
@@ -72,8 +72,8 @@ void UlnoiotI2c::write(String s) {
       buf = buffer1;
     }
     int l = s.length();
-    if(l > ULNOIOT_I2C_BUFFER_SIZE - 4) { // ignore if string too long
-      l = ULNOIOT_I2C_BUFFER_SIZE - 4;
+    if(l > IOTEMPOWER_I2C_BUFFER_SIZE - 4) { // ignore if string too long
+      l = IOTEMPOWER_I2C_BUFFER_SIZE - 4;
     }
     buffer_counter += 1;
     if( buffer_counter >= 0xffff ) buffer_counter = 0; // prevent 0xffff
@@ -90,9 +90,9 @@ void UlnoiotI2c::write(String s) {
   interrupts();
 }
 
-# define ULNOIOT_I2C_END_DELAY 10
+# define IOTEMPOWER_I2C_END_DELAY 10
 void UlnoiotI2c::suspend( int timems ) {
-  timems += ULNOIOT_I2C_END_DELAY;
+  timems += IOTEMPOWER_I2C_END_DELAY;
   // scale down time
   unsigned int t=0;
   if( timems<0 ) timems=0;
@@ -118,12 +118,12 @@ void UlnoiotI2c::suspend( int timems ) {
     if (request_copy) break;
     delayMicroseconds(1000);
     counter += 1;
-    if (counter >= ULNOIOT_I2C_REQUEST_MAXBLOCK ) {
+    if (counter >= IOTEMPOWER_I2C_REQUEST_MAXBLOCK ) {
       Serial.println("ulnoiot i2c maxblock reached, continuing");
       break;
     }
   }
-  delayMicroseconds(1000*ULNOIOT_I2C_END_DELAY);
+  delayMicroseconds(1000*IOTEMPOWER_I2C_END_DELAY);
   /*Serial.print("Request confirmed: ");
   Serial.print(request_confirmed);
   Serial.print(" counter: ");
@@ -133,7 +133,7 @@ void UlnoiotI2c::suspend( int timems ) {
 void UlnoiotI2c::receive(int count) {
   receive_buffer_size = 0;
   while(Wire.available()) { // loop through all
-    if( receive_buffer_size >= ULNOIOT_I2C_BUFFER_SIZE ) break;
+    if( receive_buffer_size >= IOTEMPOWER_I2C_BUFFER_SIZE ) break;
     receive_buffer[receive_buffer_size] = Wire.read();
     receive_buffer_size ++;
   }
@@ -152,7 +152,7 @@ void _ulnoiot_receive_caller(int count) {
 }
 
 void UlnoiotI2c::init(int init_time) {
-  Wire.begin(ULNOIOT_I2C_ADDRESS); // join i2c bus with respective address
+  Wire.begin(IOTEMPOWER_I2C_ADDRESS); // join i2c bus with respective address
   _ulnoiot_i2c_last_init = this;
   Wire.onRequest(_ulnoiot_request_caller); // register request function (to send data to master)
   Wire.onReceive(_ulnoiot_receive_caller); // register receive function (to receive data from master)

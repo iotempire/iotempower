@@ -48,7 +48,7 @@ bool Animator::measure() {
 }
 
 Animator& Animator::with_command_handler(const char* command_name, ANIMATOR_COMMAND_HANDLER handler) {
-    if(command_method_counter<ULNOIOT_MAX_ANIMATOR_COMMANDS) {
+    if(command_method_counter<IOTEMPOWER_MAX_ANIMATOR_COMMANDS) {
         command_methods[command_method_counter].key = command_name;
         command_methods[command_method_counter].method = handler;
         command_method_counter++;

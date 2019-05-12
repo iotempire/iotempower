@@ -13,7 +13,7 @@ fi
 if [[ -e "$_WIFI_CONFIG" ]]; then
     mapfile -t lines < <(sed 's/\r$//' "$_WIFI_CONFIG"| egrep -v '\w*#|^$')
     count=${#lines[@]}
-    if [[ $count -eq 1 ]]; then  # only one param given -> ULNOIOT_AP_PASSWORD
+    if [[ $count -eq 1 ]]; then  # only one param given -> IOTEMPOWER_AP_PASSWORD
         add_id=1
         uiot_ap_password="${lines[0]}"
     elif [[ $count -eq 2 ]]; then
@@ -28,18 +28,18 @@ if [[ -e "$_WIFI_CONFIG" ]]; then
         fi
 
         # overwrite some configuration variables
-        #ULNOIOT_AP_DEVICES="wlan1 wlan0"
+        #IOTEMPOWER_AP_DEVICES="wlan1 wlan0"
 
         # Name of accesspoint to create
-        export ULNOIOT_AP_NAME="$uiot_ap_name"
+        export IOTEMPOWER_AP_NAME="$uiot_ap_name"
 
         if [[ "$add_id" = 1 ]]; then
-            export ULNOIOT_AP_ADDID=yes
+            export IOTEMPOWER_AP_ADDID=yes
         else
-            export ULNOIOT_AP_ADDID=no
+            export IOTEMPOWER_AP_ADDID=no
         fi
 
-        export ULNOIOT_AP_PASSWORD="$uiot_ap_password"
+        export IOTEMPOWER_AP_PASSWORD="$uiot_ap_password"
 
         # channel, bridge, and mqtt data taken straight from ulnoiot.conf
     fi
@@ -49,7 +49,7 @@ fi
 if [[ -e "$_WIFI_IN_CONFIG" ]]; then
     mapfile -t lines < <(sed 's/\r$//' "$_WIFI_IN_CONFIG" | egrep -v '\w*#|^$')
     count=${#lines[@]}
-    if [[ $count -eq 2 ]]; then  # only one param given -> ULNOIOT_AP_PASSWORD
+    if [[ $count -eq 2 ]]; then  # only one param given -> IOTEMPOWER_AP_PASSWORD
         uiot_wifi_name="${lines[0]}"
         uiot_wifi_password="${lines[1]}"
     elif [[ $count -eq 3 ]]; then

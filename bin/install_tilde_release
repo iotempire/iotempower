@@ -6,7 +6,7 @@
 # Create date: 2018-12-04
 #
 
-[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoT empower not active, aborting." 1>&2;exit 1; }
 
 MAKEFLAGS="BUILDVERSION=release LCFLAGS=-DT3_DONT_CHECK_VERSION LCXXFLAGS=-DT3_DONT_CHECK_VERSION -j4"
 #MAKEFLAGS=""
@@ -30,7 +30,7 @@ fi
 PREFIX=/opt/tilde
 sudo mkdir -p "$PREFIX"
 
-TILDEDIR="$ULNOIOT_EXTERNAL/tilde"
+TILDEDIR="$IOTEMPOWER_EXTERNAL/tilde"
 DO_INSTALL=sudo
 
 export LD_LIBRARY_PATH="$PREFIX/lib:$LD_LIBRARY_PATH"

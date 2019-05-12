@@ -1,7 +1,7 @@
 // hx711.h
 
-#ifndef _ULNOIOT_HX711_H_
-#define _ULNOIOT_HX711_H_
+#ifndef _IOTEMPOWER_HX711_H_
+#define _IOTEMPOWER_HX711_H_
 
 #include <Arduino.h>
 #include <device.h>
@@ -31,4 +31,4 @@ class Hx711 : public Device {
 };
 
 
-#endif // _ULNOIOT_HX711_H_
+#endif // _IOTEMPOWER_HX711_H_

@@ -9,10 +9,10 @@ EOF
 exit 1
 fi
 
-[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoT empower not active, aborting." 1>&2;exit 1; }
 
 
-APTEMP="$ULNOIOT_LOCAL/tmp/mosquitto"
+APTEMP="$IOTEMPOWER_LOCAL/tmp/mosquitto"
 rm -rf "$APTEMP" &> /dev/null
 mkdir -p "$APTEMP"
 
@@ -25,26 +25,26 @@ log_dest stdout
 log_type error
 log_type warning
 bind_address 127.0.0.1
-listener 1883 $ULNOIOT_MQTT_HOST
+listener 1883 $IOTEMPOWER_MQTT_HOST
 EOF
 
 # create bridge
-if [ "$ULNOIOT_MQTT_BRIDGE_HOST" ]; then
+if [ "$IOTEMPOWER_MQTT_BRIDGE_HOST" ]; then
 
 # bridge config based on example in http://owntracks.org/booklet/guide/bridge/
 cat << EOF >> "$APTEMP/mosquitto.conf"
-connection bridge-to-$ULNOIOT_MQTT_BRIDGE_HOST
-bridge_capath $ULNOIOT_MQTT_BRIDGE_CERTPATH
+connection bridge-to-$IOTEMPOWER_MQTT_BRIDGE_HOST
+bridge_capath $IOTEMPOWER_MQTT_BRIDGE_CERTPATH
 bridge_insecure false
-address $ULNOIOT_MQTT_BRIDGE_HOST:$ULNOIOT_MQTT_BRIDGE_PORT
+address $IOTEMPOWER_MQTT_BRIDGE_HOST:$IOTEMPOWER_MQTT_BRIDGE_PORT
 cleansession false
-clientid bridge-$HOSTNAME-$ULNOIOT_MQTT_BRIDGE_HOST
+clientid bridge-$HOSTNAME-$IOTEMPOWER_MQTT_BRIDGE_HOST
 start_type automatic
-username $ULNOIOT_MQTT_BRIDGE_USER
-password $ULNOIOT_MQTT_BRIDGE_PW
+username $IOTEMPOWER_MQTT_BRIDGE_USER
+password $IOTEMPOWER_MQTT_BRIDGE_PW
 notifications false
 try_private true
-topic # both 2 ${ULNOIOT_MQTT_BRIDGE_TOPIC}/ ${ULNOIOT_MQTT_BRIDGE_TOPIC}/
+topic # both 2 ${IOTEMPOWER_MQTT_BRIDGE_TOPIC}/ ${IOTEMPOWER_MQTT_BRIDGE_TOPIC}/
 EOF
 
 fi # bridge-config

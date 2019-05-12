@@ -10,38 +10,38 @@
 #
 # Also disable all network devices in /etc/network/interfaces apart lo and wlan1
 # and make sure that wlan1 configuration looks like this (replace /home/pi/ulnoiot
-# with the respective ULNOIOT_ROOT):
+# with the respective IOTEMPOWER_ROOT):
 # allow-hotplug wlan1
 # iface wlan1 inet manual
 #    pre-up /home/pi/bin/ulnoiot exec /home/pi/ulnoiot/lib/system_boot/raspi-pre-up.sh
 #    wpa-conf /run/uiot_wpa_supplicant.conf
 
-[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoT empower not active, aborting." 1>&2;exit 1; }
 
 
-source "$ULNOIOT_ROOT/bin/read_boot_config"
+source "$IOTEMPOWER_ROOT/bin/read_boot_config"
 
 # Try to guess user
-if [[ $ULNOIOT_ROOT =~ '/home/([!/]+)/ulnoiot' ]]; then
-    ULNOIOT_USER=${BASH_REMATCH[1]}
+if [[ $IOTEMPOWER_ROOT =~ '/home/([!/]+)/ulnoiot' ]]; then
+    IOTEMPOWER_USER=${BASH_REMATCH[1]}
 else
-    ULNOIOT_USER=ulnoiot
+    IOTEMPOWER_USER=ulnoiot
 fi
 
-if [[ "ULNOIOT_AP_PASSWORD" ]]; then # pw was given, so start an accesspoint
+if [[ "IOTEMPOWER_AP_PASSWORD" ]]; then # pw was given, so start an accesspoint
     # start accesspoint and mqtt_broker
     (
         sleep 15 # let network devices start
-        cd "$ULNOIOT_ROOT"
+        cd "$IOTEMPOWER_ROOT"
         tmux new-session -d -n AP -s UIoTSvrs \
                 "./run" exec accesspoint \; \
             new-window -d -n MQTT  \
                 "./run" exec mqtt_broker \; \
             new-window -d -n nodered  \
-                su - $ULNOIOT_USER -c 'ulnoiot exec nodered_starter' \; \
+                su - $IOTEMPOWER_USER -c 'ulnoiot exec nodered_starter' \; \
             new-window -d -n cloudcmd  \
-                su - $ULNOIOT_USER -c 'ulnoiot exec cloudcmd_starter' \; \
+                su - $IOTEMPOWER_USER -c 'ulnoiot exec cloudcmd_starter' \; \
             new-window -d -n dongle  \
-                su - $ULNOIOT_USER -c 'ulnoiot exec dongle_starter' \;
+                su - $IOTEMPOWER_USER -c 'ulnoiot exec dongle_starter' \;
     ) &
 fi # accesspoint check

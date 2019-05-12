@@ -18,7 +18,7 @@ typedef struct {
 class RGB_Matrix : public RGB_Base {
     private:
         Strip_Address* matrix;
-        RGB_Base* strips[ULNOIOT_MAX_LED_STRIPS];
+        RGB_Base* strips[IOTEMPOWER_MAX_LED_STRIPS];
         int height = 0;
         int width = 0;
         int strip_count = 0;

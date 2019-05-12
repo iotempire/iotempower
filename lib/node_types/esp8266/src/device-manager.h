@@ -3,8 +3,8 @@
 // created: 2018-07-16
 // Manage a list of devices
 
-#ifndef _ULNOIOT_DEVICE_MANAGER_H_
-#define _ULNOIOT_DEVICE_MANAGER_H_
+#ifndef _IOTEMPOWER_DEVICE_MANAGER_H_
+#define _IOTEMPOWER_DEVICE_MANAGER_H_
 
 #include <AsyncMqttClient.h>
 #include <toolbox.h>
@@ -52,4 +52,4 @@ bool devices_receive(Ustring& subtopic, Ustring& payload);
  */
 bool devices_publish(AsyncMqttClient& mqtt_client, Ustring& node_topic, bool publish_all = false);
 
-#endif // _ULNOIOT_DEVICE_MANAGER_H_
+#endif // _IOTEMPOWER_DEVICE_MANAGER_H_

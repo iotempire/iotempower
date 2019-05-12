@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-sudo bash -c ". $ULNOIOT_VPYTHON/bin/activate; PYTHONPATH=$ULNOIOT_ROOT/lib python main.py"
+sudo bash -c ". $IOTEMPOWER_VPYTHON/bin/activate; PYTHONPATH=$IOTEMPOWER_ROOT/lib python main.py"

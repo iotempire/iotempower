@@ -22,7 +22,7 @@ class Animator : public Device {
         unsigned long last_frame=millis();
         #define ANIMATOR_FRAME_BUILDER_HANDLER std::function<void()>
         ANIMATOR_FRAME_BUILDER_HANDLER _handler = NULL;
-        _COMMAND_METHOD command_methods[ULNOIOT_MAX_ANIMATOR_COMMANDS];
+        _COMMAND_METHOD command_methods[IOTEMPOWER_MAX_ANIMATOR_COMMANDS];
         int command_method_counter=0;
         #define ANIMATOR_SHOW std::function<void()>
         ANIMATOR_SHOW _show_handler = NULL;

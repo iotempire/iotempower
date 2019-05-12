@@ -1,6 +1,6 @@
 // all we need to address arduino-like stuff
-#ifndef _ULNOIOT_H_
-#define _ULNOIOT_H_
+#ifndef _IOTEMPOWER_H_
+#define _IOTEMPOWER_H_
 
 #include <Arduino.h>
 #include "ulnoiot-default.h"
@@ -18,4 +18,4 @@
  *  */
 bool transmission_interval(int interval);
 
-#endif // _ULNOIOT_H_
+#endif // _IOTEMPOWER_H_

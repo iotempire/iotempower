@@ -1,15 +1,15 @@
 // distance-vl53l0x.h
 // I2C Time of flight distance sensor
 
-#ifndef _ULNOIOT_VL53L0X_H_
-#define _ULNOIOT_VL53L0X_H_
+#ifndef _IOTEMPOWER_VL53L0X_H_
+#define _IOTEMPOWER_VL53L0X_H_
 
 #include <Arduino.h>
 #include <i2c_device.h>
 
 #include <VL53L0X.h> // here only this in cpp MPU6050_6Axis_MotionApps20.h
 
-#define ULNOIOT_VL53L0X_MAXDIST 8190
+#define IOTEMPOWER_VL53L0X_MAXDIST 8190
 
 class Distance_Vl53l0x : public I2C_Device {
     private:
@@ -33,4 +33,4 @@ class Distance_Vl53l0x : public I2C_Device {
         bool measure();
 };
 
-#endif // _ULNOIOT_VL53L0X_H_
+#endif // _IOTEMPOWER_VL53L0X_H_

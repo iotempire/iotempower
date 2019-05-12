@@ -2,12 +2,11 @@
 IoT empower
 ===========
 
-The main development is now taking place here:
+The main development is taking place here:
 https://github.com/iotempire/iotempower
 
 
-IoT empower (former *ulnoiot*, pronounced: "You'll know IoT") is a
-framework and environment
+IoT empower is a framework and environment
 for empowering everyone to explore and develop for the
 Internet of Things (IoT)
 -- tinkerers, makers, programmers, hobbyists, students, artists,
@@ -31,5 +30,3 @@ one of the following:
 
 Or directly dive into the `full documentation </doc/index-doc.rst>`_.
 
-The main development is now taking place here:
-https://github.com/iotempire/iotempower

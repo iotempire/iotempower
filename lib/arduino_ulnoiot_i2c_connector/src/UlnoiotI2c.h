@@ -13,15 +13,15 @@
 #ifndef UlnoiotI2c_h
 #define UlnoiotI2c_h
 
-#define ULNOIOT_I2C_ADDRESS 8 // Slave address to register as (don't chose something smaler than 8)
+#define IOTEMPOWER_I2C_ADDRESS 8 // Slave address to register as (don't chose something smaler than 8)
 
 #include "Arduino.h"
 #include <string.h>
 
 // real buffer takes first two bytes as counter, 3rd as size, and 4th as time in ms request
-#define ULNOIOT_I2C_BUFFER_SIZE 36 // < 50 (max what can be send in 1ms on 400 KHz)
-#define ULNOIOT_I2C_REQUEST_DEFAULT 5 // Default request time if not specified
-#define ULNOIOT_I2C_REQUEST_MAXBLOCK 1000 // max time to block for waiting for request confirmation
+#define IOTEMPOWER_I2C_BUFFER_SIZE 36 // < 50 (max what can be send in 1ms on 400 KHz)
+#define IOTEMPOWER_I2C_REQUEST_DEFAULT 5 // Default request time if not specified
+#define IOTEMPOWER_I2C_REQUEST_MAXBLOCK 1000 // max time to block for waiting for request confirmation
 
 typedef void (*ulnoiot_i2c_receive_callback_type)(char *, int);
 
@@ -37,10 +37,10 @@ class UlnoiotI2c {
     void request();
     void receive(int count);
   private:
-    char buffer1[ULNOIOT_I2C_BUFFER_SIZE];
-    char buffer2[ULNOIOT_I2C_BUFFER_SIZE];
+    char buffer1[IOTEMPOWER_I2C_BUFFER_SIZE];
+    char buffer2[IOTEMPOWER_I2C_BUFFER_SIZE];
     char *buffer;
-    char receive_buffer[ULNOIOT_I2C_BUFFER_SIZE+1]; // one more which can be 0 for end
+    char receive_buffer[IOTEMPOWER_I2C_BUFFER_SIZE+1]; // one more which can be 0 for end
     int receive_buffer_size;
     int request_bus; // If this is > 0: request time in ms on bus when giving next answer
     bool request_confirmed; // This is set to true, when a request finishes and was set to false before

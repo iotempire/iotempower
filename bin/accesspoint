@@ -9,7 +9,7 @@ EOF
 exit 1
 fi
 
-[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoT empower not active, aborting." 1>&2;exit 1; }
 
 if [[ "$1" != "show" ]]; then
     ufw_active=""
@@ -26,9 +26,9 @@ while true; do
 
     # detect output wireless network device to start AP on
     OUTPUT_WIFI=""
-    if [[ "$ULNOIOT_AP_DEVICES" ]]; then
+    if [[ "$IOTEMPOWER_AP_DEVICES" ]]; then
         available_wifi=$(echo $(ip link show|cut -d: -f2|grep " wl"|cut -b2-))
-        for possible in $(echo "$ULNOIOT_AP_DEVICES"); do
+        for possible in $(echo "$IOTEMPOWER_AP_DEVICES"); do
             if [[ "$available_wifi" =~ .*"$possible".* ]]; then
                 OUTPUT_WIFI="$possible"
                 break
@@ -39,29 +39,29 @@ while true; do
         OUTPUT_WIFI=$(ip link show|cut -d: -f2|grep " wl"|cut -b2-|tail -n1)
     fi
 
-    ULNOIOT_AP_NAME_FULL="$ULNOIOT_AP_NAME"
-    if [ "$ULNOIOT_AP_ADDID" = "yes" ]; then
+    IOTEMPOWER_AP_NAME_FULL="$IOTEMPOWER_AP_NAME"
+    if [ "$IOTEMPOWER_AP_ADDID" = "yes" ]; then
         # add prefix to essid based on network adapter for unique class setup
         OUTPUT_MAC=$(ip link show "$OUTPUT_WIFI"|tail -n1|\
                 cut -d\  -f6|sed s/://g|cut -b7-)
-        ULNOIOT_AP_NAME_FULL="${ULNOIOT_AP_NAME}-$OUTPUT_MAC"
+        IOTEMPOWER_AP_NAME_FULL="${IOTEMPOWER_AP_NAME}-$OUTPUT_MAC"
     fi
 
     # add network extension for making essid more unique
-    AP_NAME="$ULNOIOT_AP_NAME_FULL"
+    AP_NAME="$IOTEMPOWER_AP_NAME_FULL"
 
-    PASSWORD="$ULNOIOT_AP_PASSWORD"
+    PASSWORD="$IOTEMPOWER_AP_PASSWORD"
 
-    CHANNEL="$ULNOIOT_AP_CHANNEL"
+    CHANNEL="$IOTEMPOWER_AP_CHANNEL"
     if [ "$CHANNEL" = "random" ]; then
         # pick channel randomly
         CHANNEL=$(shuf -n 1 -e 2 3 4 5 7 8 9 10)
     fi
 
-    IP="$ULNOIOT_AP_IP"
+    IP="$IOTEMPOWER_AP_IP"
 
     HIDDEN=""
-    if [[ "$ULNOIOT_AP_HIDDEN" = "yes" ]]; then
+    if [[ "$IOTEMPOWER_AP_HIDDEN" = "yes" ]]; then
         HIDDEN="--hidden"
     fi
 
@@ -71,15 +71,15 @@ while true; do
         exit 0
     fi
 
-    mkdir -p "$ULNOIOT_ROOT/tmp"
-    HOSTFILE="$ULNOIOT_ROOT/tmp/ap-host"
+    mkdir -p "$IOTEMPOWER_ROOT/tmp"
+    HOSTFILE="$IOTEMPOWER_ROOT/tmp/ap-host"
     cat << EOF > "$HOSTFILE"
-$ULNOIOT_AP_IP $ULNOIOT_AP_HOSTNAME
+$IOTEMPOWER_AP_IP $IOTEMPOWER_AP_HOSTNAME
 EOF
 
 
     HOSTAPD_EXTRA=""
-    if [[ "$ULNOIOT_AP_BRIDGE" ]]; then
+    if [[ "$IOTEMPOWER_AP_BRIDGE" ]]; then
         HOSTAPD_EXTRA="--hostapd-extra bridge=br0"
     fi
 
@@ -97,11 +97,11 @@ EOF
     sudo iptables -t nat -F
     sudo iptables -t mangle -F
     sudo iptables -X
-    if [[ "$ULNOIOT_AP_BRIDGE" ]]; then
+    if [[ "$IOTEMPOWER_AP_BRIDGE" ]]; then
         sudo ifconfig br0 down
         sudo brctl delbr br0
         sudo brctl addbr br0
-        sudo brctl addif br0 "$ULNOIOT_AP_BRIDGE"
+        sudo brctl addif br0 "$IOTEMPOWER_AP_BRIDGE"
         sudo ifconfig br0 "$IP"
     fi
 # sleep needs to be controlled from soemwhere outside this
@@ -112,7 +112,7 @@ EOF
     # on void linux
     # enable ip-forwarding
     sudo sysctl -w net.ipv4.ip_forward=1
-    sudo "$ULNOIOT_EXTERNAL/create_ap/create_ap" \
+    sudo "$IOTEMPOWER_EXTERNAL/create_ap/create_ap" \
         -c "$CHANNEL" $HIDDEN \
         -g "$IP" \
         $HOSTAPD_EXTRA \
@@ -120,12 +120,12 @@ EOF
         "$OUTPUT_WIFI" "$INPUT_DEVICE" "$AP_NAME" "$PASSWORD" &
     ap_id=$!
     sleep 7 # let ap start up
-    if [[ "$ULNOIOT_AP_BRIDGE" ]]; then
+    if [[ "$IOTEMPOWER_AP_BRIDGE" ]]; then
         # fix ip address
         sudo ifconfig "$OUTPUT_WIFI" 0.0.0.0
         sudo ifconfig br0 "$IP"
         sudo iptables -t nat -D POSTROUTING 1
-        sudo iptables -t nat -A POSTROUTING -s $ULNOIOT_AP_IP/24 \
+        sudo iptables -t nat -A POSTROUTING -s $IOTEMPOWER_AP_IP/24 \
                 -o "$INPUT_DEVICE" -j MASQUERADE
     fi
     # make sure to restore firewall

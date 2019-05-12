@@ -1,7 +1,7 @@
 // load modified pins
 
-#ifndef _ULNOIOT_PINS_H_
-#define _ULNOIOT_PINS_H_
+#ifndef _IOTEMPOWER_PINS_H_
+#define _IOTEMPOWER_PINS_H_
 
 #include <pins.h>
 
@@ -26,4 +26,4 @@
 #endif // FLASHBUTTON
 
 
-#endif // _ULNOIOT_PINS_H_
+#endif // _IOTEMPOWER_PINS_H_

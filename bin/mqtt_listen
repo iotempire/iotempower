@@ -16,10 +16,10 @@ EOF
 exit 1
 fi
 
-[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoT empower not active, aborting." 1>&2;exit 1; }
 
 if [[ -e "node.conf" || -e "../node.conf" ]]; then  # started from node-directory
-    source "$ULNOIOT_ROOT/bin/read_node_config"
+    source "$IOTEMPOWER_ROOT/bin/read_node_config"
 else # Check if in system directory and read
     source "system.conf" &> /dev/null
 fi
@@ -42,5 +42,5 @@ else
     topic="#"
 fi
 
-echo "Subscribing and listening to mqtt://$ULNOIOT_MQTT_HOST/$topic." >&2
-mosquitto_sub -v -h "$ULNOIOT_MQTT_HOST" -t "$topic"
+echo "Subscribing and listening to mqtt://$IOTEMPOWER_MQTT_HOST/$topic." >&2
+mosquitto_sub -v -h "$IOTEMPOWER_MQTT_HOST" -t "$topic"

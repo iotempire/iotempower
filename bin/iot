@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
+# enable local bin and python environment in modified shell
+#
 
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoT empower not active, aborting." 1>&2;exit 1; }
 
-source "$IOTEMPOWER_VPYTHON2/bin/activate"
-exec "$IOTEMPOWER_VPYTHON2/bin/pio" "$@"
+exec bash "$IOTEMPOWER_ROOT/run" "$@"
+

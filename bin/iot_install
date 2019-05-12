@@ -2,17 +2,17 @@
 # if not available, install all dependencies
 # and also allow to fix shebangs in local bin folder
 #
-# check if everything from ULNOIOT_EXTERNAL is downloaded and accessable
+# check if everything from IOTEMPOWER_EXTERNAL is downloaded and accessable
 # if not asks to install it
 #
-# if called as check_install clean, it will delete content of ULNOIOT_EXTERNAL and
+# if called as check_install clean, it will delete content of IOTEMPOWER_EXTERNAL and
 # re-download everything
 #
 # Author: ulno
 # Create date: 2017-05-17
 #
 
-[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoT empower not active, aborting." 1>&2;exit 1; }
 
 
 function welcome() {
@@ -41,13 +41,13 @@ EOF
 if [[ "$1" == clean ]]; then
   echo "Deleting external cache."
   echo
-  rm -rf "$ULNOIOT_VPYTHON"
-  rm -rf "$ULNOIOT_EXTERNAL"
+  rm -rf "$IOTEMPOWER_VPYTHON"
+  rm -rf "$IOTEMPOWER_EXTERNAL"
 fi
 
 # check if virtualenv is configured
-if [[ -e "$ULNOIOT_VPYTHON/bin/activate" ]]; then # check for existing venv
-    source "$ULNOIOT_VPYTHON/bin/activate"
+if [[ -e "$IOTEMPOWER_VPYTHON/bin/activate" ]]; then # check for existing venv
+    source "$IOTEMPOWER_VPYTHON/bin/activate"
 else
     welcome
     read answer
@@ -66,17 +66,17 @@ else
     fi
     # TODO: recheck, installation seems to fail first time -> path problems (wrong pip used?)
     # install virtualenv for python2 for platformio
-    mkdir -p "$ULNOIOT_VPYTHON2"
-    virtualenv -p "$(which python2)" "$ULNOIOT_VPYTHON2"
-    source "$ULNOIOT_VPYTHON2/bin/activate"
+    mkdir -p "$IOTEMPOWER_VPYTHON2"
+    virtualenv -p "$(which python2)" "$IOTEMPOWER_VPYTHON2"
+    source "$IOTEMPOWER_VPYTHON2/bin/activate"
     pip install --upgrade pip
     pip install --upgrade platformio
     deactivate
     
     # install virtualenv
-    mkdir -p "$ULNOIOT_VPYTHON"
-    virtualenv -p "$(which python3)" "$ULNOIOT_VPYTHON"
-    source "$ULNOIOT_VPYTHON/bin/activate"
+    mkdir -p "$IOTEMPOWER_VPYTHON"
+    virtualenv -p "$(which python3)" "$IOTEMPOWER_VPYTHON"
+    source "$IOTEMPOWER_VPYTHON/bin/activate"
     pip install --upgrade pip
     # dependencies
     pip install pyserial
@@ -94,37 +94,37 @@ else
     # TODO: fix more dependencies
     # Termux needs: ncurses-utils
     # esptool
-    git clone https://github.com/espressif/esptool "$ULNOIOT_EXTERNAL/esptool.git"
-    cd "$ULNOIOT_EXTERNAL/esptool.git"
+    git clone https://github.com/espressif/esptool "$IOTEMPOWER_EXTERNAL/esptool.git"
+    cd "$IOTEMPOWER_EXTERNAL/esptool.git"
     python setup.py install
-    ln -s "$ULNOIOT_EXTERNAL/esptool.git/esptool.py" "$ULNOIOT_VPYTHON/bin/esptool"
+    ln -s "$IOTEMPOWER_EXTERNAL/esptool.git/esptool.py" "$IOTEMPOWER_VPYTHON/bin/esptool"
 
     ## mpfshell - upy specific
-    #git clone https://github.com/ulno/mpfshell "$ULNOIOT_EXTERNAL/mpfshell.git"
-    #cd "$ULNOIOT_EXTERNAL/mpfshell.git"
+    #git clone https://github.com/ulno/mpfshell "$IOTEMPOWER_EXTERNAL/mpfshell.git"
+    #cd "$IOTEMPOWER_EXTERNAL/mpfshell.git"
     #python setup.py install
 
     # accesspoint
-    git clone https://github.com/ulno/create_ap "$ULNOIOT_EXTERNAL/create_ap"
-    #cd "$ULNOIOT_EXTERNAL/create_ap"
+    git clone https://github.com/ulno/create_ap "$IOTEMPOWER_EXTERNAL/create_ap"
+    #cd "$IOTEMPOWER_EXTERNAL/create_ap"
 
 #    # pyminifier
-#    git clone https://github.com/liftoff/pyminifier "$ULNOIOT_EXTERNAL/pyminifier"
-#    cd "$ULNOIOT_EXTERNAL/pyminifier"
+#    git clone https://github.com/liftoff/pyminifier "$IOTEMPOWER_EXTERNAL/pyminifier"
+#    cd "$IOTEMPOWER_EXTERNAL/pyminifier"
 #    python setup.py install
 
 #    # download firmware
-#    mkdir -p "$ULNOIOT_EXTERNAL/firmware"
-#    cd "$ULNOIOT_EXTERNAL/firmware"
-#    "$ULNOIOT_ROOT/bin/download_firmware"
-#    "$ULNOIOT_ROOT/bin/firmware" download
+#    mkdir -p "$IOTEMPOWER_EXTERNAL/firmware"
+#    cd "$IOTEMPOWER_EXTERNAL/firmware"
+#    "$IOTEMPOWER_ROOT/bin/download_firmware"
+#    "$IOTEMPOWER_ROOT/bin/firmware" download
 
-    cd "$ULNOIOT_LOCAL"
+    cd "$IOTEMPOWER_LOCAL"
     npm install terminal-kit
 
     popd  &> /dev/null
 
-    bash "$ULNOIOT_ROOT/bin/fix_bin"
+    bash "$IOTEMPOWER_ROOT/bin/fix_bin"
 
     update_cache
 

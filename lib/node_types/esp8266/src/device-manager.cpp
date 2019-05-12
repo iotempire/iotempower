@@ -16,11 +16,11 @@ typedef struct {
     Do_Later_Callback callback;
 } do_later_map_t;
 
-static do_later_map_t do_later_map[ULNOIOT_DO_LATER_MAP_SIZE];
+static do_later_map_t do_later_map[IOTEMPOWER_DO_LATER_MAP_SIZE];
 static int do_later_map_count=0;
 
 bool do_later_is_full() {
-    return do_later_map_count >= ULNOIOT_DO_LATER_MAP_SIZE;
+    return do_later_map_count >= IOTEMPOWER_DO_LATER_MAP_SIZE;
 }
 
 static void do_later_delete(int pos) {
@@ -57,7 +57,7 @@ static bool do_later_add(unsigned long in_ms, int16_t id, Do_Later_Callback cbu)
     for(pos=0; pos<do_later_map_count; pos++) {
         unsigned long delta = do_later_map[pos].time-current;
         // be aware of overrun
-        if(delta >= in_ms && delta <= ULNOIOT_MAX_DO_LATER_INTERVAL) break; // found something scheduled later
+        if(delta >= in_ms && delta <= IOTEMPOWER_MAX_DO_LATER_INTERVAL) break; // found something scheduled later
     }
     // do actual insert at pos
     if(pos<do_later_map_count) {
@@ -110,7 +110,7 @@ void do_later_check() {
         next = do_later_map[0].time;
         delta = current - next;
         // pay attention to overrun
-        if(delta>=0 && delta <= ULNOIOT_MAX_DO_LATER_INTERVAL) {
+        if(delta>=0 && delta <= IOTEMPOWER_MAX_DO_LATER_INTERVAL) {
             //int16_t id = do_later_map[0].id; hardcoded in callback lambda
             Do_Later_Callback cb = do_later_map[0].callback;
             // release entry as there might be a new one created
@@ -123,7 +123,7 @@ void do_later_check() {
 }
 
 ////// Device list
-static Fixed_Map<Device, ULNOIOT_MAX_DEVICES> 
+static Fixed_Map<Device, IOTEMPOWER_MAX_DEVICES> 
     __attribute__((init_priority(65525))) device_list;
 
 /*static Device* find_device(const Ustring& name) {

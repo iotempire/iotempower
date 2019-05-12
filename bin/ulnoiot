@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-# enable local bin and python environment in modified shell
-#
-
-[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
-
-exec bash "$ULNOIOT_ROOT/run" "$@"
-

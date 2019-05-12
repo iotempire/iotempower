@@ -1,8 +1,8 @@
 // gesture APDS9960.h
 // gesture/color/proximity sensor based on apds9960 i2c chip
 
-#ifndef _ULNOIOT_APDS9960_H_
-#define _ULNOIOT_APDS9960_H_
+#ifndef _IOTEMPOWER_APDS9960_H_
+#define _IOTEMPOWER_APDS9960_H_
 
 #include <Arduino.h>
 #include <Wire.h>
@@ -40,4 +40,4 @@ class Gesture_Apds9960 : public I2C_Device {
         bool measure();
 };
 
-#endif // _ULNOIOT_APDS9960_H_
+#endif // _IOTEMPOWER_APDS9960_H_

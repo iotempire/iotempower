@@ -4,11 +4,11 @@
 #
 # takes first argument as script to run (needs a shebang), rest as arguments to script
 
-[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoT empower not active, aborting." 1>&2;exit 1; }
 
 name=$(basename "$0")
 
-runname="$ULNOIOT_ROOT/bin/$name"
+runname="$IOTEMPOWER_ROOT/bin/$name"
 
 first=$(head -n1 "$runname")
 command=$(echo "$first"|cut -d\  -f1|cut -b3-)

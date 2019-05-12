@@ -2,9 +2,9 @@
 # Get ip of current node
 #
 
-[ "$ULNOIOT_ACTIVE" = "yes" ] || { echo "ulnoiot not active, aborting." 1>&2;exit 1; }
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoT empower not active, aborting." 1>&2;exit 1; }
 
-source "$ULNOIOT_ROOT/bin/read_node_config"
+source "$IOTEMPOWER_ROOT/bin/read_node_config"
 
 
-exec "$ULNOIOT_LOCAL/bin/get_ips" "$topic"
+exec "$IOTEMPOWER_LOCAL/bin/get_ips" "$topic"

@@ -8,7 +8,7 @@
 #include <_Servo.h>
 #include <device.h>
 
-#define ULNOIOT_DEFAULT_DURATION 700
+#define IOTEMPOWER_DEFAULT_DURATION 700
 
 class Servo : public Device {
     private:
@@ -26,14 +26,14 @@ class Servo : public Device {
     public:
         Servo(const char* name, uint8_t pin, int min_us, int max_us)
             : Device(name) {
-            init(pin, min_us, max_us, ULNOIOT_DEFAULT_DURATION);
+            init(pin, min_us, max_us, IOTEMPOWER_DEFAULT_DURATION);
         }
         Servo(const char* name, uint8_t pin, int min_us, int max_us, int duration)
             : Device(name) {
             init(pin, min_us, max_us, duration);
         }
         Servo(const char* name, uint8_t pin) : Device (name) {
-            init(pin, 554, 2400, ULNOIOT_DEFAULT_DURATION);
+            init(pin, 554, 2400, IOTEMPOWER_DEFAULT_DURATION);
         }
         Servo(const char* name, uint8_t pin, int duration) : Device (name) {
             init(pin, 554, 2400, duration);
