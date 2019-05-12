@@ -2,6 +2,8 @@
 Primeiro Node
 =============
 
+This manual is now outdated, refer back to the `English version <first-node.rst>`_.
+
 Para essa seção presumimos que você já tenha configurado com sucesso
 o UlnoIoT em um Raspberry Pi e já consiga acessar as páginas web nele.
 

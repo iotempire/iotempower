@@ -63,14 +63,15 @@ input(button1, D3, "released", "pressed")
 // servo(m1, D6, 800);
 
 // Distance sensor
-//hcsr04(distance, D1, D2).with_precision(50);
-//hcsr04(distance, D1, D2)
+//hcsr04(distance, D5, D6).with_precision(50);
+//hcsr04(distance, D5, D6)
 //    .with_filter_callback(filter_binarize(200, "off", "on", IN(distance)));
 
 // HX711 weight sensor
 //hx711(weight, D6, D7, 419.0, true)
 //    .with_filter(filter_round(2, IN(weight)));
 
+vl53l0x(dist);
 
 // barometer
 //bmp180(bmp1);

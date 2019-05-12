@@ -1,13 +1,16 @@
-=====================
-ulnoiot / IoT Empower
-=====================
+===========
+IoT empower
+===========
 
-*ulnoiot* (pronounced: "You'll know IoT", we are currently re-branding
-ulnoiot as *IoT Empower* part of our IoT Empire community approach) is a
+The main development is now taking place here:
+https://github.com/iotempire/iotempower
+
+
+IoT empower (former *ulnoiot*, pronounced: "You'll know IoT") is a
 framework and environment
-for making it easy for everyone to explore and develop for the
+for empowering everyone to explore and develop for the
 Internet of Things (IoT)
--- easy for tinkerers, makers, programmers, hobbyists, students, artists,
+-- tinkerers, makers, programmers, hobbyists, students, artists,
 and professionals alike.
 It has a special focus on education and is intended to support classes to teach
 Internet of Things (IoT) and
@@ -24,4 +27,9 @@ one of the following:
 - `First IoT Node </doc/first-node.rst>`_.
 - `Installation </doc/installation.rst>`_
 
+.. showcases
+
 Or directly dive into the `full documentation </doc/index-doc.rst>`_.
+
+The main development is now taking place here:
+https://github.com/iotempire/iotempower

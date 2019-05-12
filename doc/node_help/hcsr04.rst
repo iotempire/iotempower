@@ -40,4 +40,8 @@ Example
 
 ..  code-block:: cpp
 
-    hcsr04(distance, D2, D1).with_precision(10);
+    hcsr04(distance, D5, D6).with_precision(10);
+
+(Attention be careful running this on D1, D2 on the Wemos D1 Mini -
+there seems to be an internal
+resistor interfering, better use D5, D6, or D7).
