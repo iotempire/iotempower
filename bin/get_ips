@@ -3,7 +3,7 @@
 #
 # if parameter ($1) is given, match against that as a topic
 
-[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoT empower not active, aborting." 1>&2;exit 1; }
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
 source "$IOTEMPOWER_ROOT/bin/read_system_config"
 
@@ -20,8 +20,8 @@ if [[ "$1" ]]; then
     fi
 else # find all ending in /ip
     topic="#"
-    iplog=$(mktemp --suffix .ulnoiot.getip)
-    iplogall=$(mktemp --suffix .ulnoiot.getip)
+    iplog=$(mktemp --suffix .iotempower.getip)
+    iplogall=$(mktemp --suffix .iotempower.getip)
     echo -n "Scanning for ips"
     filter=""
     while true; do

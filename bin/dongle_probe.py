@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Check if an ulnoiot dongle is on the given port
+# Check if an IoTempower dongle is on the given port
 
 import sys
 import os
@@ -33,7 +33,7 @@ def do_probe(port):
 def parser(unparsed_args):
     parser = optparse.OptionParser(
         usage = "%prog [options]",
-        description = "probe a given port (or /dev/ttyUSB0) for a ulnoiot esp dongle."
+        description = "probe a given port (or /dev/ttyUSB0) for a IoTempower esp dongle."
     )
 
     # Configuration
@@ -41,7 +41,7 @@ def parser(unparsed_args):
     group.add_option("-p", "--port",
         dest = "esp_port",
         type = "str",
-        help = "ulnoiot esp dongle serial port (where the dongle is connected). Default /dev/ttyUSB0",
+        help = "IoTempower esp dongle serial port (where the dongle is connected). Default /dev/ttyUSB0",
         default = "/dev/ttyUSB0"
     )
     parser.add_option_group(group)

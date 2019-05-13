@@ -1,7 +1,7 @@
 Supported Hardware
 ------------------
 
-*ulnoiot* is targeted to run on a variety of (mainly Linux-based) hardware and
+*iotempower* is targeted to run on a variety of (mainly Linux-based) hardware and
 on wireless microcontrollers (initially mainly esp8266-based microcontrollers
 and single-board Linux computers like the Raspberry Pi 3 or 
 Raspberry Pi Zero W).
@@ -21,8 +21,8 @@ We are trying to provide virtualbox images and cocker configurations
 as soon as we find time
 and/or volunteers.
 
-We are also working on verifying that ulnoiot works well on Orange-Pi Zero to
-allow more cost-effective solutions to use ulnoiot.
+We are also working on verifying that IoTempower works well on Orange-Pi Zero to
+allow more cost-effective solutions to use iotempower.
 
 Currently the following esp8266-based devices are supported:
 
@@ -35,8 +35,8 @@ Currently the following esp8266-based devices are supported:
 - We expect to support esp32 boards very soon - let us know if you want to help
   making this possible.
 
-The part of ulnoiot running on the esp8266 is a standalone C++-based firmware
-managed by `PlatformIO <http://platform.io>`__. However, ulnoiot abstracts a
+The part of IoTempower running on the esp8266 is a standalone C++-based firmware
+managed by `PlatformIO <http://platform.io>`__. However, IoTempower abstracts a
 lot of the burden of repetitive device management away from the user so that
 attaching a device to a node usually boils down to just writing one line of
 code, which you can adapt from plenty of examples.

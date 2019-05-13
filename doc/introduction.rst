@@ -1,7 +1,7 @@
 Introduction
 ------------
 
-*ulnoiot* (pronounced: "You'll know IoT") is a framework and environment
+*IoTempower* is a framework and environment
 for making it easy for everyone to explore and develop for the
 Internet of Things (IoT)
 -- easy for tinkerers, makers, programmers, hobbyists, students, teachers, 

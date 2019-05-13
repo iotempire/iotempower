@@ -1,3 +1,5 @@
+TODO: update to modern version of IoTempower
+
 Wemos D1 Mini - rfid-rc522 board
 
 3v3 - 3.3V

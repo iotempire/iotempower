@@ -4,7 +4,7 @@
 # objects together.
 # You can also use it to easily build mqtt-drivers or devices
 #
-# It was initially developed for ulnoiot (http://github.com/ulno/ulnoiot)
+# It was initially developed for IoTempower (http://github.com/iotempire/iotempower)
 #
 # Author: Ulrich Norbisrath (http://ulno.net)
 # Created: 2017-10-05

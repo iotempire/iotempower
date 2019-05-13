@@ -1,9 +1,9 @@
-========================
-UlnoIoT Local Web Portal
-========================
+===========================
+IoTempower Local Web Portal
+===========================
 
-Welcome to your personal `UlnoIoT <https://github.com/ulno/ulnoiot>`_
-installation on the UlnoIoT gateway.
+Welcome to your personal `IoTempower <https://github.com/iotempire/iotempower>`_
+installation on the IoTempower gateway.
 
 If you just connected and want to dive right in, use one of these quick start
 *tutorials*:
@@ -26,9 +26,9 @@ Here is *more documentation*:
 
 Here are some *navigational links*:
 
-- `IoT system example configuration folder </cloudcmd/fs/home/ulnoiot/iot-test>`_
+- `IoT system example configuration folder </cloudcmd/fs/home/iotempower/iot-test>`_
 
-- `Your home-directory </cloudcmd/fs/home/ulnoiot>`_
+- `Your home-directory </cloudcmd/fs/home/iotempower>`_
 
 Here are links to the local *Node-RED*
 (visual IoT system configuration) installation:

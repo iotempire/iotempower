@@ -1,11 +1,11 @@
-.. UlnoIoT Documentation master file
+.. IoTempower Documentation master file
    it should at least contain the root `toctree` directive.
    This is for this type of documentation that also works on github not
    necessary
    .. toctree:: :maxdepth: 2 :caption: Contents:
 
-Welcome to the UlnoIoT Documentation
-====================================
+Welcome to the IoTempower Documentation
+=======================================
 
 
 Table of Contents

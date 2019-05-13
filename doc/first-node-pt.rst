@@ -5,12 +5,12 @@ Primeiro Node
 This manual is now outdated, refer back to the `English version <first-node.rst>`_.
 
 Para essa seção presumimos que você já tenha configurado com sucesso
-o UlnoIoT em um Raspberry Pi e já consiga acessar as páginas web nele.
+o IoTempower em um Raspberry Pi e já consiga acessar as páginas web nele.
 
 Vamos agora configurar nosso primeiro node IoT (se você quer saber
 o que é um *node*, acesse o `architecture chapter <architecture.rst>`_).
 
-O UlnoIoT suporta entre outras as placas microcontroladoras listas a baixo
+O IoTempower suporta entre outras as placas microcontroladoras listas a baixo
 (para a lista completa de placas suportadas acessem
 `hardware chapter <hardware.rst>`_):
 
@@ -26,7 +26,7 @@ nenhuma ajuste é necessário. Se você está usando um NodeMCU ou outra placas
 você precisará mudar a configuração (no arquivo ``node.cong`` localizado na
 pasta do seu node) para NodeMCU ou a respectiva placa.
 
-Se você estiver seguindo esse tutorial em uma aula de UlnoIoT sua placa já
+Se você estiver seguindo esse tutorial em uma aula de IoTempower sua placa já
 estará pré-instalada com o firmware do UlnoIoT.
 Caso o contrário você terá que seguir as instruções dessa página
 `First Flash page <pre-flash.rst>`_ no seu Raspberry Pi
@@ -68,7 +68,7 @@ Note também que a placa não tem uma tela então usaremos LED azul (a luzinha d
 
 - Agora use seu smart phone ou tablet (pode ser um computador também) e vá
   até o menu de configuração da rede WiFi. Seu node deverá aparecer na lista
-  de redes WiFi e terá um nome parecido com ``ulnoiot-ab-mn``. ``ab``
+  de redes WiFi e terá um nome parecido com ``iotempower-ab-mn``. ``ab``
   representam um identificar único e ``mn`` representa justamente o número de
   piscadas longas e curtas respectivamente referente ao padrão do seu node.
   Por exemplo em ``uiot-node-ab-12`` o ``12``no fim significa 1 piscada longa e 2 curtas.
@@ -91,7 +91,7 @@ escolha a rede com o sinal mais forte das duas).
 - Clique no botão ``Configure WiFi``.
 
 - Agora prencha o nome e o password do WiFi do seu Raspberry Pi
-  (aquele que criamos quando configuramos o UlnoIoT no Raspberry Pi
+  (aquele que criamos quando configuramos o IoTempower no Raspberry Pi
   no tutorial `Tutorial de configuração do Pi <quickstart-pi-pt.rst>`_)
   com o ``WiFi Name`` e ``Password`` e clique no botão *save*.
 
@@ -105,14 +105,14 @@ escolha a rede com o sinal mais forte das duas).
 - Agora o seu node está pronto para ser adotado pelo sistema UlnoIoT
   no Raspberry Pi.
 
-Adoção do Node pelo sistema UlnoIoT no Raspberry Pi
+Adoção do Node pelo sistema IoTempower no Raspberry Pi
 ---------------------------------------------------
 
 - Se você ainda não conectou seu computador (laptop ou desktop) à rede WiFi
   do seu Raspberry Pi (como ensinamos no `Tutorial de configuração do Pi
   <quickstart-pi-pt.rst>`_) faça isso agora.
 
-- Conecte ao UlnoIoT através de um navegador web.
+- Conecte ao IoTempower através de um navegador web.
 
 - No seu navegador acesse o endereço https://ulnoiotgw
   (ou https://ulnoiotgw.local se os dois não funcionarem
@@ -121,13 +121,13 @@ Adoção do Node pelo sistema UlnoIoT no Raspberry Pi
 Se não aceitou a exceção de segurança anteriormente aceite-a agora
 para gerar o certificado de segurança local.
 
-- Se for pedido um nome de usuário e password, use ``ulnoiot`` como nome e
+- Se for pedido um nome de usuário e password, use ``iotempower`` como nome e
   ``iotempire`` como password.
 
-- Você deverá ver agora a home page do seu UlnoIoT local.
+- Você deverá ver agora a home page do seu IoTempower local.
 
 - Abra o link `IoT system example configuration folder
-  </cloudcmd/fs/home/ulnoiot/iot-test>`_, você deve ver
+  </cloudcmd/fs/home/iotempower/iot-test>`_, você deve ver
   agora os arquivos do sistema
   dentro da pasta IoT-test, sendo uma pasta ``node1``,
   um arquivo ``README.rst`` e
@@ -136,11 +136,11 @@ para gerar o certificado de segurança local.
   direita da tela, primeiro vamos nos concentrar no painel ativo a esquerda.
 
 - Você deverá ver uma pasta chamada `node1
-  <https://ulnoiotgw.local/cloudcmd/fs/home/ulnoiot/iot-test/node1/>`_.
+  <https://ulnoiotgw.local/cloudcmd/fs/home/iotempower/iot-test/node1/>`_.
   Entre nesta pasta.
 
 - Quando estiver dentro da pasta `node1
-  <https://ulnoiotgw.local/cloudcmd/fs/home/ulnoiot/iot-test/node1/>`_
+  <https://ulnoiotgw.local/cloudcmd/fs/home/iotempower/iot-test/node1/>`_
   clique no botão localizado no canto inferior direito da sua tela.
   O botão está ilustrado abaixo.
 

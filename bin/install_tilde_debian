@@ -6,17 +6,17 @@
 # Create date: 2017-07-12
 #
 
-[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoT empower not active, aborting." 1>&2;exit 1; }
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
 MAKEFLAGS="BUILDVERSION=release LCFLAGS=-DT3_DONT_CHECK_VERSION LCXXFLAGS=-DT3_DONT_CHECK_VERSION -j4"
 #MAKEFLAGS=""
 
 if [[ $# -gt 1 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF
-ulnoiot tilde editor from release installer
+iotempower tilde editor from release installer
 ===========================================
 
-Welcome to the ulnoiot tilde editor for debian-systems installer (it might also
+Welcome to the IoTempower tilde editor for debian-systems installer (it might also
 work for other (non-debian-based) systems, but does not automatically install 
 dependencies for them).
 

@@ -4,7 +4,7 @@
 #
 # takes first argument as script to run (needs a shebang), rest as arguments to script
 
-[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoT empower not active, aborting." 1>&2;exit 1; }
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
 name=$(basename "$0")
 

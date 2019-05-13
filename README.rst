@@ -1,12 +1,12 @@
 ===========
-IoT empower
+IoTempower
 ===========
 
 The main development is taking place here:
 https://github.com/iotempire/iotempower
 
 
-IoT empower is a framework and environment
+IoTempower is a framework and environment
 for empowering everyone to explore and develop for the
 Internet of Things (IoT)
 -- tinkerers, makers, programmers, hobbyists, students, artists,

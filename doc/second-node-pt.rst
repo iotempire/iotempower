@@ -18,7 +18,7 @@ Novo Node
 ---------
 
 -   Navegue de volta para a sua `IoT system example configuration folder
-    </cloudcmd/fs/home/ulnoiot/iot-test/>`_.
+    </cloudcmd/fs/home/iotempower/iot-test/>`_.
 
     Como você pode notar, cada Node tem sua própria pasta de configuração
     no UlnoIoT.
@@ -56,7 +56,7 @@ Novo Node
     `Wemos D1 Mini` pelo nome da placa que irá usar.
     Se estiver usando *Wemos D1 Mini* não é preciso fazer nada.
 
--   Certifique-se de abrir outra `ulnoiot documentation web-page </>`_ para
+-   Certifique-se de abrir outra `IoTempower documentation web-page </>`_ para
     referência. Abra a `command reference </doc/node_help/commands.rst>`_.
 
     Nos arquivos, selecione ``setup.cpp``
@@ -94,7 +94,7 @@ Programando as conexões visualmente no Node-RED
 
 -   Após a adoção bem-sucedida, abra a página `Node-RED </nodered/>`_.
     Aqui, você
-    provavelmente terá que inserir o `username` (*ulnoiot*) e
+    provavelmente terá que inserir o `username` (*iotempower*) e
     `password` (*iotempire*) novamente.
 
     Você deverá ver agora um programa em Node-RED com cinco nós (`nodes`).

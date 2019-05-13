@@ -3,7 +3,7 @@ Node Description
 
 Configuration for a portable water sensor demonstration. Connects to an
 mqtt-server.
-The whole setup consists of an ulnoiot gateway (this could be an Android
+The whole setup consists of an IoTempower gateway (this could be an Android
 phone in termux with activated access point), a Wemos D1 Mini in a sealed
 tupper-ware (with a whole and an external water sensor), a battery,
 and a glass of water (or any other liquid to dip the water sensor into).

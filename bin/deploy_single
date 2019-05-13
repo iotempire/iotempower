@@ -10,7 +10,7 @@ EOF
 exit 1
 fi
 
-[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoT empower not active, aborting." 1>&2;exit 1; }
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
 MAX_UPLOAD_TRIES=3
 ESPOTAPY="$HOME/.platformio/packages/tool-espotapy/espota.py"
@@ -93,7 +93,7 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
         export PLATFORMIO_UPLOAD_PORT="/dev/$port"
         if [[ ! "$*" == *force ]]; then # usually check dongle
             dongle probe -p "$PLATFORMIO_UPLOAD_PORT" && {
-                echo "There is a ulnoiot esp dongle connected at $port."
+                echo "There is a IoTempower esp dongle connected at $port."
                 echo "Refusing to overwrite."
                 echo "If you are sure, specify force as last parameter."
                 exit 1

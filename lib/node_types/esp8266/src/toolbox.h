@@ -1,5 +1,5 @@
 // toolbox.h
-// Small toolbox for ulnoiot on Arduino-like devices
+// Small toolbox for iotempower on Arduino-like devices
 //
 
 #ifndef _TOOLBOX_H_
@@ -11,7 +11,7 @@
 #include <functional>
 #include <Arduino.h>
 #include <ESP8266TrueRandom.h>
-#include "ulnoiot-default.h"
+#include "iotempower-default.h"
 
 // a simple class for handling fixed-length strings. Ustring stands for
 // Ulnoiot-String

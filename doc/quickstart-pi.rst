@@ -1,6 +1,6 @@
 Pi Quickstart
 =============
-After `installing the UlnoIoT image onto the SD-card <image-pi.rst>`_, plug it
+After `installing the IoTempower image onto the SD-card <image-pi.rst>`_, plug it
 back into an SD-card reader on any computer (MacOS, Windows or Linux) to
 configure its WiFi router settings.
 
@@ -49,18 +49,18 @@ Setting up the WiFi-Router on the Pi
 
 - Put the sd-card into a Raspberry Pi 3 and power it up.
 
-- You should now see your ulnoiot WiFi network as specified in ``WiFi Name``.
+- You should now see your IoTempower WiFi network as specified in ``WiFi Name``.
   Connect your computer (laptop or desktop pc) to this WiFi network
   (use the password set as before for ``Password``).
 
 Accessing the Local Services on the Raspberry Pi
 ------------------------------------------------
 
-- You can now access UlnoIoT via a web browser.
+- You can now access IoTempower via a web browser.
 
 - Point your browser at https://192.168.12.1, https://ulnoiotgw,
   or https://ulnoiotgw.local. One of them should open the homepage of
-  your ulnoiot pi gateway installation.
+  your IoTempower pi gateway installation.
   Accept
   the security exception for the locally generated security certificate. You
   should now see a link to the filesystem through cloud commander
@@ -68,7 +68,7 @@ Accessing the Local Services on the Raspberry Pi
   as well as links to the Node-RED
   installation.
 
-- If you are asked for a user, use ``ulnoiot``, if you are asked for a password
+- If you are asked for a user, use ``iotempower``, if you are asked for a password
   use ``iotempire``.
 
 - Keep this home-page for for later (remember or bookmark).
@@ -82,7 +82,7 @@ Accessing the Local Services on the Raspberry Pi
   Continue to read the documentation from there.
 
 - Open the link to the `IoT system example configuration folder
-  </cloudcmd/fs/home/ulnoiot/iot-test>`_ (this link only works if you
+  </cloudcmd/fs/home/iotempower/iot-test>`_ (this link only works if you
   opened it from the previously opened local documentation),
   you should now see your filesystem
   inside the IoT-test folder, listing a ``node1``-folder, a ``README.rst`` and

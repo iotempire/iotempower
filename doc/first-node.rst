@@ -2,14 +2,14 @@
 First Node
 ==========
 
-For this section, we assume that you have successfully set-up IoT empower
+For this section, we assume that you have successfully set-up IoTempower
 on the Raspberry Pi and are able to access the local website on it.
 Make sure that the IoT dongle is connected to the Raspberry Pi.
 
 We will now set-up and configure our first IoT node (if you want to know
 what a *node* is, check the `architecture chapter <architecture.rst>`_).
 
-IoT empower supports among others the following microcontroller boards
+IoTempower supports among others the following microcontroller boards
 (for more supported boards, check the `hardware chapter <hardware.rst>`_):
 
 - Wemos D1 Mini Mini
@@ -21,7 +21,7 @@ no change is necessary. If you want to use a NodeMCU, you will
 have to change the config (in the file ``node.conf`` in your node folder)
 to NodeMCU.
 
-If you are in the classroom, your devices will be pre-flashed with the IoT empower
+If you are in the classroom, your devices will be pre-flashed with the IoTempower
 firmware on them.
 If not please go to this page `First Flash page <pre-flash.rst>`_
 on your Raspberry Pi to pre-flash your device.
@@ -32,9 +32,9 @@ Setting up the WiFi credentials on the node
 -------------------------------------------
 
 Note that this instructions are for reconfiguring the WiFi credentials on nodes
-that have been pre-installed with IoT empower and can be flashed over wireless 
+that have been pre-installed with IoTempower and can be flashed over wireless 
 (over the air - OTA - the ones used in the classroom should be ready).
-If your node has never been flashed with IoT empower before,
+If your node has never been flashed with IoTempower before,
 follow this tutorial here `First Flash page <pre-flash.rst>`_
 for the first preparation.
 
@@ -70,14 +70,14 @@ successfully working or not.
     it shoudl show you the code also on the small screen.)
     
 
-Adopting the Node in the UlnoIoT environment on the Raspberry Pi
+Adopting the Node in the IoTempower environment on the Raspberry Pi
 ----------------------------------------------------------------
 
 - If you have not done already, connect now your computer (laptop or
   desktop pc) to the Raspberry Pi's WiFi network (as described in the
   `Pi Quickstart tutorial <quickstart-pi.rst>`_).
 
-- Connect to UlnoIoT via a web browser.
+- Connect to IoTempower via a web browser.
 
   - Point your browser at https://ulnoiotgw (or https://ulnoiotgw.local,
     or if both don't work at https://192.168.12.1).
@@ -85,22 +85,22 @@ Adopting the Node in the UlnoIoT environment on the Raspberry Pi
     If not already done previously, accept the security exception for the
     locally generated security certificate.
 
-  - If you are asked for a user, use ``ulnoiot``,
+  - If you are asked for a user, use ``iotempower``,
     if you are asked for a password
     use ``iotempire``.
 
 .. TODO: provide image of home page!
 
-  -  You should now see the home page for your local UlnoIoT installation.
+  -  You should now see the home page for your local IoTempower installation.
 
 - Click on the link `IoT system example configuration folder
-  </cloudcmd/fs/home/ulnoiot/iot-test/>`_ to navigate to
+  </cloudcmd/fs/home/iotempower/iot-test/>`_ to navigate to
   the folder where the templates are.
 
 .. TODO: provide image of the Iot system example page!
 
 - Then, navigate into the `node1
-  </cloudcmd/fs/home/ulnoiot/iot-test/node1/>`_ folder.
+  </cloudcmd/fs/home/iotempower/iot-test/node1/>`_ folder.
 
 .. TODO: provide image of the Folder node1!
 
@@ -132,7 +132,7 @@ Adopting the Node in the UlnoIoT environment on the Raspberry Pi
   to `troubleshooting <troubleshooting.rst>`_.
 
 
-Congratulations!! Your node is now connect to IoT empower and the onboard-led can
+Congratulations!! Your node is now connect to IoTempower and the onboard-led can
 be controlled with Node-RED using the button on this page
 `</nodered/ui/#/1>`_.
 

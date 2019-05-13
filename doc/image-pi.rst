@@ -1,5 +1,5 @@
-Install UlnoIoT image onto an SD-card
-=====================================
+Install IoTempower image onto an SD-card
+========================================
 
 - Download the Raspberry Pi image from here: https://goo.gl/bVgLMr.
   

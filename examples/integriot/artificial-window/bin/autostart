@@ -1,5 +1,5 @@
 #!/bin/bash
-export PATH="/home/pi/ulnoiot/examples/integriot/artificial-window/bin/:$PATH"
+export PATH="/home/pi/iotempower/examples/integriot/artificial-window/bin/:$PATH"
 nodered_starter &
 browser_starter &
 matrix_starter &

@@ -1,4 +1,4 @@
-// ulnoiot-arduino i2c connector to communicate with ulnoiot-node via i2c
+// iotempower-arduino i2c connector to communicate with iotempower-node via i2c
 //
 // Based on Wire example by Nicholas Zambetti <http://www.zambetti.com>
 //
@@ -10,8 +10,8 @@
 // Other option is to use https://github.com/todbot/SoftI2CMaster for alternative Master
 // Settling now with a potential request for bus exclusivity
 
-#ifndef UlnoiotI2c_h
-#define UlnoiotI2c_h
+#ifndef IotI2c_h
+#define IotI2c_h
 
 #define IOTEMPOWER_I2C_ADDRESS 8 // Slave address to register as (don't chose something smaler than 8)
 
@@ -25,12 +25,12 @@
 
 typedef void (*ulnoiot_i2c_receive_callback_type)(char *, int);
 
-class UlnoiotI2c {
+class IotI2c {
   public:
-    UlnoiotI2c(int init_time, int addr, ulnoiot_i2c_receive_callback_type callback);
-    UlnoiotI2c(int init_time, ulnoiot_i2c_receive_callback_type callback);
-    UlnoiotI2c(int init_time, int addr);
-    UlnoiotI2c(int init_time);
+    IotI2c(int init_time, int addr, ulnoiot_i2c_receive_callback_type callback);
+    IotI2c(int init_time, ulnoiot_i2c_receive_callback_type callback);
+    IotI2c(int init_time, int addr);
+    IotI2c(int init_time);
     void init(int init_time);
     void write(String s);
     void suspend( int timems );
@@ -46,10 +46,10 @@ class UlnoiotI2c {
     bool request_confirmed; // This is set to true, when a request finishes and was set to false before
     int buffer_counter; // indicates new-ness of packages
     ulnoiot_i2c_receive_callback_type receive_callback;
-    bool inwrite; // ulnoiot is in write critical region
-    bool inrequest; // ulnoiot is in request
+    bool inwrite; // iotempower is in write critical region
+    bool inrequest; // iotempower is in request
 
     void init(int init_time, int addr, ulnoiot_i2c_receive_callback_type callback);
 };
 
-#endif // UlnoiotI2c_h
+#endif // IotI2c_h

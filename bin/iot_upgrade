@@ -4,18 +4,18 @@ if [[ $# -gt 0 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF
 Syntax: ulnoiot_upgrade
 
-Update current version ulnoiot with newest version from git repository.
+Update current version iotempower with newest version from git repository.
 This means, pulling a new version from the git repository, fixing shebangs
 in binaries, building new view of web documentation, and cleaning up the cache.
 EOF
 exit 1
 fi
 
-[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoT empower not active, aborting." 1>&2;exit 1; }
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
 
 cd "$IOTEMPOWER_ROOT"
-echo "Upgrading ulnoiot."
+echo "Upgrading iotempower."
 
 echo "Getting changes from git."
 git pull
@@ -30,6 +30,6 @@ rm -rf "$IOTEMPOWER_COMPILE_CACHE/src"
 rm -rf "$IOTEMPOWER_COMPILE_CACHE/lib"
 
 # Create web-viewable documentation
-ulnoiot doc make
+iot doc make
 
 echo "Upgrade finished."

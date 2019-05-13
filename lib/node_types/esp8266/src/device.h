@@ -2,9 +2,9 @@
 // author: ulno
 // created: 2018-07-16
 //
-// One ulnoiot device (actor or sensor connected to node)
+// One iotempower device (actor or sensor connected to node)
 
-// General note, in ulnoiot, we pass as convenience all values as strings.
+// General note, in iotempower, we pass as convenience all values as strings.
 // So other types have to be converted in such a as string or from one.
 
 #ifndef _IOTEMPOWER_DEVICE_H_
@@ -13,7 +13,7 @@
 #include <functional>
 #include <AsyncMqttClient.h>
 
-#include <ulnoiot-default.h>
+#include <iotempower-default.h>
 #include <toolbox.h>
 
 

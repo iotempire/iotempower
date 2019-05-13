@@ -1,16 +1,11 @@
 Further Documentation
 ---------------------
 
-- `Some classes where ulnoiot is used <https://ulno.net/teaching/iot/>`__
-- For any problems or just being social, visit us on matrix/riot: `#ulnoiot:matrix.org <https://riot.im/app/#/room/#ulnoiot:matrix.org>`__
-- TODO: facebook group, general youtube link (to playlists?)
+- `Some classes where IoTempower is used <https://ulno.net/teaching/iot/>`__
+- For any problems or just being social, visit us on matrix/riot:
+  `#iotempower:matrix.org <https://riot.im/app/#/room/#iotempower:matrix.org>`__
+- or our `IoTEmpower Facebook group <https://www.facebook.com/groups/2284490571612435/>`__
+- or check `IoTempower related videos on youtube <https://www.youtube.com/playlist?index=1&list=PL67eyjlXSDutIVdJG2GzzdiF_a2o1q4eR&playnext=1>`__
 
-
-Obsolete:
-
-- `micropython reference
-  <https://docs.micropython.org/en/latest/esp8266/esp8266/quickref.html>`__.
-- For a very light introduction in general python, take a look at
-  `this <https://docs.python.org/3/tutorial/introduction.html>`__.
 
 Top: `ToC <index-doc.rst>`_, Previous: `Support <support.rst>`__

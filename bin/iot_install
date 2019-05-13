@@ -12,15 +12,15 @@
 # Create date: 2017-05-17
 #
 
-[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoT empower not active, aborting." 1>&2;exit 1; }
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
 
 function welcome() {
 cat << EOF
-ulnoiot installer
+IoTempower installer
 =================
 
-Welcome to the ulnoiot environment installer. You are just a couple of steps
+Welcome to the IoTempower environment installer. You are just a couple of steps
 from setting up a very simple and accessible system to deploy your own
 Internet of Things (IoT).
 

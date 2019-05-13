@@ -8,7 +8,7 @@
 #echo "This is currently broken - need to check with author why."
 #exit 1
 
-[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoT empower not active, aborting." 1>&2;exit 1; }
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
 #MAKEFLAGS="BUILDVERSION=release LCFLAGS=-DT3_DONT_CHECK_VERSION LCXXFLAGS=-DT3_DONT_CHECK_VERSION -j4"
 MAKEFLAGS="LCFLAGS=-DT3_DONT_CHECK_VERSION LCXXFLAGS=-DT3_DONT_CHECK_VERSION -j4"
@@ -16,10 +16,10 @@ MAKEFLAGS="LCFLAGS=-DT3_DONT_CHECK_VERSION LCXXFLAGS=-DT3_DONT_CHECK_VERSION -j4
 
 if [[ $# -gt 1 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF
-ulnoiot tilde editor from git installer
+iotempower tilde editor from git installer
 =======================================
 
-Welcome to the ulnoiot tilde editor for debian-systems installer (it might also
+Welcome to the iotempower tilde editor for debian-systems installer (it might also
 work for other systems, but does nto automatically install dependencies).
 
 Run as:
@@ -70,12 +70,12 @@ if [[ ! -d "$TILDEDIR" || "$*" = "clean" ]]; then
     git clone https://github.com/gphalkes/t3window ${libp}t3window$gitver
     git clone https://github.com/ulno/t3widget ${libp}t3widget$gitver
     #cd ${libp}t3widget$gitver
-    #git checkout tags/version-0.5.4 -b ulnoiot
+    #git checkout tags/version-0.5.4 -b iotempower
     #cd ..
     git clone https://github.com/gphalkes/t3highlight ${libp}t3highlight$gitver
     git clone https://github.com/gphalkes/tilde tilde$gitver
     #cd tilde$gitver
-    #git checkout tags/version-0.3.9 -b ulnoiot
+    #git checkout tags/version-0.3.9 -b iotempower
     #cd ..
     wget https://os.ghalkes.nl/LLnextgen/releases/LLnextgen-0.5.5.tgz
     tar xzf LLnextgen-0.5.5.tgz

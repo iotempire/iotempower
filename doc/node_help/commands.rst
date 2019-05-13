@@ -1,7 +1,7 @@
 command reference
 =================
 
-The following devices and commands are available for ulnoiot nodes:
+The following devices and commands are available for IoTempower nodes:
 
 
 Alphabetic list

@@ -9,6 +9,6 @@ Example usage:
 ```python
 mqtt("192.168.10.254","testfloor")
 # this adds already an output object with the name relay
-from ulnoiot.shield import relay
+from iotempower.shield import relay
 run() # now it can be addressed
 ```

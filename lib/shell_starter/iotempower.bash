@@ -14,7 +14,7 @@ source "$IOTEMPOWER_ROOT/lib/shell_starter/config.bash" \
 
 export PYTHONPATH="$PYTHONPATH:$IOTEMPOWER_ROOT/lib"
 
-## if you type cd you go to ulnoiot-root
+## if you type cd you go to iotempower-root
 #ulnoiot_cd() {
 #    IOTEMPOWER_HOMEBACK="$HOME"
 #    HOME="$IOTEMPOWER_ROOT"
@@ -44,45 +44,45 @@ PSRESET="\[$(tput sgr0 2>/dev/null)\]"
 
 
 # user@host
-_UIOT_UH="\u@\h${PSRESET}"
-# colored seperator after colored ulnoiot
-#_UIOT_SEP="${PSWHITEBG}${PSBOLD}${PSDRED}#${PSRESET}"
-_UIOT_SEP=" "
-# colored ulnoiot
-_UIOT_UIOT="${PSWHITEBG}${PSBOLD}${PSBLACK}ul${PSDRED}no${PSBLACK}iot${PSRESET}"
+_IOT_UH="\u@\h${PSRESET}"
+# colored seperator after colored iotempower
+#_IOT_SEP="${PSWHITEBG}${PSBOLD}${PSDRED}#${PSRESET}"
+_IOT_SEP=" "
+# colored iotempower
+_IOT_IOT="${PSWHITEBG}${PSBOLD}${PSLBLUE}IoT${PSRESET}"
 # colored and bold :
-_UIOT_CLN="${PSBOLD}${PSDRED}:${PSRESET}"
+_IOT_CLN="${PSBOLD}${PSDRED}:${PSRESET}"
 # path
-_UIOT_PTH="${PSGREEN}\W${PSRESET}"
+_IOT_PTH="${PSGREEN}\W${PSRESET}"
 # prompt
-_UIOT_PMT="\$${PSRESET} "
+_IOT_PMT="\$${PSRESET} "
 
-# start is always the same (colored ulnoiot - when ulnoiot defined)
-PS1="$_UIOT_UIOT"
+# start is always the same (colored IoT - when IoTempower defined)
+PS1="$_IOT_IOT"
 PS1='$( [[ "$IOTEMPOWER_ACTIVE" = "yes" ]] && echo "'"$PS1"'")'
 
 ## allow recording of pwd in byobu/tmux
 ## (from https://stackoverflow.com/questions/19200589/auto-update-tmux-status-bar-with-active-pane-pwd#19205087)
-PS1=$PS1'$( [[ ! "$TMUX" ]] && echo "'"${_UIOT_SEP}${_UIOT_UH}${_UIOT_CLN}${_UIOT_PTH}"'")'
+PS1=$PS1'$( [[ ! "$TMUX" ]] && echo "'"${_IOT_SEP}${_IOT_UH}${_IOT_CLN}${_IOT_PTH}"'")'
 PS1=$PS1'$( [[ "$TMUX" ]] && tmux setenv -g TMUX_PWD_$(tmux display -p "#D" 2>/dev/null| tr -d %) "$PWD")'
-PS1="${PS1}${_UIOT_PMT}"
+PS1="${PS1}${_IOT_PMT}"
 
-# disable prompt command output and save prompt-changes, when in ulnoiot
+# disable prompt command output and save prompt-changes, when in iotempower
 # but still execute it
 PROMPT_COMMAND='if [[ "$IOTEMPOWER_ACTIVE" ]]; then
-_UIOT_BKUP="$PS1"
+_IOT_BKUP="$PS1"
 {
 '"$PROMPT_COMMAND"'
 true
 } &>/dev/null;
-PS1="$_UIOT_BKUP"
-unset _UIOT_BKUP
+PS1="$_IOT_BKUP"
+unset _IOT_BKUP
 else
 '"$PROMPT_COMMAND"'
 true
 fi'
 
-unset _UIOT_UH _UIOT_SEP _UIOT_UIOT _UIOT_PTH _UIOT_PMT
+unset _IOT_UH _IOT_SEP _IOT_IOT _IOT_PTH _IOT_PMT
 unset PSGREEN PSLBLUE PSWHITE PSBLACK PSDRED PSWHITEBG PSBOLD PSRESET
 
 export PS1

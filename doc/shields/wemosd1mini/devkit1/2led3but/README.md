@@ -12,7 +12,7 @@ The mapping to GPIO-ports is like the following:
 
 To use this shield execute:
 ```python
-from ulnoiot.shield import devkit_2led3but
+from iotempower.shield import devkit_2led3but
 ```
 
 Here some images of the shield:

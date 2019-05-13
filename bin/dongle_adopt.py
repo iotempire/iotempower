@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# ulnoiot esp dongle adopt/ota driver
+# IoTempower esp dongle adopt/ota driver
 # based on espota.py, modified by ulno
 #
 # Original espota.py by Ivan Grokhotkov:
@@ -9,10 +9,10 @@
 # Modified since 2015-09-18 from Pascal Gollor (https://github.com/pgollor)
 # Modified since 2015-11-09 from Hristo Gochkov (https://github.com/me-no-dev)
 # Modified since 2016-01-03 from Matthew O'Gorman (https://githumb.com/mogorman)
-# Modified to support ulnoiot dongle adopt by ulno starting 2019-02-35
+# Modified to support iotempower dongle adopt by ulno starting 2019-02-35
 #
 # This script will push an initial OTA update through a ESP dongle in the
-# ulnoiot environment
+# iotempower environment
 #
 # Use it like this: python dongle_adopt.py -p <usbport> -f <firmware.bin>
 
@@ -172,7 +172,7 @@ def parser(unparsed_args):
     group.add_option("-p", "--port",
         dest = "esp_port",
         type = "str",
-        help = "ulnoiot esp dongle serial port (where the dongle is connected). Default /dev/ttyUSB0",
+        help = "IoTempower esp dongle serial port (where the dongle is connected). Default /dev/ttyUSB0",
         default = "/dev/ttyUSB0"
     )
     group.add_option("-n", "--node",

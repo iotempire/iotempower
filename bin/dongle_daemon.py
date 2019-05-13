@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Communicate with the ulnoiot esp dongle
+# Communicate with the IoTempower esp dongle
 # implement some watchdog functions
 # listen on stdin (can be connected to fifo)
 # for commands (release, connect)
@@ -164,7 +164,7 @@ def stdin_listener(ser_listener, input_file):
 def parser(unparsed_args):
     parser = optparse.OptionParser(
         usage = "%prog [options]",
-        description = "Listen to a ulnoiot esp dongle and" + \
+        description = "Listen to a IoTempower esp dongle and" + \
                     "react to commands from the dongle or on stdin."
     )
 

@@ -1,4 +1,4 @@
-// global/static ulnoiot configuration values
+// global/static iotempower configuration values
 
 #ifndef _IOTEMPOWER_DEFAULT_H_
 #define _IOTEMPOWER_DEFAULT_H_
@@ -6,7 +6,7 @@
 //#define IOTEMPOWER_RECONFIG_MAGIC "uiotpassreset"
 #define IOTEMPOWER_AP_RECONFIG_NAME "uiot-node"
 #define IOTEMPOWER_AP_RECONFIG_PASSWORD "iotempire"
-#define ULNOIOT "ulnoiot"
+#define ULNOIOT "iotempower"
 #define IOTEMPOWER_FLASH_DEFAULT_PASSWORD ULNOIOT
 #define IOTEMPOWER_MAX_DEVICES 32
 #define IOTEMPOWER_MAX_SUBDEVICES 16

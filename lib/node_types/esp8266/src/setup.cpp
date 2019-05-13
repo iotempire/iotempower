@@ -5,7 +5,7 @@
  * This file helps including the user's setup.cpp code.
  * */
 
-#include <ulnoiot.h>
+#include <iotempower.h>
 
 void (ulnoiot_init)() __attribute__((weak));
 void (ulnoiot_start)() __attribute__((weak));

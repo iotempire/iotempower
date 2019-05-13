@@ -1,4 +1,4 @@
-// firmware for ulnoiot ESP dongle (UED)
+// firmware for iotempower ESP dongle (UED)
 //
 // author: ulno
 // created: 2019-02-22
@@ -24,7 +24,7 @@
 #include <U8g2lib.h>
 
 // config defaults
-#include "ulnoiot-default.h"
+#include "iotempower-default.h"
 
 // simple command line TODO: would it be better to use bitlash or hobbitlash?
 #include <SimpleCLI.h>
@@ -234,7 +234,7 @@ void display_info_screen() {
         case 0: // info menu
             display_gw_info();
             break;
-        case 1: // general ulnoiot dongle info screen
+        case 1: // general IoTempower dongle info screen
             display_ulnoiot();
             break;
         case 10: // internal info screen
@@ -282,7 +282,7 @@ int display_menu(int menu_pos, int menu_advance) {
 }
 
 void prompt() {
-    Serial.print("UED>"); // ulnoiot esp dongle
+    Serial.print("UED>"); // IoTempower esp dongle
     Serial.flush();
 }
 

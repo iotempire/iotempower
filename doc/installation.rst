@@ -1,17 +1,17 @@
 Installation
 ------------
 
-There are two ways to get the ulnoiot configuration management software
+There are two ways to get the IoTempower configuration management software
 up and running:
 
 1. Downloading and flashing a pre-prepared Raspberry Pi image to an sd card
    and running the gateway and configuration management software from there.
 
-2. Setting up ulnoiot in your own Linux environment:
+2. Setting up IoTempower in your own Linux environment:
    `Installation on Linux`_
 
 Please also check out the tutorial videos for this setup on ulno's youtube
-channel: https://www.youtube.com/results?search_query=ulno.net+ulnoiot+installation
+channel: https://www.youtube.com/results?search_query=ulno.net+iotempower+installation
 
 
 Installation on Raspberry Pi from Pre-Prepared Image
@@ -30,7 +30,7 @@ Tutorial videos for setup:
 
 Installation step by step:
 
-- `Install the UlnoIoT image onto an SD-card <image-pi.rst>`_
+- `Install the IoTempower image onto an SD-card <image-pi.rst>`_
 
 - `Set up the credentials of the WiFi-Router on the Pi
   <quickstart-pi.rst#installation#setting-up-the-wifi-router-on-the-pi>`_
@@ -59,10 +59,10 @@ Installation step by step:
   and an IoT testsystem on the pi,
   as well as links to the Node-RED installation.
 
-- On the raspberry pi ulnoiot installation, you can use cloudcmd to access
+- On the raspberry pi IoTempower installation, you can use cloudcmd to access
   and interact with your system.
 
-- If you are asked for a user, use ``ulnoiot``, if you are asked for a password
+- If you are asked for a user, use ``iotempower``, if you are asked for a password
   use ``iotempire``.
 
 - ssh access (this is for advanced users, usually you can just use the
@@ -85,14 +85,14 @@ Installation step by step:
 
     The command for Mac and Linux is:
 
-    ``ssh -X ulnoiot@ulnoiotgw``
+    ``ssh -X iotempower@ulnoiotgw``
 
     The command on Windows will be (and can be graphically
     configured in MobaSSH):
 
-    ``ssh -X ulnoiot@192.168.12.1``
+    ``ssh -X iotempower@192.168.12.1``
 
-    The default password for the user ulnoiot is ``iotempire``
+    The default password for the user IoTempower is ``iotempire``
 
     Consider changing it immediately entering the command ``passwd``
 
@@ -105,8 +105,8 @@ Installation step by step:
     releasing them and then pressing the h-key.
 
   - Run in ssh or the terminal (type and hit enter) the command
-    ``ulnoiot upgrade`` to make sure that
-    you have the latest version of ulnoiot.
+    ``IoTempower upgrade`` to make sure that
+    you have the latest version of iotempower.
 
 
 You can now continue with `First IoT Nodes <first-node.rst>`_.
@@ -123,27 +123,27 @@ Installation on Linux
   password-less mosquitto setup, but be warned):
   ``sudo systemctl stop mosquitto; sudo systemctl disable mosquitto``
 
-- setup ulnoiot: clone this repository
+- setup iotempower: clone this repository
 
   - If you just want read-only access type in a folder of your choice:
-    ``git clone https://github.com/ulno/ulnoiot``
+    ``git clone https://github.com/ulno/iotempower``
 
-  - If you are a ulnoiot developer, use
-    ``git clone git@github.com:ulno/ulnoiot``
+  - If you are a IoTempower developer, use
+    ``git clone git@github.com:ulno/iotempower``
 
-- make ulnoiot runnable -> copy examples/scripts/ulnoiot into your bin folder
+- make IoTempower runnable -> copy examples/scripts/iotempower into your bin folder
   and adapt
-  the path in it to reflect the location where you cloned ulnoiot. If you use
+  the path in it to reflect the location where you cloned IoTempower. If you use
   tmux or byobu with bash consider sourcing ``lib/shell_starter/iotempower.bash``
   in your .bashrc.
 
-- start ulnoiot and agree and wait for dependencies to be downloaded
+- start IoTempower and agree and wait for dependencies to be downloaded
   (if packages are missing, fix dependencies and try to run
-  ``ulnoiot install clean``)
+  ``IoTempower install clean``)
 
-- After successfully entering ulnoiot (the prompt
+- After successfully entering IoTempower (the prompt
   should have changed colors and
-  show ulnoiot in red, white, and black),
+  show IoTempower in red, white, and black),
   start configuring your first IoT node,
   see `First IoT Node <first-node.rst>`_.
 

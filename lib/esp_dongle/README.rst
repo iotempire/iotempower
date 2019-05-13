@@ -2,8 +2,8 @@
 ESP Dongle
 ==========
 
-This project is a dongle that should be connected to a ulnoiot gateway
-(like a raspberry pi with the ulnoiot pi image).
+This project is a dongle that should be connected to a IoTempower gateway
+(like a raspberry pi with the IoTempower pi image).
 
 It should be installed to Wemos D1 Mini with display shield.
 

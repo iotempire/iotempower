@@ -10,7 +10,7 @@ deploy help
 exit 1
 fi
 
-[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoT empower not active, aborting." 1>&2;exit 1; }
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
 if [[ -e "node.conf" ]]; then  # started from node-directory
     deploy compile

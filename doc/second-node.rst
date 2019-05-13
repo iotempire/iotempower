@@ -16,7 +16,7 @@ New Node
 --------
 
 -   Navigate back to your `IoT system example configuration folder
-    <https://ulnoiotgw.local/cloudcmd/fs/home/ulnoiot/iot-test/>`_
+    <https://ulnoiotgw.local/cloudcmd/fs/home/iotempower/iot-test/>`_
 
     As you have seen, each node has its own configuration folder in UlnoIoT.
 
@@ -43,7 +43,7 @@ New Node
 -   If you are not using a Wemos D1 Mini as new node, edit ``node.conf`` and
     enter the new board.
 
--   Make sure to open another `ulnoiot documentation web-page </>`_ for
+-   Make sure to open another `IoTempower documentation web-page </>`_ for
     reference. And open from there the
     `command reference </doc/node_help/commands.rst>`_.
 
@@ -74,7 +74,7 @@ Visually Programming the Connections
 ------------------------------------
 
 -   After successful adoption, open the `Node-RED </nodered/>`_ page. Here you
-    have to probably enter username (*ulnoiot*) and password (*iotempire*) again.
+    have to probably enter username (*iotempower*) and password (*iotempire*) again.
 
     You should see a Node-RED flow with five nodes.
 

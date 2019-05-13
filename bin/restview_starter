@@ -1,18 +1,18 @@
 #!/bin/bash
-# TUDO: as ulnoiot documentation is now creasted in sphinx, consider retiring this
+# TUDO: as iotempower documentation is now creasted in sphinx, consider retiring this
 
 if [[ $# -gt 0 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF
 Syntax: restview_starter
 
-Start restview (for viewing ulnoiot documentation in a browser)
+Start restview (for viewing IoTempower documentation in a browser)
 in a loop (restart when exit).
 
 EOF
 exit 1
 fi
 
-[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoT empower not active, aborting." 1>&2;exit 1; }
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
 while true; do
     sleep 1

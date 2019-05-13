@@ -6,17 +6,17 @@
 # Create date: 2018-12-04
 #
 
-[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoT empower not active, aborting." 1>&2;exit 1; }
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
 MAKEFLAGS="BUILDVERSION=release LCFLAGS=-DT3_DONT_CHECK_VERSION LCXXFLAGS=-DT3_DONT_CHECK_VERSION -j4"
 #MAKEFLAGS=""
 
 if [[ $# -gt 1 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF
-ulnoiot tilde editor from release installer
+iotempower tilde editor from release installer
 ===========================================
 
-Welcome to the ulnoiot tilde editor release installer.
+Welcome to the iotempower tilde editor release installer.
 
 Run as:
 install_tilde_release [clean]
@@ -36,7 +36,7 @@ DO_INSTALL=sudo
 export LD_LIBRARY_PATH="$PREFIX/lib:$LD_LIBRARY_PATH"
 export LD_RUN_PATH="$PREFIX/lib:$LD_RUN_PATH"
 export PKG_CONFIG_PATH="$PREFIX/lib/pkgconfig:$PKG_CONFIG_PATH"
-# overwrite install from ulnoiot
+# overwrite install from iotempower
 export PATH="/usr/bin:$PATH"
 
 if [[ ! -d "$TILDEDIR" || "$*" = "clean" ]]; then

@@ -37,7 +37,7 @@ Configurando o roteador WiFi no seu Raspberry Pi
 
 - Coloque o cartão SD em um Raspberry Pi 3 e ligue-o.
 
-- Agora você deve ver sua rede Wi-Fi UlnoIoT conforme especificado em
+- Agora você deve ver sua rede Wi-Fi IoTempower conforme especificado em
   ``Name WiFi``.
   Conecte seu computador (laptop ou desktop) a esta rede WiFi
   (use a senha definida antes em `` Password``).
@@ -45,7 +45,7 @@ Configurando o roteador WiFi no seu Raspberry Pi
 Acessando os serviços locais no Raspberry Pi
 --------------------------------------------
 
-- Conecte ao UlnoIoT através de um navegador web.
+- Conecte ao IoTempower através de um navegador web.
 
 - No seu navegador acesse o endereço https://192.168.12.1, https://ulnoiotgw,
   ou https://ulnoiotgw.local.
@@ -53,7 +53,7 @@ Acessando os serviços locais no Raspberry Pi
   Se não aceitou a exceção de segurança anteriormente aceite-a agora
   para gerar o certificado de segurança local.
 
-- Se for pedido um nome de usuário e password, use ``ulnoiot`` como nome e
+- Se for pedido um nome de usuário e password, use ``iotempower`` como nome e
   ``iotempire`` como password.
 
 - Você deverá ver agora a home page do seu UlnIoT local.
@@ -69,7 +69,7 @@ Acessando os serviços locais no Raspberry Pi
 - Continue a ler a documentação de lá.
 
 - Abra o link `IoT system example configuration folder
-  </cloudcmd/fs/home/ulnoiot/iot-test>`_,
+  </cloudcmd/fs/home/iotempower/iot-test>`_,
   você deve ver agora os arquivos do sistema
   dentro da pasta IoT-test, sendo uma pasta
   ``node1``, um arquivo `` README.rst`` e

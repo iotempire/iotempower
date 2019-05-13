@@ -1,7 +1,7 @@
 /* setup.cpp
- * This is the configuration code for a ulnoiot node.
+ * This is the configuration code for a IoTempower node.
  * This file is a full base example for all devices possible in 
- * ulnoiot. There is a configuration for each device possible in here.
+ * IoTempower. There is a configuration for each device possible in here.
  * It serves and includes current configuration tests.
  * 
  * TODO: split into single files/example node-folders.

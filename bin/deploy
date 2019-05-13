@@ -30,7 +30,7 @@ If adopt is given with a network in of the form uiot-node-id-nL-mS,
 a single node on the network that is in configuration mode
 will be overwritten with the current configuration and adopted as a new node
 in the current network.
-For this adoption process, it is using a locally connected ulnoiot esp dongle.
+For this adoption process, it is using a locally connected IoTempower esp dongle.
 It will not work if no dongle is locally connected.
 The respective board has to be in configuration/adopt mode (this mode
 is usually triggered via pressing and releasing the flash key twice during
@@ -48,12 +48,12 @@ fi
 
 # TODO: add option to specify input file with list of specific nodes to deploy
 
-[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoT empower not active, aborting." 1>&2;exit 1; }
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
 export IOTEMPOWER_DEPLOY=active
 
 # use tmp directory as refreshed at restart/crash
-LOCK="/tmp/.net.ulno.ulnoiot.deploy_lock"
+LOCK="/tmp/.net.ulno.iotempower.deploy_lock"
 
 FAILED_NODES="failed_nodes.txt"
 

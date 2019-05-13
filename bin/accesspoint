@@ -4,12 +4,12 @@ cat << EOF
 Syntax: accesspoint [show]
 
 accesspoint creates a local accespoint corresponding to parameters set
-in ulnoiot/etc/ulnoiot.conf.
+in iotempower/etc/iotempower.conf.
 EOF
 exit 1
 fi
 
-[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoT empower not active, aborting." 1>&2;exit 1; }
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
 if [[ "$1" != "show" ]]; then
     ufw_active=""

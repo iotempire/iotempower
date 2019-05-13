@@ -1,6 +1,6 @@
 #!/bin/bash
-cd ~/ulnoiot/examples/integriot/artificial-window/integriot/
+cd ~/iotempower/examples/integriot/artificial-window/integriot/
 while true; do
     sleep 7
-    ulnoiot exec ./run.sh
+    iot exec ./run.sh
 done

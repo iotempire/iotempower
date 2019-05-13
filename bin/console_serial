@@ -2,9 +2,9 @@
 # open a terminal on the given port (USB..)
 # $1: suggested port or host
 password="$2"
-test "$password" || password="ulnoiot"
+test "$password" || password="iotempower"
 
-[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoT empower not active, aborting." 1>&2;exit 1; }
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
 port=$(find_esp_port "$1" "$password")
 

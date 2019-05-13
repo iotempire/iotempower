@@ -11,13 +11,13 @@ If called without a specific serial port, it looks for a
 locally (i.e. via serial or the respective port) connected board and overwrites
 it (re-flashes) with an initial adoptable firmware.
 
-It flashes the node with the ulnoiot firmware. After this, it can be adopted
-to specific ulnoiot system.
+It flashes the node with the iotempower firmware. After this, it can be adopted
+to specific IoTempower system.
 EOF
 exit 1
 fi
 
-[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoT empower not active, aborting." 1>&2;exit 1; }
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
 FLASH_PATH="$IOTEMPOWER_ROOT/tmp/pre-flash"
 mkdir -p "$FLASH_PATH/node"

@@ -1,5 +1,5 @@
 // main.cpp
-// main program for ulnoiot esp8266 firmware
+// main program for iotempower esp8266 firmware
 
 ////// Standard libraries
 #include <ArduinoOTA.h>
@@ -22,7 +22,7 @@
 #include <toolbox.h>
 
 //// default configuration
-#include <ulnoiot-default.h>
+#include <iotempower-default.h>
 
 // TODO: move this in own file to shorten compilation time
 // node specific code
@@ -32,7 +32,7 @@
 #include "pins-wrapper.h"
 #include "wifi-config.h"
 
-// ulnoiot functions for user modification in setup.cpp
+// iotempower functions for user modification in setup.cpp
 void (ulnoiot_init)() __attribute__((weak));
 void (ulnoiot_start)() __attribute__((weak));
 
@@ -379,8 +379,8 @@ void connectToWifi() {
     Serial.println(WIFI_SSID);
     Serial.print("Registering hostname: ");
     if(reconfig_mode_active) {
-        my_hostname = (char *)"ulnoiot-adoptee"; // TODO: define in defaults
-        // my_hostname = (char *)"ulnoiot-xxxxxx";
+        my_hostname = (char *)"iotempower-adoptee"; // TODO: define in defaults
+        // my_hostname = (char *)"iotempower-xxxxxx";
         // sprintf(my_hostname + strlen(my_hostname) - 6, "%06x", ESP.getChipId());
     } else {
         my_hostname = (char *)HOSTNAME;
@@ -613,7 +613,7 @@ void loop() {
         } // endif mqtt connect
         // mqtt_client->yield(_loop_delay);
         // ulnoiot_loop(); // TODO: think if this can actually be
-        // skipped in the ulnoiot-philosophy -> maybe move to driver
+        // skipped in the iotempower-philosophy -> maybe move to driver
         // callbacks
     } else { // reconfig mode is active
         #ifdef ID_LED

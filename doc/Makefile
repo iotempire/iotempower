@@ -1,7 +1,7 @@
-# Makefile for UlnoIoT documentation
+# Makefile for IoTempower documentation
 #
 #
-# check ulnoiot is active
+# check IoTempower is active
 ifeq ($(IOTEMPOWER_ROOT),)
   $(error IOTEMPOWER_ROOT is not active, aborting)
 endif

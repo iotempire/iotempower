@@ -9,7 +9,7 @@ tmp/
 external/
 .idea/
 
-etc/ulnoiot.conf
+etc/iotempower.conf
 etc/yaota8266-keys/
 .local
 

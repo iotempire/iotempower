@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-A simple shell replacement for doing the most important tasks in ulnoiot
+A simple shell replacement for doing the most important tasks in iotempower
 in combination with cloudcmd.
 Turns out anything using ncurses in python on raspberry pi is way to slow
 and pypy3 is not supported in raspbian

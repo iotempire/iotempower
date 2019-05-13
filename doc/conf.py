@@ -17,18 +17,18 @@
 # sys.path.insert(0, os.path.abspath('.'))
 import sphinx_bootstrap_theme  # bootstrap support
 
-# -- ulnoiot related stuff ------------
+# -- IoTempower related stuff ------------
 import os
-assert "IOTEMPOWER_ROOT" in os.environ, "Not in ulnoiot environment, aborting."
+assert "IOTEMPOWER_ROOT" in os.environ, "Not in IoTempower environment, aborting."
 
 #sphinx_root = os.path.join(os.environ["IOTEMPOWER_LOCAL"], "doc/html")
 
 
 # -- Project information -----------------------------------------------------
 
-project = 'UlnoIoT Documentation'
-copyright = '2019, UlnoIoT Community'
-author = 'UlnoIoT Community'
+project = 'IoTempower Documentation'
+copyright = '2019, IoTempower Community'
+author = 'IoTempower Community'
 
 # The short X.Y version
 version = ''
@@ -110,7 +110,7 @@ html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
 #
 html_theme_options = {
     # Navigation bar title. (Default: ``project`` value)
-    'navbar_title': "UlnoIoT Documentation",
+    'navbar_title': "IoTempower Documentation",
 
     # Tab name for entire site. (Default: "Site")
     'navbar_site_name': "Site",
@@ -206,7 +206,7 @@ html_show_sourcelink = False
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'UlnoIoTDocumentationdoc'
+htmlhelp_basename = 'IoTempowerDocumentationdoc'
 
 
 # -- Options for LaTeX output ------------------------------------------------
@@ -233,8 +233,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'UlnoIoTDocumentation.tex', 'UlnoIoT Documentation',
-     'UlnoIoT Community', 'manual'),
+    (master_doc, 'IoTempowerDocumentation.tex', 'IoTempower Documentation',
+     'IoTempower Community', 'manual'),
 ]
 
 
@@ -243,7 +243,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-#    (master_doc, 'ulnoiot', 'UlnoIoT Table of Contents', [author], 1),
+#    (master_doc, 'iotempower', 'IoTempower Table of Contents', [author], 1),
 #    ("doc/node_help/commands", 'commands', 'Command Reference', [author], 1)
 ]
 
@@ -258,8 +258,8 @@ for p,f in all_docs:
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'UlnoIoTDocumentation', 'UlnoIoT Documentation Documentation',
-     author, 'UlnoIoTDocumentation', 'One line description of project.',
+    (master_doc, 'IoTempowerDocumentation', 'IoTempower Documentation Documentation',
+     author, 'IoTempowerDocumentation', 'One line description of project.',
      'Miscellaneous'),
 ]
 

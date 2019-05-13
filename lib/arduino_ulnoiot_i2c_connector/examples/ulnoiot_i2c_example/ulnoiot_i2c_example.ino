@@ -1,11 +1,11 @@
-// Example for an i2c connector to communicate with ulnoiot-node via i2c
+// Example for an i2c connector to communicate with iotempower-node via i2c
 //
 // Author: ulno (http://ulno.net)
 // Created: 2017-10-20
 //
 
 
-#include <UlnoiotI2c.h>
+#include <IotI2c.h>
 
 
 void myreceive( char *msg, int len ) {
@@ -15,7 +15,7 @@ void myreceive( char *msg, int len ) {
     Serial.println(msg); // is properly 0 terminated - but len can used to
 }
 
-UlnoiotI2c ui2c(1000,myreceive);
+IotI2c ui2c(1000,myreceive);
 
 void setup() {
   Serial.begin(115200); // start serial for debug output

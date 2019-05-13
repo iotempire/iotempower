@@ -1,4 +1,4 @@
-// Example for an i2c connector to communicate with ulnoiot-node via i2c
+// Example for an i2c connector to communicate with iotempower-node via i2c
 // This example is optimized for the keyes-scale
 //
 // Based on Wire example by Nicholas Zambetti <http://www.zambetti.com>
@@ -92,7 +92,7 @@ void loop() {
     ui2c.write(mystr);
     Serial.print("Weight in g: ");
     Serial.println(w);
-/*    ui2c.suspend(300); // Suspend ulnoiot i2c master to act myself as master
+/*    ui2c.suspend(300); // Suspend iotempower i2c master to act myself as master
     lcd.setCursor(1, 1);
     lcd.print(w);
     lcd.print(" g");*/
@@ -101,7 +101,7 @@ void loop() {
       taring = false;
       Serial.println("Tare complete");
     }
-    /*ui2c.suspend(50); // Suspend ulnoiot i2c master to use act myself as master
+    /*ui2c.suspend(50); // Suspend iotempower i2c master to use act myself as master
     if (taring) {
       lcd.print(" taring  ");        
     } else {

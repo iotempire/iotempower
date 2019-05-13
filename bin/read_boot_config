@@ -41,7 +41,7 @@ if [[ -e "$_WIFI_CONFIG" ]]; then
 
         export IOTEMPOWER_AP_PASSWORD="$uiot_ap_password"
 
-        # channel, bridge, and mqtt data taken straight from ulnoiot.conf
+        # channel, bridge, and mqtt data taken straight from iotempower.conf
     fi
     # no accesspoint if file empty or not existent
 fi

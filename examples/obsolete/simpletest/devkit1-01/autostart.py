@@ -1,4 +1,4 @@
-from ulnoiot import *
+from iotempower import *
 
 # general init
 w = wifi("ehdemo-iotempire", "internetofthings", reset=False)

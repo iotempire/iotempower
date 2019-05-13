@@ -27,5 +27,5 @@ Now the commands can be sent to the connected Arduino via the topic
 be received.
 
 For the Arduino code compare:
-ulnoiot/lib/arduino_i2c_connector/connector/connector.ino and extend it for
+iotempower/lib/arduino_i2c_connector/connector/connector.ino and extend it for
 your own project.

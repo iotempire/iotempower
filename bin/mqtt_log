@@ -21,7 +21,7 @@ fi
 
 # TODO: deal better with topic removal than with cut
 
-[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoT empower not active, aborting." 1>&2;exit 1; }
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
 # find how to call ts
 TS=ts

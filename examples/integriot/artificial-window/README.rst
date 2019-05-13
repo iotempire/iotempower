@@ -6,7 +6,7 @@ Software parts to build and drive an artificial window.
 Short manual to use:
 
 Install:
-- ulnoiot (create ulnoiot, starter script) 
+- iotempower (create iotempower, starter script) 
 - unclutter
 - Node-RED
 - Node-RED-dashboard

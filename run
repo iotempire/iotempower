@@ -1,19 +1,19 @@
 #!/usr/bin/env bash
 # This file might be not executable as is (for example when run in Termux on
 # Android). This file is best run as: bash run
-# (after changing into this ulnoiot directory)
+# (after changing into this iotempower directory)
 #
-# At first start, it installs the local ulnoiot-environment
+# At first start, it installs the local iotempower-environment
 #
 # Author: ulno
 # Create date: 2017-05-17
 #
-# if parameters are given and the first is "exec", ulnoiot will execute
-# the rest of the parameters as command in ulnoiot environment
+# if parameters are given and the first is "exec", iotempower will execute
+# the rest of the parameters as command in iotempower environment
 
 function welcome() {
 cat << EOF
-IoT empower
+IoTempower
 ===========
 
 Your friendly and affordable Internet of Things environment.
@@ -33,16 +33,16 @@ The following commands are possible:
   Print the welcome message again.
   
 - exec [cmd+arguments]:
-  Execute cmd inside the ulnoiot environment. Check out all the helper scripts
-  in ulnoiot/bin
+  Execute cmd inside the iotempower environment. Check out all the helper scripts
+  in iotempower/bin
 
 - upgrade:
-  Update current version ulnoiot with newest version from git repository.
+  Update current version iotempower with newest version from git repository.
 
 - help [cmd]:
   Display help on a specific command given in cmd. If cmd is empty,
   show this help.
-  After entering the ulnoiot environment, this help is also available just via
+  After entering the iotempower environment, this help is also available just via
   typing uhelp. Calling uhelp with no parameters will list all available
   commands.
 
@@ -50,7 +50,7 @@ The following commands are possible:
   Execute ulnoiot_[command] with the given parameters.
 
 
-If no command is given, execute the bash shell in the ulnoiot environment.
+If no command is given, execute the bash shell in the iotempower environment.
 The first time this is run, external dependencies are downloaded and
 installed here too.
 
@@ -84,13 +84,13 @@ function check_root() {
         cd "$IOTEMPOWER_ROOT"
     fi
     # else we should assume that we were started from the root-directory
-    #echo -n "Checking now that we are in the ulnoiot root directory. "
+    #echo -n "Checking now that we are in the iotempower root directory. "
     check_files "lib/shell_starter/iotempower.bash" \
         "bin/shebang_run" \
-        "etc/ulnoiot.conf.example"
+        "etc/iotempower.conf.example"
     if [ $? -ne 0 ]; then
         echo
-        echo "Cannot find IoT empower files."
+        echo "Cannot find IoTempower files."
         echo "Stopping now."
         return 1
     fi

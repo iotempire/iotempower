@@ -1,5 +1,5 @@
 /* setup.cpp
- * This is the configuration code for a ulnoiot node.
+ * This is the configuration code for a IoTempower node.
  * Here, you define all the devices (and eventually their interactions)
  * connected to the node specified with this directory.
  * If you want to see more device configuration examples,

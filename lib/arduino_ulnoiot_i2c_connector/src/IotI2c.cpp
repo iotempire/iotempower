@@ -1,4 +1,4 @@
-// ulnoiot-arduino i2c connector to communicate with ulnoiot-node via i2c
+// iotempower-arduino i2c connector to communicate with iotempower-node via i2c
 //
 // Based on Wire example by Nicholas Zambetti <http://www.zambetti.com>
 //
@@ -10,13 +10,13 @@
 // Other option is to use https://github.com/todbot/SoftI2CMaster for alternative Master
 // Settling now with a potential request for bus exclusivity
 
-#include "UlnoiotI2c.h"
+#include "IotI2c.h"
 #include "Arduino.h"
 #include <string.h>
 #include <Wire.h>
 
 
-void UlnoiotI2c::init(int init_time, int addr, ulnoiot_i2c_receive_callback_type callback) {
+void IotI2c::init(int init_time, int addr, ulnoiot_i2c_receive_callback_type callback) {
   buffer = buffer1;
   receive_buffer_size = 0;
   request_bus = 0;
@@ -29,23 +29,23 @@ void UlnoiotI2c::init(int init_time, int addr, ulnoiot_i2c_receive_callback_type
   init(init_time);
 }
 
-UlnoiotI2c::UlnoiotI2c(int init_time, int addr, ulnoiot_i2c_receive_callback_type callback) {
+IotI2c::IotI2c(int init_time, int addr, ulnoiot_i2c_receive_callback_type callback) {
   init(init_time, addr, callback);
 }
 
-UlnoiotI2c::UlnoiotI2c(int init_time, int addr) {
+IotI2c::IotI2c(int init_time, int addr) {
   init(init_time, addr, NULL);
 }
 
-UlnoiotI2c::UlnoiotI2c(int init_time) {
+IotI2c::IotI2c(int init_time) {
   init(init_time, IOTEMPOWER_I2C_ADDRESS, NULL);
 }
 
-UlnoiotI2c::UlnoiotI2c(int init_time, ulnoiot_i2c_receive_callback_type callback) {
+IotI2c::IotI2c(int init_time, ulnoiot_i2c_receive_callback_type callback) {
   init(init_time, IOTEMPOWER_I2C_ADDRESS, callback);
 }
 
-void UlnoiotI2c::request() {
+void IotI2c::request() {
   char *buf = buffer; // pick one buffer
   inrequest=true;
   Wire.write(buf, ((unsigned int)buf[2])+4); // respond
@@ -57,7 +57,7 @@ void UlnoiotI2c::request() {
 //  Serial.println(request_confirmed);
 }
 
-void UlnoiotI2c::write(String s) {
+void IotI2c::write(String s) {
   char *buf;
 
   // problem is that this function could interrupt the request
@@ -91,7 +91,7 @@ void UlnoiotI2c::write(String s) {
 }
 
 # define IOTEMPOWER_I2C_END_DELAY 10
-void UlnoiotI2c::suspend( int timems ) {
+void IotI2c::suspend( int timems ) {
   timems += IOTEMPOWER_I2C_END_DELAY;
   // scale down time
   unsigned int t=0;
@@ -119,7 +119,7 @@ void UlnoiotI2c::suspend( int timems ) {
     delayMicroseconds(1000);
     counter += 1;
     if (counter >= IOTEMPOWER_I2C_REQUEST_MAXBLOCK ) {
-      Serial.println("ulnoiot i2c maxblock reached, continuing");
+      Serial.println("iotempower i2c maxblock reached, continuing");
       break;
     }
   }
@@ -130,7 +130,7 @@ void UlnoiotI2c::suspend( int timems ) {
   Serial.println(counter);  // debug */
 }
 
-void UlnoiotI2c::receive(int count) {
+void IotI2c::receive(int count) {
   receive_buffer_size = 0;
   while(Wire.available()) { // loop through all
     if( receive_buffer_size >= IOTEMPOWER_I2C_BUFFER_SIZE ) break;
@@ -140,10 +140,10 @@ void UlnoiotI2c::receive(int count) {
   receive_buffer[receive_buffer_size] = 0; // terminate string
   if(receive_callback)
     receive_callback( receive_buffer, receive_buffer_size );
-  // Serial.println(uvoid UlnoiotI2c::receive(int count)lnoiot_i2c_receive_buffer); // debug
+  // Serial.println(uvoid IotI2c::receive(int count)lnoiot_i2c_receive_buffer); // debug
 }
 
-UlnoiotI2c *_ulnoiot_i2c_last_init; // break out of objects into static environment
+IotI2c *_ulnoiot_i2c_last_init; // break out of objects into static environment
 void _ulnoiot_request_caller() {
     _ulnoiot_i2c_last_init->request();
 }
@@ -151,7 +151,7 @@ void _ulnoiot_receive_caller(int count) {
     _ulnoiot_i2c_last_init->receive(count);
 }
 
-void UlnoiotI2c::init(int init_time) {
+void IotI2c::init(int init_time) {
   Wire.begin(IOTEMPOWER_I2C_ADDRESS); // join i2c bus with respective address
   _ulnoiot_i2c_last_init = this;
   Wire.onRequest(_ulnoiot_request_caller); // register request function (to send data to master)

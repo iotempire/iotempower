@@ -43,10 +43,10 @@ IOTEMPOWER_MQTT_BRIDGE_TOPIC="bridge"
 IOTEMPOWER_MQTT_BRIDGE_USER="bridgeuser"
 IOTEMPOWER_MQTT_BRIDGE_PW="secretpw"
 
-IOTEMPOWER_WEBREPL_PW="ulnoiot"
+IOTEMPOWER_WEBREPL_PW="iotempower"
 
-if [ -e "$IOTEMPOWER_ROOT/etc/ulnoiot.conf" ]; then
-    source "$IOTEMPOWER_ROOT/etc/ulnoiot.conf"
+if [ -e "$IOTEMPOWER_ROOT/etc/iotempower.conf" ]; then
+    source "$IOTEMPOWER_ROOT/etc/iotempower.conf"
 fi
 
 source $IOTEMPOWER_ROOT/bin/read_boot_config

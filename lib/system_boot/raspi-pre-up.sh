@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Run a raspberry pi as ulnoiot gateway (wifi router and mqtt_broker)
+# Run a raspberry pi as IoTempower gateway (wifi router and mqtt_broker)
 #
 # network pre-up script -> more documentation in raspi-boot.sh
 
-[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoT empower not active, aborting." 1>&2;exit 1; }
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
 source "$IOTEMPOWER_ROOT/bin/read_boot_config"
 

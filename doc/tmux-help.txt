@@ -2,8 +2,8 @@ UlnoIoT Tmux Help
 =================
 
 
-Welcome to ulnoiot, your friendly and affordable Internet of Things
-environment. For more info, check http://github.com/ulno/ulnoiot.
+Welcome to IoTempower, your friendly and affordable Internet of Things
+environment. For more info, check http://github.com/iotempire/iotempower.
 
 Use the Escape key (ESC) or CTRL-Q to close this help. Use CTRL-A H to show it
 again. CTRL-A H means: press the A key (do not press the shift key extra only
@@ -17,7 +17,7 @@ previous).
 
 The terminal here is not a totally normal terminal, it is a terminal
 multiplexer based on tmux (http://github.com/tmux/tmux). Why do you want this
-in ulnoiot, you ask? This allows you to reconnect to your terminal session,
+in IoTempower, you ask? This allows you to reconnect to your terminal session,
 even if you got disconnected.
 
 
@@ -46,7 +46,7 @@ are modified from the default tmux shortcuts).
 - CTRL-A LEFT (left arrow key): Select next window (tab) to the left (previous)
   (you can also use your mouse to click on different tabs in the status bar
   below and switch to them).
-- CTRL-V: The current version of tmux for ulnoiot allows you to use CTRL-V
+- CTRL-V: The current version of tmux for IoTempower allows you to use CTRL-V
   anywhere to insert the current clipboard.
 
 
@@ -72,18 +72,18 @@ reference:
   in tmux.
 - mc: opens an easy to use file-manager, which can be controlled with the
   mouse. Look also at mc's user menu as it has several commands to help you
-  with ulnoiot.
+  with IoTempower.
 
 
-UlnoIoT-Specific Commands
+IoTempower-Specific Commands
 -------------------------
 
 All these commands need to be typed in at the command line (and executed by
 typing enter).
-- ulnoiot help: shows a complete list of ulnoiot commands, type ulnoiot help.
-- ulnoiot help <command> or uhelp: shows you more information on the specific
+- iot help: shows a complete list of IoTempower commands, type iot help.
+- iot help <command> or uhelp: shows you more information on the specific
   node command <command> (like typing help("<command>")
-- ulnoiot upgrade: allows you to upgrade to the newest version of ulnoiot
+- iot upgrade: allows you to upgrade to the newest version of IoTempower
 
 
 Have fun inventing the next Internet of Things system!

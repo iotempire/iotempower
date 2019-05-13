@@ -22,7 +22,7 @@ Old versions were also using these:
 - `micropython  <https://micropython.org/>`__
 
 
-As UlnoIoT relies heavily on MQTT, it also integrates very easily with
+As IoTempower relies heavily on MQTT, it also integrates very easily with
 other community home automation software like
 `home-assistant <http://home-assistant.io>`__ and
 `openhab <https://openhab.org>`__.

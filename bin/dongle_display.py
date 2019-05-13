@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Communicate with the ulnoiot esp dongle
+# Communicate with the IoTempower esp dongle
 # and display some text on the locally connected display
 
 import sys
@@ -36,7 +36,7 @@ def display_text(port, text):
 def parser(unparsed_args):
     parser = optparse.OptionParser(
         usage = "%prog [options]",
-        description = "Use a ulnoiot esp dongle's display to display some text."
+        description = "Use a IoTempower esp dongle's display to display some text."
     )
 
     # Configuration
@@ -44,7 +44,7 @@ def parser(unparsed_args):
     group.add_option("-p", "--port",
         dest = "esp_port",
         type = "str",
-        help = "ulnoiot esp dongle serial port (where the dongle is connected). Default /dev/ttyUSB0",
+        help = "IoTempower esp dongle serial port (where the dongle is connected). Default /dev/ttyUSB0",
         default = "/dev/ttyUSB0"
     )
     parser.add_option_group(group)

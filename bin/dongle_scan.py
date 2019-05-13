@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Communicate with the ulnoiot esp dongle
+# Communicate with the IoTempower esp dongle
 # and scan for uiot-node networks
 
 import sys
@@ -80,7 +80,7 @@ def do_scan(port, cutoff):
 def parser(unparsed_args):
     parser = optparse.OptionParser(
         usage = "%prog [options]",
-        description = "Use a ulnoiot esp dongle to scan for adoptable nodes and" + \
+        description = "Use a IoTempower esp dongle to scan for adoptable nodes and" + \
                     "list them in oder from strongest to weakest."
     )
 
@@ -89,7 +89,7 @@ def parser(unparsed_args):
     group.add_option("-p", "--port",
         dest = "esp_port",
         type = "str",
-        help = "ulnoiot esp dongle serial port (where the dongle is connected). Default /dev/ttyUSB0",
+        help = "IoTempower esp dongle serial port (where the dongle is connected). Default /dev/ttyUSB0",
         default = "/dev/ttyUSB0"
     )
     group.add_option("-c", "--cutoff",

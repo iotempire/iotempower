@@ -301,8 +301,8 @@ function create_node_template() {
 
 
 function upgrade() {
-    shell_command("This will get the newest version of ulnoiot out of the internet."
-        + " Are you sure you want to run this?", "ulnoiot upgrade");
+    shell_command("This will get the newest version of iotempower out of the internet."
+        + " Are you sure you want to run this?", "iotempower upgrade");
 }
 
 
@@ -317,7 +317,7 @@ function initialize_serial() {
 
 function pre_flash_wemos() {
     shell_command('You are about to flash a connected Wemos D1 Mini with'
-        + ' a default ulnoiot firmware. Are you sure, and have you connected '
+        + ' a default iotempower firmware. Are you sure, and have you connected '
         + 'exactly one Wemos D1 Mini via USB to the gateway?',
         "pre_flash_wemos");
 }
