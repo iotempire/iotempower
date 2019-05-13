@@ -33,8 +33,8 @@ The following commands are possible:
   Print the welcome message again.
   
 - exec [cmd+arguments]:
-  Execute cmd inside the iotempower environment. Check out all the helper scripts
-  in iotempower/bin
+  Execute cmd inside the iotempower environment. Check out all the helper
+  scripts in iotempower/bin
 
 - upgrade:
   Update current version iotempower with newest version from git repository.
@@ -42,8 +42,8 @@ The following commands are possible:
 - help [cmd]:
   Display help on a specific command given in cmd. If cmd is empty,
   show this help.
-  After entering the iotempower environment, this help is also available just via
-  typing uhelp. Calling uhelp with no parameters will list all available
+  After entering the iotempower environment, this help is also available just
+  via typing uhelp. Calling uhelp with no parameters will list all available
   commands.
 
 - [command]:
