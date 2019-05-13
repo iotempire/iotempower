@@ -42,7 +42,7 @@ The following commands are possible:
 - help [cmd]:
   Display help on a specific command given in cmd. If cmd is empty,
   show this help.
-  After entering the iotempower environment, this help is also available just
+  After entering the IoTempower environment, this help is also available just
   via typing uhelp. Calling uhelp with no parameters will list all available
   commands.
 
@@ -50,7 +50,7 @@ The following commands are possible:
   Execute ulnoiot_[command] with the given parameters.
 
 
-If no command is given, execute the bash shell in the iotempower environment.
+If no command is given, execute the bash shell in the IoTempower environment.
 The first time this is run, external dependencies are downloaded and
 installed here too.
 
