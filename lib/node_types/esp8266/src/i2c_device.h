@@ -11,6 +11,9 @@
 #include <Wire.h>
 #include <device.h>
 
+// Sometimes, we need master address to receive messages back
+#define IOTEMPOWER_DEFAULT_I2C_MASTER_ADDRESS 8
+
 #define IOTEMPOWER_DEFAULT_I2C_CLOCK 400000
 // seems like esp8266 has only sw i2c
 // compare here: https://bbs.espressif.com/viewtopic.php?t=1032
@@ -19,56 +22,78 @@ class I2C_Device : public Device {
     private:
         uint8_t sda_pin;
         uint8_t scl_pin;
-        uint8_t _i2c_address = 255;
-        bool cleared = false; // bus need to be cleared when we start
+        uint8_t _i2c_address = 255; // This is the client device adddress
+        uint8_t _master_address = IOTEMPOWER_DEFAULT_I2C_MASTER_ADDRESS;
         unsigned int clock_speed;
-        void init_i2c(uint8_t sda, uint8_t scl, unsigned int clock) {
+        void init_i2c(uint8_t sda, uint8_t scl, unsigned int clock,
+                uint8_t master_address) {
             sda_pin = sda;
             scl_pin = scl;
+            _master_address = master_address;
             clock_speed = clock;
             pollrate(100); // i2c pollrate is by default slower than other devices: TODO, check this is ok
         }
         /* start is now private, check i2c_start for overwrite
          * */
         void start() {
+            if(_master_address == _i2c_address) {
+                ulog("I2C Master address equals client address - %d. Not starting device.", _i2c_address);
+                return;
+            }
             clear_bus();
             measure_init();
-            delay(100); // TODO: necessary?
             i2c_start();
         }
     public:
-        I2C_Device(const char* name, uint8_t address) : Device(name) {
-            init_i2c(SDA, SCL, IOTEMPOWER_DEFAULT_I2C_CLOCK);
-            set_address(address);
+        I2C_Device(const char* name, uint8_t client_address) : Device(name) {
+            init_i2c(SDA, SCL, IOTEMPOWER_DEFAULT_I2C_CLOCK,
+                IOTEMPOWER_DEFAULT_I2C_MASTER_ADDRESS);
+            set_address(client_address);
         }
 
         I2C_Device(const char* name) : Device(name) {
-            init_i2c(SDA, SCL, IOTEMPOWER_DEFAULT_I2C_CLOCK);
+            init_i2c(SDA, SCL, IOTEMPOWER_DEFAULT_I2C_CLOCK, 
+                IOTEMPOWER_DEFAULT_I2C_MASTER_ADDRESS);
         }
 
-        I2C_Device& i2c(uint8_t sda, uint8_t scl) {
-            init_i2c(sda, scl, IOTEMPOWER_DEFAULT_I2C_CLOCK);
-            return *this;
-        }
-        I2C_Device& i2c(uint8_t sda, uint8_t scl, unsigned int clock) {
-            init_i2c(sda, scl, clock);
+        I2C_Device& i2c(uint8_t sda, uint8_t scl,
+                unsigned int clock = IOTEMPOWER_DEFAULT_I2C_CLOCK,
+                unsigned int master_address
+                    = IOTEMPOWER_DEFAULT_I2C_MASTER_ADDRESS) {
+            init_i2c(sda, scl, clock, master_address);
             return *this;
         }
         I2C_Device& i2c(unsigned int clock) {
-            init_i2c(SDA, SCL, clock);
+            init_i2c(SDA, SCL, clock, IOTEMPOWER_DEFAULT_I2C_MASTER_ADDRESS);
             return *this;
         }
-        I2C_Device& set_address(uint8_t address) {
-            _i2c_address = address;
+
+        I2C_Device& set_address(uint8_t client_address) {
+            _i2c_address = client_address;
             return *this;
         }
-        I2C_Device& with_address(uint8_t address) {
-            return with_address(address);
+        I2C_Device& with_address(uint8_t client_address) {
+            return with_address(client_address);
+        }
+        I2C_Device& address(uint8_t client_address) {
+            return with_address(client_address);
+        }
+
+        I2C_Device& set_master(uint8_t address) {
+            _master_address = address;
+            return *this;
+        }
+        I2C_Device& with_master(uint8_t address) {
+            return set_master(address);
+        }
+        I2C_Device& master(uint8_t address) {
+            return set_master(address);
         }
 
         uint8_t get_sda() { return sda_pin; }
         uint8_t get_scl() { return scl_pin; }
         uint8_t get_address() { return _i2c_address; }
+        uint8_t get_master() { return _master_address; }
 
         /**
          * This routine turns off the respective I2C bus and clears it

@@ -26,7 +26,7 @@ int counter = 0;
 
 void loop() {
   char mystr[20];
-  ui2c.suspend(100);
+  //ui2c.suspend(100);
   snprintf(mystr, 19, "%d", counter);
   ui2c.write(mystr);
   Serial.println(mystr);

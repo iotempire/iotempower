@@ -35,7 +35,7 @@ class I2cConnector {
     void init(int init_time);
     bool write(String s); // return true when write successful (only fills buffer)
     void suspend( int timems );
-    void send_data_after_request(); // this actually sends available data out 
+    void send_data_after_request(uint8_t return_address); // this actually sends available data out 
     void receive(int count);
   private:
     char buffer1[I2C_CONNECTOR_BUFFER_SIZE];

@@ -8,7 +8,7 @@
 
 #include <i2c_device.h>
 
-#define IOTEMPOWER_I2C_CONNECTOR_DEFAULT_ADDRESS 8
+#define IOTEMPOWER_I2C_CONNECTOR_DEFAULT_ADDRESS 9
 
 // buffer_size=35:counter (2) + size (1) + data (32)
 #define IOTEMPOWER_I2C_CONNECTOR_BUFFER_SIZE 35  
@@ -18,7 +18,8 @@ class I2c_Connector : public I2C_Device {
         uint16_t last_count = 0xffff;
     public:
         I2c_Connector(const char* name,
-            int address = IOTEMPOWER_I2C_CONNECTOR_DEFAULT_ADDRESS);
+            int client_address = IOTEMPOWER_I2C_CONNECTOR_DEFAULT_ADDRESS,
+            int master_address = IOTEMPOWER_DEFAULT_I2C_MASTER_ADDRESS);
         void i2c_start();
         bool measure();
 };

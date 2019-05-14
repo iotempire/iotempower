@@ -4,6 +4,7 @@
 
 #include "i2c_device.h"
 
+
 void I2C_Device::measure_init() {
     // if(!cleared) {
     //     if(clear_bus()>0)
@@ -11,9 +12,11 @@ void I2C_Device::measure_init() {
     //             sda_pin, scl_pin);
     //     cleared = true; // We don't try again to prevent blocking
     // }
-    Wire.begin(sda_pin, scl_pin);
+    Wire.begin(sda_pin, scl_pin, _master_address);
+    // TODO: consider adding an option for not having pull-ups, so pull them down here
     Wire.setClock(clock_speed);
 }
+
 
 // The following is taken from: http://www.forward.com.au/pfod/ArduinoProgramming/I2C_ClearBus/index.html
 // Matthew Ford 1st August 2017 (original 28th September 2014)

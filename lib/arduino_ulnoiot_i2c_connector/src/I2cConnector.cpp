@@ -41,15 +41,25 @@ I2cConnector::I2cConnector(int init_time, i2c_connector_receive_callback_type ca
   init(init_time, I2C_CONNECTOR_DEFAULT_ADDRESS, callback);
 }
 
-void I2cConnector::send_data_after_request() {
+void I2cConnector::send_data_after_request(uint8_t return_address) {
   char *buf = buffer; // pick one buffer
+  if(inrequest) {
+      Serial.println("Double request, returning.");
+      return;
+  }
   inrequest=true;
+  //Serial.print("Sending to ");
+  //Serial.println(return_address);
   //Wire.write(buf, ((unsigned int)buf[2])+3); // respond
   //Wire.write(buf, I2C_CONNECTOR_BUFFER_SIZE); // respond
   //Wire.write("!!!!!!!!!! !!!!!!!!!! !!!!!!!!!!    ", 35); // respond
-  for(int i=0; i<I2C_CONNECTOR_BUFFER_SIZE; i++) {
-    Wire.write((char)0);
-  }
+  Wire.flush();
+  Wire.beginTransmission(return_address);
+  Wire.write(buf,((unsigned int)buf[2])+3);
+  //Wire.write("!!",2); // respond
+  
+  Wire.endTransmission(false);
+  
   // makes it crash: noInterrupts(); TODO: check if next line is still atomic
   if (!request_confirmed) request_confirmed = true;
   // makes it crash: interrupts();
@@ -152,12 +162,17 @@ void I2cConnector::receive(int count) {
     receive_buffer_size ++;
   }
   receive_buffer[receive_buffer_size] = 0; // terminate string
-  if(receive_callback) {
-//    Serial.println("Calling receive callback.");
-    receive_callback( receive_buffer, receive_buffer_size );
+  if((receive_buffer[0]&127)=='r') { // it's a request
+    send_data_after_request(receive_buffer[1]);
+  } else if((receive_buffer[0]&127)=='m') { // it's a message with payload
+    if(receive_callback) {
+        receive_callback( receive_buffer+1, receive_buffer_size );
+    }
+  } else {
+      Serial.print("Garbage request received: >");
+      Serial.print((uint8_t)receive_buffer[0]);
+      Serial.println("<");
   }
-//  Serial.print("receive: ");
-//  Serial.println(receive_buffer); // debug
 }
 
 // That's pretty dirty and makes this a singleton. TODO: think if this could be done nicer.
@@ -171,11 +186,12 @@ void _i2c_connector_receive_caller(int count) {
 
 void I2cConnector::init(int init_time) {
   Wire.begin(_addr); // join i2c bus as slave with respective address
-  //Wire.setClock(400000); // TODO: check if necessary
+  Wire.setClock(100000); // TODO: check if necessary
   // disable pull-ups
   pinMode(SDA, INPUT);
   pinMode(SCL, INPUT);
   _i2c_connector_last_init = this;
+  // This doesn't seem to work in new i2c library from arduino to esp
   Wire.onRequest(_i2c_connector_request_caller); // register request function (to send data to master)
   Wire.onReceive(_i2c_connector_receive_caller); // register receive function (to receive data from master)
   write(""); // init empty buffer
