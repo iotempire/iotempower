@@ -33,6 +33,7 @@ class Input : public Device {
             _pin = pin;
             with_threshold(0);
             add_subdevice(new Subdevice(""));
+            pollrate(1); // faster default pollrate (1ms) than other devices
         }
         void start() {
             _started = true;

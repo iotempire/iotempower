@@ -20,7 +20,7 @@ class Gyro_MPU6050 : public I2C_Device {
         uint8_t fifoBuffer[64]; // FIFO storage buffer
     public:
         Gyro_MPU6050(const char* name, bool calibrate_on_start=true);
-        void start();
+        void i2c_start();
         bool measure();
 };
 

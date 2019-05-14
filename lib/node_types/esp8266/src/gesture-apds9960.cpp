@@ -11,7 +11,7 @@ Gesture_Apds9960::Gesture_Apds9960(const char* name) :
 }
 
 
-void Gesture_Apds9960::start() {
+void Gesture_Apds9960::i2c_start() {
 //    sensor = new SparkFun_APDS9960(get_address());
     sensor = new SparkFun_APDS9960(); // address is hardcoded in library 0x39
 

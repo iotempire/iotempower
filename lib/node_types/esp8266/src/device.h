@@ -71,6 +71,9 @@ class Device {
         #define IOTEMPOWER_FILTER_CALLBACK std::function<bool()>
         IOTEMPOWER_FILTER_CALLBACK _filter_cb=NULL;
 
+        unsigned long _pollrate_us = 100000; // default is to poll only every 10ms
+        unsigned long last_poll = micros(); // when was last polled
+
     protected:
         bool _started = false;
 
@@ -116,53 +119,80 @@ class Device {
             // from cpp-compiler
         }
 
-        Device& with_report_change(bool report_change) { 
+        // pollrate
+        Device& set_pollrate(unsigned long rate_ms) { 
+            _pollrate_us = rate_ms * 1000;
+            return *this;
+        }
+        Device& with_pollrate(unsigned long rate_ms) { 
+            return set_pollrate(rate_ms);
+        }
+        Device& pollrate(unsigned long rate_ms) { 
+            return set_pollrate(rate_ms);
+        }
+        Device& set_pollrate_us(unsigned long rate_us) { 
+            _pollrate_us = rate_us;
+            return *this;
+        }
+        Device& with_pollrate_us(unsigned long rate_us) { 
+            return set_pollrate(rate_us);
+        }
+        Device& pollrate_us(unsigned long rate_us) { 
+            return set_pollrate(rate_us);
+        }
+
+        // report_change
+        Device& set_report_change(bool report_change) { 
             _report_change = report_change;
             return *this;
         }
-        Device& set_report_change(bool report_change) {
-            return with_report_change(report_change);
+        Device& with_report_change(bool report_change) {
+            return set_report_change(report_change);
         } 
-        Device& report_change(bool report_change) {
-            return with_report_change(report_change);
+        Device& report_change(bool report_change=true) {
+            return set_report_change(report_change);
         } 
-        Device& with_on_change_callback(IOTEMPOWER_ON_CHANGE_CALLBACK on_change_cb) { 
+
+        // on_change_callback
+        Device& set_on_change_callback(IOTEMPOWER_ON_CHANGE_CALLBACK on_change_cb) { 
             _on_change_cb = on_change_cb;
             return *this;
         }
-        Device& set_on_change_callback(IOTEMPOWER_ON_CHANGE_CALLBACK on_change_cb) { 
-            return with_on_change_callback(on_change_cb);
-        }
-        Device& with_on_change(IOTEMPOWER_ON_CHANGE_CALLBACK on_change_cb) { 
-            return with_on_change_callback(on_change_cb);
-        }
-        Device& set_on_change(IOTEMPOWER_ON_CHANGE_CALLBACK on_change_cb) { 
-            return with_on_change_callback(on_change_cb);
-        }
-        Device& on_change(IOTEMPOWER_ON_CHANGE_CALLBACK on_change_cb) { 
-            return with_on_change_callback(on_change_cb);
+        Device& with_on_change_callback(IOTEMPOWER_ON_CHANGE_CALLBACK on_change_cb) { 
+            return set_on_change_callback(on_change_cb);
         }
         Device& on_change_callback(IOTEMPOWER_ON_CHANGE_CALLBACK on_change_cb) { 
-            return with_on_change_callback(on_change_cb);
+            return set_on_change_callback(on_change_cb);
         }
-        Device& with_filter_callback(IOTEMPOWER_FILTER_CALLBACK filter_cb) { 
+        Device& set_on_change(IOTEMPOWER_ON_CHANGE_CALLBACK on_change_cb) { 
+            return set_on_change_callback(on_change_cb);
+        }
+        Device& with_on_change(IOTEMPOWER_ON_CHANGE_CALLBACK on_change_cb) { 
+            return set_on_change_callback(on_change_cb);
+        }
+        Device& on_change(IOTEMPOWER_ON_CHANGE_CALLBACK on_change_cb) { 
+            return set_on_change_callback(on_change_cb);
+        }
+
+        // filter_callback
+        Device& set_filter_callback(IOTEMPOWER_FILTER_CALLBACK filter_cb) { 
             _filter_cb = filter_cb;
             return *this;
         }
-        Device& set_filter_callback(IOTEMPOWER_FILTER_CALLBACK filter_cb) { 
-            return with_filter_callback(filter_cb);
-        }
-        Device& with_filter(IOTEMPOWER_FILTER_CALLBACK filter_cb) { 
-            return with_filter_callback(filter_cb);
-        }
-        Device& set_filter(IOTEMPOWER_FILTER_CALLBACK filter_cb) { 
-            return with_filter_callback(filter_cb);
-        }
-        Device& filter(IOTEMPOWER_FILTER_CALLBACK filter_cb) { 
-            return with_filter_callback(filter_cb);
+        Device& with_filter_callback(IOTEMPOWER_FILTER_CALLBACK filter_cb) { 
+            return set_filter_callback(filter_cb);
         }
         Device& filter_callback(IOTEMPOWER_FILTER_CALLBACK filter_cb) { 
-            return with_filter_callback(filter_cb);
+            return set_filter_callback(filter_cb);
+        }
+        Device& with_filter(IOTEMPOWER_FILTER_CALLBACK filter_cb) { 
+            return set_filter_callback(filter_cb);
+        }
+        Device& set_filter(IOTEMPOWER_FILTER_CALLBACK filter_cb) { 
+            return set_filter_callback(filter_cb);
+        }
+        Device& filter(IOTEMPOWER_FILTER_CALLBACK filter_cb) { 
+            return set_filter_callback(filter_cb);
         }
 
         Subdevice* add_subdevice(Subdevice* sd) {

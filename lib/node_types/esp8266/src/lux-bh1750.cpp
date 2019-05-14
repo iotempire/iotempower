@@ -8,7 +8,7 @@ Lux_BH1750::Lux_BH1750(const char* name) :
     set_address(0x23);
 }
 
-void Lux_BH1750::start() {
+void Lux_BH1750::i2c_start() {
     sensor = new BH1750(get_address());
 
     if(sensor) {

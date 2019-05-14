@@ -18,7 +18,7 @@ class Lux_TSL2561 : public I2C_Device {
         int discardval = 5;
     public:
         Lux_TSL2561(const char* name, bool gain=false);
-        void start();
+        void i2c_start();
         bool measure();
 };
 

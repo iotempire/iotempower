@@ -10,7 +10,7 @@ Gyro_MPU6050::Gyro_MPU6050(const char* name, bool calibrate_on_start) :
     set_address(0x68);
 }
 
-void Gyro_MPU6050::start() {
+void Gyro_MPU6050::i2c_start() {
     mpu6050 = new MPU6050(get_address());
 //    mpu6050 = new MPU6050(0x68);
 

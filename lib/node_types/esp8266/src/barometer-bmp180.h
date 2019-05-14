@@ -15,7 +15,7 @@ class Barometer_BMP180 : public I2C_Device {
         BMP085 *sensor = NULL;
     public:
         Barometer_BMP180(const char* name);
-        void start();
+        void i2c_start();
         bool measure();
 };
 

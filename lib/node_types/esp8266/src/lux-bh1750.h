@@ -16,7 +16,7 @@ class Lux_BH1750 : public I2C_Device {
         unsigned long last_read;
     public:
         Lux_BH1750(const char* name);
-        void start();
+        void i2c_start();
         bool measure();
 };
 

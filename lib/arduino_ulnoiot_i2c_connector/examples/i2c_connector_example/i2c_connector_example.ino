@@ -5,17 +5,17 @@
 //
 
 
-#include <IotI2c.h>
+#include <I2cConnector.h>
 
 
 void myreceive( char *msg, int len ) {
     Serial.print("Received a message of length: ");
     Serial.println(len);
     Serial.print("Message:");
-    Serial.println(msg); // is properly 0 terminated - but len can used to
+    Serial.println(msg); // is properly 0 terminated - but len can be used to
 }
 
-IotI2c ui2c(1000,myreceive);
+I2cConnector ui2c(1000, myreceive);
 
 void setup() {
   Serial.begin(115200); // start serial for debug output

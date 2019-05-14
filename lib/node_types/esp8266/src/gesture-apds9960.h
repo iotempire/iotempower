@@ -36,7 +36,7 @@ class Gesture_Apds9960 : public I2C_Device {
         }
 
 
-        void start();
+        void i2c_start();
         bool measure();
 };
 

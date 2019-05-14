@@ -77,6 +77,7 @@ class Ustring {
             return from(other.as_cstr(), len);
         }
         bool add(const Ustring& other);
+        bool add(char c);
         int compare(const char* other) const;
         int compare(const Ustring& other) const { return compare(other.cstr); }
         bool equals(const Ustring& other) const { return compare(other) == 0; }

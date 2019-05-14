@@ -7,6 +7,7 @@
 #ifndef _IOTEMPOWER_I2C_DEVICE_H_
 #define _IOTEMPOWER_I2C_DEVICE_H_
 
+#include <Arduino.h>
 #include <Wire.h>
 #include <device.h>
 
@@ -25,12 +26,14 @@ class I2C_Device : public Device {
             sda_pin = sda;
             scl_pin = scl;
             clock_speed = clock;
+            pollrate(100); // i2c pollrate is by default slower than other devices: TODO, check this is ok
         }
         /* start is now private, check i2c_start for overwrite
          * */
         void start() {
-            clear_bus(); 
+            clear_bus();
             measure_init();
+            delay(100); // TODO: necessary?
             i2c_start();
         }
     public:
@@ -49,6 +52,10 @@ class I2C_Device : public Device {
         }
         I2C_Device& i2c(uint8_t sda, uint8_t scl, unsigned int clock) {
             init_i2c(sda, scl, clock);
+            return *this;
+        }
+        I2C_Device& i2c(unsigned int clock) {
+            init_i2c(SDA, SCL, clock);
             return *this;
         }
         I2C_Device& set_address(uint8_t address) {

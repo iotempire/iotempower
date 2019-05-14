@@ -10,7 +10,7 @@
 
 //////// Device setup  ////////
 // output example
-output(blue, ONBOARDLED, "off", "on").set("on");
+//output(blue, ONBOARDLED, "off", "on").set("on");
 // void blink() {
 //     IN(blue).toggle();
 //     do_later(2000, blink);
@@ -19,13 +19,13 @@ output(blue, ONBOARDLED, "off", "on").set("on");
 // input example
 // Add a button with a slightly higher debounce rate, which will report
 // in the topic myroom/test1/button1.
-input(button1, D3, "released", "pressed")
-    .with_threshold(3)
-    .with_on_change_callback([&] {
-         if(IN(button1).is("pressed")) {
-             IN(blue).toggle();
-         }
-     });
+// input(button1, D3, "released", "pressed")
+//     .with_threshold(3)
+//     .with_on_change_callback([&] {
+//          if(IN(button1).is("pressed")) {
+//              IN(blue).toggle();
+//          }
+//      });
 
 // Examples for analog device:
 // analog(a0).with_precision(5); //.with_threshold(100, "high", "low");
@@ -71,11 +71,17 @@ input(button1, D3, "released", "pressed")
 //hx711(weight, D6, D7, 419.0, true)
 //    .with_filter(filter_round(2, IN(weight)));
 
-vl53l0x(dist);
+//vl53l0x(dist);
 
 // barometer
 //bmp180(bmp1);
 //bmp280(bmp2);
+
+// i2c connector - talk to an arduino talking on i2c on address 9
+//i2cc(arduino1, 9).i2c(100000).pollrate(500);
+i2cc(arduino1, 9).i2c(400000).pollrate(2000);
+//i2cc(arduino1, 9).pollrate(2000);
+//input(test, D2);
 
 // light sensitivity sensors
 // bh1750(lux1);

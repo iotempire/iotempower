@@ -9,15 +9,15 @@
 
 // use init_priority to make sure these get initialized last
 #define IOTEMPOWER_DEVICE_(Class_Name, internal_name, gcc_va_args...) \
-    Class_Name ulnoiot_dev_ ## internal_name __attribute__((init_priority(65535))) \
+    Class_Name iotempower_dev_ ## internal_name __attribute__((init_priority(65535))) \
         = Class_Name(gcc_va_args); \
-    Class_Name& internal_name = (Class_Name&) ulnoiot_dev_ ## internal_name
+    Class_Name& internal_name = (Class_Name&) iotempower_dev_ ## internal_name
 
 // convenience macros for device definition
 // Internal name (IN) references the internal name created with DN
-#define IN(name) ulnoiot_dev_##name
+#define IN(name) iotempower_dev_##name
 
-#define IOTEMPOWER_DEVICE(name, macro_name, ...) macro_name(ulnoiot_dev_##name, #name , ##__VA_ARGS__)
+#define IOTEMPOWER_DEVICE(name, macro_name, ...) macro_name(iotempower_dev_##name, #name , ##__VA_ARGS__)
 
 
 #include <output.h>
@@ -120,6 +120,15 @@
 #define bmp280_(internal_name, ...) \
     IOTEMPOWER_DEVICE_(Barometer_BMP280, internal_name, ##__VA_ARGS__)
 #define bmp280(name, ...) IOTEMPOWER_DEVICE(name, bmp280_, ##__VA_ARGS__)
+
+
+#include <i2c-connector.h>
+#define i2c_connector_(internal_name, ...) \
+    IOTEMPOWER_DEVICE_(I2c_Connector, internal_name, ##__VA_ARGS__)
+#define i2c_connector(name, ...) IOTEMPOWER_DEVICE(name, i2c_connector_, ##__VA_ARGS__)
+#define i2cc_(internal_name, ...) \
+    IOTEMPOWER_DEVICE_(I2c_Connector, internal_name, ##__VA_ARGS__)
+#define i2cc(name, ...) IOTEMPOWER_DEVICE(name, i2cc_, ##__VA_ARGS__)
 
 
 #include <lux-bh1750.h>

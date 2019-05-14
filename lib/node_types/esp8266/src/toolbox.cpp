@@ -17,6 +17,20 @@ bool Ustring::add(const Ustring& other) {
     return untruncated;
 }
 
+bool Ustring::add(char c) {
+    int ownlen = length();
+    bool untruncated = true;
+
+    if(ownlen < IOTEMPOWER_MAX_STRLEN) {
+        cstr[ownlen] = c;
+        cstr[ownlen+1] = 0; // 0 terminate correctly
+    } else {
+        untruncated = false;
+    }
+    case_adjust();
+    return untruncated;
+}
+
 bool Ustring::from(const char* _cstr) {
     int otherlen = strnlen(_cstr,IOTEMPOWER_MAX_STRLEN+1);
     bool untruncated = true;

@@ -41,7 +41,7 @@ void static printError(byte error)
 }
 
 
-void Lux_TSL2561::start() {
+void Lux_TSL2561::i2c_start() {
     sensor = new SFE_TSL2561();
 
     if(sensor) {

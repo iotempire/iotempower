@@ -24,6 +24,7 @@ int I2C_Device::clear_bus() {
     TWCR &= ~(_BV(TWEN)); //Disable the Atmel 2-Wire interface so we can control the sda_pin and scl_pin pins directly
 #endif
 
+    // using pullup is allowed here as also in esp8266 core twi-library (could damage bus-devices?)
     pinMode(sda_pin, INPUT_PULLUP); // Make sda_pin (data) and scl_pin (clock) pins Inputs with pullup.
     pinMode(scl_pin, INPUT_PULLUP);
 
@@ -75,5 +76,6 @@ int I2C_Device::clear_bus() {
     delayMicroseconds(10); // x. wait >5uS
     pinMode(sda_pin, INPUT); // and reset pins as tri-state inputs which is the default state on reset
     pinMode(scl_pin, INPUT);
+
     return 0; // all ok
 }

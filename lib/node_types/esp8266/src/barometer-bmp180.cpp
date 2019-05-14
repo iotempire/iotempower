@@ -10,7 +10,7 @@ Barometer_BMP180::Barometer_BMP180(const char* name) :
     set_address(BMP085_ADDRESS);
 }
 
-void Barometer_BMP180::start() {
+void Barometer_BMP180::i2c_start() {
     sensor = new BMP085();
 
     if(sensor) {
