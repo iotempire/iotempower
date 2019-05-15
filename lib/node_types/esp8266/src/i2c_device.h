@@ -34,16 +34,8 @@ class I2C_Device : public Device {
             pollrate(100); // i2c pollrate is by default slower than other devices: TODO, check this is ok
         }
         /* start is now private, check i2c_start for overwrite
-         * */
-        void start() {
-            if(_master_address == _i2c_address) {
-                ulog("I2C Master address equals client address - %d. Not starting device.", _i2c_address);
-                return;
-            }
-            clear_bus();
-            measure_init();
-            i2c_start();
-        }
+         * TODO: check, why overwrite still works */
+        void start();
     public:
         I2C_Device(const char* name, uint8_t client_address) : Device(name) {
             init_i2c(SDA, SCL, IOTEMPOWER_DEFAULT_I2C_CLOCK,
@@ -56,15 +48,15 @@ class I2C_Device : public Device {
                 IOTEMPOWER_DEFAULT_I2C_MASTER_ADDRESS);
         }
 
-        I2C_Device& i2c(uint8_t sda, uint8_t scl,
-                unsigned int clock = IOTEMPOWER_DEFAULT_I2C_CLOCK,
-                unsigned int master_address
-                    = IOTEMPOWER_DEFAULT_I2C_MASTER_ADDRESS) {
+        I2C_Device& i2c(uint8_t sda, uint8_t scl, unsigned int clock = 0,
+                unsigned int master_address = 255) {
+            if(clock==0) clock = clock_speed;
+            if(master_address == 255) master_address = _master_address;
             init_i2c(sda, scl, clock, master_address);
             return *this;
         }
         I2C_Device& i2c(unsigned int clock) {
-            init_i2c(SDA, SCL, clock, IOTEMPOWER_DEFAULT_I2C_MASTER_ADDRESS);
+            init_i2c(sda_pin, scl_pin, clock, _master_address);
             return *this;
         }
 

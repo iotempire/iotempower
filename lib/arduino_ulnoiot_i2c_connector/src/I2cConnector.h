@@ -34,13 +34,13 @@ class I2cConnector {
     I2cConnector(int init_time, int addr=I2C_CONNECTOR_DEFAULT_ADDRESS);
     void init(int init_time);
     bool write(String s); // return true when write successful (only fills buffer)
-    void suspend( int timems );
-    void send_data_after_request(uint8_t return_address); // this actually sends available data out 
+    // void suspend( int timems );
+    void send_data_after_request(); // this actually sends available data out 
     void receive(int count);
+    char* buffer;
   private:
     char buffer1[I2C_CONNECTOR_BUFFER_SIZE];
     char buffer2[I2C_CONNECTOR_BUFFER_SIZE];
-    char *buffer;
     char receive_buffer[I2C_CONNECTOR_BUFFER_SIZE+1]; // one more which can be 0 for end
     int receive_buffer_size;
     int request_bus; // If this is > 0: request time in ms on bus when giving next answer

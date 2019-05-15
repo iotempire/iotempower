@@ -78,9 +78,8 @@
 //bmp280(bmp2);
 
 // i2c connector - talk to an arduino talking on i2c on address 9
-//i2cc(arduino1, 9).i2c(100000).pollrate(500);
-i2cc(arduino1, 9).i2c(100000).pollrate(2000);
-//i2cc(arduino1, 9).pollrate(2000);
+//i2cc(arduino1, 8).i2c(100000).master(9).pollrate(2000);
+i2cc(arduino1, 8, 9).i2c(400000).pollrate(2000);
 //input(test, D2);
 
 // light sensitivity sensors

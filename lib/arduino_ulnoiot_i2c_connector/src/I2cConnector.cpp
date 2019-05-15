@@ -17,71 +17,56 @@
 
 
 void I2cConnector::init(int init_time, int addr, i2c_connector_receive_callback_type callback) {
-  buffer = buffer1;
-  receive_buffer_size = 0;
-  request_bus = 0;
-  request_confirmed = true;
-  buffer_counter = 1024;
-  receive_callback = callback;
-  inwrite = false;
-  inrequest = false;
-  _addr = addr;
-  init(init_time);
+    buffer = buffer1;
+    receive_buffer_size = 0;
+    request_bus = 0;
+    request_confirmed = true;
+    buffer_counter = 1024;
+    receive_callback = callback;
+    inwrite = false;
+    inrequest = false;
+    _addr = addr;
+    init(init_time);
 }
 
 I2cConnector::I2cConnector(int init_time, int addr, i2c_connector_receive_callback_type callback) {
-  init(init_time, addr, callback);
+    init(init_time, addr, callback);
 }
 
 I2cConnector::I2cConnector(int init_time, int addr) {
-  init(init_time, addr, NULL);
+    init(init_time, addr, NULL);
 }
 
 I2cConnector::I2cConnector(int init_time, i2c_connector_receive_callback_type callback) {
-  init(init_time, I2C_CONNECTOR_DEFAULT_ADDRESS, callback);
+    init(init_time, I2C_CONNECTOR_DEFAULT_ADDRESS, callback);
 }
 
-void I2cConnector::send_data_after_request(uint8_t return_address) {
-  char *buf = buffer; // pick one buffer
-  if(inrequest) {
-      Serial.println("Double request, returning.");
-      return;
-  }
-  inrequest=true;
-  //Serial.print("Sending to ");
-  //Serial.println(return_address);
-  //Wire.write(buf, ((unsigned int)buf[2])+3); // respond
-  //Wire.write(buf, I2C_CONNECTOR_BUFFER_SIZE); // respond
-  //Wire.write("!!!!!!!!!! !!!!!!!!!! !!!!!!!!!!    ", 35); // respond
-  Wire.flush();
-  Wire.beginTransmission(return_address);
-  Wire.write(buf,((unsigned int)buf[2])+3);
-  //Wire.write("!!",2); // respond
-  
-  Wire.endTransmission(false);
-  
-  // makes it crash: noInterrupts(); TODO: check if next line is still atomic
-  if (!request_confirmed) request_confirmed = true;
-  // makes it crash: interrupts();
-  inrequest=false;
-  Serial.print("Wrote request response. Count: "); // TODO: remove
-  Serial.print((int)((unsigned char)buf[0])*256 + (unsigned char)buf[1]);
-  Serial.print(" Len: "); // TODO: remove
-  Serial.print((int)buf[2]);
-  Serial.print(" text: >");
-  for(int i=0; i<buf[2]; i++) {
-      Serial.print(buf[i+3]);
-  }
-  buf[2] = 0; // delete content
-  Serial.print("< conf: "); // TODO: remove
-  Serial.println(request_confirmed); // TODO: remove
+void I2cConnector::send_data_after_request() {
+    // no Serial.prints in this method allowed
+    // using Serial here messes up all the comunication (also if done beforehand)
+
+    char* buf = buffer; // pick one buffer
+    if(inrequest) {
+        Serial.println("Double request, returning.");
+        return;
+    }
+    inrequest=true;
+    Wire.write(buf, ((unsigned int)buf[2])+3); // respond
+    //Wire.write(buf, I2C_CONNECTOR_BUFFER_SIZE); // respond
+    //Wire.write("!!!!!!!!!! !!!!!!!!!! !!!!!!!!!!    ", 35); // respond
+    //Wire.write("hell2\n");
+    
+    // makes it crash: noInterrupts(); TODO: check if next line is still atomic
+    if (!request_confirmed) request_confirmed = true;
+    // makes it crash: interrupts();
+    inrequest=false;
 }
 
 bool I2cConnector::write(String s) {
   char *buf;
   bool written = false;
 
-  // problem is that this function could interrupt the request
+  // problem is that this function could be interrupted by the request
   // therefore, we use double buffering.
   noInterrupts(); // this needs to be written atomically
   if (!inwrite) { // enter only once
@@ -114,89 +99,94 @@ bool I2cConnector::write(String s) {
   return written; // we still don't know if this value was received, it just made it into the out-buffer
 }
 
-# define I2C_CONNECTOR_END_DELAY 10
-void I2cConnector::suspend( int timems ) {
-  timems += I2C_CONNECTOR_END_DELAY;
-  // scale down time
-  unsigned int t=0;
-  if( timems<0 ) timems=0;
-  else if( timems>5000 ) timems = 5000; // max 5s -> TODO: move to constants
-  if( timems>=100 ) {
-    t+=128; // set high bit
-    timems = (timems+50) / 100;
-  }
-  t += timems;
-  // Wait/block until new request has been sent
-  noInterrupts();
-  request_confirmed = false;
-  request_bus = t;
-  interrupts();
-  // block until request came in but max maxblock
-  int counter = 0;
-  // Arduino's compiler just doesn't allow to read the request confirmed
-  bool request_copy;
-  while (true) {
-    noInterrupts(); // if interrupt clause not given, it is just cached and never read
-    request_copy = request_confirmed;
-    interrupts();
-    if (request_copy) break;
-    delayMicroseconds(1000);
-    counter += 1;
-    if (counter >= I2C_CONNECTOR_REQUEST_MAXBLOCK ) {
-      Serial.println("iotempower i2c maxblock reached, continuing");
-      break;
-    }
-  }
-  delayMicroseconds(1000*I2C_CONNECTOR_END_DELAY);
-  /*Serial.print("Request confirmed: ");
-  Serial.print(request_confirmed);
-  Serial.print(" counter: ");
-  Serial.println(counter);  // debug */
-}
+// # define I2C_CONNECTOR_END_DELAY 10
+// void I2cConnector::suspend( int timems ) {
+//   timems += I2C_CONNECTOR_END_DELAY;
+//   // scale down time
+//   unsigned int t=0;
+//   if( timems<0 ) timems=0;
+//   else if( timems>5000 ) timems = 5000; // max 5s -> TODO: move to constants
+//   if( timems>=100 ) {
+//     t+=128; // set high bit
+//     timems = (timems+50) / 100;
+//   }
+//   t += timems;
+//   // Wait/block until new request has been sent
+//   noInterrupts();
+//   request_confirmed = false;
+//   request_bus = t;
+//   interrupts();
+//   // block until request came in but max maxblock
+//   int counter = 0;
+//   // Arduino's compiler just doesn't allow to read the request confirmed
+//   bool request_copy;
+//   while (true) {
+//     noInterrupts(); // if interrupt clause not given, it is just cached and never read
+//     request_copy = request_confirmed;
+//     interrupts();
+//     if (request_copy) break;
+//     delayMicroseconds(1000);
+//     counter += 1;
+//     if (counter >= I2C_CONNECTOR_REQUEST_MAXBLOCK ) {
+//       Serial.println("iotempower i2c maxblock reached, continuing");
+//       break;
+//     }
+//   }
+//   delayMicroseconds(1000*I2C_CONNECTOR_END_DELAY);
+//   /*Serial.print("Request confirmed: ");
+//   Serial.print(request_confirmed);
+//   Serial.print(" counter: ");
+//   Serial.println(counter);  // debug */
+// }
 
 void I2cConnector::receive(int count) {
-  receive_buffer_size = 0;
-  while(Wire.available()) { // loop through all
-    if( receive_buffer_size >= I2C_CONNECTOR_BUFFER_SIZE ) break;
-    receive_buffer[receive_buffer_size] = Wire.read();
-    receive_buffer_size ++;
-  }
-  receive_buffer[receive_buffer_size] = 0; // terminate string
-  if((receive_buffer[0]&127)=='r') { // it's a request
-    send_data_after_request(receive_buffer[1]);
-  } else if((receive_buffer[0]&127)=='m') { // it's a message with payload
-    if(receive_callback) {
-        receive_callback( receive_buffer+1, receive_buffer_size );
+    receive_buffer_size = 0;
+    while(Wire.available()) { // loop through all
+        if( receive_buffer_size >= I2C_CONNECTOR_BUFFER_SIZE ) break;
+        receive_buffer[receive_buffer_size] = Wire.read();
+        receive_buffer_size ++;
     }
-  } else {
-      Serial.print("Garbage request received: >");
-      Serial.print((uint8_t)receive_buffer[0]);
-      Serial.println("<");
-  }
+    receive_buffer[receive_buffer_size] = 0; // 0-terminate
+    if(receive_callback) {
+        receive_callback( receive_buffer, receive_buffer_size );
+    }
 }
 
 // That's pretty dirty and makes this a singleton. TODO: think if this could be done nicer.
 I2cConnector *_i2c_connector_last_init; // break out of objects into static environment
 void _i2c_connector_request_caller() {
+    
+    // no Serial.prints in this method allowed
+    // using Serial here messes up all the comunication (also if done beforehand)
+
+    // Wire.write(0);
+    // Wire.write(41);
+    // Wire.write(6);
+    // Wire.write("hell2\n");
+    
     _i2c_connector_last_init->send_data_after_request();
+    // char* buf = _i2c_connector_last_init->buffer; // pick one buffer
+
+    // Wire.write(buf, ((unsigned int)buf[2])+3); // respond
+    
 }
+
 void _i2c_connector_receive_caller(int count) {
     _i2c_connector_last_init->receive(count);
 }
 
 void I2cConnector::init(int init_time) {
   Wire.begin(_addr); // join i2c bus as slave with respective address
-  Wire.setClock(100000); // TODO: check if necessary
+  //Wire.setClock(100000); // TODO: check if necessary
   // disable pull-ups
   pinMode(SDA, INPUT);
   pinMode(SCL, INPUT);
   _i2c_connector_last_init = this;
-  // This doesn't seem to work in new i2c library from arduino to esp
   Wire.onRequest(_i2c_connector_request_caller); // register request function (to send data to master)
   Wire.onReceive(_i2c_connector_receive_caller); // register receive function (to receive data from master)
   write(""); // init empty buffer
-  delayMicroseconds(3000000); // let things settle TODO: check if necessary this long
-  suspend(init_time); // wait given time
+  delay(100); // let things settle TODO: check if necessary this long
+  //suspend(init_time); // wait given time
 }
 
 /*void i2c_connector_reinit() {

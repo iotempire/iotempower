@@ -5,6 +5,16 @@
 #include "i2c_device.h"
 
 
+void I2C_Device::start() {
+    if(_master_address == _i2c_address) {
+        ulog("I2C Master address equals client address - %d. Not starting device.", _i2c_address);
+        return;
+    }
+    clear_bus();
+    measure_init();
+    i2c_start();
+}
+
 void I2C_Device::measure_init() {
     // if(!cleared) {
     //     if(clear_bus()>0)
