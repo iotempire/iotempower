@@ -5,7 +5,7 @@
 #define _IOTEMPOWER_VL53L0X_H_
 
 #include <Arduino.h>
-#include <i2c_device.h>
+#include <i2c-device.h>
 
 #include <VL53L0X.h> // here only this in cpp MPU6050_6Axis_MotionApps20.h
 

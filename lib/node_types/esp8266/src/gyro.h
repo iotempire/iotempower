@@ -6,7 +6,7 @@
 
 #include <Arduino.h>
 #include <Wire.h>
-#include <i2c_device.h>
+#include <i2c-device.h>
 
 #include <MPU6050.h> // here only this in cpp MPU6050_6Axis_MotionApps20.h
 

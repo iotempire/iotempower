@@ -1,7 +1,7 @@
-// i2c-connector.cpp
-#include "i2c-connector.h"
+// i2c-socket.cpp
+#include "i2c-socket.h"
 
-I2c_Connector::I2c_Connector(const char* name, int client_address,
+I2C_Socket::I2C_Socket(const char* name, int client_address,
             int master_address) :
     I2C_Device(name, client_address) {
     
@@ -21,11 +21,11 @@ I2c_Connector::I2c_Connector(const char* name, int client_address,
     );
 }
 
-void I2c_Connector::i2c_start() {
+void I2C_Socket::i2c_start() {
     _started = true;
 }
 
-bool I2c_Connector::measure() {
+bool I2C_Socket::measure() {
 
     // notable is that this already reads the answer, no need for any delays after this
     if(Wire.requestFrom(get_address(), (size_t) IOTEMPOWER_I2C_CONNECTOR_BUFFER_SIZE, false) == 0) {

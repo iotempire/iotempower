@@ -14,7 +14,7 @@
 #include <LiquidCrystal_I2C.h> // support for PCF8574T(i2C adapter) to Hitachi 44780/1602A/LCM1602
 #include <SPI.h>
 #include <Wire.h>
-#include <i2c_device.h>
+#include <i2c-device.h>
 
 #define font_tiny u8g2_font_4x6_tr
 #define font_medium u8g2_font_5x8_tr

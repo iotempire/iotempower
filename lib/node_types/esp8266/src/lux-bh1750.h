@@ -6,7 +6,7 @@
 
 #include <Arduino.h>
 #include <Wire.h>
-#include <i2c_device.h>
+#include <i2c-device.h>
 
 #include <BH1750.h>
 

@@ -122,13 +122,10 @@
 #define bmp280(name, ...) IOTEMPOWER_DEVICE(name, bmp280_, ##__VA_ARGS__)
 
 
-#include <i2c-connector.h>
-#define i2c_connector_(internal_name, ...) \
-    IOTEMPOWER_DEVICE_(I2c_Connector, internal_name, ##__VA_ARGS__)
-#define i2c_connector(name, ...) IOTEMPOWER_DEVICE(name, i2c_connector_, ##__VA_ARGS__)
-#define i2cc_(internal_name, ...) \
-    IOTEMPOWER_DEVICE_(I2c_Connector, internal_name, ##__VA_ARGS__)
-#define i2cc(name, ...) IOTEMPOWER_DEVICE(name, i2cc_, ##__VA_ARGS__)
+#include <i2c-socket.h>
+#define i2c_socket_(internal_name, ...) \
+    IOTEMPOWER_DEVICE_(I2C_Socket, internal_name, ##__VA_ARGS__)
+#define i2c_socket(name, ...) IOTEMPOWER_DEVICE(name, i2c_socket_, ##__VA_ARGS__)
 
 
 #include <lux-bh1750.h>

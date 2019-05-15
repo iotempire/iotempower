@@ -6,7 +6,7 @@
 
 #include <Arduino.h>
 #include <Wire.h>
-#include <i2c_device.h>
+#include <i2c-device.h>
 
 #include <Seeed_BMP280.h>
 

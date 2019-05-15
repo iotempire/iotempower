@@ -77,14 +77,14 @@
 //bmp180(bmp1);
 //bmp280(bmp2);
 
-// i2c connector - talk to an arduino talking on i2c on address 9
-//i2cc(arduino1, 8).i2c(100000).master(9).pollrate(2000);
-i2cc(arduino1, 8, 9).i2c(400000).pollrate(2000);
-//input(test, D2);
+// i2c connector socket - talk to an Arduino talking on i2c on address 9
+// (called plug there)
+// i2c_socket(arduino1, 9, 8).i2c(100000).pollrate(100);
+i2c_socket(arduino1).pollrate(2000);
 
 // light sensitivity sensors
 // bh1750(lux1);
-//tsl2561(lux2);
+// tsl2561(lux2);
 
 // Example for single RGB-led
 // rgb(r0, D6, D5, D0, true);
