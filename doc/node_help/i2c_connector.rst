@@ -1,1 +1,1 @@
-i2c-socket.rst
+i2c_socket.rst
