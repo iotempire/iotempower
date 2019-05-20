@@ -38,7 +38,7 @@ IOTEMPOWER_AP_IP="192.168.12.1"
 # hostname to export
 # if this is empty, it uses the actual hostname
 # this name is associated with the IP given in IOTEMPOWER_AP_IP
-IOTEMPOWER_AP_HOSTNAME="ulnoiotgw"
+IOTEMPOWER_AP_HOSTNAME="iotgateway"
 
 #### END - Accesspoint configuration ####
 

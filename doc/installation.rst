@@ -52,7 +52,7 @@ Installation step by step:
 
 - You can now connect to the pi gateway via a web browser or ssh
 
-- https://ulnoiotgw (or https://ulnoiotgw.local or
+- https://iotgateway (or https://iotgateway.local or
   sometimes https://192.168.12.1). Accept
   the security exception for the locally generated security certificate. You
   should now see a link to the filesystem through cloud commander (cloudcmd)
@@ -85,7 +85,7 @@ Installation step by step:
 
     The command for Mac and Linux is:
 
-    ``ssh -X iotempower@ulnoiotgw``
+    ``ssh -X iotempower@iotgateway``
 
     The command on Windows will be (and can be graphically
     configured in MobaSSH):

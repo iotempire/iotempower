@@ -79,7 +79,7 @@ Adopting the Node in the IoTempower environment on the Raspberry Pi
 
 - Connect to IoTempower via a web browser.
 
-  - Point your browser at https://ulnoiotgw (or https://ulnoiotgw.local,
+  - Point your browser at https://iotgateway (or https://iotgateway.local,
     or if both don't work at https://192.168.12.1).
 
     If not already done previously, accept the security exception for the

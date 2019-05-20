@@ -1,8 +1,8 @@
 # Add the following to the end of the the boot/config.txt file of a raspberry pi
-# ulnoiotgw.
+# iotgateway.
 
 ################################
-##### ulnoiotgw options ########
+##### iotgateway options ########
 ################################
 
 # USB OTG
@@ -18,5 +18,5 @@
 #dtoverlay=dwc2
 
 ################################
-#### end: ulnoiotgw options ####
+#### end: iotgateway options ####
 ################################

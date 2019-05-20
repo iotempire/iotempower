@@ -114,8 +114,8 @@ Adoção do Node pelo sistema IoTempower no Raspberry Pi
 
 - Conecte ao IoTempower através de um navegador web.
 
-- No seu navegador acesse o endereço https://ulnoiotgw
-  (ou https://ulnoiotgw.local se os dois não funcionarem
+- No seu navegador acesse o endereço https://iotgateway
+  (ou https://iotgateway.local se os dois não funcionarem
   tente https://192.168.12.1).
 
 Se não aceitou a exceção de segurança anteriormente aceite-a agora
@@ -136,11 +136,11 @@ para gerar o certificado de segurança local.
   direita da tela, primeiro vamos nos concentrar no painel ativo a esquerda.
 
 - Você deverá ver uma pasta chamada `node1
-  <https://ulnoiotgw.local/cloudcmd/fs/home/iotempower/iot-test/node1/>`_.
+  <https://iotgateway.local/cloudcmd/fs/home/iotempower/iot-test/node1/>`_.
   Entre nesta pasta.
 
 - Quando estiver dentro da pasta `node1
-  <https://ulnoiotgw.local/cloudcmd/fs/home/iotempower/iot-test/node1/>`_
+  <https://iotgateway.local/cloudcmd/fs/home/iotempower/iot-test/node1/>`_
   clique no botão localizado no canto inferior direito da sua tela.
   O botão está ilustrado abaixo.
 
@@ -161,7 +161,7 @@ para gerar o certificado de segurança local.
   `troubleshooting <troubleshooting.rst>`_ para mais informações.
 
 Parabéns! Seu node agora está conectado ao UlnIoT. Você pode ligar e desligar o LED da placa pode usando esse programa Node-RED do link
-`<https://ulnoiotgw/nodered/ui/#/1>`_
+`<https://iotgateway/nodered/ui/#/1>`_
 
 Topo: `ToC <index-doc.rst>`_, Anterior: `Installation <installation.rst>`_,
 Próximo: `Segundo Node <second-node-pt.rst>`_.

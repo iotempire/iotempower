@@ -85,7 +85,7 @@ def draw_image(im,startx,starty):
 
 # use integriot for mqtt intgration
 from integriot import *
-init("192.168.12.1")  # TODO: change to ulnoiotgw
+init("192.168.12.1")  # TODO: change to iotgateway
 prefix("lightboard00")  # prototype lightboard
 
 imagelist=[]

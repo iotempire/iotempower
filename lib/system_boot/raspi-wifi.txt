@@ -1,5 +1,5 @@
 # Add the following into the boot/wifi.txt file of a raspberry pi
-# ulnoiotgw.
+# iotgateway.
 
 ### Wifi Name (avoid blanks) ###
 iotempire-123456

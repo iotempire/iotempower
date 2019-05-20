@@ -1,5 +1,5 @@
 # Add the following into the boot/wifi-in.txt file of a raspberry pi
-# ulnoiotgw.
+# iotgateway.
 
 # Connect to wireless on wlan1 (external wifi adapter on pi 3 or zero w).
 # If at least wifi_name and wifi_password are set, try to connect to wpa

@@ -16,7 +16,7 @@ New Node
 --------
 
 -   Navigate back to your `IoT system example configuration folder
-    <https://ulnoiotgw.local/cloudcmd/fs/home/iotempower/iot-test/>`_
+    <https://iotgateway.local/cloudcmd/fs/home/iotempower/iot-test/>`_
 
     As you have seen, each node has its own configuration folder in UlnoIoT.
 

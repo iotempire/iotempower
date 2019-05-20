@@ -47,8 +47,8 @@ Acessando os serviços locais no Raspberry Pi
 
 - Conecte ao IoTempower através de um navegador web.
 
-- No seu navegador acesse o endereço https://192.168.12.1, https://ulnoiotgw,
-  ou https://ulnoiotgw.local.
+- No seu navegador acesse o endereço https://192.168.12.1, https://iotgateway,
+  ou https://iotgateway.local.
 
   Se não aceitou a exceção de segurança anteriormente aceite-a agora
   para gerar o certificado de segurança local.
@@ -63,8 +63,8 @@ Acessando os serviços locais no Raspberry Pi
 - Agora abra uma outra aba esta documentação localmente no gateway:
 
   Este será https://192.168.12.1/doc/quickstart-pi.rst,
-  https: //ulnoiotgw/doc/quickstart-pi.rst
-  ou https: //ulnoiotgw.local/doc/quickstart-pi.rst .
+  https: //iotgateway/doc/quickstart-pi.rst
+  ou https: //iotgateway.local/doc/quickstart-pi.rst .
 
 - Continue a ler a documentação de lá.
 
