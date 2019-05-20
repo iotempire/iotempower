@@ -117,6 +117,7 @@ EOF
         -g "$IP" \
         $HOSTAPD_EXTRA \
         -e "$HOSTFILE" \
+        --domain "localnet" \
         "$OUTPUT_WIFI" "$INPUT_DEVICE" "$AP_NAME" "$PASSWORD" &
     ap_id=$!
     sleep 7 # let ap start up
