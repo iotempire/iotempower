@@ -91,6 +91,8 @@ else
     pip install paho-mqtt  # also for integriot
     pip install ipython
     pushd . &> /dev/null
+    # for dongle
+    pip install psutil
     # TODO: fix more dependencies
     # Termux needs: ncurses-utils
     # esptool
