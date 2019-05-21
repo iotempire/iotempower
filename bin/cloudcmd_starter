@@ -13,7 +13,7 @@ fi
 
 while true; do
     sleep 1
-    cloudcmd --prefix cloudcmd --no-contact --no-open
+    cloudcmd --prefix cloudcmd --no-contact --no-open --user-menu
     sleep 1
 done
 
