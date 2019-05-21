@@ -22,10 +22,10 @@
 source "$IOTEMPOWER_ROOT/bin/read_boot_config"
 
 # Try to guess user
-if [[ $IOTEMPOWER_ROOT =~ '/home/([!/]+)/iot' ]]; then
+if [[ $IOTEMPOWER_ROOT =~ /home/'([!/]+)'/iot ]]; then
     IOTEMPOWER_USER=${BASH_REMATCH[1]}
 else
-    IOTEMPOWER_USER=iotempower
+    IOTEMPOWER_USER=iot
 fi
 
 if [[ "IOTEMPOWER_AP_PASSWORD" ]]; then # pw was given, so start an accesspoint
@@ -33,7 +33,7 @@ if [[ "IOTEMPOWER_AP_PASSWORD" ]]; then # pw was given, so start an accesspoint
     (
         sleep 15 # let network devices start
         cd "$IOTEMPOWER_ROOT"
-        tmux new-session -d -n AP -s UIoTSvrs \
+        tmux new-session -d -n AP -s IoTsvcs \
                 "./run" exec accesspoint \; \
             new-window -d -n MQTT  \
                 "./run" exec mqtt_broker \; \
