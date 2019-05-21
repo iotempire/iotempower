@@ -1,6 +1,6 @@
-==========
-ESP Dongle
-==========
+=================
+IoTempower Dongle
+=================
 
 This project is a dongle that should be connected to a IoTempower gateway
 (like a raspberry pi with the IoTempower pi image).

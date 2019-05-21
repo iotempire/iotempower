@@ -16,7 +16,7 @@ New Node
 --------
 
 -   Navigate back to your `IoT system example configuration folder
-    <https://iotgateway.local/cloudcmd/fs/home/iotempower/iot-test/>`_
+    <https://iotgateway.local/cloudcmd/fs/home/iot/iot-test/>`_
 
     As you have seen, each node has its own configuration folder in UlnoIoT.
 
@@ -74,7 +74,7 @@ Visually Programming the Connections
 ------------------------------------
 
 -   After successful adoption, open the `Node-RED </nodered/>`_ page. Here you
-    have to probably enter username (*iotempower*) and password (*iotempire*) again.
+    have to probably enter username (*iot*) and password (*iotempire*) again.
 
     You should see a Node-RED flow with five nodes.
 

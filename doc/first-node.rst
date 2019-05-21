@@ -21,8 +21,8 @@ no change is necessary. If you want to use a NodeMCU, you will
 have to change the config (in the file ``node.conf`` in your node folder)
 to NodeMCU.
 
-If you are in the classroom, your devices will be pre-flashed with the IoTempower
-firmware on them.
+If you are in the classroom, your devices will be pre-flashed with the 
+IoTempower firmware on them.
 If not please go to this page `First Flash page <pre-flash.rst>`_
 on your Raspberry Pi to pre-flash your device.
 
@@ -32,7 +32,7 @@ Setting up the WiFi credentials on the node
 -------------------------------------------
 
 Note that this instructions are for reconfiguring the WiFi credentials on nodes
-that have been pre-installed with IoTempower and can be flashed over wireless 
+that have been pre-installed with IoTempower and can be flashed over wireless
 (over the air - OTA - the ones used in the classroom should be ready).
 If your node has never been flashed with IoTempower before,
 follow this tutorial here `First Flash page <pre-flash.rst>`_
@@ -42,7 +42,7 @@ Also note that the board does not have a display so we will use the blue LED
 (the onboard light) to indicate the different configuration states.
 (If you are using the Wemos D1 Mini and have a respective display shield,
 you can plug it in and see some messages during the configuration process.)
-Pay attention to LED during the whole process, whether it is on or off
+Pay attention to the LED during the whole process, whether it is on or off
 and how it is blinking because this will indicate if the steps are
 successfully working or not.
 
@@ -85,7 +85,7 @@ Adopting the Node in the IoTempower environment on the Raspberry Pi
     If not already done previously, accept the security exception for the
     locally generated security certificate.
 
-  - If you are asked for a user, use ``iotempower``,
+  - If you are asked for a user, use ``iot``,
     if you are asked for a password
     use ``iotempire``.
 
@@ -94,13 +94,13 @@ Adopting the Node in the IoTempower environment on the Raspberry Pi
   -  You should now see the home page for your local IoTempower installation.
 
 - Click on the link `IoT system example configuration folder
-  </cloudcmd/fs/home/iotempower/iot-test/>`_ to navigate to
+  </cloudcmd/fs/home/iot/iot-test/>`_ to navigate to
   the folder where the templates are.
 
 .. TODO: provide image of the Iot system example page!
 
 - Then, navigate into the `node1
-  </cloudcmd/fs/home/iotempower/iot-test/node1/>`_ folder.
+  </cloudcmd/fs/home/iot/iot-test/node1/>`_ folder.
 
 .. TODO: provide image of the Folder node1!
 

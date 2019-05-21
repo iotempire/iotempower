@@ -1,4 +1,4 @@
-// firmware for iotempower ESP dongle (UED)
+// firmware for IoTempower ESP dongle (UED)
 //
 // author: ulno
 // created: 2019-02-22
@@ -131,7 +131,7 @@ void display_init() {
     if(!display_present) return;
     display( [&] {
         u8g2.setFont(u8g2_font_7x14B_tr);
-        u8g2.drawStr(7, 18, "UlnoIoT");
+        u8g2.drawStr(20, 18, "IoT");
         u8g2.drawStr(10, 39, "Dongle");
     });
     last_display_change = millis();
@@ -180,9 +180,9 @@ void display_text(const String& text) {
 }
 
 
-void display_ulnoiot() {
+void display_iot() {
     if(!display_present) return;
-    String display_string = "  UlnoIoT\n  Dongle\n\n";
+    String display_string = "    IoT\n  Dongle\n\n";
     String ssid = String(gw_ssid);
     int l = (int)ssid.length();
 
@@ -198,7 +198,7 @@ void display_ulnoiot() {
 
 void display_gw_info() {
     if(!display_present) return;
-    String display_string = "UlnoIoTDongle\n";
+    String display_string = " IoT Dongle\n";
     String ssid = String(gw_ssid);
     int l = (int)ssid.length();
 
@@ -235,7 +235,7 @@ void display_info_screen() {
             display_gw_info();
             break;
         case 1: // general IoTempower dongle info screen
-            display_ulnoiot();
+            display_iot();
             break;
         case 10: // internal info screen
             display_esp_info();
@@ -730,7 +730,7 @@ void setup() {
     Serial.println();
     Serial.println();
     // print init message
-    Serial.println("Starting UlnoIoT Dongle.");
+    Serial.println("Starting IoTempower Dongle.");
     Serial.println();
     // initially no WiFi switched on, TODO: later be in ESP-Now mode and initialize LORA
     WiFi.softAPdisconnect (true);
@@ -910,7 +910,7 @@ void loop() {
             gw_mem_free[0] = 0;
             gw_load[0] = 0;
             if(current_menu >= 0)
-                display_text("  UlnoIoT\n  Dongle\n\nConnection to\ngateway lost.");
+                display_text("   IoT\n  Dongle\n\nConnection to\ngateway lost.");
         }
         last_gw_action = millis(); // prevent triggering display all the time
     }
