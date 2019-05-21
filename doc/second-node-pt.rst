@@ -18,7 +18,7 @@ Novo Node
 ---------
 
 -   Navegue de volta para a sua `IoT system example configuration folder
-    </cloudcmd/fs/home/iotempower/iot-test/>`_.
+    </cloudcmd/fs/home/iot/iot-test/>`_.
 
     Como você pode notar, cada Node tem sua própria pasta de configuração
     no UlnoIoT.

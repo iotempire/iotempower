@@ -1,5 +1,5 @@
 #!/bin/bash
-cd ~/iotempower/examples/integriot/artificial-window/integriot/
+cd ~/iot/examples/integriot/artificial-window/integriot/
 while true; do
     sleep 7
     iot exec ./run.sh

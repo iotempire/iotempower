@@ -45,7 +45,7 @@
     "type": "file in",
     "z": "485b2d9f.f00784",
     "name": "alarm file",
-    "filename": "/home/ulno/iotempower/examples/water-sensor/248211__jomellejager__alarm-1.m4a",
+    "filename": "/home/ulno/iot/examples/water-sensor/248211__jomellejager__alarm-1.m4a",
     "format": "",
     "chunk": false,
     "sendError": false,

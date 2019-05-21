@@ -127,7 +127,7 @@ para gerar o certificado de segurança local.
 - Você deverá ver agora a home page do seu IoTempower local.
 
 - Abra o link `IoT system example configuration folder
-  </cloudcmd/fs/home/iotempower/iot-test>`_, você deve ver
+  </cloudcmd/fs/home/iot/iot-test>`_, você deve ver
   agora os arquivos do sistema
   dentro da pasta IoT-test, sendo uma pasta ``node1``,
   um arquivo ``README.rst`` e
@@ -136,11 +136,11 @@ para gerar o certificado de segurança local.
   direita da tela, primeiro vamos nos concentrar no painel ativo a esquerda.
 
 - Você deverá ver uma pasta chamada `node1
-  <https://iotgateway.local/cloudcmd/fs/home/iotempower/iot-test/node1/>`_.
+  <https://iotgateway.local/cloudcmd/fs/home/iot/iot-test/node1/>`_.
   Entre nesta pasta.
 
 - Quando estiver dentro da pasta `node1
-  <https://iotgateway.local/cloudcmd/fs/home/iotempower/iot-test/node1/>`_
+  <https://iotgateway.local/cloudcmd/fs/home/iot/iot-test/node1/>`_
   clique no botão localizado no canto inferior direito da sua tela.
   O botão está ilustrado abaixo.
 

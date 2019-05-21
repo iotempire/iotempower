@@ -69,7 +69,7 @@ Acessando os serviços locais no Raspberry Pi
 - Continue a ler a documentação de lá.
 
 - Abra o link `IoT system example configuration folder
-  </cloudcmd/fs/home/iotempower/iot-test>`_,
+  </cloudcmd/fs/home/iot/iot-test>`_,
   você deve ver agora os arquivos do sistema
   dentro da pasta IoT-test, sendo uma pasta
   ``node1``, um arquivo `` README.rst`` e

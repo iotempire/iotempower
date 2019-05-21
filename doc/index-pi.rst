@@ -26,9 +26,9 @@ Here is *more documentation*:
 
 Here are some *navigational links*:
 
-- `IoT system example configuration folder </cloudcmd/fs/home/iotempower/iot-test>`_
+- `IoT system example configuration folder </cloudcmd/fs/home/iot/iot-test>`_
 
-- `Your home-directory </cloudcmd/fs/home/iotempower>`_
+- `Your home-directory </cloudcmd/fs/home/iot>`_
 
 Here are links to the local *Node-RED*
 (visual IoT system configuration) installation:
