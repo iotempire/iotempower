@@ -22,7 +22,7 @@
 source "$IOTEMPOWER_ROOT/bin/read_boot_config"
 
 # Try to guess user
-if [[ $IOTEMPOWER_ROOT =~ '/home/([!/]+)/iotempower' ]]; then
+if [[ $IOTEMPOWER_ROOT =~ '/home/([!/]+)/iot' ]]; then
     IOTEMPOWER_USER=${BASH_REMATCH[1]}
 else
     IOTEMPOWER_USER=iotempower
