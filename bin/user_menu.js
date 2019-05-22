@@ -1,4 +1,4 @@
-var term = require( 'terminal-kit' ).terminal ;
+var term = require( 'terminal-kit' ).terminal;
 var child_process = require('child_process');
 
 
@@ -102,7 +102,11 @@ async function choice(items, pre_select=0, pad_last=0) {
             //     response.selectedIndex
             // );
             clean_up();
-            if(response.unexpectedKey != undefined) {
+            if(response == undefined) {
+                term(error);
+                term("\n");
+            } 
+            else if(response.unexpectedKey != undefined) {
                 function check_key(name, key, cb) {
                     if(name.toUpperCase() === key.toUpperCase()) {
                         cb();
@@ -361,7 +365,8 @@ function advanced() {
 function menu_default() {
     //term.clear();
     term("\n\n");
-    term.bgBrightWhite.black.wrap( '^+ul^rno^-^kiot^: User Menu\n' ) ;
+    term
+    term.bgBrightWhite.black.brightCyan.wrap( '^+IoT^bempower^: User Menu\n' );
     term("\n");
     term.wrap('Use mouse, arrow keys, enter, or shortcut key to select.\n')
     term("\n");

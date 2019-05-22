@@ -17,5 +17,8 @@ fi
 
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
-export NODE_PATH="/usr/lib/node_modules:$IOTEMPOWER_LOCAL/node_modules"
-exec node "$IOTEMPOWER_ROOT/bin/user_menu.js"
+# does not work in node 10
+#export NODE_PATH="/usr/lib/node_modules:$IOTEMPOWER_LOCAL/node_modules"
+
+# fix_bin makes sure to copy js-files to the nodejs directory
+exec node "$IOTEMPOWER_LOCAL/nodejs/user_menu.js"

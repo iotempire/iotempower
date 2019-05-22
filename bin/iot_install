@@ -121,7 +121,10 @@ else
 #    "$IOTEMPOWER_ROOT/bin/download_firmware"
 #    "$IOTEMPOWER_ROOT/bin/firmware" download
 
+
     cd "$IOTEMPOWER_LOCAL"
+    mkdir -p nodejs
+    cd nodejs
     npm install terminal-kit
 
     popd  &> /dev/null
