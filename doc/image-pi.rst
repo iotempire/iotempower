@@ -2,8 +2,7 @@ Install IoTempower image onto an SD-card
 ========================================
 
 - Download the Raspberry Pi image from
-  `here on Google Drive
-   <https://drive.google.com/open?id=1b0M93T2-suLFMjpmf8PLUTEGh_rKT6_6>`_
+  `here on Google Drive <https://drive.google.com/open?id=1b0M93T2-suLFMjpmf8PLUTEGh_rKT6_6>`_
   
 - Make sure the sha256-checksum of the image is correct. It should be:
 
