@@ -1,11 +1,13 @@
 Install IoTempower image onto an SD-card
 ========================================
 
-- Download the Raspberry Pi image from here: https://goo.gl/bVgLMr.
+- Download the Raspberry Pi image from
+  `here on Google Drive
+   <https://drive.google.com/open?id=1b0M93T2-suLFMjpmf8PLUTEGh_rKT6_6>`_
   
 - Make sure the sha256-checksum of the image is correct. It should be:
 
-  ``b10c3ade65489ad4096e30c9537ba2c7c664cb8ad878fee54016531941f20be7``
+  ``51feec9e303559f1900984fd78786cf0338859ff36f4599596d59f0439c3e419``
 
   On Linux and MacOS, you can use ``sha256sum`` or ``shasum -a 256`` to verify
   the image, on Windows you can use
