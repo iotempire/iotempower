@@ -386,9 +386,6 @@ function menu_default() {
 
 
 /////// main program
-term("arguments: ");
-term(process.argv);
-term("\n");
 switch(process.argv[process.argv.length - 1]) {
     case "deploy":
         deploy();
