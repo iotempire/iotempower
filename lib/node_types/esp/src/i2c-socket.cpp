@@ -28,7 +28,9 @@ void I2C_Socket::i2c_start() {
 bool I2C_Socket::measure() {
 
     // notable is that this already reads the answer, no need for any delays after this
-    if(Wire.requestFrom(get_address(), (size_t) IOTEMPOWER_I2C_CONNECTOR_BUFFER_SIZE, false) == 0) {
+    if(Wire.requestFrom((uint8_t) get_address(), 
+            (uint8_t) IOTEMPOWER_I2C_CONNECTOR_BUFFER_SIZE, 
+            (uint8_t) false) == 0) {
         ulog("Reading from i2c not successful. Dev with address %d connected?", get_address());
         return false;
     }

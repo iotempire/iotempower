@@ -52,10 +52,14 @@
 #define REFRESH_INTERVAL    20000     // minimum time to refresh servos in microseconds -> freq = 100Hz
 //#define REFRESH_INTERVAL    40000     // minimum time to refresh servos in microseconds -> freq = 50Hz
 
-#if !defined(ESP8266)
+// #if !defined(ESP8266)
 
-#error "This library only supports esp8266 boards."
+// #error "This library only supports esp8266 boards."
 
+// #endif
+
+#ifdef ESP32
+    #include <analogWrite.h>
 #endif
 
 class  _Servo

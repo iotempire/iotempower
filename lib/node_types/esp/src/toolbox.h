@@ -10,7 +10,7 @@
 #include <string.h>
 #include <functional>
 #include <Arduino.h>
-#include <ESP8266TrueRandom.h>
+#include <ESPTrueRandom.h>
 #include "iotempower-default.h"
 
 // a simple class for handling fixed-length strings. Ustring stands for

@@ -4,8 +4,13 @@
 ////// Standard libraries
 #include <ArduinoOTA.h>
 //#include <ESP8266WebServer.h> //Local WebServer used to serve the configuration portal
-#include <ESP8266WiFi.h>
-#include <ESP8266mDNS.h>
+#ifdef ESP32
+    #include <WiFi.h>
+    #include <ESPmDNS.h>
+#else
+    #include <ESP8266WiFi.h>
+    #include <ESP8266mDNS.h>
+#endif
 #include <FS.h>
 #include <WiFiUdp.h>
 
@@ -56,15 +61,14 @@ bool ota_failed = false;
 void id_blinker() {
     static bool init_just_done = false;
     static int total, global_pos;
-    int pos;
     static unsigned long lasttime;
     unsigned long currenttime;
     int delta;
 
     if (long_blinks == 0) { // first time, still unitialized
         // randomness for 30 different blink patterns (5*6)
-        long_blinks = ESP8266TrueRandom.random(1, 6);
-        short_blinks = ESP8266TrueRandom.random(1, 7);
+        long_blinks = ESPTrueRandom.random(1, 6);
+        short_blinks = ESPTrueRandom.random(1, 7);
         Serial.printf("Blink pattern: %d long_blinks, %d short_blinks\n",
                       long_blinks, short_blinks);
         total = BLINK_OFF_START +
@@ -87,8 +91,8 @@ void id_blinker() {
     currenttime = millis();
     delta = currenttime - lasttime;
     global_pos = (global_pos + delta) % total;
-    pos = global_pos;
     #ifdef ID_LED
+    int pos = global_pos;
     if (pos < BLINK_OFF_START) { // still in BLINK_OFF_START
         pinMode(ID_LED, INPUT); // floating (as onboard led)
         //digitalWrite(ID_LED, 1); // off - in off phase
@@ -206,6 +210,13 @@ void setup_ota() {
     });
 }
 
+uint32_t getChipId32() {
+    #ifdef ESP32
+        return ESP.getEfuseMac();
+    #else
+        return ESP.getChipId();
+    #endif
+}
 
 void reconfigMode() {
     // go to access-point and reconfiguration mode to allow a new
@@ -218,7 +229,7 @@ void reconfigMode() {
     Serial.println("Reconfiguration requested. Activating open AP-mode.");
     WiFi.disconnect(true);
     id_blinker(); //trigger init of random blink pattern
-    sprintf(ap_ssid + strlen(ap_ssid) - 8, "%02x-%01dL-%01dS", ESP.getChipId() & 255,
+    sprintf(ap_ssid + strlen(ap_ssid) - 8, "%02x-%01dL-%01dS", getChipId32() & 255,
                 long_blinks, short_blinks);
 
     // check if a display is present
@@ -275,7 +286,7 @@ void reconfigMode() {
                 ota_display->clear();
                 ota_display->print("ReconfigMode");
                 ota_display->cursor(0,2);
-                s.printf("node %02x", ESP.getChipId() & 255);
+                s.printf("node %02x", getChipId32() & 255);
                 ota_display->print(s);
                 s.printf("blinks %dL-%dS", long_blinks, short_blinks);
                 ota_display->print(s);
@@ -381,7 +392,7 @@ void connectToWifi() {
     if(reconfig_mode_active) {
         my_hostname = (char *)"iotempower-adoptee"; // TODO: define in defaults
         // my_hostname = (char *)"iotempower-xxxxxx";
-        // sprintf(my_hostname + strlen(my_hostname) - 6, "%06x", ESP.getChipId());
+        // sprintf(my_hostname + strlen(my_hostname) - 6, "%06x", getChipId32());
     } else {
         my_hostname = (char *)HOSTNAME;
     }
@@ -510,8 +521,8 @@ void setup() {
     ulog("Booting.");
 
     // intialize randomness
-    long seed_helper=ESP8266TrueRandom.random(0,2000000);
-    // TODO: fix that calling ESP8266TrueRandom crashes later
+    long seed_helper=ESPTrueRandom.random(0,2000000);
+    // TODO: fix that calling ESPTrueRandom crashes later
     Serial.print("Random generator seeded, testnumber: ");
     Serial.println(seed_helper);
     randomSeed((unsigned long)seed_helper); 

@@ -348,7 +348,7 @@ function wifi_config() {
 }
 
 
-function advanced() {
+function advanced(back) {
     choice([
         ["Pre-Flash Wemos D1 Mini (P)", "P", pre_flash_wemos],
         ["Initialize Serial (I)", "I", initialize_serial], 
@@ -357,8 +357,12 @@ function advanced() {
         ["Change Wifi-Router Configuration (W)", "W", wifi_config],
         ["Shell Escape (S)", "S", shell_escape],
         ["Shutdown/Poweroff (O)", "O", poweroff],
-        ["Back (B,X,ESC)", ["B","X"], menu_default]
+        ["Back (B,X,ESC)", ["B","X"], back?menu_default:terminate]
     ], pre_select=-1, pad_last=1);
+}
+
+function advanced_back() {
+    advanced(true);
 }
 
 
@@ -375,9 +379,46 @@ function menu_default() {
         ["Deploy (D)", "D", deploy], 
         ["Adopt (A)", "A", adopt],
         ["Create New Node Folder (N)", "N", create_node_template],
-        ["Advanced (V)", "V", advanced],
+        ["Advanced (V)", "V", advanced_back],
         ["Exit (X,ESC)", "X", terminate]
     ], pre_select=0, pad_last=1);
 }
 
-menu_default();
+
+/////// main program
+term("arguments: ");
+term(process.argv);
+term("\n");
+switch(process.argv[process.argv.length - 1]) {
+    case "deploy":
+        deploy();
+        break;
+    case "adopt":
+        adopt();
+        break;
+    case "create_node_template":
+        create_node_template();
+        break;
+    case "advanced":
+        advanced(false);
+        break;
+    case "pre_flash_wemos":
+        pre_flash_wemos();
+        break;
+    case "initialize_serial":
+        initialize_serial();
+        break;
+    case "upgrade":
+        upgrade();
+        break;
+    case "wifi_config":
+        wifi_config();
+        break;
+    case "shell":
+        shell_escape();
+        break;
+    case "poweroff":
+        poweroff();
+    default:
+        menu_default();
+}

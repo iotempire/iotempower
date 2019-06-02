@@ -71,15 +71,19 @@ bool Gesture_Apds9960::measure() {
     uint16_t green_light = 0;
     uint16_t blue_light = 0;
 
-    // if (  !sensor->readAmbientLight(ambient_light) ||
-    //         !sensor->readRedLight(red_light) ||
-    //         !sensor->readGreenLight(green_light) ||
-    //         !sensor->readBlueLight(blue_light) ) {
-    //     ulog("Error reading light values");
-    // } else { // success
-    //     measured_value(0).printf("%d,%d,%d,%d", 
-    //         ambient_light, red_light, green_light, blue_light);
-    // }
+    // make sure the sensor has a 100uF capacitor
+    // TODO: check if this works at once
+    // expose more tuning values
+
+    if (  !sensor->readAmbientLight(ambient_light) ||
+            !sensor->readRedLight(red_light) ||
+            !sensor->readGreenLight(green_light) ||
+            !sensor->readBlueLight(blue_light) ) {
+        ulog("Error reading light values");
+    } else { // success
+        measured_value(0).printf("%d,%d,%d,%d", 
+            ambient_light, red_light, green_light, blue_light);
+    }
 
     uint8_t proximity_data = 0;
 

@@ -6,6 +6,10 @@
 
 #include <rgb_base.h>
 
+#ifdef ESP32
+    #include <analogWrite.h>
+#endif
+
 class RGB_Single : public RGB_Base {
     private:
         int p_r;
