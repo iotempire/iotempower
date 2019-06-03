@@ -40,7 +40,8 @@ else
     #     fi
     # done
     ports=$(platformio device list --serial|egrep '^/dev/tty'|\
-        sed s/ttyS/zzttyS/|sort|sed s/zzttyS/ttyS/) # get available serial ports ttyS in end
+        sed s/ttyS/zzttyS/|sed s/ttyAMA/zzttyAMA/|sort|\
+        sed s/zzttyS/ttyS/|sed s/zzttyAMA/ttyAMA/) # get available serial ports with ttyS and ttyAMA in end
     port=""
     for p in $ports; do
         if [[ "$skip_dongletest" ]]; then # take first
