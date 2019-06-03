@@ -21,8 +21,8 @@ def do_probe(port):
         ser.write(b"\n")
         ser.flush()
         answer = ser.read_until(b"UED>")
-    except:
-        pass
+    except Exception as e:
+        answer = ""
 
     if not answer.endswith(b"UED>"):
         sys.stderr.write("No dongle detected on %s.\n"%port)
