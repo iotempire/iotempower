@@ -19,6 +19,11 @@ source "node.conf" || { echo "Can't read node.conf. Aborting." 1>&2;exit 1; }
 # normalize node_type
 board=$(echo -n "$board"|tr [:upper:][:space:] [:lower:]_)
 
+# TODO: find better way to duplicate board configs
+if [[ "$board" == "wemos_d1_mini_pro" ]]; then
+    board="wemos_d1_mini"
+fi
+
 # normalize node_name from topic
 # turns out that you should not use underscores in hostnames, but can use hyphen
 #node_name=$(echo -n "$topic"|tr [:upper:][:space:]\\/ [:lower:]___)
