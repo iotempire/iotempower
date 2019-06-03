@@ -13,7 +13,7 @@ import time
 
 def do_probe(port):
     # Create a serial connection
-    answer = ""
+    answer = b""
     try:
         ser = serial.Serial(port, 115200, timeout=1);
         logging.info('Starting on %s.', port)
@@ -22,7 +22,7 @@ def do_probe(port):
         ser.flush()
         answer = ser.read_until(b"UED>")
     except Exception as e:
-        answer = ""
+        answer = b""
 
     if not answer.endswith(b"UED>"):
         sys.stderr.write("No dongle detected on %s.\n"%port)
