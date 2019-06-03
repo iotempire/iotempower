@@ -1,1 +1,1 @@
-../../node_types/esp8266/src/iotempower-default.h
+../../node_types/esp/src/iotempower-default.h
