@@ -24,8 +24,8 @@ mkdir -p "$FLASH_PATH/node"
 cd "$FLASH_PATH"
 ln -s -f "$IOTEMPOWER_ROOT/lib/system_template/system.conf" .
 cd "node"
-ln -s -f "$IOTEMPOWER_ROOT/lib/node_types/wemos_d1_mini/pre-flash/node.conf" .
-ln -s -f "$IOTEMPOWER_ROOT/lib/node_types/wemos_d1_mini/pre-flash/setup.cpp" .
+ln -s -f "$IOTEMPOWER_ROOT/lib/node_types/nodemcu/pre-flash/node.conf" .
+ln -s -f "$IOTEMPOWER_ROOT/lib/node_types/nodemcu/pre-flash/setup.cpp" .
 # TODO: think about regenerating key each time
 # TODO: think about selecting random wifi
 initialize serial "$@"  # build it
