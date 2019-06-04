@@ -126,10 +126,10 @@ Installation on Linux
 - setup iotempower: clone this repository
 
   - If you just want read-only access type in a folder of your choice:
-    ``git clone https://github.com/ulno/iotempower``
+    ``git clone https://github.com/iotempire/iotempower``
 
   - If you are a IoTempower developer, use
-    ``git clone git@github.com:ulno/iotempower``
+    ``git clone git@github.com:iotempire/iotempower``
 
 - make IoTempower runnable -> copy examples/scripts/iotempower into your bin folder
   and adapt
