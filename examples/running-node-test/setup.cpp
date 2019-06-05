@@ -80,7 +80,10 @@
 // i2c connector socket - talk to an Arduino talking on i2c on address 9
 // (called plug there)
 // i2c_socket(arduino1, 9, 8).i2c(100000).pollrate(100);
-i2c_socket(arduino1).pollrate(2000);
+//i2c_socket(arduino1).pollrate(2000);
+
+// MFRC522 reader example (SPI sensor)
+mfrc522(rfid1);
 
 // light sensitivity sensors
 // bh1750(lux1);

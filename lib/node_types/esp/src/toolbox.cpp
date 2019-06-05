@@ -12,7 +12,21 @@ bool Ustring::add(const Ustring& other) {
         otherlen = IOTEMPOWER_MAX_STRLEN - ownlen;
         untruncated = false;
     }
-    strncpy(cstr+ownlen, other.cstr, otherlen);
+    strncpy(cstr+ownlen, other.cstr, otherlen+1); // +1 also copy 0
+    case_adjust();
+    return untruncated;
+}
+
+bool Ustring::add(const char* other) {
+    int ownlen = length();
+    int otherlen = strnlen(other, IOTEMPOWER_MAX_STRLEN-ownlen);
+    bool untruncated = true;
+
+    if( ownlen+otherlen > IOTEMPOWER_MAX_STRLEN ) {
+        otherlen = IOTEMPOWER_MAX_STRLEN - ownlen;
+        untruncated = false;
+    }
+    strncpy(cstr+ownlen, other, otherlen+1); // +1 also copy 0
     case_adjust();
     return untruncated;
 }
@@ -24,6 +38,24 @@ bool Ustring::add(char c) {
     if(ownlen < IOTEMPOWER_MAX_STRLEN) {
         cstr[ownlen] = c;
         cstr[ownlen+1] = 0; // 0 terminate correctly
+    } else {
+        untruncated = false;
+    }
+    case_adjust();
+    return untruncated;
+}
+
+bool Ustring::add_hex(uint8_t c) {
+    int ownlen = length();
+    bool untruncated = true;
+    uint8_t nib;
+
+    if(ownlen < IOTEMPOWER_MAX_STRLEN-1) {
+        nib = c>>4;
+        cstr[ownlen] = nib<10?'0'+nib:'A'+nib-10;
+        nib = c&15;
+        cstr[ownlen+1] = nib<10?'0'+nib:'A'+nib-10;
+        cstr[ownlen+2] = 0; // 0 terminate correctly
     } else {
         untruncated = false;
     }

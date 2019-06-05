@@ -192,4 +192,10 @@
 #define gyro(name, ...) IOTEMPOWER_DEVICE(name, gyro_, ##__VA_ARGS__)
 
 
+#include <mfrc522.h>
+#define mfrc522_(internal_name, ...) \
+    IOTEMPOWER_DEVICE_(Mfrc522, internal_name, ##__VA_ARGS__)
+#define mfrc522(name, ...) IOTEMPOWER_DEVICE(name, mfrc522_, ##__VA_ARGS__)
+
+
 #endif // _DEVICES_H_

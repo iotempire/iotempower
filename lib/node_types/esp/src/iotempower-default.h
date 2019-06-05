@@ -10,7 +10,7 @@
 #define IOTEMPOWER_FLASH_DEFAULT_PASSWORD ULNOIOT
 #define IOTEMPOWER_MAX_DEVICES 32
 #define IOTEMPOWER_MAX_SUBDEVICES 16
-#define IOTEMPOWER_MAX_STRLEN 63
+#define IOTEMPOWER_MAX_STRLEN 127
 #define IOTEMPOWER_MAX_BUFLEN 127
 #define MIN_PUBLISH_TIME_MS 20  // posting every 20ms allowed -> only 50messages per second (else network stacks seems to run full)- TODO: check if this is too conservative or too much
 #define LOG_LINE_MAX_LEN 128

@@ -59,7 +59,13 @@ link_type_through_base() {
 if [[ -e "node.conf" ]]; then  # started from node-directory
     source "$IOTEMPOWER_ROOT/bin/read_node_config"
     node_type="$board"
-    
+
+    # echo DEBUG prepare_build_dir
+    # echo $IOTEMPOWER_AP_NAME_FULL
+    # echo $IOTEMPOWER_AP_NAME
+    # echo $IOTEMPOWER_AP_PASSWORD
+    # echo DEBUG prepare_build_dir END
+
     src_dir="$IOTEMPOWER_ROOT/lib/node_types/$node_type"
     dest_dir="build"
     

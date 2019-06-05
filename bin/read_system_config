@@ -34,3 +34,9 @@ unset _IOTEMPOWER_TMP
 source "$IOTEMPOWER_ROOT/bin/read_boot_config"
 
 cd "$path" # return to original path
+
+#echo DEBUG read_system_config
+#echo $IOTEMPOWER_AP_NAME_FULL
+#echo $IOTEMPOWER_AP_NAME
+#echo $IOTEMPOWER_AP_PASSWORD
+#echo DEBUG read_system_config END

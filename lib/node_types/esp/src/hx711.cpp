@@ -1,6 +1,7 @@
 // hx711.cpp
 #include "hx711.h"
 
+// TODO: this might be just an i2c device, check if it can be defined as one
 
 Hx711::Hx711(const char* name, uint8_t sck_pin, uint8_t dout_pin,
                 float calfactor, bool calibration)
