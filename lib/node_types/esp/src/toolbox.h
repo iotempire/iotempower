@@ -222,6 +222,8 @@ void controlled_crash(const char * error_message);
 
 void ulog(const char *fmt, ...);
 
+void ulog(const __FlashStringHelper *fmt, ...);
+
 long urandom(long from, long upto_exclusive);
 
 // constrain or limit a number to an interval

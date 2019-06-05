@@ -227,6 +227,24 @@ void ulog(const char *fmt, ...) {
 	Serial.println(buf);
 }
 
+void ulog(const __FlashStringHelper *fmt, ...) {
+    static bool serial_initialized=false;
+    if(!serial_initialized) {
+        serial_initialized = true;
+        Serial.begin(115200);
+        delay(500); // Wait for serial to get ready
+        Serial.println();
+        Serial.println();
+        Serial.println("Serial ready.");
+    }
+	char buf[LOG_LINE_MAX_LEN];
+	va_list ap;
+	va_start(ap, (const char*)fmt);
+	vsnprintf(buf, LOG_LINE_MAX_LEN, (const char*)fmt, ap);
+	va_end(ap);
+	Serial.println(buf);
+}
+
 long urandom(long from, long upto_exclusive) {
     return random(from, upto_exclusive);
 }

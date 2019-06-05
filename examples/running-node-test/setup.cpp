@@ -83,7 +83,7 @@
 //i2c_socket(arduino1).pollrate(2000);
 
 // MFRC522 reader example (SPI sensor)
-mfrc522(rfid1);
+mfrc522(rfid1, 32);
 
 // light sensitivity sensors
 // bh1750(lux1);
