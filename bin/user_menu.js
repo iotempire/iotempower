@@ -306,7 +306,7 @@ function create_node_template() {
 
 function upgrade() {
     shell_command("This will get the newest version of iotempower out of the internet."
-        + " Are you sure you want to run this?", "iotempower upgrade");
+        + " Are you sure you want to run this?", "iot upgrade");
 }
 
 
