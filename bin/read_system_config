@@ -20,6 +20,17 @@ while [[ ! -e "system.conf" ]]; do
     cd ..
 done
 
+# first, read boot_config for special settings on pi
+source "$IOTEMPOWER_ROOT/bin/read_boot_config"
+
+# second, read eventually a config file in etc
+# should have been read for iot-environment
+# just read it again here
+if [[ -e "$IOTEMPOWER_ROOT/etc/iotempower.conf" ]]; then
+    source "$IOTEMPOWER_ROOT/etc/iotempower.conf"
+fi
+
+# last, read a locally available system.conf, can overwrite everything
 _IOTEMPOWER_TMP="$IOTEMPOWER_AP_NAME"
 IOTEMPOWER_AP_NAME="__IOTEMPOWER_TEST__"
 source "system.conf" &> /dev/null || { echo "Can't read system.conf. Aborting." 1>&2;exit 1; }
@@ -30,8 +41,6 @@ else # not overwritten, restore
 fi 
 unset _IOTEMPOWER_TMP
 
-# read boot_config for special settings on pi
-source "$IOTEMPOWER_ROOT/bin/read_boot_config"
 
 cd "$path" # return to original path
 

@@ -45,11 +45,15 @@ IOTEMPOWER_MQTT_BRIDGE_PW="secretpw"
 
 IOTEMPOWER_WEBREPL_PW="iotempower"
 
+# first read local boot configuration
+source $IOTEMPOWER_ROOT/bin/read_boot_config
+
+
+# second read config in etc, can overwrite boot config
 if [ -e "$IOTEMPOWER_ROOT/etc/iotempower.conf" ]; then
     source "$IOTEMPOWER_ROOT/etc/iotempower.conf"
 fi
 
-source $IOTEMPOWER_ROOT/bin/read_boot_config
 
 IOTEMPOWER_VERSION=$(cat "$IOTEMPOWER_ROOT/VERSION")
 
