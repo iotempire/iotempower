@@ -71,7 +71,7 @@
 //hx711(weight, D6, D7, 419.0, true)
 //    .with_filter(filter_round(2, IN(weight)));
 
-//vl53l0x(dist);
+vl53l0x(dist);
 
 // barometer
 //bmp180(bmp1);
@@ -83,7 +83,7 @@
 //i2c_socket(arduino1).pollrate(2000);
 
 // MFRC522 reader example (SPI sensor)
-mfrc522(rfid1, 32);
+//mfrc522(rfid1, 32);
 
 // light sensitivity sensors
 // bh1750(lux1);
@@ -170,9 +170,9 @@ mfrc522(rfid1, 32);
 
 // Examples for displays
 //display(d1, font_medium).i2c(D6, D5); // standard ssd1306
-// U8G2_SSD1306_128X64_NONAME_1_HW_I2C u8g2d(U8G2_R0); // small ssd1306 as wemos shield
-// display(d1, u8g2d);
-//display44780(d2, 16, 2);
+//U8G2_SSD1306_64X48_ER_F_HW_I2C u8g2d(U8G2_R0); // small ssd1306 as wemos shield
+//display(d1, u8g2d);
+display44780(d2, 16, 2);
 
 // Example for pulse width modulation
 // pwm(blue, ONBOARDLED).with_frequency(1000);

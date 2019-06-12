@@ -1,5 +1,7 @@
 // i2c-socket.cpp
 #include "i2c-socket.h"
+// for setting master address
+#include "twi.h"
 
 I2C_Socket::I2C_Socket(const char* name, int client_address,
             int master_address) :
@@ -26,6 +28,10 @@ void I2C_Socket::i2c_start() {
 }
 
 bool I2C_Socket::measure() {
+
+    //Wire.begin(sda_pin, scl_pin, get_master()); // need to set here as it destroys other i2c devices // TODO: FIX!
+
+    twi_setAddress(get_master()); // check if this is enough
 
     // notable is that this already reads the answer, no need for any delays after this
     if(Wire.requestFrom((uint8_t) get_address(), 

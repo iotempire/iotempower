@@ -11,7 +11,7 @@ void I2C_Device::start() {
         return;
     }
     clear_bus();
-    measure_init();
+    measure_init(); //empty currently
     i2c_start();
 }
 
@@ -22,7 +22,9 @@ void I2C_Device::measure_init() {
     //             sda_pin, scl_pin);
     //     cleared = true; // We don't try again to prevent blocking
     // }
-    Wire.begin(sda_pin, scl_pin, _master_address);
+    // TODO: check - this seems to destroy the display
+//    Wire.begin(sda_pin, scl_pin, _master_address); // TODO: add again, destroys some i2c devices (incl. display)
+    Wire.begin(sda_pin, scl_pin); // works, better than giving master
     // TODO: consider adding an option for not having pull-ups, so pull them down here
     Wire.setClock(clock_speed);
 }

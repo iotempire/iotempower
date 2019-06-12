@@ -241,6 +241,9 @@ void reconfigMode() {
         ota_display = new Display("testdisplay", u8g2);
         if(ota_display) {
             ota_display_present = true;
+            ota_display->clear_bus(); // debug test TODO: remove
+            Wire.begin(); // check default i2c
+            ota_display->measure_init(); // debug test TODO: remove
             ota_display->i2c_start();
         }
     }

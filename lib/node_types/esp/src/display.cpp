@@ -9,9 +9,9 @@ bool Display_Base::init(int w, int h) {
     // create our own textbuffer
     textbuffer = (char *)malloc(lines*columns);
     if(!textbuffer) {
-        return false;
         ulog("Could not allocate textbuffer.");
         // TODO: anything which should be destructed now?
+        return false;
     }
     add_subdevice(new Subdevice("",true))->with_receive_cb(
         [&] (const Ustring& payload) {
@@ -161,6 +161,7 @@ bool Display::init_u8g2() {
 
 void Display::show(const char* buffer) {
     char charstr[2]=" ";
+    ulog("Display debug: %s",buffer);
     _display->firstPage();
     do {
         for(int y=0; y<lines; y++) {
