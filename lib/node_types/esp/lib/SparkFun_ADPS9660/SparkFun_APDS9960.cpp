@@ -383,6 +383,7 @@ bool SparkFun_APDS9960::enableGestureSensor(bool interrupts)
         return false;
     }
     //Jon if( !setLEDBoost(LED_BOOST_300) ) {
+    //Ulno confirmed, does not even work on 300 with capacitor
     if( !setLEDBoost(LED_BOOST_100) ) {
         return false;
     }
