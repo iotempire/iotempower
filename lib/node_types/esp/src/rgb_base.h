@@ -56,6 +56,11 @@ class RGB_Base : public Device {
             } else {
                 process_color(lednr, color, _show);
             }
+            // update values with last color set
+            // TODO: make this reporting skippable
+            measured_value(0).from(color.getLuma()>0?"on":"off");
+            measured_value(2).from((int)color.getLuma());
+            measured_value(4).printf("%2x%2x%2x", color.r, color.g, color.b);
             return *this;
         }
 

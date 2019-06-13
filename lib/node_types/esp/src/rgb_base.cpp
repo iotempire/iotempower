@@ -51,8 +51,8 @@ void RGB_Base::push_back(CRGB color, bool _show) {
 RGB_Base::RGB_Base(const char* name, int led_count) :
         Device(name) {
     _led_count = led_count;
-    add_subdevice(new Subdevice(""));
-    add_subdevice(new Subdevice("set",true))->with_receive_cb(
+    add_subdevice(new Subdevice("")); // 0
+    add_subdevice(new Subdevice("set",true))->with_receive_cb( // 1
         [&] (const Ustring& payload) {
             if(payload.equals("on")) high();
             else {
@@ -62,8 +62,8 @@ RGB_Base::RGB_Base(const char* name, int led_count) :
             return true;
         }
     );
-    add_subdevice(new Subdevice("brightness"));
-    add_subdevice(new Subdevice("brightness/set",true))->with_receive_cb(
+    add_subdevice(new Subdevice("brightness")); // 2
+    add_subdevice(new Subdevice("brightness/set",true))->with_receive_cb( // 3
         [&] (const Ustring& payload) {
             int brightness=payload.as_int();
             if(brightness<0) brightness=0;
@@ -72,8 +72,8 @@ RGB_Base::RGB_Base(const char* name, int led_count) :
             return true;
         }
     );
-    add_subdevice(new Subdevice("rgb"));
-    add_subdevice(new Subdevice("rgb/set",true))->with_receive_cb(
+    add_subdevice(new Subdevice("rgb")); // 4
+    add_subdevice(new Subdevice("rgb/set",true))->with_receive_cb( // 5
         [&] (const Ustring& payload) {
             set_colorstr(payload);
             return true;
