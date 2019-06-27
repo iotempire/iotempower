@@ -541,20 +541,26 @@ void setup() {
     // Serial.println();
     ulog("Booting.");
 
-    // intialize randomness
+    // initialize randomness
     long seed_helper=ESPTrueRandom.random(0,2000000);
     // TODO: fix that calling ESPTrueRandom crashes later
     Serial.print("Random generator seeded, testnumber: ");
     Serial.println(seed_helper);
     randomSeed((unsigned long)seed_helper); 
 
+    ulog("debug1");
+
     flash_mode_select();
 
+    ulog("debug2");
+
     #ifdef ESP32
-    // TODO: anything equivalent for ESP32
+    // TODO: anything equivalent for ESP32 necessary?
     #else
     WiFi.setSleepMode(WIFI_NONE_SLEEP); // TODO: check if this works -> for better rgb-strip-smoothness
     #endif
+
+    ulog("debug3");
 
     setup_ota();
 
@@ -569,9 +575,11 @@ void setup() {
     wifiConnectHandler = WiFi.onStationModeGotIP(onWifiConnect);
     wifiDisconnectHandler = WiFi.onStationModeDisconnected(onWifiDisconnect);
     #endif
+    ulog("debug4");
 
     connectToWifi();
 
+    ulog("debug5");
     // TODO: check if port is configurable
 
     if (!reconfig_mode_active) {
