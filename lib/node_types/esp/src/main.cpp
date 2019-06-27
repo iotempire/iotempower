@@ -457,7 +457,7 @@ void onWifiConnect(
 #ifdef ESP32
     WiFiEvent_t event, WiFiEventInfo_t info
 #else
-    const WiFiEventStationModeDisconnected &event
+    const WiFiEventStationModeGotIP &event
 #endif
         ) {
     Serial.print("Connected to Wi-Fi with IP: ");

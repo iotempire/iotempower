@@ -56,7 +56,7 @@ void  _PWM::set_duty(int duty)
 #endif
 }
 
-void  _PWM::set_frequency(int duty)
+void  _PWM::set_frequency(int frequency)
 {
 #if ESP32
     analogWriteFrequency(_pin, _frequency);
