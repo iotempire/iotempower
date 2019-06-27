@@ -70,8 +70,10 @@ else
     virtualenv -p "$(which python2)" "$IOTEMPOWER_VPYTHON2"
     source "$IOTEMPOWER_VPYTHON2/bin/activate"
     pip install --upgrade pip
-    pip install --upgrade platformio
-    deactivate
+#    pip install --upgrade platformio
+# TODO: go back to normal install, but for now we need version4 (development version)
+    pip install --upgrade https://github.com/platformio/platformio-core/archive/develop.zip
+    deactivate # disable python 2 environment
     
     # install virtualenv
     mkdir -p "$IOTEMPOWER_VPYTHON"
