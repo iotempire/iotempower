@@ -25,9 +25,9 @@ git pull
 
 fix_bin # prints out Fixing links
 
-echo "Cleaning source files from cache to regenerate."
-rm -rf "$IOTEMPOWER_COMPILE_CACHE/src"
-rm -rf "$IOTEMPOWER_COMPILE_CACHE/lib"
+#echo "Cleaning source files from cache to regenerate."
+#rm -rf "$IOTEMPOWER_COMPILE_CACHE/src"
+#rm -rf "$IOTEMPOWER_COMPILE_CACHE/lib"
 
 # Create web-viewable documentation
 iot doc make

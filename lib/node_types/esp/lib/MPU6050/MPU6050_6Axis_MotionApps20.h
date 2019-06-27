@@ -41,6 +41,11 @@ THE SOFTWARE.
 
 #include "MPU6050.h"
 
+// ulno fix for esp32
+#ifdef ESP32
+        #define __PGMSPACE_H_ 1    
+#endif
+
 // Tom Carpenter's conditional PROGMEM code
 // http://forum.arduino.cc/index.php?topic=129407.0
 #ifdef __AVR__

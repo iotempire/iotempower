@@ -69,31 +69,39 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
     src_dir="$IOTEMPOWER_ROOT/lib/node_types/$node_type"
     dest_dir="build"
     
-    if [[ "$1" == "cache" ]]; then
-        rm -rf "$dest_dir" &> /dev/null
-        ln -f -s "$IOTEMPOWER_COMPILE_CACHE" "$dest_dir"
-        # obsolet as we now compile everything in one dir and just update src
-        # if [[ ! -e "$dest_dir/.pioenvs/$board" ]]; then # only create if not there yet
-        #     rm -rf "$dest_dir/.piolibdeps" &>/dev/null
-        #     ln -f -s "$IOTEMPOWER_COMPILE_CACHE/.piolibdeps" "$dest_dir/"
-        #     if [[ "$board" ]]; then
-        #         mkdir -p "$dest_dir/.pioenvs/$board"
-        #         for file in $(ls "$IOTEMPOWER_COMPILE_CACHE/.pioenvs/$board"); do
-        #             if [[ ! "$file" =~ ^(src|firmware.elf|firmware.bin|)$ ]]; then
-        #                 ln -f -s "$IOTEMPOWER_COMPILE_CACHE/.pioenvs/$board/$file" \
-        #                     "$dest_dir/.pioenvs/$board/"
-        #             fi
-        #         done
-        #         rsync -r "$IOTEMPOWER_COMPILE_CACHE/.pioenvs/$board/src/" \
-        #                     "$dest_dir/.pioenvs/$board/src/"
-        #     fi
-        # fi
-    else
-        mkdir -p "$dest_dir"
+    # if [[ "$1" == "cache" ]]; then
+    #     rm -rf "$dest_dir" &> /dev/null
+    #     ln -f -s "$IOTEMPOWER_COMPILE_CACHE" "$dest_dir"
+    #     # obsolet as we now compile everything in one dir and just update src
+    #     # if [[ ! -e "$dest_dir/.pioenvs/$board" ]]; then # only create if not there yet
+    #     #     rm -rf "$dest_dir/.piolibdeps" &>/dev/null
+    #     #     ln -f -s "$IOTEMPOWER_COMPILE_CACHE/.piolibdeps" "$dest_dir/"
+    #     #     if [[ "$board" ]]; then
+    #     #         mkdir -p "$dest_dir/.pioenvs/$board"
+    #     #         for file in $(ls "$IOTEMPOWER_COMPILE_CACHE/.pioenvs/$board"); do
+    #     #             if [[ ! "$file" =~ ^(src|firmware.elf|firmware.bin|)$ ]]; then
+    #     #                 ln -f -s "$IOTEMPOWER_COMPILE_CACHE/.pioenvs/$board/$file" \
+    #     #                     "$dest_dir/.pioenvs/$board/"
+    #     #             fi
+    #     #         done
+    #     #         rsync -r "$IOTEMPOWER_COMPILE_CACHE/.pioenvs/$board/src/" \
+    #     #                     "$dest_dir/.pioenvs/$board/src/"
+    #     #     fi
+    #     # fi
+    # else
+    #   mkdir -p "$dest_dir"
+    # fi
+    
+    # always create a cache-dir
+    if [[ -L "$dest_dir" ]]; then
+        rm "$dest_dir"
     fi
+    mkdir -p "$dest_dir"
+    
     link_type_through_base "$src_dir" src "$dest_dir/src"
     link_type_through_base "$src_dir" lib "$dest_dir/lib"
     link_type_through_base "$src_dir" platformio.ini "$dest_dir"
+    link_type_through_base "$src_dir" pre_extra_script.py "$dest_dir"
 
     ln -s -f "$(realpath setup.cpp)" "$dest_dir/src/setup.h"
 #    password=$(tail -n1 key.hex|head -c64|basez -x -d|md5sum -b|cut -d\  -f1)

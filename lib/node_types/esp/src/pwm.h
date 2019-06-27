@@ -5,11 +5,12 @@
 #ifndef _PWM_H_
 #define _PWM_H_
 
+#include <_PWM.h>
 #include <device.h>
 
 class Pwm : public Device {
     private:
-        uint8_t _pin;
+        _PWM *_pwm;
         int _frequency = 1000;
         int _duty = 0;
     public:

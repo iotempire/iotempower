@@ -371,8 +371,10 @@ void flash_mode_select() {
 AsyncMqttClient mqttClient;
 Ticker mqttReconnectTimer;
 
+#ifndef ESP32
 WiFiEventHandler wifiConnectHandler;
 WiFiEventHandler wifiDisconnectHandler;
+#endif
 Ticker wifiReconnectTimer;
 
 Ustring node_topic(mqtt_topic);
@@ -399,7 +401,11 @@ void connectToWifi() {
     } else {
         my_hostname = (char *)HOSTNAME;
     }
+    #ifdef ESP32
+    WiFi.setHostname(my_hostname);
+    #else
     WiFi.hostname(my_hostname);
+    #endif
     ArduinoOTA.setHostname(my_hostname);
     Serial.println(my_hostname);
     WiFi.mode(WIFI_STA);
@@ -430,7 +436,13 @@ void connectToWifi() {
     }
 }
 
-void onWifiDisconnect(const WiFiEventStationModeDisconnected &event) {
+void onWifiDisconnect(
+#ifdef ESP32
+    WiFiEvent_t event, WiFiEventInfo_t info
+#else
+    const WiFiEventStationModeDisconnected &event
+#endif
+        ) {
     wifi_connected = false;
     Serial.println("Disconnected from Wi-Fi.");
     if(!reconfig_mode_active) {
@@ -441,7 +453,13 @@ void onWifiDisconnect(const WiFiEventStationModeDisconnected &event) {
 }
 
 
-void onWifiConnect(const WiFiEventStationModeGotIP &event) {
+void onWifiConnect(
+#ifdef ESP32
+    WiFiEvent_t event, WiFiEventInfo_t info
+#else
+    const WiFiEventStationModeDisconnected &event
+#endif
+        ) {
     Serial.print("Connected to Wi-Fi with IP: ");
     Serial.println(WiFi.localIP());
     wifi_connected = true;
@@ -532,15 +550,25 @@ void setup() {
 
     flash_mode_select();
 
+    #ifdef ESP32
+    // TODO: anything equivalent for ESP32
+    #else
     WiFi.setSleepMode(WIFI_NONE_SLEEP); // TODO: check if this works -> for better rgb-strip-smoothness
+    #endif
 
     setup_ota();
 
 //    WiFi.disconnect(true);
 //    delay(10);
+    
     // Try already to bring up WiFi
+    #ifdef ESP32    
+    WiFi.onEvent(onWifiConnect, WiFiEvent_t::SYSTEM_EVENT_STA_GOT_IP);
+    WiFi.onEvent(onWifiDisconnect, WiFiEvent_t::SYSTEM_EVENT_STA_DISCONNECTED);
+    #else
     wifiConnectHandler = WiFi.onStationModeGotIP(onWifiConnect);
     wifiDisconnectHandler = WiFi.onStationModeDisconnected(onWifiDisconnect);
+    #endif
 
     connectToWifi();
 

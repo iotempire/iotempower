@@ -45,6 +45,11 @@ THE SOFTWARE.
 
 #include "I2Cdev.h"
 
+// ulno: weird error on esp32
+#ifndef BUFFER_LENGTH
+    #define BUFFER_LENGTH 32
+#endif
+
 #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
 
     #ifdef I2CDEV_IMPLEMENTATION_WARNINGS

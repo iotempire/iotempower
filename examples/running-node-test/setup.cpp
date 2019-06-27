@@ -48,7 +48,7 @@
 // analog(a0).with_filter_callback(filter_average(int, 100, IN(a0));
 
 // gestue/color/proximity
-// gesture_apds9960(gesture);
+//gesture_apds9960(gesture);
 
 // edge_counter example
 // Count rising and falling signals on D2=Pin(4) and
@@ -71,7 +71,7 @@
 //hx711(weight, D6, D7, 419.0, true)
 //    .with_filter(filter_round(2, IN(weight)));
 
-vl53l0x(dist);
+//vl53l0x(dist);
 
 // barometer
 //bmp180(bmp1);
@@ -87,7 +87,7 @@ vl53l0x(dist);
 
 // light sensitivity sensors
 // bh1750(lux1);
-// tsl2561(lux2);
+tsl2561(lux2);
 
 // Example for single RGB-led
 // rgb(r0, D6, D5, D0, true);

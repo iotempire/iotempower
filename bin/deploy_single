@@ -102,7 +102,11 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
     fi
 
     prepare_build_dir cache
-    cd "$IOTEMPOWER_COMPILE_CACHE"
+    #cd "$IOTEMPOWER_COMPILE_CACHE"
+    cd build
+
+    export PLATFORMIO_LIBDEPS_DIR="$IOTEMPOWER_COMPILE_CACHE/libs"
+    export PLATFORMIO_BUILD_CACHE_DIR="$IOTEMPOWER_COMPILE_CACHE/platformio"
 
     platformio run $pio_upload || { echo "Trouble compiling or flashing new firmware, check errors."; exit 1; }
     
