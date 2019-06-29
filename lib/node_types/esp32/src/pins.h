@@ -28,7 +28,8 @@
 #define D3 17
 #define FLASHBUTTON D3
 #define D4 16
-#define ONBOARDLED D4
+#define ONBOARDLED 2
+#define ONBOARDLED_FULL_GPIO 1
 // // GND
 // // 5V
 

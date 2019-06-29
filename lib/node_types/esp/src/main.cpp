@@ -58,6 +58,27 @@ bool ota_failed = false;
 #define BLINK_SHORT 200
 #define BLINK_OFF 500
 
+void onboard_led_on() {
+    #ifdef ID_LED
+        #ifdef ONBOARDLED_FULL_GPIO
+            digitalWrite(ID_LED, 1); // on - in blink phase
+        #else
+            pinMode(ID_LED, OUTPUT);
+            digitalWrite(ID_LED, 0); // on - in blink phase
+        #endif
+    #endif
+}
+
+void onboard_led_off() {
+    #ifdef ID_LED
+        #ifdef ONBOARDLED_FULL_GPIO
+            digitalWrite(ID_LED, 0); // off - in off phase
+        #else
+            pinMode(ID_LED, INPUT); // floating (as onboard led) -> off
+        #endif
+    #endif
+}
+
 void id_blinker() {
     static bool init_just_done = false;
     static int total, global_pos;
@@ -67,18 +88,15 @@ void id_blinker() {
 
     if (long_blinks == 0) { // first time, still unitialized
         // randomness for 30 different blink patterns (5*6)
-        long_blinks = ESPTrueRandom.random(1, 6);
-        short_blinks = ESPTrueRandom.random(1, 7);
+        long_blinks = urandom(1, 6);
+        short_blinks = urandom(1, 7);
         Serial.printf("Blink pattern: %d long_blinks, %d short_blinks\n",
                       long_blinks, short_blinks);
         total = BLINK_OFF_START +
                 long_blinks * (BLINK_LONG + BLINK_OFF) +
                 BLINK_OFF_MID +
                 short_blinks * (BLINK_SHORT + BLINK_OFF);
-        #ifdef ID_LED
-        pinMode(ID_LED, OUTPUT);
-        digitalWrite(ID_LED, 0); // on - start with a long blink
-        #endif // ID_LED
+        onboard_led_on(); // on - start with a long blink
         init_just_done = true;
         return; // finish here first time
     }
@@ -94,34 +112,29 @@ void id_blinker() {
     #ifdef ID_LED
     int pos = global_pos;
     if (pos < BLINK_OFF_START) { // still in BLINK_OFF_START
-        pinMode(ID_LED, INPUT); // floating (as onboard led)
-        //digitalWrite(ID_LED, 1); // off - in off phase
+        // off - in off phase
+        onboard_led_off();
     } else { // already pass BLINK_OFF_START
         pos -= BLINK_OFF_START;
         if(pos < long_blinks * (BLINK_LONG + BLINK_OFF)) { // in long blink phase
 
             if (pos % (BLINK_LONG + BLINK_OFF) < BLINK_LONG) {
-                pinMode(ID_LED, OUTPUT);
-                digitalWrite(ID_LED, 0); // on - in blink phase
+                onboard_led_on();
             } else {
-                pinMode(ID_LED, INPUT); // floating (as onboard led)
-                // digitalWrite(ID_LED, 1); // off - in off phase
+                onboard_led_off();
             }
 
         } else { // in short blink phase
             pos -= long_blinks * (BLINK_LONG + BLINK_OFF);
             if(pos < BLINK_OFF_MID) { // still in BLINK_OFF_MID
-                pinMode(ID_LED, INPUT); // floating (as onboard led)
-                // digitalWrite(ID_LED, 1); // off - in off phase
+                onboard_led_off();
             } else {
                 pos -= BLINK_OFF_MID;
                 if (pos % (BLINK_SHORT + BLINK_OFF) <
                     BLINK_SHORT) {
-                    pinMode(ID_LED, OUTPUT);
-                    digitalWrite(ID_LED, 0); // on - in blink phase
+                    onboard_led_on();
                 } else {
-                    pinMode(ID_LED, INPUT); // floating (as onboard led)
-                    // digitalWrite(ID_LED, 1); // off - in off phase
+                    onboard_led_off();
                 }
             }
         }
@@ -172,10 +185,9 @@ void setup_ota() {
             // blink led, toggle every percent
             #ifdef ID_LED
             if(percent % 2) {
-                pinMode(ID_LED, INPUT); // floating -> off
+                onboard_led_off();
             } else {
-                pinMode(ID_LED, OUTPUT);
-                digitalWrite(ID_LED, 0);
+                onboard_led_on();
             }
             #endif
             if(ota_display_present) {
@@ -332,31 +344,29 @@ void flash_mode_select() {
                     "mode is requested.");
     int last = 1, toggles = 0;
     // blink a bit to show that we have booted and waiting for
-    // potential input
+    // potential reconfig/adopt mode selection
 
-    #ifdef ID_LED
-    pinMode(ID_LED, INPUT); // floating -> off
-    #endif
-    pinMode(FLASHBUTTON, INPUT_PULLUP); // check flash button (d3 on wemos and
-                                // nodemcu) 
-    for (int i = 0; i < 500; i++) {
-        #ifdef ID_LED
-        if((i / 25) % 2) {
-            pinMode(ID_LED, INPUT); // floating -> off
-        } else {
-            pinMode(ID_LED, OUTPUT);
-            digitalWrite(ID_LED, 0);
+    onboard_led_off();
+    
+    #ifdef FLASHBUTTON
+        pinMode(FLASHBUTTON, INPUT_PULLUP); // D3 on wemos and nodemcu
+        for (int i = 0; i < 500; i++) {
+            #ifdef ID_LED
+                if((i / 25) % 2) {
+                    onboard_led_off();
+                } else {
+                    onboard_led_on();
+                }
+            #endif
+            int new_state = digitalRead(0);
+            if (new_state != last) {
+                last = new_state;
+                toggles++;
+            }
+            delay(10);
+            if (toggles >= 4) break;
         }
-        #endif
-        int new_state = digitalRead(0);
-        if (new_state != last) {
-            last = new_state;
-            toggles++;
-        }
-        delay(10);
-        if (toggles >= 4) break;
-    }
-
+    #endif // FLASHBUTTON
 
     if (toggles >= 4) { // was pressed (and released) at least 2 times
         reconfigMode();
@@ -541,26 +551,29 @@ void setup() {
     // Serial.println();
     ulog("Booting.");
 
+    #ifdef ID_LED
+        pinMode(ID_LED, OUTPUT); // initialize a potential onboardled
+    #endif
+
     // initialize randomness
-    long seed_helper=ESPTrueRandom.random(0,2000000);
+    uint32_t seed_helper =
+    #ifdef ESP32
+        esp_random();
+    #else
+        ESPTrueRandom.random(0,UINT32_MAX);
+    #endif
     // TODO: fix that calling ESPTrueRandom crashes later
     Serial.print("Random generator seeded, testnumber: ");
     Serial.println(seed_helper);
-    randomSeed((unsigned long)seed_helper); 
-
-    ulog("debug1");
+    randomSeed(seed_helper); 
 
     flash_mode_select();
-
-    ulog("debug2");
 
     #ifdef ESP32
     // TODO: anything equivalent for ESP32 necessary?
     #else
     WiFi.setSleepMode(WIFI_NONE_SLEEP); // TODO: check if this works -> for better rgb-strip-smoothness
     #endif
-
-    ulog("debug3");
 
     setup_ota();
 
@@ -575,11 +588,9 @@ void setup() {
     wifiConnectHandler = WiFi.onStationModeGotIP(onWifiConnect);
     wifiDisconnectHandler = WiFi.onStationModeDisconnected(onWifiDisconnect);
     #endif
-    ulog("debug4");
 
     connectToWifi();
 
-    ulog("debug5");
     // TODO: check if port is configurable
 
     if (!reconfig_mode_active) {
@@ -599,10 +610,13 @@ void setup() {
         if(ulnoiot_start) ulnoiot_start(); // call user start from setup.cpp
         connectToMqtt(); // only subscribe after setup
     } else {  // do something to show that we are in adopt mode
-        // enable flashing that light
         #ifdef ID_LED
-        pinMode(ID_LED, OUTPUT);
-        digitalWrite(ID_LED, adopt_flash_toggle);
+            // enable flashing that light
+            if(adopt_flash_toggle) {
+                onboard_led_off();
+            } else {
+                onboard_led_on();
+            }
         #endif
     }
 
@@ -670,7 +684,11 @@ void loop() {
         // flashing very rapidly
         if (wifi_connected && current_time - last_measured >= 80) {
             adopt_flash_toggle = !adopt_flash_toggle;
-            digitalWrite(ID_LED, adopt_flash_toggle);
+            if(adopt_flash_toggle) {
+                onboard_led_off();
+            } else {
+                onboard_led_on();
+            }
             last_measured = current_time;
         }
         #endif
