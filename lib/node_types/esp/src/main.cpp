@@ -58,6 +58,8 @@ bool ota_failed = false;
 #define BLINK_SHORT 200
 #define BLINK_OFF 500
 
+#define IOTEMPOWER_OTA_PORT 8266  // needs to be fixed as it also should work for esp32
+
 void onboard_led_on() {
     #ifdef ID_LED
         #ifdef ONBOARDLED_FULL_GPIO
@@ -149,8 +151,7 @@ Display* ota_display=NULL;
 bool ota_display_present = false;
 
 void setup_ota() {
-        // Port defaults to 8266
-    // ArduinoOTA.setPort(8266);
+    ArduinoOTA.setPort(IOTEMPOWER_OTA_PORT);
 
     // TODO: only enter OTA when requested
 
@@ -267,6 +268,7 @@ void reconfigMode() {
     ulog(F("Setting flash default password to %s."),
                     flash_default_password);
     setup_ota();
+    ArduinoOTA.setPort(IOTEMPOWER_OTA_PORT);
     ArduinoOTA.setPassword(flash_default_password);
     ArduinoOTA.setHostname(ssid.as_cstr());
 
