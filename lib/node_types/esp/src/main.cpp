@@ -234,21 +234,22 @@ void reconfigMode() {
     // go to access-point and reconfiguration mode to allow a new
     // firmware to be uploaded
 
+    Ustring ssid;
     Ustring s;
-    char *ap_ssid = (char *)(IOTEMPOWER_AP_RECONFIG_NAME "-xx-xL-xS");
     const char *ap_password = IOTEMPOWER_AP_RECONFIG_PASSWORD;
 
-    Serial.println("Reconfiguration requested. Activating open AP-mode.");
+    ulog("Reconfiguration requested. Activating open AP-mode.");
     WiFi.disconnect(true);
     id_blinker(); //trigger init of random blink pattern
-    sprintf(ap_ssid + strlen(ap_ssid) - 8, "%02x-%01dL-%01dS", getChipId32() & 255,
-                long_blinks, short_blinks);
+    ssid.printf("%s-%02x-%01dL-%01dS", 
+        IOTEMPOWER_AP_RECONFIG_NAME, getChipId32() & 255,
+        long_blinks, short_blinks);
 
     // check if a display is present
-    Wire.begin(); // check default i2c
+    Wire.begin(); // check default i2c // check, if it's the same on esp32 for wemos shield
     Wire.beginTransmission(0x3c);
     if (Wire.endTransmission() == 0) {
-        Serial.println("Display shield found.");
+        ulog("Display shield found.");
         U8G2_SSD1306_64X48_ER_F_HW_I2C u8g2(U8G2_R0);
         ota_display = new Display("testdisplay", u8g2);
         if(ota_display) {
@@ -260,18 +261,18 @@ void reconfigMode() {
         }
     }
 
-    Serial.printf("Connect to %s with password %s.\n", ap_ssid, ap_password);
+    ulog(F("Connect to %s with password %s."), ssid.as_cstr(), ap_password);
     
     const char *flash_default_password = IOTEMPOWER_FLASH_DEFAULT_PASSWORD;
-    Serial.printf("Setting flash default password to %s.\n",
+    ulog(F("Setting flash default password to %s."),
                     flash_default_password);
     setup_ota();
     ArduinoOTA.setPassword(flash_default_password);
-    ArduinoOTA.setHostname(ap_ssid);
+    ArduinoOTA.setHostname(ssid.as_cstr());
 
-   	WiFi.softAP(ap_ssid, ap_password);
+   	WiFi.softAP(ssid.as_cstr(), ap_password);
     ArduinoOTA.begin();
-    Serial.println("AP and OTA Ready, waiting 10min for new firmware.");
+    ulog(F("AP and OTA Ready, waiting 10min for new firmware."));
 
     unsigned long start_time = millis();
     const unsigned long wait_time = 10 * 60 * 1000; // 10 minutes
@@ -281,7 +282,7 @@ void reconfigMode() {
         seconds_left = (int)((wait_time - (millis() - start_time))/1000);
         ArduinoOTA.handle();
         if(ota_failed) {
-            WiFi.softAP(ap_ssid, ap_password);
+            WiFi.softAP(ssid.as_cstr(), ap_password);
             ota_failed = false;
             start_time = millis(); // restart time
             ArduinoOTA.begin();
@@ -358,7 +359,7 @@ void flash_mode_select() {
                     onboard_led_on();
                 }
             #endif
-            int new_state = digitalRead(0);
+            int new_state = digitalRead(FLASHBUTTON);
             if (new_state != last) {
                 last = new_state;
                 toggles++;

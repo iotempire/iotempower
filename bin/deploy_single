@@ -62,7 +62,7 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
                 # no network name should be given
                 # we should only compile and then adopt
                 pio_upload=""
-                adopt="dongle adopt -r -f .pioenvs/$board/firmware.bin -n "\""$2"\"
+                adopt="dongle adopt -r -f .pio/build/$board/firmware.bin -n "\""$2"\"
             fi
         elif [[ "$1" ]]; then # address or network name given
             remote="$1"
@@ -118,7 +118,7 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
             if [[ "$remote" ]]; then
                 waittime=15
                 python "$ESPOTAPY" --progress -a "$key" \
-                    --port=8266 --ip="$remote" --file=".pioenvs/$board/firmware.bin"
+                    --port=8266 --ip="$remote" --file=".pio/build/$board/firmware.bin"
             else
                 waittime=45
                 $adopt
