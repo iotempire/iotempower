@@ -9,12 +9,12 @@ source "$IOTEMPOWER_ROOT/bin/read_system_config"
 
 board="wemos d1 mini"
 
+source "node.conf" || { echo "Can't read node.conf. Aborting." 1>&2;exit 1; }
+
+# must be after sourcing node.conf
 mqtt_server="$IOTEMPOWER_MQTT_HOST"
 mqtt_user="$IOTEMPOWER_MQTT_USER"
 mqtt_password="$IOTEMPOWER_MQTT_PW"
-
-
-source "node.conf" || { echo "Can't read node.conf. Aborting." 1>&2;exit 1; }
 
 # normalize node_type
 board=$(echo -n "$board"|tr [:upper:][:space:] [:lower:]_)
