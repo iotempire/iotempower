@@ -13,7 +13,10 @@ fi
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
 MAX_UPLOAD_TRIES=3
-ESPOTAPY="$HOME/.platformio/packages/tool-espotapy/espota.py"
+
+# TODO, decide if esp32 or wesp8266 to use
+ESPOTAPY="$HOME/.platformio/packages/framework-arduinoespressif8266/tools/espota.py"
+# ESPOTAPY="$HOME/.platformio/packages/framework-arduinoespressif32/tools/espota.py"
 
 if [[ -e "node.conf" ]]; then  # started from node-directory
     source "$IOTEMPOWER_ROOT/bin/read_node_config"
