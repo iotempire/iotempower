@@ -28,7 +28,8 @@
 
 // simple command line TODO: would it be better to use bitlash or hobbitlash?
 #include <SimpleCLI.h>
-using namespace simplecli;
+//using namespace simplecli;
+
 // create an instance of it
 SimpleCLI* cli;
 
@@ -561,7 +562,9 @@ bool ota_serve(int firmware_size, const char* firmware_md5) {
 }
 
 
-void adopt(Cmd* cmd) {
+void adopt(cmd* c) {
+    Command cmd(c);
+
     const int ssid_maxlen = 32;
     char node_network[ssid_maxlen+1];
     char md5sum[33];
@@ -570,7 +573,7 @@ void adopt(Cmd* cmd) {
 // debug   const char *node_ap_password = "mypassword";
 
     node_network[ssid_maxlen] = 0 ; // terminate
-    cmd->getArg(0)->getValue().toCharArray(node_network, ssid_maxlen);
+    cmd.getArg(0).getValue().toCharArray(node_network, ssid_maxlen);
     WiFi.mode(WIFI_STA);
     WiFi.disconnect();
 
@@ -594,8 +597,8 @@ void adopt(Cmd* cmd) {
     Serial.print("IP: ");
     Serial.println(WiFi.localIP());
     // when successfully connected start OTA handshake
-    cmd->getArg(2)->getValue().toCharArray(md5sum, 33);
-    bool result = ota_serve(cmd->getArg(1)->getValue().toInt(), md5sum);
+    cmd.getArg(2).getValue().toCharArray(md5sum, 33);
+    bool result = ota_serve(cmd.getArg(1).getValue().toInt(), md5sum);
     if(!result) {
         display_text(" *Adoption*\n\nFailure");
     } else {
@@ -604,14 +607,15 @@ void adopt(Cmd* cmd) {
 };
 
 
-void daemon_info(Cmd* cmd) {
-    cmd->getArg(0)->getValue().toCharArray(gw_ssid, SMALL_STRING_LEN);
+void daemon_info(cmd* c) {
+    Command cmd(c);
+    cmd.getArg(0).getValue().toCharArray(gw_ssid, SMALL_STRING_LEN);
     gw_ssid[SMALL_STRING_LEN] = 0;
-    cmd->getArg(1)->getValue().toCharArray(gw_uptime, SMALL_STRING_LEN);
+    cmd.getArg(1).getValue().toCharArray(gw_uptime, SMALL_STRING_LEN);
     gw_uptime[SMALL_STRING_LEN] = 0;
-    cmd->getArg(2)->getValue().toCharArray(gw_mem_free, SMALL_STRING_LEN);
+    cmd.getArg(2).getValue().toCharArray(gw_mem_free, SMALL_STRING_LEN);
     gw_mem_free[SMALL_STRING_LEN] = 0;
-    cmd->getArg(3)->getValue().toCharArray(gw_load, SMALL_STRING_LEN);
+    cmd.getArg(3).getValue().toCharArray(gw_load, SMALL_STRING_LEN);
     gw_load[SMALL_STRING_LEN] = 0;
     
     unsigned long timer_backup = last_display_change;
@@ -619,46 +623,60 @@ void daemon_info(Cmd* cmd) {
     last_display_change = timer_backup; // only refresh, but do not prevent screen switching
 }
 
+// Callback in case of an error
+void cli_errorCallback(cmd_error* e) {
+    CommandError cmdError(e); // Create wrapper object
+
+    Serial.print("ERROR: ");
+    Serial.println(cmdError.toString());
+
+    if (cmdError.hasCommand()) {
+        Serial.print("Did you mean \"");
+        Serial.print(cmdError.getCommand().toString());
+        Serial.println("\"?");
+    }
+}
+
+void help_callback(cmd* c) {
+    Command cmd(c);
+
+    Serial.println(
+        "You can use the following commands:\n"
+        "- help: shows this help\n"
+        "- display TEXT: show TEXT on the display\n"
+        "- scan: scan wifi networks\n"
+        "- adopt NODE SIZE MD5: adopt NODE and send initial firmware,\n"
+        "    SIZE and MD5 are part of following espota protocal\n"
+        "- reset: resets the dongle\n"
+        "- $info ssid uptime mem_free load: resets the dongle\n");
+}
+
 
 void setup_cli() {
     cli = new SimpleCLI();
 
-    // when no valid command could be found for given user input
-    cli->onNotFound = [](String str) {
-                          Serial.println("\"" + str + "\" command not found, try help.");
-                      };
+    cli->setOnError(cli_errorCallback); // Set error Callback
 
     //// help
-    cli->addCmd(new Command("help", [](Cmd* cmd) {
-        Serial.println(
-            "You can use the follwing commands:\n"
-            "- help: shows this help\n"
-            "- display TEXT: show TEXT on the display\n"
-            "- scan: scan wifi networks\n"
-            "- adopt NODE SIZE MD5: adopt NODE and send initial firmware,\n"
-            "    SIZE and MD5 are part of following espota protocal\n"
-            "- reset: resets the dongle\n"
-            "- $info ssid uptime mem_free load: resets the dongle\n");
-    }));
+    cli->addCmd("help", help_callback);
 
     //// reset
-    cli->addCmd(new Command("reset", [](Cmd* cmd) {
+    cli->addCmd("reset", [](cmd* c) {
         Serial.println("Reset in 2s.\n");
         delay(2000);
         ESP.restart();
-    }));
+    });
 
     //// display
-    Command* display_cmd = new Command("display", [](Cmd* cmd) {
+    cli->addBoundlessCmd("display", [](cmd* c) {
+        Command cmd(c);
         Serial.print("Display got: ");
-        Serial.println(cmd->getArg(0)->getValue());
-        display_text(cmd->getArg(0)->getValue());
+        Serial.println(cmd.getArg(0).getValue());
+        display_text(cmd.getArg(0).getValue());
     });
-    display_cmd->addArg(new AnonymOptArg()); // text
-    cli->addCmd(display_cmd);
 
     //// scan
-    cli->addCmd(new Command("scan", [](Cmd* cmd) {
+    cli->addCmd("scan", [](cmd* c) {
         // Set WiFi to station mode and disconnect from an AP if it was previously connected
         WiFi.mode(WIFI_STA);
         WiFi.disconnect();
@@ -675,29 +693,27 @@ void setup_cli() {
         Serial.println("!network_scan end");
         Serial.flush();
         display_text("WiFi Scan\n\nDone.");
-    }));
+    });
 
     //// adopt
-    Command* adopt_cmd = new Command("adopt", adopt);
-    adopt_cmd->addArg(new AnonymOptArg()); // node
-    adopt_cmd->addArg(new AnonymOptArg()); // size
-    adopt_cmd->addArg(new AnonymOptArg()); // md5
-    cli->addCmd(adopt_cmd);
+    Command adopt_cmd = cli->addCmd("adopt", adopt);
+    adopt_cmd.addPosArg("node"); // node
+    adopt_cmd.addPosArg("size"); // size
+    adopt_cmd.addPosArg("md5"); // md5
 
     // dongle daemon responses
-    Command* info_cmd = new Command("$info", daemon_info);
-    info_cmd->addArg(new AnonymOptArg()); // ap-name/ssid
-    info_cmd->addArg(new AnonymOptArg()); // gw uptime
-    info_cmd->addArg(new AnonymOptArg()); // mem free
-    info_cmd->addArg(new AnonymOptArg()); // load
-    cli->addCmd(info_cmd);
+    Command info_cmd = cli->addCmd("$info", daemon_info);
+    info_cmd.addPosArg("ssid"); // ap-name/ssid
+    info_cmd.addPosArg("uptime"); // gw uptime
+    info_cmd.addPosArg("mfree"); // mem free
+    info_cmd.addPosArg("load"); // load
 
 
     // // TODO: remove =========== Add ping command =========== //
     // // ping                 => pong
     // // ping -s ponk         => ponk
     // // ping -s ponk -n 2    => ponkponk
-    // Command* ping = new Command("ping", [](Cmd* cmd) {
+    // Command* ping = new Command("ping", [](cmd* c) {
     //     int h = cmd->getValue("n").toInt();
 
     //     for (int i = 0; i < h; i++) {
