@@ -36,6 +36,42 @@ Device::Device(const char* _name) {
     }
 }
 
+#ifdef mqtt_discovery_prefix
+    void Device::create_discovery_info(const String type,
+            bool state_topic, const char* state_on, const char* state_off,
+            bool command_topic, const String extra_json) { // TODO: for inverted on/off this doesn't really work -> rethink
+        String slash("/");
+        String name_s(name.as_cstr());
+        String topic_s = String(mqtt_topic) + slash + name_s;
+        String hostname_s(HOSTNAME);
+
+        discovery_config_topic = mqtt_discovery_prefix + slash + type + slash
+            + hostname_s + slash + name_s + String("/config");
+
+        discovery_info = String("{ \"name\": \"") + String(name.as_cstr()) + String("\"");
+        if(state_topic) {
+            discovery_info += String(", \"state_topic\": \"") + topic_s 
+                + String("\", \"state_on\": \"") + String(state_on) 
+                + String("\", \"state_off\": \"") + String(state_off) + String("\"");
+            if(command_topic) {
+                discovery_info += String(", \"command_topic\": \"") + topic_s 
+                    + String("/set\", \"payload_on\": \"") + String(state_on) 
+                    + String("\", \"payload_off\": \"") + String(state_off) + String("\"");
+            }
+        }
+        if(extra_json.length() > 0) {
+            discovery_info += String(", ") + extra_json;
+        }
+        discovery_info += String(" }");
+        
+        // Serial.print("discovery topic: ");
+        // Serial.println(discovery_config_topic);
+        // Serial.print("discovery info: ");
+        // Serial.println(discovery_info);
+    }
+#endif
+
+
 bool Device::publish(AsyncMqttClient& mqtt_client, Ustring& node_topic) {
     bool published = false;
     Ustring topic;
@@ -73,6 +109,18 @@ bool Device::publish(AsyncMqttClient& mqtt_client, Ustring& node_topic) {
     if(published) _needs_publishing = false;
     return published;
 }
+
+#ifdef mqtt_discovery_prefix
+bool Device::publish_discovery_info(AsyncMqttClient& mqtt_client) {
+    if(!mqtt_client.publish(discovery_config_topic.c_str(), 0, true, discovery_info.c_str())) {
+        Serial.print("!discovery publish error!");
+        // TODO: signal error and trigger reconnect - necessary?
+        return false;
+    }
+    return true;
+}
+#endif
+
 
 
 bool Device::poll_measure() {

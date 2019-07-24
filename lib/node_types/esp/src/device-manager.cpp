@@ -226,6 +226,21 @@ bool devices_subscribe(AsyncMqttClient& mqtt_client, Ustring& node_topic) {
     return true; // TODO: decide if error occured
 }
 
+bool devices_publish_discovery_info(AsyncMqttClient& mqtt_client) {
+#ifdef mqtt_discovery_prefix
+
+    device_list.for_each( [&] (Device& dev) {
+        if( dev.started() ) {
+            dev.publish_discovery_info(mqtt_client);
+        } // endif dev.started()
+        return true; //continue loop device loop
+    } ); // end foreach - iterate over devices
+
+#endif
+
+    return true; // TODO: decide if error occured
+}
+
 
 bool devices_receive(Ustring& subtopic, Ustring& payload) {
     Ustring topic;

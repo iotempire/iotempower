@@ -16,6 +16,8 @@
 #include <iotempower-default.h>
 #include <toolbox.h>
 
+#include "config.h"
+
 
 class Subdevice {
     private:
@@ -48,6 +50,14 @@ class Subdevice {
 class Device {
     protected:
         Fixed_Map<Subdevice, IOTEMPOWER_MAX_SUBDEVICES> subdevices;
+        #ifdef mqtt_discovery_prefix
+            // TODO: might have to move this to subdevice (if there are two values measured)
+            String discovery_config_topic;
+            String discovery_info;
+            void create_discovery_info(const String type,
+                bool state_topic, const char* state_on, const char* state_off,
+                bool command_topic, const String extra_json);
+        #endif
     private:
         Ustring name; // device name and mqtt-topic extension
         bool _ignore_case = true;
@@ -104,6 +114,10 @@ class Device {
 
         // publish current value(s) and resets needs_publishing state
         bool publish(AsyncMqttClient& mqtt_client, Ustring& node_topic);
+
+#ifdef mqtt_discovery_prefix
+        bool publish_discovery_info(AsyncMqttClient& mqtt_client);
+#endif
 
         Ustring& value(unsigned long index);
         Ustring& value() { return value(0); }

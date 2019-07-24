@@ -44,6 +44,10 @@ IOTEMPOWER_MQTT_BRIDGE_TOPIC="bridge"
 IOTEMPOWER_MQTT_BRIDGE_USER="bridgeuser"
 IOTEMPOWER_MQTT_BRIDGE_PW="secretpw"
 
+# if this is empty, no discovery done
+IOTEMPOWER_MQTT_DISCOVERY_PREFIX="iotempower"
+
+
 IOTEMPOWER_WEBREPL_PW="iotempower"
 
 # first read local boot configuration
@@ -79,6 +83,7 @@ export IOTEMPOWER_MQTT_BRIDGE_CERTPATH
 export IOTEMPOWER_MQTT_BRIDGE_TOPIC
 export IOTEMPOWER_MQTT_BRIDGE_USER
 export IOTEMPOWER_MQTT_BRIDGE_PW
+export IOTEMPOWER_MQTT_DISCOVERY_PREFIX
 
 # activate the virtual python environment
 source "$IOTEMPOWER_VPYTHON/bin/activate" &> /dev/null

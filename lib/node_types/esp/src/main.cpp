@@ -485,6 +485,7 @@ void onMqttConnect(bool sessionPresent) {
     Serial.println(sessionPresent);
 
     devices_subscribe(mqttClient, node_topic);
+    devices_publish_discovery_info(mqttClient);
 }
 
 void onMqttDisconnect(AsyncMqttClientDisconnectReason reason) {

@@ -52,4 +52,7 @@ bool devices_receive(Ustring& subtopic, Ustring& payload);
  */
 bool devices_publish(AsyncMqttClient& mqtt_client, Ustring& node_topic, bool publish_all = false);
 
+bool devices_publish_discovery_info(AsyncMqttClient& mqtt_client);
+
+
 #endif // _IOTEMPOWER_DEVICE_MANAGER_H_

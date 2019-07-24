@@ -122,6 +122,10 @@ cat > "$fname.new" << EOF
 #define mqtt_user "$mqtt_user"
 #define mqtt_password "$mqtt_password"
 EOF
+    if [[ "$IOTEMPOWER_MQTT_DISCOVERY_PREFIX" ]]; then
+        echo '#define mqtt_discovery_prefix "'$IOTEMPOWER_MQTT_DISCOVERY_PREFIX'"' >> "$fname.new"
+    fi
+
     # only replace if it's new
     diff -q -f "$fname.new" "$fname" 2>/dev/null || mv "$fname.new" "$fname"
     rm -f "$fname.new"

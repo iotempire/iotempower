@@ -15,6 +15,9 @@ Output::Output(const char* name, const int pin,
             return true;
         }
     );
+    #ifdef mqtt_discovery_prefix
+        create_discovery_info("switch", true, high_command, low_command, true, "");
+    #endif
     low(); // must be after subdevices as it uses global measured_value()
 }
 
