@@ -50,14 +50,14 @@ class Subdevice {
 class Device {
     protected:
         Fixed_Map<Subdevice, IOTEMPOWER_MAX_SUBDEVICES> subdevices;
-        #ifdef mqtt_discovery_prefix
-            // TODO: might have to move this to subdevice (if there are two values measured)
-            String discovery_config_topic;
-            String discovery_info;
-            void create_discovery_info(const String type,
-                bool state_topic, const char* state_on, const char* state_off,
-                bool command_topic, const String extra_json);
-        #endif
+#ifdef mqtt_discovery_prefix
+        // TODO: might have to move this to subdevice (if there are two values measured)
+        String discovery_config_topic;
+        String discovery_info;
+        void create_discovery_info(const String& type,
+            bool state_topic, const char* state_on, const char* state_off,
+            bool command_topic, const String& extra_json);
+#endif
     private:
         Ustring name; // device name and mqtt-topic extension
         bool _ignore_case = true;

@@ -7,20 +7,20 @@
 
 
 void Subdevice::init(const char* subname, bool subscribed) {
-    ulog("subdevice init: subname: >%s< subscribed: %d", subname, subscribed);
+    ulog(F("subdevice init: subname: >%s< subscribed: %d"), subname, subscribed);
     name.from(subname);
     _subscribed = subscribed;
 }
 
 bool Subdevice::call_receive_cb(Ustring& payload) {
-    Serial.print("Calling receive callback ");
+    Serial.print(F("Calling receive callback "));
     Serial.print(name.as_cstr());
     Serial.print(" ");
     if(receive_cb != NULL) {
         Serial.println(payload.as_cstr());
         return receive_cb(payload);
     }
-    Serial.println("!failure!");
+    Serial.println(F("!failure receive_cb!"));
     return false;
 }
 
@@ -30,45 +30,51 @@ bool add_device(Device& device);
 
 Device::Device(const char* _name) {
     name.from(_name);
-    ulog("Device: Adding device: %s", name.as_cstr());
+    ulog(F("Device: Adding device: %s"), name.as_cstr());
     if(!add_device(*this)) {
-        ulog("Device %s couldn't be added - max devices reached.", _name);
+        ulog(F("Device %s couldn't be added - max devices reached."), _name);
     }
 }
 
 #ifdef mqtt_discovery_prefix
-    void Device::create_discovery_info(const String type,
-            bool state_topic, const char* state_on, const char* state_off,
-            bool command_topic, const String extra_json) { // TODO: for inverted on/off this doesn't really work -> rethink
-        String slash("/");
-        String name_s(name.as_cstr());
-        String topic_s = String(mqtt_topic) + slash + name_s;
-        String hostname_s(HOSTNAME);
+void Device::create_discovery_info(const String& type,
+        bool state_topic, const char* state_on, const char* state_off,
+        bool command_topic, const String& extra_json) { // TODO: for inverted on/off this doesn't really work -> rethink
+    
+    
+    discovery_config_topic.reserve(128); // TODO: extract into constants
+    discovery_info.reserve(512);
 
-        discovery_config_topic = mqtt_discovery_prefix + slash + type + slash
-            + hostname_s + slash + name_s + String("/config");
+    String slash(F("/"));
+    String name_s(name.as_cstr());
+    String topic_s = String(mqtt_topic) + slash + name_s;
+    String hostname_s(HOSTNAME);
 
-        discovery_info = String("{ \"name\": \"") + String(name.as_cstr()) + String("\"");
-        if(state_topic) {
-            discovery_info += String(", \"state_topic\": \"") + topic_s 
-                + String("\", \"state_on\": \"") + String(state_on) 
-                + String("\", \"state_off\": \"") + String(state_off) + String("\"");
-            if(command_topic) {
-                discovery_info += String(", \"command_topic\": \"") + topic_s 
-                    + String("/set\", \"payload_on\": \"") + String(state_on) 
-                    + String("\", \"payload_off\": \"") + String(state_off) + String("\"");
-            }
+    discovery_config_topic = String(F(mqtt_discovery_prefix)) + slash + type + slash
+        + hostname_s + slash + name_s + String(F("/config"));
+
+    discovery_info = String(F("{ \"name\": \"")) + String(name.as_cstr()) + String(F("\""));
+    if(state_topic) {
+        discovery_info += String(F(", \"state_topic\": \"")) + topic_s 
+            + String(F("\", \"state_on\": \"")) + String(state_on) 
+            + String(F("\", \"state_off\": \"")) + String(state_off) + String(F("\""));
+        if(command_topic) {
+            discovery_info += String(F(", \"command_topic\": \"")) + topic_s 
+                + String(F("/set\", \"payload_on\": \"")) + String(state_on) 
+                + String(F("\", \"payload_off\": \"") )+ String(state_off) + String(F("\""));
         }
-        if(extra_json.length() > 0) {
-            discovery_info += String(", ") + extra_json;
-        }
-        discovery_info += String(" }");
-        
-        // Serial.print("discovery topic: ");
-        // Serial.println(discovery_config_topic);
-        // Serial.print("discovery info: ");
-        // Serial.println(discovery_info);
     }
+    if(extra_json.length() > 0) {
+        discovery_info += F(", ");
+        discovery_info += extra_json;
+    }
+    discovery_info += F(" }");
+    
+    // Serial.print("discovery topic: ");
+    // Serial.println(discovery_config_topic);
+    // Serial.print("discovery info: ");
+    // Serial.println(discovery_info);
+}
 #endif
 
 
@@ -89,16 +95,16 @@ bool Device::publish(AsyncMqttClient& mqtt_client, Ustring& node_topic) {
                 topic.add(sd.get_name());
             }
             if(first) {
-                Serial.print(" ");
+                Serial.print(F(" "));
                 first = false;
             }
-            else Serial.print("|");
+            else Serial.print(F("|"));
             Serial.print(topic.as_cstr()+node_topic.length()+1);
             Serial.print(":");
             Serial.print(val.as_cstr());
 
-            if(!mqtt_client.publish(topic.as_cstr(), 0, true, val.as_cstr())) {
-                Serial.print("!publish error!");
+            if(!mqtt_client.publish(topic.as_cstr(), 0, false, val.as_cstr())) {
+                Serial.print(F("!publish error!"));
                 // TODO: signal error and trigger reconnect - necessary?
                 return false;
             }
@@ -112,8 +118,8 @@ bool Device::publish(AsyncMqttClient& mqtt_client, Ustring& node_topic) {
 
 #ifdef mqtt_discovery_prefix
 bool Device::publish_discovery_info(AsyncMqttClient& mqtt_client) {
-    if(!mqtt_client.publish(discovery_config_topic.c_str(), 0, true, discovery_info.c_str())) {
-        Serial.print("!discovery publish error!");
+    if(!mqtt_client.publish(discovery_config_topic.c_str(), 0, false, discovery_info.c_str(), discovery_info.length())) {
+        Serial.print(F("!discovery publish error!"));
         // TODO: signal error and trigger reconnect - necessary?
         return false;
     }
@@ -168,13 +174,13 @@ bool Device::check_changes() {
             if(_report_change) {
                 updated = true;
                 _needs_publishing = true;
-                Serial.print("Needs publishing: ");
+                Serial.print(F("Needs publishing: "));
                 Serial.print(name.as_cstr());
                 if(!sd.get_name().empty()) {
-                    Serial.print("/");
+                    Serial.print(F("/"));
                     Serial.print(sd.get_name().as_cstr());
                 }
-                Serial.print(":");
+                Serial.print(F(":"));
                 Serial.println(sd.measured_value.as_cstr());
             }
         }
