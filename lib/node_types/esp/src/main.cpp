@@ -29,13 +29,9 @@
 //// default configuration
 #include <iotempower-default.h>
 
-// TODO: move this in own file to shorten compilation time
-// node specific code
-#include "config.h"
-#include "key.h"//// configuration
+#include "key.h"
+#include "config-wrapper.h"
 
-#include "pins-wrapper.h"
-#include "wifi-config.h"
 
 // iotempower functions for user modification in setup.cpp
 void (ulnoiot_init)() __attribute__((weak));

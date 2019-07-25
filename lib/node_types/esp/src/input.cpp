@@ -16,5 +16,8 @@ bool Input::measure() {
     } else {
         measured_value().from(_low);
     }
+    #ifdef mqtt_discovery_prefix
+        create_discovery_info("binary_sensor", true, _high, _low, false, "");
+    #endif
     return true;
 }

@@ -16,7 +16,7 @@
 #include <iotempower-default.h>
 #include <toolbox.h>
 
-#include "config.h"
+#include "config-wrapper.h"
 
 
 class Subdevice {
