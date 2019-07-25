@@ -58,6 +58,7 @@ class Ustring {
             return snprintf(cstr, IOTEMPOWER_MAX_STRLEN+1, "%f", f) <= IOTEMPOWER_MAX_STRLEN; 
         }
         bool from(const char* _cstr);
+        bool from(const __FlashStringHelper* _cstr);
         bool from(const byte* payload, unsigned int length);
         bool from(const char* payload, unsigned int length) {
             return from((byte*) payload, length);
@@ -80,13 +81,29 @@ class Ustring {
         }
         bool add(const Ustring& other);
         bool add(const char* other);
+        bool add(const __FlashStringHelper* other);
         bool add(char c);
         bool add_hex(uint8_t c);
+
         int compare(const char* other) const;
         int compare(const Ustring& other) const { return compare(other.cstr); }
+        int compare(const __FlashStringHelper* other) const {
+            Ustring us;
+            us.from(other);
+            return compare(us);
+        };
+
         bool equals(const Ustring& other) const { return compare(other) == 0; }
         bool equals(const char* other) const { return compare(other) == 0; }
+        bool equals(const __FlashStringHelper* other) const { return compare(other) == 0; }
+
         bool equals(const char* other, bool ignore_case) const;
+        bool equals(const __FlashStringHelper* other, bool ignore_case) const {
+            Ustring us;
+            us.from(other);
+            return equals(us.as_cstr(), ignore_case);
+        };
+
         bool empty() const { return cstr[0] == 0; }
         
         //int as_int() const { return atoi(cstr); }
@@ -116,14 +133,27 @@ class Ustring {
         void strip_param();
 
         int find(const char* pattern);
+        int find(const __FlashStringHelper* pattern) {
+            Ustring pattern_u;
+            pattern_u.from(pattern);
+            return find(pattern_u.as_cstr());
+        };
 
         bool contains(const char* pattern) {
+            return find(pattern) >= 0;
+        }
+        bool contains(const __FlashStringHelper* pattern) {
             return find(pattern) >= 0;
         }
 
         bool starts_with(const char* pattern) const {
             unsigned long len = strnlen(pattern, IOTEMPOWER_MAX_STRLEN);
             return memcmp(cstr,pattern,len) == 0;
+        }
+
+        bool starts_with(const __FlashStringHelper* pattern) const {
+            unsigned long len = strnlen_P((PGM_P)pattern, IOTEMPOWER_MAX_STRLEN);
+            return memcmp_P(cstr,pattern,len) == 0;
         }
 
         Ustring() { clear (); }

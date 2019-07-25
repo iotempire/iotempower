@@ -89,11 +89,11 @@ Mfrc522::Mfrc522(const char* name, uint16_t data_size,
     }
     pollrate(250); // 4 times per s should be enough
     add_subdevice(new Subdevice("")); // data (0)
-    add_subdevice(new Subdevice("uid")); // uid (1)
-    add_subdevice(new Subdevice("picc")); // picc (2)
-    add_subdevice(new Subdevice("set", true))->with_receive_cb(
+    add_subdevice(new Subdevice(F("uid"))); // uid (1)
+    add_subdevice(new Subdevice(F("picc"))); // picc (2)
+    add_subdevice(new Subdevice(F("set"), true))->with_receive_cb(
         [&] (const Ustring& payload) {
-            ulog("Mfrc522 set requested.");
+            ulog(F("Mfrc522 set requested."));
             write(payload);
             return true;
         });
@@ -109,7 +109,7 @@ Mfrc522::Mfrc522(const char* name, uint16_t data_size,
 
 
 void Mfrc522::start() {
-    ulog("Starting MFRC522 initialization.");
+    ulog(F("Starting MFRC522 initialization."));
     // TODO: check on esp32
     sensor = new MFRC522(15, 0); // D8, D3 on Wemos
     if(sensor) {
@@ -131,8 +131,8 @@ bool Mfrc522::measure() {
     // only read when new card there
     if ( ! sensor->PICC_IsNewCardPresent()) {
         // no card, make sure to return empty value
-        measured_value(1).from("NONE");
-        measured_value(2).from("NONE");
+        measured_value(1).from(F("NONE"));
+        measured_value(2).from(F("NONE"));
         return true;
     }
 
@@ -189,7 +189,7 @@ bool Mfrc522::measure() {
             break;
         }
 
-        ulog("Block len: %d", len);
+        ulog(F("Block len: %d"), len);
 
         for (uint8_t i = 0; i < len-2; i++) {
             if(_in_hex) {

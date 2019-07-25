@@ -50,7 +50,7 @@ bool Hcsr04::measure() {
     // down.
     if(triggered) {
         if(delta >= _timeout_us) { // timed out -> reset
-            ulog("hcrs04 timeout %lu", current);
+            ulog(F("hcrs04 timeout %lu"), current);
             digitalWrite(_trigger_pin, 0); // set pin back to 0 (should already be)
             trigger_started = false;
             triggered = false;

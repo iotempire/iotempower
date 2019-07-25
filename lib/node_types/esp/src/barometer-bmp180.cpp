@@ -4,9 +4,9 @@
 Barometer_BMP180::Barometer_BMP180(const char* name) :
     I2C_Device(name) {
     
-    add_subdevice(new Subdevice("temperature")); // 0
-    add_subdevice(new Subdevice("pressure")); // 1
-    add_subdevice(new Subdevice("altitude")); // 2
+    add_subdevice(new Subdevice(F("temperature"))); // 0
+    add_subdevice(new Subdevice(F("pressure"))); // 1
+    add_subdevice(new Subdevice(F("altitude"))); // 2
     set_address(BMP085_ADDRESS);
 }
 
@@ -17,7 +17,7 @@ void Barometer_BMP180::i2c_start() {
         sensor->init(); // TODO: timeout
         _started = true;
     } else {
-        ulog("Can't reserve memory for BMP085/BMP180.");
+        ulog(F("Can't reserve memory for BMP085/BMP180."));
     }
 }
 

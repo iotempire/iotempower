@@ -42,9 +42,19 @@ class Display_Base : public I2C_Device {
         Display_Base& scroll_up(int lines=1);
         Display_Base& print(const char* str);
         Display_Base& print(Ustring& ustr);
+        Display_Base& print(const __FlashStringHelper* str) {
+            Ustring str_u;
+            str_u.from(str);
+            print(str_u);
+        }
         Display_Base& println();
         Display_Base& println(const char* str);
         Display_Base& println(Ustring& ustr);
+        Display_Base& println(const __FlashStringHelper* str) {
+            Ustring str_u;
+            str_u.from(str);
+            println(str_u);
+        }
         Display_Base& cursor(int x, int y);
         Display_Base& clear();
 
@@ -113,7 +123,7 @@ class Display : public Display_Base {
                     // only sw i2c https://bbs.espressif.com/viewtopic.php?t=1032
                     if(_display) {
                         _started = init_u8g2();
-                        ulog("SSD1306 address: %x", _display->getU8x8()->i2c_address);
+                        ulog(F("SSD1306 address: %x"), _display->getU8x8()->i2c_address);
                     } else {
                         ulog(display_ssd1306_failed);
                     }

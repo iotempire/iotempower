@@ -36,7 +36,7 @@ class RGB_Matrix : public RGB_Base {
                 pos->stripnr = stripnr;
                 pos->lednr = lednr;
             } else {
-                ulog("Wrong position %d,%d for matrix requested.",x,y);
+                ulog(F("Wrong position %d,%d for matrix requested."),x,y);
             }
         }
 
@@ -82,7 +82,7 @@ class RGB_Matrix : public RGB_Base {
                 a = matrix_get(x,y);
             }
             if(a->stripnr >= 0) return strips[a->stripnr]->get_color(a->lednr);
-            ulog("get_pixel, out of bounds: %d,%d",x,y); // TODO: remove debug
+            ulog(F("get_pixel, out of bounds: %d,%d"),x,y); // TODO: remove debug
             return CRGB(CRGB::Black); // if something goes wrong, return black
         }
         CRGB set_pixel(int x, int y, CRGB color, bool wrap=true) {
@@ -100,7 +100,7 @@ class RGB_Matrix : public RGB_Base {
                 strips[a->stripnr]->set_color(a->lednr, color, false);
                 return old;
             }
-            ulog("set_pixel, out of bounds: %d,%d",x,y);  // TODO: remove debug
+            ulog(F("set_pixel, out of bounds: %d,%d"),x,y);  // TODO: remove debug
             return CRGB(CRGB::Black); // if something goes wrong, return black
         }
         // Matrix drawing functions

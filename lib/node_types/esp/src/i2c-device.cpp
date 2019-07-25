@@ -7,7 +7,7 @@
 
 void I2C_Device::start() {
     if(_master_address == _i2c_address) {
-        ulog("I2C Master address equals client address - %d. Not starting device.", _i2c_address);
+        ulog(F("I2C Master address equals client address - %d. Not starting device."), _i2c_address);
         return;
     }
     clear_bus();
@@ -18,7 +18,7 @@ void I2C_Device::start() {
 void I2C_Device::measure_init() {
     // if(!cleared) {
     //     if(clear_bus()>0)
-    //         ulog("Could not clear i2c bus on sda %d and scl %d.",
+    //         ulog(F("Could not clear i2c bus on sda %d and scl %d."),
     //             sda_pin, scl_pin);
     //     cleared = true; // We don't try again to prevent blocking
     // }

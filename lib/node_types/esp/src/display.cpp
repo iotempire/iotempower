@@ -5,11 +5,11 @@ bool Display_Base::init(int w, int h) {
     set_ignore_case(false); // want to use capital letters
     columns = w;
     lines = h;
-    ulog("Display with %d columns and %d lines.", columns, lines);
+    ulog(F("Display with %d columns and %d lines."), columns, lines);
     // create our own textbuffer
     textbuffer = (char *)malloc(lines*columns);
     if(!textbuffer) {
-        ulog("Could not allocate textbuffer.");
+        ulog(F("Could not allocate textbuffer."));
         // TODO: anything which should be destructed now?
         return false;
     }
@@ -18,19 +18,19 @@ bool Display_Base::init(int w, int h) {
             Ustring command(payload);
             Ustring subcommand;
             while(true) {
-                int pos=command.find("&&");
+                int pos=command.find(F("&&"));
                 if(pos<0) break;
                 subcommand.copy(command, pos);
                 print(subcommand.as_cstr());
                 command.remove(pos+2);
-                if(command.starts_with("nl") || command.starts_with("ln")) {
+                if(command.starts_with(F("nl")) || command.starts_with(F("ln"))) {
                     command.strip_param();
                     println();
-                } else if(command.starts_with("cl")) {
+                } else if(command.starts_with(F("cl"))) {
                     command.strip_param();
                     clear();
                     if(command.length()==0) return true; // skip newline at end
-                } else if(command.starts_with("go")) {
+                } else if(command.starts_with(F("go"))) {
                     command.strip_param();
                     int x=command.as_int()-1;
                     command.strip_param();
@@ -39,7 +39,7 @@ bool Display_Base::init(int w, int h) {
                     cursor(x,y);
                     if(command.length()==0) return true; // skip newline at end
                 } else { // unknown
-                    print("&&");
+                    print(F("&&"));
                 }
             }
             // Anything coming here should usually just be printed
@@ -101,7 +101,7 @@ Display_Base& Display_Base::print(const char* str) {
 }
 
 Display_Base& Display_Base::println() {
-    return print("\n");
+    return print(F("\n"));
 }
 
 Display_Base& Display_Base::println(const char* str) {
@@ -161,7 +161,7 @@ bool Display::init_u8g2() {
 
 void Display::show(const char* buffer) {
     char charstr[2]=" ";
-    ulog("Display debug: %s",buffer);
+    ulog(F("Display debug: %s"),buffer);
     _display->firstPage();
     do {
         for(int y=0; y<lines; y++) {

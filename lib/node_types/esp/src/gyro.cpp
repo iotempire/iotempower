@@ -5,8 +5,8 @@
 Gyro_MPU6050::Gyro_MPU6050(const char* name, bool calibrate_on_start) :
     I2C_Device(name) {
     _calibrate = calibrate_on_start;
-    add_subdevice(new Subdevice("ypr")); // 0
-    add_subdevice(new Subdevice("acc")); // 1
+    add_subdevice(new Subdevice(F("ypr"))); // 0
+    add_subdevice(new Subdevice(F("acc"))); // 1
     set_address(0x68);
 }
 
@@ -18,18 +18,18 @@ void Gyro_MPU6050::i2c_start() {
         mpu6050->initialize();
         int test;
         for(test=10; test>0; test--) {
-            ulog("Testing MPU6050 connection...");
+            ulog(F("Testing MPU6050 connection..."));
             if(mpu6050->testConnection()) break;
             delay(200);
         }
         if(test<=0) {
-            ulog("MPU6050 connection failed");
+            ulog(F("MPU6050 connection failed"));
             return;
         }
-        ulog("MPU6050 connection successful.");
+        ulog(F("MPU6050 connection successful."));
 
         // load and configure the DMP
-        ulog("Initializing DMP...");
+        ulog(F("Initializing DMP..."));
         uint8_t devStatus = mpu6050->dmpInitialize();
 
         // supply your own gyro offsets here, scaled for min sensitivity
@@ -54,7 +54,7 @@ void Gyro_MPU6050::i2c_start() {
             // 1 = initial memory load failed
             // 2 = DMP configuration updates failed
             // (if it's going to break, usually the code will be 1)
-            ulog("DMP Initialization failed (code %d)", devStatus);
+            ulog(F("DMP Initialization failed (code %d)"), devStatus);
             return;
         }
 
@@ -63,7 +63,7 @@ void Gyro_MPU6050::i2c_start() {
         starttime = millis();
         measure();
     } else {
-        ulog("Can't reserve memory for mpu6050.");
+        ulog(F("Can't reserve memory for mpu6050."));
     }
 }
 
@@ -71,7 +71,7 @@ void Gyro_MPU6050::i2c_start() {
 bool Gyro_MPU6050::measure() {
     // get current FIFO count
     uint16_t fifoCount = mpu6050->getFIFOCount();
-    // ulog("fifocount: %d  packetsize: %d", fifoCount, packetSize);
+    // ulog(F("fifocount: %d  packetsize: %d"), fifoCount, packetSize);
     if(fifoCount < packetSize) return false; // nothing ready
 
     uint8_t mpuIntStatus = mpu6050->getIntStatus();
@@ -80,7 +80,7 @@ bool Gyro_MPU6050::measure() {
     if ((mpuIntStatus & 0x10) || fifoCount == 1024) {
         // reset so we can continue cleanly
         mpu6050->resetFIFO();
-        ulog("MPU6050 FIFO overflow!");
+        ulog(F("MPU6050 FIFO overflow!"));
 
     // otherwise, check for DMP data ready interrupt (this should happen frequently)
     } else if (mpuIntStatus & 0x02) {
@@ -109,13 +109,13 @@ bool Gyro_MPU6050::measure() {
         // #ifdef OUTPUT_READABLE_QUATERNION
         //     // display quaternion values in easy matrix form: w x y z
         //     mpu6050->dmpGetQuaternion(&q, fifoBuffer);
-        //     Serial.print("quat\t");
+        //     Serial.print(F("quat\t"));
         //     Serial.print(q.w);
-        //     Serial.print("\t");
+        //     Serial.print(F("\t"));
         //     Serial.print(q.x);
-        //     Serial.print("\t");
+        //     Serial.print(F("\t"));
         //     Serial.print(q.y);
-        //     Serial.print("\t");
+        //     Serial.print(F("\t"));
         //     Serial.println(q.z);
         // #endif
 
@@ -123,11 +123,11 @@ bool Gyro_MPU6050::measure() {
         //     // display Euler angles in degrees
         //     mpu6050->dmpGetQuaternion(&q, fifoBuffer);
         //     mpu6050->dmpGetEuler(euler, &q);
-        //     Serial.print("euler\t");
+        //     Serial.print(F("euler\t"));
         //     Serial.print(euler[0] * 180/M_PI);
-        //     Serial.print("\t");
+        //     Serial.print(F("\t"));
         //     Serial.print(euler[1] * 180/M_PI);
-        //     Serial.print("\t");
+        //     Serial.print(F("\t"));
         //     Serial.println(euler[2] * 180/M_PI);
         // #endif
 
@@ -145,11 +145,11 @@ bool Gyro_MPU6050::measure() {
         //     mpu6050->dmpGetAccel(&aa, fifoBuffer);
         //     mpu6050->dmpGetGravity(&gravity, &q);
         //     mpu6050->dmpGetLinearAccel(&aaReal, &aa, &gravity);
-        //     Serial.print("areal\t");
+        //     Serial.print(F("areal\t"));
         //     Serial.print(aaReal.x);
-        //     Serial.print("\t");
+        //     Serial.print(F("\t"));
         //     Serial.print(aaReal.y);
-        //     Serial.print("\t");
+        //     Serial.print(F("\t"));
         //     Serial.println(aaReal.z);
         // #endif
 

@@ -23,7 +23,9 @@ class Subdevice {
     private:
         Ustring name; // subdevice name (added to the device name)
         bool _subscribed = false;
+        void init_log();
         void init(const char* subname, bool subscribed);
+        void init(const __FlashStringHelper* subname, bool subscribed);
         #define IOTEMPOWER_ON_RECEIVE_CALLBACK std::function<bool(const Ustring&)>
         IOTEMPOWER_ON_RECEIVE_CALLBACK receive_cb = NULL;
     public:
@@ -43,6 +45,12 @@ class Subdevice {
             init(subname, subscribed);
         }
         Subdevice(const char* subname) { 
+            init(subname, false);
+        }
+        Subdevice(const __FlashStringHelper* subname, bool subscribed) {
+            init(subname, subscribed);
+        }
+        Subdevice(const __FlashStringHelper* subname) { 
             init(subname, false);
         }
 };
@@ -210,12 +218,12 @@ class Device {
         }
 
         Subdevice* add_subdevice(Subdevice* sd) {
-            ulog("add_subdevice: device: %s subdev: >%s<", name.as_cstr(), sd->get_name().as_cstr());
+            ulog(F("add_subdevice: device: %s subdev: >%s<"), name.as_cstr(), sd->get_name().as_cstr());
             if(subdevices.add(sd)) {
-                ulog("add_subdevice >%s< succeeded.", sd->get_name().as_cstr());
+                ulog(F("add_subdevice >%s< succeeded."), sd->get_name().as_cstr());
                 return sd;
             } else {
-                ulog("add_subdevice >%s< failed.", sd->get_name().as_cstr());
+                ulog(F("add_subdevice >%s< failed."), sd->get_name().as_cstr());
                 return NULL;
             }
         }

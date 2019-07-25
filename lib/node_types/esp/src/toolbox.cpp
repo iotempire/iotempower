@@ -31,6 +31,20 @@ bool Ustring::add(const char* other) {
     return untruncated;
 }
 
+bool Ustring::add(const __FlashStringHelper* other) {
+    int ownlen = length();
+    int otherlen = strnlen_P((PGM_P)other, IOTEMPOWER_MAX_STRLEN-ownlen);
+    bool untruncated = true;
+
+    if( ownlen+otherlen > IOTEMPOWER_MAX_STRLEN ) {
+        otherlen = IOTEMPOWER_MAX_STRLEN - ownlen;
+        untruncated = false;
+    }
+    strncpy_P(cstr+ownlen, (PGM_P)other, otherlen+1); // +1 also copy 0
+    case_adjust();
+    return untruncated;
+}
+
 bool Ustring::add(char c) {
     int ownlen = length();
     bool untruncated = true;
@@ -71,6 +85,18 @@ bool Ustring::from(const char* _cstr) {
         untruncated = false;
     }
     strncpy(cstr,_cstr,IOTEMPOWER_MAX_STRLEN);
+    case_adjust();
+    return untruncated;
+}
+
+bool Ustring::from(const __FlashStringHelper* _cstr) {
+    int otherlen = strnlen_P((PGM_P)_cstr,IOTEMPOWER_MAX_STRLEN+1);
+    bool untruncated = true;
+    if(otherlen > IOTEMPOWER_MAX_STRLEN) {
+        otherlen = IOTEMPOWER_MAX_STRLEN;
+        untruncated = false;
+    }
+    strncpy_P(cstr,(PGM_P)_cstr,IOTEMPOWER_MAX_STRLEN);
     case_adjust();
     return untruncated;
 }
@@ -186,7 +212,7 @@ int Ustring::scanf(const char *fmt, ...) {
 
 void reboot() {
     // TODO: add network debugging
-    Serial.println("Rebooting in 5 seconds.");
+    Serial.println(F("Rebooting in 5 seconds."));
     delay(5000);
     // TODO: Consider counting in rtc and going into reconfigure after a while
 
@@ -205,7 +231,7 @@ void reboot() {
 }
 
 void controlled_crash(const char * error_message) {
-    ulog("\nCrash, cause (reboot in 5s): %s", error_message);
+    ulog(F("\nCrash, cause (reboot in 5s): %s"), error_message);
     reboot();
 }
 
@@ -217,7 +243,7 @@ void ulog(const char *fmt, ...) {
         delay(500); // Wait for serial to get ready
         Serial.println();
         Serial.println();
-        Serial.println("Serial ready.");
+        Serial.println(F("Serial ready."));
     }
 	char buf[LOG_LINE_MAX_LEN];
 	va_list ap;
@@ -235,7 +261,7 @@ void ulog(const __FlashStringHelper *fmt, ...) {
         delay(500); // Wait for serial to get ready
         Serial.println();
         Serial.println();
-        Serial.println("Serial ready.");
+        Serial.println(F("Serial ready."));
     }
 	char buf[LOG_LINE_MAX_LEN];
 	va_list ap;

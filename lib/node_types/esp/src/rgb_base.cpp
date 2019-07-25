@@ -52,18 +52,18 @@ RGB_Base::RGB_Base(const char* name, int led_count) :
         Device(name) {
     _led_count = led_count;
     add_subdevice(new Subdevice("")); // 0
-    add_subdevice(new Subdevice("set",true))->with_receive_cb( // 1
+    add_subdevice(new Subdevice(F("set"),true))->with_receive_cb( // 1
         [&] (const Ustring& payload) {
-            if(payload.equals("on")) high();
+            if(payload.equals(F("on"))) high();
             else {
-                if(payload.equals("off")) low();
+                if(payload.equals(F("off"))) low();
                 else return false;
             }
             return true;
         }
     );
-    add_subdevice(new Subdevice("brightness")); // 2
-    add_subdevice(new Subdevice("brightness/set",true))->with_receive_cb( // 3
+    add_subdevice(new Subdevice(F("brightness"))); // 2
+    add_subdevice(new Subdevice(F("brightness/set"),true))->with_receive_cb( // 3
         [&] (const Ustring& payload) {
             int brightness=payload.as_int();
             if(brightness<0) brightness=0;
@@ -72,8 +72,8 @@ RGB_Base::RGB_Base(const char* name, int led_count) :
             return true;
         }
     );
-    add_subdevice(new Subdevice("rgb")); // 4
-    add_subdevice(new Subdevice("rgb/set",true))->with_receive_cb( // 5
+    add_subdevice(new Subdevice(F("rgb"))); // 4
+    add_subdevice(new Subdevice(F("rgb/set"),true))->with_receive_cb( // 5
         [&] (const Ustring& payload) {
             set_colorstr(payload);
             return true;
@@ -112,11 +112,11 @@ RGB_Base& RGB_Base::set_colorstr(const Ustring& color, bool _show) {
     Ustring command(color);
     int lednr = ALL_LEDS;
     command.strip();
-    int p=command.find(" ");
+    int p=command.find(F(" "));
     if(p>0) { // seems like these are two values
-        if(command.starts_with("front")) {
+        if(command.starts_with(F("front"))) {
             lednr = -1;
-        } else if(command.starts_with("back")) {
+        } else if(command.starts_with(F("back"))) {
             lednr = led_count();
         } else {
             // extract led number (start counting at 1)

@@ -26,7 +26,7 @@ bool do_later_is_full() {
 static void do_later_delete(int pos) {
     if(do_later_map_count<=0) return;
     pos = limit(pos, 0, do_later_map_count-1);
-//    ulog("do_later_delete pos: %d  count: %d",pos,do_later_map_count);
+//    ulog(F("do_later_delete pos: %d  count: %d"),pos,do_later_map_count);
     memmove(do_later_map+pos, do_later_map+pos+1, sizeof(do_later_map_t)*(do_later_map_count-pos));
     do_later_map_count --;
 }
@@ -68,13 +68,13 @@ static bool do_later_add(unsigned long in_ms, int16_t id, Do_Later_Callback cbu)
     do_later_map[pos].id = id;
     do_later_map[pos].callback = cbu;
     do_later_map_count ++;
-//    ulog("Adding do_later scheduler at %d with time %ld at time %ld",pos,in_ms,current); // TODO: remove debug
+//    ulog(F("Adding do_later scheduler at %d with time %ld at time %ld"),pos,in_ms,current); // TODO: remove debug
     return !forgot_one;
 }
 
 bool do_later(unsigned long in_ms, int16_t id, DO_LATER_CB_ID callback) {
     if(id==-1) {
-        ulog("The id -1 is not allowed for id-based do_later callback.");
+        ulog(F("The id -1 is not allowed for id-based do_later callback."));
     } else {
         Do_Later_Callback cbu = [id,callback] { callback(id); };
         return do_later_add(in_ms, id, cbu);
@@ -87,7 +87,7 @@ void deep_sleep(unsigned long time_from_now_ms, unsigned long duration_ms) {
 
     duration_ms_backup = duration_ms; // static to save for lambda
     do_later(time_from_now_ms, [&] {
-        ulog("About to fall into deepsleep for %lu s", duration_ms_backup/1000);
+        ulog(F("About to fall into deepsleep for %lu s"), duration_ms_backup/1000);
         delay(100);
         delay(100);
         delay(100);
@@ -135,7 +135,7 @@ static Device* find_device(const char* name) {
 }*/
 
 bool add_device(Device &device) {
-    ulog("add_device: Adding device: %s", device.get_name().as_cstr());
+    ulog(F("add_device: Adding device: %s"), device.get_name().as_cstr());
     return device_list.add(&device);
 }
 
@@ -171,10 +171,10 @@ bool devices_publish(AsyncMqttClient& mqtt_client, Ustring& node_topic, bool pub
         if(dev.started()) {
             if(publish_all || dev.needs_publishing()) {
                 if(first) {
-                    Serial.print("Publishing");
+                    Serial.print(F("Publishing"));
                 }
                 if(dev.publish(mqtt_client, node_topic)) {
-                    if(!first) Serial.print("; ");
+                    if(!first) Serial.print(F("; "));
                     published = true;
                 }
                 if(first) {
@@ -185,10 +185,10 @@ bool devices_publish(AsyncMqttClient& mqtt_client, Ustring& node_topic, bool pub
         return true; // Continue loop
     } );
     if(!first && !published) {
-        Serial.println(" nothing.");
+        Serial.println(F(" nothing."));
         return true; // If you did send nothing at all, say this publish was successful
     }
-    if(published) Serial.println(".");
+    if(published) Serial.println(F("."));
     return published;
 }
 
@@ -208,14 +208,14 @@ bool devices_subscribe(AsyncMqttClient& mqtt_client, Ustring& node_topic) {
                 if(sd.subscribed()) {
                     // construct full topic
                     topic.copy(node_topic);
-                    topic.add("/");
+                    topic.add(F("/"));
                     topic.add(dev.get_name());
                     if(sd.get_name().length() > 0) {
-                        topic.add("/");
+                        topic.add(F("/"));
                         topic.add(sd.get_name());
                     }
                     uint16_t packetIdSub = mqtt_client.subscribe(topic.as_cstr(), 0);
-                    ulog("Subscribing to %s with id %d.", 
+                    ulog(F("Subscribing to %s with id %d."), 
                         topic.as_cstr(), packetIdSub);
                 }
                 return true; // continue subdevice loop
@@ -253,12 +253,12 @@ bool devices_receive(Ustring& subtopic, Ustring& payload) {
                 // construct full topic
                 topic.copy(dev.get_name());
                 if(sd.get_name().length()>0) {
-                    topic.add("/");
+                    topic.add(F("/"));
                     topic.add(sd.get_name());
                 }
-                // Serial.print("Trying to match ");
+                // Serial.print(F("Trying to match "));
                 // Serial.print(subtopic.as_cstr());
-                // Serial.print(" with ");
+                // Serial.print(F(" with "));
                 // Serial.println(topic.as_cstr());
                 if(topic.equals(subtopic)) { // found match
                     payload.ignore_case(dev.get_ignore_case());

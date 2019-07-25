@@ -5,17 +5,26 @@
 #include <Arduino.h>
 #include "device.h"
 
+void Subdevice::init_log() {
+    ulog(F("subdevice init: subname: >%s<"), name.as_cstr());
+}
 
 void Subdevice::init(const char* subname, bool subscribed) {
-    ulog(F("subdevice init: subname: >%s< subscribed: %d"), subname, subscribed);
     name.from(subname);
     _subscribed = subscribed;
+    init_log();
+}
+
+void Subdevice::init(const __FlashStringHelper* subname, bool subscribed) {
+    name.from(subname);
+    _subscribed = subscribed;
+    init_log();
 }
 
 bool Subdevice::call_receive_cb(Ustring& payload) {
     Serial.print(F("Calling receive callback "));
     Serial.print(name.as_cstr());
-    Serial.print(" ");
+    Serial.print(F(" "));
     if(receive_cb != NULL) {
         Serial.println(payload.as_cstr());
         return receive_cb(payload);
@@ -70,9 +79,9 @@ void Device::create_discovery_info(const String& type,
     }
     discovery_info += F(" }");
     
-    // Serial.print("discovery topic: ");
+    // Serial.print(F("discovery topic: "));
     // Serial.println(discovery_config_topic);
-    // Serial.print("discovery info: ");
+    // Serial.print(F("discovery info: "));
     // Serial.println(discovery_info);
 }
 #endif
@@ -87,11 +96,11 @@ bool Device::publish(AsyncMqttClient& mqtt_client, Ustring& node_topic) {
         if(!val.empty()) {
             // construct full topic
             topic.copy(node_topic);
-            topic.add("/");
+            topic.add(F("/"));
             topic.add(get_name());
             const Ustring& sd_name = sd.get_name();
             if(!sd_name.empty()) { // only add, if name given
-                topic.add("/");
+                topic.add(F("/"));
                 topic.add(sd.get_name());
             }
             if(first) {
@@ -100,7 +109,7 @@ bool Device::publish(AsyncMqttClient& mqtt_client, Ustring& node_topic) {
             }
             else Serial.print(F("|"));
             Serial.print(topic.as_cstr()+node_topic.length()+1);
-            Serial.print(":");
+            Serial.print(F(":"));
             Serial.print(val.as_cstr());
 
             if(!mqtt_client.publish(topic.as_cstr(), 0, false, val.as_cstr())) {
@@ -199,8 +208,8 @@ static Ustring value_error;
 Ustring& Device::value(unsigned long index) {
     Subdevice* sd = subdevice(index);
     if(sd == NULL) {
-        ulog("Error in value(). Device: %s", name.as_cstr());
-        value_error.from("subdevice value error");
+        ulog(F("Error in value(). Device: %s"), name.as_cstr());
+        value_error.from(F("subdevice value error"));
         return value_error;
         // TODO: should this crash here?
     }
@@ -210,8 +219,8 @@ Ustring& Device::value(unsigned long index) {
 Ustring& Device::measured_value(unsigned long index) {
     Subdevice* sd = subdevice(index);
     if(sd == NULL) {
-        ulog("Error in measured_value(): Device: %s", name.as_cstr());
-        value_error.from("no subdevice");
+        ulog(F("Error in measured_value(): Device: %s"), name.as_cstr());
+        value_error.from(F("no subdevice"));
         return value_error;
     }
     return sd->measured_value;

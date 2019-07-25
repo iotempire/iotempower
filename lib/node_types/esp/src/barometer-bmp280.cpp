@@ -4,9 +4,9 @@
 Barometer_BMP280::Barometer_BMP280(const char* name) :
     I2C_Device(name) {
     
-    add_subdevice(new Subdevice("temperature")); // 0
-    add_subdevice(new Subdevice("pressure")); // 1
-    add_subdevice(new Subdevice("altitude")); // 2
+    add_subdevice(new Subdevice(F("temperature"))); // 0
+    add_subdevice(new Subdevice(F("pressure"))); // 1
+    add_subdevice(new Subdevice(F("altitude"))); // 2
     set_address(BMP280_ADDRESS);
 }
 
@@ -15,12 +15,12 @@ void Barometer_BMP280::i2c_start() {
 
     if(sensor) {
         if(!sensor->init()) { // TODO: timeout
-            Serial.println("BMP280 not connected or broken!");
+            Serial.println(F("BMP280 not connected or broken!"));
         } else {
             _started = true;
         }
     } else {
-        ulog("Can't reserve memory for bmp280.");
+        ulog(F("Can't reserve memory for bmp280."));
     }
 }
 

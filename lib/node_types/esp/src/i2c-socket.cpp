@@ -15,7 +15,7 @@ I2C_Socket::I2C_Socket(const char* name, int client_address,
     set_master(master_address);
 
     add_subdevice(new Subdevice("")); // 0
-    add_subdevice(new Subdevice("set",true))->with_receive_cb(
+    add_subdevice(new Subdevice(F("set"),true))->with_receive_cb(
         [&] (const Ustring& payload) {
             // TODO: check that correct i2c bus is selected
             Wire.beginTransmission(get_address());
@@ -44,12 +44,12 @@ bool I2C_Socket::measure() {
     if(Wire.requestFrom((uint8_t) get_address(), 
             (uint8_t) IOTEMPOWER_I2C_CONNECTOR_BUFFER_SIZE, 
             (uint8_t) false) == 0) {
-        ulog("Reading from i2c not successful. Dev with address %d connected?", get_address());
+        ulog(F("Reading from i2c not successful. Dev with address %d connected?"), get_address());
         return false;
     }
 
     if(Wire.available() < 3) {
-        ulog("No answer received");
+        ulog(F("No answer received"));
         return false; // not even header
     }
 
@@ -59,13 +59,13 @@ bool I2C_Socket::measure() {
     uint16_t buf_len = Wire.read(); // should be length
     
     if(count == 0xffff) {
-        ulog("No data after request received.", last_count);
+        ulog(F("No data after request received."), last_count);
         return false;
     }
     if(count == last_count) return false; // ignore same package TODO: enable
     if(count - last_count > 255) {
         last_count =  count;
-        ulog("Received far off package with nr: %d", last_count);
+        ulog(F("Received far off package with nr: %d"), last_count);
         return false; // too much distance
     }
     last_count = count;
@@ -77,6 +77,6 @@ bool I2C_Socket::measure() {
         v.add((uint8_t)Wire.read()); // TODO: a bit inefficient, optimize if necessary
         left--;
     }
-//    ulog("count: %d len: %d content: %s", count, buf_len, v.as_cstr());
+//    ulog(F("count: %d len: %d content: %s"), count, buf_len, v.as_cstr());
     return true;
 }

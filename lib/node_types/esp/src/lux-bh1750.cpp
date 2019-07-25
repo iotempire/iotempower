@@ -16,7 +16,7 @@ void Lux_BH1750::i2c_start() {
         last_read = millis();
         _started = true;
     } else {
-        ulog("Can't reserve memory for BH1750.");
+        ulog(F("Can't reserve memory for BH1750."));
     }
 }
 

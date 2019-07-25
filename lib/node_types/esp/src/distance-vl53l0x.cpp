@@ -45,7 +45,7 @@ void Distance_Vl53l0x::i2c_start() {
         _started = true;
         measure();
     } else {
-        ulog("Can't reserve memory for vl53l0x.");
+        ulog(F("Can't reserve memory for vl53l0x."));
     }
 }
 
@@ -53,7 +53,7 @@ void Distance_Vl53l0x::i2c_start() {
 bool Distance_Vl53l0x::measure() {
     uint16_t distance = sensor->readRangeContinuousMillimeters();
     if (sensor->timeoutOccurred()) { 
-        ulog("VL53L0X TIMEOUT or invalid distance");
+        ulog(F("VL53L0X TIMEOUT or invalid distance"));
         return false; 
     }
     if(distance > IOTEMPOWER_VL53L0X_MAXDIST) {

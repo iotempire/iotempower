@@ -17,7 +17,7 @@ void Servo::start() {
 
 void Servo::do_register() {
     add_subdevice(new Subdevice(""));
-    add_subdevice(new Subdevice("set",true))->with_receive_cb(
+    add_subdevice(new Subdevice(F("set"),true))->with_receive_cb(
         [&] (const Ustring& payload) {
             process(payload);
             return true;

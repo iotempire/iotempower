@@ -12,15 +12,15 @@ Pwm::Pwm(const char* name, uint8_t pin, int frequency)
         return;
     }
     add_subdevice(new Subdevice(""));
-    add_subdevice(new Subdevice("set",true))->with_receive_cb(
+    add_subdevice(new Subdevice(F("set"),true))->with_receive_cb(
         [&] (const Ustring& payload) {
             int duty=payload.as_int();
             set_duty(duty);
             return true;
         }
     );
-    add_subdevice(new Subdevice("frequency"));
-    add_subdevice(new Subdevice("frequency/set",true))->with_receive_cb(
+    add_subdevice(new Subdevice(F("frequency")));
+    add_subdevice(new Subdevice(F("frequency/set"),true))->with_receive_cb(
         [&] (const Ustring& payload) {
             int frequency=payload.as_int();
             set_frequency(frequency);

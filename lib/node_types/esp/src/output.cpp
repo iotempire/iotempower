@@ -9,14 +9,14 @@ Output::Output(const char* name, const int pin,
     _low = low_command;
     _pin = pin;
     add_subdevice(new Subdevice(""));
-    add_subdevice(new Subdevice("set",true))->with_receive_cb(
+    add_subdevice(new Subdevice(F("set"),true))->with_receive_cb(
         [&] (const Ustring& payload) {
             set(payload.as_cstr());
             return true;
         }
     );
     #ifdef mqtt_discovery_prefix
-        create_discovery_info("switch", true, high_command, low_command, true, "");
+        create_discovery_info(F("switch"), true, high_command, low_command, true, "");
     #endif
     low(); // must be after subdevices as it uses global measured_value()
 }

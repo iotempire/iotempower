@@ -11,7 +11,7 @@ void Animator::init() {
             // search for command
             for(int i=0; i<command_method_counter; i++) {
                 const char* key = command_methods[i].key;
-                ulog("Trying %s",key);
+                ulog(F("Trying %s"),key);
                 int len = strlen(key);
                 if(payload.starts_with(key) && payload.as_cstr()[len] <= 32) {
                     Ustring command(payload.as_cstr()+len);
@@ -53,7 +53,7 @@ Animator& Animator::with_command_handler(const char* command_name, ANIMATOR_COMM
         command_methods[command_method_counter].method = handler;
         command_method_counter++;
     } else {
-        ulog("Too many commands for animator given.");
+        ulog(F("Too many commands for animator given."));
     }
     return *this;
 }

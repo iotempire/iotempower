@@ -154,17 +154,18 @@ void setup_ota() {
     ArduinoOTA.onStart([]() {
         String type;
         if (ArduinoOTA.getCommand() == U_FLASH)
-            type = "sketch";
+            type = F("sketch");
         else // U_SPIFFS
-            type = "filesystem";
+            type = F("filesystem");
 
         // NOTE: if updating SPIFFS this would be the place to unmount
         // SPIFFS using SPIFFS.end()
         Serial.println();
-        Serial.println("Start updating " + type);
+        Serial.println(F("Start updating "));
+        Serial.println(type);
     });
     ArduinoOTA.onEnd([]() { 
-        Serial.println("\nOTA End, success.");
+        Serial.println(F("\nOTA End, success."));
         if(ota_display_present) {
             ota_display->i2c_start();
             ota_display->clear();
@@ -189,7 +190,7 @@ void setup_ota() {
             #endif
             if(ota_display_present) {
                 ota_display->clear();
-                ota_display->print("Adoption\nactive\n\nProgress:\n");
+                ota_display->print(F("Adoption\nactive\n\nProgress:\n"));
                 s.printf("%d%%", percent);
                 ota_display->print(s);
                 ota_display->measure();
@@ -200,19 +201,19 @@ void setup_ota() {
     ArduinoOTA.onError([](ota_error_t error) {
         Serial.printf("Error[%u]: ", error);
         if (error == OTA_AUTH_ERROR)
-            Serial.println("Auth Failed");
+            Serial.println(F("Auth Failed"));
         else if (error == OTA_BEGIN_ERROR)
-            Serial.println("Begin Failed");
+            Serial.println(F("Begin Failed"));
         else if (error == OTA_CONNECT_ERROR)
-            Serial.println("Connect Failed");
+            Serial.println(F("Connect Failed"));
         else if (error == OTA_RECEIVE_ERROR)
-            Serial.println("Receive Failed");
+            Serial.println(F("Receive Failed"));
         else if (error == OTA_END_ERROR)
-            Serial.println("End Failed");
+            Serial.println(F("End Failed"));
         if(ota_display_present) {
             ota_display->i2c_start();
             ota_display->clear();
-            ota_display->print("OTA Error.");
+            ota_display->print(F("OTA Error."));
             ota_display->measure();
         }
         ota_failed = true;
@@ -235,7 +236,7 @@ void reconfigMode() {
     Ustring s;
     const char *ap_password = IOTEMPOWER_AP_RECONFIG_PASSWORD;
 
-    ulog("Reconfiguration requested. Activating open AP-mode.");
+    ulog(F("Reconfiguration requested. Activating open AP-mode."));
     WiFi.disconnect(true);
     id_blinker(); //trigger init of random blink pattern
     ssid.printf("%s-%02x-%01dL-%01dS", 
@@ -246,7 +247,7 @@ void reconfigMode() {
     Wire.begin(); // check default i2c // check, if it's the same on esp32 for wemos shield
     Wire.beginTransmission(0x3c);
     if (Wire.endTransmission() == 0) {
-        ulog("Display shield found.");
+        ulog(F("Display shield found."));
         U8G2_SSD1306_64X48_ER_F_HW_I2C u8g2(U8G2_R0);
         ota_display = new Display("testdisplay", u8g2);
         if(ota_display) {
@@ -292,13 +293,13 @@ void reconfigMode() {
         id_blinker(); // TODO: check why not blinking after crash
         yield();
         if(last_seconds_left != seconds_left) {
-            Serial.print("Seconds left for adoption: ");
+            Serial.print(F("Seconds left for adoption: "));
             Serial.print(seconds_left);
-            Serial.print("\r");
+            Serial.print(F("\r"));
             last_seconds_left = seconds_left;
             if(ota_display_present) {
                 ota_display->clear();
-                ota_display->print("ReconfigMode");
+                ota_display->print(F("ReconfigMode"));
                 ota_display->cursor(0,2);
                 s.printf("node %02x", getChipId32() & 255);
                 ota_display->print(s);
@@ -308,7 +309,7 @@ void reconfigMode() {
                 s.printf("%ds left", seconds_left);
                 ota_display->print(s);
                 ota_display->cursor(0,5);
-                ota_display->print("for adoption");
+                ota_display->print(F("for adoption"));
                 ota_display->measure(); // trigger drawing
             }
         }
@@ -316,14 +317,14 @@ void reconfigMode() {
     }
 
     Serial.println();
-    Serial.println("No adoption request done, rebooting...");
+    Serial.println(F("No adoption request done, rebooting..."));
     if(ota_display_present) {
         ota_display->i2c_start();
         ota_display->clear();
         ota_display->measure();
         ota_display->clear_bus();
     }
-    // Serial.println("Requesting password reset on next boot.");
+    // Serial.println(F("Requesting password reset on next boot."));
     // int magicSize = sizeof(IOTEMPOWER_RECONFIG_MAGIC);
     // char rtcData[magicSize];
     // strncpy(rtcData, IOTEMPOWER_RECONFIG_MAGIC, magicSize);
@@ -339,8 +340,8 @@ void flash_mode_select() {
     // Check specific GPIO port if pressed and unpressed 2-4 times
     // to enter reconfiguration mode (allow generic reflash in AP
     // mode)
-    Serial.println("Allow 5s to check if reconfiguration and AP "
-                    "mode is requested.");
+    Serial.println(F("Allow 5s to check if reconfiguration and AP "
+                    "mode is requested."));
     int last = 1, toggles = 0;
     // blink a bit to show that we have booted and waiting for
     // potential reconfig/adopt mode selection
@@ -371,7 +372,7 @@ void flash_mode_select() {
         reconfigMode();
     }
 
-    Serial.println("Continue to boot normally.");
+    Serial.println(F("Continue to boot normally."));
     // register password-hash for uploading
     ArduinoOTA.setPasswordHash(keyhash);
 }
@@ -393,16 +394,16 @@ static char *my_hostname;
 void connectToMqtt() {
     if (reconfig_mode_active)
         return;
-    Serial.println("Connecting to MQTT...");
+    Serial.println(F("Connecting to MQTT..."));
     mqttClient.connect();
 }
 
 
 void connectToWifi() {
     // Start WiFi connection and register hostname
-    Serial.print("Trying to connect to Wi-Fi with name ");
+    Serial.print(F("Trying to connect to Wi-Fi with name "));
     Serial.println(WIFI_SSID);
-    Serial.print("Registering hostname: ");
+    Serial.print(F("Registering hostname: "));
     if(reconfig_mode_active) {
         my_hostname = (char *)"iotempower-adoptee"; // TODO: define in defaults
         // my_hostname = (char *)"iotempower-xxxxxx";
@@ -420,25 +421,25 @@ void connectToWifi() {
     WiFi.mode(WIFI_STA);
 
     // Before wifi-start?
-    Serial.println("Starting MDNS.");
+    Serial.println(F("Starting MDNS."));
     MDNS.begin(my_hostname);
-    Serial.println("MDNS Ready.");
+    Serial.println(F("MDNS Ready."));
 
     // start ota
     ArduinoOTA.begin();
-    Serial.println("OTA Ready.");
+    Serial.println(F("OTA Ready."));
 
     if(reconfig_mode_active) {
         // use last known configuration (configured in WifiManager)
-        Serial.println("Using last wifi credentials in adopt mode.");
+        Serial.println(F("Using last wifi credentials in adopt mode."));
         WiFi.begin();
     } else {
-        Serial.println("Setting wifi credentials.");
+        Serial.println(F("Setting wifi credentials."));
         WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
     }
-    Serial.println("Wifi begin called.");
+    Serial.println(F("Wifi begin called."));
     if(WiFi.isConnected()) {
-        Serial.print("Already connected to Wi-Fi with IP: ");
+        Serial.print(F("Already connected to Wi-Fi with IP: "));
         Serial.println(WiFi.localIP());
         wifi_connected = true;
         connectToMqtt();
@@ -453,7 +454,7 @@ void onWifiDisconnect(
 #endif
         ) {
     wifi_connected = false;
-    Serial.println("Disconnected from Wi-Fi.");
+    Serial.println(F("Disconnected from Wi-Fi."));
     if(!reconfig_mode_active) {
         mqttReconnectTimer.detach(); // ensure we don't reconnect to MQTT while
                                      // reconnecting to Wi-Fi
@@ -469,15 +470,15 @@ void onWifiConnect(
     const WiFiEventStationModeGotIP &event
 #endif
         ) {
-    Serial.print("Connected to Wi-Fi with IP: ");
+    Serial.print(F("Connected to Wi-Fi with IP: "));
     Serial.println(WiFi.localIP());
     wifi_connected = true;
     connectToMqtt();
 }
 
 void onMqttConnect(bool sessionPresent) {
-    Serial.println("Connected to MQTT.");
-    Serial.print("Session present: ");
+    Serial.println(F("Connected to MQTT."));
+    Serial.print(F("Session present: "));
     Serial.println(sessionPresent);
 
     devices_subscribe(mqttClient, node_topic);
@@ -485,7 +486,7 @@ void onMqttConnect(bool sessionPresent) {
 }
 
 void onMqttDisconnect(AsyncMqttClientDisconnectReason reason) {
-    Serial.println("Disconnected from MQTT.");
+    Serial.println(F("Disconnected from MQTT."));
 
     if (WiFi.isConnected()) {
         mqttReconnectTimer.once(2, connectToMqtt);
@@ -493,52 +494,52 @@ void onMqttDisconnect(AsyncMqttClientDisconnectReason reason) {
 }
 
 void onMqttSubscribe(uint16_t packetId, uint8_t qos) {
-    Serial.print("Subscribe acknowledged.");
-    Serial.print("  packetId: ");
+    Serial.print(F("Subscribe acknowledged."));
+    Serial.print(F("  packetId: "));
     Serial.print(packetId);
-    Serial.print("  qos: ");
+    Serial.print(F("  qos: "));
     Serial.println(qos);
 }
 
 void onMqttUnsubscribe(uint16_t packetId) {
-    Serial.print("Unsubscribe acknowledged.");
-    Serial.print("  packetId: ");
+    Serial.print(F("Unsubscribe acknowledged."));
+    Serial.print(F("  packetId: "));
     Serial.println(packetId);
 }
 
 void onMqttMessage(char *topic, char *payload,
                    AsyncMqttClientMessageProperties properties, size_t len,
                    size_t index, size_t total) {
-    Serial.print("Publish received.");
-    Serial.print("  topic: ");
+    Serial.print(F("Publish received."));
+    Serial.print(F("  topic: "));
     Serial.print(topic);
-    Serial.print("  qos: ");
+    Serial.print(F("  qos: "));
     Serial.print(properties.qos);
-    Serial.print("  dup: ");
+    Serial.print(F("  dup: "));
     Serial.print(properties.dup);
-    Serial.print("  retain: ");
+    Serial.print(F("  retain: "));
     Serial.print(properties.retain);
-    Serial.print("  len: ");
+    Serial.print(F("  len: "));
     Serial.print(len);
-    Serial.print("  index: ");
+    Serial.print(F("  index: "));
     Serial.print(index);
-    Serial.print("  total: ");
+    Serial.print(F("  total: "));
     Serial.print(total);
 
     Ustring utopic(topic);
     utopic.remove(0, node_topic.length() + 1);
     Ustring upayload(payload, (unsigned int)total);
 
-    Serial.print(" payload: >");
+    Serial.print(F(" payload: >"));
     Serial.print(upayload.as_cstr());
-    Serial.println("<");
+    Serial.println(F("<"));
     
     devices_receive(utopic, upayload);
 }
 
 void onMqttPublish(uint16_t packetId) {
-    Serial.println("Publish acknowledged.");
-    Serial.print("  packetId: ");
+    Serial.println(F("Publish acknowledged."));
+    Serial.print(F("  packetId: "));
     Serial.println(packetId);
 }
 
@@ -549,7 +550,7 @@ void setup() {
     // connections
     // Serial.begin(115200);
     // Serial.println();
-    ulog("Booting.");
+    ulog(F("Booting."));
 
     #ifdef ID_LED
         pinMode(ID_LED, OUTPUT); // initialize a potential onboardled
@@ -563,7 +564,7 @@ void setup() {
         ESPTrueRandom.random(0,UINT32_MAX);
     #endif
     // TODO: fix that calling ESPTrueRandom crashes later
-    Serial.print("Random generator seeded, testnumber: ");
+    Serial.print(F("Random generator seeded, testnumber: "));
     Serial.println(seed_helper);
     randomSeed(seed_helper); 
 
@@ -658,7 +659,7 @@ void loop() {
                         current_time - last_transmission >=
                             transmission_delta) {
                         if (devices_publish(mqttClient, node_topic, true)) {
-                            ulog("Free memory: %ld",ESP.getFreeHeap());
+                            ulog(F("Free memory: %ld"),ESP.getFreeHeap());
                             last_transmission = current_time;
                             last_published = current_time;
                         }
@@ -670,7 +671,7 @@ void loop() {
                 } // endif update delay
             } // endif measure delay
         } else {
-            // ulog("Trouble connecting to mqtt server.");
+            // ulog(F("Trouble connecting to mqtt server."));
             // Don't block here with delay as other processes might
             // be running in background
             // TODO: wait a bit before trying to reconnect.

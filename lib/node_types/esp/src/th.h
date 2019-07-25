@@ -20,8 +20,8 @@ class Dht : public Device {
         Dht(const char* name, uint8_t pin) :
             Device(name) {
             _pin = pin;
-            add_subdevice(new Subdevice("temperature"));
-            add_subdevice(new Subdevice("humidity"));
+            add_subdevice(new Subdevice(F("temperature")));
+            add_subdevice(new Subdevice(F("humidity")));
         }
         void start() {
             _dht.setup(_pin);
@@ -56,7 +56,7 @@ class Ds18b20 : public Device {
             if(!sensors) return;
             sensors->begin();
             if (!sensors->getAddress(first, 0)) {
-                ulog("Unable to find address for Device 0. Sensor will not work.");
+                ulog(F("Unable to find address for Device 0. Sensor will not work."));
                 return;
             } 
             _started = true;

@@ -7,17 +7,17 @@ Gesture_Apds9960::Gesture_Apds9960(const char* name,
     
     int8_t subd_nr=0;
     if(light) {
-        add_subdevice(new Subdevice("color")); // 0
+        add_subdevice(new Subdevice(F("color"))); // 0
         _light = subd_nr;
         subd_nr ++;
     }
     if(proximity) {
-        add_subdevice(new Subdevice("proximity")); // 1
+        add_subdevice(new Subdevice(F("proximity"))); // 1
         _proximity = subd_nr;
         subd_nr ++;
     }
     if(gesture) {
-        add_subdevice(new Subdevice("gesture")); // 2
+        add_subdevice(new Subdevice(F("gesture"))); // 2
         gesture = subd_nr;
         subd_nr ++;
     }
@@ -33,17 +33,17 @@ void Gesture_Apds9960::i2c_start() {
     if(sensor) {
         // Start running the APDS-9960 gesture sensor engine
         if(sensor->init()) {
-            ulog("APDS-9960 initialization complete");
+            ulog(F("APDS-9960 initialization complete"));
         } else {
-            ulog("Something went wrong during APDS-9960 init!");
+            ulog(F("Something went wrong during APDS-9960 init!"));
             return;
         }
 
         // Start light sensor
         if ( sensor->enableLightSensor(false) ) {
-            ulog("Light sensor is now running");
+            ulog(F("Light sensor is now running"));
         } else {
-            ulog("Something went wrong during light sensor init!");
+            ulog(F("Something went wrong during light sensor init!"));
             return;
         }
 
@@ -51,30 +51,30 @@ void Gesture_Apds9960::i2c_start() {
         
         // Adjust the Proximity sensor gain
         if ( !sensor->setProximityGain(PGAIN_2X) ) {
-            ulog("Something went wrong trying to set PGAIN");
+            ulog(F("Something went wrong trying to set PGAIN"));
         }        
         
         // Start running the APDS-9960 proximity sensor (interrupts)
         if ( sensor->enableProximitySensor(false) ) {
-            ulog("Proximity sensor is now running");
+            ulog(F("Proximity sensor is now running"));
         } else {
-            ulog("Something went wrong during sensor init!");
+            ulog(F("Something went wrong during sensor init!"));
             return;
         }
 
         // init gesture (after proximity?)
         if (sensor->enableGestureSensor(false)) {
             //sensor->setLEDBoost(LED_BOOST_100); // comment from https://github.com/jonn26/SparkFun_APDS-9960_Sensor_Arduino_Library
-            ulog("Gesture sensor is now running");
+            ulog(F("Gesture sensor is now running"));
         } else {
-            ulog("Something went wrong during gesture sensor init!");
+            ulog(F("Something went wrong during gesture sensor init!"));
             return;
         }
 
         // use pollrate instead last_read = millis();
         _started = true;        
     } else {
-        ulog("Can't reserve memory for APDS9960.");
+        ulog(F("Can't reserve memory for APDS9960."));
     }
 }
 
@@ -100,7 +100,7 @@ bool Gesture_Apds9960::measure() {
                 !sensor->readRedLight(red_light) ||
                 !sensor->readGreenLight(green_light) ||
                 !sensor->readBlueLight(blue_light) ) {
-            ulog("Error reading light values");
+            ulog(F("Error reading light values"));
         } else { // success
             measured_value(_light).printf("%d,%d,%d,%d", 
                 ambient_light, red_light, green_light, blue_light);
@@ -111,7 +111,7 @@ bool Gesture_Apds9960::measure() {
         uint8_t proximity_data = 0;
 
         if ( !sensor->readProximity(proximity_data) ) {
-            ulog("Error reading proximity value");
+            ulog(F("Error reading proximity value"));
         } else {
             if(_threshold == 0) {
                 measured_value(_proximity).from((unsigned int)proximity_data);
@@ -128,25 +128,25 @@ bool Gesture_Apds9960::measure() {
         if ( sensor->isGestureAvailable() ) {
             switch ( sensor->readGesture() ) {
             case DIR_UP:
-                measured_value(_gesture).from("up");
+                measured_value(_gesture).from(F("up"));
                 break;
             case DIR_DOWN:
-                measured_value(_gesture).from("down");
+                measured_value(_gesture).from(F("down"));
                 break;
             case DIR_LEFT:
-                measured_value(_gesture).from("left");
+                measured_value(_gesture).from(F("left"));
                 break;
             case DIR_RIGHT:
-                measured_value(_gesture).from("right");
+                measured_value(_gesture).from(F("right"));
                 break;
             case DIR_NEAR:
-                measured_value(_gesture).from("near");
+                measured_value(_gesture).from(F("near"));
                 break;
             case DIR_FAR:
-                measured_value(_gesture).from("far");
+                measured_value(_gesture).from(F("far"));
                 break;
             default:
-                measured_value(_gesture).from("none");
+                measured_value(_gesture).from(F("none"));
             }
         }
     }
