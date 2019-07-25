@@ -63,8 +63,9 @@ class Device {
         String discovery_config_topic;
         String discovery_info;
         void create_discovery_info(const String& type,
-            bool state_topic, const char* state_on, const char* state_off,
-            bool command_topic, const String& extra_json);
+            bool state_topic=true, const char* state_on=NULL, const char* state_off=NULL,
+            bool command_topic=false, const char* payload_on=NULL, const char* payload_off=NULL,
+            const String& extra_json=String());
 #endif
     private:
         Ustring name; // device name and mqtt-topic extension

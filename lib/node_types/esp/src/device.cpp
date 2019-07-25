@@ -48,13 +48,16 @@ Device::Device(const char* _name) {
 #ifdef mqtt_discovery_prefix
 void Device::create_discovery_info(const String& type,
         bool state_topic, const char* state_on, const char* state_off,
-        bool command_topic, const String& extra_json) { // TODO: for inverted on/off this doesn't really work -> rethink
+        bool command_topic, const char* payload_on, const char* payload_off,
+        const String& extra_json) { // TODO: for inverted on/off this doesn't really work -> rethink
     
-    
-    discovery_config_topic.reserve(128); // TODO: extract into constants
-    discovery_info.reserve(512);
+// should work dynamically  
+//    discovery_config_topic.reserve(128); // extract lengths into constants
+//    discovery_info.reserve(512);
 
     String slash(F("/"));
+    String qmarks(F("\""));
+    String comma_marks(F(", \""));
     String name_s(name.as_cstr());
     String topic_s = String(mqtt_topic) + slash + name_s;
     String hostname_s(HOSTNAME);
@@ -62,17 +65,22 @@ void Device::create_discovery_info(const String& type,
     discovery_config_topic = String(F(mqtt_discovery_prefix)) + slash + type + slash
         + hostname_s + slash + name_s + String(F("/config"));
 
-    discovery_info = String(F("{ \"name\": \"")) + String(name.as_cstr()) + String(F("\""));
+    discovery_info = String(F("{ \"name\": \"")) + String(name.as_cstr()) + qmarks;
     if(state_topic) {
-        discovery_info += String(F(", \"state_topic\": \"")) + topic_s 
-            + String(F("\", \"state_on\": \"")) + String(state_on) 
-            + String(F("\", \"state_off\": \"")) + String(state_off) + String(F("\""));
-        if(command_topic) {
-            discovery_info += String(F(", \"command_topic\": \"")) + topic_s 
-                + String(F("/set\", \"payload_on\": \"")) + String(state_on) 
-                + String(F("\", \"payload_off\": \"") )+ String(state_off) + String(F("\""));
-        }
+        discovery_info += comma_marks + String(F("state_topic\": \"")) + topic_s + qmarks;
     }
+    if(state_on)
+        discovery_info += comma_marks + String(F("state_on\": \"")) + String(state_on) + qmarks;
+    if(state_off)
+        discovery_info += comma_marks + String(F("state_off\": \"")) + String(state_off) + qmarks;
+    if(command_topic) {
+        discovery_info += comma_marks + String(F("command_topic\": \"")) 
+                            + topic_s + String(F("/set")) + qmarks;
+    }
+    if(payload_on)
+        discovery_info += comma_marks + String(F("payload_on\": \"")) + String(payload_on) + qmarks;
+    if(payload_off)
+        discovery_info += comma_marks + String(F("payload_off\": \"")) + String(payload_off) + qmarks;
     if(extra_json.length() > 0) {
         discovery_info += F(", ");
         discovery_info += extra_json;
