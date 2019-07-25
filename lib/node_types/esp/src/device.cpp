@@ -127,10 +127,12 @@ bool Device::publish(AsyncMqttClient& mqtt_client, Ustring& node_topic) {
 
 #ifdef mqtt_discovery_prefix
 bool Device::publish_discovery_info(AsyncMqttClient& mqtt_client) {
-    if(!mqtt_client.publish(discovery_config_topic.c_str(), 0, false, discovery_info.c_str(), discovery_info.length())) {
-        Serial.print(F("!discovery publish error!"));
-        // TODO: signal error and trigger reconnect - necessary?
-        return false;
+    if(discovery_config_topic.length()>0) { // only if exists
+        if(!mqtt_client.publish(discovery_config_topic.c_str(), 0, false, discovery_info.c_str(), discovery_info.length())) {
+            Serial.print(F("!discovery publish error!"));
+            // TODO: signal error and trigger reconnect - necessary?
+            return false;
+        }
     }
     return true;
 }
