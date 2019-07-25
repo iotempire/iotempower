@@ -65,7 +65,7 @@ void Device::create_discovery_info(const String& type,
     discovery_config_topic = String(F(mqtt_discovery_prefix)) + slash + type + slash
         + hostname_s + slash + name_s + String(F("/config"));
 
-    discovery_info = String(F("{ \"name\": \"")) + String(name.as_cstr()) + qmarks;
+    discovery_info = String(F("{ \"name\": \"")) + hostname_s + String(F(" ")) + String(name.as_cstr()) + qmarks;
     if(state_topic) {
         discovery_info += comma_marks + String(F("state_topic\": \"")) + topic_s + qmarks;
     }
