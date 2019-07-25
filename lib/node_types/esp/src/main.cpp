@@ -381,6 +381,8 @@ void flash_mode_select() {
 AsyncMqttClient mqttClient;
 Ticker mqttReconnectTimer;
 
+bool mqtt_just_connected = false;
+
 #ifndef ESP32
 WiFiEventHandler wifiConnectHandler;
 WiFiEventHandler wifiDisconnectHandler;
@@ -454,6 +456,7 @@ void onWifiDisconnect(
 #endif
         ) {
     wifi_connected = false;
+    mqtt_just_connected = false;
     Serial.println(F("Disconnected from Wi-Fi."));
     if(!reconfig_mode_active) {
         mqttReconnectTimer.detach(); // ensure we don't reconnect to MQTT while
@@ -482,11 +485,13 @@ void onMqttConnect(bool sessionPresent) {
     Serial.println(sessionPresent);
 
     devices_subscribe(mqttClient, node_topic);
-    devices_publish_discovery_info(mqttClient);
+    mqtt_just_connected = true;
 }
 
 void onMqttDisconnect(AsyncMqttClientDisconnectReason reason) {
     Serial.println(F("Disconnected from MQTT."));
+
+    mqtt_just_connected = false;
 
     if (WiFi.isConnected()) {
         mqttReconnectTimer.once(2, connectToMqtt);
@@ -648,6 +653,10 @@ void loop() {
     ArduinoOTA.handle();
     current_time = millis();
     if (!reconfig_mode_active) {
+        if(mqtt_just_connected) {
+            mqtt_just_connected = false;
+            devices_publish_discovery_info(mqttClient); // needs to happen here not to collide with other publishes
+        }
         do_later_check(); // work the scheduler
         if (current_time - last_measured >= _measure_delay) {
             devices_update();
