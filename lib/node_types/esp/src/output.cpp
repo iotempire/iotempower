@@ -3,11 +3,13 @@
 #include "output.h"
 
 Output::Output(const char* name, const int pin, 
-        const char* high_command, const char* low_command ) :
+        const char* high_command, const char* low_command,
+        bool inverted ) :
     Device(name) {
     _high = high_command;
     _low = low_command;
     _pin = pin;
+    _inverted = inverted;
     add_subdevice(new Subdevice(""));
     add_subdevice(new Subdevice(F("set"),true))->with_receive_cb(
         [&] (const Ustring& payload) {

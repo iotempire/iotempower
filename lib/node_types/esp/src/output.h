@@ -10,20 +10,30 @@ class Output : public Device {
     private:
         const char* _high;
         const char* _low;
+        bool _inverted;
         int _pin;
     public:
         Output(const char* name, const int pin, 
                 const char* high_command="on",
-                const char* low_command="off" );
+                const char* low_command="off",
+                bool inverted=false );
         void start();
+        Output& invert() {
+            _inverted = true;
+            return *this;
+        }
+        Output& inverted() {
+            _inverted = true;
+            return *this;
+        }
         Output& high() { 
-            if(started()) digitalWrite(_pin, 1);
+            if(started()) digitalWrite(_pin, _inverted?0:1);
             measured_value().from(_high);
             return *this;
         }
         Output& on() { return high(); }
         Output& low() { 
-            if(started()) digitalWrite(_pin, 0); 
+            if(started()) digitalWrite(_pin, _inverted?1:0); 
             measured_value().from(_low);
             return *this;
         }

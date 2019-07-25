@@ -11,6 +11,7 @@ class Input : public Device {
     private:
         const char* _high;
         const char* _low;
+        bool _inverted;
         int _pin;
         int _threshold;
         bool _pull_up = true;
@@ -26,11 +27,12 @@ class Input : public Device {
         }
     public:
         Input(const char* name, int pin, 
-            const char* high="on", const char* low="off") :
+            const char* high="on", const char* low="off", bool inverted = false) :
             Device(name) {
             _high = high;
             _low = low;
             _pin = pin;
+            _inverted = inverted;
             with_threshold(0);
             add_subdevice(new Subdevice(""));
             pollrate(1); // faster default pollrate (1ms) than other devices
@@ -50,12 +52,20 @@ class Input : public Device {
             debouncer = digitalRead(_pin) * _threshold;
             return *this;
         }
+        Input& invert() {
+            _inverted = true;
+            return *this;
+        }
+        Input& inverted() {
+            _inverted = true;
+            return *this;
+        }
         bool is_high() {
-            return measured_value().equals(_high);
+            return measured_value().equals(_inverted?_low:_high);
         }
         bool is_on() { return is_high(); }
         bool is_low() {
-            return measured_value().equals(_low);
+            return measured_value().equals(_inverted?_high:_low);
         }
         bool is_off() { return is_low(); }
         bool is(const char* test_value) {
