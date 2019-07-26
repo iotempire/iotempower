@@ -654,8 +654,8 @@ void loop() {
     current_time = millis();
     if (!reconfig_mode_active) {
         if(mqtt_just_connected) {
-            mqtt_just_connected = false;
-            devices_publish_discovery_info(mqttClient); // needs to happen here not to collide with other publishes
+            mqtt_just_connected = ! // only set to true when publish successful
+                devices_publish_discovery_info(mqttClient); // needs to happen here not to collide with other publishes
         }
         do_later_check(); // work the scheduler
         if (current_time - last_measured >= _measure_delay) {

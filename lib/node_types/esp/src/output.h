@@ -11,6 +11,7 @@ class Output : public Device {
         const char* _high;
         const char* _low;
         bool _inverted;
+        bool _light = false;
         int _pin;
     public:
         Output(const char* name, const int pin, 
@@ -23,7 +24,10 @@ class Output : public Device {
             return *this;
         }
         Output& inverted() {
-            _inverted = true;
+            return invert();
+        }
+        Output& light() { // for discovery
+            _light = true;
             return *this;
         }
         Output& high() { 

@@ -17,17 +17,20 @@ Output::Output(const char* name, const int pin,
             return true;
         }
     );
-    #ifdef mqtt_discovery_prefix
-        create_discovery_info(F("switch"), 
-            true, high_command, low_command,
-            true, high_command, low_command);
-    #endif
-    low(); // must be after subdevices as it uses global measured_value()
+// don't switch until started    low(); // must be after subdevices as it uses global measured_value()
 }
 
 void Output::start() {
+    #ifdef mqtt_discovery_prefix
+        // late creation in start as _light might not be defined in constructor yet
+        create_discovery_info(_light?F("light"):F("switch"), 
+            true, _light?NULL:_high, _light?NULL:_low,
+            true, _high, _low);
+    #endif
+    
     pinMode(_pin,OUTPUT);
     _started = true;
-    if(measured_value().equals(_high)) high();
-    else low();
+    // if(measured_value().equals(_high)) high();
+    // else low();
+    low(); // off by default
 }

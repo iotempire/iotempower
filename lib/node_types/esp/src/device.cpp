@@ -145,7 +145,7 @@ bool Device::publish_discovery_info(AsyncMqttClient& mqtt_client) {
             return false;
         } else {
             // make sure it gets sent
-            delay(10);  // This delay is important to prevent overflow of network buffer TODO: implement sync publish mechanism
+            delay(1);  // This delay is important to prevent overflow of network buffer TODO: implement sync publish mechanism
         }
     }
     return true;
