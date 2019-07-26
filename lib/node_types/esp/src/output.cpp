@@ -30,7 +30,6 @@ void Output::start() {
     
     pinMode(_pin,OUTPUT);
     _started = true;
-    // if(measured_value().equals(_high)) high();
-    // else low();
-    low(); // off by default
+    if(measured_value().equals(_high)) high();
+    else low();
 }
