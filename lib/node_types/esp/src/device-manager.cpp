@@ -235,10 +235,9 @@ bool devices_publish_discovery_info(AsyncMqttClient& mqtt_client) {
         } // endif dev.started()
         return true; //continue loop device loop
     } ); // end foreach - iterate over devices
-
 #endif
 
-    return true; // TODO: decide if error occured
+    return true; // TODO: decide if error ocurred
 }
 
 
