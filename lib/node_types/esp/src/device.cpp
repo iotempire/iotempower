@@ -94,8 +94,9 @@ void Device::create_discovery_info(const String& type,
 }
 #endif
 
-
-bool Device::publish(AsyncMqttClient& mqtt_client, Ustring& node_topic) {
+////AsyncMqttClient disabled in favor of PubSubClient
+//bool Device::publish(AsyncMqttClient& mqtt_client, Ustring& node_topic) {
+bool Device::publish(PubSubClient& mqtt_client, Ustring& node_topic) {
     bool published = false;
     Ustring topic;
     bool first = true;
@@ -120,7 +121,9 @@ bool Device::publish(AsyncMqttClient& mqtt_client, Ustring& node_topic) {
             Serial.print(F(":"));
             Serial.print(val.as_cstr());
 
-            if(!mqtt_client.publish(topic.as_cstr(), 0, false, val.as_cstr())) {
+            ////AsyncMqttClient disabled in favor of PubSubClient
+            // if(!mqtt_client.publish(topic.as_cstr(), 0, false, val.as_cstr())) {
+            if(!mqtt_client.publish(topic.as_cstr(), (uint8_t*) val.as_cstr(), (unsigned int)val.length(), false)) {
                 Serial.print(F("!publish error!"));
                 // TODO: signal error and trigger reconnect - necessary?
                 return false;
@@ -136,17 +139,43 @@ bool Device::publish(AsyncMqttClient& mqtt_client, Ustring& node_topic) {
 }
 
 #ifdef mqtt_discovery_prefix
-bool Device::publish_discovery_info(AsyncMqttClient& mqtt_client) {
+////AsyncMqttClient disabled in favor of PubSubClient
+//bool Device::publish_discovery_info(AsyncMqttClient& mqtt_client) {
+bool Device::publish_discovery_info(PubSubClient& mqtt_client) {
     if(discovery_config_topic.length()>0) { // only if exists
         ulog(F("Publishing discovery info for %s."), name.as_cstr());
         // TODO: check if retained necessary or some cleanup
-        if(!mqtt_client.publish(discovery_config_topic.c_str(), 0, true, discovery_info.c_str(), discovery_info.length())) {
-            ulog(F("!discovery publish error!"));
-            // TODO: signal error and trigger reconnect - necessary?
+        ////AsyncMqttClient disabled in favor of PubSubClient
+        // if(!mqtt_client.publish(discovery_config_topic.c_str(), 0, true, discovery_info.c_str(), discovery_info.length())) {
+        //     ulog(F("!discovery publish error!"));
+        //     // TODO: signal error and trigger reconnect - necessary?
+        //     return false;
+        // } else {
+        //     // make sure it gets sent
+        //     delay(10);  // This delay is important to prevent overflow of network buffer TODO: implement sync publish mechanism
+        // }
+        unsigned int left = discovery_info.length();
+        if(!mqtt_client.beginPublish(discovery_config_topic.c_str(), left, false)) {
+            ulog(F("!discovery publish init error!"));
+        }
+        const uint8_t* start = (uint8_t*) discovery_info.c_str();
+        while(true) {
+            if(left>128) {
+                if(!mqtt_client.write(start, 128)) break;
+                start += 128;
+                left -= 128;
+            } else {
+                if(!mqtt_client.write(start, left)) break;
+                left = 0;
+                break;
+            }
+        }
+        if(left>0) {
+            ulog(F("!discovery publish write error!"));
+        }
+        if(!mqtt_client.endPublish()) {
+            ulog(F("!discovery publish end error!"));
             return false;
-        } else {
-            // make sure it gets sent
-            delay(10);  // This delay is important to prevent overflow of network buffer TODO: implement sync publish mechanism
         }
     }
     return true;

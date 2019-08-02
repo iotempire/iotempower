@@ -6,7 +6,9 @@
 #ifndef _IOTEMPOWER_DEVICE_MANAGER_H_
 #define _IOTEMPOWER_DEVICE_MANAGER_H_
 
-#include <AsyncMqttClient.h>
+////AsyncMqttClient disabled in favor of PubSubClient
+//#include <AsyncMqttClient.h>
+#include <PubSubClient.h>
 #include <toolbox.h>
 #include <device.h>
 
@@ -38,7 +40,9 @@ bool devices_start();
 bool devices_update();
 
 /* Subscribe all devices */
-bool devices_subscribe(AsyncMqttClient& mqtt_client, Ustring& node_topic);
+////AsyncMqttClient disabled in favor of PubSubClient
+//bool devices_subscribe(AsyncMqttClient& mqtt_client, Ustring& node_topic);
+bool devices_subscribe(PubSubClient& mqtt_client, Ustring& node_topic);
 
 /* match a receive-topic and deliver payload */
 bool devices_receive(Ustring& subtopic, Ustring& payload);
@@ -50,9 +54,12 @@ bool devices_receive(Ustring& subtopic, Ustring& payload);
  * Return true if anything has been published.
  * Return false if nothing was published.
  */
-bool devices_publish(AsyncMqttClient& mqtt_client, Ustring& node_topic, bool publish_all = false);
+////AsyncMqttClient disabled in favor of PubSubClient
+//bool devices_publish(AsyncMqttClient& mqtt_client, Ustring& node_topic, bool publish_all = false);
+//bool devices_publish_discovery_info(AsyncMqttClient& mqtt_client);
 
-bool devices_publish_discovery_info(AsyncMqttClient& mqtt_client);
+bool devices_publish(PubSubClient& mqtt_client, Ustring& node_topic, bool publish_all = false);
+bool devices_publish_discovery_info(PubSubClient& mqtt_client);
 
 
 #endif // _IOTEMPOWER_DEVICE_MANAGER_H_

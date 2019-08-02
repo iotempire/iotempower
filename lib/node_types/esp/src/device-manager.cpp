@@ -3,7 +3,9 @@
 // created: 2018-07-16
 
 #include <Arduino.h>
-#include <AsyncMqttClient.h>
+////AsyncMqttClient disabled in favor of PubSubClient
+//#include <AsyncMqttClient.h>
+#include <PubSubClient.h>
 #include <toolbox.h>
 #include <device-manager.h>
 
@@ -164,7 +166,9 @@ bool devices_update() {
     return changed;
 }
 
-bool devices_publish(AsyncMqttClient& mqtt_client, Ustring& node_topic, bool publish_all) {
+////AsyncMqttClient disabled in favor of PubSubClient
+//bool devices_publish(AsyncMqttClient& mqtt_client, Ustring& node_topic, bool publish_all) {
+bool devices_publish(PubSubClient& mqtt_client, Ustring& node_topic, bool publish_all) {
     bool published = false;
     bool first = true;
     device_list.for_each( [&] (Device& dev) {
@@ -182,6 +186,7 @@ bool devices_publish(AsyncMqttClient& mqtt_client, Ustring& node_topic, bool pub
                 }
             }
         }
+        mqtt_client.loop(); // give time to send things out -> seems necessary
         return true; // Continue loop
     } );
     if(!first && !published) {
@@ -192,13 +197,15 @@ bool devices_publish(AsyncMqttClient& mqtt_client, Ustring& node_topic, bool pub
     return published;
 }
 
-
-bool devices_publish(AsyncMqttClient& mqtt_client, Ustring& node_topic) {
+////AsyncMqttClient disabled in favor of PubSubClient
+//bool devices_publish(AsyncMqttClient& mqtt_client, Ustring& node_topic) {
+bool devices_publish(PubSubClient& mqtt_client, Ustring& node_topic) {
     return devices_publish(mqtt_client, node_topic, false); 
 }
 
-
-bool devices_subscribe(AsyncMqttClient& mqtt_client, Ustring& node_topic) {
+////AsyncMqttClient disabled in favor of PubSubClient
+//bool devices_subscribe(AsyncMqttClient& mqtt_client, Ustring& node_topic) {
+bool devices_subscribe(PubSubClient& mqtt_client, Ustring& node_topic) {
     // subscribe to all devices that accept input
     Ustring topic;
 
@@ -226,7 +233,10 @@ bool devices_subscribe(AsyncMqttClient& mqtt_client, Ustring& node_topic) {
     return true; // TODO: decide if error occured
 }
 
-bool devices_publish_discovery_info(AsyncMqttClient& mqtt_client) {
+////AsyncMqttClient disabled in favor of PubSubClient
+
+//bool devices_publish_discovery_info(AsyncMqttClient& mqtt_client) {
+bool devices_publish_discovery_info(PubSubClient& mqtt_client) {
 #ifdef mqtt_discovery_prefix
 
     device_list.for_each( [&] (Device& dev) {
@@ -235,6 +245,7 @@ bool devices_publish_discovery_info(AsyncMqttClient& mqtt_client) {
         } // endif dev.started()
         return true; //continue loop device loop
     } ); // end foreach - iterate over devices
+    
 #endif
 
     return true; // TODO: decide if error ocurred

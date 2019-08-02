@@ -14,13 +14,20 @@
 #include <FS.h>
 #include <WiFiUdp.h>
 
-////// adapted libraries
-#include <Ticker.h>
-//#include <WiFiManager.h>
+// MQTT
 
-// PubSubClient.h and ArduinoMqtt unstable
-// TODO: recheck PubSubClient
-#include <AsyncMqttClient.h>
+//// AsyncMqtt disabled in favor of PubSubClient
+//#include <Ticker.h> // needed for AsyncMqtt
+//#include <AsyncMqttClient.h>
+
+// Timeout Values that can be modified in PubSubClient
+//#define MQTT_KEEPALIVE 75
+//#define MQTT_SOCKET_TIMEOUT 75
+#include <PubSubClient.h>
+
+////// adapted libraries
+// none currently
+
 
 // helpers
 #include <device-manager.h>
@@ -30,6 +37,7 @@
 #include <iotempower-default.h>
 
 #include "key.h"
+
 #include "config-wrapper.h"
 
 
@@ -378,33 +386,114 @@ void flash_mode_select() {
 }
 
 ////////////// mqtt
-AsyncMqttClient mqttClient;
-Ticker mqttReconnectTimer;
 
-bool mqtt_just_connected = false;
+////AsyncMqttClient disabled in favor of PubSubClient
+//AsyncMqttClient mqttClient;
+//Ticker mqttReconnectTimer;
+//
+//bool mqtt_just_connected = false;
+//
+//#ifndef ESP32
+//WiFiEventHandler wifiConnectHandler;
+//WiFiEventHandler wifiDisconnectHandler;
+//#endif
+//Ticker wifiReconnectTimer;
+//
+//Ustring node_topic(mqtt_topic);
+//
+//static char *my_hostname;
+//
+//void connectToMqtt() {
+//    if (reconfig_mode_active)
+//        return;
+//    Serial.println(F("Connecting to MQTT..."));
+//    mqttClient.connect();
+//}
 
-#ifndef ESP32
-WiFiEventHandler wifiConnectHandler;
-WiFiEventHandler wifiDisconnectHandler;
-#endif
-Ticker wifiReconnectTimer;
-
-Ustring node_topic(mqtt_topic);
-
+/// WiFi Network
+WiFiClient netClient;
 static char *my_hostname;
 
-void connectToMqtt() {
-    if (reconfig_mode_active)
+////////////// mqtt
+PubSubClient mqttClient(netClient) ;
+Ustring node_topic(mqtt_topic);
+bool mqtt_connected = false; // mqtt in process of connecting
+// char mqtt_id[33]="01234567890123456789012";
+#define MQTT_RETRY_INTERVAL 5000
+unsigned long mqtt_last_attempt = millis() - MQTT_RETRY_INTERVAL;
+
+void onMqttMessage(char *topic, byte *payload, unsigned int len) {
+    Serial.print(F("Publish received."));
+    Serial.print(F("  topic: "));
+    Serial.print(topic);
+    Serial.print(F("  len: "));
+    Serial.print(len);
+
+    Ustring utopic(topic);
+    utopic.remove(0, node_topic.length() + 1);
+    Ustring upayload((char *)payload, (unsigned int)len);
+
+    Serial.print(F(" payload: >"));
+    Serial.print(upayload.as_cstr());
+    Serial.println(F("<"));
+    
+    devices_receive(utopic, upayload);
+}
+
+
+void onMqttConnect() {
+    Serial.println(F("Connected to MQTT."));
+
+    devices_publish_discovery_info(mqttClient); // TODO: Check if this is necessary each time or should be somwhere else
+    devices_subscribe(mqttClient, node_topic);
+}
+
+
+void maintain_mqtt() {
+    if(reconfig_mode_active)
         return;
-    Serial.println(F("Connecting to MQTT..."));
-    mqttClient.connect();
+    if(!wifi_connected)
+        return;
+    mqttClient.loop();
+    if(!mqttClient.connected()) {
+        if(mqtt_connected) {
+            mqtt_connected = false;
+            Serial.print(F("MQTT: just disconnected. Reason:"));
+            Serial.println(mqttClient.state());
+        }
+        if(millis() - mqtt_last_attempt >= MQTT_RETRY_INTERVAL) { // let's try again
+            Serial.println(F("Connecting to MQTT..."));
+            // for(int i=0; i<32; i++) {
+            //     char c = urandom(0,16);
+            //     mqtt_id[i] = c>=10?'a'+c:'0'+c;
+            // }
+            if(
+            #ifdef mqtt_user
+                mqttClient.connect(my_hostname, mqtt_user, mqtt_password)
+            #else
+                mqttClient.connect(my_hostname) // hostname is unique - TODO: can this be done more asynchronously?
+            #endif
+            ) {
+            } else { // mqtt failed
+                Serial.print(F("MQTT connection failed, rc="));
+                Serial.println(mqttClient.state());
+            }
+            mqtt_last_attempt = millis();
+        }
+    } else { // mqtt is connected
+        if(!mqtt_connected) {
+            mqtt_connected = true; // Just became available
+            onMqttConnect();
+        }
+//        mqttClient.loop(); called in beginning
+   }
 }
 
 
 void connectToWifi() {
     // Start WiFi connection and register hostname
     Serial.print(F("Trying to connect to Wi-Fi with name "));
-    Serial.println(WIFI_SSID);
+    Serial.println(F(WIFI_SSID));
     Serial.print(F("Registering hostname: "));
     if(reconfig_mode_active) {
         my_hostname = (char *)"iotempower-adoptee"; // TODO: define in defaults
@@ -444,109 +533,112 @@ void connectToWifi() {
         Serial.print(F("Already connected to Wi-Fi with IP: "));
         Serial.println(WiFi.localIP());
         wifi_connected = true;
-        connectToMqtt();
+        // connectToMqtt(); //AsyncMqttClient disabled in favor of PubSubClient
     }
 }
 
 void onWifiDisconnect(
-#ifdef ESP32
-    WiFiEvent_t event, WiFiEventInfo_t info
-#else
-    const WiFiEventStationModeDisconnected &event
-#endif
+////AsyncMqttClient disabled in favor of PubSubClient
+//#ifdef ESP32
+//    WiFiEvent_t event, WiFiEventInfo_t info
+//#else
+//    const WiFiEventStationModeDisconnected &event
+//#endif
         ) {
     wifi_connected = false;
-    mqtt_just_connected = false;
+//    mqtt_just_connected = false;
     Serial.println(F("Disconnected from Wi-Fi."));
-    if(!reconfig_mode_active) {
-        mqttReconnectTimer.detach(); // ensure we don't reconnect to MQTT while
-                                     // reconnecting to Wi-Fi
-    }
-    wifiReconnectTimer.once(2, connectToWifi);
+//    if(!reconfig_mode_active) {
+//        mqttReconnectTimer.detach(); // ensure we don't reconnect to MQTT while
+//                                     // reconnecting to Wi-Fi
+//    }
+//    wifiReconnectTimer.once(2, connectToWifi);
 }
 
 
 void onWifiConnect(
-#ifdef ESP32
-    WiFiEvent_t event, WiFiEventInfo_t info
-#else
-    const WiFiEventStationModeGotIP &event
-#endif
+////AsyncMqttClient disabled in favor of PubSubClient
+//#ifdef ESP32
+//    WiFiEvent_t event, WiFiEventInfo_t info
+//#else
+//    const WiFiEventStationModeGotIP &event
+//#endif
         ) {
     Serial.print(F("Connected to Wi-Fi with IP: "));
     Serial.println(WiFi.localIP());
     wifi_connected = true;
-    connectToMqtt();
+//    connectToMqtt();
 }
 
-void onMqttConnect(bool sessionPresent) {
-    Serial.println(F("Connected to MQTT."));
-    Serial.print(F("Session present: "));
-    Serial.println(sessionPresent);
+////AsyncMqttClient disabled in favor of PubSubClient
+// void onMqttConnect(bool sessionPresent) {
+//     Serial.println(F("Connected to MQTT."));
+//     Serial.print(F("Session present: "));
+//     Serial.println(sessionPresent);
 
-    devices_subscribe(mqttClient, node_topic);
-    mqtt_just_connected = true;
-}
+//     devices_subscribe(mqttClient, node_topic);
+//     mqtt_just_connected = true;
+// }
+//
+// void onMqttDisconnect(AsyncMqttClientDisconnectReason reason) {
+//     Serial.println(F("Disconnected from MQTT."));
+//
+//     mqtt_just_connected = false;
+//
+//     if (WiFi.isConnected()) {
+//         mqttReconnectTimer.once(2, connectToMqtt);
+//     }
+// }
+//
+// void onMqttSubscribe(uint16_t packetId, uint8_t qos) {
+//     Serial.print(F("Subscribe acknowledged."));
+//     Serial.print(F("  packetId: "));
+//     Serial.print(packetId);
+//     Serial.print(F("  qos: "));
+//     Serial.println(qos);
+// }
 
-void onMqttDisconnect(AsyncMqttClientDisconnectReason reason) {
-    Serial.println(F("Disconnected from MQTT."));
+// void onMqttUnsubscribe(uint16_t packetId) {
+//     Serial.print(F("Unsubscribe acknowledged."));
+//     Serial.print(F("  packetId: "));
+//     Serial.println(packetId);
+// }
 
-    mqtt_just_connected = false;
+// void onMqttMessage(char *topic, char *payload,
+//                    AsyncMqttClientMessageProperties properties, size_t len,
+//                    size_t index, size_t total) {
+//     Serial.print(F("Publish received."));
+//     Serial.print(F("  topic: "));
+//     Serial.print(topic);
+//     Serial.print(F("  qos: "));
+//     Serial.print(properties.qos);
+//     Serial.print(F("  dup: "));
+//     Serial.print(properties.dup);
+//     Serial.print(F("  retain: "));
+//     Serial.print(properties.retain);
+//     Serial.print(F("  len: "));
+//     Serial.print(len);
+//     Serial.print(F("  index: "));
+//     Serial.print(index);
+//     Serial.print(F("  total: "));
+//     Serial.print(total);
 
-    if (WiFi.isConnected()) {
-        mqttReconnectTimer.once(2, connectToMqtt);
-    }
-}
+//     Ustring utopic(topic);
+//     utopic.remove(0, node_topic.length() + 1);
+//     Ustring upayload(payload, (unsigned int)total);
 
-void onMqttSubscribe(uint16_t packetId, uint8_t qos) {
-    Serial.print(F("Subscribe acknowledged."));
-    Serial.print(F("  packetId: "));
-    Serial.print(packetId);
-    Serial.print(F("  qos: "));
-    Serial.println(qos);
-}
-
-void onMqttUnsubscribe(uint16_t packetId) {
-    Serial.print(F("Unsubscribe acknowledged."));
-    Serial.print(F("  packetId: "));
-    Serial.println(packetId);
-}
-
-void onMqttMessage(char *topic, char *payload,
-                   AsyncMqttClientMessageProperties properties, size_t len,
-                   size_t index, size_t total) {
-    Serial.print(F("Publish received."));
-    Serial.print(F("  topic: "));
-    Serial.print(topic);
-    Serial.print(F("  qos: "));
-    Serial.print(properties.qos);
-    Serial.print(F("  dup: "));
-    Serial.print(properties.dup);
-    Serial.print(F("  retain: "));
-    Serial.print(properties.retain);
-    Serial.print(F("  len: "));
-    Serial.print(len);
-    Serial.print(F("  index: "));
-    Serial.print(index);
-    Serial.print(F("  total: "));
-    Serial.print(total);
-
-    Ustring utopic(topic);
-    utopic.remove(0, node_topic.length() + 1);
-    Ustring upayload(payload, (unsigned int)total);
-
-    Serial.print(F(" payload: >"));
-    Serial.print(upayload.as_cstr());
-    Serial.println(F("<"));
+//     Serial.print(F(" payload: >"));
+//     Serial.print(upayload.as_cstr());
+//     Serial.println(F("<"));
     
-    devices_receive(utopic, upayload);
-}
+//     devices_receive(utopic, upayload);
+// }
 
-void onMqttPublish(uint16_t packetId) {
-    Serial.println(F("Publish acknowledged."));
-    Serial.print(F("  packetId: "));
-    Serial.println(packetId);
-}
+// void onMqttPublish(uint16_t packetId) {
+//     Serial.println(F("Publish acknowledged."));
+//     Serial.print(F("  packetId: "));
+//     Serial.println(packetId);
+// }
 
 
 void setup() {
@@ -585,36 +677,41 @@ void setup() {
 
 //    WiFi.disconnect(true);
 //    delay(10);
-    
-    // Try already to bring up WiFi
-    #ifdef ESP32    
-    WiFi.onEvent(onWifiConnect, WiFiEvent_t::SYSTEM_EVENT_STA_GOT_IP);
-    WiFi.onEvent(onWifiDisconnect, WiFiEvent_t::SYSTEM_EVENT_STA_DISCONNECTED);
-    #else
-    wifiConnectHandler = WiFi.onStationModeGotIP(onWifiConnect);
-    wifiDisconnectHandler = WiFi.onStationModeDisconnected(onWifiDisconnect);
-    #endif
+
+    ////AsyncMqttClient disabled in favor of PubSubClient
+    // // Try already to bring up WiFi
+    // #ifdef ESP32    
+    // WiFi.onEvent(onWifiConnect, WiFiEvent_t::SYSTEM_EVENT_STA_GOT_IP);
+    // WiFi.onEvent(onWifiDisconnect, WiFiEvent_t::SYSTEM_EVENT_STA_DISCONNECTED);
+    // #else
+    // wifiConnectHandler = WiFi.onStationModeGotIP(onWifiConnect);
+    // wifiDisconnectHandler = WiFi.onStationModeDisconnected(onWifiDisconnect);
+    // #endif
 
     connectToWifi();
 
     // TODO: check if port is configurable
 
     if (!reconfig_mode_active) {
-        mqttClient.onConnect(onMqttConnect);
-        mqttClient.onDisconnect(onMqttDisconnect);
-        mqttClient.onSubscribe(onMqttSubscribe);
-        mqttClient.onUnsubscribe(onMqttUnsubscribe);
-        mqttClient.onMessage(onMqttMessage);
-        mqttClient.onPublish(onMqttPublish);
+        ////AsyncMqttClient disabled in favor of PubSubClient
+        // mqttClient.onConnect(onMqttConnect);
+        // mqttClient.onDisconnect(onMqttDisconnect);
+        // mqttClient.onSubscribe(onMqttSubscribe);
+        // mqttClient.onUnsubscribe(onMqttUnsubscribe);
+        // mqttClient.onMessage(onMqttMessage);
+        // mqttClient.onPublish(onMqttPublish);
+        // mqttClient.setServer(mqtt_server, 1883);
+        // mqttClient.setClientId(my_hostname);
+        // if (mqtt_user[0]) { // auth given
+        //     mqttClient.setCredentials(mqtt_user, mqtt_password);
+        // }
         mqttClient.setServer(mqtt_server, 1883);
-        mqttClient.setClientId(my_hostname);
-        if (mqtt_user[0]) { // auth given
-            mqttClient.setCredentials(mqtt_user, mqtt_password);
-        }
+        mqttClient.setCallback(onMqttMessage);
+
         if(ulnoiot_init) ulnoiot_init(); // call user init from setup.cpp
         devices_start(); // call start of all devices
         if(ulnoiot_start) ulnoiot_start(); // call user start from setup.cpp
-        connectToMqtt(); // only subscribe after setup
+        // connectToMqtt(); //AsyncMqttClient disabled in favor of PubSubClient
     } else {  // do something to show that we are in adopt mode
         #ifdef ID_LED
             // enable flashing that light
@@ -647,17 +744,32 @@ void measure_delay(int delay) {
 }
 
 void loop() {
+    yield(); // do necessary things for  maintaining WiFi and other system tasks
+
     unsigned long current_time;
     // TODO: make sure nothing weird happens -> watchdog
-    //MDNS.update();
+    //MDNS.update(); TODO: needed???
     ArduinoOTA.handle();
     current_time = millis();
-    if (!reconfig_mode_active) {
-        if(mqtt_just_connected) {
-            mqtt_just_connected = ! // only set to true when publish successful
-                devices_publish_discovery_info(mqttClient); // needs to happen here not to collide with other publishes
-        }
+    if (!reconfig_mode_active) { // not in reconfig mode -> normal mode
+        ////AsyncMqttClient disabled in favor of PubSubClient
+        // if(mqtt_just_connected) {
+        //     mqtt_just_connected = ! // only set to true when publish successful
+        //         devices_publish_discovery_info(mqttClient); // needs to happen here not to collide with other publishes
+        // }
         do_later_check(); // work the scheduler
+        // Network connection maintainance
+        if(WiFi.status() != WL_CONNECTED) { /// No WiFi connection
+            if(wifi_connected) { // It was before
+                onWifiDisconnect();
+            }
+        } else { // WiFi connection exists
+            if(!wifi_connected) { // It was not connected before
+                onWifiConnect();
+            }
+            maintain_mqtt();
+        } // end WiFi exists
+        
         if (current_time - last_measured >= _measure_delay) {
             devices_update();
             last_measured = current_time;
