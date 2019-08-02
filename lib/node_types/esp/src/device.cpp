@@ -139,13 +139,14 @@ bool Device::publish(AsyncMqttClient& mqtt_client, Ustring& node_topic) {
 bool Device::publish_discovery_info(AsyncMqttClient& mqtt_client) {
     if(discovery_config_topic.length()>0) { // only if exists
         ulog(F("Publishing discovery info for %s."), name.as_cstr());
-        if(!mqtt_client.publish(discovery_config_topic.c_str(), 0, false, discovery_info.c_str(), discovery_info.length())) {
+        // TODO: check if retained necessary or some cleanup
+        if(!mqtt_client.publish(discovery_config_topic.c_str(), 0, true, discovery_info.c_str(), discovery_info.length())) {
             ulog(F("!discovery publish error!"));
             // TODO: signal error and trigger reconnect - necessary?
             return false;
         } else {
             // make sure it gets sent
-            delay(1);  // This delay is important to prevent overflow of network buffer TODO: implement sync publish mechanism
+            delay(10);  // This delay is important to prevent overflow of network buffer TODO: implement sync publish mechanism
         }
     }
     return true;
