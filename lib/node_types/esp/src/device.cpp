@@ -144,7 +144,7 @@ bool Device::publish(PubSubClient& mqtt_client, Ustring& node_topic) {
 bool Device::publish_discovery_info(PubSubClient& mqtt_client) {
     if(discovery_config_topic.length()>0) { // only if exists
         ulog(F("Publishing discovery info for %s."), name.as_cstr());
-        // TODO: check if retained necessary or some cleanup
+        // TODO: check if retained and/or some cleanup necessary
         ////AsyncMqttClient disabled in favor of PubSubClient
         // if(!mqtt_client.publish(discovery_config_topic.c_str(), 0, true, discovery_info.c_str(), discovery_info.length())) {
         //     ulog(F("!discovery publish error!"));
@@ -155,7 +155,7 @@ bool Device::publish_discovery_info(PubSubClient& mqtt_client) {
         //     delay(10);  // This delay is important to prevent overflow of network buffer TODO: implement sync publish mechanism
         // }
         unsigned int left = discovery_info.length();
-        if(!mqtt_client.beginPublish(discovery_config_topic.c_str(), left, false)) {
+        if(!mqtt_client.beginPublish(discovery_config_topic.c_str(), left, true)) {
             ulog(F("!discovery publish init error!"));
         }
         const uint8_t* start = (uint8_t*) discovery_info.c_str();
