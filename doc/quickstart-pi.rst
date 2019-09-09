@@ -53,6 +53,7 @@ Setting up the WiFi-Router on the Pi
   Connect your computer (laptop or desktop pc) to this WiFi network
   (use the password set as before for ``Password``).
 
+
 Accessing the Local Services on the Raspberry Pi
 ------------------------------------------------
 
@@ -68,7 +69,7 @@ Accessing the Local Services on the Raspberry Pi
   as well as links to the Node-RED
   installation.
 
-- If you are asked for a user, use ``iotempower``, if you are asked for a password
+- If you are asked for a user, use ``iot``, if you are asked for a password
   use ``iotempire``.
 
 - Keep this home-page for for later (remember or bookmark).
