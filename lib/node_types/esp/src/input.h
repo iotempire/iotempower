@@ -28,14 +28,13 @@ class Input : public Device {
     public:
         Input(const char* name, int pin, 
             const char* high="on", const char* low="off", bool inverted = false) :
-            Device(name) {
+            Device(name, 1000) { // faster default pollrate (1ms) than other devices
             _high = high;
             _low = low;
             _pin = pin;
             _inverted = inverted;
             with_threshold(0);
             add_subdevice(new Subdevice(""));
-            pollrate(1); // faster default pollrate (1ms) than other devices
         }
         void start() {
             _started = true;

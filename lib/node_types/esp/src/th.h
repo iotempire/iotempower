@@ -18,7 +18,7 @@ class Dht : public Device {
         unsigned long last_read = millis() - _read_interval;
     public:
         Dht(const char* name, uint8_t pin) :
-            Device(name) {
+            Device(name, 10000) {
             _pin = pin;
             add_subdevice(new Subdevice(F("temperature")));
             add_subdevice(new Subdevice(F("humidity")));
@@ -44,7 +44,7 @@ class Ds18b20 : public Device {
         unsigned long last_read = millis() - _read_interval;
     public:
         Ds18b20(const char* name, uint8_t pin) :
-            Device(name) {
+            Device(name, 10000) {
             _pin = pin;
             add_subdevice(new Subdevice(""));
         }

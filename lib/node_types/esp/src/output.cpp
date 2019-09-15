@@ -5,7 +5,7 @@
 Output::Output(const char* name, const int pin, 
         const char* high_command, const char* low_command,
         bool inverted ) :
-    Device(name) {
+    Device(name, 1000) { // very low pollrate (1ms) to react fast
     _high = high_command;
     _low = low_command;
     _pin = pin;

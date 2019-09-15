@@ -19,7 +19,7 @@ void Hcsr04::echo_changed(void) {
 }
 
 Hcsr04::Hcsr04(const char* name, uint8_t trigger_pin, uint8_t echo_pin)
-    : Device(name) {
+    : Device(name, 10000) {
     
     _timeout_us = timeout_us;
     _echo_pin = echo_pin;

@@ -33,7 +33,7 @@ void Edge_Counter::reinit() {
 }
 
 Edge_Counter::Edge_Counter(const char* name, int pin, bool rising, bool falling) :
-    Device(name) {
+    Device(name, 10000) {
     _pin = pin;
     _rising = rising;
     _falling = falling;

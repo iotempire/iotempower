@@ -59,9 +59,9 @@ class RGB_Base : public Device {
             // update values with last color set
             // TODO: make this reporting skipable
             // TODO: seems like also on and off should be ignored for home-assistant
-            measured_value(0).from(color.getLuma()>0?"on":"off");
-            measured_value(2).from((int)color.getLuma());
-            measured_value(4).printf("%2x%2x%2x", color.r, color.g, color.b);
+            measured_value(0).from(avg_color.getLuma()>0?"on":"off");
+            measured_value(2).from((int)avg_color.getLuma());
+            measured_value(4).printf("%02x%02x%02x", avg_color.r, avg_color.g, avg_color.b);
             return *this;
         }
 
@@ -77,7 +77,8 @@ class RGB_Base : public Device {
         }
 
         virtual void process_color(int lednr, CRGB color, bool _show=true) {
-            avg_color = color;
+            avg_color = color; // in strip, real average is computed
+            // show not evaluated in single led case (but in rgb_strip)
         }
 
         virtual CRGB get_color(int lednr) {

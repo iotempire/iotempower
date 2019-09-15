@@ -5,7 +5,7 @@
 
 Hx711::Hx711(const char* name, uint8_t sck_pin, uint8_t dout_pin,
                 float calfactor, bool calibration)
-        : Device(name) {
+        : Device(name, 10000) {
     _calfactor = calfactor;
     _sck_pin = sck_pin;
     _dout_pin = dout_pin;

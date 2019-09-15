@@ -5,7 +5,7 @@
 #include "_PWM.h"
 
 Pwm::Pwm(const char* name, uint8_t pin, int frequency) 
-        : Device(name) {
+        : Device(name, 1000) { // low pollrate 1ms
     _pwm = new _PWM(pin, frequency);
     if(!_pwm) {
         ulog(F("Can't register PWM. Not enough memory."));

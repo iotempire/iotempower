@@ -77,7 +77,7 @@ void Mfrc522::write(const Ustring &payload) {
 
 
 Mfrc522::Mfrc522(const char* name, uint16_t data_size, 
-        bool in_hex, bool use_auth, const byte* six_byte_key) : Device(name) {
+        bool in_hex, bool use_auth, const byte* six_byte_key) : Device(name, 10000) {
     _use_auth = use_auth;
     if(_use_auth) {
         if(six_byte_key) {

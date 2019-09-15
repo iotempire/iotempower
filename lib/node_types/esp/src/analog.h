@@ -16,7 +16,7 @@ class Analog : public Device {
         int _precision = 1;
     public:
         Analog(const char* name) :
-            Device(name) {
+            Device(name, 10000) {
             add_subdevice(new Subdevice(""));
         }
         void start() {

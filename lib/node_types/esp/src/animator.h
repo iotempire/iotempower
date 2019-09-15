@@ -31,7 +31,7 @@ class Animator : public Device {
         void init();
 
     public:
-        Animator(const char* name) : Device(name) {
+        Animator(const char* name) : Device(name, 10000) {
             init();            
         }
         Animator& with_frame_builder(ANIMATOR_FRAME_BUILDER_HANDLER handler) {
@@ -42,7 +42,7 @@ class Animator : public Device {
             _show_handler = handler;
             return *this;
         }
-        Animator(const char* name, RGB_Matrix& matrix) : Device(name) {
+        Animator(const char* name, RGB_Matrix& matrix) : Device(name, 10000) {
             init();
             _matrix = &matrix;
             with_show([&] () { _matrix->show(); });

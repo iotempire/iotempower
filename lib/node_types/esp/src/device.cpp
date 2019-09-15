@@ -37,8 +37,9 @@ bool Subdevice::call_receive_cb(Ustring& payload) {
 // Just define add_device from here - to avoid messed up dependencies
 bool add_device(Device& device);
 
-Device::Device(const char* _name) {
+Device::Device(const char* _name, unsigned long __pollrate_us) {
     name.from(_name);
+    pollrate_us(__pollrate_us);
     ulog(F("Device: Adding device: %s"), name.as_cstr());
     if(!add_device(*this)) {
         ulog(F("Device %s couldn't be added - max devices reached."), _name);
@@ -189,6 +190,7 @@ bool Device::poll_measure() {
         if( micros() - last_poll >= _pollrate_us) { // only measure so often
             // TODO: reenable measure_init(); // something might have to be executed here to init each time, for example i2c setup
             if(!measure()) {  // measure new value or trigger physical update
+                yield(); // measure might have take long, give some time to system TODO: do we have to take care of mqtt here too?
                 // re-use last value(s), if measurement not successful
                 subdevices.for_each( [](Subdevice& sd) {
                     sd.measured_value.copy(sd.current_value);

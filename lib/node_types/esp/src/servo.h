@@ -24,18 +24,19 @@ class Servo : public Device {
         int _duration;
         unsigned long start_time;
     public:
+#define IOTEMPIRE_SERVO_POLLRATE 1000
         Servo(const char* name, uint8_t pin, int min_us, int max_us)
-            : Device(name) {
+            : Device(name, IOTEMPIRE_SERVO_POLLRATE) {
             init(pin, min_us, max_us, IOTEMPOWER_DEFAULT_DURATION);
         }
         Servo(const char* name, uint8_t pin, int min_us, int max_us, int duration)
-            : Device(name) {
+            : Device(name, IOTEMPIRE_SERVO_POLLRATE) {
             init(pin, min_us, max_us, duration);
         }
-        Servo(const char* name, uint8_t pin) : Device (name) {
+        Servo(const char* name, uint8_t pin) : Device (name, IOTEMPIRE_SERVO_POLLRATE) {
             init(pin, 554, 2400, IOTEMPOWER_DEFAULT_DURATION);
         }
-        Servo(const char* name, uint8_t pin, int duration) : Device (name) {
+        Servo(const char* name, uint8_t pin, int duration) : Device (name, IOTEMPIRE_SERVO_POLLRATE) {
             init(pin, 554, 2400, duration);
         }
         void stop();

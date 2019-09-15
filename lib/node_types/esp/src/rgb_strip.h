@@ -40,6 +40,20 @@ class RGB_Strip : public RGB_Base {
         virtual void show() {
             if(!started()) return;
             controller->showLeds(); // TODO: handle brightness of showLeds?
+            // TODO: consider only computing average every 10ms
+            // compute average color
+            uint32_t avg_r = 0;
+            uint32_t avg_g = 0;
+            uint32_t avg_b = 0;
+            CRGB c;
+            int lc = led_count();
+            for(int i=lc-1; i>=0; i--) {
+                c = leds[i];
+                avg_r += c.r;
+                avg_g += c.g;
+                avg_b += c.b;
+            }
+            avg_color = CRGB(avg_r/lc, avg_g/lc, avg_b/lc);
         }
 };
 

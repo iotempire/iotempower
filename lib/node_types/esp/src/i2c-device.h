@@ -37,13 +37,13 @@ class I2C_Device : public Device {
          * TODO: check, why overwrite still works */
         void start();
     public:
-        I2C_Device(const char* name, uint8_t client_address) : Device(name) {
+        I2C_Device(const char* name, uint8_t client_address) : Device(name, 10000) {
             init_i2c(SDA, SCL, IOTEMPOWER_DEFAULT_I2C_CLOCK,
                 IOTEMPOWER_DEFAULT_I2C_MASTER_ADDRESS);
             set_address(client_address);
         }
 
-        I2C_Device(const char* name) : Device(name) {
+        I2C_Device(const char* name) : Device(name, 10000) {
             init_i2c(SDA, SCL, IOTEMPOWER_DEFAULT_I2C_CLOCK, 
                 IOTEMPOWER_DEFAULT_I2C_MASTER_ADDRESS);
         }

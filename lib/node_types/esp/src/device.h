@@ -91,14 +91,14 @@ class Device {
         #define IOTEMPOWER_FILTER_CALLBACK std::function<bool()>
         IOTEMPOWER_FILTER_CALLBACK _filter_cb=NULL;
 
-        unsigned long _pollrate_us = 100000; // default is to poll only every 10ms
+        unsigned long _pollrate_us = 0; // poll as often as possible
         unsigned long last_poll = micros(); // when was last polled
 
     protected:
         bool _started = false;
 
     public:
-        Device(const char* _name);
+        Device(const char* _name, unsigned long pollrate_ms);
         //// Getters & Setters
         Device& with_ignore_case(bool ignore_case) { 
             _ignore_case = ignore_case;
