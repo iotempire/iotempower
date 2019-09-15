@@ -22,7 +22,10 @@ class RGB_Base : public Device {
     public:
         RGB_Base(const char* name, int led_count);
         RGB_Base& high() { 
-            return set_color(CRGB::White);
+            if((uint16_t)avg_color.r+avg_color.g+avg_color.b>0) { 
+                return *this; // if something is on, do nothing
+            }
+            return set_color(CRGB::White); // else switch to white TODO: make on-brightness configurable
         }
         RGB_Base& on() { return high(); }
         RGB_Base& low() { 
