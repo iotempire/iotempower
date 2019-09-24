@@ -4,6 +4,7 @@
 
 #include "i2c-device.h"
 
+TwoWire Wire1;  // TODO: recheck
 
 void I2C_Device::start() {
     if(_master_address == _i2c_address) {
@@ -24,9 +25,11 @@ void I2C_Device::measure_init() {
     // }
     // TODO: check - this seems to destroy the display
 //    Wire.begin(sda_pin, scl_pin, _master_address); // TODO: add again, destroys some i2c devices (incl. display)
+    Wire = mywire; // overwrite current Wire to allow multiple
+    // reset sda and scl as they are global in twi
     Wire.begin(sda_pin, scl_pin); // works, better than giving master
     // TODO: consider adding an option for not having pull-ups, so pull them down here
-    Wire.setClock(clock_speed);
+    Wire.setClock(clock_speed); // reset clock speed
 }
 
 

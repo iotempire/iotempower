@@ -5,7 +5,7 @@
 #define _ANIMATOR_H_
 
 #include <device.h>
-// TODO: should this dependencies softened to classes having a show-method?
+// TODO: should these dependencies softened to classes having a show-method?
 #include <rgb_matrix.h>
 
 #define ANIMATOR_COMMAND_HANDLER std::function<void(Ustring& command)>
@@ -31,8 +31,9 @@ class Animator : public Device {
         void init();
 
     public:
-        Animator(const char* name) : Device(name, 10000) {
-            init();            
+        Animator(const char* name) : Device(name, 0) {
+            init();
+            ulog("animator init pollrate: %lu", get_pollrate_us());
         }
         Animator& with_frame_builder(ANIMATOR_FRAME_BUILDER_HANDLER handler) {
             _handler = handler;
@@ -42,7 +43,7 @@ class Animator : public Device {
             _show_handler = handler;
             return *this;
         }
-        Animator(const char* name, RGB_Matrix& matrix) : Device(name, 10000) {
+        Animator(const char* name, RGB_Matrix& matrix) : Device(name, 0) {
             init();
             _matrix = &matrix;
             with_show([&] () { _matrix->show(); });

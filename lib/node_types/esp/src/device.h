@@ -98,7 +98,7 @@ class Device {
         bool _started = false;
 
     public:
-        Device(const char* _name, unsigned long pollrate_ms);
+        Device(const char* _name, unsigned long pollrate_us);
         //// Getters & Setters
         Device& with_ignore_case(bool ignore_case) { 
             _ignore_case = ignore_case;
@@ -148,9 +148,18 @@ class Device {
         }
 
         // pollrate
-        Device& set_pollrate(unsigned long rate_ms) { 
-            _pollrate_us = rate_ms * 1000;
+        Device& set_pollrate_us(unsigned long rate_us) { 
+            _pollrate_us = rate_us;
             return *this;
+        }
+        Device& with_pollrate_us(unsigned long rate_us) { 
+            return set_pollrate_us(rate_us);
+        }
+        Device& pollrate_us(unsigned long rate_us) { 
+            return set_pollrate_us(rate_us);
+        }
+        Device& set_pollrate(unsigned long rate_ms) { 
+            return set_pollrate_us(rate_ms*1000);
         }
         Device& with_pollrate(unsigned long rate_ms) { 
             return set_pollrate(rate_ms);
@@ -158,15 +167,11 @@ class Device {
         Device& pollrate(unsigned long rate_ms) { 
             return set_pollrate(rate_ms);
         }
-        Device& set_pollrate_us(unsigned long rate_us) { 
-            _pollrate_us = rate_us;
-            return *this;
+        unsigned int get_pollrate() {
+            return _pollrate_us/1000;
         }
-        Device& with_pollrate_us(unsigned long rate_us) { 
-            return set_pollrate(rate_us);
-        }
-        Device& pollrate_us(unsigned long rate_us) { 
-            return set_pollrate(rate_us);
+        unsigned int get_pollrate_us() {
+            return _pollrate_us;
         }
 
         // report_change

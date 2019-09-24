@@ -658,7 +658,7 @@ void setup() {
     #ifdef ESP32
         esp_random();
     #else
-        ESPTrueRandom.random(0,UINT32_MAX);
+        ESPTrueRandom.random(0,UINT32_MAX); // has become always 0
     #endif
     // TODO: fix that calling ESPTrueRandom crashes later
     Serial.print(F("Random generator seeded, testnumber: "));

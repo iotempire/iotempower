@@ -40,7 +40,7 @@ bool add_device(Device& device);
 Device::Device(const char* _name, unsigned long __pollrate_us) {
     name.from(_name);
     pollrate_us(__pollrate_us);
-    ulog(F("Device: Adding device: %s"), name.as_cstr());
+    ulog(F("Device: Adding device: %s pollrate: %lu"), name.as_cstr(), _pollrate_us);
     if(!add_device(*this)) {
         ulog(F("Device %s couldn't be added - max devices reached."), _name);
     }
@@ -188,15 +188,21 @@ bool Device::publish_discovery_info(PubSubClient& mqtt_client) {
 bool Device::poll_measure() {
     if(started()) { // only if device active
         if( micros() - last_poll >= _pollrate_us) { // only measure so often
-            // TODO: reenable measure_init(); // something might have to be executed here to init each time, for example i2c setup
+            last_poll = micros();
+            measure_init(); // something might have to be executed here to init each time, for example i2c setup
             if(!measure()) {  // measure new value or trigger physical update
-                yield(); // measure might have take long, give some time to system TODO: do we have to take care of mqtt here too?
+//                ulog("poll measure no val: %s, %lu", name.as_cstr(), _pollrate_us); // TODO: remove/debug
+                // no new value generated
+                yield(); // measure might have taken long, give some time to system TODO: do we have to take care of mqtt here too?
                 // re-use last value(s), if measurement not successful
                 subdevices.for_each( [](Subdevice& sd) {
                     sd.measured_value.copy(sd.current_value);
                     return true; // continue loop
                 } );
-            } else {
+            } else { // new value generated
+//                ulog("poll measure new val: %s, %lu", name.as_cstr(), _pollrate_us); // TODO: remove/debug
+                yield(); // measure might have taken long, give some time to system TODO: do we have to take care of mqtt here too?
+                //ulog("poll rate measure new val: %lu", _pollrate_us); // TODO: remove/debug
                 if(_ignore_case) { // if necessary, lower them all
                     subdevices.for_each( [](Subdevice& sd) {
                         sd.measured_value.lower();
@@ -204,7 +210,6 @@ bool Device::poll_measure() {
                     } );
                 }
             }
-            last_poll = micros();
             
             // a current value is now in measured_value(s)
             // check if it needs to be filtered

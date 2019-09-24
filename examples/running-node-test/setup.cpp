@@ -47,7 +47,7 @@
 // });
 // analog(a0).with_filter_callback(filter_average(int, 100, IN(a0));
 
-// gestue/color/proximity
+// gesture/color/proximity
 //gesture_apds9960(gesture);
 
 // edge_counter example
@@ -71,6 +71,7 @@
 //hx711(weight, D6, D7, 419.0, true)
 //    .with_filter(filter_round(2, IN(weight)));
 
+//vl53l0x distance sensor
 //vl53l0x(dist);
 
 // barometer
@@ -87,7 +88,7 @@
 
 // light sensitivity sensors
 // bh1750(lux1);
-tsl2561(lux2);
+//tsl2561(lux2);
 
 // Example for single RGB-led
 // rgb(r0, D6, D5, D0, true);
@@ -172,7 +173,7 @@ tsl2561(lux2);
 //display(d1, font_medium).i2c(D6, D5); // standard ssd1306
 //U8G2_SSD1306_64X48_ER_F_HW_I2C u8g2d(U8G2_R0); // small ssd1306 as wemos shield
 //display(d1, u8g2d);
-display44780(d2, 16, 2);
+//display44780(d2, 16, 2);
 
 // Example for pulse width modulation
 // pwm(blue, ONBOARDLED).with_frequency(1000);

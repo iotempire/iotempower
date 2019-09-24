@@ -7,6 +7,9 @@
 #ifndef _IOTEMPOWER_I2C_DEVICE_H_
 #define _IOTEMPOWER_I2C_DEVICE_H_
 
+//// prevent Wire instance to be allocated // too late, let's better overwrite
+//#define NO_GLOBAL_TWOWIRE
+
 #include <Arduino.h>
 #include <Wire.h>
 #include <device.h>
@@ -20,6 +23,7 @@
 
 class I2C_Device : public Device {
     private:
+        TwoWire mywire; // own wire: TODO: only reserve once per I2C-bus
         uint8_t sda_pin;
         uint8_t scl_pin;
         uint8_t _i2c_address = 255; // This is the client device adddress
