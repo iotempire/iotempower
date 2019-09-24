@@ -110,6 +110,11 @@ class I2C_Device : public Device {
          * */
         void measure_init(); 
 
+        /* measure_init
+         * all i2c params have to be restored all the time.
+         * */
+        void measure_exit(); 
+
         // i2c devices need to overwrite i2c_start instead of start
         virtual void i2c_start() { _started = true; }
 

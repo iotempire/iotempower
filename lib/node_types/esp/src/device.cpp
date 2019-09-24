@@ -210,6 +210,7 @@ bool Device::poll_measure() {
                     } );
                 }
             }
+            measure_exit(); // something might have to be executed here to exit each time, for example i2c setup
             
             // a current value is now in measured_value(s)
             // check if it needs to be filtered
