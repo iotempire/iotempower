@@ -230,7 +230,7 @@ bool devices_subscribe(PubSubClient& mqtt_client, Ustring& node_topic) {
         } // endif dev.started()
         return true; //continue loop device loop
     } ); // end foreach - iterate over devices
-    return true; // TODO: decide if error occured
+    return true; // TODO: decide if error occurred
 }
 
 ////AsyncMqttClient disabled in favor of PubSubClient

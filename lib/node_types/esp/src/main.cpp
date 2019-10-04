@@ -1,9 +1,13 @@
 // main.cpp
-// main program for iotempower esp8266 firmware
+// main program for iotempower esp8266/esp32 firmware
+
+
+// for randomness, we need crypto library first
+#include <hydrogen.h>
 
 ////// Standard libraries
 #include <ArduinoOTA.h>
-//#include <ESP8266WebServer.h> //Local WebServer used to serve the configuration portal
+//#include <ESP8266WebServer.h> //Local WebServer used to serve the configuration portal - obsolete due to dongle
 #ifdef ESP32
     #include <WiFi.h>
     #include <ESPmDNS.h>
@@ -11,8 +15,16 @@
     #include <ESP8266WiFi.h>
     #include <ESP8266mDNS.h>
 #endif
-#include <FS.h>
+//#include <FS.h> // no filesystem used
 #include <WiFiUdp.h>
+
+// PJON, we use PJON as generic network layer
+#define PJON_MAX_PACKETS 1
+#define PJON_PACKET_MAX_LENGTH 1024 // configuration packages can be quite long
+#define PJON_INCLUDE_ASYNC_ACK true
+#define PJON_MAX_RECENT_PACKET_IDS 10
+#include <PJON.h>
+PJON<GlobalUDP> pjon_bus;
 
 // MQTT
 
@@ -444,7 +456,7 @@ void onMqttMessage(char *topic, byte *payload, unsigned int len) {
 void onMqttConnect() {
     Serial.println(F("Connected to MQTT."));
 
-    devices_publish_discovery_info(mqttClient); // TODO: Check if this is necessary each time or should be somwhere else
+    devices_publish_discovery_info(mqttClient); // TODO: Check if this is necessary each time or should be somewhere else
     devices_subscribe(mqttClient, node_topic);
 }
 
@@ -521,8 +533,7 @@ void connectToWifi() {
     Serial.println(F("OTA Ready."));
 
     if(reconfig_mode_active) {
-        // use last known configuration (configured in WifiManager)
-        Serial.println(F("Using last wifi credentials in adopt mode."));
+        Serial.println(F("Using default wifi credentials in adopt mode."));
         WiFi.begin();
     } else {
         Serial.println(F("Setting wifi credentials."));
@@ -568,6 +579,17 @@ void onWifiConnect(
     Serial.println(WiFi.localIP());
     wifi_connected = true;
 //    connectToMqtt();
+    pjon_bus.set_shared_network(true);
+    pjon_bus.set_id(IPAddress(WiFi.localIP())[3]);
+    // resend configuration to PJON iot gateway
+    pjon_bus.begin();
+    // When coming online we send the general config to the server
+    // hostname - to match to our main topic and find the key we use to communicate
+    // encrypted(nonce+data): data=(ip-address,id)
+    
+    // create package:
+    
+    //pjon_bus.send_packet(1, );
 }
 
 ////AsyncMqttClient disabled in favor of PubSubClient
@@ -642,7 +664,7 @@ void onWifiConnect(
 
 
 void setup() {
-    // TODO: setup watchdog
+    // TODO: setup (another, the internal one seem quite ok) watchdog
     // TODO: consider not using serial at all and freeing it for other
     // connections
     // Serial.begin(115200);
@@ -650,20 +672,11 @@ void setup() {
     ulog(F("Booting."));
 
     #ifdef ID_LED
-        pinMode(ID_LED, OUTPUT); // initialize a potential onboardled
+        pinMode(ID_LED, OUTPUT); // initialize a potential onboardled // TODO: check if it's inverted
     #endif
 
-    // initialize randomness
-    uint32_t seed_helper =
-    #ifdef ESP32
-        esp_random();
-    #else
-        ESPTrueRandom.random(0,UINT32_MAX); // has become always 0
-    #endif
-    // TODO: fix that calling ESPTrueRandom crashes later
-    Serial.print(F("Random generator seeded, testnumber: "));
-    Serial.println(seed_helper);
-    randomSeed(seed_helper); 
+    // not necessary to initialize randomness, if not seeded
+    ulog(F("Random generator check, testnumber: %lu"), random(INT32_MAX));
 
     flash_mode_select();
 
