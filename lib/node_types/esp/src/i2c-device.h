@@ -23,7 +23,12 @@
 
 class I2C_Device : public Device {
     private:
-        TwoWire mywire; // own wire: TODO: only reserve once per I2C-bus
+        // own wire: TODO: only reserve once per I2C-bus
+    #ifdef ESP32
+        TwoWire mywire = TwoWire(0); // ESP32 has two busses TODO: see if iotempower emulation works or need to distributed 
+    #else
+        TwoWire mywire;
+    #endif
         uint8_t sda_pin;
         uint8_t scl_pin;
         uint8_t _i2c_address = 255; // This is the client device adddress

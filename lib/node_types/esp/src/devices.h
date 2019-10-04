@@ -54,9 +54,9 @@
 #define pwm(name, ...) IOTEMPOWER_DEVICE(name, pwm_, ##__VA_ARGS__)
 
 
-#include <servo.h>
+#include <emp_servo.h>
 #define servo_(internal_name, ...) \
-    IOTEMPOWER_DEVICE_(Servo, internal_name, ##__VA_ARGS__)
+    IOTEMPOWER_DEVICE_(Emp_Servo, internal_name, ##__VA_ARGS__)
 #define servo(name, ...) IOTEMPOWER_DEVICE(name, servo_, ##__VA_ARGS__)
 
 

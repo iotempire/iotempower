@@ -4,8 +4,6 @@
 
 #include "i2c-device.h"
 
-TwoWire Wire1;  // TODO: recheck
-
 void I2C_Device::start() {
     if(_master_address == _i2c_address) {
         ulog(F("I2C Master address equals client address - %d. Not starting device."), _i2c_address);

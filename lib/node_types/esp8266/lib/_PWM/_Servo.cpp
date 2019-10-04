@@ -18,14 +18,13 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
-#if defined(ESP8266)
-
 #include <Arduino.h>
 #include <_Servo.h>
+
 #include "core_esp8266_waveform.h"
 
-// similiar to map but will have increased accuracy that provides a more
-// symetric api (call it and use result to reverse will provide the original value)
+// similar to map but will have increased accuracy that provides a more
+// symmetric api (call it and use result to reverse will provide the original value)
 int improved_map(int value, int minIn, int maxIn, int minOut, int maxOut)
 {
     const int rangeIn = maxIn - minIn;
@@ -41,7 +40,7 @@ int improved_map(int value, int minIn, int maxIn, int minOut, int maxOut)
 //-------------------------------------------------------------------
 //  _Servo class methods
 
- _Servo:: _Servo()
+_Servo:: _Servo()
 {
   _attached = false;
   _valueUs = DEFAULT_PULSE_WIDTH;
@@ -49,7 +48,7 @@ int improved_map(int value, int minIn, int maxIn, int minOut, int maxOut)
   _maxUs = MAX_PULSE_WIDTH;
 }
 
- _Servo::~ _Servo() {
+_Servo::~ _Servo() {
   detach();
 }
 
@@ -90,7 +89,7 @@ void  _Servo::detach()
 
 void  _Servo::write(int value)
 {
-  // treat values less than 544 as angles in degrees (valid values in microseconds are handled as microseconds)
+  // treat small values (less than 544) as angles in degrees (valid values in microseconds are handled as microseconds)
   if (value < MIN_PULSE_WIDTH) {
     // assumed to be 0-180 degrees servo
     value = constrain(value, 0, 180);
@@ -102,7 +101,7 @@ void  _Servo::write(int value)
 }
 
 void  _Servo::writeMicroseconds(int value)
-{
+{ // write the pulse_width
   _valueUs = value;
   if (_attached) {
     startWaveform(_pin, _valueUs, REFRESH_INTERVAL - _valueUs, 0);
@@ -125,5 +124,3 @@ bool  _Servo::attached()
 {
   return _attached;
 }
-
-#endif

@@ -46,6 +46,7 @@ class Display_Base : public I2C_Device {
             Ustring str_u;
             str_u.from(str);
             print(str_u);
+            return *this;
         }
         Display_Base& println();
         Display_Base& println(const char* str);
@@ -54,6 +55,7 @@ class Display_Base : public I2C_Device {
             Ustring str_u;
             str_u.from(str);
             println(str_u);
+            return *this;
         }
         Display_Base& cursor(int x, int y);
         Display_Base& clear();

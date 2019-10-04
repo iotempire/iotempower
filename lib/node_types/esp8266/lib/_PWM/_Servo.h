@@ -49,18 +49,8 @@
 #define MIN_PULSE_WIDTH       544     // the shortest pulse sent to a servo  
 #define MAX_PULSE_WIDTH      2400     // the longest pulse sent to a servo 
 #define DEFAULT_PULSE_WIDTH  1500     // default pulse width when servo is attached
-#define REFRESH_INTERVAL    20000     // minimum time to refresh servos in microseconds -> freq = 100Hz
-//#define REFRESH_INTERVAL    40000     // minimum time to refresh servos in microseconds -> freq = 50Hz
-
-// #if !defined(ESP8266)
-
-// #error "This library only supports esp8266 boards."
-
-// #endif
-
-#ifdef ESP32
-    #include <analogWrite.h>
-#endif
+#define REFRESH_INTERVAL    20000     // minimum time to refresh servos in microseconds -> freq = 50Hz
+//#define REFRESH_INTERVAL    40000     // minimum time to refresh servos in microseconds -> freq = 25Hz
 
 class  _Servo
 {
