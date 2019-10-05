@@ -15,22 +15,24 @@ class Pwm : public Device {
         int _duty = 0;
     public:
         Pwm(const char* name, uint8_t pin, int frequency=1000);
-        void set_duty(int duty) {
+        Pwm& set_duty(int duty) {
             set(duty,_frequency);
+            return *this;
         }
         Pwm& with_duty(int duty) {
             set_duty(duty);
             return *this;
         }
-        void set_frequency(int frequency) {
+        Pwm& set_frequency(int frequency) {
             // analogWriteFreq(_pin, frequency);
             set(_duty, frequency);
+            return *this;
         }
         Pwm& with_frequency(int frequency) {
             set_frequency(frequency);
             return *this;
         }
-        void set(int duty, int frequency);
+        Pwm& set(int duty, int frequency);
         void start() {
             _started = true;
             set(_duty, _frequency);

@@ -5,26 +5,33 @@
 _PWM:: _PWM(uint8_t pin, int frequency)
 {
     _pin=pin;
-//    pinMode(_pin, OUTPUT);
+    _frequency = frequency;
+    pinMode(_pin, OUTPUT);
 }
 
 #define limit(nr, min, max) \
     ( (nr) < (min) ? (min):((nr) > (max) ? (max):(nr)) )
 
 void _PWM::set(int duty, int frequency) {
-    _frequency = limit(frequency,2,5000);
-    _duty = limit(duty,0,1023);
-
-    if(!esp32_pwm.attached())
-        esp32_pwm.attachPin(_pin, 5000.0/frequency);
+    set_frequency(frequency); // first set new frequency to guarantee attached pin
+    set_duty(duty);
 }
 
 void  _PWM::set_duty(int duty)
 {
-    esp32_pwm.write(_duty);
+    _duty = limit(duty,0,1023);
+
+    if(esp32_pwm.attached()) // only when attached
+        esp32_pwm.write(_duty);
 }
 
 void  _PWM::set_frequency(int frequency)
 {
-    esp32_pwm.adjustFrequency(5000.0/frequency);
+    frequency = limit(frequency,2,5000);
+
+    if(frequency != _frequency || !esp32_pwm.attached()) {
+        if(esp32_pwm.attached()) // if necessary detach first
+            esp32_pwm.detachPin(_pin);
+        esp32_pwm.attachPin(_pin, frequency, 10); // new attach to reset frequency
+    }
 }

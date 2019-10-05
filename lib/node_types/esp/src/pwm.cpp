@@ -2,7 +2,6 @@
 // change pwm parameters on a gpio port
 
 #include "pwm.h"
-#include "_PWM.h"
 
 Pwm::Pwm(const char* name, uint8_t pin, int frequency) 
         : Device(name, 1000) { // low pollrate 1ms
@@ -31,13 +30,13 @@ Pwm::Pwm(const char* name, uint8_t pin, int frequency)
     set_duty(0);
 }
 
-void Pwm::set(int duty, int frequency) {
+Pwm& Pwm::set(int duty, int frequency) {
     _frequency = limit(frequency,2,5000);
     _duty = limit(duty,0,1023);
-    if(!started()) return;
+    if(!started()) return *this;
     
     measured_value(2).from(_frequency);
     measured_value(0).from(_duty);
-
     _pwm->set(_duty, _frequency);
+    return *this;
 }

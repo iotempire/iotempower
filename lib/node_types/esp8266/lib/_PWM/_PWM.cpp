@@ -7,6 +7,7 @@
 _PWM:: _PWM(uint8_t pin, int frequency)
 {
     _pin=pin;
+    _frequency = frequency;
     pinMode(_pin, OUTPUT);
 }
 
