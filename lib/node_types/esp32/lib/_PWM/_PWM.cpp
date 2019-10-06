@@ -6,7 +6,6 @@ _PWM:: _PWM(uint8_t pin, int frequency)
 {
     _pin=pin;
     _frequency = frequency;
-    pinMode(_pin, OUTPUT);
 }
 
 #define limit(nr, min, max) \
@@ -32,6 +31,7 @@ void  _PWM::set_frequency(int frequency)
     if(frequency != _frequency || !esp32_pwm.attached()) {
         if(esp32_pwm.attached()) // if necessary detach first
             esp32_pwm.detachPin(_pin);
+        pinMode(_pin, OUTPUT); // this needs to happen here - a little late    
         esp32_pwm.attachPin(_pin, frequency, 10); // new attach to reset frequency
     }
 }

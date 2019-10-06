@@ -8,13 +8,17 @@ _PWM:: _PWM(uint8_t pin, int frequency)
 {
     _pin=pin;
     _frequency = frequency;
-    pinMode(_pin, OUTPUT);
 }
 
 #define limit(nr, min, max) \
     ( (nr) < (min) ? (min):((nr) > (max) ? (max):(nr)) )
 
 void _PWM::set(int duty, int frequency) {
+    if(!started) { // late start - at first access
+        pinMode(_pin, OUTPUT);
+        started = true;
+    }
+
     _frequency = limit(frequency,2,5000);
     _duty = limit(duty,0,1023);
 

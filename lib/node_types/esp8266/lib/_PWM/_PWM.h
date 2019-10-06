@@ -16,6 +16,7 @@ private:
     uint8_t  _pin;
     int _frequency;
     int _duty;
+    bool started = false;
 public:
     _PWM(uint8_t pin, int frequency=1000);
     void set(int duty, int frequency);
