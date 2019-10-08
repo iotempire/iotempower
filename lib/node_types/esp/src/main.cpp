@@ -666,7 +666,7 @@ void onWifiConnect(
 void setup() {
     // TODO: setup (another, the internal one seem quite ok) watchdog
     // TODO: consider not using serial at all and freeing it for other
-    // connections
+    // connections, and offering other debug channels
     // Serial.begin(115200);
     // Serial.println();
     ulog(F("Booting."));
@@ -738,28 +738,21 @@ void setup() {
 
 }
 
+// global variables for loop
 static unsigned long last_transmission = millis();
 static unsigned long last_published = millis();
 static unsigned long last_measured = millis();
 static unsigned long transmission_delta = 5000;
+static unsigned long current_time;
+
 void transmission_interval(int interval) {
     transmission_delta = ((unsigned long)interval) * 1000;
 }
 
-// TODO: is this actually necessary if sending is limited
-// too small delay prevents makes analog reads interrupt wifi
-static unsigned long _measure_delay = 1;
-void measure_delay(int delay) {
-    // TODO: should 0 be allowed here?
-    if (delay <= 0)
-        delay = 1;
-    _measure_delay = delay;
-}
-
+// main loop managing the cooperative multitasking
 void loop() {
     yield(); // do necessary things for  maintaining WiFi and other system tasks
 
-    unsigned long current_time;
     // TODO: make sure nothing weird happens -> watchdog
     //MDNS.update(); TODO: needed???
     ArduinoOTA.handle();
@@ -770,7 +763,9 @@ void loop() {
         //     mqtt_just_connected = ! // only set to true when publish successful
         //         devices_publish_discovery_info(mqttClient); // needs to happen here not to collide with other publishes
         // }
+        
         do_later_check(); // work the scheduler
+
         // Network connection maintainance
         if(WiFi.status() != WL_CONNECTED) { /// No WiFi connection
             if(wifi_connected) { // It was before
@@ -782,28 +777,29 @@ void loop() {
             }
             maintain_mqtt();
         } // end WiFi exists
-        
-        if (current_time - last_measured >= _measure_delay) {
-            devices_update();
-            last_measured = current_time;
-            if (mqttClient.connected()) {
-                if (current_time - last_published >= MIN_PUBLISH_TIME_MS) {
-                    // go through devices and send reports if necessary
-                    if (transmission_delta > 0 &&
-                        current_time - last_transmission >=
-                            transmission_delta) {
-                        if (devices_publish(mqttClient, node_topic, true)) {
-                            ulog(F("Free memory: %ld"),ESP.getFreeHeap());
-                            last_transmission = current_time;
-                            last_published = current_time;
-                        }
-                    } else { // no full transmission necessary
-                        if (devices_publish(mqttClient, node_topic, false)) {
-                            last_published = current_time;
-                        }
-                    } // endif transmission delta
-                } // endif update delay
-            } // endif measure delay
+
+        // update physical connections as often as possible (they have their own pollrate built in)
+        devices_update();
+        current_time = millis(); // device update might have taken time, so update
+
+        // sent out new values if mesaured (and time isn't too low)
+        if (mqttClient.connected()) {
+            if (current_time - last_published >= MIN_PUBLISH_TIME_MS) {
+                // go through devices and send reports if necessary
+                if (transmission_delta > 0 &&
+                    current_time - last_transmission >=
+                        transmission_delta) {
+                    if (devices_publish(mqttClient, node_topic, true)) {
+                        ulog(F("Free memory: %ld"),ESP.getFreeHeap());
+                        last_transmission = current_time;
+                        last_published = current_time;
+                    }
+                } else { // no full transmission necessary
+                    if (devices_publish(mqttClient, node_topic, false)) {
+                        last_published = current_time;
+                    }
+                } // endif transmission delta
+            } // endif update delay
         } else {
             // ulog(F("Trouble connecting to mqtt server."));
             // Don't block here with delay as other processes might
@@ -811,7 +807,7 @@ void loop() {
             // TODO: wait a bit before trying to reconnect.
         } // endif mqtt connect
         // mqtt_client->yield(_loop_delay);
-        // ulnoiot_loop(); // TODO: think if this can actually be
+        // iotempower_loop(); // TODO: think if this can actually be
         // skipped in the iotempower-philosophy -> maybe move to driver
         // callbacks
     } else { // reconfig mode is active
