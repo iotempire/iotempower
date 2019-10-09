@@ -7,14 +7,14 @@
 
 #include <iotempower.h>
 
-void (ulnoiot_init)() __attribute__((weak));
-void (ulnoiot_start)() __attribute__((weak));
+void (iotempower_init)() __attribute__((weak));
+void (iotempower_start)() __attribute__((weak));
 
 #define init() \
-    ulnoiot_start()
+    iotempower_start()
 
 #define start() \
-    ulnoiot_start()
+    iotempower_start()
 
 // That's the user file (called in folder setup.cpp, but linked as setup.h
 // here)

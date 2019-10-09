@@ -208,7 +208,7 @@ void start() { // begin start, uncomment, if you need to start things
 //     do_later(2000, blink);
 //
     //  // fall into deep sleep in 15s for 60s
-    //  deep_sleep(15000, 20000);
+    //  deep_sleep(15000, 60000);
 // 
 //     // Send updates of current status every 10s (default 5)
 //     transmission_interval(10);

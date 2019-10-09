@@ -2,8 +2,9 @@
 // main program for iotempower esp8266/esp32 firmware
 
 
-// for randomness, we need crypto library first
-#include <hydrogen.h>
+// TODO: enable when PJON works 
+// // for randomness, we need crypto library first
+// #include <hydrogen.h>
 
 ////// Standard libraries
 #include <ArduinoOTA.h>
@@ -18,14 +19,6 @@
 //#include <FS.h> // no filesystem used
 #include <WiFiUdp.h>
 
-// PJON, we use PJON as generic network layer
-#define PJON_MAX_PACKETS 1
-#define PJON_PACKET_MAX_LENGTH 1024 // configuration packages can be quite long
-#define PJON_INCLUDE_ASYNC_ACK true
-#define PJON_MAX_RECENT_PACKET_IDS 10
-#include <PJON.h>
-PJON<GlobalUDP> pjon_bus;
-
 // MQTT
 
 //// AsyncMqtt disabled in favor of PubSubClient
@@ -36,6 +29,8 @@ PJON<GlobalUDP> pjon_bus;
 //#define MQTT_KEEPALIVE 75
 //#define MQTT_SOCKET_TIMEOUT 75
 #include <PubSubClient.h>
+
+String mqtt_management_topic;
 
 ////// adapted libraries
 // none currently
@@ -48,14 +43,23 @@ PJON<GlobalUDP> pjon_bus;
 //// default configuration
 #include <iotempower-default.h>
 
+// TODO: enable PJON, when UDP works on esp8266 
+// // PJON, we use PJON as generic network layer (depends on default)
+// #define PJON_MAX_PACKETS 1
+// #define PJON_PACKET_MAX_LENGTH IOTEMPOWER_MAX_BUFLEN
+// #define PJON_INCLUDE_ASYNC_ACK true
+// #define PJON_MAX_RECENT_PACKET_IDS 10
+// #include <PJON.h>
+// PJON<GlobalUDP> pjon_bus;
+
 #include "key.h"
 
 #include "config-wrapper.h"
 
 
 // iotempower functions for user modification in setup.cpp
-void (ulnoiot_init)() __attribute__((weak));
-void (ulnoiot_start)() __attribute__((weak));
+void (iotempower_init)() __attribute__((weak));
+void (iotempower_start)() __attribute__((weak));
 
 int long_blinks = 0, short_blinks = 0;
 
@@ -456,6 +460,9 @@ void onMqttMessage(char *topic, byte *payload, unsigned int len) {
 void onMqttConnect() {
     Serial.println(F("Connected to MQTT."));
 
+    // publish IP on mqtt
+    mqttClient.publish((mqtt_management_topic+String("ip")).c_str(),
+        WiFi.localIP().toString().c_str(), true); // keep active until next update
     devices_publish_discovery_info(mqttClient); // TODO: Check if this is necessary each time or should be somewhere else
     devices_subscribe(mqttClient, node_topic);
 }
@@ -575,21 +582,62 @@ void onWifiConnect(
 //    const WiFiEventStationModeGotIP &event
 //#endif
         ) {
-    Serial.print(F("Connected to Wi-Fi with IP: "));
-    Serial.println(WiFi.localIP());
+    ulog(F("Connected to Wi-Fi with IP: "));
+    IPAddress ip_obj = WiFi.localIP();
+    Serial.println(ip_obj.toString());
     wifi_connected = true;
-//    connectToMqtt();
-    pjon_bus.set_shared_network(true);
-    pjon_bus.set_id(IPAddress(WiFi.localIP())[3]);
-    // resend configuration to PJON iot gateway
-    pjon_bus.begin();
-    // When coming online we send the general config to the server
-    // hostname - to match to our main topic and find the key we use to communicate
-    // encrypted(nonce+data): data=(ip-address,id)
-    
-    // create package:
-    
-    //pjon_bus.send_packet(1, );
+//    connectToMqtt(); not necessary here
+
+    // TODO: enable PJON, when UDP works on esp8266 
+    // // connect to PJON network
+    // pjon_bus.set_shared_network(true);
+    // pjon_bus.set_id(ip_obj[3]);
+    // bus.strategy.link.set_id(bus.device_id()); // EthernetTCP specific, TODO: remove when UDP works
+
+    // IPAddress mqtt_ip_obj;
+    // mqtt_ip_obj.fromString(mqtt_server);
+    // uint8_t mqtt_ip[] = {mqtt_ip_obj[0],mqtt_ip_obj[1],mqtt_ip_obj[2],mqtt_ip_obj[3]};
+    // //pjon_bus.strategy.add_node(1, mqtt_ip); // UDP version
+    // pjon_bus.strategy.link.add_node(1, mqtt_ip); // EthernetTCP version
+    // bus.strategy.link.start_listening(); // EthernetTCP specific, TODO: remove when UDP works
+
+    // ulog(F("Connecting to PJON on server %s."), IPAddress(mqtt_ip).toString().c_str()); // TODO: extract this statically in the beginning
+
+    // //bus.set_receiver(receiver_function);
+    // pjon_bus.begin();
+
+    // // resend configuration to PJON iot gateway
+    // // When coming online we send the general config to the server
+    // // hostname - to match to our main topic and find the key we use to communicate
+    // // encrypted(nonce+data):
+    // //   data=(
+    // //     ip4-address, // as 4 bytes
+    // //     device1id, // the name of device 1
+    // //       subdev1nr, // number of subdevices as byte
+    // //       subdevice1id, // subdevice 1 of device 1
+    // //       subdevice2id, // subdevice 2 of device 1
+    // //       ...
+    // //     device2id, // the name of device 2
+    // //       subdev2nr, // number of subdevices as byte
+    // //       subdevice1id, // subdevice 1 of device 2
+    // //       subdevice2id, // subdevice 2 of device 2
+    // //       ...
+    // //         )
+
+    // // create this config package:
+    // Fixed_Buffer b;
+    // b.append(strnlen(my_hostname, IOTEMPOWER_MAX_STRLEN), (byte*)my_hostname);
+
+    // b.skip(hydro_secretbox_HEADERBYTES); // space for encryption header
+
+    // for(int i=0; i<4; i++) b.append_byte(ip_obj[i]);
+
+    // devices_get_report_list(b);
+
+    // Serial.print("sending via pjon a buffer with length ");
+    // Serial.println(b.length());
+    // pjon_bus.send_packet(1, b.buffer(), b.length()); // id 1 is gateway
+
 }
 
 ////AsyncMqttClient disabled in favor of PubSubClient
@@ -703,9 +751,10 @@ void setup() {
 
     connectToWifi();
 
-    // TODO: check if port is configurable
-
     if (!reconfig_mode_active) {
+        mqtt_management_topic = String(F(IOTEMPOWER)) + String(F("/_cfg_/")) 
+                                + String(F(HOSTNAME)) + String(F("/"));
+
         ////AsyncMqttClient disabled in favor of PubSubClient
         // mqttClient.onConnect(onMqttConnect);
         // mqttClient.onDisconnect(onMqttDisconnect);
@@ -721,9 +770,9 @@ void setup() {
         mqttClient.setServer(mqtt_server, 1883);
         mqttClient.setCallback(onMqttMessage);
 
-        if(ulnoiot_init) ulnoiot_init(); // call user init from setup.cpp
+        if(iotempower_init) iotempower_init(); // call user init from setup.cpp
         devices_start(); // call start of all devices
-        if(ulnoiot_start) ulnoiot_start(); // call user start from setup.cpp
+        if(iotempower_start) iotempower_start(); // call user start from setup.cpp
         // connectToMqtt(); //AsyncMqttClient disabled in favor of PubSubClient
     } else {  // do something to show that we are in adopt mode
         #ifdef ID_LED
@@ -764,6 +813,12 @@ void loop() {
         //         devices_publish_discovery_info(mqttClient); // needs to happen here not to collide with other publishes
         // }
         
+        // TODO: enable PJON, when UDP works on esp8266 
+        // // handle pjon communication
+        // pjon_bus.update();
+        // //ulog(F("Packages left: %d"), pjon_bus.update());
+        // pjon_bus.receive();
+
         do_later_check(); // work the scheduler
 
         // Network connection maintainance

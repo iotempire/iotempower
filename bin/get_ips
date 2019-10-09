@@ -9,17 +9,18 @@ source "$IOTEMPOWER_ROOT/bin/read_system_config"
 
 
 if [[ "$1" ]]; then
-    topic="$1/ip"
+    topic="iotempower/_cfg_/$1/ip"
     result=$(timeout --foreground 2 mosquitto_sub -C 1 $filter -v \
-            -h "$IOTEMPOWER_MQTT_HOST" -t "$topic"|cut -d\  -f2)
+            -h "$IOTEMPOWER_MQTT_HOST" -t "$topic"|cut -d/ -f3-|cut -d\  -f2)
     if [[ "$result" ]]; then
-        echo "$1: $result"
+        echo "IP for $1:" >&2
+        echo "$result"
     else
         echo "IP for $1 not found." >&2
         exit 1
     fi
 else # find all ending in /ip
-    topic="#"
+    topic="iotempower/_cfg_/#"
     iplog=$(mktemp --suffix .iotempower.getip)
     iplogall=$(mktemp --suffix .iotempower.getip)
     echo -n "Scanning for ips"
@@ -28,7 +29,7 @@ else # find all ending in /ip
         echo -n "."
         timeout --foreground 2 mosquitto_sub -C 1 $filter -v \
             -h "$IOTEMPOWER_MQTT_HOST" -t "$topic" | grep "/ip " > "$iplog"
-        t=$(cat "$iplog"|cut -d\   -f1)
+        t=$(cat "$iplog"|cut -d\  -f1)
         ip=$(cat "$iplog"|cut -d\  -f2)
         if [[ ! "$t" ]]; then
             break
@@ -38,7 +39,7 @@ else # find all ending in /ip
     done
     echo " done."
 
-    cat "$iplogall"
+    cat "$iplogall" | cut -d/ -f3-
     rm "$iplog" "$iplogall"
 fi
 

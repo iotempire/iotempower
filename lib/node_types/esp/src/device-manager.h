@@ -61,5 +61,7 @@ bool devices_receive(Ustring& subtopic, Ustring& payload);
 bool devices_publish(PubSubClient& mqtt_client, Ustring& node_topic, bool publish_all = false);
 bool devices_publish_discovery_info(PubSubClient& mqtt_client);
 
+// Add the device and subdevice list to a buffer in abbreviated format
+void devices_get_report_list(Fixed_Buffer& b);
 
 #endif // _IOTEMPOWER_DEVICE_MANAGER_H_

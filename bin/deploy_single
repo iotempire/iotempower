@@ -75,10 +75,10 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
                 key=$(tail -n1 key.txt 2>/dev/null|head -c 64)
             fi
         else # nothing given, deploy was just called without parameters
-            remote="$node_name.local"
-#           obsolete: getting IP from mqtt
-#           echo "Getting IP of node $topic for deployment."
-#           address=$(get_ip "$topic" 2>/dev/null|grep "$topic"|cut -d\  -f2)
+            #remote="$node_name.local"
+            # getting IP from mqtt
+            echo "Getting IP of node $topic for deployment."
+            remote=$(get_ip "$topic" 2>/dev/null)
         fi
         # TODO: when doing ota-upload, allow doing the actual upload several times, but only
         # needing to compile once

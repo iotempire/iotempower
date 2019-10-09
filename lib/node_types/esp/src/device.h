@@ -100,6 +100,9 @@ class Device {
     public:
         Device(const char* _name, unsigned long pollrate_us);
         //// Getters & Setters
+        unsigned int subdevices_count() {
+            return subdevices.length();
+        }
         Device& with_ignore_case(bool ignore_case) { 
             _ignore_case = ignore_case;
             return *this;

@@ -284,5 +284,18 @@ bool devices_receive(Ustring& subtopic, Ustring& payload) {
     return true;
 }
 
+void devices_get_report_list(Fixed_Buffer& b) {
+    device_list.for_each( [&] (Device& dev) {
+        b.append(dev.get_name().length(), (byte*)dev.get_name().as_cstr());
+        byte sdc = dev.subdevices_count();
+        b.append_nolen(1, &sdc);
+        dev.subdevices_for_each( [&] (Subdevice& sd) {
+            b.append(sd.get_name().length(), (byte*)sd.get_name().as_cstr());
+            return true; // Continue loop
+        } ); // subdevices
+        return true; // Continue loop
+    } ); // devices
+}
+
 // TODO: timestack, do_later
 

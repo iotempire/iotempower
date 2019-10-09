@@ -12,8 +12,8 @@
 #include <Arduino.h>
 #include "iotempower-default.h"
 
-// a simple class for handling fixed-length strings. Ustring stands for
-// Ulnoiot-String
+// a simple class for handling fixed-length strings.
+// Ustring stands for UlnoIoT (old framework name) - String
 class Ustring {
     protected:
         char cstr[IOTEMPOWER_MAX_STRLEN+1];
@@ -183,6 +183,48 @@ class Ustring {
         Ustring& printf(const char *fmt, ...);
         int scanf(const char *fmt, ...);
 };
+
+// Similar to Ustring, a fixed length buffer
+class Fixed_Buffer {
+    protected:
+        byte _buffer[IOTEMPOWER_MAX_BUFLEN];
+        unsigned long len = 0;
+    public:
+        const byte* buffer() {
+            return _buffer;
+        }
+        void clear() {
+            len=0;
+        }
+        unsigned long length() {
+            return len;
+        }
+        // append a single byte
+        void append_byte(byte b) {
+            if(len>=IOTEMPOWER_MAX_BUFLEN) return;
+            _buffer[len] = b;
+            len ++;
+        }
+        // append without adding length, stop when buffer end reached
+        void append_nolen(byte buflen, const byte* buf) {
+            while(len < IOTEMPOWER_MAX_BUFLEN && buflen > 0) {
+                _buffer[len] = *buf;
+                buf ++;
+                len ++;
+                buflen --;
+            }
+        }
+        // append with adding the len as a byte
+        void append(byte buflen, const byte* buf) {
+            append_byte(buflen);
+            append_nolen(buflen, buf);
+        }
+        void skip(unsigned long bytes) {
+            len = len+bytes;
+            if(len>IOTEMPOWER_MAX_BUFLEN) len=IOTEMPOWER_MAX_BUFLEN;
+        }
+};
+
 
 // small fixed size map with linear search functionality
 // VALUE_TYPE needs to have a member function key, returning a Ustring,
