@@ -6,7 +6,7 @@ Install IoTempower image onto an SD-card
   
 - Make sure the sha256-checksum of the image is correct. It should be:
 
-  ``c3245c8fbb8f52922966624a505b4db84c23ae211abab5d6c0a4c935cc770f3a``
+  ``eee10360053a2814b2e7c12b19c5db1c3b0886baaf88b337bd184247481c1296``
 
   On Linux and MacOS, you can use ``sha256sum`` or ``shasum -a 256`` to verify
   the image, on Windows you can use
