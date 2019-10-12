@@ -2,7 +2,7 @@
 Segundo Node
 ============
 
-Para esta seção, presumimos que você configurou com sucesso o UlnoIoT
+Para esta seção, presumimos que você configurou com sucesso o IoTempower
 no Raspberry Pi e já consiga acessar as páginas web do sistema nele.
 Também como presumimos que você já tenha configurado seu primeiro no
 `Primeiro Node <first-node-pt.rst>`_ e pode controlar o LED da
@@ -21,7 +21,7 @@ Novo Node
     </cloudcmd/fs/home/iot/iot-test/>`_.
 
     Como você pode notar, cada Node tem sua própria pasta de configuração
-    no UlnoIoT.
+    no IoTempower.
 
 -   Precisamos, portanto, criar outra pasta para o segundo Node.
     Nós podemos rapidamente crie uma pasta usando como modelo

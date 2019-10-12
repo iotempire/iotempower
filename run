@@ -47,7 +47,7 @@ The following commands are possible:
   commands.
 
 - [command]:
-  Execute ulnoiot_[command] with the given parameters.
+  Execute iot_[command] with the given parameters.
 
 
 If no command is given, execute the bash shell in the IoTempower environment.

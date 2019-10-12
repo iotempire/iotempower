@@ -2,7 +2,7 @@
 
 function usage() {
 cat << EOF
-Syntax: ulnoiot_shell [menu-entry]
+Syntax: iot_shell [menu-entry]
 
 Allow to execute common actions with text/terminal-user-interface interface
 for iotempower.

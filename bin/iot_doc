@@ -2,7 +2,7 @@
 
 function usage() {
 cat << EOF
-Syntax: ulnoiot_doc [make|clean|serve]
+Syntax: iot_doc [make|clean|serve]
 
 Manage the web-viewable documentation.
 

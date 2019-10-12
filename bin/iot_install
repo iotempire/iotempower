@@ -103,27 +103,11 @@ else
     python setup.py install
     ln -s "$IOTEMPOWER_EXTERNAL/esptool.git/esptool.py" "$IOTEMPOWER_VPYTHON/bin/esptool"
 
-    ## mpfshell - upy specific
-    #git clone https://github.com/ulno/mpfshell "$IOTEMPOWER_EXTERNAL/mpfshell.git"
-    #cd "$IOTEMPOWER_EXTERNAL/mpfshell.git"
-    #python setup.py install
-
     # accesspoint
     git clone https://github.com/ulno/create_ap "$IOTEMPOWER_EXTERNAL/create_ap"
     #cd "$IOTEMPOWER_EXTERNAL/create_ap"
 
-#    # pyminifier
-#    git clone https://github.com/liftoff/pyminifier "$IOTEMPOWER_EXTERNAL/pyminifier"
-#    cd "$IOTEMPOWER_EXTERNAL/pyminifier"
-#    python setup.py install
-
-#    # download firmware
-#    mkdir -p "$IOTEMPOWER_EXTERNAL/firmware"
-#    cd "$IOTEMPOWER_EXTERNAL/firmware"
-#    "$IOTEMPOWER_ROOT/bin/download_firmware"
-#    "$IOTEMPOWER_ROOT/bin/firmware" download
-
-
+    # install node.js related stuff
     cd "$IOTEMPOWER_LOCAL"
     mkdir -p nodejs
     cd nodejs

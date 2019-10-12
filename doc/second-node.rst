@@ -2,7 +2,7 @@
 Second Node
 ===========
 
-For this section, we assume that you have successfully set-up UlnoIoT
+For this section, we assume that you have successfully set-up IoTempower
 on the Raspberry Pi and are able to access the websites on it as well as
 have set-up your `first node <first-node.rst>`_ and can control its onboard
 led via the node-RED web gui.
@@ -18,7 +18,7 @@ New Node
 -   Navigate back to your `IoT system example configuration folder
     <https://iotgateway.local/cloudcmd/fs/home/iot/iot-test/>`_
 
-    As you have seen, each node has its own configuration folder in UlnoIoT.
+    As you have seen, each node has its own configuration folder in IoTempower.
 
 -   For a second node, we need therefore another node-folder. We can quickly
     create one, based on a node-template.

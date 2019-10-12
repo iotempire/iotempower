@@ -15,6 +15,7 @@ Setting up the WiFi-Router on the Pi
 - Edit this ``wifi.txt`` file. Change the default values under
   ``Wifi Name`` (#iotempire-123456) and ``Password`` (iotempire) to your own
   values. Make sure that ``Password`` is longer than 8 characters.
+  Also make sure to remove the pound sign (#) from the ``Wifi Name`` line - else it is ignored.
 
   ..  code-block:: bash
 
@@ -88,9 +89,13 @@ Accessing the Local Services on the Raspberry Pi
   you should now see your filesystem
   inside the IoT-test folder, listing a ``node1``-folder, a ``README.rst`` and
   a ``system.conf`` file. For now, ignore a potential second file panel to
-  the right, we will first just concentrate here on the active panel.
+  the right, we will first just concentrate here on the active panel. You can 
+  also right-click
+  and open the pages in new tabs, so you can keep the overview page
+  open for later.
 
-- Check out the content of README.rst using the view button or view in the
+- In the Cloudcmd filesystem view,
+  check out the content of README.rst using the view button or view in the
   context menu (and exiting the view again with Escape or the x in the upper
   right corner).
 

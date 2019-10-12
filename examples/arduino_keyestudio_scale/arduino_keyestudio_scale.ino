@@ -6,6 +6,7 @@
 // Author: ulno (http://ulno.net)
 // Created: 2017-10-21
 //
+// TODO: adjust to i2csocket/plug
 
 #include <HX711_ADC.h> // https://github.com/olkal/HX711_ADC
 #include <Wire.h> 

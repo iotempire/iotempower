@@ -4,7 +4,9 @@ First Node
 
 For this section, we assume that you have successfully set-up IoTempower
 on the Raspberry Pi and are able to access the local website on it.
-Make sure that the IoT dongle is connected to the Raspberry Pi.
+Make sure that the IoT dongle (usually a little Wemos D1 mini with a
+pre-mounted display shield connected to the pi via a good and sturdy
+USB cable) is connected to the Raspberry Pi.
 
 We will now set-up and configure our first IoT node (if you want to know
 what a *node* is, check the `architecture chapter <architecture.rst>`_).
@@ -49,7 +51,7 @@ successfully working or not.
 ..   TODO: Insert image of the button shield!
 
 -   Connect a button usually to D3 (or pin 0 depending on the board) against
-    ground or a button shield (see image) on top of the Wemos D1 Mini.
+    ground or a button shield on top of the Wemos D1 Mini.
     This will be used to set the node into *adoption mode*.
 
 -   Power up your microcontroller via battery or usb power supply
@@ -67,7 +69,7 @@ successfully working or not.
     blinks and several short blinks, for example 1 long and 2 short blinks.
     Count the blinks in the pattern as it will be used to identify your node's
     in the next step. (If you had the Wemos Display Shield connected,
-    it shoudl show you the code also on the small screen.)
+    it should show you the code also on the small screen.)
     
 
 Adopting the Node in the IoTempower environment on the Raspberry Pi
@@ -108,17 +110,17 @@ Adopting the Node in the IoTempower environment on the Raspberry Pi
   ``README.rst``, ``node.conf``, and ``setup.cpp``.
 
 - When inside the ``node1`` folder click on the user menu button located on
-  the bottom right corner of your web screen.
-  The button to press is
+  the bottom left corner of your web screen.
+..  The button to press is
   depicted below.
 
-  .. image:: /doc/images/user-menu-button.png
+..  TODO .. image:: /doc/images/user-menu-button.png
 
 .. TODO: provide image of the button menu for initializing!
 
-- You will now see a menu with several buttons as options.
+- You will now see a menu with several options.
 
-- Click on the button called ``Adopt/Initialize``
+- Click on the option called ``Adopt/Initialize``
   and verify again that you are in the
   ``node1`` folder, then agree to start the process via selecting the
   ``Yes, run initialize``

@@ -15,7 +15,7 @@ source "$IOTEMPOWER_ROOT/lib/shell_starter/config.bash" \
 export PYTHONPATH="$PYTHONPATH:$IOTEMPOWER_ROOT/lib"
 
 ## if you type cd you go to iotempower-root
-#ulnoiot_cd() {
+#iot_cd() {
 #    IOTEMPOWER_HOMEBACK="$HOME"
 #    HOME="$IOTEMPOWER_ROOT"
 #    cd "$@"
@@ -23,7 +23,7 @@ export PYTHONPATH="$PYTHONPATH:$IOTEMPOWER_ROOT/lib"
 #    unset IOTEMPOWER_HOMEBACK
 #}
 #
-#alias cd=ulnoiot_cd
+#alias cd=iot_cd
 #
 #cd
 

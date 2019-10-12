@@ -3,7 +3,7 @@ IoTempower Local Web Portal
 ===========================
 
 Welcome to your personal `IoTempower <https://github.com/iotempire/iotempower>`_
-installation on the IoTempower gateway.
+installation on the IoTempower gateway (short iotgateway).
 
 If you just connected and want to dive right in, use one of these quick start
 *tutorials*:

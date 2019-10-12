@@ -2,13 +2,13 @@ Pre-Flash devices
 =================
 
 When we buy our microcontrollers, they usually do not come pre-installed with
-UlnoIoT. We have to manually write an initial firmware to our microcontrollers
+IoTempower. We have to manually write an initial firmware to our microcontrollers
 at least once. Later, we can use the adoption method to re-configure
 IoTempower nodes. We call this initialization process pre-flash.
 
 If you want to pre-flash a Wemos D1 Mini, this process is very easy. Connect
 the device, you want to pre-flash with a USB cable to the Pi gateway (or the
-PC that runs IoTempower) and call the user menu (or on PC ``iot shell``).
+PC that runs IoTempower) and call the user menu (or on PC ``iot menu``).
 The user menu contains in the advance section a ``Pre-flash Wemos D1 Mini``
 option. Just execute this option.
 

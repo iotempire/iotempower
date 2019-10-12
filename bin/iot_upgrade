@@ -2,7 +2,7 @@
 
 if [[ $# -gt 0 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF
-Syntax: ulnoiot_upgrade
+Syntax: iot_upgrade
 
 Update current version iotempower with newest version from git repository.
 This means, pulling a new version from the git repository, fixing shebangs

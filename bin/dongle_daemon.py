@@ -173,7 +173,7 @@ def parser(unparsed_args):
     group.add_option("-p", "--port",
         dest = "esp_port",
         type = "str",
-        help = "UlnoIoT Esp Dongle serial port (where the dongle is connected). Default /dev/ttyUSB0",
+        help = "IoTEmpower Esp Dongle serial port (where the dongle is connected). Default /dev/ttyUSB0",
         default = "/dev/ttyUSB0"
     )
     group.add_option("-i", "--input",

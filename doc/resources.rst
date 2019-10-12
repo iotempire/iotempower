@@ -9,17 +9,11 @@ tools:
 - `Node-RED <https://nodered.org>`__
 - `mosquitto <https://mosquitto.org/>`__.
 - `The Tilde Texteditor <https://os.ghalkes.nl/tilde>`__
-- `create_ap <https://github.com/oblique/create_ap>`__ forked for UlnoIoT
+- `create_ap <https://github.com/oblique/create_ap>`__ forked for IoTempower
   `here <https://github.com/ulno/create_ap>`__.
 - `FastLed rgb-strip library <https://github.com/FastLED/FastLED>`__
 - `rpi-clone <https://github.com/billw2/rpi-clone>`__
 - `cloudcmd <https://github.com/coderaiser/cloudcmd>`__
-
-Old versions were also using these:
-
-- `mpfshell <https://github.com/wendlers/mpfshell>`__ forked for UlnoIoT
-  `here <https://github.com/ulno/mpfshell>`__.
-- `micropython  <https://micropython.org/>`__
 
 
 As IoTempower relies heavily on MQTT, it also integrates very easily with

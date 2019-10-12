@@ -1,5 +1,5 @@
-UlnoIoT Tmux Help
-=================
+IoTempower Tmux Help
+====================
 
 
 Welcome to IoTempower, your friendly and affordable Internet of Things
@@ -91,5 +91,5 @@ Have fun inventing the next Internet of Things system!
 
 Yours,
 
-     The UlnoIoT Team
+     The IoTempower Team
 

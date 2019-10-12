@@ -27,7 +27,7 @@ você precisará mudar a configuração (no arquivo ``node.cong`` localizado na
 pasta do seu node) para NodeMCU ou a respectiva placa.
 
 Se você estiver seguindo esse tutorial em uma aula de IoTempower sua placa já
-estará pré-instalada com o firmware do UlnoIoT.
+estará pré-instalada com o firmware do IoTempower.
 Caso o contrário você terá que seguir as instruções dessa página
 `First Flash page <pre-flash.rst>`_ no seu Raspberry Pi
 para saber como instalar pela primeira vez o UlnIoT em uma placa.
@@ -102,7 +102,7 @@ escolha a rede com o sinal mais forte das duas).
   passos anterioriores falharam e você terá que repeti-los novamente.
   Se falhar novamente tente usar outro node pois este pode estar com defeito.
 
-- Agora o seu node está pronto para ser adotado pelo sistema UlnoIoT
+- Agora o seu node está pronto para ser adotado pelo sistema IoTempower
   no Raspberry Pi.
 
 Adoção do Node pelo sistema IoTempower no Raspberry Pi
