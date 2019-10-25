@@ -7,4 +7,4 @@
 source "$IOTEMPOWER_ROOT/bin/read_node_config"
 
 
-exec "$IOTEMPOWER_LOCAL/bin/get_ips" "$topic"
+exec "$IOTEMPOWER_LOCAL/bin/get_ips" "$node_name"
