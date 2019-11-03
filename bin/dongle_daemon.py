@@ -129,6 +129,7 @@ class UED_Listener(threading.Thread):
                     self.ser.close()
                     self.ser = None
                     self.connected = False
+            time.sleep(0.1)  # prevent busy waiting
         self.release()
         sys.stderr.write("Exiting.\n")
 
@@ -159,6 +160,7 @@ def stdin_listener(ser_listener, input_file):
         elif l.startswith("q"):
             ser_listener.quit()
             break
+        time.sleep(0.1)  # prevent busy waiting
 
 
 def parser(unparsed_args):
