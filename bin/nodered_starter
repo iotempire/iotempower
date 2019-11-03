@@ -13,7 +13,7 @@ fi
 
 while true; do
     sleep 1
-    # be conservative on ram usage
+    # be conservative on ram usage (https://github.com/node-red/node-red-dashboard/issues/144)
     node-red --node-args="--max-old-space-size=256"
     sleep 1
 done
