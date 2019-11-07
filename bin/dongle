@@ -39,11 +39,19 @@ if [[ "$command" = flash ]]; then
     cd "$IOTEMPOWER_ROOT/lib/esp_dongle"
     export PLATFORMIO_UPLOAD_PORT="$port"
     platformio run -t upload
+#    platformio run
     result=$?
-    if [[ "$result" -eq 0 ]]; then
-        echo "Waiting 5s for reboot before reconnect..."
-        sleep 5 # allow reboot
-        echo "Successfully flashed dongle."
+#    if [[ "$result" -eq 0 ]]; then
+#        echo "Flashing dongle on $port."
+#        esptool.py --port "$port" write_flash 0 .pio/build/d1_mini/firmware.bin
+#        result=$?
+        if [[ "$result" -eq 0 ]]; then
+            echo "Waiting 5s for reboot before reconnect..."
+            sleep 5 # allow reboot
+            echo "Successfully flashed dongle."
+#        else
+#            echo "Error compiling or flashing. Check errors."
+#        fi
     else
         echo "Error compiling or flashing. Check errors."
     fi
