@@ -62,7 +62,7 @@ Installation step by step:
 - On the raspberry pi IoTempower installation, you can use cloudcmd to access
   and interact with your system.
 
-- If you are asked for a user, use ``iotempower``, if you are asked for a password
+- If you are asked for a user, use ``iot``, if you are asked for a password
   use ``iotempire``.
 
 - ssh access (this is for advanced users, usually you can just use the
@@ -85,12 +85,12 @@ Installation step by step:
 
     The command for Mac and Linux is:
 
-    ``ssh -X iotempower@iotgateway``
+    ``ssh -X iot@iotgateway``
 
     The command on Windows will be (and can be graphically
     configured in MobaSSH):
 
-    ``ssh -X iotempower@192.168.12.1``
+    ``ssh -X iot@192.168.12.1``
 
     The default password for the user IoTempower is ``iotempire``
 
@@ -105,7 +105,7 @@ Installation step by step:
     releasing them and then pressing the h-key.
 
   - Run in ssh or the terminal (type and hit enter) the command
-    ``IoTempower upgrade`` to make sure that
+    ``iot upgrade`` to make sure that
     you have the latest version of iotempower.
 
 
@@ -139,7 +139,7 @@ Installation on Linux
 
 - start IoTempower and agree and wait for dependencies to be downloaded
   (if packages are missing, fix dependencies and try to run
-  ``IoTempower install clean``)
+  ``iot install clean``)
 
 - After successfully entering IoTempower (the prompt
   should have changed colors and
