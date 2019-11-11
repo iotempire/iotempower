@@ -67,6 +67,7 @@ Display_Base& Display_Base::print(const char* str) {
         switch(ch) {
             case '\n':
                 cursor_y++;
+                // no break to do next by default
             case '\r':
                 cursor_x=0;
                 ch=0;
@@ -100,6 +101,10 @@ Display_Base& Display_Base::print(const char* str) {
     return *this;
 }
 
+Display_Base& Display_Base::print(Ustring& ustr) {
+    return print(ustr.as_cstr());
+}
+
 Display_Base& Display_Base::println() {
     return print(F("\n"));
 }
@@ -107,10 +112,6 @@ Display_Base& Display_Base::println() {
 Display_Base& Display_Base::println(const char* str) {
     print(str);
     return println();
-}
-
-Display_Base& Display_Base::print(Ustring& ustr) {
-    return println(ustr.as_cstr());
 }
 
 Display_Base& Display_Base::println(Ustring& ustr) {

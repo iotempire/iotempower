@@ -277,7 +277,7 @@ void reconfigMode() {
         if(ota_display) {
             ota_display_present = true;
             ota_display->clear_bus(); // debug test TODO: remove
-            Wire.begin(); // check default i2c
+            Wire.begin(); // check default i2c TODO: replace with i2c switch in i2c_device
             ota_display->measure_init(); // debug test TODO: remove
             ota_display->i2c_start();
         }
