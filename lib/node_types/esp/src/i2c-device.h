@@ -18,6 +18,9 @@
 #define IOTEMPOWER_DEFAULT_I2C_MASTER_ADDRESS 8
 
 #define IOTEMPOWER_DEFAULT_I2C_CLOCK 400000
+
+#define IOTEMPOWER_DEFAULT_I2C_POLLRATE 100000
+
 // seems like esp8266 has only sw i2c
 // compare here: https://bbs.espressif.com/viewtopic.php?t=1032
 
@@ -40,19 +43,19 @@ class I2C_Device : public Device {
             scl_pin = scl;
             _master_address = master_address;
             clock_speed = clock;
-            pollrate(100); // i2c pollrate is by default slower than other devices: TODO, check this is ok
         }
+        bool run_scan_at_start = true;
         /* start is now private, check i2c_start for overwrite
          * TODO: check, why overwrite still works */
         void start();
     public:
-        I2C_Device(const char* name, uint8_t client_address) : Device(name, 10000) {
+        I2C_Device(const char* name, uint8_t client_address) : Device(name, IOTEMPOWER_DEFAULT_I2C_POLLRATE) {
             init_i2c(SDA, SCL, IOTEMPOWER_DEFAULT_I2C_CLOCK,
                 IOTEMPOWER_DEFAULT_I2C_MASTER_ADDRESS);
             set_address(client_address);
         }
 
-        I2C_Device(const char* name) : Device(name, 10000) {
+        I2C_Device(const char* name) : Device(name, IOTEMPOWER_DEFAULT_I2C_POLLRATE) {
             init_i2c(SDA, SCL, IOTEMPOWER_DEFAULT_I2C_CLOCK, 
                 IOTEMPOWER_DEFAULT_I2C_MASTER_ADDRESS);
         }
@@ -90,11 +93,25 @@ class I2C_Device : public Device {
         I2C_Device& master(uint8_t address) {
             return set_master(address);
         }
+        
+        I2C_Device& disable_scan() {
+            run_scan_at_start = false;
+            return *this;
+        }
 
         uint8_t get_sda() { return sda_pin; }
         uint8_t get_scl() { return scl_pin; }
         uint8_t get_address() { return _i2c_address; }
         uint8_t get_master() { return _master_address; }
+
+        /**
+         * Check if device connected (returns true if it is found);
+         * This should be called usually in start
+         * after bus is initialized.
+         * If called outside needs to be encapsuled
+         * by measure_init and measure_exit.
+         */
+        bool scan();
 
         /**
          * This routine turns off the respective I2C bus and clears it

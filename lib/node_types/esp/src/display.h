@@ -20,6 +20,8 @@
 #define font_medium u8g2_font_5x8_tr
 #define font_large u8g2_font_8x13B_tr
 
+#define IOTEMPOWER_DEFAULT_I2C_DISPLAY_ADDRESS 0x78
+
 class Display_Base : public I2C_Device {
     private:
         int _fps;
@@ -77,8 +79,6 @@ class Display_Base : public I2C_Device {
         bool measure();
 };
 
-static const char* display_ssd1306_failed = "u8g2 creation of ssd1306 failed.";
-
 // This is based on the U82G displays
 class Display : public Display_Base {
     private:
@@ -94,12 +94,13 @@ class Display : public Display_Base {
             _font = font;
             _display = &display;
             start_type = 0;
+            disable_scan();
         }
         Display(const char* name, const uint8_t* font=font_medium)
         : Display_Base(name) {
             _font = font;
             start_type = 1;
-            set_address(0x78);
+            set_address(IOTEMPOWER_DEFAULT_I2C_DISPLAY_ADDRESS);
         }
 
         u8g2_uint_t width_pixels() {
@@ -113,6 +114,14 @@ class Display : public Display_Base {
             switch(start_type) {
                 case 0: // display was given and init done outside
                     _started = init_u8g2();
+                    if(_started) {
+                        set_address(_display->getU8x8()->i2c_address);
+                        ulog(F("Display %s with address 0x%x initialized."),
+                                get_name().as_cstr(), get_address());
+                    } else {
+                        ulog(F("Problems starting display %s."), 
+                                get_name().as_cstr());
+                    }
                     break;
                 // TODO: consider to use templates to statically reserve space for display
                 case 1: // display was not given and no i2c ports either
@@ -125,9 +134,10 @@ class Display : public Display_Base {
                     // only sw i2c https://bbs.espressif.com/viewtopic.php?t=1032
                     if(_display) {
                         _started = init_u8g2();
-                        ulog(F("SSD1306 address: %x"), _display->getU8x8()->i2c_address);
+                        ulog(F("SSD1306 with address 0x%x initialized"),
+                            _display->getU8x8()->i2c_address);
                     } else {
-                        ulog(display_ssd1306_failed);
+                        ulog(F("SSD1306 creation of ssd1306 failed."));
                     }
             }
         }
@@ -159,5 +169,7 @@ class Display_HD44780_I2C : public Display_Base {
 };
 
 // TODO: implement 4bit (7outputs) control of HD44780 display (without I2C adapter)
+
+// TODO: enable and check SPI displays
 
 #endif // _DISPLAY_H_

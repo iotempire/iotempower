@@ -10,8 +10,18 @@ void I2C_Device::start() {
         return;
     }
     clear_bus();
-    measure_init(); //empty currently
-    i2c_start();
+    measure_init();
+    if(run_scan_at_start) {
+        if(scan()) {
+            i2c_start(); // call device specific overwritten start
+        } else {
+            ulog(F("I2C-device with address 0x%x is not on bus, not starting it."), 
+                _i2c_address);
+        }
+    } else {
+        i2c_start(); // call device specific overwritten start
+    }
+    measure_exit();
 }
 
 void I2C_Device::measure_init() {
@@ -34,6 +44,10 @@ void I2C_Device::measure_exit() {
     mywire = Wire; // remember state of Wire to allow multiple i2c busses
 }
 
+bool I2C_Device::scan() {
+    Wire.beginTransmission(_i2c_address);
+    return Wire.endTransmission() == 0;
+}
 
 // The following is taken from: http://www.forward.com.au/pfod/ArduinoProgramming/I2C_ClearBus/index.html
 // Matthew Ford 1st August 2017 (original 28th September 2014)
