@@ -325,9 +325,10 @@ void reconfigMode() {
                 ota_display->clear();
                 ota_display->print(F("ReconfigMode"));
                 ota_display->cursor(0,2);
-                s.printf("node %02x", getChipId32() & 255);
+                s.printf("Node: %02x", getChipId32() & 255);
                 ota_display->print(s);
-                s.printf("blinks %dL-%dS", long_blinks, short_blinks);
+                ota_display->cursor(0,3);
+                s.printf("Blinks %dL %dS", long_blinks, short_blinks);
                 ota_display->print(s);
                 ota_display->cursor(0,4);
                 s.printf("%ds left", seconds_left);
