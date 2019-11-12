@@ -3,9 +3,7 @@ gyroscope
 
 ..  code-block:: cpp
 
-    gyro6050(name)[.i2c(sda,scl)][.with_address(i2c_address)];
-
-**Other names:** ``gyro6050``
+    gyro9250(name)[.i2c(sda,scl)][.with_address(i2c_address)];
 
 Create a new gyroscope sensor device.
 name will be appended to the mqtt topic and the current angles will be
@@ -31,9 +29,13 @@ Example
 
 ..  code-block:: cpp
 
-    gyro6050(g1);
+    gyro9250(g1);
 
-Now angles and acceleration are published as ``mynode/g1/ypr`` and 
-``mynode/g1/acc``.
+Now angles, acceleration, magnetometer, and temperature are published as ``mynode/g1/ypr``,
+``mynode/g1/acc``, 
+``mynode/g1/mag``, and
+``mynode/g1/temperature``.
+ 
 
-Also check the MPU9250 based gyro at ``gyro9250``.
+
+Also check the MPU5050 based gyro at ``gyro6050``.
