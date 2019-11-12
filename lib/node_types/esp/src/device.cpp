@@ -22,14 +22,12 @@ void Subdevice::init(const __FlashStringHelper* subname, bool subscribed) {
 }
 
 bool Subdevice::call_receive_cb(Ustring& payload) {
-    Serial.print(F("Calling receive callback "));
-    Serial.print(name.as_cstr());
-    Serial.print(F(" "));
+    ulog(F("Calling receive callback >%s< >%s<"), 
+        name.as_cstr(), payload.as_cstr());
     if(receive_cb != NULL) {
-        Serial.println(payload.as_cstr());
         return receive_cb(payload);
     }
-    Serial.println(F("!failure receive_cb!"));
+    ulog(F("!failure receive_cb!"));
     return false;
 }
 

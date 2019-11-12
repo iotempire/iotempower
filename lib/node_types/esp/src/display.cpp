@@ -163,7 +163,6 @@ bool Display::init_u8g2() {
 
 void Display::show(const char* buffer) {
     char charstr[2]=" ";
-    ulog(F("Display debug: %s"),buffer);  // TODO: consider removing
     _display->firstPage();
     do {
         for(int y=0; y<lines; y++) {
