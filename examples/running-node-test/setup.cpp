@@ -10,7 +10,7 @@
 
 //////// Device setup  ////////
 // output example
-//output(blue, ONBOARDLED, "off", "on").set("on");
+// output(blue, ONBOARDLED, "off", "on").set("on");
 // void blink() {
 //     IN(blue).toggle();
 //     do_later(2000, blink);
@@ -20,12 +20,12 @@
 // Add a button with a slightly higher debounce rate, which will report
 // in the topic myroom/test1/button1.
 // input(button1, D3, "released", "pressed")
-//     .with_threshold(3)
-//     .with_on_change_callback([&] {
-//          if(IN(button1).is("pressed")) {
-//              IN(blue).toggle();
-//          }
-//      });
+//      .with_threshold(3)
+//      .with_on_change_callback([&] {
+//           if(IN(button1).is("pressed")) {
+//               IN(blue).toggle();
+//           }
+//       });
 
 // Examples for analog device:
 // analog(a0).with_precision(5); //.with_threshold(100, "high", "low");
@@ -63,7 +63,7 @@
 // servo(m1, D6, 800);
 
 // Distance sensor
-//hcsr04(distance, D5, D6).with_precision(50);
+//hcsr04(distance, D5, D6).with_precision(10);
 //hcsr04(distance, D5, D6)
 //    .with_filter_callback(filter_binarize(200, "off", "on", IN(distance)));
 
@@ -94,6 +94,9 @@
 // rgb(r0, D6, D5, D0, true);
 
 // RGB strips
+// small wemos 7-leds shield (careful, on D4=ONBOARDLED)
+// rgb_strip(strip1, 7, WS2812B, D4, GRB);
+
 //rgb_strip(strip1, 90, WS2811, D2, BRG);
 // // rgb_strip_(strip2, "strip2", 50, WS2811, D5, BRG);
 // // rgb_strip_(strip3, "strip3", 50, WS2811, D4, BRG);
@@ -169,16 +172,24 @@
 //         set_animation(command, scroll, 5, 150);
 //     } );
 
-// Examples for displays
-//display(d1, font_medium).i2c(D6, D5); // standard ssd1306
-//U8G2_SSD1306_64X48_ER_F_HW_I2C u8g2d(U8G2_R0); // small ssd1306 as wemos shield
+//// Examples for displays
+
+// standard ssd1306 display
+//display(d1, font_medium).i2c(D6, D5);
+
+// small ssd1306 as wemos shield
+//U8G2_SSD1306_64X48_ER_F_HW_I2C u8g2d(U8G2_R0);
 //display(d1, u8g2d);
+
+// 2 lines 44780 i2c lcd display
 //display44780(d2, 16, 2);
 
 // Example for pulse width modulation
 // pwm(blue, ONBOARDLED).with_frequency(1000);
 
-// Example for gyro
+//// Examples for gyros
+
+// MPU-6050
 // gyro6050(g0).with_filter( [&] { // fuse accel value into one
 //    // ignore angles
 //    IN(g0).measured_value(0).clear();
@@ -190,6 +201,8 @@
 //    return true;
 // });
 
+// MPU-9250
+gyro9250(g1);
 
 // Optional init function, which is called right before device initialization
 // void init() {

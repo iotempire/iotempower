@@ -28,9 +28,9 @@ class I2C_Device : public Device {
     private:
         // own wire: TODO: only reserve once per I2C-bus
     #ifdef ESP32
-        TwoWire mywire = TwoWire(0); // ESP32 has two busses TODO: see if iotempower emulation works or need to distributed 
+        TwoWire mywire = TwoWire(0); // ESP32 has two busses TODO: see if iotempower emulation works or needs to be distributed 
     #else
-        TwoWire mywire;
+        TwoWire mywire = Wire;
     #endif
         uint8_t sda_pin;
         uint8_t scl_pin;
@@ -103,6 +103,8 @@ class I2C_Device : public Device {
         uint8_t get_scl() { return scl_pin; }
         uint8_t get_address() { return _i2c_address; }
         uint8_t get_master() { return _master_address; }
+        unsigned int get_clock() { return clock_speed; }
+        TwoWire& get_wire() { return mywire; }
 
         /**
          * Check if device connected (returns true if it is found);

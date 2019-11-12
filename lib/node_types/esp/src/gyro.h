@@ -1,5 +1,5 @@
 // gyro.h
-// Header File for controlling gyroscopes like MPU6050 and MPU9250
+// Header File for controlling the MPU6050 gyroscope
 
 #ifndef _IOTEMPOWER_GYRO_H_
 #define _IOTEMPOWER_GYRO_H_

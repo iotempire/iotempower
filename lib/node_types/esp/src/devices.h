@@ -192,6 +192,12 @@
 #define gyro(name, ...) IOTEMPOWER_DEVICE(name, gyro_, ##__VA_ARGS__)
 
 
+#include <gyro-mpu9250.h>
+#define gyro9250_(internal_name, ...) \
+    IOTEMPOWER_DEVICE_(Gyro_MPU9250, internal_name, ##__VA_ARGS__)
+#define gyro9250(name, ...) IOTEMPOWER_DEVICE(name, gyro9250_, ##__VA_ARGS__)
+
+
 #include <mfrc522.h>
 #define mfrc522_(internal_name, ...) \
     IOTEMPOWER_DEVICE_(Mfrc522, internal_name, ##__VA_ARGS__)
