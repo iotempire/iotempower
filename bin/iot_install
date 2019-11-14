@@ -25,11 +25,12 @@ from setting up a very simple and accessible system to deploy your own
 Internet of Things (IoT).
 
 You need build-essential, virtualenv, git, hostapd, dnsmasq, nodejs,
-and haveged installed.
+python-dev, and haveged installed.
 
 On Ubuntu or Debian systems install these with:
-sudo apt install git mc mosquitto mosquitto-clients virtualenv \
-         iptables bridge-utils hostapd dnsmasq nodejs
+sudo apt install build-essential git mc mosquitto mosquitto-clients \
+         virtualenv iptables bridge-utils hostapd dnsmasq nodejs haveged \
+         python-dev python3-dev
 
 (On raspberry pi, installing nodejs is more difficult. Search the web, how.)
 

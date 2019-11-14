@@ -19,7 +19,7 @@
 // input example
 // Add a button with a slightly higher debounce rate, which will report
 // in the topic myroom/test1/button1.
-// input(button1, D3, "released", "pressed")
+input(button1, D3, "released", "pressed");
 //      .with_threshold(3)
 //      .with_on_change_callback([&] {
 //           if(IN(button1).is("pressed")) {
@@ -212,7 +212,7 @@
 // gyro9250(g1);
 
 // MPR121 capacitive touch
-mpr121(cap);
+//mpr121(cap);
 
 // Optional init function, which is called right before device initialization
 // void init() {
@@ -231,7 +231,7 @@ void start() { // begin start, uncomment, if you need to start things
 //     do_later(2000, blink);
 //
     //  // fall into deep sleep in 15s for 60s
-    //  deep_sleep(15000, 60000);
+    deep_sleep(10000, 10000);
 // 
 //     // Send updates of current status every 10s (default 5)
 //     transmission_interval(10);
