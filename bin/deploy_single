@@ -79,6 +79,10 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
             # getting IP from mqtt
             echo "Getting IP of node $node_name for deployment."
             remote=$(get_ip "$node_name" 2>/dev/null)
+            if [[ ! "$remote" ]]; then
+                echo "Node doesn't seem to be online. Deploy of $node_name failed."
+                exit 1
+            fi
         fi
         # TODO: when doing ota-upload, allow doing the actual upload several times, but only
         # needing to compile once
