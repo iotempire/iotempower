@@ -1,0 +1,39 @@
+mpr121
+======
+
+..  code-block:: cpp
+
+    mpr121(name)[.i2c(sda,scl)][.with_address(i2c_address)];
+
+Create a new MPR121 capacative touch sensor device.
+name will be appended to the mqtt topic and corresponding
+values will be published directly as a string of the length 12 with zeros and
+ones corresponding to the 12 ports at the MPR121, showing a 1 if the port is
+touched and a 0 otherwise.
+
+Parameters
+----------
+
+- ``name``: the name it can be addressed via MQTT in the network. Inside the code
+  it can be addressed via IN(name).
+
+- ``.i2c(sda,scl)``: move i2c to given ports - if not specified uses default 
+  i2c ports
+
+- ``.with_address(i2c_address)``: the i2c_address is the address of MPR121
+  capacitive touch sensor. Default address is 0x5A, but depending on wiring
+  can also be 0x5B, 0x5C, or 0x5D.
+
+With ``.with_filter`` a filter function can be specified: (see uhelp filter).
+
+Example
+-------
+
+node name: ``toyroom/controller1``:
+
+..  code-block:: cpp
+
+    mpr121(cap1);
+
+Now the status of the 12 touch ports is returned on
+``toyroom/controller1/cap1``.

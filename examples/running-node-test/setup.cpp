@@ -30,21 +30,22 @@
 // Examples for analog device:
 // analog(a0).with_precision(5); //.with_threshold(100, "high", "low");
 // Using _ in end of device allows giving internal name and "external name"
-// analog_(a0, "a0").with_filter_callback([&] {
+// analog(a0).with_filter_callback([&] {
 //     const int buflen = 100;
 //     static long sum = 0;
 //     static long values_count = 0;
-//     int v = a0.read_int();
+//     int v = IN(a0).read_int();
 //     sum += v;
 //     values_count ++;
 //     if(values_count >= buflen) {
-//         a0.write_int(sum/values_count);
+//         IN(a0).write_int(sum/values_count);
 //         values_count = 0;
 //         sum = 0;
 //         return true;
 //     }
 //     return false;
 // });
+// The same as above, but shorter with generic filter
 // analog(a0).with_filter_callback(filter_average(int, 100, IN(a0));
 
 // gesture/color/proximity
@@ -62,19 +63,23 @@
 // Servo motor
 // servo(m1, D6, 800);
 
-// Distance sensor
+//// Distance sensors
+
+// Acoustic distance sensor
 //hcsr04(distance, D5, D6).with_precision(10);
 //hcsr04(distance, D5, D6)
 //    .with_filter_callback(filter_binarize(200, "off", "on", IN(distance)));
 
-// HX711 weight sensor
-//hx711(weight, D6, D7, 419.0, true)
-//    .with_filter(filter_round(2, IN(weight)));
-
+// Laser distance sensor
 //vl53l0x distance sensor
 //vl53l0x(dist);
 
-// barometer
+
+// HX711 weight sensor (sensor for scales)
+//hx711(weight, D6, D7, 419.0, true)
+//    .with_filter(filter_round(2, IN(weight)));
+
+// Barometers
 //bmp180(bmp1);
 //bmp280(bmp2);
 
@@ -83,17 +88,19 @@
 // i2c_socket(arduino1, 9, 8).i2c(100000).pollrate(100);
 //i2c_socket(arduino1).pollrate(2000);
 
-// MFRC522 reader example (SPI sensor)
+// MFRC522 RFID/NFC reader example (SPI sensor)
 //mfrc522(rfid1, 32);
 
-// light sensitivity sensors
-// bh1750(lux1);
+//// light sensitivity sensors
+//bh1750(lux1);
 //tsl2561(lux2);
 
 // Example for single RGB-led
 // rgb(r0, D6, D5, D0, true);
 
-// RGB strips
+
+//// RGB strips
+
 // small wemos 7-leds shield (careful, on D4=ONBOARDLED)
 // rgb_strip(strip1, 7, WS2812B, D4, GRB);
 
@@ -202,7 +209,10 @@
 // });
 
 // MPU-9250
-gyro9250(g1);
+// gyro9250(g1);
+
+// MPR121 capacitive touch
+mpr121(cap);
 
 // Optional init function, which is called right before device initialization
 // void init() {

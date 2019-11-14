@@ -203,5 +203,10 @@
     IOTEMPOWER_DEVICE_(Mfrc522, internal_name, ##__VA_ARGS__)
 #define mfrc522(name, ...) IOTEMPOWER_DEVICE(name, mfrc522_, ##__VA_ARGS__)
 
+#include <mpr121.h>
+#define mpr121_(internal_name, ...) \
+    IOTEMPOWER_DEVICE_(MPR121, internal_name, ##__VA_ARGS__)
+#define mpr121(name, ...) IOTEMPOWER_DEVICE(name, mpr121_, ##__VA_ARGS__)
+
 
 #endif // _DEVICES_H_
