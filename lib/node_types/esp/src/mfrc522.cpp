@@ -9,12 +9,13 @@ void Mfrc522::write(const Ustring &payload) {
     byte buffer_fill=0;
     int pos = 0;
 
+    ulog("MFRC522: Trying to write: %s", payload.as_cstr());
     while(left>0) {
 
         if(_use_auth) {
             // authenticate
-            MFRC522::StatusCode status = sensor->PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A, 
-                    block, &key, &(sensor->uid)); //line 834
+            MFRC522::StatusCode status = sensor->PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_B, // TODO: A or B? 
+                    block, &key, &(sensor->uid));
             if (status != MFRC522::STATUS_OK) {
                 ulog(F("MFRC522 Authentication failed: %s"),
                     sensor->GetStatusCodeName(status));
@@ -68,16 +69,17 @@ void Mfrc522::write(const Ustring &payload) {
         }
     }  // end while left
 
-    if(_use_auth) {
-        sensor->PICC_HaltA();
-        sensor->PCD_StopCrypto1();
-    } // TODO: also allow to select key B
+    // sensor->PICC_HaltA();
 
+    // if(_use_auth) {
+    //     sensor->PCD_StopCrypto1();
+    // } // TODO: also allow to select key B
+    // done in measure that calls this
 }
 
 
 Mfrc522::Mfrc522(const char* name, uint16_t data_size, 
-        bool in_hex, bool use_auth, const byte* six_byte_key) : Device(name, 10000) {
+        bool in_hex, bool use_auth, const byte* six_byte_key) : Device(name, 100000) {
     _use_auth = use_auth;
     if(_use_auth) {
         if(six_byte_key) {
@@ -94,7 +96,8 @@ Mfrc522::Mfrc522(const char* name, uint16_t data_size,
     add_subdevice(new Subdevice(F("set"), true))->with_receive_cb(
         [&] (const Ustring& payload) {
             ulog(F("Mfrc522 set requested."));
-            write(payload);
+            next_write.copy(payload);
+            write_requested = true;
             return true;
         });
     _in_hex = in_hex;
@@ -111,7 +114,7 @@ Mfrc522::Mfrc522(const char* name, uint16_t data_size,
 void Mfrc522::start() {
     ulog(F("Starting MFRC522 initialization."));
     // TODO: check on esp32
-    sensor = new MFRC522(15, 0); // D8, D3 on Wemos
+    sensor = new MFRC522(15, 0); // D8, D3 on Wemos TODO: make configurable?
     if(sensor) {
         SPI.begin(); // Init SPI bus
         sensor->PCD_Init(); // Init MFRC522 card
@@ -126,19 +129,35 @@ void Mfrc522::start() {
 
 
 bool Mfrc522::measure() {
-    measured_value(0).clear(); // empty this by default TODO: check if necessary or always empty on start
+    byte buffer2[18];
+    byte len;
 
-    // only read when new card there
+    // assume no card by default, make sure to return empty value
+    measured_value(0).clear();
+    measured_value(1).from(F("NONE"));
+    measured_value(2).from(F("NONE"));
+
+    // Check if card there (the "new" is missleading)
     if ( ! sensor->PICC_IsNewCardPresent()) {
-        // no card, make sure to return empty value
-        measured_value(1).from(F("NONE"));
-        measured_value(2).from(F("NONE"));
-        return true;
-    }
+        if(presence_detect_tries>0) {
+            // might be old card there that needs to be woken up
+            sensor->PICC_WakeupA(buffer2, &len); // Does not work
+            presence_detect_tries --;
+            return false; // try again later as might have just not detected presence
+        } else {
+            presence_detect_tries = 10;
+            return true;
+        }
+    } // TODO: what if old card is still there?
+
+    ulog(F("MFRC522 detected new card after %d tries."), 10-presence_detect_tries);
+
+    presence_detect_tries = 10;
+
 
     // Select one of the cards, TODO: handle multiple
     if ( ! sensor->PICC_ReadCardSerial()) {
-        return false;
+        return true;
     }
 
     Ustring buf;
@@ -150,7 +169,9 @@ bool Mfrc522::measure() {
 
     // PICC type
     MFRC522::PICC_Type piccType = sensor->PICC_GetType(sensor->uid.sak);
-    measured_value(2).from((char*)sensor->PICC_GetTypeName(piccType));
+//    measured_value(2).from((char*)sensor->PICC_GetTypeName(piccType));
+// (char*) was crashing due to change of return of PICC_GetTypeName to FlashStringHelper
+    measured_value(2).from(sensor->PICC_GetTypeName(piccType));
 
     //sensor->PICC_DumpDetailsToSerial(&(sensor->uid)); //dump some details about the card
 
@@ -164,8 +185,6 @@ bool Mfrc522::measure() {
 
     buf.clear();
 
-    byte buffer2[18];
-    byte len;
     MFRC522::StatusCode status;
 
     for(uint16_t block = 1; block<block_count+1; block++) {
@@ -204,8 +223,14 @@ bool Mfrc522::measure() {
 
     measured_value().copy(buf);
 
+    if(write_requested) {
+        write(next_write);
+        write_requested = false;
+    }
+
+    sensor->PICC_HaltA();
+
     if(_use_auth) {
-        sensor->PICC_HaltA();
         sensor->PCD_StopCrypto1();
     } // TODO: also allow to select key B
 

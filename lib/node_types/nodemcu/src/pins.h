@@ -18,6 +18,7 @@
 #define MOSI D7
 // #define D8 15
 #define CS D8
+#define SS D8 // or sometimes SDA (for example on RFID-RC522)
 // // 3.3V
 
 // //// right
