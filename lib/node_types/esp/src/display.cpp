@@ -175,14 +175,25 @@ void Display::show(const char* buffer) {
 }
 
 void Display_HD44780_I2C::init_hd44780_i2c(int w, int h, uint8_t scl, uint8_t sda, int i2c_addr) {
-    _display = new LiquidCrystal_I2C(i2c_addr, w, h);
-    _display->init(sda, scl);
-    if(init(w, h)) {
+    set_address(i2c_addr);
+    _width = w;
+    _height = h;
+    set_fps(2); // can be low for these type of displays and just showing text
+}
+
+void Display_HD44780_I2C::i2c_start() {
+    _display = new LiquidCrystal_I2C(get_address(), _width, _height);
+    if( ! _display ) {
+        ulog("Can't reserve display memory, not starting display.");
+        return;
+    }
+    _display->init(get_sda(), get_scl());
+    if(init(_width, _height)) {
         clear();
         _display->cursor_off();
         _display->backlight();
     }
-    set_fps(2); // can be low for these type of displays and just showing text
+    _started = true;
 }
 
 void Display_HD44780_I2C::show(const char* buffer) {

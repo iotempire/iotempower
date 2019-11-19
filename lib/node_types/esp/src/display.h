@@ -148,6 +148,8 @@ class Display_HD44780_I2C : public Display_Base {
     private:
         LiquidCrystal_I2C* _display;
         void init_hd44780_i2c(int w, int h, uint8_t scl, uint8_t sda, int i2c_addr);
+        int _width = 0;
+        int _height = 0;
     public:
         Display_HD44780_I2C(const char* name, int w, int h, uint8_t scl, uint8_t sda, int i2c_addr=0x27) // or 0x38?
         : Display_Base(name) {
@@ -158,10 +160,7 @@ class Display_HD44780_I2C : public Display_Base {
         : Display_Base(name) {
             init_hd44780_i2c(w, h, SCL, SDA, i2c_addr);
         }
-        void i2c_start() {
-            // TODO: check if i2c start was successful
-            _started = true;
-        }
+        void i2c_start();
 
         // TODO: check what happens when we use this together with the I2C hardware pins
 
