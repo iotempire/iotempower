@@ -20,9 +20,9 @@ Under the resulting topic will be the following subtopics:
 
 - ``set``: turn on or off
 
-- ``brightness/status``, ``brightness/set``: read and set brightness (0-255)
+- ``brightness``, ``brightness/set``: read and set brightness (0-255)
 
-- ``rgb/status``, ``rgb/set``:
+- ``rgb``, ``rgb/set``:
   read and set color as colorname, 6-digit hexcode
   ``rrggbb`` or comma separated triplet ``r,g,b``
 
