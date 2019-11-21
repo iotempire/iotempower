@@ -4,7 +4,7 @@ input
 ..  code-block:: cpp
 
     input(name, pin, "high_word", "low_word")
-      [.with_threshold(threshold_value, "high_word", "low_word")]
+      [.with_threshold(threshold_value)]
       [.with_pull_up(true/false)]
       [.with_filter(filter_function)]
       ;
@@ -41,6 +41,6 @@ Example
 
 ..  code-block:: cpp
     
-    input(lower, D2, "depressed", "pressed");
+    input(lower, D2, "depressed", "pressed").with_threshold(50);
 
 Now the status button is published as ``living room/leds1/lower``.
