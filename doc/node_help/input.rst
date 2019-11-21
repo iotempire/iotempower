@@ -41,6 +41,6 @@ Example
 
 ..  code-block:: cpp
     
-    input(lower, D2, "depressed", "pressed").with_threshold(50);
+    input(lower, D2, "depressed", "pressed").with_threshold(5);
 
 Now the status button is published as ``living room/leds1/lower``.
