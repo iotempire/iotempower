@@ -88,92 +88,79 @@ RGB_Matrix& RGB_Matrix::add(RGB_Base& strip, int posx, int posy,
     return *this;
 }
 
-void RGB_Matrix::scroll_up(bool cycle, int column) {
+void RGB_Matrix::scroll_up(bool cycle, int startx, int starty, int w, int h) {
     CRGB old;
-    int start,end;
-    if(column<0) {
-        start = 0;
-        end = width;
-    } else {
-        start = column;
-        end = column + 1;
-    }
-    for(int x=start; x<end; x++) {
+    if(w<0) w=width;
+    if(h<0) h=height;
+    if(startx+w >= width) w=width-startx;
+    if(starty+h >= height) h=height-starty;
+
+    for(int x=startx; x<startx+w; x++) {
         if(cycle)
-            old = get_pixel(x,0);
+            old = get_pixel(x,starty);
         else
             old = CRGB::Black;
-        for(int y=height-1; y>=0; y--) {
+        for(int y=starty+h-1; y>=starty; y--) {
             old = set_pixel(x,y,old);
         }
     }
 }
 
-void RGB_Matrix::scroll_down(bool cycle, int column) {
+void RGB_Matrix::scroll_down(bool cycle, int startx, int starty, int w, int h) {
     CRGB old;
-    int start,end;
-    if(column<0) {
-        start = 0;
-        end = width;
-    } else {
-        start = column;
-        end = column + 1;
-    }
-    for(int x=start; x<end; x++) {
+    if(w<0) w=width;
+    if(h<0) h=height;
+    if(startx+w >= width) w=width-startx;
+    if(starty+h >= height) h=height-starty;
+
+    for(int x=startx; x<startx+w; x++) {
         if(cycle)
-            old = get_pixel(x,height-1);
+            old = get_pixel(x,starty+h-1);
         else
             old = CRGB::Black;
-        for(int y=0; y<height; y++) {
+        for(int y=starty; y<starty+h; y++) {
             old = set_pixel(x,y,old);
         }
     }
 }
 
-void RGB_Matrix::scroll_right(bool cycle, int line) {
+void RGB_Matrix::scroll_right(bool cycle, int startx, int starty, int w, int h) {
     CRGB old;
-    int start,end;
-    if(line<0) {
-        start = 0;
-        end = height;
-    } else {
-        start = line;
-        end = line + 1;
-    }
-    for(int y=start; y<end; y++) {
+    if(w<0) w=width;
+    if(h<0) h=height;
+    if(startx+w >= width) w=width-startx;
+    if(starty+h >= height) h=height-starty;
+
+    for(int y=starty; y<starty+h; y++) {
         if(cycle)
-            old = get_pixel(width-1,y);
+            old = get_pixel(startx+w-1,y);
         else
             old = CRGB::Black;
-        for(int x=0; x<width; x++) {
+        for(int x=startx; x<startx+w; x++) {
             old = set_pixel(x,y,old);
         }
     }
 }
 
-void RGB_Matrix::scroll_left(bool cycle, int line) {
+void RGB_Matrix::scroll_left(bool cycle, int startx, int starty, int w, int h) {
     CRGB old;
-    int start, end;
-    if(line<0) {
-        start = 0;
-        end = height;
-    } else {
-        start = line;
-        end = line + 1;
-    }
-    for(int y=start; y<end; y++) {
+    if(w<0) w=width;
+    if(h<0) h=height;
+    if(startx+w >= width) w=width-startx;
+    if(starty+h >= height) h=height-starty;
+
+    for(int y=starty; y<starty+h; y++) {
         if(cycle)
             old = get_pixel(0,y);
         else
             old = CRGB::Black;
-        for(int x=width-1; x>=0; x--) {
+        for(int x=startx+w-1; x>=0; x--) {
             old = set_pixel(x,y,old);
         }
     }
 }
 
-void RGB_Matrix::rainbow( int startx, int starty,
-            int w, int h,
+void RGB_Matrix::rainbow( int startx, int starty, int w, int h,
             uint8_t initialhue, uint8_t deltahue ) {
     if(w<0) w=width;
     if(h<0) h=height;

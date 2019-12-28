@@ -104,10 +104,14 @@ class RGB_Matrix : public RGB_Base {
             return CRGB(CRGB::Black); // if something goes wrong, return black
         }
         // Matrix drawing functions
-        void scroll_up(bool cycle=false, int column=-1);
-        void scroll_down(bool cycle=false, int column=-1);
-        void scroll_left(bool cycle=false, int line=-1);
-        void scroll_right(bool cycle=false, int line=-1);
+        void scroll_up(bool cycle=false, int startx=0, int starty=0,
+                int w=-1, int h=-1);
+        void scroll_down(bool cycle=false, int startx=0, int starty=0,
+                int w=-1, int h=-1);
+        void scroll_left(bool cycle=false, int startx=0, int starty=0,
+                int w=-1, int h=-1);
+        void scroll_right(bool cycle=false, int startx=0, int starty=0,
+                int w=-1, int h=-1);
         // all off
         void black() {
             for(int y=0; y<height; y++) {
