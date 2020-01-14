@@ -5,7 +5,7 @@
 
 Hx711::Hx711(const char* name, uint8_t sck_pin, uint8_t dout_pin,
                 float calfactor, bool calibration)
-        : Device(name, 10000) {
+        : Device(name, 500) {
     _calfactor = calfactor;
     _sck_pin = sck_pin;
     _dout_pin = dout_pin;
@@ -66,16 +66,21 @@ bool Hx711::measure() {
 
     sensor->update();
 
-    if(first_tare_done && delta>=100) { // only deliver values after first tare done
-        // only every 100ms
+    // if(first_tare_done && delta>=100) { // only deliver values after first tare done
+    //     // only every 100ms
+    if(first_tare_done) { // only deliver values after first tare done
+    // go as often as pollrate allows
         float weight = sensor->getData();
-        if(_calibration) {
-            float factor = sensor->getCalFactor();
-            measured_value().printf("%0.1f %0.3f", weight, factor);
-        } else {
-            measured_value().printf("%0.1f", weight);
-        }
-        measured = true;
+        if(abs(lastweight-weight)>_precision) {
+            lastweight = weight;
+            if(_calibration) {
+                float factor = sensor->getCalFactor();
+                measured_value().printf("%0.1f %0.3f", weight, factor);
+            } else {
+                measured_value().printf("%0.1f", weight);
+            }
+            measured = true;
+            }
         last_read = current;
     }
     if (sensor->getTareStatus() == true) {

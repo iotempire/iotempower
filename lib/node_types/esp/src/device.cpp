@@ -212,7 +212,7 @@ bool Device::poll_measure() {
             
             // a current value is now in measured_value(s)
             // check if it needs to be filtered
-            if(_filter_cb != NULL && ! _filter_cb()) {
+            if(filter_first != NULL && ! filter_first->call(*this)) {
                 // if filter defined but indicates to ignore the current measurement
                 return false; // end here with no update
             }
@@ -249,7 +249,7 @@ bool Device::check_changes() {
     } ); // end for each subdevices
 
     if(changed) {
-        call_on_change_callback();
+        call_on_change_callbacks();
     }
     return updated;
 }

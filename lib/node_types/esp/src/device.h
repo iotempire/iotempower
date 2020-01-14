@@ -5,7 +5,8 @@
 // One iotempower device (actor or sensor connected to node)
 
 // General note, in iotempower, we pass as convenience all values as strings.
-// So other types have to be converted in such a as string or from one.
+// So other types have to be converted into a string or from one.
+// We are actually using Ustring as defined in toolbox.h.
 
 #ifndef _IOTEMPOWER_DEVICE_H_
 #define _IOTEMPOWER_DEVICE_H_
@@ -19,6 +20,55 @@
 
 #include "config-wrapper.h"
 
+class Device;
+
+#define IOTEMPOWER_DEVICE_CALLBACK std::function<bool(Device&)>
+
+// This class implements a callback for IOTEMPOWER
+// It's call function can be overwritten or the internal callback
+// can be intialized by another function
+class Callback {
+    private:
+        IOTEMPOWER_DEVICE_CALLBACK _callback = NULL;
+    public:
+        Callback(IOTEMPOWER_DEVICE_CALLBACK callback = NULL) {
+            _callback = callback;
+        }
+        virtual bool call(Device& device) {
+            if(_callback) return _callback(device);
+            return false; // if not overwritten, let this filter forget everything
+        }
+};
+
+
+// This is a chained list of callbacks working on a device
+// If called it traverses the chain and all it's subchain elements and
+// returns only true if all subcalls returned true - else it will return false
+// the call back operates on a device as parameter
+class Callback_Link {
+    private:
+        Callback* _callback;
+        Callback_Link* next = NULL; // allow building chain
+    public:
+        Callback_Link(Callback& cb) {
+            _callback = &cb;
+        }
+        bool call(Device &dev) {
+            bool result = _callback->call(dev);
+            if(result && next) { // traverse chain down to end
+                result &= next->call(dev);
+            }
+            return result;
+        }
+        bool chain(Callback& cb) {
+            if(next) {
+                return next->chain(cb); // traverse chain down to end
+            } else {
+                next = new Callback_Link(cb);
+                return next != NULL;
+            }
+        }
+};
 
 class Subdevice {
     private:
@@ -74,22 +124,28 @@ class Device {
         bool _report_change = true;
         bool _needs_publishing = false;
 
-        // This is the callback which is called based on a value change
-        // it gets passed the triggering device. Last measured values can be
-        // read from the globally defined device.
-        // TODO: commented example
-        #define IOTEMPOWER_ON_CHANGE_CALLBACK std::function<void()>
-        IOTEMPOWER_ON_CHANGE_CALLBACK _on_change_cb=NULL;
 
-        // This is the callback which is used for filtering and influencing values
-        // It does not get the current device passed as parameter. The value can
-        // be read from measured_value in the globally defined device. This
-        // measure_value can be now modified. It is declared valid via
-        // returning true and invalid via returning false or returning an empty 
-        // string (set first char to 0).
+        // This is a chain of callbacks called for every measuring iteration of the
+        // device.
+        // It gets passed the triggering device. 
+        // the last measured value will be in .measured_value() or
+        // .measured_value(n) with n denoting the subdevice.
+        // .measured_value can be modified.
+        // Returning false means that the value should not be considered.
+        // Returning true means that the (new) value in .measured_value is correct.
         // TODO: commented example
-        #define IOTEMPOWER_FILTER_CALLBACK std::function<bool()>
-        IOTEMPOWER_FILTER_CALLBACK _filter_cb=NULL;
+        Callback_Link *filter_first;
+
+
+        // This is a chain of callbacks which are called based on
+        // a value change of the or one of any of the values of the subdevices.
+        // It gets passed the triggering device. 
+        // the last measured value will be in .measured_value() or
+        // .measured_value(n) with n denoting the subdevice.
+        // Returning false also allows here to discard the value.
+        // Returning true menas that value was considered.
+        // TODO: commented example
+        Callback_Link *on_change_first;
 
         unsigned long _pollrate_us = 0; // poll as often as possible
         unsigned long last_poll = micros(); // when was last polled
@@ -110,17 +166,16 @@ class Device {
         Device& set_ignore_case(bool ignore_case) {
             return with_ignore_case(ignore_case);
         }
+        Device& ignore_case(bool ignore_case) {
+            return with_ignore_case(ignore_case);
+        }
 
         bool get_ignore_case() {
             return _ignore_case;
         }
 
-        void call_on_change_callback() {
-            if(_on_change_cb != NULL) {
-                _on_change_cb();
-            }
-        }
 
+        ///////// Publishing
         bool needs_publishing() {
             return _needs_publishing;
         }
@@ -150,7 +205,8 @@ class Device {
             // from cpp-compiler
         }
 
-        // pollrate
+
+        //// pollrate
         Device& set_pollrate_us(unsigned long rate_us) { 
             _pollrate_us = rate_us;
             return *this;
@@ -177,7 +233,7 @@ class Device {
             return _pollrate_us;
         }
 
-        // report_change
+        //// report_change
         Device& set_report_change(bool report_change) { 
             _report_change = report_change;
             return *this;
@@ -189,48 +245,79 @@ class Device {
             return set_report_change(report_change);
         } 
 
-        // on_change_callback
-        Device& set_on_change_callback(IOTEMPOWER_ON_CHANGE_CALLBACK on_change_cb) { 
-            _on_change_cb = on_change_cb;
+        //// on_change_callback
+        Device& set_on_change_callback(Callback& on_change_cb) {
+            bool result;
+            if(on_change_first) result=on_change_first->chain(on_change_cb);
+            else {
+                on_change_first = new Callback_Link(on_change_cb);
+                result = on_change_first != NULL;
+            }
+            if(!result) {
+                ulog(F("Trouble reserving on_change entry."));
+            }
             return *this;
         }
-        Device& with_on_change_callback(IOTEMPOWER_ON_CHANGE_CALLBACK on_change_cb) { 
+        Device& with_on_change_callback(Callback& on_change_cb) { 
             return set_on_change_callback(on_change_cb);
         }
-        Device& on_change_callback(IOTEMPOWER_ON_CHANGE_CALLBACK on_change_cb) { 
+        Device& on_change_callback(Callback& on_change_cb) { 
             return set_on_change_callback(on_change_cb);
         }
-        Device& set_on_change(IOTEMPOWER_ON_CHANGE_CALLBACK on_change_cb) { 
+        Device& set_on_change(Callback& on_change_cb) { 
             return set_on_change_callback(on_change_cb);
         }
-        Device& with_on_change(IOTEMPOWER_ON_CHANGE_CALLBACK on_change_cb) { 
+        Device& with_on_change(Callback& on_change_cb) { 
             return set_on_change_callback(on_change_cb);
         }
-        Device& on_change(IOTEMPOWER_ON_CHANGE_CALLBACK on_change_cb) { 
+        Device& on_change(Callback& on_change_cb) { 
             return set_on_change_callback(on_change_cb);
+        }
+        bool call_on_change_callbacks() {
+            if(on_change_first) {
+                return on_change_first->call(*this);
+            } else {
+                return true; // all ok if there are no on_change callbacks
+            }
         }
 
         // filter_callback
-        Device& set_filter_callback(IOTEMPOWER_FILTER_CALLBACK filter_cb) { 
-            _filter_cb = filter_cb;
+        Device& set_filter_callback(Callback& filter_cb) { 
+            bool result;
+            if(filter_first) result=filter_first->chain(filter_cb);
+            else {
+                filter_first = new Callback_Link(filter_cb);
+                result = filter_first != NULL;
+            }
+            if(!result) {
+                ulog(F("Trouble reserving filter entry."));
+            }
             return *this;
         }
-        Device& with_filter_callback(IOTEMPOWER_FILTER_CALLBACK filter_cb) { 
+        Device& with_filter_callback(Callback& filter_cb) { 
             return set_filter_callback(filter_cb);
         }
-        Device& filter_callback(IOTEMPOWER_FILTER_CALLBACK filter_cb) { 
+        Device& filter_callback(Callback& filter_cb) { 
             return set_filter_callback(filter_cb);
         }
-        Device& with_filter(IOTEMPOWER_FILTER_CALLBACK filter_cb) { 
+        Device& with_filter(Callback& filter_cb) { 
             return set_filter_callback(filter_cb);
         }
-        Device& set_filter(IOTEMPOWER_FILTER_CALLBACK filter_cb) { 
+        Device& set_filter(Callback& filter_cb) { 
             return set_filter_callback(filter_cb);
         }
-        Device& filter(IOTEMPOWER_FILTER_CALLBACK filter_cb) { 
+        Device& filter(Callback& filter_cb) { 
             return set_filter_callback(filter_cb);
+        }
+        bool call_filter_callbacks() {
+            if(filter_first) {
+                return filter_first->call(*this);
+            } else {
+                return true; // all ok if there are no filters
+            }
         }
 
+        // Subdevices
         Subdevice* add_subdevice(Subdevice* sd) {
             ulog(F("add_subdevice: device: %s subdev: >%s<"), name.as_cstr(), sd->get_name().as_cstr());
             if(subdevices.add(sd)) {
@@ -312,26 +399,63 @@ class Device {
 
 
 //// Some filters
-// TODO: check how to turn this in a functor class that does not die when used
-#define filter_average(TYPE, buflen, dev) [&] { \
-        static TYPE sum = 0; \
-        static size_t values_count = 0; \
-        TYPE v; \
-        if(std::is_same<TYPE, double>::value) { \
-            v = dev.measured_value().as_float(); \
-        } else { \
-            v = dev.measured_value().as_int(); \
-        } \
-        sum += v; \
-        values_count ++; \
-        if(values_count >= buflen) { \
-            dev.measured_value().from(sum/values_count); \
-            values_count = 0; \
-            sum = 0; \
-            return true; \
-        } \
-        return false; \
-    }
+// simple averaging filter
+class Filter_Average : public Callback {
+    private:
+        double sum=0;
+        size_t values_count = 0;
+        size_t _buflen = 0;
+    public:
+        Filter_Average(size_t buflen) : Callback() {
+            _buflen = buflen;
+        }
+        bool call(Device &dev) {
+            sum += dev.measured_value().as_float();
+            values_count ++;
+            if(values_count >= _buflen) {
+                dev.measured_value().from(sum/values_count);
+                values_count = 0;
+                sum = 0;
+                return true;
+            }
+            return false;
+        }
+};
+#define filter_average(count) (*new Filter_Average(count))
+
+class Filter_Time_Average : public Callback {
+    private:
+        double sum=0;
+        size_t values_count = 0;
+        uint32_t last_measured = millis();
+        uint32_t _delta;
+        double last_val = NAN;
+    public:
+        Filter_Time_Average(uint32_t delta) : Callback() {
+            _delta=delta;
+        }
+        bool call(Device &dev) {
+            sum += dev.measured_value().as_float();
+            values_count ++;
+            if(millis()-last_measured >= _delta) {
+                last_measured = millis();
+                double result;
+                if(values_count == 0) { // no values read yet
+                    if(last_val != NAN) {
+                        result = last_val;
+                    } else return false; // No value to return
+                } else {
+                    result = sum/values_count;
+                }
+                dev.measured_value().from(result);
+                values_count = 0;
+                sum = 0;
+                return true;
+            }
+            return false;
+        }
+};
+#define filter_time_average(delta_ms) (*new Filter_Time_Average(delta_ms))
 
 
 
