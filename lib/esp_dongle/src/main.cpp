@@ -9,10 +9,6 @@
 #define RXBUFFER_SIZE 1024
 #define SMALL_STRING_LEN 33
 
-#define FLASH 0
-#define SPIFFS 100
-#define AUTH 200
-
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
@@ -22,6 +18,10 @@
 // used external hardware
 #include <Wire.h>
 #include <U8g2lib.h>
+
+#define FLASH 0
+#define SPIFFS 100
+#define AUTH 200
 
 // config defaults
 #include "iotempower-default.h"
