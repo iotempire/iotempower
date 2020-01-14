@@ -24,7 +24,7 @@ class Hx711 : public Device {
             float calfactor=450.0, bool calibration=false);
         Hx711& with_precision(float precision) {
             if(precision < 1) precision = 1;
-            return (Hx711&)filter(*new Filter_Minchange<float>(precision));
+            return (Hx711&)with_filter_callback(*new Filter_Minchange<float>(precision));
         }
         Hx711& precision(float precision) {
             return with_precision(precision);

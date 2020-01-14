@@ -7,6 +7,9 @@
 #include <Arduino.h>
 #include <device.h>
 
+
+
+
 class Input : public Device {
     private:
         const char* _high;
@@ -51,6 +54,12 @@ class Input : public Device {
             debouncer = digitalRead(_pin) * _threshold;
             return *this;
         }
+        Input& debounce(int threshold) {
+            return with_threshold(threshold);
+        }
+        Input& with_debounce(int threshold) {
+            return with_threshold(threshold);
+        }
         Input& invert() {
             _inverted = true;
             return *this;
@@ -71,6 +80,5 @@ class Input : public Device {
             return measured_value().equals(test_value);
         }
 };
-
 
 #endif // _INPUT_H_

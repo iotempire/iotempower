@@ -35,7 +35,7 @@ class Hcsr04 : public Device {
         Hcsr04(const char* name, uint8_t trigger_pin, uint8_t echo_pin);
         Hcsr04& with_precision(int precision) {
             if(precision < 1) precision = 1;
-            return (Hcsr04&)filter(*new Filter_Minchange<int>(precision));
+            return (Hcsr04&)with_filter_callback(*new Filter_Minchange<int>(precision));
         }
         Hcsr04& precision(int precision) {
             return with_precision(precision);

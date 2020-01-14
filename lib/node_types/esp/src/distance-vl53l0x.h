@@ -24,7 +24,7 @@ class Distance_Vl53l0x : public I2C_Device {
                     bool long_range=false, bool high_accuracy_slow=false);
         Distance_Vl53l0x& with_precision(int precision) {
             if(precision < 1) precision = 1;
-            return (Distance_Vl53l0x&)filter(*new Filter_Minchange<int>(precision));
+            return (Distance_Vl53l0x&)with_filter_callback(*new Filter_Minchange<int>(precision));
         }
         Distance_Vl53l0x& precision(int precision) {
             return with_precision(precision);

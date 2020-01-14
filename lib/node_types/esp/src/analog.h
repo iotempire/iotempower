@@ -23,14 +23,14 @@ class Analog : public Device {
         Analog& with_threshold(int threshold, const char* high="on", const char* low="off") {
             if(threshold > 1024) threshold=1024;
             else if(threshold < 0) threshold=0;
-            return (Analog&)filter(filter_binarize(threshold,high,low));
+            return (Analog&)filter_binarize(threshold,high,low);
         }
         Analog& threshold(int threshold, const char* high="on", const char* low="off") {
             return with_threshold(threshold, high, low);
         }
         Analog& with_precision(int precision) {
             if(precision < 1) precision = 1;
-            return (Analog&)filter(*new Filter_Minchange<int>(precision));
+            return (Analog&)with_filter_callback(*new Filter_Minchange<int>(precision));
         }
         Analog& precision(int precision) {
             return with_precision(precision);

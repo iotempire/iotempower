@@ -264,15 +264,6 @@ class Device {
         Device& on_change_callback(Callback& on_change_cb) { 
             return set_on_change_callback(on_change_cb);
         }
-        Device& set_on_change(Callback& on_change_cb) { 
-            return set_on_change_callback(on_change_cb);
-        }
-        Device& with_on_change(Callback& on_change_cb) { 
-            return set_on_change_callback(on_change_cb);
-        }
-        Device& on_change(Callback& on_change_cb) { 
-            return set_on_change_callback(on_change_cb);
-        }
         bool call_on_change_callbacks() {
             if(on_change_first) {
                 return on_change_first->call(*this);
@@ -298,15 +289,6 @@ class Device {
             return set_filter_callback(filter_cb);
         }
         Device& filter_callback(Callback& filter_cb) { 
-            return set_filter_callback(filter_cb);
-        }
-        Device& with_filter(Callback& filter_cb) { 
-            return set_filter_callback(filter_cb);
-        }
-        Device& set_filter(Callback& filter_cb) { 
-            return set_filter_callback(filter_cb);
-        }
-        Device& filter(Callback& filter_cb) { 
             return set_filter_callback(filter_cb);
         }
         bool call_filter_callbacks() {
@@ -422,7 +404,7 @@ class Filter_Average : public Callback {
             return false;
         }
 };
-#define filter_average(count) filter(*new Filter_Average(count))
+#define filter_average(count) with_filter_callback(*new Filter_Average(count))
 
 // build an average over all samples arriving in a specific time window
 class Filter_Time_Average : public Callback {
@@ -458,7 +440,7 @@ class Filter_Time_Average : public Callback {
             return false;
         }
 };
-#define filter_time_average(delta_ms) filter(*new Filter_Time_Average(delta_ms))
+#define filter_time_average(delta_ms) with_filter_callback(*new Filter_Time_Average(delta_ms))
 
 
 // compute derivative in 1/ms
@@ -481,7 +463,7 @@ class Filter_Derivative : public Callback {
             return retval;
         }
 };
-#define filter_derivative() (*new Filter_Derivative())
+#define filter_derivative() with_filter_callback(*new Filter_Derivative())
 
 
 // only report value if a minimum change to last value happened
@@ -510,7 +492,7 @@ class Filter_Minchange : public Callback {
             return false;
         }
 };
-#define filter_minchange(minchange) filter(*new Filter_Minchange<double>(minchange))
+#define filter_minchange(minchange) with_filter_callback(*new Filter_Minchange<double>(minchange))
 
 
 /* The Jeff McClintock running median estimate. 
@@ -539,11 +521,11 @@ class Filter_JMC_Median : public Callback {
             return false;
         }
 };
-#define filter_jmc_median(update_ms) filter(*new Filter_JMC_Median(update_ms))
+#define filter_jmc_median(update_ms) with_filter_callback(*new Filter_JMC_Median(update_ms))
 
 
 /* Jmc median over small time intervals with reset after time runs out*/
-#define filter_jmc_interval_median(interval, dev) filter(\
+#define filter_jmc_interval_median(interval, dev) with_filter_callback(\
     *new Callback([&](Device& dev) { \
         static double median; \
         static double average; \
@@ -569,7 +551,7 @@ class Filter_JMC_Median : public Callback {
 
 
 /* Turn analog values into binary with a threshold level */
-#define filter_binarize(cutoff, high, low) filter( \
+#define filter_binarize(cutoff, high, low) with_filter_callback( \
     *new Callback([&](Device& dev) { \
         if(dev.measured_value().equals(low)) return false; \
         if(dev.measured_value().equals(high)) return false; \
@@ -584,7 +566,7 @@ class Filter_JMC_Median : public Callback {
 
 
 /* round to the next multiple of base */
-#define filter_round(base) filter(\
+#define filter_round(base) with_filter_callback(\
     *new Callback( [&](Device& dev) { \
         int32_t v = (long)(dev.measured_value().as_float()/(base)+0.5); \
         dev.measured_value().from(v*(base)); \
@@ -593,7 +575,7 @@ class Filter_JMC_Median : public Callback {
 
 
 /* return maximum one value per time interval (interval in ms) */
-#define filter_limit_time(interval, dev) filter(\
+#define filter_limit_time(interval, dev) with_filter_callback(\
     *new Callback( [&](Device& dev) { \
         static unsigned long last_time; \
         unsigned long current = millis() ; \
@@ -604,6 +586,93 @@ class Filter_JMC_Median : public Callback {
         } \
         return false; \
     }))
+
+// build an average over all samples arriving in a specific time window
+class Filter_Click_Detector : public Callback {
+    private:
+        size_t values_count = 0;
+        uint32_t event_times[4];
+        const char* none="released";
+        const char* click="click";
+        const char* double_click="double";
+        const char* long_click="long";
+        uint32_t _click_min_ms;
+        uint32_t _click_max_ms;
+        uint32_t _longclick_min_ms;
+        uint32_t _longclick_max_ms;
+        bool last_was_released = true;
+        const char *_released;
+        const char *_pressed;
+    public:
+        Filter_Click_Detector(uint32_t click_min_ms=20, uint32_t click_max_ms=500,
+            uint32_t longclick_min_ms=1000, uint32_t longclick_max_ms=2500,
+            const char* pressed="on", const char* released="off") : Callback() {
+
+            _click_min_ms = click_min_ms;
+            _click_max_ms = click_max_ms;
+            _longclick_min_ms = longclick_min_ms;
+            _longclick_max_ms = longclick_max_ms;
+            _released = released;
+            _pressed = pressed;
+            for(int i=0; i<4; i++) {
+                event_times[i] = millis() - _longclick_max_ms; // make them long past in history
+            }
+        }
+        bool call(Device &dev) {
+            bool is_released = dev.measured_value().equals(_released);
+            if(is_released || dev.measured_value().equals(_pressed)) {
+                // only store when changed
+                if(is_released != last_was_released) {
+                    last_was_released = is_released;
+                    // move events down
+                    for(int i=0; i<3; i++) {
+                        event_times[i] = event_times[i+1];
+                    }
+                    event_times[3] = millis();
+                    if(is_released) {
+                        // analyse what type of click this is
+                        if(event_times[3] -  event_times[2] >= _longclick_max_ms) {
+                            dev.measured_value().from(none); // was pressed too long
+                            return true;
+                        }
+                        if(event_times[3] -  event_times[2] >= _longclick_min_ms) {
+                            dev.measured_value().from(long_click); // was in long click interval
+                            return true;
+                        }
+                        if(event_times[3] -  event_times[2] >= _click_max_ms) {
+                            // was pressed too long for normal click but too short for long click
+                            dev.measured_value().from(none);
+                            return true;
+                        }
+                        if(event_times[3] -  event_times[2] >= _click_min_ms) {
+                            // this is a normal click
+                            // check if it was a double
+                            if(event_times[3]-event_times[0] >= 2*_click_max_ms) {
+                                dev.measured_value().from(click);
+                            } else {
+                                // TODO: consider analyzing interval first click
+                                dev.measured_value().from(double_click);
+                            }
+                            return true;
+                        }
+                    }
+                } else { // Same value as before
+                    if(is_released) {
+                        // make sure to notify that now things are released
+                        dev.measured_value().from(none);
+                        return true;
+                    }
+                }
+            } // neither released nor pressed
+            return false;
+        }
+};
+#define filter_click_detector(...) \
+    with_filter_callback(*new Filter_Click_Detector(__VA_ARGS__))
+
+#define filter(f) with_filter_callback(*new Callback(f))
+
+#define on_change(f) with_on_change_callback(*new Callback(f))
 
 
 #endif // _IOTEMPOWER_DEVICE_H_
