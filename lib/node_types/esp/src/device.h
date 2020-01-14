@@ -422,7 +422,7 @@ class Filter_Average : public Callback {
             return false;
         }
 };
-#define filter_average(count) (*new Filter_Average(count))
+#define filter_average(count) filter(*new Filter_Average(count))
 
 // build an average over all samples arriving in a specific time window
 class Filter_Time_Average : public Callback {
@@ -458,7 +458,7 @@ class Filter_Time_Average : public Callback {
             return false;
         }
 };
-#define filter_time_average(delta_ms) (*new Filter_Time_Average(delta_ms))
+#define filter_time_average(delta_ms) filter(*new Filter_Time_Average(delta_ms))
 
 
 // compute derivative in 1/ms
@@ -482,6 +482,35 @@ class Filter_Derivative : public Callback {
         }
 };
 #define filter_derivative() (*new Filter_Derivative())
+
+
+// only report value if a minimum change to last value happened
+// (often called precision)
+template<class TYPE>
+class Filter_Minchange : public Callback {
+    private:
+        TYPE old_val = 0;
+        TYPE _min_change;
+    public:
+        Filter_Minchange(uint32_t min_change) : Callback() {
+            _min_change=min_change;
+        }
+        bool call(Device &dev) {
+            TYPE v;
+            if(std::is_same<TYPE, double>::value) {
+                v = dev.measured_value().as_float();
+            } else {
+                v = dev.measured_value().as_int();
+            }
+            if(abs(old_val - v) >= _min_change) {
+                dev.measured_value().from(v);
+                old_val = v;
+                return true;
+            }
+            return false;
+        }
+};
+#define filter_minchange(minchange) filter(*new Filter_Minchange<double>(minchange))
 
 
 /* The Jeff McClintock running median estimate. 
@@ -510,11 +539,11 @@ class Filter_JMC_Median : public Callback {
             return false;
         }
 };
-#define filter_jmc_median(update_ms) (*new Filter_JMC_Median(update_ms))
+#define filter_jmc_median(update_ms) filter(*new Filter_JMC_Median(update_ms))
 
 
 /* Jmc median over small time intervals with reset after time runs out*/
-#define filter_jmc_interval_median(interval, dev) \
+#define filter_jmc_interval_median(interval, dev) filter(\
     *new Callback([&](Device& dev) { \
         static double median; \
         static double average; \
@@ -536,11 +565,11 @@ class Filter_JMC_Median : public Callback {
             return true; \
         } \
         return false; \
-    })
+    }))
 
 
 /* Turn analog values into binary with a threshold level */
-#define filter_binarize(cutoff, high, low) \
+#define filter_binarize(cutoff, high, low) filter( \
     *new Callback([&](Device& dev) { \
         if(dev.measured_value().equals(low)) return false; \
         if(dev.measured_value().equals(high)) return false; \
@@ -551,20 +580,20 @@ class Filter_JMC_Median : public Callback {
             dev.measured_value().from(low); \
         } \
         return true; \
-    })
+    }))
 
 
 /* round to the next multiple of base */
-#define filter_round(base) \
+#define filter_round(base) filter(\
     *new Callback( [&](Device& dev) { \
         int32_t v = (long)(dev.measured_value().as_float()/(base)+0.5); \
         dev.measured_value().from(v*(base)); \
         return true; \
-    })
+    }))
 
 
 /* return maximum one value per time interval (interval in ms) */
-#define filter_limit_time(interval, dev) \
+#define filter_limit_time(interval, dev) filter(\
     *new Callback( [&](Device& dev) { \
         static unsigned long last_time; \
         unsigned long current = millis() ; \
@@ -574,7 +603,7 @@ class Filter_JMC_Median : public Callback {
             return true; \
         } \
         return false; \
-    })
+    }))
 
 
 #endif // _IOTEMPOWER_DEVICE_H_

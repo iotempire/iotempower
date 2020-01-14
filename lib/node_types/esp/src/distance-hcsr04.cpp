@@ -116,12 +116,9 @@ bool Hcsr04::measure() {
                     }
                     median_buffer[j]=distance_buffer[i]; // add at right position
                 }
-                d = median_buffer[IOTEMPOWER_HCSR04_BUFFER_SIZE/2];
-                if(measured_value().empty() 
-                        || abs(measured_value().as_int() - d) >= _precision ) {
-                    measured_value().from(d);
-                    return true;
-                }
+                d = median_buffer[IOTEMPOWER_HCSR04_BUFFER_SIZE/2]; // TODO: consider doing median only via filter
+                measured_value().from(d);
+                return true;
             } // endif buffer is filled
         } // endif under max distance
     }

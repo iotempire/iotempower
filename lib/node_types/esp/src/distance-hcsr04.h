@@ -28,7 +28,6 @@ class Hcsr04 : public Device {
         unsigned long interval_start;
         unsigned long interval_end;
         unsigned long last_triggered;
-        int _precision = 1;
         uint8_t _echo_pin;
         uint8_t _trigger_pin;
         void echo_changed();
@@ -36,8 +35,10 @@ class Hcsr04 : public Device {
         Hcsr04(const char* name, uint8_t trigger_pin, uint8_t echo_pin);
         Hcsr04& with_precision(int precision) {
             if(precision < 1) precision = 1;
-            _precision = precision;
-            return *this;
+            return (Hcsr04&)filter(*new Filter_Minchange<int>(precision));
+        }
+        Hcsr04& precision(int precision) {
+            return with_precision(precision);
         }
         void start();
         bool measure();

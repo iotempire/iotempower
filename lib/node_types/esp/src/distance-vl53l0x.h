@@ -14,7 +14,6 @@
 class Distance_Vl53l0x : public I2C_Device {
     private:
         bool _calibrate = false;
-        int _precision = 1;
         bool _long_range;
         bool _high_accuracy_slow;
         unsigned long starttime;
@@ -25,8 +24,10 @@ class Distance_Vl53l0x : public I2C_Device {
                     bool long_range=false, bool high_accuracy_slow=false);
         Distance_Vl53l0x& with_precision(int precision) {
             if(precision < 1) precision = 1;
-            _precision = precision;
-            return *this;
+            return (Distance_Vl53l0x&)filter(*new Filter_Minchange<int>(precision));
+        }
+        Distance_Vl53l0x& precision(int precision) {
+            return with_precision(precision);
         }
 
         void i2c_start();

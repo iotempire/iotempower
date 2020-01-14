@@ -16,7 +16,7 @@ class Hx711 : public Device {
         float _calfactor;
         HX711 sensor;
         bool _calibration;
-        bool first_tare_done = false;
+        bool first_tare_done = false; // TODO: better tare
         unsigned long last_read;
         float lastweight = -10000;
     public:
@@ -24,8 +24,7 @@ class Hx711 : public Device {
             float calfactor=450.0, bool calibration=false);
         Hx711& with_precision(float precision) {
             if(precision < 1) precision = 1;
-            _precision = precision;
-            return *this;
+            return (Hx711&)filter(*new Filter_Minchange<float>(precision));
         }
         Hx711& precision(float precision) {
             return with_precision(precision);

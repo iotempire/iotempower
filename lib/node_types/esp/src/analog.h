@@ -9,11 +9,7 @@
 
 class Analog : public Device {
     private:
-        const char* _high;
-        const char* _low;
         int _pin;
-        int _threshold = 0;
-        int _precision = 1;
     public:
         Analog(const char* name) :
             Device(name, 10000) {
@@ -24,21 +20,20 @@ class Analog : public Device {
             measure();
         }
         bool measure();
-        Analog& with_threshold(int threshold, const char* high, const char* low) {
-            _high = high;
-            _low = low;
+        Analog& with_threshold(int threshold, const char* high="on", const char* low="off") {
             if(threshold > 1024) threshold=1024;
             else if(threshold < 0) threshold=0;
-            _threshold = threshold;
-            return *this;
+            return (Analog&)filter(filter_binarize(threshold,high,low));
         }
-        Analog& with_threshold(int threshold) {
-            return with_threshold(threshold, "on", "off");
+        Analog& threshold(int threshold, const char* high="on", const char* low="off") {
+            return with_threshold(threshold, high, low);
         }
         Analog& with_precision(int precision) {
             if(precision < 1) precision = 1;
-            _precision = precision;
-            return *this;
+            return (Analog&)filter(*new Filter_Minchange<int>(precision));
+        }
+        Analog& precision(int precision) {
+            return with_precision(precision);
         }
         // access measured_value()
         double read_float() { return measured_value().as_float(); }

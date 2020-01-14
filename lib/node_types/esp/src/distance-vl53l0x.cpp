@@ -59,10 +59,6 @@ bool Distance_Vl53l0x::measure() {
     if(distance > IOTEMPOWER_VL53L0X_MAXDIST) {
         distance = IOTEMPOWER_VL53L0X_MAXDIST;
     }
-    if(measured_value().empty() 
-            || abs(measured_value().as_int() - distance) >= _precision ) {
-       measured_value().from(distance);
-       return true;
-    }
-    return false;
+    measured_value().from(distance);
+    return true;
 }
