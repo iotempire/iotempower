@@ -5,7 +5,7 @@
 
 #include <Arduino.h>
 #include <device.h>
-#include <HX711_ADC.h>
+#include <HX711.h>
 
 
 class Hx711 : public Device {
@@ -14,7 +14,7 @@ class Hx711 : public Device {
         uint8_t _sck_pin;
         uint8_t _dout_pin;
         float _calfactor;
-        HX711_ADC *sensor;
+        HX711 sensor;
         bool _calibration;
         bool first_tare_done = false;
         unsigned long last_read;

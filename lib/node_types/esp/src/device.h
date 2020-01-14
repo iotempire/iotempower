@@ -400,6 +400,7 @@ class Device {
 
 //// Some filters
 // simple averaging filter
+// average over buflen samples
 class Filter_Average : public Callback {
     private:
         double sum=0;
@@ -423,6 +424,7 @@ class Filter_Average : public Callback {
 };
 #define filter_average(count) (*new Filter_Average(count))
 
+// build an average over all samples arriving in a specific time window
 class Filter_Time_Average : public Callback {
     private:
         double sum=0;
@@ -447,6 +449,7 @@ class Filter_Time_Average : public Callback {
                 } else {
                     result = sum/values_count;
                 }
+                last_val = result;
                 dev.measured_value().from(result);
                 values_count = 0;
                 sum = 0;
@@ -458,28 +461,61 @@ class Filter_Time_Average : public Callback {
 #define filter_time_average(delta_ms) (*new Filter_Time_Average(delta_ms))
 
 
+// compute derivative in 1/ms
+class Filter_Derivative : public Callback {
+    private:
+        double old_val = NAN;
+        size_t values_count = 0;
+        uint32_t old_time = micros();
+    public:
+        bool call(Device &dev) {
+            uint32_t t = micros();
+            bool retval = false;
+            double v = dev.measured_value().as_float();
+            if(old_val != NAN) {
+                dev.measured_value().from((v - old_val) *1000 / (t-old_time));
+                retval = true;
+            }
+            old_val = v;
+            old_time = t;
+            return retval;
+        }
+};
+#define filter_derivative() (*new Filter_Derivative())
+
 
 /* The Jeff McClintock running median estimate. 
  * base: https://stackoverflow.com/questions/10930732/c-efficiently-calculating-a-running-median
  * */
-#define filter_jmc_median(update_ms, dev) [&] { \
-        static double median = 0.0; \
-        static double average = 0.0; \
-        static unsigned long last_time = millis(); \
-        double sample = dev.measured_value().as_float(); \
-        average += ( sample - average ) * 0.1; \
-        median += copysign( average * 0.01, sample - median ); \
-        unsigned long current = millis() ; \
-        if(current - last_time >= update_ms) { \
-            dev.measured_value().from(average); \
-            last_time = current; \
-            return true; \
-        } \
-        return false; \
-    }
+class Filter_JMC_Median : public Callback {
+    private:
+        double median = 0.0;
+        double average = 0.0;
+        uint32_t last_time = millis();
+        uint32_t _update_ms;
+    public:
+        Filter_JMC_Median(uint32_t update_ms) : Callback() {
+            _update_ms = update_ms;
+        }
+        bool call(Device &dev) {
+            double sample = dev.measured_value().as_float();
+            average += ( sample - average ) * 0.1;
+            median += copysign( average * 0.01, sample - median );
+            uint32_t current = millis() ;
+            if(current - last_time >= _update_ms) {
+                dev.measured_value().from(average);
+                last_time = current;
+                return true;
+            }
+            return false;
+        }
+};
+#define filter_jmc_median(update_ms) (*new Filter_JMC_Median(update_ms))
 
-/* Derivation of jmc median over small time intervals */
-#define filter_jmc_interval_median(interval, dev) [&] { \
+
+/* Jmc median over small time intervals with reset after time runs out*/
+#define filter_jmc_interval_median(interval, dev) \
+    *new Callback([&](Device& dev) { \
         static double median; \
         static double average; \
         static bool undefined = true; \
@@ -500,10 +536,12 @@ class Filter_Time_Average : public Callback {
             return true; \
         } \
         return false; \
-    }
+    })
+
 
 /* Turn analog values into binary with a threshold level */
-#define filter_binarize(cutoff, high, low, dev) [&] { \
+#define filter_binarize(cutoff, high, low) \
+    *new Callback([&](Device& dev) { \
         if(dev.measured_value().equals(low)) return false; \
         if(dev.measured_value().equals(high)) return false; \
         double sample = dev.measured_value().as_float(); \
@@ -513,17 +551,21 @@ class Filter_Time_Average : public Callback {
             dev.measured_value().from(low); \
         } \
         return true; \
-    }
+    })
+
 
 /* round to the next multiple of base */
-#define filter_round(base, dev) [&] { \
-        long v = (long)(dev.measured_value().as_float()/(base)+0.5); \
+#define filter_round(base) \
+    *new Callback( [&](Device& dev) { \
+        int32_t v = (long)(dev.measured_value().as_float()/(base)+0.5); \
         dev.measured_value().from(v*(base)); \
         return true; \
-    }
+    })
+
 
 /* return maximum one value per time interval (interval in ms) */
-#define filter_limit_time(interval, dev) [&] { \
+#define filter_limit_time(interval, dev) \
+    *new Callback( [&](Device& dev) { \
         static unsigned long last_time; \
         unsigned long current = millis() ; \
         if(!dev.measured_value().empty() \
@@ -532,7 +574,7 @@ class Filter_Time_Average : public Callback {
             return true; \
         } \
         return false; \
-    }
+    })
 
 
 #endif // _IOTEMPOWER_DEVICE_H_

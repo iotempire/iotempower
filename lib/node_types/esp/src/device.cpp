@@ -188,35 +188,31 @@ bool Device::poll_measure() {
         if( micros() - last_poll >= _pollrate_us) { // only measure so often
             last_poll = micros();
             measure_init(); // something might have to be executed here to init each time, for example i2c setup
-            if(!measure()) {  // measure new value or trigger physical update
-//                ulog("poll measure no val: %s, %lu", name.as_cstr(), _pollrate_us); // TODO: remove/debug
-                // no new value generated
-                yield(); // measure might have taken long, give some time to system TODO: do we have to take care of mqtt here too?
-                // re-use last value(s), if measurement not successful
-                subdevices.for_each( [](Subdevice& sd) {
-                    sd.measured_value.copy(sd.current_value);
-                    return true; // continue loop
-                } );
-            } else { // new value generated
-//                ulog("poll measure new val: %s, %lu", name.as_cstr(), _pollrate_us); // TODO: remove/debug
-                yield(); // measure might have taken long, give some time to system TODO: do we have to take care of mqtt here too?
-                //ulog("poll rate measure new val: %lu", _pollrate_us); // TODO: remove/debug
+            bool measure_result = measure(); // measure new value or trigger physical update
+//            ulog("poll measure val: %s, %lu", name.as_cstr(), _pollrate_us); // TODO: remove/debug
+            yield(); // measure might have taken long, give some time to system TODO: do we have to take care of mqtt here too?
+            measure_exit(); // something might have to be executed here to exit each time, for example i2c setup
+            if(measure_result) { // new value generated
                 if(_ignore_case) { // if necessary, lower them all
                     subdevices.for_each( [](Subdevice& sd) {
                         sd.measured_value.lower();
                         return true; // continue loop
                     } );
                 }
+                // check if it needs to be filtered - only filter when new value was measured
+                if(filter_first != NULL && ! filter_first->call(*this)) {
+                    // if filter defined but indicates to ignore the current measurement
+                    return false; // end here with no update
+                }
+            } else { // no new value generated
+                // re-use last value(s), if measurement not successful
+                subdevices.for_each( [](Subdevice& sd) {
+                    sd.measured_value.copy(sd.current_value);
+                    return true; // continue loop
+                } );
             }
-            measure_exit(); // something might have to be executed here to exit each time, for example i2c setup
             
-            // a current value is now in measured_value(s)
-            // check if it needs to be filtered
-            if(filter_first != NULL && ! filter_first->call(*this)) {
-                // if filter defined but indicates to ignore the current measurement
-                return false; // end here with no update
-            }
-            // The measured value(s) is/are now an actual, valid new measurement
+            // The measured value(s) is/are now an actual, valid new measurement (or last value)
             return true;
         }
     }
