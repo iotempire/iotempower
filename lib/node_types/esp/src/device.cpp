@@ -220,18 +220,20 @@ bool Device::poll_measure() {
 }
 
 bool Device::check_changes() {
-    // check if the value has changed/is updated and call on_change_cb
-    bool changed = false;
+    // check if value has changed/is updated and call on_change_callback if it did
     
+    // Check if there was a change in any subdevice
+    bool changed = false;
     subdevices.for_each( [&] (Subdevice& sd) {
         if(!sd.measured_value.equals(sd.last_confirmed_value)) {
             changed = true;
+            return false; // stop loop after one change found
         }
         return true; // continue loop
     } ); // end for each subdevices
 
+    // Call on_change callback if change happened
     bool updated = false;
-
     if(changed) {
         if(call_on_change_callbacks()) {
             subdevices.for_each( [&] (Subdevice& sd) {
@@ -250,7 +252,7 @@ bool Device::check_changes() {
                     }
                     sd.last_confirmed_value.copy(sd.measured_value);
                 }
-                return true; // continue loop
+                return true; // continue whole loop to copy confirmed values
             } ); // end for each subdevices
         }
     } // changed?

@@ -173,7 +173,7 @@ bool devices_publish(PubSubClient& mqtt_client, Ustring& node_topic, bool publis
     bool first = true;
     device_list.for_each( [&] (Device& dev) {
         if(dev.started()) {
-            if(publish_all || dev.needs_publishing()) {
+            if(dev.get_report_change() && (publish_all || dev.needs_publishing())) {
                 if(first) {
                     Serial.print(F("Publishing"));
                 }
@@ -181,12 +181,12 @@ bool devices_publish(PubSubClient& mqtt_client, Ustring& node_topic, bool publis
                     if(!first) Serial.print(F("; "));
                     published = true;
                 }
+                mqtt_client.loop(); // give time to send things out -> seems necessary
                 if(first) {
                     first = false;
                 }
             }
         }
-        mqtt_client.loop(); // give time to send things out -> seems necessary
         return true; // Continue loop
     } );
     if(!first && !published) {
@@ -195,12 +195,6 @@ bool devices_publish(PubSubClient& mqtt_client, Ustring& node_topic, bool publis
     }
     if(published) Serial.println(F("."));
     return published;
-}
-
-////AsyncMqttClient disabled in favor of PubSubClient
-//bool devices_publish(AsyncMqttClient& mqtt_client, Ustring& node_topic) {
-bool devices_publish(PubSubClient& mqtt_client, Ustring& node_topic) {
-    return devices_publish(mqtt_client, node_topic, false); 
 }
 
 ////AsyncMqttClient disabled in favor of PubSubClient

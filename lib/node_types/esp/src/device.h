@@ -250,6 +250,9 @@ class Device {
         Device& report_change(bool report_change=true) {
             return set_report_change(report_change);
         } 
+        bool get_report_change() { 
+            return _report_change;
+        }
 
         //// on_change_callback
         Device& set_on_change_callback(Callback& on_change_cb) {
