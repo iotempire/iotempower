@@ -33,7 +33,7 @@ uint16_t touch_state = 0;
 input(button1, BTN1).invert()
     .debounce(DEBOUNCE)
     .filter([&] (Device &dev) {
-        if(dev.value().equals("on")) {
+        if(dev.is("on")) {
             touch_state |= 1;
         } else {
             touch_state &= 254; 
@@ -44,7 +44,7 @@ input(button1, BTN1).invert()
     })
     .filter_click_detector(20, 800, 1000, 2500)
     .on_change([&] (Device& dev) {
-         if(dev.value().equals("click")) {
+         if(dev.is("click")) {
              unsigned long current = millis();
              if(current - lastb1 > 500) {
                  if(current - lastb2 < GESTURE 
@@ -52,7 +52,7 @@ input(button1, BTN1).invert()
                      // undo previous toggles
                      IN(relais2).toggle();
                      IN(relais3).toggle();
-                     dev.value().from("up_gesture");
+                     dev.write("up_gesture");
                  } else {
                      IN(relais1).toggle();
                  }
@@ -65,7 +65,7 @@ input(button1, BTN1).invert()
 input(button2, BTN2).invert()
     .debounce(DEBOUNCE)
     .filter([&] (Device &dev) {
-        if(dev.value().equals("on")) {
+        if(dev.is("on")) {
             touch_state |= 2;
         } else {
             touch_state &= 253; 
@@ -76,7 +76,7 @@ input(button2, BTN2).invert()
     })
     .filter_click_detector(20, 800, 1000, 2500)
     .on_change([&] (Device& dev) {
-         if(dev.value().equals("click")) {
+         if(dev.is("click")) {
              lastb2 = millis();
              IN(relais2).toggle();
          }
@@ -86,7 +86,7 @@ input(button2, BTN2).invert()
 input(button3, BTN3).invert()
     .debounce(DEBOUNCE)
     .filter([&] (Device &dev) {
-        if(dev.value().equals("on")) {
+        if(dev.is("on")) {
             touch_state |= 4;
         } else {
             touch_state &= 251; 
@@ -97,7 +97,7 @@ input(button3, BTN3).invert()
     })
     .filter_click_detector(20, 800, 1000, 2500)
     .on_change([&] (Device& dev) {
-         if(dev.value().equals("click")) {
+         if(dev.is("click")) {
              unsigned long current = millis();
              if(current - lastb3 > 500) {
                  if(current-lastb1 < GESTURE 
@@ -105,7 +105,7 @@ input(button3, BTN3).invert()
                      // undo previous toggles
                      IN(relais1).toggle();
                      IN(relais2).toggle();
-                     dev.value().from("down_gesture");
+                     dev.write("down_gesture");
                  } else {
                      IN(relais3).toggle();
                  }

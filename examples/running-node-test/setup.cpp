@@ -10,7 +10,7 @@
 
 //////// Device setup  ////////
 // output example
-// output(blue, ONBOARDLED, "off", "on").set("on");
+// output(blue, ONBOARDLED, "off", "on").invert().set("on");
 // void blink() {
 //     IN(blue).toggle();
 //     do_later(2000, blink);
@@ -21,32 +21,33 @@
 // in the topic myroom/test1/button1.
 input(button1, D3, "released", "pressed");
 //      .with_threshold(3)
-//      .with_on_change_callback([&] {
-//           if(IN(button1).is("pressed")) {
+//      .on_change([&] (Device& dev) {
+//           if(dev.is("pressed")) {
 //               IN(blue).toggle();
 //           }
+//           return true;
 //       });
 
 // Examples for analog device:
 // analog(a0).with_precision(5); //.with_threshold(100, "high", "low");
 // Using _ in end of device allows giving internal name and "external name"
-// analog(a0).with_filter_callback([&] {
-//     const int buflen = 100;
-//     static long sum = 0;
-//     static long values_count = 0;
-//     int v = IN(a0).read_int();
-//     sum += v;
-//     values_count ++;
-//     if(values_count >= buflen) {
-//         IN(a0).write_int(sum/values_count);
-//         values_count = 0;
-//         sum = 0;
-//         return true;
-//     }
-//     return false;
-// });
+// analog(a0).filter( [&] (Device& dev) {
+//         const int buflen = 100;
+//         static long sum = 0;
+//         static long values_count = 0;
+//         int v = dev.read_int();
+//         sum += v;
+//         values_count ++;
+//         if(values_count >= buflen) {
+//             dev.value().from(sum / values_count);
+//             values_count = 0;
+//             sum = 0;
+//             return true;
+//         }
+//         return false;
+//     });
 // The same as above, but shorter with generic filter
-// analog(a0).with_filter_callback(filter_average(int, 100, IN(a0));
+// analog(a0).filter_average(100);
 
 // gesture/color/proximity
 //gesture_apds9960(gesture);
@@ -68,7 +69,7 @@ input(button1, D3, "released", "pressed");
 // Acoustic distance sensor
 //hcsr04(distance, D5, D6).with_precision(10);
 //hcsr04(distance, D5, D6)
-//    .with_filter_callback(filter_binarize(200, "off", "on", IN(distance)));
+//    .filter_binarize(200, "off", "on");
 
 // Laser distance sensor
 //vl53l0x distance sensor
@@ -77,7 +78,7 @@ input(button1, D3, "released", "pressed");
 
 // HX711 weight sensor (sensor for scales)
 //hx711(weight, D6, D7, 419.0, true)
-//    .with_filter(filter_round(2, IN(weight)));
+//    .filter_round(2, IN(weight));
 
 // Barometers
 //bmp180(bmp1);
@@ -110,7 +111,7 @@ input(button1, D3, "released", "pressed");
 // // rgb_strip_(strip4, "strip4", 50, WS2811, D1, BRG);
 
 // A matrix consiting of several strips
-// rgb_matrix_(matrix, "matrix", 25, 2)
+// rgb_matrix(matrix, 25, 2)
 //        .with(strip1, 0, 0, Right_Down, 25);
 // //       .with(strip2, 0, 1)
 // //       .with(strip3, 0, 2)
@@ -128,13 +129,13 @@ input(button1, D3, "released", "pressed");
 // void draw_pattern(int p, int line, int len) {
 //     switch(p) {
 //         case 1:
-//             matrix.rainbow(0, line, len, 1);
+//             IN(matrix).rainbow(0, line, len, 1);
 //             break;
 //         case 2:
-//             matrix.gradient_row(CRGB::Green, CRGB::Blue, 0, line, len, 1);
+//             IN(matrix).gradient_row(CRGB::Green, CRGB::Blue, 0, line, len, 1);
 //             break;
 //         case 3:
-//             matrix.gradient_row(CRGB::Blue, CRGB::Red, 0, line, len, 1);
+//             IN(matrix).gradient_row(CRGB::Blue, CRGB::Red, 0, line, len, 1);
 //             break;
 //         default:
 //             break;
@@ -145,26 +146,26 @@ input(button1, D3, "released", "pressed");
 //     int stripnr = limit(command.as_int() - 1, 0, 3);
 //     command.strip_param();
 //     int pattern = limit(command.as_int(), 1, 3);
-//     draw_pattern(matrix, pattern, stripnr, -1);
+//     draw_pattern(IN(matrix), pattern, stripnr, -1);
 //     anim_types[stripnr] = at;
 //     frames[stripnr] = frame_count;
 // }
 //
 // // this defines the actual animator object
-// animator(anim, matrix)
+// animator(anim, IN(matrix))
 //     .with_fps(10)
 //     .with_frame_builder( [&] () {
 //         for(int i=0; i<4; i++) {
 //             if(frames[i]>0 && anim_types[i] != none) {
 //                 switch(anim_types[i]) {
 //                     case fade:
-//                         matrix.fade(8, 0, i, -1, 1);
+//                         IN(matrix).fade(8, 0, i, -1, 1);
 //                         break;
 //                     case scroll:
-//                         matrix.scroll_right(false,i);
+//                         IN(matrix).scroll_right(false,i);
 //                         break;
 //                     case fade_to:
-//                         matrix.fade_to(CRGB::Red, 16, 0, i, -1, 1);
+//                         IN(matrix).fade_to(CRGB::Red, 16, 0, i, -1, 1);
 //                     default:
 //                         break; 
 //                 }
@@ -197,14 +198,14 @@ display44780(d2, 16, 2);
 //// Examples for gyros
 
 // MPU-6050
-// gyro6050(g0).with_filter( [&] { // fuse accel value into one
+// gyro6050(g0).filter( [&] (Device& dev) { // fuse accel value into one
 //    // ignore angles
-//    IN(g0).value(0).clear();
+//    dev.value(0).clear();
 //    int a,b,c;
-//    if(IN(g0).value(1).scanf("%d,%d,%d", &a, &b, &c)!=3)
+//    if(dev.value(1).scanf("%d,%d,%d", &a, &b, &c)!=3)
 //        return false;
 //    unsigned long d = sqrt((unsigned long)(a*a) + (b*b) + (c*c)) + 0.5;
-//    IN(g0).value(1).from(d>27?1:0);
+//    dev.value(1).from(d>27?1:0);
 //    return true;
 // });
 
@@ -230,8 +231,8 @@ void start() { // begin start, uncomment, if you need to start things
 //     // Trigger first blink
 //     do_later(2000, blink);
 //
-    //  // fall into deep sleep in 15s for 60s
-//    deep_sleep(10000, 10000);
+//     // fall into deep sleep in 15s for 60s
+//     deep_sleep(15000, 60000);
 // 
 //     // Send updates of current status every 10s (default 5)
 //     transmission_interval(10);

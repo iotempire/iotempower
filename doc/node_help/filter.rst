@@ -21,33 +21,48 @@ Example for filter-function:
         return false;
     });
 
+Several filters can be chained and are executed in order.
+
 There some pre-defined filters available:
 
--   **filter:** ``filter_average(TYPE, buflen, dev)``
+-   **filter:** ``filter_average(buflen)``
     
-    **example:** ``analog(a0).with_filter_callback(filter_average(int, 100, IN(a0)));``
+    **example:** ``analog(a0).filter_average(100);``
     
     **description:** That's the same as above.
 
--   **filter:** ``filter_jmc_median(update_ms, dev)``
+-   **filter:** ``filter_jmc_median(update_ms)``
 
-    **example:** ``analog(a0).with_filter_callback(filter_jmc_median(500, IN(a0)));``
+    **example:** ``analog(a0).filter_jmc_median(500);``
 
     **description:** That's an estimated median giving a new value every 500ms.
     (The Jeff McClintock running median estimate.)
 
 -   **filter:** ``filter_jmc_interval_median(interval, dev)``
 
-    **description:** Derivation of jmc median over small time intervals
+    **description:** Same as above but resets every interval
 
--   **filter:** ``filter_binarize(cutoff, high, low, dev)``
+-   **filter:** ``filter_minchange(minchange)``
 
-    **description:** Turn analog values into binary with a threshold level.
+    **description:** Only report (forward) value if a minimum change to last 
+    value happened (also often called precision)
 
--   **filter:** ``filter_round(base, dev)``
+-   **filter:** ``filter_binarize(cutoff, high, low)``
+
+    **description:** Turn analog values into binary with a cutoff/threshold level.
+
+-   **filter:** ``filter_round(base)``
 
     **description:** Round to the next multiple of base.
 
--   **filter:** ``filter_limit_time(interval, dev)``
+-   **filter:** ``filter_limit_time(interval)``
 
     **description:** Return maximum one value per time interval (interval in ms).
+
+-   **filter:** ``filter_detect_click(click_min_ms, click_max_ms,
+    longclick_min_ms, longclick_max_ms=2500,
+    pressed_str, released_str)``
+
+    **description:** A filter that can detect, clicks, double clicks,
+    long clicks and too long clicks. Parameter are usually not necessary as
+    it has sane defaults.

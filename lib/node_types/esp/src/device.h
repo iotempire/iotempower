@@ -198,6 +198,8 @@ class Device {
         long read_int(unsigned long index=0) { return value(index).as_int(); }
         void write_float(double v, unsigned long index=0) { value(index).from(v); }
         void write_int(long v, unsigned long index=0) { value(index).from(v); }
+        void write(const char* s, unsigned long index=0) { value(index).from(s); }
+        bool is(const char* s, unsigned long index=0) { return value(index).equals(s); }
 
         const Ustring& get_name() const { return name; }
         //const char* get_name() const { return name.as_cstr(); }
@@ -591,7 +593,7 @@ class Filter_JMC_Median : public Callback {
         return false; \
     }))
 
-// build an average over all samples arriving in a specific time window
+// A filter that can detect, clicks, double clicks, long clicks and too long clicks
 class Filter_Click_Detector : public Callback {
     private:
         size_t values_count = 0;
@@ -626,8 +628,8 @@ class Filter_Click_Detector : public Callback {
             }
         }
         bool call(Device &dev) {
-            bool is_released = dev.value().equals(_released);
-            if(is_released || dev.value().equals(_pressed)) {
+            bool is_released = dev.is(_released);
+            if(is_released || dev.is(_pressed)) {
                 // only store when changed
                 if(is_released != last_was_released) {
                     last_was_released = is_released;
@@ -638,18 +640,18 @@ class Filter_Click_Detector : public Callback {
                     event_times[3] = millis();
                     if(is_released) {
                         // analyse what type of click this is
-                        if(event_times[3] -  event_times[2] >= _longclick_max_ms) {
-                            dev.value().from(none); // was pressed too long
+                        if(event_times[3] - event_times[2] >= _longclick_max_ms) {
+                            dev.write(none); // was pressed too long
                             return true;
                         }
                         if(event_times[3] -  event_times[2] >= _longclick_min_ms) {
-                            dev.value().from(long_click); // was in long click interval
+                            dev.write(long_click); // was in long click interval
                             click_registered = false;
                             return true;
                         }
                         if(event_times[3] -  event_times[2] >= _click_max_ms) {
                             // was pressed too long for normal click but too short for long click
-                            dev.value().from(none);
+                            dev.write(none);
                             return true;
                         }
                         if(event_times[3] -  event_times[2] >= _click_min_ms) {
@@ -660,7 +662,7 @@ class Filter_Click_Detector : public Callback {
                                 click_registered = true;
                                 return false;
                             } else {
-                                dev.value().from(double_click);
+                                dev.write(double_click);
                             }
                             click_registered = false;
                             return true;
@@ -671,11 +673,11 @@ class Filter_Click_Detector : public Callback {
                         if(click_registered && // if click happened, check it was no double click
                             (millis()-event_times[3]) > _double_distance_ms) {
 
-                            dev.value().from(click);
+                            dev.write(click);
                             click_registered = false;
                         } else {
                             // make sure to notify that now things are released
-                            dev.value().from(none);
+                            dev.write(none);
                         }
                         return true;
                     }
