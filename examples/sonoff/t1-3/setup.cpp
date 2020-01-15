@@ -1,36 +1,25 @@
-/* Sonoff T1 3 with gestures, long click, and double click*/
+/* Sonoff T1 3 with gestures, long click, and double click
+ * 
+ * Board has to be set to sonoff in node.conf
+ */
 
-//// Testing on Wemos D1 Mini
-//#define BTN1 D1
-//#define BTN2 D2
-//#define BTN3 D3
-//#define RL1 D5
-//#define RL2 D6
-//#define RL3 D7
-
-// Real Sonoff T1 3 Channel
-#define BTN1 BUTTON1
-#define BTN2 BUTTON2
-#define BTN3 BUTTON3
-#define RL1 RELAIS1
-#define RL2 RELAIS2
-#define RL3 RELAIS3
-
-#define GESTURE 1500
+// Time the gesture can last
+#define GESTURE 1800
+// Number of debounce counts
 #define DEBOUNCE 10
 
-led(blue, ONBOARDLED).invert().off();
-output(relais1, RL1).light().off();
-output(relais2, RL2).light().off();
-output(relais3, RL3).light().off();
+led(blue, ONBOARDLED).invert().off().report_change(false);
+output(relais1, RELAIS1).light().off();
+output(relais2, RELAIS2).light().off();
+output(relais3, RELAIS3).light().off();
 
 unsigned long lastb1 = millis();
 unsigned long lastb2 = millis();
 unsigned long lastb3 = millis();
 
-uint16_t touch_state = 0;
+uint16_t touch_state = 0; // bit pattern for the touched buttons
 
-input(button1, BTN1).invert()
+input(button1, BUTTON1).invert()
     .debounce(DEBOUNCE)
     .filter([&] (Device &dev) {
         if(dev.is("on")) {
@@ -62,7 +51,7 @@ input(button1, BTN1).invert()
          return true;
      });
 
-input(button2, BTN2).invert()
+input(button2, BUTTON2).invert()
     .debounce(DEBOUNCE)
     .filter([&] (Device &dev) {
         if(dev.is("on")) {
@@ -83,7 +72,7 @@ input(button2, BTN2).invert()
          return true;
      });
 
-input(button3, BTN3).invert()
+input(button3, BUTTON3).invert()
     .debounce(DEBOUNCE)
     .filter([&] (Device &dev) {
         if(dev.is("on")) {
@@ -114,13 +103,3 @@ input(button3, BTN3).invert()
          }
          return true;
      });
-
-void all_off() {
-    IN(relais1).off();
-    IN(relais2).off();
-    IN(relais3).off();
-}
-
-void start() {
-    do_later(500, all_off);
-}
