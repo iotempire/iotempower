@@ -189,7 +189,7 @@ input(button1, D3, "released", "pressed");
 //display(d1, u8g2d);
 
 // 2 lines 44780 i2c lcd display
-//display44780(d2, 16, 2);
+display44780(d2, 16, 2);
 
 // Example for pulse width modulation
 // pwm(blue, ONBOARDLED).with_frequency(1000);
@@ -199,12 +199,12 @@ input(button1, D3, "released", "pressed");
 // MPU-6050
 // gyro6050(g0).with_filter( [&] { // fuse accel value into one
 //    // ignore angles
-//    IN(g0).measured_value(0).clear();
+//    IN(g0).value(0).clear();
 //    int a,b,c;
-//    if(IN(g0).measured_value(1).scanf("%d,%d,%d", &a, &b, &c)!=3)
+//    if(IN(g0).value(1).scanf("%d,%d,%d", &a, &b, &c)!=3)
 //        return false;
 //    unsigned long d = sqrt((unsigned long)(a*a) + (b*b) + (c*c)) + 0.5;
-//    IN(g0).measured_value(1).from(d>27?1:0);
+//    IN(g0).value(1).from(d>27?1:0);
 //    return true;
 // });
 
@@ -231,7 +231,7 @@ void start() { // begin start, uncomment, if you need to start things
 //     do_later(2000, blink);
 //
     //  // fall into deep sleep in 15s for 60s
-    deep_sleep(10000, 10000);
+//    deep_sleep(10000, 10000);
 // 
 //     // Send updates of current status every 10s (default 5)
 //     transmission_interval(10);

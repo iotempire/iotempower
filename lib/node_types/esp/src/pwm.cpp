@@ -35,8 +35,8 @@ Pwm& Pwm::set(int duty, int frequency) {
     _duty = limit(duty,0,1023);
     if(!started()) return *this;
     
-    measured_value(2).from(_frequency);
-    measured_value(0).from(_duty);
+    value(2).from(_frequency);
+    value(0).from(_duty);
     _pwm->set(_duty, _frequency);
     return *this;
 }

@@ -253,13 +253,13 @@ bool Gyro_MPU9250::measure()
 
     mpu9250->count = millis();
 
-    measured_value(0).printf("%.1f,%.1f,%.1f", 
+    value(0).printf("%.1f,%.1f,%.1f", 
         mpu9250->yaw, mpu9250->pitch, mpu9250->roll);
-    measured_value(1).printf("%.1f,%.1f,%.1f", 
+    value(1).printf("%.1f,%.1f,%.1f", 
         mpu9250->ax, mpu9250->ay, mpu9250->az);
-    measured_value(2).printf("%.1f,%.1f,%.1f", 
+    value(2).printf("%.1f,%.1f,%.1f", 
         mpu9250->mx, mpu9250->my, mpu9250->mz);
-    measured_value(3).printf("%.1f", mpu9250->temperature);
+    value(3).printf("%.1f", mpu9250->temperature);
 
     return true;
 }

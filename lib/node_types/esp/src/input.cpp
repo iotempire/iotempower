@@ -12,9 +12,9 @@ bool Input::measure() {
             debouncer = 0;
     }
     if( debouncer >= _threshold) {
-        measured_value().from(_inverted?_low:_high);
+        value().from(_inverted?_low:_high);
     } else {
-        measured_value().from(_inverted?_high:_low);
+        value().from(_inverted?_high:_low);
     }
     #ifdef mqtt_discovery_prefix
         create_discovery_info(F("binary_sensor"), true, NULL, NULL, false, _high, _low);

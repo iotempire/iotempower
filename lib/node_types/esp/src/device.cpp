@@ -100,7 +100,7 @@ bool Device::publish(PubSubClient& mqtt_client, Ustring& node_topic) {
     Ustring topic;
     bool first = true;
     subdevices_for_each( [&] (Subdevice& sd) {
-        const Ustring& val = sd.value();
+        const Ustring& val = sd.get_last_confirmed_value();
         if(!val.empty()) {
             // construct full topic
             topic.copy(node_topic);
@@ -207,7 +207,7 @@ bool Device::poll_measure() {
             } else { // no new value generated
                 // re-use last value(s), if measurement not successful
                 subdevices.for_each( [](Subdevice& sd) {
-                    sd.measured_value.copy(sd.current_value);
+                    sd.measured_value.copy(sd.last_confirmed_value);
                     return true; // continue loop
                 } );
             }
@@ -221,53 +221,60 @@ bool Device::poll_measure() {
 
 bool Device::check_changes() {
     // check if the value has changed/is updated and call on_change_cb
-    bool updated = false;
     bool changed = false;
     
     subdevices.for_each( [&] (Subdevice& sd) {
-        if(!sd.measured_value.equals(sd.current_value)) {
-            sd.current_value.copy(sd.measured_value);
+        if(!sd.measured_value.equals(sd.last_confirmed_value)) {
             changed = true;
-            if(_report_change) {
-                updated = true;
-                _needs_publishing = true;
-                Serial.print(F("Needs publishing: "));
-                Serial.print(name.as_cstr());
-                if(!sd.get_name().empty()) {
-                    Serial.print(F("/"));
-                    Serial.print(sd.get_name().as_cstr());
-                }
-                Serial.print(F(":"));
-                Serial.println(sd.measured_value.as_cstr());
-            }
         }
         return true; // continue loop
     } ); // end for each subdevices
 
+    bool updated = false;
+
     if(changed) {
-        call_on_change_callbacks();
-    }
+        if(call_on_change_callbacks()) {
+            subdevices.for_each( [&] (Subdevice& sd) {
+                if(!sd.measured_value.equals(sd.last_confirmed_value)) {
+                    if(_report_change) {
+                        updated = true;
+                        _needs_publishing = true;
+                        Serial.print(F("Needs publishing: "));
+                        Serial.print(name.as_cstr());
+                        if(!sd.get_name().empty()) {
+                            Serial.print(F("/"));
+                            Serial.print(sd.get_name().as_cstr());
+                        }
+                        Serial.print(F(":"));
+                        Serial.println(sd.measured_value.as_cstr());
+                    }
+                    sd.last_confirmed_value.copy(sd.measured_value);
+                }
+                return true; // continue loop
+            } ); // end for each subdevices
+        }
+    } // changed?
     return updated;
 }
 
 static Ustring value_error;
 
 // TODO: why can't I make this const/const?
-Ustring& Device::value(unsigned long index) {
+Ustring& Device::get_last_confirmed_value(unsigned long index) {
     Subdevice* sd = subdevice(index);
     if(sd == NULL) {
-        ulog(F("Error in value(). Device: %s"), name.as_cstr());
+        ulog(F("Error in get_last_confirmed_value(). Device: %s"), name.as_cstr());
         value_error.from(F("subdevice value error"));
         return value_error;
         // TODO: should this crash here?
     }
-    return sd->value();
+    return sd->get_last_confirmed_value();
 }
 
-Ustring& Device::measured_value(unsigned long index) {
+Ustring& Device::value(unsigned long index) {
     Subdevice* sd = subdevice(index);
     if(sd == NULL) {
-        ulog(F("Error in measured_value(): Device: %s"), name.as_cstr());
+        ulog(F("Error in value(): Device: %s"), name.as_cstr());
         value_error.from(F("no subdevice"));
         return value_error;
     }

@@ -136,7 +136,7 @@ bool Gyro_MPU6050::measure() {
 
         // angles (yaw pitch roll/ypr)
         mpu6050->dmpGetYawPitchRoll(ypr, &q, &gravity);
-        measured_value(0).printf("%.1f,%.1f,%.1f",
+        value(0).printf("%.1f,%.1f,%.1f",
             ypr[0] * 180/M_PI, ypr[1] * 180/M_PI, ypr[2] * 180/M_PI);
 
         // #ifdef OUTPUT_READABLE_REALACCEL
@@ -159,9 +159,9 @@ bool Gyro_MPU6050::measure() {
         mpu6050->dmpGetAccel(&aa, fifoBuffer);
         mpu6050->dmpGetGravity(&gravity, &q);
         mpu6050->dmpGetLinearAccel(&aaReal, &aa, &gravity);
-//        measured_value(1).printf("%d,%d,%d", aa.x, aa.y, aa.z);
+//        value(1).printf("%d,%d,%d", aa.x, aa.y, aa.z);
         mpu6050->dmpGetLinearAccelInWorld(&aaWorld, &aaReal, &q);
-        measured_value(1).printf("%d,%d,%d", aaWorld.x/20, aaWorld.y/20, aaWorld.z/20);
+        value(1).printf("%d,%d,%d", aaWorld.x/20, aaWorld.y/20, aaWorld.z/20);
     }
 
     return true;

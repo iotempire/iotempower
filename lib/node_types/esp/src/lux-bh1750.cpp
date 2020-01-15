@@ -28,7 +28,7 @@ bool Lux_BH1750::measure() {
 
     float lux = sensor->readLightLevel();
 
-    measured_value().from((int)round(lux)); // lx
+    value().from((int)round(lux)); // lx
 
     return true;
 }

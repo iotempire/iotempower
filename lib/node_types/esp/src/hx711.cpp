@@ -74,9 +74,9 @@ bool Hx711::measure() {
             lastweight = weight;
             if(_calibration) {
                 float factor = sensor.get_scale();
-                measured_value().printf("%0.1f %0.3f", weight, factor);
+                value().printf("%0.1f %0.3f", weight, factor);
             } else {
-                measured_value().printf("%0.1f", weight);
+                value().printf("%0.1f", weight);
             }
             measured = true;
             }

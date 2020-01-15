@@ -109,7 +109,7 @@ bool Lux_TSL2561::measure() {
         if (discardval>0) {
             discardval --;
         } else {
-            measured_value().from((int)round(lux)); // lx
+            value().from((int)round(lux)); // lx
         }
         //if (good) Serial.println(F(" (good)"); else Serial.println(" (BAD)"));
     }

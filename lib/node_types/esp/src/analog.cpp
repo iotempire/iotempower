@@ -9,7 +9,7 @@ bool Analog::measure() {
     last_read = current_time;
     if(started()) { 
         int v = analogRead(A0);
-        measured_value().from(v);
+        value().from(v);
         return true;
     }
     return false; // not started

@@ -51,7 +51,7 @@ bool Edge_Counter::measure() {
     if(triggered) {
         measured = true;
         triggered = false;
-        measured_value().from(counter);
+        value().from(counter);
     }
     interrupts();
     return measured;

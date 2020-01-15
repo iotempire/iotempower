@@ -69,15 +69,15 @@ class Input : public Device {
             return *this;
         }
         bool is_high() {
-            return measured_value().equals(_inverted?_low:_high);
+            return value().equals(_inverted?_low:_high);
         }
         bool is_on() { return is_high(); }
         bool is_low() {
-            return measured_value().equals(_inverted?_high:_low);
+            return value().equals(_inverted?_high:_low);
         }
         bool is_off() { return is_low(); }
         bool is(const char* test_value) {
-            return measured_value().equals(test_value);
+            return value().equals(test_value);
         }
 };
 

@@ -5,15 +5,15 @@ Example for filter-function:
 
 ..  code-block:: cpp
 
-    analog(a0).with_filter_callback( [&] {
+    analog(a0).filter( [&] (Device& dev) {
         const int buflen = 100;
         static long sum = 0;
         static long values_count = 0;
-        int v=IN(a0).read_int();
+        int v = dev.read_int();
         sum += v;
         values_count ++;
         if(values_count >= buflen) {
-            dev.measured_value().from(sum/values_count);
+            dev.value().from(sum / values_count);
             values_count = 0;
             sum = 0;
             return true;

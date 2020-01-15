@@ -29,9 +29,9 @@ bool Barometer_BMP280::measure() {
     float pressure;
 
     // adjust already due to precision TODO: revisit
-    measured_value(0).from(round(sensor->getTemperature()*10)/10); // Celsius
+    value(0).from(round(sensor->getTemperature()*10)/10); // Celsius
     pressure = sensor->getPressure();
-    measured_value(1).from(((int)round(pressure/100))); // Hecto-Pascal
-    measured_value(2).from((int)round(sensor->calcAltitude(pressure))); // meter
+    value(1).from(((int)round(pressure/100))); // Hecto-Pascal
+    value(2).from((int)round(sensor->calcAltitude(pressure))); // meter
     return true;
 }

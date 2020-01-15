@@ -1,7 +1,4 @@
-//output(blue, ONBOARDLED).invert();
-//input(b1, D3, "pressed", "released").invert();
-
-/* Sonoff T1 3 */
+/* Sonoff T1 3 with gestures, long click, and double click*/
 
 //// Testing on Wemos D1 Mini
 //#define BTN1 D1
@@ -20,53 +17,87 @@
 #define RL3 RELAIS3
 
 #define GESTURE 1500
-#define DEBOUNCE 80
+#define DEBOUNCE 10
 
-led(blue, ONBOARDLED).invert().on();
+led(blue, ONBOARDLED).invert().off();
 output(relais1, RL1).light().off();
 output(relais2, RL2).light().off();
 output(relais3, RL3).light().off();
-
-const char* pressed = "pressed";
-const char* released = "released";
 
 unsigned long lastb1 = millis();
 unsigned long lastb2 = millis();
 unsigned long lastb3 = millis();
 
-input(button1, BTN1, pressed, released).invert()
-    .with_threshold(DEBOUNCE)
-    .with_on_change_callback([&] {
-         if(IN(button1).is(pressed)) {
+uint16_t touch_state = 0;
+
+input(button1, BTN1).invert()
+    .debounce(DEBOUNCE)
+    .filter([&] (Device &dev) {
+        if(dev.value().equals("on")) {
+            touch_state |= 1;
+        } else {
+            touch_state &= 254; 
+        }
+        if(touch_state) IN(blue).on();
+        else IN(blue).off();
+        return true;
+    })
+    .filter_click_detector(20, 800, 1000, 2500)
+    .on_change([&] (Device& dev) {
+         if(dev.value().equals("click")) {
              unsigned long current = millis();
              if(current - lastb1 > 500) {
-                 if(current-lastb2 < GESTURE 
-                       && current-lastb3 < GESTURE) { // gesture
+                 if(current - lastb2 < GESTURE 
+                       && current - lastb3 < GESTURE) { // gesture
                      // undo previous toggles
                      IN(relais2).toggle();
                      IN(relais3).toggle();
-                     IN(button1).value().from("up_gesture");
+                     dev.value().from("up_gesture");
                  } else {
                      IN(relais1).toggle();
                  }
              }
              lastb1 = current;
          }
+         return true;
      });
 
-input(button2, BTN2, pressed, released).invert()
-    .with_threshold(DEBOUNCE)
-    .with_on_change_callback([&] {
-         if(IN(button2).is(pressed)) {
+input(button2, BTN2).invert()
+    .debounce(DEBOUNCE)
+    .filter([&] (Device &dev) {
+        if(dev.value().equals("on")) {
+            touch_state |= 2;
+        } else {
+            touch_state &= 253; 
+        }
+        if(touch_state) IN(blue).on();
+        else IN(blue).off();
+        return true;
+    })
+    .filter_click_detector(20, 800, 1000, 2500)
+    .on_change([&] (Device& dev) {
+         if(dev.value().equals("click")) {
              lastb2 = millis();
              IN(relais2).toggle();
          }
+         return true;
      });
 
-input(button3, BTN3, pressed, released).invert()
-    .with_threshold(DEBOUNCE)
-    .with_on_change_callback([&] {
-         if(IN(button3).is(pressed)) {
+input(button3, BTN3).invert()
+    .debounce(DEBOUNCE)
+    .filter([&] (Device &dev) {
+        if(dev.value().equals("on")) {
+            touch_state |= 4;
+        } else {
+            touch_state &= 251; 
+        }
+        if(touch_state) IN(blue).on();
+        else IN(blue).off();
+        return true;
+    })
+    .filter_click_detector(20, 800, 1000, 2500)
+    .on_change([&] (Device& dev) {
+         if(dev.value().equals("click")) {
              unsigned long current = millis();
              if(current - lastb3 > 500) {
                  if(current-lastb1 < GESTURE 
@@ -74,13 +105,14 @@ input(button3, BTN3, pressed, released).invert()
                      // undo previous toggles
                      IN(relais1).toggle();
                      IN(relais2).toggle();
-                     IN(button3).value().from("down_gesture");
+                     dev.value().from("down_gesture");
                  } else {
                      IN(relais3).toggle();
                  }
              }
              lastb3 = current;
          }
+         return true;
      });
 
 void all_off() {

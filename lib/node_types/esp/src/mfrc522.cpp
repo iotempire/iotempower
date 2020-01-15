@@ -102,9 +102,9 @@ Mfrc522::Mfrc522(const char* name, uint16_t data_size,
         });
     _in_hex = in_hex;
     if(_in_hex)
-        _data_size = min((uint16_t)(measured_value().max_length()/2)*2, data_size*2);
+        _data_size = min((uint16_t)(value().max_length()/2)*2, data_size*2);
     else
-        _data_size = min((uint16_t)measured_value().max_length(), data_size);
+        _data_size = min((uint16_t)value().max_length(), data_size);
     block_count = (_data_size+15)/16;
     ulog(F("MFRC522 setup. hex: %d, data_size: %d, block_count: %d"),
         _in_hex, _data_size, block_count);
@@ -133,9 +133,9 @@ bool Mfrc522::measure() {
     byte len;
 
     // assume no card by default, make sure to return empty value
-    measured_value(0).clear();
-    measured_value(1).from(F("NONE"));
-    measured_value(2).from(F("NONE"));
+    value(0).clear();
+    value(1).from(F("NONE"));
+    value(2).from(F("NONE"));
 
     // Check if card there (the "new" is missleading)
     if ( ! sensor->PICC_IsNewCardPresent()) {
@@ -165,13 +165,13 @@ bool Mfrc522::measure() {
     for (byte i = 0; i < sensor->uid.size; i++) {
         buf.add_hex(sensor->uid.uidByte[i]);
     }
-    measured_value(1).copy(buf);
+    value(1).copy(buf);
 
     // PICC type
     MFRC522::PICC_Type piccType = sensor->PICC_GetType(sensor->uid.sak);
-//    measured_value(2).from((char*)sensor->PICC_GetTypeName(piccType));
+//    value(2).from((char*)sensor->PICC_GetTypeName(piccType));
 // (char*) was crashing due to change of return of PICC_GetTypeName to FlashStringHelper
-    measured_value(2).from(sensor->PICC_GetTypeName(piccType));
+    value(2).from(sensor->PICC_GetTypeName(piccType));
 
     //sensor->PICC_DumpDetailsToSerial(&(sensor->uid)); //dump some details about the card
 
@@ -221,7 +221,7 @@ bool Mfrc522::measure() {
         }
     }
 
-    measured_value().copy(buf);
+    value().copy(buf);
 
     if(write_requested) {
         write(next_write);

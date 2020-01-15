@@ -17,7 +17,7 @@ Output::Output(const char* name, const int pin,
             return true;
         }
     );
-// don't switch until started    low(); // must be after subdevices as it uses global measured_value()
+// don't switch until started    low(); // must be after subdevices as it uses global value()
 }
 
 void Output::start() {
@@ -30,6 +30,6 @@ void Output::start() {
     
     pinMode(_pin,OUTPUT);
     _started = true;
-    if(measured_value().equals(_high)) high();
+    if(value().equals(_high)) high();
     else low();
 }

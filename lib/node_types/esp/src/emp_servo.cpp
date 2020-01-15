@@ -25,25 +25,25 @@ void Emp_Servo::do_register() {
     );
 }
 
-Emp_Servo& Emp_Servo::turn_to(int value) {
+Emp_Servo& Emp_Servo::turn_to(int angle) {
     if(!started()) return *this;
     if(stopped) {
         _servo.attach(_pin, _min_us, _max_us);
         stopped = false;
     }
     start_time = millis();
-    _servo.write(value);
-    _value = value;
-    measured_value(0).from(value);
+    _servo.write(angle);
+    _value = angle;
+    value(0).from(angle);
     return *this;
 }
 
-Emp_Servo& Emp_Servo::set(int value) {
-    return turn_to(value);
+Emp_Servo& Emp_Servo::set(int angle) {
+    return turn_to(angle);
 }
 
-void Emp_Servo::process(const Ustring& value) {
-    int v = value.as_int();
+void Emp_Servo::process(const Ustring& angle) {
+    int v = angle.as_int();
     turn_to(v);
 }
 

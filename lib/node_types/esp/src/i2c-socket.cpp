@@ -70,7 +70,7 @@ bool I2C_Socket::measure() {
     }
     last_count = count;
 
-    Ustring& v = measured_value();
+    Ustring& v = value();
     v.clear();
     int left = buf_len;
     while(left>0 && Wire.available()>0) {

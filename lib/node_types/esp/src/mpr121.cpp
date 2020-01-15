@@ -27,12 +27,12 @@ bool MPR121::measure() {
 
     uint16_t touched = sensor->touched();
 
-    measured_value(0).clear();
+    value(0).clear();
     for(int i=0; i<12; i++) {
         if(touched&2048) {
-            measured_value(0).add(F("1"));
+            value(0).add(F("1"));
         } else {
-            measured_value(0).add(F("0"));
+            value(0).add(F("0"));
         }
         touched = touched << 1;
     }

@@ -81,9 +81,9 @@ class Subdevice {
         IOTEMPOWER_ON_RECEIVE_CALLBACK receive_cb = NULL;
     public:
         Ustring measured_value; // the just measured value (after calling measure)
-        Ustring current_value;
-        Ustring& value() { return current_value; }
-        Ustring& get() { return current_value; }
+        Ustring last_confirmed_value;
+        Ustring& get_last_confirmed_value() { return last_confirmed_value; }
+        Ustring& get() { return measured_value; }
         Subdevice& with_receive_cb(IOTEMPOWER_ON_RECEIVE_CALLBACK cb) {
             receive_cb = cb;
             return *this;
@@ -128,8 +128,8 @@ class Device {
         // This is a chain of callbacks called for every measuring iteration of the
         // device.
         // It gets passed the triggering device. 
-        // the last measured value will be in .measured_value() or
-        // .measured_value(n) with n denoting the subdevice.
+        // the last measured value will be in .value() or
+        // .value(n) with n denoting the subdevice.
         // .measured_value can be modified.
         // Returning false means that the value should not be considered.
         // Returning true means that the (new) value in .measured_value is correct.
@@ -140,8 +140,8 @@ class Device {
         // This is a chain of callbacks which are called based on
         // a value change of the or one of any of the values of the subdevices.
         // It gets passed the triggering device. 
-        // the last measured value will be in .measured_value() or
-        // .measured_value(n) with n denoting the subdevice.
+        // the last measured value will be in .value() or
+        // .value(n) with n denoting the subdevice.
         // Returning false also allows here to discard the value.
         // Returning true menas that value was considered.
         // TODO: commented example
@@ -191,10 +191,14 @@ class Device {
         bool publish_discovery_info(PubSubClient& mqtt_client);
 #endif
 
-        Ustring& value(unsigned long index);
-        Ustring& value() { return value(0); }
-        Ustring& measured_value(unsigned long index);
-        Ustring& measured_value() { return measured_value(0); }
+        Ustring& get_last_confirmed_value(unsigned long index=0);
+        Ustring& value(unsigned long index=0);
+        // access value()
+        double read_float(unsigned long index=0) { return value(index).as_float(); }
+        long read_int(unsigned long index=0) { return value(index).as_int(); }
+        void write_float(double v, unsigned long index=0) { value(index).from(v); }
+        void write_int(long v, unsigned long index=0) { value(index).from(v); }
+
         const Ustring& get_name() const { return name; }
         //const char* get_name() const { return name.as_cstr(); }
         const Ustring& key() const { return name; }
@@ -393,10 +397,10 @@ class Filter_Average : public Callback {
             _buflen = buflen;
         }
         bool call(Device &dev) {
-            sum += dev.measured_value().as_float();
+            sum += dev.read_float();
             values_count ++;
             if(values_count >= _buflen) {
-                dev.measured_value().from(sum/values_count);
+                dev.write_float(sum/values_count);
                 values_count = 0;
                 sum = 0;
                 return true;
@@ -419,7 +423,7 @@ class Filter_Time_Average : public Callback {
             _delta=delta;
         }
         bool call(Device &dev) {
-            sum += dev.measured_value().as_float();
+            sum += dev.read_float();
             values_count ++;
             if(millis()-last_measured >= _delta) {
                 last_measured = millis();
@@ -432,7 +436,7 @@ class Filter_Time_Average : public Callback {
                     result = sum/values_count;
                 }
                 last_val = result;
-                dev.measured_value().from(result);
+                dev.write_float(result);
                 values_count = 0;
                 sum = 0;
                 return true;
@@ -453,9 +457,9 @@ class Filter_Derivative : public Callback {
         bool call(Device &dev) {
             uint32_t t = micros();
             bool retval = false;
-            double v = dev.measured_value().as_float();
+            double v = dev.read_float();
             if(old_val != NAN) {
-                dev.measured_value().from((v - old_val) *1000 / (t-old_time));
+                dev.write_float((v - old_val) *1000 / (t-old_time));
                 retval = true;
             }
             old_val = v;
@@ -480,12 +484,12 @@ class Filter_Minchange : public Callback {
         bool call(Device &dev) {
             TYPE v;
             if(std::is_same<TYPE, double>::value) {
-                v = dev.measured_value().as_float();
+                v = dev.read_float();
             } else {
-                v = dev.measured_value().as_int();
+                v = dev.read_int();
             }
             if(abs(old_val - v) >= _min_change) {
-                dev.measured_value().from(v);
+                dev.value().from(v);
                 old_val = v;
                 return true;
             }
@@ -509,12 +513,12 @@ class Filter_JMC_Median : public Callback {
             _update_ms = update_ms;
         }
         bool call(Device &dev) {
-            double sample = dev.measured_value().as_float();
-            average += ( sample - average ) * 0.1;
-            median += copysign( average * 0.01, sample - median );
+            double sample = dev.read_float();
+            average += (sample - average) * 0.1;
+            median += copysign(average * 0.01, sample - median);
             uint32_t current = millis() ;
             if(current - last_time >= _update_ms) {
-                dev.measured_value().from(average);
+                dev.write_float(average);
                 last_time = current;
                 return true;
             }
@@ -537,12 +541,12 @@ class Filter_JMC_Median : public Callback {
             average = 0.0; \
             undefined = false; \
         } \
-        double sample = dev.measured_value().as_float(); \
+        double sample = dev.read_float(); \
         average += ( sample - average ) * 0.1; \
         median += copysign( average * 0.01, sample - median ); \
         unsigned long current = millis() ; \
         if(current - start_time >= interval) { \
-            dev.measured_value().from(average); \
+            dev.write_float(average); \
             undefined = true; /* trigger reset */ \
             return true; \
         } \
@@ -553,13 +557,13 @@ class Filter_JMC_Median : public Callback {
 /* Turn analog values into binary with a threshold level */
 #define filter_binarize(cutoff, high, low) with_filter_callback( \
     *new Callback([&](Device& dev) { \
-        if(dev.measured_value().equals(low)) return false; \
-        if(dev.measured_value().equals(high)) return false; \
-        double sample = dev.measured_value().as_float(); \
+        if(dev.value().equals(low)) return false; \
+        if(dev.value().equals(high)) return false; \
+        double sample = dev.value().as_float(); \
         if(sample>=cutoff) { \
-            dev.measured_value().from(high); \
+            dev.value().from(high); \
         } else { \
-            dev.measured_value().from(low); \
+            dev.value().from(low); \
         } \
         return true; \
     }))
@@ -568,8 +572,8 @@ class Filter_JMC_Median : public Callback {
 /* round to the next multiple of base */
 #define filter_round(base) with_filter_callback(\
     *new Callback( [&](Device& dev) { \
-        int32_t v = (long)(dev.measured_value().as_float()/(base)+0.5); \
-        dev.measured_value().from(v*(base)); \
+        int32_t v = (long)(dev.read_float()/(base)+0.5); \
+        dev.write_int(v*(base)); \
         return true; \
     }))
 
@@ -579,7 +583,7 @@ class Filter_JMC_Median : public Callback {
     *new Callback( [&](Device& dev) { \
         static unsigned long last_time; \
         unsigned long current = millis() ; \
-        if(!dev.measured_value().empty() \
+        if(!dev.value().empty() \
            && current - last_time >= interval) { \
             last_time = current; \
             return true; \
@@ -600,9 +604,11 @@ class Filter_Click_Detector : public Callback {
         uint32_t _click_max_ms;
         uint32_t _longclick_min_ms;
         uint32_t _longclick_max_ms;
+        uint32_t _double_distance_ms;
         bool last_was_released = true;
         const char *_released;
         const char *_pressed;
+        bool click_registered = false;
     public:
         Filter_Click_Detector(uint32_t click_min_ms=20, uint32_t click_max_ms=500,
             uint32_t longclick_min_ms=1000, uint32_t longclick_max_ms=2500,
@@ -612,6 +618,7 @@ class Filter_Click_Detector : public Callback {
             _click_max_ms = click_max_ms;
             _longclick_min_ms = longclick_min_ms;
             _longclick_max_ms = longclick_max_ms;
+            _double_distance_ms = _click_max_ms/4;
             _released = released;
             _pressed = pressed;
             for(int i=0; i<4; i++) {
@@ -619,8 +626,8 @@ class Filter_Click_Detector : public Callback {
             }
         }
         bool call(Device &dev) {
-            bool is_released = dev.measured_value().equals(_released);
-            if(is_released || dev.measured_value().equals(_pressed)) {
+            bool is_released = dev.value().equals(_released);
+            if(is_released || dev.value().equals(_pressed)) {
                 // only store when changed
                 if(is_released != last_was_released) {
                     last_was_released = is_released;
@@ -632,34 +639,44 @@ class Filter_Click_Detector : public Callback {
                     if(is_released) {
                         // analyse what type of click this is
                         if(event_times[3] -  event_times[2] >= _longclick_max_ms) {
-                            dev.measured_value().from(none); // was pressed too long
+                            dev.value().from(none); // was pressed too long
                             return true;
                         }
                         if(event_times[3] -  event_times[2] >= _longclick_min_ms) {
-                            dev.measured_value().from(long_click); // was in long click interval
+                            dev.value().from(long_click); // was in long click interval
+                            click_registered = false;
                             return true;
                         }
                         if(event_times[3] -  event_times[2] >= _click_max_ms) {
                             // was pressed too long for normal click but too short for long click
-                            dev.measured_value().from(none);
+                            dev.value().from(none);
                             return true;
                         }
                         if(event_times[3] -  event_times[2] >= _click_min_ms) {
                             // this is a normal click
                             // check if it was a double
-                            if(event_times[3]-event_times[0] >= 2*_click_max_ms) {
-                                dev.measured_value().from(click);
+                            if(event_times[3] - event_times[0] >= 2*_click_max_ms
+                                || event_times[2] - event_times[1] > _double_distance_ms) {
+                                click_registered = true;
+                                return false;
                             } else {
-                                // TODO: consider analyzing interval first click
-                                dev.measured_value().from(double_click);
+                                dev.value().from(double_click);
                             }
+                            click_registered = false;
                             return true;
                         }
                     }
                 } else { // Same value as before
                     if(is_released) {
-                        // make sure to notify that now things are released
-                        dev.measured_value().from(none);
+                        if(click_registered && // if click happened, check it was no double click
+                            (millis()-event_times[3]) > _double_distance_ms) {
+
+                            dev.value().from(click);
+                            click_registered = false;
+                        } else {
+                            // make sure to notify that now things are released
+                            dev.value().from(none);
+                        }
                         return true;
                     }
                 }

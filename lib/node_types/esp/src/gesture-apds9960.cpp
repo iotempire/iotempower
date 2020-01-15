@@ -102,7 +102,7 @@ bool Gesture_Apds9960::measure() {
                 !sensor->readBlueLight(blue_light) ) {
             ulog(F("Error reading light values"));
         } else { // success
-            measured_value(_light).printf("%d,%d,%d,%d", 
+            value(_light).printf("%d,%d,%d,%d", 
                 ambient_light, red_light, green_light, blue_light);
         }
     }
@@ -114,12 +114,12 @@ bool Gesture_Apds9960::measure() {
             ulog(F("Error reading proximity value"));
         } else {
             if(_threshold == 0) {
-                measured_value(_proximity).from((unsigned int)proximity_data);
+                value(_proximity).from((unsigned int)proximity_data);
             } else {
                 if(proximity_data <= _threshold)
-                    measured_value(_proximity).from(_high);
+                    value(_proximity).from(_high);
                 else
-                    measured_value(_proximity).from(_low);
+                    value(_proximity).from(_low);
             }
         }
     }
@@ -128,25 +128,25 @@ bool Gesture_Apds9960::measure() {
         if ( sensor->isGestureAvailable() ) {
             switch ( sensor->readGesture() ) {
             case DIR_UP:
-                measured_value(_gesture).from(F("up"));
+                value(_gesture).from(F("up"));
                 break;
             case DIR_DOWN:
-                measured_value(_gesture).from(F("down"));
+                value(_gesture).from(F("down"));
                 break;
             case DIR_LEFT:
-                measured_value(_gesture).from(F("left"));
+                value(_gesture).from(F("left"));
                 break;
             case DIR_RIGHT:
-                measured_value(_gesture).from(F("right"));
+                value(_gesture).from(F("right"));
                 break;
             case DIR_NEAR:
-                measured_value(_gesture).from(F("near"));
+                value(_gesture).from(F("near"));
                 break;
             case DIR_FAR:
-                measured_value(_gesture).from(F("far"));
+                value(_gesture).from(F("far"));
                 break;
             default:
-                measured_value(_gesture).from(F("none"));
+                value(_gesture).from(F("none"));
             }
         }
     }

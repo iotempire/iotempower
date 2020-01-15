@@ -36,8 +36,8 @@ bool Barometer_BMP180::measure() {
     float altitude = sensor->calcAltitude(101900); 
 
     // adjust already due to precision TODO: revisit
-    measured_value(0).from(round(temperature*10)/10); // Celsius
-    measured_value(1).from((int)round(pressure/100)); // Hectopascal
-    measured_value(2).from((int)round(altitude/5)*5); // Meter
+    value(0).from(round(temperature*10)/10); // Celsius
+    value(1).from((int)round(pressure/100)); // Hectopascal
+    value(2).from((int)round(altitude/5)*5); // Meter
     return true;
 }

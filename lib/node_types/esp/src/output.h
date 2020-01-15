@@ -32,22 +32,22 @@ class Output : public Device {
         }
         Output& high() { 
             if(started()) digitalWrite(_pin, _inverted?0:1);
-            measured_value().from(_high);
+            value().from(_high);
             return *this;
         }
         Output& on() { return high(); }
         Output& low() { 
             if(started()) digitalWrite(_pin, _inverted?1:0); 
-            measured_value().from(_low);
+            value().from(_low);
             return *this;
         }
         Output& off() { return low(); }
 
         bool is_high() {
-            return value().equals(_high);
+            return get_last_confirmed_value().equals(_high);
         }
         bool is_low() {
-            return value().equals(_low);
+            return get_last_confirmed_value().equals(_low);
         }
         Output& set(const char* value) {
             Ustring v(value);
@@ -58,7 +58,7 @@ class Output : public Device {
             return *this;
         }
         void toggle() {
-            if(measured_value().equals(_high)) set(_low);
+            if(value().equals(_high)) set(_low);
             else set(_high);
         }
 
