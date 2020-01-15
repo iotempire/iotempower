@@ -1,6 +1,9 @@
 filter
 ======
 
+Any device in IoTempower can take a filter. A filter can change or even compress
+measured values and even prevent them from being sent.
+
 Example for filter-function:
 
 ..  code-block:: cpp
@@ -60,7 +63,7 @@ There some pre-defined filters available:
     **description:** Return maximum one value per time interval (interval in ms).
 
 -   **filter:** ``filter_detect_click(click_min_ms, click_max_ms,
-    longclick_min_ms, longclick_max_ms=2500,
+    longclick_min_ms, longclick_max_ms,
     pressed_str, released_str)``
 
     **description:** A filter that can detect, clicks, double clicks,

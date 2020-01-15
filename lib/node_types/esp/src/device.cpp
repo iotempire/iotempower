@@ -187,11 +187,11 @@ bool Device::poll_measure() {
     if(started()) { // only if device active
         if( micros() - last_poll >= _pollrate_us) { // only measure so often
             last_poll = micros();
-            measure_init(); // something might have to be executed here to init each time, for example i2c setup
+            measure_init(); // something might have to be executed here to init each time, for example i2c-setup
             bool measure_result = measure(); // measure new value or trigger physical update
 //            ulog("poll measure val: %s, %lu", name.as_cstr(), _pollrate_us); // TODO: remove/debug
             yield(); // measure might have taken long, give some time to system TODO: do we have to take care of mqtt here too?
-            measure_exit(); // something might have to be executed here to exit each time, for example i2c setup
+            measure_exit(); // something might have to be executed here to exit each time, for example i2c-exit
             if(measure_result) { // new value generated
                 if(_ignore_case) { // if necessary, lower them all
                     subdevices.for_each( [](Subdevice& sd) {
