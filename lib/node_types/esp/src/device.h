@@ -396,7 +396,7 @@ class Filter_Average : public Callback {
     private:
         double sum=0;
         size_t values_count = 0;
-        size_t _buflen = 0;
+        size_t _buflen;
     public:
         Filter_Average(size_t buflen) : Callback() {
             _buflen = buflen;
@@ -414,6 +414,44 @@ class Filter_Average : public Callback {
         }
 };
 #define filter_average(count) with_filter_callback(*new Filter_Average(count))
+
+// simple sliding averaging filter
+// average over last buflen samples
+class Filter_Sliding_Average : public Callback {
+    private:
+        double sum=0;
+        size_t _buflen;
+        size_t buffer_filled = 0;
+        size_t buffer_position = 0;
+        double *samples;
+    public:
+        Filter_Sliding_Average(size_t buflen) : Callback() {
+            _buflen = buflen;
+            samples = new double[_buflen];
+            if(!samples) {
+                ulog(F("Not enough memory for sliding average filter buffer."));
+            }
+        }
+        bool call(Device &dev) {
+            bool retval = false;
+            if(samples) {
+                double v = dev.read_float();
+                sum += v; // add to overall sum
+                buffer_filled ++;
+                if(buffer_filled > _buflen) { // only active when buffer filled
+                    buffer_filled = _buflen; // keep at that size
+                    // forget old value (that is on that new position) before overwriting
+                    sum -= samples[(buffer_position) % _buflen];
+                    dev.write_float(sum/buffer_filled);
+                    retval = true; // only return results when buffer filled
+                }
+                samples[buffer_position] = v; // store (overwrite when full) new value
+                buffer_position = (buffer_position + 1) % _buflen; // move to next pos
+            } // else not enough space, discard
+            return retval; 
+        }
+};
+#define filter_sliding_average(count) with_filter_callback(*new Filter_Sliding_Average(count))
 
 // build an average over all samples arriving in a specific time window
 class Filter_Time_Average : public Callback {
@@ -534,7 +572,7 @@ class Filter_JMC_Median : public Callback {
 
 
 /* Jmc median over small time intervals with reset after time runs out*/
-#define filter_jmc_interval_median(interval, dev) with_filter_callback(\
+#define filter_jmc_interval_median(interval) with_filter_callback(\
     *new Callback([&](Device& dev) { \
         static double median; \
         static double average; \
@@ -617,7 +655,7 @@ class Filter_Click_Detector : public Callback {
     public:
         Filter_Click_Detector(uint32_t click_min_ms=20, uint32_t click_max_ms=500,
             uint32_t longclick_min_ms=1000, uint32_t longclick_max_ms=2500,
-            const char* pressed="on", const char* released="off") : Callback() {
+            const char* pressed=str_on, const char* released=str_off) : Callback() {
 
             _click_min_ms = click_min_ms;
             _click_max_ms = click_max_ms;

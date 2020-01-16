@@ -301,4 +301,7 @@ long urandom(long from, long upto_exclusive);
 #define limit(nr, min, max) \
     ( (nr) < (min) ? (min):((nr) > (max) ? (max):(nr)) )
 
+extern const PROGMEM char* str_on;
+extern const PROGMEM char* str_off;
+
 #endif // _TOOLBOX_H_

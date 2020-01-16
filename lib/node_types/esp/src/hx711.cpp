@@ -15,7 +15,7 @@ Hx711::Hx711(const char* name, uint8_t sck_pin, uint8_t dout_pin,
         [&] (const Ustring& payload) {
             // any load here triggers tare
             ulog(F("HX711 tare requested."));
-            sensor.tare();
+            tare();
             return true;
         });
     if(calibration) {
@@ -43,6 +43,10 @@ Hx711::Hx711(const char* name, uint8_t sck_pin, uint8_t dout_pin,
 
 #define stabilizing_time 2000 // for better tare precision
 
+void Hx711::tare() {
+    sensor.tare(5);
+}
+
 void Hx711::start() {
     ulog(F("Starting HX711 initialization, this will block 2s."));
     sensor.begin(_dout_pin, _sck_pin);
@@ -51,7 +55,7 @@ void Hx711::start() {
         return;
     }
     sensor.set_scale(_calfactor); // user set calibration factor (float)
-    sensor.tare();
+    sensor.tare(10);
     _started = true;
     last_read = millis();
     ulog(F("HX711 initialized."));

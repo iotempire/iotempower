@@ -62,7 +62,7 @@ class RGB_Base : public Device {
             // update values with last color set
             // TODO: make this reporting skipable
             // TODO: seems like also on and off should be ignored for home-assistant
-            value(0).from(avg_color.getLuma()>0?"on":"off");
+            value(0).from(avg_color.getLuma()>0?str_on:str_off);
             value(2).from((int)avg_color.getLuma());
             value(4).printf("%02x%02x%02x", avg_color.r, avg_color.g, avg_color.b);
             return *this;

@@ -15,8 +15,8 @@ class Output : public Device {
         int _pin;
     public:
         Output(const char* name, const int pin, 
-                const char* high_command="on",
-                const char* low_command="off",
+                const char* high_command=str_on,
+                const char* low_command=str_off,
                 bool inverted=false );
         void start();
         Output& invert() {

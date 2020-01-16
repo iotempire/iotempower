@@ -29,6 +29,7 @@ class Hx711 : public Device {
         Hx711& precision(float precision) {
             return with_precision(precision);
         }
+        void tare();
         void start();
         bool measure();
 };

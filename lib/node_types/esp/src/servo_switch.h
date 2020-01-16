@@ -43,22 +43,22 @@ class Servo_Switch : public Emp_Servo {
                 int on_angle, int off_angle, int return_angle,
                 int min_us, int max_us, int duration)
                 : Emp_Servo(name, pin, min_us, max_us, duration) {
-            init(on_angle, off_angle, return_angle, "on", "off");
+            init(on_angle, off_angle, return_angle, str_on, str_off);
         }
         Servo_Switch(const char* name, uint8_t pin,
                 int on_angle, int off_angle, int return_angle,
                 int min_us, int max_us)
                 : Emp_Servo(name, pin, min_us, max_us) {
-            init(on_angle, off_angle, return_angle, "on", "off");
+            init(on_angle, off_angle, return_angle, str_on, str_off);
         }
         Servo_Switch(const char* name, uint8_t pin,
                 int on_angle, int off_angle, int return_angle)
                 : Emp_Servo(name, pin) {
-            init(on_angle, off_angle, return_angle, "on", "off");
+            init(on_angle, off_angle, return_angle, str_on, str_off);
         }
         Servo_Switch(const char* name, uint8_t pin)
                 : Emp_Servo(name, pin) {
-            init(0, 180, 90, "on", "off");
+            init(0, 180, 90, str_on, str_off);
         }
         Servo_Switch& set(const Ustring& status);
         void process(const Ustring& value);

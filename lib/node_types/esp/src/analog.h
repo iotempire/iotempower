@@ -20,12 +20,12 @@ class Analog : public Device {
             measure();
         }
         bool measure();
-        Analog& with_threshold(int threshold, const char* high="on", const char* low="off") {
+        Analog& with_threshold(int threshold, const char* high=str_on, const char* low=str_off) {
             if(threshold > 1024) threshold=1024;
             else if(threshold < 0) threshold=0;
             return (Analog&)filter_binarize(threshold,high,low);
         }
-        Analog& threshold(int threshold, const char* high="on", const char* low="off") {
+        Analog& threshold(int threshold, const char* high=str_on, const char* low=str_off) {
             return with_threshold(threshold, high, low);
         }
         Analog& with_precision(int precision) {

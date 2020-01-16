@@ -1,1 +1,1 @@
-output(blue, ONBOARDLED, "off", "on").set("off");
+output(blue, ONBOARDLED, "off", str_on).set("off");

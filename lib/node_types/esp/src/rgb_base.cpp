@@ -54,9 +54,9 @@ RGB_Base::RGB_Base(const char* name, int led_count) :
     add_subdevice(new Subdevice("")); // 0
     add_subdevice(new Subdevice(F("set"),true))->with_receive_cb( // 1
         [&] (const Ustring& payload) {
-            if(payload.equals(F("on"))) high();
+            if(payload.equals(str_on)) high();
             else {
-                if(payload.equals(F("off"))) low();
+                if(payload.equals(str_off)) low();
                 else return false;
             }
             return true;

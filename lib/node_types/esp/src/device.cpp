@@ -122,13 +122,19 @@ bool Device::publish(PubSubClient& mqtt_client, Ustring& node_topic) {
 
             ////AsyncMqttClient disabled in favor of PubSubClient
             // if(!mqtt_client.publish(topic.as_cstr(), 0, false, val.as_cstr())) {
+            // get buffers a bit emptier before we try to publish
+            yield();
+            mqtt_client.loop();
+            yield();
             if(!mqtt_client.publish(topic.as_cstr(), (uint8_t*) val.as_cstr(), (unsigned int)val.length(), false)) {
                 Serial.print(F("!publish error!"));
                 // TODO: signal error and trigger reconnect - necessary?
                 return false;
-            } else {
-                delay(1); // give room for publish to be sent out TODO: implement sync send
             }
+            // give room for publish to be sent out TODO: implement sync send
+            yield();
+            mqtt_client.loop();
+            yield();
             published = true;
         }
         return true; // continue loop

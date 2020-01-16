@@ -274,3 +274,6 @@ void ulog(const __FlashStringHelper *fmt, ...) {
 long urandom(long from, long upto_exclusive) {
     return random(from, upto_exclusive);
 }
+
+const PROGMEM char* str_on = "on";
+const PROGMEM char* str_off = "off";
