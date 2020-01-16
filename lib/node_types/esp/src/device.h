@@ -438,10 +438,10 @@ class Filter_Sliding_Average : public Callback {
                 double v = dev.read_float();
                 sum += v; // add to overall sum
                 buffer_filled ++;
-                if(buffer_filled > _buflen) { // only active when buffer filled
+                if(buffer_filled >= _buflen) { // only active when buffer filled
                     buffer_filled = _buflen; // keep at that size
                     // forget old value (that is on that new position) before overwriting
-                    sum -= samples[(buffer_position) % _buflen];
+                    sum -= samples[buffer_position];
                     dev.write_float(sum/buffer_filled);
                     retval = true; // only return results when buffer filled
                 }
@@ -452,6 +452,145 @@ class Filter_Sliding_Average : public Callback {
         }
 };
 #define filter_sliding_average(count) with_filter_callback(*new Filter_Sliding_Average(count))
+
+
+// sliding minimum, maximum average filter
+// average over last buflen samples
+class Filter_Sliding_Min_Max_Avg : public Callback {
+    private:
+        double sum=0;
+        size_t _buflen;
+        size_t buffer_filled = 0;
+        size_t buffer_position = 0;
+        double *samples;
+    public:
+        Filter_Sliding_Min_Max_Avg(size_t buflen) : Callback() {
+            _buflen = buflen;
+            samples = new double[_buflen];
+            if(!samples) {
+                ulog(F("Not enough memory for sliding average filter buffer."));
+            }
+        }
+        bool call(Device &dev) {
+            bool retval = false;
+            if(samples) {
+                double v = dev.read_float();
+                sum += v; // add to overall sum
+                buffer_filled ++;
+                if(buffer_filled >= _buflen) { // only active when buffer filled
+                    buffer_filled = _buflen; // keep at that size
+                    // forget old value (that is on that new position) before overwriting
+                    sum -= samples[buffer_position];
+                }
+                samples[buffer_position] = v; // store (overwrite when full) new value
+                buffer_position = (buffer_position + 1) % _buflen; // move to next pos
+                if(buffer_filled >= _buflen) {
+                    double _min = samples[0], _max=samples[0];
+                    for(int i=1; i<buffer_filled; i++) {
+                        double s = samples[i];
+                        if(s < _min) _min=s;
+                        if(s > _max) _max=s;
+                    }
+                    dev.write_float((_min + _max) / 2);
+                    retval = true; // only return results when buffer filled
+                }
+            } // else not enough space, discard
+            return retval; 
+        }
+};
+#define filter_sliding_min_max_avg(count) with_filter_callback(*new Filter_Sliding_Min_Max_Avg(count))
+
+
+// sliding maximum filter
+// average over last buflen samples
+class Filter_Sliding_Max : public Callback {
+    private:
+        double sum=0;
+        size_t _buflen;
+        size_t buffer_filled = 0;
+        size_t buffer_position = 0;
+        double *samples;
+    public:
+        Filter_Sliding_Max(size_t buflen) : Callback() {
+            _buflen = buflen;
+            samples = new double[_buflen];
+            if(!samples) {
+                ulog(F("Not enough memory for sliding average filter buffer."));
+            }
+        }
+        bool call(Device &dev) {
+            bool retval = false;
+            if(samples) {
+                double v = dev.read_float();
+                sum += v; // add to overall sum
+                buffer_filled ++;
+                if(buffer_filled >= _buflen) { // only active when buffer filled
+                    buffer_filled = _buflen; // keep at that size
+                    // forget old value (that is on that new position) before overwriting
+                    sum -= samples[buffer_position];
+                }
+                samples[buffer_position] = v; // store (overwrite when full) new value
+                buffer_position = (buffer_position + 1) % _buflen; // move to next pos
+                if(buffer_filled >= _buflen) {
+                    double _max=samples[0];
+                    for(int i=1; i<buffer_filled; i++) {
+                        double s = samples[i];
+                        if(s > _max) _max=s;
+                    }
+                    dev.write_float(_max);
+                    retval = true; // only return results when buffer filled
+                }
+            } // else not enough space, discard
+            return retval; 
+        }
+};
+#define filter_sliding_max(count) with_filter_callback(*new Filter_Sliding_Max(count))
+
+// sliding maximum filter
+// average over last buflen samples
+class Filter_Sliding_Min : public Callback {
+    private:
+        double sum=0;
+        size_t _buflen;
+        size_t buffer_filled = 0;
+        size_t buffer_position = 0;
+        double *samples;
+    public:
+        Filter_Sliding_Min(size_t buflen) : Callback() {
+            _buflen = buflen;
+            samples = new double[_buflen];
+            if(!samples) {
+                ulog(F("Not enough memory for sliding average filter buffer."));
+            }
+        }
+        bool call(Device &dev) {
+            bool retval = false;
+            if(samples) {
+                double v = dev.read_float();
+                sum += v; // add to overall sum
+                buffer_filled ++;
+                if(buffer_filled >= _buflen) { // only active when buffer filled
+                    buffer_filled = _buflen; // keep at that size
+                    // forget old value (that is on that new position) before overwriting
+                    sum -= samples[buffer_position];
+                }
+                samples[buffer_position] = v; // store (overwrite when full) new value
+                buffer_position = (buffer_position + 1) % _buflen; // move to next pos
+                if(buffer_filled >= _buflen) {
+                    double _min=samples[0];
+                    for(int i=1; i<buffer_filled; i++) {
+                        double s = samples[i];
+                        if(s < _min) _min=s;
+                    }
+                    dev.write_float(_min);
+                    retval = true; // only return results when buffer filled
+                }
+            } // else not enough space, discard
+            return retval; 
+        }
+};
+#define filter_sliding_min(count) with_filter_callback(*new Filter_Sliding_Min(count))
+
 
 // build an average over all samples arriving in a specific time window
 class Filter_Time_Average : public Callback {
@@ -488,6 +627,92 @@ class Filter_Time_Average : public Callback {
         }
 };
 #define filter_time_average(delta_ms) with_filter_callback(*new Filter_Time_Average(delta_ms))
+
+
+// moving median filter over last buflen samples
+class Filter_Moving_Median : public Callback {
+    private:
+        size_t _buflen;
+        double *samples;
+        size_t samples_filled = 0;
+        size_t samples_position = 0;
+        double *sorted;
+    public:
+        Filter_Moving_Median(size_t buflen) : Callback() {
+            _buflen = buflen;
+            samples = new double[_buflen];
+            sorted = new double[_buflen];
+            if(!samples || !sorted) {
+                samples = NULL;
+                ulog(F("Not enough memory for moving median filter buffers."));
+            }
+        }
+        bool call(Device &dev) {
+            bool retval = false;
+            if(samples) {
+                double v = dev.read_float();
+                double oldv;
+                samples_filled ++;
+                if(samples_filled >= _buflen) { // only active when buffer filled
+                    samples_filled = _buflen; // keep at that size
+                    // remember old value
+                    oldv = samples[samples_position];
+                    samples[samples_position] = v; // overwrite with new value
+                    // remove old value from sorted and add new one
+                    bool removed_old = false;
+                    bool inserted_new = false;
+                    for(int pos=0; pos<samples_filled-1; pos++)
+                    {
+                        if(!removed_old) {
+                            if(sorted[pos] == oldv) {
+                                removed_old = true; // from now on copy higher values to current pos;
+                            }
+                        }
+                        if(removed_old) {
+                            sorted[pos] = sorted[pos+1];
+                        }
+                        if(v <= sorted[pos]) { // needs to be inserted here
+                            double tmp = sorted[pos];
+                            sorted[pos] = v;
+                            v = tmp; // remember to insert in next round
+                            inserted_new = true;
+                            if(removed_old) {
+                                break; // found and replaced
+                            }
+                        }
+                    }
+                    if(!inserted_new) { // if it hasn't been stored already
+                        sorted[samples_filled-1] = v;
+                    }
+                    dev.write_float(sorted[samples_filled/2]);
+                    retval = true; // only return results when buffer filled
+                } else { // just add to buffers
+                    samples[samples_position] = v; // store new value
+                    // add sorted
+                    for(int pos=0; pos<samples_filled-1; pos++)
+                    {
+                        if(v <= sorted[pos]) { // needs to be inserted here
+                            double tmp = sorted[pos];
+                            sorted[pos] = v;
+                            v = tmp; // remember to insert in next round
+                        }
+                    }
+                }
+
+                // // debug, TODO: remove 
+                // for(int pos=0; pos<samples_filled-1; pos++) {
+                //     Serial.print(sorted[pos]);
+                //     Serial.print(" ");
+                // }
+                // Serial.println();
+
+                samples_position = (samples_position + 1) % _buflen; // move to next pos
+            } // else not enough space, discard
+            return retval; 
+        }
+};
+#define filter_moving_median(count) with_filter_callback(*new Filter_Moving_Median(count))
+
 
 
 // compute derivative in 1/ms
@@ -549,23 +774,13 @@ class Filter_JMC_Median : public Callback {
     private:
         double median = 0.0;
         double average = 0.0;
-        uint32_t last_time = millis();
-        uint32_t _update_ms;
     public:
-        Filter_JMC_Median(uint32_t update_ms) : Callback() {
-            _update_ms = update_ms;
-        }
         bool call(Device &dev) {
             double sample = dev.read_float();
             average += (sample - average) * 0.1;
             median += copysign(average * 0.01, sample - median);
-            uint32_t current = millis() ;
-            if(current - last_time >= _update_ms) {
-                dev.write_float(average);
-                last_time = current;
-                return true;
-            }
-            return false;
+            dev.write_float(average);
+            return true;
         }
 };
 #define filter_jmc_median(update_ms) with_filter_callback(*new Filter_JMC_Median(update_ms))
