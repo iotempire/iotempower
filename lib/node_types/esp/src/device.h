@@ -854,10 +854,10 @@ class Filter_Click_Detector : public Callback {
     private:
         size_t values_count = 0;
         uint32_t event_times[4];
-        const char* none="released";
-        const char* click="click";
-        const char* double_click="double";
-        const char* long_click="long";
+        const char* none = "released";
+        const char* click = "click";
+        const char* double_click = "double";
+        const char* long_click = "long";
         uint32_t _click_min_ms;
         uint32_t _click_max_ms;
         uint32_t _longclick_min_ms;
@@ -866,9 +866,11 @@ class Filter_Click_Detector : public Callback {
         bool last_was_released = true;
         const char *_released;
         const char *_pressed;
+        bool _early_click;
         bool click_registered = false;
     public:
-        Filter_Click_Detector(uint32_t click_min_ms=20, uint32_t click_max_ms=500,
+        Filter_Click_Detector(bool early_click = false, 
+            uint32_t click_min_ms=20, uint32_t click_max_ms=500,
             uint32_t longclick_min_ms=1000, uint32_t longclick_max_ms=2500,
             const char* pressed=str_on, const char* released=str_off) : Callback() {
 
@@ -877,6 +879,7 @@ class Filter_Click_Detector : public Callback {
             _longclick_min_ms = longclick_min_ms;
             _longclick_max_ms = longclick_max_ms;
             _double_distance_ms = _click_max_ms/4;
+            _early_click = early_click;
             _released = released;
             _pressed = pressed;
             for(int i=0; i<4; i++) {
@@ -885,7 +888,7 @@ class Filter_Click_Detector : public Callback {
         }
         bool call(Device &dev) {
             bool is_released = dev.is(_released);
-            if(is_released || dev.is(_pressed)) {
+            if(is_released || dev.is(_pressed)) { // is pressed or released?
                 // only store when changed
                 if(is_released != last_was_released) {
                     last_was_released = is_released;
@@ -894,48 +897,79 @@ class Filter_Click_Detector : public Callback {
                         event_times[i] = event_times[i+1];
                     }
                     event_times[3] = millis();
-                    if(is_released) {
-                        // analyse what type of click this is
-                        if(event_times[3] - event_times[2] >= _longclick_max_ms) {
-                            dev.write(none); // was pressed too long
-                            return true;
-                        }
-                        if(event_times[3] -  event_times[2] >= _longclick_min_ms) {
-                            dev.write(long_click); // was in long click interval
-                            click_registered = false;
-                            return true;
-                        }
-                        if(event_times[3] -  event_times[2] >= _click_max_ms) {
-                            // was pressed too long for normal click but too short for long click
-                            dev.write(none);
-                            return true;
-                        }
-                        if(event_times[3] -  event_times[2] >= _click_min_ms) {
-                            // this is a normal click
-                            // check if it was a double
-                            if(event_times[3] - event_times[0] >= 2*_click_max_ms
-                                || event_times[2] - event_times[1] > _double_distance_ms) {
-                                click_registered = true;
-                                return false;
-                            } else {
+                    if(_early_click) {
+                        if(!is_released) { // if (just) pressed
+                            // analyse what type of click this is
+                            // max longclick not evaluated
+                            // long_click is handled in keeping things down
+                            // check if normal or double
+                            if(event_times[3] - event_times[1] 
+                                >= _click_max_ms + _double_distance_ms) {
+                                // if distance is too big-> normal click
+                                // check if it was a double
+                                dev.write(click);
+                            } else { // must have been a double 
                                 dev.write(double_click);
                             }
-                            click_registered = false;
                             return true;
-                        }
-                    }
+                        } // endif is_released
+                    } else { // not early_click
+                        if(is_released) {
+                            // analyse what type of click this is
+                            if(event_times[3] - event_times[2] >= _longclick_max_ms) {
+                                dev.write(none); // was pressed too long
+                                return true;
+                            }
+                            if(event_times[3] -  event_times[2] >= _longclick_min_ms) {
+                                dev.write(long_click); // was in long click interval
+                                click_registered = false;
+                                return true;
+                            }
+                            if(event_times[3] -  event_times[2] >= _click_max_ms) {
+                                // was pressed too long for normal click but too short for long click
+                                dev.write(none);
+                                return true;
+                            }
+                            if(event_times[3] -  event_times[2] >= _click_min_ms) {
+                                // this is a normal click
+                                // check if it was a double
+                                if(event_times[3] - event_times[0] >= 2*_click_max_ms
+                                    || event_times[2] - event_times[1] > _double_distance_ms) {
+                                    click_registered = true;
+                                    return false;
+                                } else {
+                                    dev.write(double_click);
+                                }
+                                click_registered = false;
+                                return true;
+                            }
+                        } // endif is_released
+                    } // endif early_click
                 } else { // Same value as before
-                    if(is_released) {
-                        if(click_registered && // if click happened, check it was no double click
-                            (millis()-event_times[3]) > _double_distance_ms) {
-
-                            dev.write(click);
-                            click_registered = false;
+                    if(_early_click) {
+                        if(!is_released) { // still pressed
+                            if(millis() -  event_times[3] >= _longclick_min_ms) {
+                                dev.write(long_click);
+                                return true;
+                            } // TODO: fix multiple long clicks when held
                         } else {
                             // make sure to notify that now things are released
                             dev.write(none);
+                            return true;
                         }
-                        return true;
+                    } else { // if not early_click
+                        if(is_released) {
+                            if(click_registered && // if click happened, check it was no double click
+                                (millis()-event_times[3]) > _double_distance_ms) {
+
+                                dev.write(click);
+                                click_registered = false;
+                            } else {
+                                // make sure to notify that now things are released
+                                dev.write(none);
+                            }
+                            return true;
+                        }
                     }
                 }
             } // neither released nor pressed
@@ -943,7 +977,9 @@ class Filter_Click_Detector : public Callback {
         }
 };
 #define filter_click_detector(...) \
-    with_filter_callback(*new Filter_Click_Detector(__VA_ARGS__))
+    with_filter_callback(*new Filter_Click_Detector(false, __VA_ARGS__))
+#define filter_early_click_detector(...) \
+    with_filter_callback(*new Filter_Click_Detector(true, __VA_ARGS__))
 
 #define filter(f) with_filter_callback(*new Callback(f))
 
