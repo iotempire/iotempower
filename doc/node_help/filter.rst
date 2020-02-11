@@ -69,3 +69,13 @@ There some pre-defined filters available:
     **description:** A filter that can detect, clicks, double clicks,
     long clicks and too long clicks. Parameter are usually not necessary as
     it has sane defaults.
+
+-   **filter:** ``filter_interval_map(v0, b0, v1, b1, ..., vn)``
+
+    **description:** A filter that maps a set of intervals to single
+    descrete values. It is always assumed to start at minus infinity and
+    is automatically terminated by infinity
+ 
+    **example**:  ``.filter_interval_map("low", -0.5, NULL, 0.5, "high")``
+    returns ``low`` for values <=-0.5, nothing between -0.5 and 0.5,
+    and ``high`` for values > 0.5

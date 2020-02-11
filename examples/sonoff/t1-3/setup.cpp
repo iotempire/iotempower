@@ -15,7 +15,6 @@
 #define longclick_max_ms 2500
 
 const char* str_click = "click";
-const char* str_on = "on";
 
 led(blue, ONBOARDLED).invert().off().report_change(false);
 output(relais1, RELAIS1).light().off();
