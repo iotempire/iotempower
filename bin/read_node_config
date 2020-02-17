@@ -17,7 +17,7 @@ mqtt_user="$IOTEMPOWER_MQTT_USER"
 mqtt_password="$IOTEMPOWER_MQTT_PW"
 
 # normalize node_type
-board=$(echo -n "$board"|tr [:upper:][:space:] [:lower:]_)
+board=$(echo -n "$board"|tr [:upper:][:space:]- [:lower:]__)
 
 # TODO: find better way to duplicate board configs
 if [[ "$board" == "wemos_d1_mini_pro" ]]; then
