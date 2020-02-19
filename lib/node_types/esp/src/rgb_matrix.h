@@ -78,7 +78,7 @@ class RGB_Matrix : public RGB_Base {
                 y+=4*height;
                 a = matrix_get(x%width,y%height);
             } else {
-                if(x<0 || y<0 || x>=width || y>=width) return CRGB(CRGB::Black);
+                if(x<0 || y<0 || x>=width || y>=height) return CRGB(CRGB::Black);
                 a = matrix_get(x,y);
             }
             if(a->stripnr >= 0) return strips[a->stripnr]->get_color(a->lednr);
@@ -92,7 +92,7 @@ class RGB_Matrix : public RGB_Base {
                 y+=4*height;
                 a = matrix_get(x%width,y%height);
             } else {
-                if(x<0 || y<0 || x>=width || y>=width) return CRGB(CRGB::Black);
+                if(x<0 || y<0 || x>=width || y>=height) return CRGB(CRGB::Black);
                 a = matrix_get(x,y);
             }
             if(a->stripnr >= 0) {

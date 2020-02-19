@@ -81,30 +81,40 @@ RGB_Base::RGB_Base(const char* name, int led_count) :
     );
 }
 
-RGB_Base& RGB_Base::set_colorstr(int lednr, const Ustring& color, bool _show) {
-    // Check if this is a color?
+bool RGB_Base::read_color(const Ustring& colorstr, CRGB& color) {
+    // Check if this is a predefined color, allow colorstr to have other values after color
     unsigned int i;
     for(i=0; i<color_map_count; i++) {
-        if(color.equals(color_map[i].key)) {
-            set_color(lednr, color_map[i].color, _show);
-            return *this;
+        if(colorstr.starts_with(color_map[i].key)) {
+            if(colorstr.as_cstr()[strlen(color_map[i].key)] > ' ') return false; // needs to be terminated
+            color = color_map[i].color;
+            return true;
         }
     }
     // we didn't get a match
     // check if it is a 6-byte hex value
-    if(color.length() == 6) {
+    if(colorstr.length() >= 6 && colorstr.as_cstr()[6] <= ' ') { // terminated by blank or none char
         char *endptr;
-        long colorval = strtol(color.as_cstr(), &endptr, 16);
-        if(endptr - color.as_cstr() == 6) {
-            set_color(lednr, CRGB(colorval), _show);
-            return *this;
+        long colorval = strtol(colorstr.as_cstr(), &endptr, 16);
+        if(endptr - colorstr.as_cstr() == 6) {
+            color = CRGB(colorval);
+            return true;
         } 
     }
     // Last chance: see, if we can extract 3 comma seperated integers
     int r,g,b;
-    if(sscanf(color.as_cstr(),"%d,%d,%d",&r,&g,&b) == 3) {
-        set_color(lednr, CRGB(r,g,b), _show);
+    if(sscanf(colorstr.as_cstr(),"%d,%d,%d",&r,&g,&b) == 3) {
+        color = CRGB(r,g,b);
+        return true;
     }
+    return false; // could not convert
+}
+
+RGB_Base& RGB_Base::set_colorstr(int lednr, const Ustring& color, bool _show) {
+    CRGB c;
+    if(read_color(color, c)) {
+        set_color(lednr, c, _show);
+    } // TODO: should error be reported if no color found
     return *this;
 }
 

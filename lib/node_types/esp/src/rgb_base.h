@@ -39,6 +39,8 @@ class RGB_Base : public Device {
             return set_color(ALL_LEDS, color, false);
         }
 
+        bool read_color(const Ustring& colorstr, CRGB& color); // TODO: make static
+
         RGB_Base& set_colorstr(int lednr, const Ustring& color, bool _show=true);
         RGB_Base& set_colorstr(const Ustring& color, bool _show=true);
 

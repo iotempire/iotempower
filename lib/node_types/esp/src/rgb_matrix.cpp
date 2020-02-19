@@ -220,7 +220,7 @@ void RGB_Matrix::rainbow_column( int startx, int starty,
     hsv.sat = 240;
 
     for( int y = starty; y < starty + h; y++) {
-        for( int x = startx; x < startx + w; x++) { 
+        for( int x = startx; x < startx + w; x++) {
             set_pixel(x, y, hsv, false);
         }
         hsv.hue += deltahue;
