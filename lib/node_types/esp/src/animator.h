@@ -63,6 +63,13 @@ class Animator : public Device {
             set_fps(fps);
             return *this;
         }
+        Animator& fps(int fps) {
+            set_fps(fps);
+            return *this;
+        }
+        int get_fps() {
+            return _fps;
+        }
 
         void show() {
             if(_show_handler) _show_handler();
