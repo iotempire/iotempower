@@ -1,4 +1,4 @@
-// gyro.h
+// gyro-mpu9250.h
 // Header File for controlling the MPU9250 gyroscope
 
 #ifndef _IOTEMPOWER_GYRO_MPU9250_H_
