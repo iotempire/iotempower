@@ -1,10 +1,11 @@
 #!/bin/bash
 if [[ "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF
-Syntax: mqtt_broker
+Syntax: mqtt_broker [interface]
 
 mqtt_broker starts a local mosquitto-mqtt-server corresponding to parameters
-set in iotempower/etc/iotempower.conf.
+set in iotempower/etc/iotempower.conf. If an interfae is given it overwrited
+the listener address with this interface.
 EOF
 exit 1
 fi
@@ -15,6 +16,12 @@ fi
 APTEMP="$IOTEMPOWER_LOCAL/tmp/mosquitto"
 rm -rf "$APTEMP" &> /dev/null
 mkdir -p "$APTEMP"
+
+if [[ "$1" ]]; then
+    export IOTEMPOWER_MQTT_HOST=$(ip a show "$1"|grep " inet "|head -n1|cut -dt -f2|cut -d\  -f2|cut -d/ -f1)
+fi
+
+echo "Listening on $IOTEMPOWER_MQTT_HOST."
 
 # create mosquitto config
 cat << EOF > "$APTEMP/mosquitto.conf"

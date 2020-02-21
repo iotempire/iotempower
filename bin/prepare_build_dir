@@ -115,13 +115,23 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
 
     # create node-specific config file.
     fname="$dest_dir/src/config.h"
+    
 cat > "$fname.new" << EOF
 #define HOSTNAME "$node_name"
 #define mqtt_topic "$topic"
+EOF
+
+if [[ "$mqtt_server" ]]; then
+cat >> "$fname.new" << EOF
 #define mqtt_server "$mqtt_server"
+EOF
+fi
+
+cat >> "$fname.new" << EOF
 #define mqtt_user "$mqtt_user"
 #define mqtt_password "$mqtt_password"
 EOF
+
     if [[ "$IOTEMPOWER_MQTT_DISCOVERY_PREFIX" ]]; then
         echo '#define mqtt_discovery_prefix "'$IOTEMPOWER_MQTT_DISCOVERY_PREFIX'"' >> "$fname.new"
     fi

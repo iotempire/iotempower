@@ -420,12 +420,7 @@ void flash_mode_select() {
 //
 //static char *my_hostname;
 //
-//void connectToMqtt() {
-//    if (reconfig_mode_active)
-//        return;
-//    Serial.println(F("Connecting to MQTT..."));
-//    mqttClient.connect();
-//}
+
 
 /// WiFi Network
 WiFiClient netClient;
@@ -455,6 +450,36 @@ void onMqttMessage(char *topic, byte *payload, unsigned int len) {
     Serial.println(F("<"));
     
     devices_receive(utopic, upayload);
+}
+
+
+void connectToMqtt() {
+    if (reconfig_mode_active)
+        return;
+    Serial.println(F("(Re-)Connecting to MQTT..."));
+    // mqttClient.connect();
+    ////AsyncMqttClient disabled in favor of PubSubClient
+    // mqttClient.onConnect(onMqttConnect);
+    // mqttClient.onDisconnect(onMqttDisconnect);
+    // mqttClient.onSubscribe(onMqttSubscribe);
+    // mqttClient.onUnsubscribe(onMqttUnsubscribe);
+    // mqttClient.onMessage(onMqttMessage);
+    // mqttClient.onPublish(onMqttPublish);
+    // mqttClient.setServer(mqtt_server, 1883);
+    // mqttClient.setClientId(my_hostname);
+    // if (mqtt_user[0]) { // auth given
+    //     mqttClient.setCredentials(mqtt_user, mqtt_password);
+    // }
+    #ifdef mqtt_server
+        // if defined, just set address
+        mqttClient.setServer(mqtt_server, 1883);
+        ulog(F("Connecting to mqtt server with ip: %s"),  mqtt_server);
+    #else
+        // if not defined, take gateway address
+        mqttClient.setServer(WiFi.gatewayIP().toString().c_str(), 1883);
+        ulog(F("Connecting to mqtt server with ip: %s"),  WiFi.gatewayIP().toString().c_str());
+    #endif
+    mqttClient.setCallback(onMqttMessage);
 }
 
 
@@ -587,7 +612,7 @@ void onWifiConnect(
     IPAddress ip_obj = WiFi.localIP();
     Serial.println(ip_obj.toString());
     wifi_connected = true;
-//    connectToMqtt(); not necessary here
+    connectToMqtt();
 
     // TODO: enable PJON, when UDP works on esp8266 
     // // connect to PJON network
@@ -755,21 +780,6 @@ void setup() {
     if (!reconfig_mode_active) {
         mqtt_management_topic = String(F(IOTEMPOWER)) + String(F("/_cfg_/")) 
                                 + String(F(HOSTNAME)) + String(F("/"));
-
-        ////AsyncMqttClient disabled in favor of PubSubClient
-        // mqttClient.onConnect(onMqttConnect);
-        // mqttClient.onDisconnect(onMqttDisconnect);
-        // mqttClient.onSubscribe(onMqttSubscribe);
-        // mqttClient.onUnsubscribe(onMqttUnsubscribe);
-        // mqttClient.onMessage(onMqttMessage);
-        // mqttClient.onPublish(onMqttPublish);
-        // mqttClient.setServer(mqtt_server, 1883);
-        // mqttClient.setClientId(my_hostname);
-        // if (mqtt_user[0]) { // auth given
-        //     mqttClient.setCredentials(mqtt_user, mqtt_password);
-        // }
-        mqttClient.setServer(mqtt_server, 1883);
-        mqttClient.setCallback(onMqttMessage);
 
         if(iotempower_init) iotempower_init(); // call user init from setup.cpp
         devices_start(); // call start of all devices
