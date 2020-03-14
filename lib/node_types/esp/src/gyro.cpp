@@ -2,6 +2,10 @@
 #include <MPU6050_6Axis_MotionApps20.h>
 #include "gyro.h"
 
+
+// call function to keep connection up
+void maintain_mqtt(); // TODO: check if calls really necessary
+
 Gyro_MPU6050::Gyro_MPU6050(const char* name, bool calibrate_on_start) :
     I2C_Device(name) {
     _calibrate = calibrate_on_start;
@@ -70,28 +74,34 @@ void Gyro_MPU6050::i2c_start() {
 
 bool Gyro_MPU6050::measure() {
     // get current FIFO count
-    uint16_t fifoCount = mpu6050->getFIFOCount();
+    uint16_t fifoCount = mpu6050->getFIFOCount(); // this reads from i2c
+    maintain_mqtt(); // make sure connection doesn't drop
     // ulog(F("fifocount: %d  packetsize: %d"), fifoCount, packetSize);
     if(fifoCount < packetSize) return false; // nothing ready
 
-    uint8_t mpuIntStatus = mpu6050->getIntStatus();
+    uint8_t mpuIntStatus = mpu6050->getIntStatus(); // this reads from i2c
+    maintain_mqtt(); // make sure connection doesn't drop
 
     // check for overflow (can happen as we poll)
     if ((mpuIntStatus & 0x10) || fifoCount == 1024) {
         // reset so we can continue cleanly
-        mpu6050->resetFIFO();
+        mpu6050->resetFIFO(); // this writed to i2c
+        maintain_mqtt(); // make sure connection doesn't drop
         ulog(F("MPU6050 FIFO overflow!"));
 
     // otherwise, check for DMP data ready interrupt (this should happen frequently)
     } else if (mpuIntStatus & 0x02) {
         // read a packet from FIFO
-        mpu6050->getFIFOBytes(fifoBuffer, packetSize);
+        mpu6050->getFIFOBytes(fifoBuffer, packetSize); // read from i2c
+        maintain_mqtt(); // make sure connection doesn't drop
 
         if(!discard_done) {
-            // discard all for first 30s
-            if(millis() - starttime < 30000) return false;
+            // discard all for first 15s
+            if(millis() - starttime < 15000) return false;
             discard_done = true;
         }
+
+        // the rest is just math and should be very fast and doesn't need calls to mqtt_maintain
 
         // track FIFO count here in case there is > 1 packet available
         // (this lets us immediately read more without waiting for an interrupt)

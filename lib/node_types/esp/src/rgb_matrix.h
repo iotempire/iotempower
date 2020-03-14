@@ -8,7 +8,8 @@
 #include <rgb_base.h>
 
 enum Strip_Direction { Left_Down = 1, Left_Up, Right_Down, Right_Up, 
-                    Down_Right, Down_Left, Up_Right, Up_Left};
+                    Down_Right, Down_Left, Up_Right, Up_Left,
+                    }; // TODO: implement Down, Up, Left, Right
 
 typedef struct {
     int16_t stripnr;

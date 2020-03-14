@@ -453,10 +453,10 @@ void onMqttMessage(char *topic, byte *payload, unsigned int len) {
 }
 
 
-void connectToMqtt() {
+void init_mqtt() {
     if (reconfig_mode_active)
         return;
-    Serial.println(F("(Re-)Connecting to MQTT..."));
+    ulog(F("Initializing MQTT..."));
     // mqttClient.connect();
     ////AsyncMqttClient disabled in favor of PubSubClient
     // mqttClient.onConnect(onMqttConnect);
@@ -473,11 +473,11 @@ void connectToMqtt() {
     #ifdef mqtt_server
         // if defined, just set address
         mqttClient.setServer(mqtt_server, 1883);
-        ulog(F("Connecting to mqtt server with ip: %s"),  mqtt_server);
+        ulog(F("Setting mqtt server ip to: %s"),  mqtt_server);
     #else
         // if not defined, take gateway address
         mqttClient.setServer(WiFi.gatewayIP().toString().c_str(), 1883);
-        ulog(F("Connecting to mqtt server with ip: %s"),  WiFi.gatewayIP().toString().c_str());
+        ulog(F("Setting mqtt server ip to: %s"),  WiFi.gatewayIP().toString().c_str());
     #endif
     mqttClient.setCallback(onMqttMessage);
 }
@@ -507,11 +507,12 @@ void maintain_mqtt() {
             Serial.println(mqttClient.state());
         }
         if(millis() - mqtt_last_attempt >= MQTT_RETRY_INTERVAL) { // let's try again
-            Serial.println(F("Connecting to MQTT..."));
+            init_mqtt();
             // for(int i=0; i<32; i++) {
             //     char c = urandom(0,16);
             //     mqtt_id[i] = c>=10?'a'+c:'0'+c;
             // }
+            ulog(F("Trying to connect to mqtt server as %s."), my_hostname);
             if(
             #ifdef mqtt_user
                 mqttClient.connect(my_hostname, mqtt_user, mqtt_password)
@@ -577,7 +578,7 @@ void connectToWifi() {
         Serial.print(F("Already connected to Wi-Fi with IP: "));
         Serial.println(WiFi.localIP());
         wifi_connected = true;
-        // connectToMqtt(); //AsyncMqttClient disabled in favor of PubSubClient
+        // init_mqtt(); //AsyncMqttClient disabled in favor of PubSubClient
     }
 }
 
@@ -612,7 +613,8 @@ void onWifiConnect(
     IPAddress ip_obj = WiFi.localIP();
     Serial.println(ip_obj.toString());
     wifi_connected = true;
-    connectToMqtt();
+    //mqtt_connected = false; // trigger reconnect <- should detect automatically
+    //init_mqtt();
 
     // TODO: enable PJON, when UDP works on esp8266 
     // // connect to PJON network
@@ -682,7 +684,7 @@ void onWifiConnect(
 //     mqtt_just_connected = false;
 //
 //     if (WiFi.isConnected()) {
-//         mqttReconnectTimer.once(2, connectToMqtt);
+//         mqttReconnectTimer.once(2, init_mqtt);
 //     }
 // }
 //
@@ -784,7 +786,7 @@ void setup() {
         if(iotempower_init) iotempower_init(); // call user init from setup.cpp
         devices_start(); // call start of all devices
         if(iotempower_start) iotempower_start(); // call user start from setup.cpp
-        // connectToMqtt(); //AsyncMqttClient disabled in favor of PubSubClient
+        // init_mqtt(); //AsyncMqttClient disabled in favor of PubSubClient
     } else {  // do something to show that we are in adopt mode
         #ifdef ID_LED
             // enable flashing that light

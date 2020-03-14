@@ -16,6 +16,9 @@ RGB_Matrix& RGB_Matrix::add(RGB_Base& strip, int posx, int posy,
     strip_count ++;
     if( linelen <= 0) {
         linelen = strip.led_count();
+        if(posy + linelen > height) {
+            linelen = height - posy;
+        }
     }
     int xdir, ydir, xline, yline;;
     switch(direction) {
@@ -73,7 +76,7 @@ RGB_Matrix& RGB_Matrix::add(RGB_Base& strip, int posx, int posy,
     }
     for(int i=0; i<strip.led_count(); i++) {
         matrix_set(posx, posy, strip_nr, i);
-        //log(F("Setting strip reference at %d,%d to %d,%d"),posx,posy,strip_nr,i);
+        ulog(F("Setting strip reference at %d,%d to %d,%d"),posx,posy,strip_nr,i);
         if((i+1)%linelen == 0) { // at lineend
             posx += xline;
             posy += yline;
