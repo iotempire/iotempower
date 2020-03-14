@@ -449,7 +449,7 @@ class Filter_Restrict : public Callback {
         }
         bool call(Device &dev) {
             double sample = dev.read_float();
-            if(sample < _from || sample > _from) return false;
+            if(sample < _from || sample > _to) return false;
             return true;
         }
 };
