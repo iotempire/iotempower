@@ -1,7 +1,7 @@
 # short example how to use integriot and pulsectl to control a pulseaudio volume via mqtt
 # author: ulno
 
-# TODO: turn these in arguments
+# TODO: turn these into arguments
 mqtt_server = "homeaut"
 sink_name = 'alsa_output.usb-Altec_Lansing_Technologies__Inc._Altec_Lansing_XT2_-_USB_Audio-00.analog-stereo'
 location = "kitchen"
@@ -38,7 +38,7 @@ def change_volume_cb(msg):
     try:
         v = float(msg)
     except ValueError:
-        print("Got illegal value:",msg)
+        print("Got illegal value:", msg)
     else:
         print("Setting volume to", v)
         pulse.volume_set_all_chans(sinkoutput, v)
