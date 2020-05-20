@@ -1,3 +1,7 @@
+# short example how to use integriot nad pulsectl to control a pulseaudio volume via mqtt
+# author: ulno
+
+# TODO: turn these in arguments
 mqtt_server = "homeaut"
 sink_name = 'alsa_output.usb-Altec_Lansing_Technologies__Inc._Altec_Lansing_XT2_-_USB_Audio-00.analog-stereo'
 location = "kitchen"
@@ -46,6 +50,8 @@ print("MQTT volume controller started.")
 print("Controlling: ", sinkoutput.description)
 print("Listening on: ", location + "/" + device)
 print("Press Ctrl-C to stop.")
+
+# main loop
 while True:
     v = get_volume()
     if v != last_v:
