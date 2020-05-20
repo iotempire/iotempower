@@ -67,7 +67,7 @@ class Thingi(_Thingi):
     def subscribe_data(self, sub_topic, data, callback, ignore_case=True):
         """
         Add a callback function for specific incoming data on a sub_topic.
-        This is called any time teh specified data arrives on sub_topic.
+        This is called any time the specified data arrives on sub_topic.
         :param sub_topic: the subtopic to react on
         :param callback: a calback function of form func()
         :param ignore_case: if True, cast all received payload into lowercase
@@ -107,7 +107,12 @@ class Thingi(_Thingi):
             callback(sub_topic, lp)  # call before resetting last_received
         self.last_received[sub_topic] = p  # remember last received
 
-    def publish(self, sub_topic, message, qos=0):
+    def publish(self, sub_topic=None, message=None, qos=0):
+        if message is None:
+            message = sub_topic
+            sub_topic = ""
+        if message is None: # nothing to publish
+            return
         if type(message) is not str:
             message = str(message)
         if sub_topic:
