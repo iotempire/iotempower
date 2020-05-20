@@ -11,17 +11,6 @@ from time import sleep
 pulse = Pulse("pulse_mqtt_volume")
 sinkoutput = pulse.get_sink_by_name(sink_name)
 
-#def pulse_event_cb(ev):
-#    print("Pulse event.")
-#    print("Facility:", ev.facility)
-#    print("Type:", ev.t)
-#    # ev.index
-##    raise pulsectl.PulseLoopStop
-#
-#pulse.event_mask_set("all")
-#pulse.event_callback_set(pulse_event_cb)
-#
-
 # mqtt setup
 init(mqtt_server)
 prefix(location)
@@ -65,7 +54,6 @@ while True:
     event_trigger -= 1
     if event_trigger <= 0:
         publish_volume(v)
-        event_trigger = 500 # every 5s
+        event_trigger = 50 # every 5s
     process()
-    sleep(0.01)
-#    pulse.event_listen(0.05)
+    sleep(0.1)
