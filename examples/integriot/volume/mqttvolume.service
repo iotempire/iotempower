@@ -1,0 +1,16 @@
+[Unit]
+Description=MQTT Pulseaudio Volume Controller
+After=sound.target syslog.target network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/pi/mqttvolume
+ExecStart=/home/pi/mqttvolume/start.sh
+
+RestartSec=1
+Restart=on-failure
+
+SyslogIdentifier=mqttvolume
+
+[Install]
+WantedBy=default.target

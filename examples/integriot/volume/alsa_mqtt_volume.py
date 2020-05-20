@@ -1,19 +1,28 @@
-# short example how to use integriot and pulsectl to control a pulseaudio volume via mqtt
+# short example how to use integriot and alsaaudio to control the volume via mqtt
 # author: ulno
 
 # TODO: turn these into arguments
 mqtt_server = "homeaut"
-sink_name = 'alsa_output.usb-Altec_Lansing_Technologies__Inc._Altec_Lansing_XT2_-_USB_Audio-00.analog-stereo'
-location = "kitchen"
-device = "volume"
+sink_name = 'Altec Lansing XT2 - USB Audio'
+location = "living-room"
+device = "audio01/volume"
 
-from pulsectl import Pulse # we need this here: https://pypi.org/project/pulsectl/
+import alsaaudio  # https://pypi.org/project/pyalsaaudio/
 from integriot import *
 from time import sleep
 
-# pulse mixer setup
-pulse = Pulse("pulse_mqtt_volume")
-sinkoutput = pulse.get_sink_by_name(sink_name)
+# find card
+card = -1
+for index in alsaaudio.card_indexes():
+    if sink_name in alsaaudio.card_name(index):
+        card = index
+        break
+mixers = alsaaudio.mixers(cardindex=card)
+sink = None
+for name in ["Master", "PCM", "Speaker", "Front"]:
+    if name in mixers:
+        sink = alsaaudio.Mixer(name, cardindex=card)
+        break
 
 # mqtt setup
 init(mqtt_server)
@@ -21,9 +30,13 @@ prefix(location)
 p = publisher(device)
 
 def get_volume():
-    # needs to be looked up each time as we don't get a volume else
-    sinkinfo = pulse.sink_info(sinkoutput.index)
-    return sinkinfo.volume.value_flat
+    sink.handleevents()
+    volumes = sink.getvolume()
+    retv = 0
+    for v in volumes:
+        retv += v
+    retv /= len(volumes) * 100
+    return retv
 
 def publish_volume(v):
     global p
@@ -41,15 +54,15 @@ def change_volume_cb(msg):
         print("Got illegal value:", msg)
     else:
         print("Setting volume to", v)
-        pulse.volume_set_all_chans(sinkoutput, v)
-        publish_volume(v)        
+        sink.setvolume(int(v*100))
+        publish_volume(v)
         last_v = v
         event_trigger = 50
 
 s = p.subscribe("set", callback=change_volume_cb)
 
 print("MQTT volume controller started.")
-print("Controlling: ", sinkoutput.description)
+print("Controlling: ", sink_name)
 print("Listening on: ", location + "/" + device)
 print("Press Ctrl-C to stop.")
 
