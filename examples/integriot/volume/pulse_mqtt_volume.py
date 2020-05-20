@@ -1,4 +1,4 @@
-# short example how to use integriot nad pulsectl to control a pulseaudio volume via mqtt
+# short example how to use integriot and pulsectl to control a pulseaudio volume via mqtt
 # author: ulno
 
 # TODO: turn these in arguments
