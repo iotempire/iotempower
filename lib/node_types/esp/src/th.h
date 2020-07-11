@@ -7,29 +7,69 @@
 #include <Arduino.h>
 #include <device.h>
 
-#include <DHT.h>
+#include <DHTesp.h>
 
-// should work with autodetect
-class Dht : public Device {
+// does not work with autodetect anymore
+class Dht11 : public Device {
     private:
-        DHT _dht;
+        DHTesp *_dht = NULL;
         uint8_t _pin;
         unsigned long _read_interval = 2000; // only read every interval ms
         unsigned long last_read = millis() - _read_interval;
     public:
-        Dht(const char* name, uint8_t pin) :
+        Dht11(const char* name, uint8_t pin) :
             Device(name, 10000) {
-            _pin = pin;
-            add_subdevice(new Subdevice(F("temperature")));
-            add_subdevice(new Subdevice(F("humidity")));
+            _dht = new DHTesp();
+            if(_dht) {
+                ulog(F("DHT11 initialized."));
+                _pin = pin;
+                add_subdevice(new Subdevice(F("temperature")));
+                add_subdevice(new Subdevice(F("humidity")));
+            } else {
+                ulog(F("Trouble reserving memory for DHT11."));
+            }
         }
         void start() {
-            _dht.setup(_pin);
-            _started = true;
-            measure();
+            if(_dht) {
+                _dht->setup(_pin, DHTesp::DHT11);
+                _started = true;
+                measure();
+            }
         }
         bool measure();
 };
+
+// TODO: merge similar code into super class
+class Dht22 : public Device {
+    private:
+        DHTesp *_dht = NULL;
+        uint8_t _pin;
+        unsigned long _read_interval = 2000; // only read every interval ms
+        unsigned long last_read = millis() - _read_interval;
+    public:
+        Dht22(const char* name, uint8_t pin) :
+            Device(name, 10000) {
+            _dht = new DHTesp();
+            if(_dht) {
+                ulog(F("DHT22 initialized."));
+                _pin = pin;
+                add_subdevice(new Subdevice(F("temperature")));
+                add_subdevice(new Subdevice(F("humidity")));
+            } else {
+                ulog(F("Trouble reserving memory for DHT22."));
+            }
+        }
+        void start() {
+            if(_dht) {
+                _dht->setup(_pin, DHTesp::DHT22);
+                _started = true;
+                measure();
+            }
+        }
+        bool measure();
+};
+
+
 
 #include <OneWire.h>
 #include <DallasTemperature.h>

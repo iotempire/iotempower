@@ -91,13 +91,14 @@
 
 
 #include <th.h>
-#define dht_(internal_name, ...) \
-    IOTEMPOWER_DEVICE_(Dht, internal_name, ##__VA_ARGS__)
-#define dht11_(gcc_va_args...) dht_(gcc_va_args)
-#define dht22_(gcc_va_args...) dht_(gcc_va_args)
-#define dht(name, ...) IOTEMPOWER_DEVICE(name, dht_, ##__VA_ARGS__)
-#define dht11(gcc_va_args...) dht(gcc_va_args)
-#define dht22(gcc_va_args...) dht(gcc_va_args)
+#define dht11_(internal_name, ...) \
+    IOTEMPOWER_DEVICE_(Dht11, internal_name, ##__VA_ARGS__)
+#define dht_(gcc_va_args...) dht11_(gcc_va_args)
+#define dht22_(gcc_va_args...) \
+    IOTEMPOWER_DEVICE_(Dht22, internal_name, ##__VA_ARGS__)
+#define dht11(name, ...) IOTEMPOWER_DEVICE(name, dht11_, ##__VA_ARGS__)
+#define dht(gcc_va_args...) dht11(gcc_va_args)
+#define dht22(gcc_va_args...) IOTEMPOWER_DEVICE(name, dht22_, ##__VA_ARGS__)
 
 
 #define ds18b20_(internal_name, ...) \
