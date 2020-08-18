@@ -22,6 +22,7 @@ fi
 # TODO: deal better with topic removal than with cut
 
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
+source <( iot_env ignore_system )
 
 # find how to call ts
 TS=ts

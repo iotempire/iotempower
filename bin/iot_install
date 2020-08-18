@@ -50,8 +50,12 @@ fi
 if [[ -e "$IOTEMPOWER_VPYTHON/bin/activate" ]]; then # check for existing venv
     source "$IOTEMPOWER_VPYTHON/bin/activate"
 else
-    welcome
-    read answer
+	if [[ "$1" == *quiet* ]]; then
+		answer=y
+	else
+	    welcome
+    	read answer
+    fi
     if [[ "$answer" == "y" ||  "$answer" == "Y" || "$answer" == "" ]]; then
         if [[ $(which virtualenv) == "" ]]; then
             echo "You need to install virtualenv. Exiting."

@@ -4,9 +4,7 @@
 # if parameter ($1) is given, match against that as a topic
 
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
-
-source "$IOTEMPOWER_ROOT/bin/read_system_config"
-
+source <( iot_env ignore_system )
 
 if [[ "$1" ]]; then
     topic="iotempower/_cfg_/$1/ip"

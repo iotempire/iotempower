@@ -29,6 +29,7 @@ fi
 
 
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
+source <( iot_env ignore_system )
 
 arg_topic="$1"
 trigger_type="$2"

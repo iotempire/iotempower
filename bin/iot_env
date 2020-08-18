@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
+
+
+if [[ $# -gt 2 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
+cat << EOF
+Syntax: iot_env [ignore_system|ignore_node]
+
+Read and print IoTempower environment for current folder
+taking node.conf, system.conf, and iotempower.conf into account
+node.conf overwrites, system.conf, overwrites iotempower.conf.
+ignore_system as option continues when no system.conf is found
+and ignore_node just ignores the case that no node.conf but a
+system.conf is found
+EOF
+exit 1
+fi
+
+if [[ "$*" == *ignore_system* ]]; then
+  __IOTEMPOWER_NOERROR=true
+  source "$IOTEMPOWER_ROOT/bin/read_system_config"
+elif [[ "$*" == *ignore_node* ]]; then
+  __IOTEMPOWER_NOERROR=true
+  source "$IOTEMPOWER_ROOT/bin/read_node_config"
+else
+  source "$IOTEMPOWER_ROOT/bin/read_node_config"
+fi
+
+# output and quote result
+env|egrep "^IOTEMPOWER"|sed 's/^\([^=]*\)=\(.*\)$/export\ \1=\"\2\"/g'

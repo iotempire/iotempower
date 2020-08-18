@@ -1,5 +1,8 @@
 #@IgnoreInspection BashAddShebang
 # Read system configuration
+#
+# if __IOTEMPOWER_NOERROR is set, it will not exit
+# when files are not found.
 
 # search system.conf in parent directories and build a respective path to self
 # this search goes the following number of levels up max
@@ -33,7 +36,12 @@ fi
 # last, read a locally available system.conf, can overwrite everything
 _IOTEMPOWER_TMP="$IOTEMPOWER_AP_NAME"
 IOTEMPOWER_AP_NAME="__IOTEMPOWER_TEST__"
-source "system.conf" &> /dev/null || { echo "Can't read system.conf. Aborting." 1>&2;exit 1; }
+source "system.conf" &> /dev/null || { 
+    if [[ ! "$__IOTEMPOWER_NOERROR" ]]; then
+        echo "Can't read system.conf. Aborting." 1>&2
+        exit 1 
+    fi
+}
 if [[ "$IOTEMPOWER_AP_NAME" != "__IOTEMPOWER_TEST__" ]]; then # was overwritten
     IOTEMPOWER_AP_NAME_FULL="$IOTEMPOWER_AP_NAME"
 else # not overwritten, restore

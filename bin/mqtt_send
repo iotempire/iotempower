@@ -20,7 +20,7 @@ fi
 if [[ -e "node.conf" || -e "../node.conf" ]]; then  # started from node-directory
     source "$IOTEMPOWER_ROOT/bin/read_node_config"
 else # Check if in system directory and read
-    source "system.conf" &> /dev/null
+    source <( iot_env ignore_system )
 fi
 
 if [[ "$1" = "/"* ]]; then

@@ -1,8 +1,16 @@
 #@IgnoreInspection BashAddShebang
 # Read node and system configuration
+#
+# if __IOTEMPOWER_NOERROR is set, it will not exit
+# when files are not found.
 
 [[ -e "node.conf" ]] || cd ..
-[[ -e "node.conf" ]] || { echo "Can't find node.conf. Aborting." 1>&2;exit 1; }
+[[ -e "node.conf" ]] || { 
+    if [[ ! "$__IOTEMPOWER_NOERROR" ]]; then
+        echo "Can't find node.conf. Aborting." 1>&2
+        exit 1 
+    fi
+}
 
 source "$IOTEMPOWER_ROOT/bin/read_system_config"
 # topic of current node now in $topic
