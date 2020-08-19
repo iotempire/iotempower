@@ -101,8 +101,6 @@ def start(*args):
         args = [_main_devices]
 
     while not _stopped:
-        for d in args:
-            d.client.loop(0.01)
-
+        process(args)
 
 run = start

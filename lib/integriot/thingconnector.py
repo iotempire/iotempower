@@ -28,6 +28,15 @@ class ThingConnector():
         except:
             self.connected = False
         return retval
+    
+    def reconnect(self):
+        try:
+            retval = self.client.reconnect()
+            self.connected = True
+        except:
+            self.connected = False
+        return retval
+
 
     def _device_full_topic(self, topic):
         if self.topic_prefix:

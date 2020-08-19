@@ -3,6 +3,8 @@
 # Author: Ulrich Norbisrath (http://ulno.net)
 # Created: 2017-10-05
 
+import paho.mqtt.client as mqtt
+
 class _Thingi():
     def __init__(self):
         self.status = None
@@ -119,7 +121,12 @@ class Thingi(_Thingi):
             t = self.main_topic + "/" + sub_topic
         else:
             t = self.main_topic
-        self.mqtt_client.publish(t, message, qos)
+        ret = self.mqtt_client.publish(t, message, qos)
+        if ret.rc != mqtt.MQTT_ERR_SUCCESS:
+            print("Lost connection.") # TODO: would be nice if paho mqtt coudl reconnect itself
+            raise ConnectionAbortedError("Lost connection in publish.") 
+            return False
+        return True
 
 
 class ThingiSwitch(Thingi):
