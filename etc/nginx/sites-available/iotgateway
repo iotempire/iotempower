@@ -1,0 +1,58 @@
+server {
+       listen 80;
+       rewrite ^(.*) https://$host$request_uri;
+}
+
+server {
+    listen 443;
+    client_max_body_size 100m;
+    ssl                  on;
+    ssl_certificate      /etc/ssl/self.crt;
+    ssl_certificate_key  /etc/ssl/self.key;
+    server_name iotgateway;
+#    access_log /var/log/nginx/iotgateway.access.log;
+    error_log syslog:server=unix:/dev/log;
+    access_log syslog:server=unix:/dev/log;
+
+    root /home/iot/iot/.local/doc/html;
+    index index.html;
+    
+    location / {
+        # First attempt to serve request as file, then
+        # as directory, then fall back to displaying a 404.
+        try_files $uri $uri.html $uri/ =404;
+        
+        # remove .rst or .md extension
+        rewrite ^(/.*)\.rst(\?.*)?$ $1$2 permanent;
+        rewrite ^(/.*)\.md(\?.*)?$ $1$2 permanent;
+    }
+
+    location /cloudcmd {
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_pass    http://127.0.0.1:8000/cloudcmd;
+    }
+
+    location /nodered {
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        #proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_pass http://127.0.0.1:1880/nodered;
+    }
+
+# for restview
+#    location /doc {
+#        proxy_pass http://127.0.0.1:3000/doc;
+#    }
+
+}
+
