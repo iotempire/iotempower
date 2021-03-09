@@ -19,11 +19,15 @@ for index in alsaaudio.card_indexes():
         break
 mixers = alsaaudio.mixers(cardindex=card)
 sink = None
-for name in ["Master", "PCM", "Speaker", "Front"]:
+for name in ["Master", "PCM", "Speaker", "Front","FM"]:
     if name in mixers:
         sink = alsaaudio.Mixer(name, cardindex=card)
         break
 
+if sink is None:
+    print("Mixer not found")
+    exit(1)
+        
 # mqtt setup
 init(mqtt_server)
 prefix(location)
