@@ -7,4 +7,5 @@ input(button1, BUTTON1, "released", "pressed")
              IN(relais1).toggle();
              IN(green).toggle();
          }
+         return true;
      });
