@@ -69,17 +69,19 @@ else
         echo "Can't continue, exiting now."
         exit 1
     fi
-    # TODO: recheck, installation seems to fail first time -> path problems (wrong pip used?)
-    # install virtualenv for python2 for platformio
-    mkdir -p "$IOTEMPOWER_VPYTHON2"
-    virtualenv -p "$(which python2)" "$IOTEMPOWER_VPYTHON2"
-    source "$IOTEMPOWER_VPYTHON2/bin/activate"
-    pip install --upgrade pip
-#    pip install --upgrade platformio
-# TODO: go back to normal install, but for now we need version4 (development version)
-    pip install --upgrade https://github.com/platformio/platformio-core/archive/develop.zip
-    deactivate # disable python 2 environment
-    
+    # python2 seems not to be necessary anymore
+    # # TODO: recheck, installation seems to fail first time -> path problems (wrong pip used?)
+    # # install virtualenv for python2 for platformio
+    # mkdir -p "$IOTEMPOWER_VPYTHON2"
+    # virtualenv -p "$(which python2)" "$IOTEMPOWER_VPYTHON2"
+    # source "$IOTEMPOWER_VPYTHON2/bin/activate"
+    # pip install --upgrade pip
+# #    pip install --upgrade platformio
+# # TODO: go back to normal install, but for now we need version4 (development version)
+    # pip install --upgrade https://github.com/platformio/platformio-core/archive/develop.zip
+    # deactivate # disable python 2 environment
+
+    pip install --upgrade platformio
     # install virtualenv
     mkdir -p "$IOTEMPOWER_VPYTHON"
     virtualenv -p "$(which python3)" "$IOTEMPOWER_VPYTHON"
