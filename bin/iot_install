@@ -81,7 +81,6 @@ else
     # pip install --upgrade https://github.com/platformio/platformio-core/archive/develop.zip
     # deactivate # disable python 2 environment
 
-    pip install --upgrade platformio
     # install virtualenv
     mkdir -p "$IOTEMPOWER_VPYTHON"
     virtualenv -p "$(which python3)" "$IOTEMPOWER_VPYTHON"
@@ -100,6 +99,8 @@ else
     pip install paho-mqtt  # also for integriot
     pip install ipython
     pushd . &> /dev/null
+	# platformio in python3
+    pip install --upgrade platformio
     # for dongle
     pip install psutil
     # TODO: fix more dependencies
