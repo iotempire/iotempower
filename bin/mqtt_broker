@@ -31,7 +31,7 @@ persistence_location $APTEMP/mosquitto.db
 log_dest stdout
 log_type error
 log_type warning
-bind_address 127.0.0.1
+listener 1883 127.0.0.1
 listener 1883 $IOTEMPOWER_MQTT_HOST
 EOF
 
