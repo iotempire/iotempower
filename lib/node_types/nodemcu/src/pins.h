@@ -23,7 +23,9 @@
 
 // //// right
 // #define TX 1
+#define UART0 TX
 // #define RX 3
+#define DMA RX
 // #define D1 5
 // #define SCL D1
 // #define D2 4
@@ -32,6 +34,7 @@
 #define FLASHBUTTON D3
 // #define D4 2
 #define ONBOARDLED D4
+#define UART1 D4
 // // GND
 // // 5V
 

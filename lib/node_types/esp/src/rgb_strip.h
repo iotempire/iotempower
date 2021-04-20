@@ -1,4 +1,4 @@
-// rgb_multi.h
+// rgb_strip.h
 // control a multicolor led strip
 
 #ifndef _RGB_STRIP_H_
@@ -18,6 +18,7 @@ class RGB_Strip : public RGB_Base {
         RGB_Strip(const char* name, int _led_count, CLEDController& _controller) 
         : RGB_Base(name, _led_count) {
             controller = &_controller;
+            set_pollrate_us(10); // give update chance
             leds = controller->leds();
         }
         void start() {
@@ -55,6 +56,7 @@ class RGB_Strip : public RGB_Base {
             }
             avg_color = CRGB(avg_r/lc, avg_g/lc, avg_b/lc);
         }
+        virtual bool measure() { show(); } // give control to library on regular base
 };
 
 #endif // _RGB_STRIP_H_

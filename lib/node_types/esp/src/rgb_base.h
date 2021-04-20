@@ -94,6 +94,8 @@ class RGB_Base : public Device {
             // nothing by default
         }
 
+        virtual bool measure() { return true; }
+
 };
 
 #endif // _RGB_BASE_H_

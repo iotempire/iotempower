@@ -1,6 +1,8 @@
 // devices.h
 // list of all available device creation functions
 
+// TODO: think how to make includes conditional, reducing compiletime
+
 #ifndef _DEVICES_H_
 #define _DEVICES_H_
 
@@ -147,12 +149,26 @@
 #define rgb_single(name, ...) IOTEMPOWER_DEVICE(name, rgb_single_, ##__VA_ARGS__)
 
 
+// FastLed based rgb strip
 #include <rgb_strip.h>
 #define rgb_strip_(internal_name, mqtt_name_str, led_count, ...) \
     CRGB (internal_name ## leds)[led_count]; \
     IOTEMPOWER_DEVICE_(RGB_Strip, internal_name, mqtt_name_str, led_count, \
         FastLED.addLeds< __VA_ARGS__ >((internal_name ## leds), led_count))
 #define rgb_strip(name, ...) IOTEMPOWER_DEVICE(name, rgb_strip_, ##__VA_ARGS__)
+
+
+// NeoPixelBus based rgb strip
+#include <rgb_strip_bus.h>
+#define F_RGB NeoRgbFeature
+#define F_GRB NeoGrbFeature
+#define F_BRG NeoBrgFeature
+#define F_RGBW NeoRgbwFeature
+#define rgb_strip_bus_(internal_name, mqtt_name_str, led_count, color_feature, control_method, pin) \
+    RGB_Strip_Bus_Template<color_feature, control_method> (internal_name ## leds)(led_count, pin); \
+    IOTEMPOWER_DEVICE_(RGB_Strip_Bus, internal_name, mqtt_name_str, led_count, \
+        (internal_name ## leds))
+#define rgb_strip_bus(name, ...) IOTEMPOWER_DEVICE(name, rgb_strip_bus_, ##__VA_ARGS__)
 
 
 #include <rgb_matrix.h>
