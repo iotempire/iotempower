@@ -18,7 +18,7 @@ class RGB_Strip : public RGB_Base {
         RGB_Strip(const char* name, int _led_count, CLEDController& _controller) 
         : RGB_Base(name, _led_count) {
             controller = &_controller;
-            set_pollrate_us(10); // give update chance
+            set_pollrate_us(10000); // give update chance - TODO: check if necessary
             leds = controller->leds();
         }
         void start() {
@@ -56,7 +56,7 @@ class RGB_Strip : public RGB_Base {
             }
             avg_color = CRGB(avg_r/lc, avg_g/lc, avg_b/lc);
         }
-        virtual bool measure() { show(); } // give control to library on regular base
+        virtual bool measure() { show(); } // give control to library on regular basis - TODO: check if necessary;
 };
 
 #endif // _RGB_STRIP_H_
