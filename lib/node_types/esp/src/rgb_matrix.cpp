@@ -16,9 +16,11 @@ RGB_Matrix& RGB_Matrix::add(RGB_Base& strip, int posx, int posy,
     strip_count ++;
     if( linelen <= 0) {
         linelen = strip.led_count();
-        if(posy + linelen > height) {
-            linelen = height - posy;
-        }
+        //// TODO: check - this here seems to cause something very weird
+        //// not sure about this check
+        //if(posy + linelen > height) {
+        //    linelen = height - posy;
+        //}
     }
     int xdir, ydir, xline, yline;;
     switch(direction) {

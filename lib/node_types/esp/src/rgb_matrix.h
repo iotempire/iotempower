@@ -53,7 +53,7 @@ class RGB_Matrix : public RGB_Base {
 
     public:
         RGB_Matrix(const char* name, int _width, int _height) : RGB_Base(name,_width) {
-            init(_width,_height);            
+            init(_width,_height);
         }
         RGB_Matrix(const char* name, RGB_Base& strip) : RGB_Base(name,strip.led_count()) {
             init(strip.led_count(),1);

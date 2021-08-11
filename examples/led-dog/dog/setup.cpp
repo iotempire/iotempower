@@ -14,7 +14,8 @@ int tie_frames = 0;
 // prototype for wink
 void start_wink();
 
-rgb_strip(leds, 13, WS2812, D3, GRB);
+//rgb_strip(leds, 13, WS2812, D3, GRB);
+rgb_strip_bus(leds, 13, F_GRB, NeoEsp8266Uart1800KbpsMethod, D4).report_change(false);
 rgb_matrix(matrix, IN(leds));
 
 animator(anim)

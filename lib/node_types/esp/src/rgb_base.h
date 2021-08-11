@@ -5,8 +5,8 @@
 #define _RGB_BASE_H_
 
 #define FASTLED_ESP8266_RAW_PIN_ORDER // solve issues with D4
-//#define FASTLED_INTERRUPT_RETRY_COUNT 0 or better 1 or 2?
-#define FASTLED_INTERRUPT_RETRY_COUNT 1
+//#define FASTLED_INTERRUPT_RETRY_COUNT 0 or better 1 or 2? - both seem to cause random flashes
+#define FASTLED_INTERRUPT_RETRY_COUNT 2
 #define FASTLED_INTERNAL // ignore pragma messages in FastLED
 // needs to be included here for color table
 #include <FastLED.h>
@@ -21,15 +21,15 @@ class RGB_Base : public Device {
         CRGB avg_color;
     public:
         RGB_Base(const char* name, int led_count);
-        RGB_Base& high() { 
-            if((uint16_t)avg_color.r+avg_color.g+avg_color.b>0) { 
+        RGB_Base& high() {
+            if((uint16_t)avg_color.r+avg_color.g+avg_color.b>0) {
                 return *this; // if something is on, do nothing
             }
             return set_color(CRGB::White); // else switch to white TODO: make on-brightness configurable
         }
         RGB_Base& on() { return high(); }
-        RGB_Base& low() { 
-            return set_color(CRGB::Black);           
+        RGB_Base& low() {
+            return set_color(CRGB::Black);
         }
         RGB_Base& off() { return low(); }
         RGB_Base& set_color(CRGB color) {
