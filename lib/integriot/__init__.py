@@ -98,7 +98,7 @@ def start(*args):
     global _main_devices
 
     if len(args) == 0:
-        args = [_main_devices]
+        args = _main_devices
 
     while not _stopped:
         process(args)
