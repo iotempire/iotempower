@@ -65,14 +65,18 @@ elif [[ "$command" = daemon ]]; then
     fi
     # probe where dongle is running
     echo "Searching dongle..."
-    port=""
-    ports=$(platformio device list --serial|egrep '^/dev/tty'|sort) # get available serial ports
-    for p in $ports; do
-        if dongle probe -p "$p"; then
-            port="$p"
-            break;
-        fi
-    done
+    if [[ "$1" ]]; then  # port was given
+        port="/dev/"
+    else
+        port=""
+        ports=$(platformio device list --serial|egrep '^/dev/tty'|sort) # get available serial ports
+        for p in $ports; do
+            if dongle probe -p "$p"; then
+                port="$p"
+                break;
+            fi
+        done
+    fi
     if [[ "$port" ]]; then
         echo "$port" > "$daemon_port"
         echo "Starting daemon on $port."
