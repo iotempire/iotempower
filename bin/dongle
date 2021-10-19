@@ -31,7 +31,7 @@ if [[ "$command" = flash ]]; then
     port=""
     port=$(cat "$daemon_port" 2>/dev/null)
     if [[ ! "$port" ]]; then
-        port=/dev/$(find_esp_port "$2" nodongle)
+        port=/dev/$(find_esp_port "$1" nodongle)
     fi
     echo "Flashing dongle on port $port..."
     python3 "$IOTEMPOWER_ROOT/bin/dongle_display.py" -p "$port" \
