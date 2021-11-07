@@ -1,60 +1,93 @@
 Installing IoT Empower for Linux (and WSL)
-============================================
+==========================================
 
 The steps for WSL and Linux should be the same. For information on how to run IoT Empower on a Raspberry Pi, please go to this link:
 https://github.com/iotempire/iotempower/blob/master/doc/installation.rst
 
-1. In Linux (WSL or native), run the following commands in root (~)
-- sudo apt-get update
-- sudo apt install git mc mosquitto mosquitto-clients virtualenv iptables bridge-utils hostapd dnsmasq nodejs build-essential npm
-- sudo npm install terminal-kit
+1. On a Debian based Linux like Ubuntu or Mint (WSL or native), 
+   run the following commands:
 
-2. Clone the IoT Empower repository using git
-- git clone https://github.com/iotempire/iotempower
+   .. code-block:: bash
+   
+      cd  # go into your home directory also referrable as ~ or $HOME
+      sudo apt-get update  # make sure system is up to date
+      sudo apt install git mc mosquitto mosquitto-clients virtualenv iptables bridge-utils hostapd dnsmasq nodejs build-essential npm
+      sudo npm install terminal-kit  # this is ugly as it uses root, but the simplest way
 
-3. Copy examples/scripts/iot into your bin folder and adapt the path in it to reflect the location where you cloned the IoTempower 
-(ex. to export IOTEMPOWER_ROOT="$HOME/iotempower" if your iotempower git directory is in root(~))
+   On an Arch based system (like vanilla Arch or Manjaro), assuming you have yay installed,
+   run the following commands:
 
-4. Run ./iot, you should get a welcome message. Accept the installation of any extra packages. After the installation, you can run just iot 
-to see if you have everything installed correctly.
+   .. code-block:: bash
+
+      cd  # go into your home directory also referrable as ~ or $HOME
+      sudo pacman -Syyu  # make sure system is up to date
+      sudo pacman -S git mc mosquitto python-virtualenv iptables bridge-utils hostapd dnsmasq nodejs npm
+      # terminal-kit installation is done locally in iot environment and works on arch
+      # but if you want it globally, you can consider sudo npm install terminal-kit
+
+
+2. Clone the IoTEmpower repository using git into the iot folder in home directory
+
+   .. code-block:: bash
+
+      cd  # go into your home directory
+      git clone https://github.com/iotempire/iotempower iot
+
+3. Copy ``iot/examples/scripts/iot`` into your ``bin`` folder
+   (either `~/bin` or `~/.local/bin`) and
+   adapt the path in it to reflect the location where you cloned the IoTempower
+   (if you followed the advice above: `~/iot` which is the default in the sample script
+   or if you just cloned it without specifying the folder iot,
+   ``export IOTEMPOWER_ROOT="$HOME/iotempower"`` if your IoTempower
+   directory is directly ``iotempower`` in your home directory)
+
+4. Change into your iotempower directory (``cd ~/iot``) and run ``bash run``,
+   you should get a welcome message. Accept the installation of any extra packages.
+   After the installation, you can just run ``iot`` from anywhere (if you created the binary as described in 3)
+   or you can also run ``bash run`` in the IoTempower directory again.
+
 
 Pre-flashing Wemos D1 Mini
-============================================
+==========================
 
 Note that some nodes might be already pre-flashed, but that should not be an issue.
 
-1. Add port permissions for less hassle (replace your-username with the username you chose/have).
-- sudo usermod -a -G dialout your-username
+1. Add port permissions for avoiding permission issues (replace ``<your-username>`` with the username you chose/have).
+   
+   - In Debian based (Ubuntu, Mint): ``sudo usermod -a -G dialout <your-username>``
+
+   - In Arch based (Arch, Manjaro): ``sudo usermod -a -G uucp <your-username>``
 
 2. Restart PC (Linux) or terminal (WSL).
 
-3. Start iot empower
+3. Start IoTempower (open terminal and type ``iot`` + Enter key)
 
-4. Plug in your Wemod D1 Mini if you haven't already.
+4. Plug in your Wemos D1 Mini if you haven't already.
 
-For Windows Users
+5. For Windows (WSL 1) Users:
 
-- Make note of the COM port that the Device Manager Shows (for example (COM4))
+   - Make note of the COM port that the Device Manager Shows (for example (COM4))
 
-- Run the following command, but replace the y with the number after COM (in the above example y = 4)
-	pre_flash_wemos ttySy force
+   - Run the following command, but replace the y with the number after COM (in the above example y = 4)
+	
+     ``pre_flash_wemos ttySy force``
 
-For Linux Users
+   - For Linux Users
 
-- pre_flash_wemos
+     ``pre_flash_wemos``
 
-If you are getting a /dev/ttySy permission denied error, add yourself to the dialout group or run the command with sudo.
+   If you are getting a /dev/ttySy permission denied error, add yourself to the dialout group or run the command with sudo.
 
-If you are getting that /dev/ttySy error related to wemos not being plugged in, most likely you have incorrectly specified which ttySy port 
-Wemos is connected to.
+   If you are getting that /dev/ttySy error related to wemos not being plugged in, most likely you have incorrectly specified which ttySy port 
+   Wemos is connected to.
 
-Wait for the pre_flash_wemos command to finish, it should take about 3:30 minutes.
+   Wait for the pre_flash_wemos command to finish, it should take about 2-5 minutes.
 
-5. Now, prepare the Wemos for the next exercise. Attach the Button Shield to your Wemos D1 Mini.
+6. Now, prepare the Wemos for the next exercise. Attach the Button Shield to your Wemos D1 Mini.
 Make sure that the pins align with the Wemos.
 
 Managing Repo
-============================================
+=============
 
 We will now setup our own folder so we can modify what our Wemos D1 mini can do.
 For that, we need to copy one of folders in the git repository outside of the repository.

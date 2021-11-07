@@ -73,7 +73,7 @@ successfully working or not.
     
 
 Adopting the Node in the IoTempower environment on the Raspberry Pi
-----------------------------------------------------------------
+-------------------------------------------------------------------
 
 - If you have not done already, connect now your computer (laptop or
   desktop pc) to the Raspberry Pi's WiFi network (as described in the
@@ -111,6 +111,7 @@ Adopting the Node in the IoTempower environment on the Raspberry Pi
 
 - When inside the ``node1`` folder click on the user menu button located on
   the bottom left corner of your web screen.
+
 ..  The button to press is
   depicted below.
 
