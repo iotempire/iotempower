@@ -2,40 +2,50 @@
 Second Node
 ===========
 
-For this section, we assume that you have successfully set-up IoTempower
-on the Raspberry Pi and are able to access the websites on it as well as
-have set-up your `first node <first-node.rst>`_ and can control its onboard
-led via the node-RED web gui.
+For this section, we assume that you have either
+successfully set-up IoTempower on the Raspberry Pi and are able
+to access the websites on it or setup IoTempower under yourself
+own Linux environment with access to a running mqtt broker and
+a running Node-RED
 
-The goal of this tutorial is to show you how to adopt and initialize a second
-node and then connect them together *over the air (OTA)* via Node-RED.
+We also assume, you have completed and running a node and
+system folder from `first node <first-node.rst>`_ 
+and can control its onboard led via the Node-RED web gui.
+
+The goal of this tutorial is to show you how to flash or adopt
+a second node and then connect them together 
+*over the air (OTA)* via Node-RED.
 
 Let's get started...
 
 New Node
 --------
 
--   Navigate back to your `IoT system example configuration folder
+-   If you use the raspberry pi web gui cloudcmd,
+    navigate back to your `IoT system example configuration folder
     <https://iotgateway.local/cloudcmd/fs/home/iot/iot-test/>`_
+    else navigate there by command line (``cd ~/iot-systems``).
 
     As you have seen, each node has its own configuration folder in IoTempower.
 
 -   For a second node, we need therefore another node-folder. We can quickly
     create one, based on a node-template.
 
-    For that, make sure, you are still in the example system configuration
-    folder and activate again the user menu.
+    For that, make sure, you are still in the system configuration
+    folder and activate again the user menu (or type ``iot menu``).
 
     In the user menu, select ``Create New Node Folder``, and after verifying
-    the destination path (which should be ``iot-test/``), select
-    ``Yes, run create_node_template``. Confirm a (hopefully) successful
-    creation, and you wil be back in cloudcmd's web file panel.
+    the destination path (which should be ``iot-test/`` or ``iot-systems/``),
+    select ``Yes, run create_node_template``. Confirm a (hopefully) successful
+    creation, and you wil be back in cloudcmd's web file panel or the command
+    line.
 
     You should see there a new folder called new-node (next to the old folder
     ``node1``, the ``README.rst`` and ``system.conf``).
 
 -   Select the new folder by mouse or keyboard, and press the rename button
-    (or the F2 key) and rename the folder into ``node2``.
+    (or the F2 key) and rename the folder into ``node2`` - or rename it
+    directly on the command line.
 
 -   Navigate into the ``node2`` folder, you should see the files:
     ``README.rst``, ``key.txt``, ``node.conf``, and ``setup.cpp``
@@ -46,9 +56,14 @@ New Node
 -   Make sure to open another `IoTempower documentation web-page </>`_ for
     reference. And open from there the
     `command reference </doc/node_help/commands.rst>`_.
+    (If you don't have teh documentation server running,
+    start it in a new terminal with ``iot doc serve`` and
+    access it at http://localhost:8001)
+    
 
--   In the file view, select ``setup.cpp``
-    and edit it (with edit button or F4 key).
+-   Edit ``setup.cpp``
+    and edit it (with edit button or F4 key
+    - or in command line with for example nano).
 
     You should see a small explanation comment block. You should now
     completely remove it to have an empty configuration file.
@@ -64,14 +79,19 @@ New Node
 -   Leave the editor (press ok or by mouse the x in the upper right corner)
     and agree to save the file.
 
--   Like in the `first node tutorial <first-node.rst>`_ described, adopt now
-    node2. (attach button, activate adoption mode, count Morse blinks, 
+-   Like in the `first node tutorial <first-node.rst>`_ described, 
+    adopt or flash (with deploy serial - eventually specifying the correct tty) 
+    now node2. (for adoption: attach button, activate adoption mode, count Morse blinks, 
     use phone to set own WiFi network credentials, finish calling
     adopt/initialize from user menu in ``node2`` folder).
 
 
 Visually Programming the Connections
 ------------------------------------
+
+-   If you don't use the Raspberry Pi image, you need to open now
+    your Node-RED server page in the browser and build the whole
+    integration flow anlogue to the description below.
 
 -   After successful adoption, open the `Node-RED </nodered/>`_ page. Here you
     have to probably enter username (*iot*) and password (*iotempire*) again.
@@ -114,7 +134,8 @@ Visually Programming the Connections
 Congratulations!! You can remote control your led!
 
 If you still have some time, try to use this new button to actually toggle
-the led. Study for this the rbe and toggle node. What is happening in them?
+the led. Study for this the filter/rbe and toggle node.
+What is happening in them?
 
 
 Top: `ToC <index-doc.rst>`_, Previous: `First Node <first-node.rst>`_,

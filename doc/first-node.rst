@@ -36,7 +36,8 @@ and in there a ``node.conf`` and ``setup.cpp`` file describing a
 sonoff 3 channel switch and potential gestures on it (see also
 /examples/sonoff/t1-3).
 
-To create such a system folder, we need to copy one of folders in the git repository 
+To create such a system folder, we need to copy one of the folders
+of the cloned git repository to the
 outside of the repository. Let's assume, the new system is called "demo"
 and our first node should be called "test01".
 
@@ -51,7 +52,7 @@ To create the initial folder, do the following:
 
 You can of course use another system name than "demo" (and even move
 or rename this folder later). Renaming nodes at a later point
-requires a re-flash of teh corresponding microcontroller, so let's be a
+requires a re-flash of the corresponding microcontroller, so let's be a
 bit more careful here.
 
 Depending on your network setup, we now need to figure out some ipconfig
@@ -68,9 +69,9 @@ For Linux
 
 - Open Terminal
 - Run ``ip a``
-- Look for and note down ``inet`` <address of it=interest> ``scope global dynamic ip``
+- Look for and note down ``inet`` <address of interest> ``scope global dynamic ip``
 - Run ``ip r``
-- Look for and note down ``default gateway via`` <address of it=interest>.
+- Look for and note down ``default gateway via`` <address of interest>.
 
 If you have an mqtt broker like mosquitto running in your local network,
 find and note down its IP address and ignore the next indented text block.
@@ -125,7 +126,7 @@ We will now write a small script for the Wemos D1 Mini
 (this should also work for other supported microcontrollers,
 but not board and GPIO ports might have to be adjusted).
 
-``cd test``
+``cd test01``
 
 ``nano setup.cpp``
 
@@ -142,7 +143,7 @@ Add the following line to the end of the setup.cpp file:
 
   .. code-block:: cpp
 
-     iot doc make  # might only be needed the first time after installation
+     # iot doc make  # is included in the next
      iot doc serve
 
   If both of these commands worked, you should now be able to go to 
@@ -184,6 +185,14 @@ First Deployment
    as well as lots of debug information and also 
    ``pressed`` and ``released`` on the terminal
    running ``console_serial``.
+
+In advanced settings, you can extend your installation with_debounce
+a specially flashed Wemos D1 Mini, called a dongle allowing you to
+to flash previously flashed (or preflashed) esp8266 and esp32 based
+microcontrollers without them being registered in your WiFi (you
+can put any microcontroller flashed with IoTempower in a
+so-called adoption mode. For more look here: `Adoption <adopting.rst>`__
+
 
 Next deployments
 ================
