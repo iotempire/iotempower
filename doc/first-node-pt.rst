@@ -2,7 +2,10 @@
 Primeiro Node
 =============
 
-This manual is now outdated, refer back to the `English version <first-node.rst>`_.
+Pedimos desculpas, mas este manual está desatualizado,
+por favor consulte a versão em inglês ou ajude-nos a fornecer
+uma atualização como "pull request".
+A versão em inglês está aqui: `English version <first-node-pi-dongle.rst>`_.
 
 Para essa seção presumimos que você já tenha configurado com sucesso
 o IoTempower em um Raspberry Pi e já consiga acessar as páginas web nele.

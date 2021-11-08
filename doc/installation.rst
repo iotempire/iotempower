@@ -8,7 +8,7 @@ up and running:
    and running the gateway and configuration management software from there.
 
 2. Setting up IoTempower in your own Linux environment:
-   `Installation on Linux`_
+   `Installation on Linux (and WSL)`_
 
 Please also check out the tutorial videos for this setup on ulno's youtube
 channel: https://www.youtube.com/results?search_query=ulno.net+iotempower+installation
@@ -16,6 +16,8 @@ channel: https://www.youtube.com/results?search_query=ulno.net+iotempower+instal
 
 Installation on Raspberry Pi from Pre-Prepared Image
 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+This section is currently outdated, proceed with caution (look better at Linux installation).
 
 Tutorial videos for setup:
 
@@ -69,10 +71,11 @@ Installation step by step:
   browser):
 
   - For ssh access in Windows,
-    install `Moba xterm <https://mobaxterm.mobatek.net/>`__.
+    install `Moba xterm <https://mobaxterm.mobatek.net/>`__ 
+    or `Git and integrated ssh for Windows <https://git-scm.com/download/win>`__.
 
   - On MacOS,
-    make sure, you have `iTerm2 <https://iterm2.com/>`__ and
+    make sure, you have `iTerm2 <https://iterm2.com/>`__ and optionally
     `XQuartz <https://www.xquartz.org/>`__ installed.
 
   - Linux will work out of the box.
@@ -112,40 +115,97 @@ Installation step by step:
 You can now continue with `First IoT Nodes <first-node.rst>`_.
 
 
-Installation on Linux
-+++++++++++++++++++++
+Installation on Linux (and WSL)
++++++++++++++++++++++++++++++++
 
-- install dependencies:
-  ``sudo apt install git mc mosquitto mosquitto-clients virtualenv
-  iptables bridge-utils hostapd dnsmasq nodejs``
+The steps for WSL (Windows Subsystem for Linux) and Linux should be the same. For information on how to run IoT Empower on a Raspberry Pi, 
+please go to this link:
+/doc/installation.rst
 
-- disable the mosquitto server (you can skip this if you like the default
-  password-less mosquitto setup, but be warned):
-  ``sudo systemctl stop mosquitto; sudo systemctl disable mosquitto``
+We highly recommend against using WSL 2 as the networking is currently
+a total mess and serial ports are nearly unsupported.
+WSL 1 kind of works, though a powerful computer (4 cores and min. 16GB) should still yield better
+results in with a lightweight Linux (like xubuntu or xfce manjaro) in
+virtual machine (using for example virtual box with bridged networking).
+If you don't have a computer running a dedicated Linux, consider dual
+booting Linux.
 
-- setup iotempower: clone this repository
+1. On a Debian based Linux like Ubuntu or Mint (WSL or native), 
+   run the following commands:
 
-  - If you just want read-only access type in a folder of your choice:
-    ``git clone https://github.com/iotempire/iotempower``
+   .. code-block:: bash
+   
+      cd  # go into your home directory also referred to as ~ or $HOME
+      sudo apt-get update  # make sure system is up to date
+      sudo apt install git mc mosquitto mosquitto-clients virtualenv iptables 
+      sudo apt install bridge-utils hostapd dnsmasq nodejs build-essential npm
+      sudo npm install -g terminal-kit  # this is ugly as it uses root, but the simplest way
+      # if you run on a native Ubuntu (not in WSL) consider running
+      # (you can skip this if you like the default password-less mosquitto setup, but be warned)
+      sudo systemctl stop mosquitto
+      sudo systemctl disable mosquitto
 
-  - If you are a IoTempower developer, use
-    ``git clone git@github.com:iotempire/iotempower``
+   On an Arch based system (like vanilla Arch or Manjaro), assuming you have yay installed,
+   run the following commands:
 
-- make IoTempower runnable -> copy examples/scripts/iotempower into your bin folder
-  and adapt
-  the path in it to reflect the location where you cloned IoTempower. If you use
-  tmux or byobu with bash consider sourcing ``lib/shell_starter/iotempower.bash``
-  in your .bashrc.
+   .. code-block:: bash
 
-- start IoTempower and agree and wait for dependencies to be downloaded
-  (if packages are missing, fix dependencies and try to run
-  ``iot install clean``)
+      cd  # go into your home directory also referred to as ~ or $HOME
+      sudo pacman -Syyu  # make sure system is up to date
+      sudo pacman -S git mc mosquitto python-virtualenv 
+      sudo pacman -S iptables bridge-utils hostapd dnsmasq nodejs npm
+      # terminal-kit installation is done locally in iot environment and works on arch
+      # but if you want it globally, you can consider sudo npm install -g terminal-kit
+      # if you run on a native Arch/Manjaro (not in WSL) consider running
+      # (you can skip this if you like the default password-less mosquitto setup, but be warned)
+      sudo systemctl stop mosquitto
+      sudo systemctl disable mosquitto
 
-- After successfully entering IoTempower (the prompt
-  should have changed colors and
-  show IoTempower in red, white, and black),
-  start configuring your first IoT node,
-  see `First IoT Node <first-node.rst>`_.
+
+2. Add port permissions for avoiding permission issues (replace ``<your-username>`` with the username you chose/have).
+   
+   - In Debian based (Ubuntu, Mint): ``sudo usermod -a -G dialout <your-username>``
+   
+   - In Arch based (Arch, Manjaro): ``sudo usermod -a -G uucp <your-username>``
+   
+   Restart or re-login into Linux or restart terminal (WSL 1).
+
+   
+3. Clone the IoTempower repository using git into the iot folder in home directory
+
+   .. code-block:: bash
+
+      cd  # go into your home directory
+      git clone https://github.com/iotempire/iotempower iot
+
+      # if you are an IoTempower developer, use the following instead
+      git clone git@github.com:iotempire/iotempower iot
+
+4. Copy ``iot/examples/scripts/iot`` into your ``bin`` folder
+   (either ``~/bin`` or ``~/.local/bin``) and
+   adapt the path in it to reflect the location where you cloned the IoTempower
+   (if you followed the advice above: `~/iot` which is the default in the sample script
+   or if you just cloned it without specifying the folder iot,
+   ``export IOTEMPOWER_ROOT="$HOME/iotempower"`` if your IoTempower
+   directory is directly ``iotempower`` in your home directory)
+
+   If you use tmux or byobu with bash consider sourcing ``lib/shell_starter/iotempower.bash``
+   in your .bashrc. (If you did not understand the last sentence, ignore it.)
+
+5. Change into your iotempower directory (``cd ~/iot``) and run ``bash run``,
+   you should get a welcome message. Accept the installation of any extra packages.
+   After the installation, you can just run ``iot`` from anywhere (if you created the binary as described in 3)
+   or you can also run ``bash run`` in the IoTempower directory again.
+
+   (If packages are missing, fix dependencies and try to run
+   ``iot install clean``)
+
+
+6. After successfully entering IoTempower (the prompt
+   should have changed and start now with IoT),
+   start configuring your first IoT node,
+   see `First IoT Node <first-node.rst>`_.
+
 
 Top: `ToC <index-doc.rst>`_, Previous: `Tool Support <tool-support.rst>`_,
 Next: `First IoT Node <first-node.rst>`_.

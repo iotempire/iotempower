@@ -1,7 +1,12 @@
 Install IoTempower image onto an SD-card
 ========================================
 
-- Download the Raspberry Pi image from
+ATTENTION: The raspberry pi image is currently outdated as we are using
+transitioning to docker. Please stay tuned and be active on the issues
+or in the forum if you want the re-implemantation of this feature
+coming back.
+
+- Download the Raspberry Pi image from - this version is outdated!!!
   `here on Google Drive <https://drive.google.com/open?id=1b0M93T2-suLFMjpmf8PLUTEGh_rKT6_6>`_
   
 - Make sure the sha256-checksum of the image is correct. It should be:

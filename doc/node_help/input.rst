@@ -4,8 +4,9 @@ input
 ..  code-block:: cpp
 
     input(name, pin, "high_word", "low_word")
-      [.with_threshold(threshold_value)]
+      [.with_debounce(debounce)]
       [.with_pull_up(true/false)]
+      [.inverted()]
       [.with_filter(filter_function)]
       ;
 
@@ -29,7 +30,9 @@ Parameters
 
 - ``pull_up``: enable (true) or disable (false) internal pullup (default enabled)
 
-- ``threshold``: debouncing value (higher -> average more measurements)
+- ``debounce``: debouncing value (higher -> average more measurements)
+
+- ``inverted``: if called makes the button inverted (use high as low and low as high).
 
 - ``filter_function``: specify a preprocessor for measured values
   (`filter <filter.rst>`_).
@@ -41,6 +44,6 @@ Example
 
 ..  code-block:: cpp
     
-    input(lower, D2, "depressed", "pressed").with_threshold(5);
+    input(lower, D2, "depressed", "pressed").with_debounce(5);
 
 Now the status button is published as ``living room/leds1/lower``.
