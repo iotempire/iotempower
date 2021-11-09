@@ -34,3 +34,22 @@ Example
     hx711(weight, D6, D7, 419.0, true);
 
 This example will report weight in g on the topic ``node_topic/weight``.
+
+Wiring
+------
+
+From elecrow kit:
+
+.. code-block::
+
+   standard  scale  connector  board
+   E-,GND    black  black      D
+   O-,S-,A-  green  yellow     A
+   O+,S+,A+  white  white      B
+   E+,VCC    red    red        C
+
+   some body scales:
+   S- yellow
+   E- black
+   S+ white
+   E+ red

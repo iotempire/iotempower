@@ -72,6 +72,7 @@
 #define hcsr04_(internal_name, ...) \
     IOTEMPOWER_DEVICE_(Hcsr04, internal_name, ##__VA_ARGS__)
 #define hcsr04(name, ...) IOTEMPOWER_DEVICE(name, hcsr04_, ##__VA_ARGS__)
+#define ultra_sonic_distance(gcc_va_args...) hcsr04(gcc_va_args)
 
 
 #include <distance-vl53l0x.h>
@@ -219,6 +220,7 @@
 #define mfrc522_(internal_name, ...) \
     IOTEMPOWER_DEVICE_(Mfrc522, internal_name, ##__VA_ARGS__)
 #define mfrc522(name, ...) IOTEMPOWER_DEVICE(name, mfrc522_, ##__VA_ARGS__)
+#define rfid(gcc_va_args...) mfrc522(gcc_va_args)
 
 #include <mpr121.h>
 #define mpr121_(internal_name, ...) \

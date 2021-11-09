@@ -19,7 +19,7 @@ If you just connected and want to dive right in, use one of these quick start
 
 - You also might run IoTempower yourself inside a Linux installation, 
   so you might have followed this tutorial:
-  `Linux Installation: </doc/installation.rst#installation-on-linux-and-wsl>`__
+  `Linux Installation </doc/installation.rst#installation-on-linux-and-wsl>`__
 
 Here is *more documentation*:
 
