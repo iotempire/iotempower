@@ -167,6 +167,12 @@ First Deployment
 
    In Windows: ``deploy serial ttySy``
    If you forgot the y value, check the Device Manager -> Ports
+   
+   .. figure:: /doc/images/windows-serial-ports.png
+   :width: 50%
+   :figwidth: 100%
+   :align: center
+   :alt: Serial port and deployment on Windows
 
 3. Open 2 more Linux terminals (make sure you are in iot environment for all 3 terminals).
    Run a singular command on one terminal, like the following

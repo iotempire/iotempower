@@ -181,8 +181,8 @@ booting Linux.
       git clone git@github.com:iotempire/iotempower iot
 
 4. Copy ``iot/examples/scripts/iot`` into your ``bin`` folder
-   (either ``~/bin`` or ``~/.local/bin``) and
-   adapt the path in it to reflect the location where you cloned the IoTempower
+   (either ``~/bin`` or ``~/.local/bin``, may have to create these folders). Then, 
+   modify this file so that the path in it reflects the location where you cloned the IoTempower
    (if you followed the advice above: `~/iot` which is the default in the sample script
    or if you just cloned it without specifying the folder iot,
    ``export IOTEMPOWER_ROOT="$HOME/iotempower"`` if your IoTempower
