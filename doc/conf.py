@@ -27,7 +27,7 @@ assert "IOTEMPOWER_ROOT" in os.environ, "Not in IoTempower environment, aborting
 # -- Project information -----------------------------------------------------
 
 project = 'IoTempower Documentation'
-copyright = '2019, IoTempower Community'
+copyright = '2021, IoTempower Community'
 author = 'IoTempower Community'
 
 # The short X.Y version

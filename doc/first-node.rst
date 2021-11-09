@@ -172,7 +172,7 @@ First Deployment
      (this particular microcontroller usually shows as USB-SERIAL CH340 (COMy)
      with y some kind of integer number) as seen in this screenshot.
 
-     .. figure:: /doc/images/windows-serial-ports.png
+     .. figure:: images/windows-serial-ports.png
         :width: 70%
         :figwidth: 100%
         :align: center
