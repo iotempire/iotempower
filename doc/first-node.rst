@@ -165,14 +165,22 @@ First Deployment
    In Linux (if you run in a virtual machine, pass through your serial USB
    of your microcontroller): ``deploy serial``
 
-   In Windows: ``deploy serial ttySy``
-   If you forgot the y value, check the Device Manager -> Ports
+   In Windows: 
    
-   .. figure:: /doc/images/windows-serial-ports.png
-   :width: 50%
-   :figwidth: 100%
-   :align: center
-   :alt: Serial port and deployment on Windows
+   - Take note of the COM port number that the `Device Manager`
+     shows under `Ports` (for example (COM8) for the connected Wemos D1 Mini
+     (this particular microcontroller usually shows as USB-SERIAL CH340 (COMy)
+     with y some kind of integer number) as seen in this screenshot.
+
+     .. figure:: /doc/images/windows-serial-ports.png
+        :width: 70%
+        :figwidth: 100%
+        :align: center
+        :alt: Serial port enumeration in Windows 10 - showing 8 for connected Wemos D1 Mini
+
+   - Run the following command, but replace the y with the number after COM (in the above example y = 8)
+     
+     ``deploy serial ttySy``
 
 3. Open 2 more Linux terminals (make sure you are in iot environment for all 3 terminals).
    Run a singular command on one terminal, like the following
