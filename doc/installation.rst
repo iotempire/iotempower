@@ -119,8 +119,7 @@ Installation on Linux (and WSL)
 +++++++++++++++++++++++++++++++
 
 The steps for WSL (Windows Subsystem for Linux) and Linux should be the same. For information on how to run IoT Empower on a Raspberry Pi, 
-please go to this link:
-/doc/installation.rst
+please go to `this link </doc/installation.rst>`__.
 
 We highly recommend against using WSL 2 as the networking is currently
 a total mess and serial ports are nearly unsupported.
