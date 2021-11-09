@@ -11,7 +11,7 @@ starting the iot command or executing run in the main IoTempower directory):
   system variables and virtual python environments). To run an IoTempower command, prefix
   it by the exec keyword, i.e.: ``iot exec accesspoint``. Make sure the iot script is
   installed in your bin-folder correctly (eventually check 
-  `here </doc/installation.rst#installation-on-linux-and-wsl>`__ again).
+  `here </doc/installation.rst#installation-on-linux-and-wsl>`__, Point 4 again).
 
 - ``iot menu``: Bundling most of the frequently used IoTempower tools
   under one convenient text based menu. Just try it out, but still look at
@@ -49,6 +49,10 @@ starting the iot command or executing run in the main IoTempower directory):
 
 - ``mqtt_send``: Publish to a given topic (or the node topic of the current node directory)
   deriving all configuration data from the current environment.
+
+- ``accesspoint``: If you are running in Linux on a laptop and are connected to Ethernet
+  but not WiFi, you have a good chance to turn your built-in WiFi here into an accesspoint.
+  Very nice feature for teachign environments. This comamnd does ask though for root access.
 
 - ``iot doc serve``: Run a documentation webserver on http://localhost:8001
   (also compiles the documentation first).
