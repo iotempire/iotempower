@@ -67,7 +67,7 @@ There are some pre-defined filters available:
     pressed_str, released_str)``
 
     **description:** A filter that can detect, clicks, double clicks,
-    long clicks and too long clicks. Parameter are usually not necessary as
+    long clicks and too long clicks. Parameters are usually not necessary as
     it has sane defaults.
 
 -   **filter:** ``filter_interval_map(v0, b0, v1, b1, ..., vn)``
