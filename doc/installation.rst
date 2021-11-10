@@ -137,7 +137,8 @@ booting Linux.
       cd  # go into your home directory also referred to as ~ or $HOME (it is something like /home/user)
       sudo apt-get update  # make sure system is up to date
       sudo apt install git mc mosquitto mosquitto-clients virtualenv iptables 
-      sudo apt install bridge-utils hostapd dnsmasq nodejs build-essential npm
+      sudo apt install bridge-utils hostapd dnsmasq build-essential
+      sudo apt install nodejs npm  # if you have node-red, nodejs, npm running, skip this step as it might show errors
       sudo npm install -g terminal-kit  # this is ugly as it uses root, but the simplest way
       # if you run on a native Ubuntu (not in WSL) consider running
       # (you can skip this if you like the default password-less mosquitto setup, but be warned)
