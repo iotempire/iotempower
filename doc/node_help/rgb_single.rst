@@ -46,3 +46,21 @@ Example
 
 Now the RGB LED can be switched to red via sending to the mqtt-broker
 to the topic ``living room/tvlights/rgb1/rgb/set`` the command ``red``.
+
+Wiring
+------
+
+If you have an integrated single RGB module with pins, there will be resitors
+on the module, and you can wire the module directly to the GPIO ports
+(RGB to the diffrent ports) and ground (or -) to ground.
+
+If you want to wire up a single RGB led (Comman Cathode) with four legs,
+soldered or on a breadboard, you need 3 resistors (100-500 Ohm range)
+in front of the R, G, and B channels. Check these resrouces to get an ideally
+about the wiring:
+
+- http://www.learningaboutelectronics.com/Articles/Common-cathode-RGB-LED-circuit.php (last visited 2021-11-10)
+
+- https://create.arduino.cc/projecthub/muhammad-aqib/arduino-rgb-led-tutorial-fc003e (last visited 2021-11-10)
+
+- https://randomnerdtutorials.com/esp8266-rgb-color-picker/ (last visited 2021-11-10)

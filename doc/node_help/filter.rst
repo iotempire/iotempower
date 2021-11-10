@@ -26,7 +26,7 @@ Example for filter-function:
 
 Several filters can be chained and are executed in order.
 
-There some pre-defined filters available:
+There are some pre-defined filters available:
 
 -   **filter:** ``filter_average(buflen)``
     
