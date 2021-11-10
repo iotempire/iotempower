@@ -48,7 +48,7 @@ To create the initial folder, do the following:
   mkdir ~/iot-systems
   cp -R "$IOTEMPOWER_ROOT/lib/system_template" ~/iot-systems/demo
   cd ~/iot-systems/demo
-  mv node-template test01
+  mv node_template test01
 
 You can of course use another system name than "demo" (and even move
 or rename this folder later). Renaming nodes at a later point
