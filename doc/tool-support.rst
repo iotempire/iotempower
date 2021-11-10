@@ -27,7 +27,7 @@ starting the iot command or executing run in the main IoTempower directory):
   (if you specify clean, it re-installs)
 
 - ``console_serial``: Open a serial console to see debug output of a
-  serially (locally) connected node
+  serially (locally) connected node.
 
 - ``initialize``: Initialize a current node which is in reconfiguration mode or
   flashes a serially connected node and sets all initial configuration

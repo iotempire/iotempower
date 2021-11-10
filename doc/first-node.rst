@@ -191,6 +191,8 @@ First Deployment
 
    (just for confirmation, if mqtt needs to run locally,
    there should be one terminal running ``mqtt_broker``)
+   If you have trouble stopping ``console_serial`` with Ctrl-C,
+   you can also kill it from another terminal with ``pkill -f monitor``.
 
 4. Now press the button that is attached to your Wemos D1 Mini.
    If you did everything correctly, 
@@ -200,12 +202,15 @@ First Deployment
    ``pressed`` and ``released`` on the terminal
    running ``console_serial``.
 
-In advanced settings, you can extend your installation with_debounce
+In an advanced settings, you can extend your installation with
 a specially flashed Wemos D1 Mini, called a dongle allowing you to
 to flash previously flashed (or preflashed) esp8266 and esp32 based
 microcontrollers without them being registered in your WiFi (you
 can put any microcontroller flashed with IoTempower in a
 so-called adoption mode. For more look here: `Adoption <adopting.rst>`__
+If your serial flashing works and you don't have lots of devices to manage,
+adoption might though be only of marginl interest, so only use itswhen you
+have gathered some experience with IoTempower.
 
 
 Next deployments
