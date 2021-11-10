@@ -38,6 +38,7 @@ Alphabetic list
 - `led <led.rst>`_
 - `mpr121 <mpr121.rst>`_
 - `mpu6050 <mpu6050.rst>`_
+- `mfrc522 <mfrc522.rst>`_
 - `output <output.rst>`_
 - `out <out.rst>`_
 - `pwm <pwm.rst>`_
@@ -45,6 +46,7 @@ Alphabetic list
 - `reconfiguration <reconfiguration.rst>`_
 - `relais <relais.rst>`_
 - `relay <relay.rst>`_
+- `rfid <rfid.rst>`_
 - `rgb_matrix <rgb_matrix.rst>`_
 - `rgb_single <rgb_single.rst>`_
 - `rgb_strip <rgb_strip.rst>`_
