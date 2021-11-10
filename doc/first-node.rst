@@ -83,7 +83,7 @@ find and note down its IP address and ignore the next indented text block.
   Create a global iot configuration for this Linux installation
   by copying ``etc/iotempower.example.conf`` to to just iotempower.conf:
 
-  ``cp "$IOTEMPOWER_ROOT/etc/iotempower.conf.example" "$IOTEMPOWER_ROOT/iotempower/etc/iotempower.conf"``
+  ``cp "$IOTEMPOWER_ROOT/etc/iotempower.conf.example" "$IOTEMPOWER_ROOT/etc/iotempower.conf"``
 
   Set and adjust IOTEMPOWER_MQTT_HOST of the iotempower.conf to the following (note that {values} need to changed to what you found in the above steps or to whatever your SSID is)
   ``nano "$IOTEMPOWER_ROOT/etc/iotempower.conf"`` - don't forget to uncomment this line (remove leading #),
