@@ -19,7 +19,7 @@ does not work using WiFi on esp8266 anymore. Short led strips might still work,
 but long strips will show flickering wrong colors, and other synchronization issues.
 Please use the new rgb_strip_bus that uses precise timing but can only be wired to
 specific datapins (like only D4 on the Wemos D1 Mini or NodeMCU).
-Check  https://github.com/Makuna/NeoPixelBus for this advanced version.
+Check https://github.com/Makuna/NeoPixelBus for this advanced version.
 
 
 Topics
