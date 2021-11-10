@@ -134,7 +134,7 @@ booting Linux.
 
    .. code-block:: bash
    
-      cd  # go into your home directory also referred to as ~ or $HOME
+      cd  # go into your home directory also referred to as ~ or $HOME (it is something like /home/user)
       sudo apt-get update  # make sure system is up to date
       sudo apt install git mc mosquitto mosquitto-clients virtualenv iptables 
       sudo apt install bridge-utils hostapd dnsmasq nodejs build-essential npm
@@ -149,7 +149,7 @@ booting Linux.
 
    .. code-block:: bash
 
-      cd  # go into your home directory also referred to as ~ or $HOME
+      cd  # go into your home directory also referred to as ~ or $HOME (it is something like /home/user)
       sudo pacman -Syyu  # make sure system is up to date
       sudo pacman -S git mc mosquitto python-virtualenv 
       sudo pacman -S iptables bridge-utils hostapd dnsmasq nodejs npm
@@ -174,7 +174,7 @@ booting Linux.
 
    .. code-block:: bash
 
-      cd  # go into your home directory
+      cd  # go into your home directory also referred to as ~ or $HOME (it is something like /home/user)
       git clone https://github.com/iotempire/iotempower iot
 
       # if you are an IoTempower developer, use the following instead
