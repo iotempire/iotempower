@@ -188,6 +188,14 @@ booting Linux.
    ``export IOTEMPOWER_ROOT="$HOME/iotempower"`` if your IoTempower
    directory is directly ``iotempower`` in your home directory)
 
+   It turns out that the behavoir if ``bin`` is available globally on your ``PATH`` seems to be a bit
+   random nowadays based on your installed Linux distribution. If you cannot start (find) iot,
+   add (type ``nano ~/.bashrc) the following to the end of your .bashrc:
+
+   ``export PATH="$PATH:$HOME/bin:$HOME/.local/bin``
+
+   Then open a new terminal and hopefully now iot should be found and start.
+
    If you use tmux or byobu with bash consider sourcing ``lib/shell_starter/iotempower.bash``
    in your .bashrc. (If you did not understand the last sentence, ignore it.)
 
