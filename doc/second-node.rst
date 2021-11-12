@@ -56,7 +56,7 @@ New Node
 -   Make sure to open another `IoTempower documentation web-page </>`_ for
     reference. And open from there the
     `command reference </doc/node_help/commands.rst>`_.
-    (If you don't have teh documentation server running,
+    (If you don't have the documentation server running,
     start it in a new terminal with ``iot doc serve`` and
     access it at http://localhost:8001)
     

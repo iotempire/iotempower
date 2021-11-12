@@ -11,7 +11,7 @@ The system folder can contain several nodes. Make sure to adjust system.conf.
 Connected nodes
 ---------------
 
-Describe system related infomration of teh connected nodes explaing more than
+Describe system related infomration of the connected nodes explaing more than
 visible in the descriptions of the single nodes.
 
 * device 1

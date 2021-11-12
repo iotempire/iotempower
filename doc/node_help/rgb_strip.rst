@@ -63,10 +63,23 @@ Example
 
 ..  code-block:: cpp
 
-    rgb_strip(strip2, 10, WS2811, D6, BRG);
+    // Only runs stable on D4 on esp8266 based boards
+    rgb_strip(strip2, strip_len, WS2812B, D4, GRB)
+
+    // old obsolete and probably instabel version, use on your own risk
+    rgb_strip(strip2, 10, WS2811, D6, BRG); // <- do not use!
 
 Now the second RGB LED can be switched to red via sending to the mqtt-broker
 to the topic ``living room/tvlights/strip2/rgb/set`` the command ``2 red`` or
 ``front red``.
 
 Check also `rgb_matrix <rgb_matrix.rst>`_ and `animator <animator.rst>`_.
+
+Wiring
+------
+
+Remember that the WS2811 needs 12V (but can still be driven from the dataline in
+of the esp8266), make sure it uses the same ground as the esp8266.
+The WS2812 and WS2812B use 5V, but make sure you have a big enough power supply.
+You can drive about 10 LEDs directly from a wemos d1 mini connected to a
+USB 3 port (a usb 2 port does not have enough power, maybe 5 LEDs).

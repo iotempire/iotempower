@@ -5,7 +5,10 @@ temperature/humidity
 
     dht(name, pin);
 
-**Other names:** ``dht11``, ``dht22``
+**Other names:** ``dht11``
+
+
+    dht22(name, pin);
 
 ..  code-block:: cpp
 

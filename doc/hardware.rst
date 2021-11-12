@@ -15,7 +15,7 @@ The gateway services have been tested to run on:
 
 - Raspberry Pi 1 (B and B+), 2, 3, and Zero W - however,
   the Raspberry Pi 3 is our first choice
-- Laptops running Ubuntu Linux 17.04 and 18.04
+- Laptops running Ubuntu Linux > 18.04
 
 We are trying to provide virtualbox images and cocker configurations
 as soon as we find time
@@ -32,10 +32,9 @@ Currently the following esp8266-based devices are supported:
 - Espresso Lite V2
 - Sonoff and Sonoff Touch
 - There is an esp8266 generic option for other esp8266-based boards.
-- We expect to support esp32 boards very soon - let us know if you want to help
-  making this possible.
+- We do support esp32 boards (so far genric esp32, wroom-02, and esp32minikit/mh-et live)
 
-The part of IoTempower running on the esp8266 is a standalone C++-based firmware
+The part of IoTempower running on the esp8266 or esp32 is a standalone C++-based firmware
 managed by `PlatformIO <http://platform.io>`__. However, IoTempower abstracts a
 lot of the burden of repetitive device management away from the user so that
 attaching a device to a node usually boils down to just writing one line of
