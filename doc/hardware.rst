@@ -26,13 +26,15 @@ allow more cost-effective solutions to use iotempower.
 
 Currently the following esp8266-based devices are supported:
 
-- Wemos D1 Mini
-- NodeMCU
-- ESP-M1
-- Espresso Lite V2
-- Sonoff and Sonoff Touch
-- There is an esp8266 generic option for other esp8266-based boards.
-- We do support esp32 boards (so far genric esp32, wroom-02, and esp32minikit/mh-et live)
+- esp8266 (generic available)
+    - Wemos D1 Mini, pinout: https://escapequotes.net/esp8266-wemos-d1-mini-pins-and-diagram/
+    - NodeMCU, pinout: https://www.reddit.com/r/esp8266/comments/9q3314/nodemcu_v1_v2_v3_size_and_pinout_comparison/
+    - ESP-M1
+    - Espresso Lite V2
+    - Sonoff and Sonoff Touch
+- esp32 (generic available)
+    - wroom-02
+    - esp32minikit (mh-et live), pinout: http://esp32.net/images/MH-ET-LIVE/ESP32-MiniKit/MH-ET-LIVE_ESP32-MiniKit.jpg
 
 The part of IoTempower running on the esp8266 or esp32 is a standalone C++-based firmware
 managed by `PlatformIO <http://platform.io>`__. However, IoTempower abstracts a
