@@ -32,7 +32,7 @@ Example
 
 This example will report data of a supported RFID/tag in ``node_topic/reader``
 and uid in ``node_topic/reader/uid`` (works on most NFC tags) as well as picc
-in ``node_topic/reader/uid`.
+in ``node_topic/reader/uid``.
 
 Wiring
 ------
