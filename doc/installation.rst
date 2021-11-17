@@ -136,9 +136,10 @@ booting Linux.
    
       cd  # go into your home directory also referred to as ~ or $HOME (it is something like /home/user)
       sudo apt-get update  # make sure system is up to date
-      sudo apt install git mc mosquitto mosquitto-clients virtualenv iptables 
+      sudo apt install git haveged mosquitto mosquitto-clients virtualenv iptables 
       sudo apt install bridge-utils hostapd dnsmasq build-essential
       sudo apt install nodejs npm  # if you have node-red, nodejs, npm running, skip this step as it might show errors
+      sudo apt install mc tilde # this is optional: mc is nicer file management in cli, tilde a nicer editor than nano
       sudo npm install -g terminal-kit  # this is ugly as it uses root, but the simplest way
       # if you run on a native Ubuntu (not in WSL) consider running
       # (you can skip this if you like the default password-less mosquitto setup, but be warned)
@@ -152,8 +153,9 @@ booting Linux.
 
       cd  # go into your home directory also referred to as ~ or $HOME (it is something like /home/user)
       sudo pacman -Syyu  # make sure system is up to date
-      sudo pacman -S git mc mosquitto python-virtualenv 
+      sudo pacman -S git haveged mosquitto python-virtualenv 
       sudo pacman -S iptables bridge-utils hostapd dnsmasq nodejs npm
+      sudo pacman -S mc micro # this is optional: mc is nicer file management in cli, micro a nicer editor than nano
       # terminal-kit installation is done locally in iot environment and works on arch
       # but if you want it globally, you can consider sudo npm install -g terminal-kit
       # if you run on a native Arch/Manjaro (not in WSL) consider running
