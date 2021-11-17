@@ -50,3 +50,4 @@ Wiring
         D5  -  SCK
         D0  -  RST
          G  -  GND
+       N/C  -  IRQ (IRQ is not connected for use in IoTempower)
