@@ -412,6 +412,7 @@ class Filter_JMC_Median : public Callback {
 #define filter_jmc_median(update_ms) with_filter_callback(*new Filter_JMC_Median(update_ms))
 
 /* Jmc median over small time intervals with reset after time runs out*/
+// TODO rewrite as class to avoid local closure issues
 #define filter_jmc_interval_median(interval) with_filter_callback(\
     *new Callback([&](Device& dev) { \
         static double median; \
@@ -457,6 +458,7 @@ class Filter_Restrict : public Callback {
 
 
 /* round to the next multiple of base */
+// TODO rewrite as class to avoid local closure issues
 #define filter_round(base) with_filter_callback(\
     *new Callback( [&](Device& dev) { \
         int32_t v = (long)(dev.read_float()/(base)+0.5); \
@@ -466,6 +468,7 @@ class Filter_Restrict : public Callback {
 
 
 /* return maximum one value per time interval (interval in ms) */
+// TODO rewrite as class to avoid local closure issues
 #define filter_limit_time(interval, dev) with_filter_callback(\
     *new Callback( [&](Device& dev) { \
         static unsigned long last_time; \
