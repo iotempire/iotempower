@@ -611,20 +611,44 @@ class Filter_Click_Detector : public Callback {
     with_filter_callback(*new Filter_Click_Detector(true, __VA_ARGS__))
 
 
-
-/* Turn analog values into binary with a threshold level */
-#define filter_binarize(cutoff, high, low) with_filter_callback( \
-    *new Callback([&](Device& dev) { \
-        if(dev.value().equals(low)) return false; \
-        if(dev.value().equals(high)) return false; \
-        double sample = dev.value().as_float(); \
-        if(sample>=cutoff) { \
-            dev.value().from(high); \
-        } else { \
-            dev.value().from(low); \
-        } \
-        return true; \
-    }))
+// new closures in esp8266 sdk are not allowing simple local callback closures anymore
+// /* Turn analog values into binary with a threshold level */
+// #define filter_binarize(cutoff, high, low) with_filter_callback( \
+//     *new Callback([&](Device& dev) { \
+//         if(dev.value().equals(low)) return false; \
+//         if(dev.value().equals(high)) return false; \
+//         double sample = dev.value().as_float(); \
+//         if(sample>=cutoff) { \
+//             dev.value().from(high); \
+//         } else { \
+//             dev.value().from(low); \
+//         } \
+//         return true; \
+//     }))
+class Filter_Binarize : public Callback {
+    private:
+        double _cutoff;
+        const char* _high;
+        const char* _low;
+    public:
+        Filter_Binarize(double cutoff, const char* high, const char* low) : Callback() {
+            _cutoff = cutoff;
+            _high = high;
+            _low = low;
+        }
+        bool call(Device &dev) {
+            if(dev.value().equals(_low)) return false;
+            if(dev.value().equals(_high)) return false;
+            double sample = dev.value().as_float();
+            if(sample >= _cutoff) {
+                dev.value().from(_high);
+            } else {
+                dev.value().from(_low);
+            }
+            return true;
+        }
+};
+#define filter_binarize(cutoff, high, low) with_filter_callback(*new Filter_Binarize(cutoff, high, low))
 
 
 /* map set of intervals to single descrite values
