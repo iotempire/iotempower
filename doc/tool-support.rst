@@ -17,8 +17,10 @@ starting the iot command or executing run in the main IoTempower directory):
   under one convenient text based menu. Just try it out, but still look at
   the description below.
 
-- accesspoint: Start an accesspoint on a free WiFi interface (this is
-  done by default on the IoTempower Raspberry Pi image). 
+- ``accesspoint``:Start an accesspoint on a free WiFi interface (this is
+  done by default on the IoTempower Raspberry Pi image). If you are running in Linux on a laptop and are connected to Ethernet
+  but not WiFi, you have a good chance to turn your built-in WiFi here into an accesspoint.
+  Very nice feature for teaching environments. This command does ask though for root access.
 
 - ``iot upgrade``: Get latest version of IoTempower
   (inside an existing version)
@@ -49,10 +51,6 @@ starting the iot command or executing run in the main IoTempower directory):
 
 - ``mqtt_send``: Publish to a given topic (or the node topic of the current node directory)
   deriving all configuration data from the current environment.
-
-- ``accesspoint``: If you are running in Linux on a laptop and are connected to Ethernet
-  but not WiFi, you have a good chance to turn your built-in WiFi here into an accesspoint.
-  Very nice feature for teachign environments. This comamnd does ask though for root access.
 
 - ``iot doc serve``: Run a documentation webserver on http://localhost:8001
   (also compiles the documentation first).
