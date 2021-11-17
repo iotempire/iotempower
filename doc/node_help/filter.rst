@@ -50,7 +50,9 @@ There are some pre-defined filters available:
     **description:** Only report (forward) value if a minimum change to last 
     value happened (also often called precision)
 
--   **filter:** ``filter_binarize(cutoff, high, low)``
+-   **filter:** ``filter_binarize(cutoff, high, low)`` 
+
+    **example:** ``hcsr04(distance, D5, D6).filter_binarize(200, "off", "on");``
 
     **description:** Turn analog values into binary with a cutoff/threshold level.
 
