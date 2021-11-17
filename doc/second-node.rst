@@ -93,13 +93,16 @@ Visually Programming the Connections
     your Node-RED server page in the browser and build the whole
     integration flow anlogue to the description below.
 
--   After successful adoption, open the `Node-RED </nodered/>`_ page. Here you
+-   If you use the pi image, you can just head to this `Node-RED </nodered/>`_ page
+    (only works in the raspberry pi image setup - else this will lead to an undifined page).
+    Here you
     have to probably enter username (*iot*) and password (*iotempire*) again.
 
     You should see a Node-RED flow with five nodes.
 
 -   Notable here are the two pink nodes at the sides, one labeled ``node1/b1``
-    and one ``node1/blue/set``
+    and one ``node1/blue/set`` (if you don't use the pi image, you have to create this
+    yourself).
 
     These are so called mqtt (Message Queuing Telemetry Transport) nodes.
     They are our bridge to the IoT communication language.
