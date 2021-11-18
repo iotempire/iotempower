@@ -169,8 +169,8 @@ First Deployment
    
    - Take note of the COM port number that the `Device Manager`
      shows under `Ports` (for example (COM8) for the connected Wemos D1 Mini
-     (this particular microcontroller usually shows as USB-SERIAL CH340 (COMy)
-     with y some kind of integer number) as seen in this screenshot.
+     (this particular microcontroller usually shows as USB-SERIAL CH340 (COMX)
+     with X: some kind of integer number) as seen in this screenshot.
 
      .. figure:: images/windows-serial-ports.png
         :width: 70%
@@ -178,9 +178,9 @@ First Deployment
         :align: center
         :alt: Serial port enumeration in Windows 10 - showing 8 for connected Wemos D1 Mini
 
-   - Run the following command, but replace the y with the number after COM (in the above example y = 8)
+   - Run the following command, but replace the X with the number after COM (in the above example X = 8)
      
-     ``deploy serial ttySy``
+     ``deploy serial ttySX``
 
 3. Open 2 more Linux terminals (make sure you are in iot environment for all 3 terminals).
    Run a singular command on one terminal, like the following
