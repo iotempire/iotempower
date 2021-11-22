@@ -227,5 +227,15 @@
     IOTEMPOWER_DEVICE_(MPR121, internal_name, ##__VA_ARGS__)
 #define mpr121(name, ...) IOTEMPOWER_DEVICE(name, mpr121_, ##__VA_ARGS__)
 
+#include <IRReceiver.h>
+#define IRReceiver_(internal_name, ...) \
+    IOTEMPOWER_DEVICE_(IRReceiver, internal_name, ##__VA_ARGS__)
+#define IRReceiver(name, ...) IOTEMPOWER_DEVICE(name, IRReceiver_, ##__VA_ARGS__)
+
+#include <IRSender.h>
+#define IRSender_(internal_name, ...) \
+    IOTEMPOWER_DEVICE_(IRSender, internal_name, ##__VA_ARGS__)
+#define IRSender(name, ...) IOTEMPOWER_DEVICE(name, IRSender_, ##__VA_ARGS__)
+
 
 #endif // _DEVICES_H_
