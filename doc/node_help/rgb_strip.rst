@@ -14,7 +14,7 @@ rgb_strip
 Create a new rgb strip device object for an rgb-led strip connected to the
 given ``data_pin`` (or ``data`` and ``clock_pin``) with ``num_leds`` rgb leds.
 All led chips supported by FastLED (https://github.com/FastLED/FastLED) are
-supported. Attention: FastLED seems to be broken sinc beginning of 2000 and
+supported. Attention: FastLED seems to be broken since beginning of 2020 and
 does not work using WiFi on esp8266 anymore. Short led strips might still work,
 but long strips will show flickering wrong colors, and other synchronization issues.
 Please use the new rgb_strip_bus that uses precise timing but can only be wired to
@@ -64,7 +64,7 @@ Example
 ..  code-block:: cpp
 
     // Only runs stable on D4 on esp8266 based boards
-    rgb_strip(strip2, strip_len, WS2812B, D4, GRB)
+    rgb_strip_bus(strip2, strip_len, WS2812B, D4, GRB)
 
     // old obsolete and probably instabel version, use on your own risk
     rgb_strip(strip2, 10, WS2811, D6, BRG); // <- do not use!
