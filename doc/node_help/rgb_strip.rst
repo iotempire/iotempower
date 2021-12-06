@@ -64,7 +64,7 @@ Example
 ..  code-block:: cpp
 
     // Only runs stable on D4 on esp8266 based boards
-    rgb_strip_bus(strip2, strip_len, WS2812B, D4, GRB)
+    rgb_strip_bus(strip2, 10, F_GRB, NeoEsp8266Uart1800KbpsMethod, D4);
 
     // old obsolete and probably instabel version, use on your own risk
     rgb_strip(strip2, 10, WS2811, D6, BRG); // <- do not use!
