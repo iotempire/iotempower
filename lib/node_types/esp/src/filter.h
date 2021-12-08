@@ -469,7 +469,7 @@ class Filter_Restrict : public Callback {
 
 /* return maximum one value per time interval (interval in ms) */
 // TODO rewrite as class to avoid local closure issues
-#define filter_limit_time(interval, dev) with_filter_callback(\
+#define filter_limit_time(interval) with_filter_callback(\
     *new Callback( [&](Device& dev) { \
         static unsigned long last_time; \
         unsigned long current = millis() ; \
