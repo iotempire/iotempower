@@ -3,8 +3,8 @@ Node Description
 
 A short human readable description of this particular node.
 
-Rename the node_template folder name to something more descriptive. Make sure
-to adjust node.conf.
+Rename the node_template folder name to something more descriptive.
+Make sure to adjust ``node.conf``.
 
 
 Connected devices
