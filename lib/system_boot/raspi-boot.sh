@@ -36,7 +36,7 @@ if [[ "IOTEMPOWER_AP_PASSWORD" ]]; then # pw was given, so start an accesspoint
         tmux new-session -d -n AP -s IoTsvcs \
                 "./run" exec accesspoint \; \
             new-window -d -n MQTT  \
-                "./run" exec mqtt_broker \; \
+                su - $IOTEMPOWER_USER -c 'iot exec mqtt_broker' \; \
             new-window -d -n nodered  \
                 su - $IOTEMPOWER_USER -c 'iot exec nodered_starter' \; \
             new-window -d -n cloudcmd  \
