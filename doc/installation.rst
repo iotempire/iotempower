@@ -17,7 +17,8 @@ channel: https://www.youtube.com/results?search_query=ulno.net+iotempower+instal
 Installation on Raspberry Pi from Pre-Prepared Image
 ++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-This section is currently outdated, proceed with caution (look better at Linux installation).
+This section is currently outdated!
+Proceed with caution (look better at Linux installation).
 
 Tutorial videos for setup:
 
@@ -37,18 +38,18 @@ Installation step by step:
 - `Set up the credentials of the WiFi-Router on the Pi
   <quickstart-pi.rst#installation#setting-up-the-wifi-router-on-the-pi>`_
 
-- If you have another USB-wifi stick, and want to use Internet via WiFi
-  connect this wifi stick to the pi and make corresponding changes to the
+- If you have another USB-wifi stick and want to use the Internet via WiFi,
+  connect this WiFi stick to the pi and make corresponding changes to the
   file ``/boot/wifi-in.txt``, setting ``WiFi Name/SSID``, ``WiFi Password``,
   and eventually the ``WiFi business network user``.
 
-  Careful, lots of WiFi sticks do not work properly on the
+  Careful! Lots of WiFi sticks do not work correctly on the
   Raspberry Pi. Make sure you have verified that it works under the normal
   Raspberry Pi desktop environment.
 
   Much preferred is connecting the Pi to ethernet. It avoids all the
   aforementioned potential WiFi problems. If you have access to ethernet
-  (for example a free ethernet lan port on your
+  (for example, a free ethernet LAN port on your
   router), connect the Pi to this ethernet - no extra configuration is
   necessary for this.
 
@@ -104,7 +105,7 @@ Installation step by step:
     hd in the advanced options.
 
 ..  - Check out the `short tmux help </doc/tmux-help.txt>`__,
-    pressing the ctrl-key and a-key simultanously,
+    pressing the ctrl-key and a-key simultaneously,
     releasing them and then pressing the h-key.
 
   - Run in ssh or the terminal (type and hit enter) the command
@@ -164,7 +165,7 @@ booting Linux.
       sudo systemctl disable mosquitto
 
 
-2. Add port permissions for avoiding permission issues (replace ``<your-username>`` with the username you chose/have).
+2. Add port permissions to avoid permission issues (replace ``<your-username>`` with the username you chose/have).
    
    - In Debian based (Ubuntu, Mint): ``sudo usermod -a -G dialout <your-username>``
    
@@ -191,7 +192,7 @@ booting Linux.
    ``export IOTEMPOWER_ROOT="$HOME/iotempower"`` if your IoTempower
    directory is directly ``iotempower`` in your home directory)
 
-   It turns out that the behavoir if ``bin`` is available globally on your ``PATH`` seems to be a bit
+   It turns out that the behavior if ``bin`` is available globally on your ``PATH`` seems to be a bit
    random nowadays based on your installed Linux distribution. If you cannot start (find) iot,
    add (type ``nano ~/.bashrc) the following to the end of your .bashrc:
 
@@ -212,7 +213,7 @@ booting Linux.
 
 
 6. After successfully entering IoTempower (the prompt
-   should have changed and start now with IoT),
+   should have changed and started now with IoT),
    start configuring your first IoT node,
    see `First IoT Node <first-node.rst>`_.
 

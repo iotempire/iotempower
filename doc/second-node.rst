@@ -8,9 +8,9 @@ to access the websites on it or setup IoTempower under yourself
 own Linux environment with access to a running mqtt broker and
 a running Node-RED
 
-We also assume, you have completed and running a node and
+We also assume you have completed and running a node and
 system folder from `first node <first-node.rst>`_ 
-and can control its onboard led via the Node-RED web gui.
+and can control its onboard led via the Node-RED web GUI.
 
 The goal of this tutorial is to show you how to flash or adopt
 a second node and then connect them together 
@@ -21,7 +21,7 @@ Let's get started...
 New Node
 --------
 
--   If you use the raspberry pi web gui cloudcmd,
+-   If you use the raspberry pi web GUI cloudcmd,
     navigate back to your `IoT system example configuration folder
     <https://iotgateway.local/cloudcmd/fs/home/iot/iot-test/>`_
     else navigate there by command line (``cd ~/iot-systems``).
@@ -31,13 +31,13 @@ New Node
 -   For a second node, we need therefore another node-folder. We can quickly
     create one, based on a node-template.
 
-    For that, make sure, you are still in the system configuration
+    For that, make sure you are still in the system configuration
     folder and activate again the user menu (or type ``iot menu``).
 
     In the user menu, select ``Create New Node Folder``, and after verifying
     the destination path (which should be ``iot-test/`` or ``iot-systems/``),
     select ``Yes, run create_node_template``. Confirm a (hopefully) successful
-    creation, and you wil be back in cloudcmd's web file panel or the command
+    creation and you will be back in cloudcmd's web file panel or the command
     line.
 
     You should see there a new folder called new-node (next to the old folder
@@ -68,7 +68,7 @@ New Node
     You should see a small explanation comment block. You should now
     completely remove it to have an empty configuration file.
 
--   In the command reference open the button help and copy from there the
+-   In the command reference, open the button help and copy from there the
     example configuration (including semicolon),
     something like this: ``input(lower, D2, "depressed", "pressed");``
 
@@ -82,7 +82,7 @@ New Node
 -   Like in the `first node tutorial <first-node.rst>`_ described, 
     adopt or flash (with deploy serial - eventually specifying the correct tty) 
     now node2. (for adoption: attach button, activate adoption mode, count Morse blinks, 
-    use phone to set own WiFi network credentials, finish calling
+    use your phone to set own WiFi network credentials, finish calling
     adopt/initialize from user menu in ``node2`` folder).
 
 
@@ -91,10 +91,10 @@ Visually Programming the Connections
 
 -   If you don't use the Raspberry Pi image, you need to open now
     your Node-RED server page in the browser and build the whole
-    integration flow anlogue to the description below.
+    integration flow analog to the description below.
 
--   If you use the pi image, you can just head to this `Node-RED </nodered/>`_ page
-    (only works in the raspberry pi image setup - else this will lead to an undifined page).
+-   If you use the pi image, you can head to this `Node-RED </nodered/>`_ page
+    (only works in the raspberry pi image setup - else this will lead to an undefined page).
     Here you
     have to probably enter username (*iot*) and password (*iotempire*) again.
 
@@ -104,17 +104,17 @@ Visually Programming the Connections
     and one ``node1/blue/set`` (if you don't use the pi image, you have to create this
     yourself).
 
-    These are so called mqtt (Message Queuing Telemetry Transport) nodes.
+    These are so-called mqtt (Message Queuing Telemetry Transport) nodes.
     They are our bridge to the IoT communication language.
 
--   The new node, we just configured, is sending data on the topic
+-   The new node we just configured is sending data on the topic
     ``node2/b1``
 
--   Therefore, create a new mqtt input node, by dragging it from the left into
+-   Therefore, create a new mqtt input node by dragging it from the left into
     the current flow. Double click it and set its topic to ``node2/b1``.
 
 -   Also create a debug output node (drag it into the pane) and draw a wire
-    from the mqtt-node port to the debug-port.
+    from the mqtt-node port to the debug port.
 
 -   Press the red deploy button (in the upper right) corner.
 
@@ -131,13 +131,13 @@ Visually Programming the Connections
     our ``node2`` button controller and the mqtt output labeled
     ``node1/blue/set``.
 
--   Deploy and press the button on ``node2``, observer the onboard led on
+-   Deploy and press the button on ``node2``, observe the onboard led on
     ``node1``.
 
 Congratulations!! You can remote control your led!
 
-If you still have some time, try to use this new button to actually toggle
-the led. Study for this the filter/rbe and toggle node.
+If you still have some time, try using this new button to toggle the led.
+Study for this the filter/rbe and toggle node.
 What is happening in them?
 
 

@@ -10,7 +10,7 @@ enter the IoTempower environment (prompt changes to IoT).
 We will now set-up and configure our first IoT node (if you want to know
 what a *node* is, check the `architecture chapter <architecture.rst>`_).
 
-IoTempower supports among others the following microcontroller boards
+IoTempower supports, among others, the following microcontroller boards
 (for more supported boards, check the `hardware chapter <hardware.rst>`_):
 
 - Wemos D1 Mini Mini
@@ -26,10 +26,10 @@ you need to setup a folder describing your IoT system (the
 gateway services, the nodes, and the connected devices/things).
 
 The top folder describes the system and has a ``system.conf``
-configuration file (we will call it therefore `system folder`).
+configuration file (we will call it, therefore `system folder`).
 In addition to the ``system.conf`` file the
 folder includes the locations and sub-locations (sub folders) of
-the nodes networked into the IoT system. This allows to model a
+the nodes networked into the IoT system. This allows to model
 hierarchical nodes and connected things architecture for having
 something like ``ulnos-home-system/living-room/dining-corner/switches``
 and in there a ``node.conf`` and ``setup.cpp`` file describing a
@@ -38,7 +38,7 @@ sonoff 3 channel switch and potential gestures on it (see also
 
 To create such a system folder, we need to copy one of the folders
 of the cloned git repository to the
-outside of the repository. Let's assume, the new system is called "demo"
+outside of the repository. Let's assume the new system is called "demo"
 and our first node should be called "test01".
 
 To create the initial folder, do the following:
@@ -50,12 +50,12 @@ To create the initial folder, do the following:
   cd ~/iot-systems/demo
   mv node_template test01
 
-You can of course use another system name than "demo" (and even move
+You can, of course, use another system name than "demo" (and even move
 or rename this folder later). Renaming nodes at a later point
 requires a re-flash of the corresponding microcontroller, so let's be a
 bit more careful here.
 
-Depending on your network setup, we now need to figure out some ipconfig
+Depending on your network setup, we now need to figure out some ``ipconfig``
 addresses and configure things accordingly to make sure our node can
 connect to the right services.
 
@@ -93,7 +93,7 @@ find and note down its IP address and ignore the next indented text block.
 
      IOTEMPOWER_MQTT_HOST={IPv4 IP from above}
 
-  This needs to be updated, each time your Linux IP address changes.
+  This needs to be updated each time your Linux IP address changes.
 
   Leave the iot environment (run ``exit``).
 
@@ -103,7 +103,7 @@ find and note down its IP address and ignore the next indented text block.
   You can interrupt it with pressing Ctrl-C twice or issuing
   ``pkill mqtt_broker; pkill mosquitto`` from another terminal.
 
-  If the IP address didn't change you can also start the mqtt broker
+  If the IP address didn't change, you can also start the mqtt broker
   now at any time with ``iot exec mqtt_broker``.
 
 Go to the folder we copied earlier:
@@ -156,7 +156,7 @@ First Deployment
 
 1. Now, prepare the Wemos: attach the Button Shield to your Wemos D1 Mini.
    Make sure that the pins align with the Wemos
-   (on other microcontroller make sure you have some button connected
+   (on other microcontrollers make sure you have some button connected
    and know the corresponding GPIO port).
 
 2. In the ``test01`` (and inside the iot environment) folder,
@@ -202,15 +202,15 @@ First Deployment
    ``pressed`` and ``released`` on the terminal
    running ``console_serial``.
 
-In an advanced settings, you can extend your installation with
+In advanced settings, you can extend your installation with
 a specially flashed Wemos D1 Mini, called a dongle allowing you to
 to flash previously flashed (or preflashed) esp8266 and esp32 based
 microcontrollers without them being registered in your WiFi (you
 can put any microcontroller flashed with IoTempower in a
 so-called adoption mode. For more look here: `Adoption <adopting.rst>`__
 If your serial flashing works and you don't have lots of devices to manage,
-adoption might though be only of marginl interest, so only use itswhen you
-have gathered some experience with IoTempower.
+adoption might be only of marginal interest.
+So only use it when you have gathered some experience with IoTempower.
 
 
 Next deployments
