@@ -185,7 +185,7 @@ First Deployment
 3. Open 2 more Linux terminals (make sure you are in iot environment for all 3 terminals).
    Run a singular command on one terminal, like the following
    
-   Terminal 1: ``console_serial ttySy``
+   Terminal 1: ``console_serial`` (in Linux) or in WSL 1 ``console_serial ttySX`` (like above)
 
    Terminal 2: ``mqtt_listen``
 
