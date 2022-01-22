@@ -4,15 +4,15 @@ Second Node
 
 For this section, we assume that you have either
 successfully set-up IoTempower on the Raspberry Pi and are able
-to access the websites on it or setup IoTempower under yourself
+to access the websites on it or setup IoTempower in your
 own Linux environment with access to a running mqtt broker and
-a running Node-RED
+a running Node-RED.
 
 We also assume you have completed and running a node and
 system folder from `first node <first-node.rst>`_ 
 and can control its onboard led via the Node-RED web GUI.
 
-The goal of this tutorial is to show you how to flash or adopt
+The goal of this tutorial is to show you how to flash (or adopt)
 a second node and then connect them together 
 *over the air (OTA)* via Node-RED.
 
@@ -23,8 +23,8 @@ New Node
 
 -   If you use the raspberry pi web GUI cloudcmd,
     navigate back to your `IoT system example configuration folder
-    <https://iotgateway.local/cloudcmd/fs/home/iot/iot-test/>`_
-    else navigate there by command line (``cd ~/iot-systems``).
+    <https://iotgateway.local/cloudcmd/fs/home/iot/iot-test/>`_.
+    Else navigate there by command line (for example ``cd ~/iot-systems/demo``).
 
     As you have seen, each node has its own configuration folder in IoTempower.
 
@@ -35,23 +35,26 @@ New Node
     folder and activate again the user menu (or type ``iot menu``).
 
     In the user menu, select ``Create New Node Folder``, and after verifying
-    the destination path (which should be ``iot-test/`` or ``iot-systems/``),
+    the destination path (which should be ``iot-test/`` or ``iot-systems/demo``),
     select ``Yes, run create_node_template``. Confirm a (hopefully) successful
     creation and you will be back in cloudcmd's web file panel or the command
-    line.
+    line. You can also run ``create_node_template`` directly.
 
     You should see there a new folder called new-node (next to the old folder
-    ``node1``, the ``README.rst`` and ``system.conf``).
+    ``node1`` or ``test01``, the ``README.rst`` and ``system.conf``
+    and eventually a sceraios folder).
 
--   Select the new folder by mouse or keyboard, and press the rename button
-    (or the F2 key) and rename the folder into ``node2`` - or rename it
-    directly on the command line.
+-   In cloudcmd, select the new folder by mouse or keyboard, and press the rename button
+    (or the F2 key) and rename the folder into ``node2`` - or rename it with the file
+    manager directlyor with ``mv new-node my-node2-name``  on the command line.
 
--   Navigate into the ``node2`` folder, you should see the files:
+-   Navigate into the ``node2`` or ``my-node2-name`` (for simplification, from now on 
+    we refer to your second node folder with the name ``node2`` - change accordingly) folder,
+    you should see the files:
     ``README.rst``, ``key.txt``, ``node.conf``, and ``setup.cpp``
 
 -   If you are not using a Wemos D1 Mini as new node, edit ``node.conf`` and
-    enter the new board.
+    enter the respective new board.
 
 -   Make sure to open another `IoTempower documentation web-page </>`_ for
     reference. And open from there the
@@ -62,8 +65,8 @@ New Node
     
 
 -   Edit ``setup.cpp``
-    and edit it (with edit button or F4 key
-    - or in command line with for example nano).
+    Either with cloudcmd edit it (with edit button or F4 key)
+    or in the command line with for example nano, micro, or tilde.
 
     You should see a small explanation comment block. You should now
     completely remove it to have an empty configuration file.
