@@ -53,7 +53,7 @@ So far just an example:
 
     animator(anim, IN(matrix))
         .with_fps(10)
-        .with_frame_builder( [&] () {
+        .with_frame_builder( [] () {
             for(int i=0; i<4; i++) {
                 if(frames[i]>0 && anim_types[i] != none) {
                     switch(anim_types[i]) {
@@ -71,10 +71,10 @@ So far just an example:
                     frames[i] --;
                 }
             }
-        } ).with_command_handler( "fade", [&] (Ustring& command) {
+        } ).with_command_handler( "fade", [] (Ustring& command) {
             set_animation(command, fade, -1, 100);
-        } ).with_command_handler( "fade_to", [&] (Ustring& command) {
+        } ).with_command_handler( "fade_to", [] (Ustring& command) {
             set_animation(command, fade_to, -1, 50);
-        } ).with_command_handler( "scroll", [&] (Ustring& command) {
+        } ).with_command_handler( "scroll", [] (Ustring& command) {
             set_animation(command, scroll, 5, 150);
         } );

@@ -21,7 +21,7 @@
 // in the topic myroom/test1/button1.
 input(button1, D3, "released", "pressed");
 //      .with_threshold(3)
-//      .on_change([&] (Device& dev) {
+//      .on_change([] (Device& dev) {
 //           if(dev.is("pressed")) {
 //               IN(blue).toggle();
 //           }
@@ -31,7 +31,7 @@ input(button1, D3, "released", "pressed");
 // Examples for analog device:
 // analog(a0).with_precision(5); //.with_threshold(100, "high", "low");
 // Using _ in end of device allows giving internal name and "external name"
-// analog(a0).filter( [&] (Device& dev) {
+// analog(a0).filter( [] (Device& dev) {
 //         const int buflen = 100;
 //         static long sum = 0;
 //         static long values_count = 0;
@@ -154,7 +154,7 @@ input(button1, D3, "released", "pressed");
 // // this defines the actual animator object
 // animator(anim, IN(matrix))
 //     .with_fps(10)
-//     .with_frame_builder( [&] () {
+//     .with_frame_builder( [] () {
 //         for(int i=0; i<4; i++) {
 //             if(frames[i]>0 && anim_types[i] != none) {
 //                 switch(anim_types[i]) {
@@ -172,11 +172,11 @@ input(button1, D3, "released", "pressed");
 //                 frames[i] --;
 //             }
 //         }
-//     } ).with_command_handler( "fade", [&] (Ustring& command) {
+//     } ).with_command_handler( "fade", [] (Ustring& command) {
 //         set_animation(command, fade, -1, 100);
-//     } ).with_command_handler( "fade_to", [&] (Ustring& command) {
+//     } ).with_command_handler( "fade_to", [] (Ustring& command) {
 //         set_animation(command, fade_to, -1, 50);
-//     } ).with_command_handler( "scroll", [&] (Ustring& command) {
+//     } ).with_command_handler( "scroll", [] (Ustring& command) {
 //         set_animation(command, scroll, 5, 150);
 //     } );
 
@@ -198,7 +198,7 @@ display44780(d2, 16, 2);
 //// Examples for gyros
 
 // MPU-6050
-// gyro6050(g0).filter( [&] (Device& dev) { // fuse accel value into one
+// gyro6050(g0).filter( [] (Device& dev) { // fuse accel value into one
 //    // ignore angles
 //    dev.value(0).clear();
 //    int a,b,c;

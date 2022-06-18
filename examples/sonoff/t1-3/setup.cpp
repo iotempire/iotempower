@@ -39,12 +39,12 @@ bool manage_state_led(Device& dev, int button_index) {
 
 input(button1, BUTTON1).invert()
     .debounce(DEBOUNCE)
-    .filter([&] (Device &dev) {
+    .filter([] (Device &dev) {
         return manage_state_led(dev, 1);
     })
     .filter_click_detector(click_min_ms, click_max_ms,
          longclick_min_ms, longclick_max_ms)
-    .on_change([&] (Device& dev) {
+    .on_change([] (Device& dev) {
          if(dev.is(str_click)) {
              unsigned long current = millis();
              if(current - lastb1 > 500) {
@@ -65,12 +65,12 @@ input(button1, BUTTON1).invert()
 
 input(button2, BUTTON2).invert()
     .debounce(DEBOUNCE)
-    .filter([&] (Device &dev) {
+    .filter([] (Device &dev) {
         return manage_state_led(dev, 2);
     })
     .filter_click_detector(click_min_ms, click_max_ms,
          longclick_min_ms, longclick_max_ms)
-    .on_change([&] (Device& dev) {
+    .on_change([] (Device& dev) {
          if(dev.is(str_click)) {
              lastb2 = millis();
              IN(relais2).toggle();
@@ -80,12 +80,12 @@ input(button2, BUTTON2).invert()
 
 input(button3, BUTTON3).invert()
     .debounce(DEBOUNCE)
-    .filter([&] (Device &dev) {
+    .filter([] (Device &dev) {
         return manage_state_led(dev, 3);
     })
     .filter_click_detector(click_min_ms, click_max_ms,
          longclick_min_ms, longclick_max_ms)
-    .on_change([&] (Device& dev) {
+    .on_change([] (Device& dev) {
          if(dev.is(str_click)) {
              unsigned long current = millis();
              if(current - lastb3 > 500) {

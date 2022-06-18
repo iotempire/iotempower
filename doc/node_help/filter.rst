@@ -8,7 +8,7 @@ Example for filter-function:
 
 ..  code-block:: cpp
 
-    analog(a0).filter( [&] (Device& dev) {
+    analog(a0).filter( [] (Device& dev) {
         const int buflen = 100;
         static long sum = 0;
         static long values_count = 0;

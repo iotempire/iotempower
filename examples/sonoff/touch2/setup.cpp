@@ -17,7 +17,7 @@ uint16_t touch_state = 0; // bit pattern for the touched buttons
 
 input(button1, BUTTON1).invert()
     .debounce(DEBOUNCE)
-    .filter([&] (Device &dev) {
+    .filter([] (Device &dev) {
         if(dev.is("on")) {
             touch_state |= 1;
         } else {
@@ -28,7 +28,7 @@ input(button1, BUTTON1).invert()
         return true;
     })
     .filter_click_detector(20, 800, 1000, 2500)
-    .on_change([&] (Device& dev) {
+    .on_change([] (Device& dev) {
          if(dev.is("click")) {
             IN(relais1).toggle();
          }
@@ -37,7 +37,7 @@ input(button1, BUTTON1).invert()
 
 input(button2, BUTTON2).invert()
     .debounce(DEBOUNCE)
-    .filter([&] (Device &dev) {
+    .filter([] (Device &dev) {
         if(dev.is("on")) {
             touch_state |= 2;
         } else {
@@ -48,7 +48,7 @@ input(button2, BUTTON2).invert()
         return true;
     })
     .filter_click_detector(20, 800, 1000, 2500)
-    .on_change([&] (Device& dev) {
+    .on_change([] (Device& dev) {
          if(dev.is("click")) {
              IN(relais2).toggle();
          }

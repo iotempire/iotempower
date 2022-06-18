@@ -414,7 +414,7 @@ class Filter_JMC_Median : public Callback {
 /* Jmc median over small time intervals with reset after time runs out*/
 // TODO rewrite as class to avoid local closure issues
 #define filter_jmc_interval_median(interval) with_filter_callback(\
-    *new Callback([&](Device& dev) { \
+    *new Callback([](Device& dev) { \
         static double median; \
         static double average; \
         static bool undefined = true; \
@@ -460,7 +460,7 @@ class Filter_Restrict : public Callback {
 /* round to the next multiple of base */
 // TODO rewrite as class to avoid local closure issues
 #define filter_round(base) with_filter_callback(\
-    *new Callback( [&](Device& dev) { \
+    *new Callback( [](Device& dev) { \
         int32_t v = (long)(dev.read_float()/(base)+0.5); \
         dev.write_int(v*(base)); \
         return true; \
@@ -470,7 +470,7 @@ class Filter_Restrict : public Callback {
 /* return maximum one value per time interval (interval in ms) */
 // TODO rewrite as class to avoid local closure issues
 #define filter_limit_time(interval) with_filter_callback(\
-    *new Callback( [&](Device& dev) { \
+    *new Callback( [](Device& dev) { \
         static unsigned long last_time; \
         unsigned long current = millis() ; \
         if(!dev.value().empty() \
@@ -617,7 +617,7 @@ class Filter_Click_Detector : public Callback {
 // new closures in esp8266 sdk are not allowing simple local callback closures anymore
 // /* Turn analog values into binary with a threshold level */
 // #define filter_binarize(cutoff, high, low) with_filter_callback( \
-//     *new Callback([&](Device& dev) { \
+//     *new Callback([](Device& dev) { \
 //         if(dev.value().equals(low)) return false; \
 //         if(dev.value().equals(high)) return false; \
 //         double sample = dev.value().as_float(); \

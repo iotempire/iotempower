@@ -14,7 +14,7 @@ void blink(int id) {
 analog(a0)
     .with_precision(5)
     .with_threshold(100, "wet", "dry")
-    .with_on_change_callback([&] {
+    .with_on_change_callback([] {
         if(IN(a0).value().equals("wet")) {
             blinks_left = 10;
             do_later(100, 1234, blink);

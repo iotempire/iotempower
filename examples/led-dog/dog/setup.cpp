@@ -20,7 +20,7 @@ rgb_matrix(matrix, IN(leds));
 
 animator(anim)
     .with_fps(30)
-    .with_frame_builder( [&] {
+    .with_frame_builder( [] {
         CRGB eye1=CRGB::Black, eye2 = CRGB::Black;
         CRGB new_color;
         CHSV hsv;
@@ -79,37 +79,37 @@ animator(anim)
 			}
 		}
     } )
-    .with_show( [&] { 
+    .with_show( [] { 
     	if(eyes_atype != none || tie_atype != tie_none) IN(matrix).show(); 
     } )
-    .with_command_handler( "colors", [&] (Ustring& command) {
+    .with_command_handler( "colors", [] (Ustring& command) {
         eyes_atype = color_animation;
         eyes_frame_counter = 0;
         eyes_frames = 300;
     } )
-    .with_command_handler( "wink", [&] (Ustring& command) {
+    .with_command_handler( "wink", [] (Ustring& command) {
         start_wink();
     } )
-    .with_command_handler( "rainbow", [&] (Ustring& command) {
+    .with_command_handler( "rainbow", [] (Ustring& command) {
         tie_atype = tie_none;
         IN(matrix).rainbow_row(2,0);
         IN(matrix).show();
     } )
-    .with_command_handler( "blue_red", [&] (Ustring& command) {
+    .with_command_handler( "blue_red", [] (Ustring& command) {
         tie_atype = tie_none;
         IN(matrix).gradient_row(CRGB::Blue, CRGB::Red, 2, 0);
         IN(matrix).show();
     } )
-    .with_command_handler( "green_blue", [&] (Ustring& command) {
+    .with_command_handler( "green_blue", [] (Ustring& command) {
         tie_atype = tie_none;
         IN(matrix).gradient_row(CRGB::Green, CRGB::Blue, 2, 0);
         IN(matrix).show();
     } )
-    .with_command_handler( "scroll", [&] (Ustring& command) {
+    .with_command_handler( "scroll", [] (Ustring& command) {
 		tie_frames = 300;
 		tie_atype = scroll;
     } )
-    .with_command_handler( "fade_out", [&] (Ustring& command) {
+    .with_command_handler( "fade_out", [] (Ustring& command) {
 		tie_frames = 100;
 		tie_atype = fade_out;
     } );

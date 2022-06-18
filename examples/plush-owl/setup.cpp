@@ -9,7 +9,7 @@ anim_type atype;
 rgb_strip(eyes, 2, WS2812, D2, GRB);
 animator(anim)
     .with_fps(30)
-    .with_frame_builder( [&] {
+    .with_frame_builder( [] {
         CRGB eye1=CRGB::Black, eye2 = CRGB::Black;
         CRGB new_color;
         CHSV hsv;
@@ -44,8 +44,8 @@ animator(anim)
             atype = none;
         }
     } )
-    .with_show( [&] { IN(eyes).show(); })
-    .with_command_handler( "colors", [&] (Ustring& command) {
+    .with_show( [] { IN(eyes).show(); })
+    .with_command_handler( "colors", [] (Ustring& command) {
         atype = color_animation;
         frame_counter = 0;
         frames = 300;

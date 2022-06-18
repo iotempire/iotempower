@@ -130,7 +130,7 @@ void display(std::function<void()> display_func) {
 
 void display_init() {
     if(!display_present) return;
-    display( [&] {
+    display( [] {
         u8g2.setFont(u8g2_font_7x14B_tr);
         u8g2.drawStr(20, 18, "IoT");
         u8g2.drawStr(10, 39, "Dongle");
