@@ -58,7 +58,13 @@ def change_volume_cb(msg):
         print("Got illegal value:", msg)
     else:
         print("Setting volume to", v)
-        sink.setvolume(int(v*100))
+        v=int(v*100)
+        if v==0:
+            sink.setvolume(v)
+            sink.setmute(1, alsaaudio.MIXER_CHANNEL_ALL)
+        else:
+            sink.setmute(0, alsaaudio.MIXER_CHANNEL_ALL)
+            sink.setvolume(v)
         publish_volume(v)
         last_v = v
         event_trigger = 50
