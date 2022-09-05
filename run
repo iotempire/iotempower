@@ -14,7 +14,7 @@
 function welcome() {
 cat << EOF
 IoTempower
-===========
+==========
 
 Your friendly and affordable Internet of Things environment.
 More at http://github.com/iotempire/iotempower
@@ -128,7 +128,7 @@ function run() {
             ;;
         "")
             welcome
-            exec bash
+            exec bash --noprofile --norc  # do not read again any of the environments
             ;;
         exec | x | run | -x | -c | --exec)
             shift
