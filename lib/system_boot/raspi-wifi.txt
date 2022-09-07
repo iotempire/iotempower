@@ -1,7 +1,7 @@
 # Add the following into the boot/wifi.txt file of a raspberry pi
 # iotgateway.
 
-### Wifi Name (avoid blanks) ###
+### Wifi Name (avoid blanks), when commented out, pick iotempower+mac-id ###
 iotempire-123456
 
 ### Password (at least 8 characters, max 32, avoid blanks) ###

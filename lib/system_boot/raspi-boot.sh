@@ -6,7 +6,7 @@
 # add the following to the end of /etc/rc.local with adjusted location of the
 # run-script:
 # export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-# /home/iot/bin/iot exec /home/iot/iot/lib/system_boot/raspi-boot.sh"
+# /home/iot/bin/iot exec /home/iot/iot/lib/system_boot/raspi-boot.sh
 #
 # Also disable all network devices in /etc/network/interfaces apart lo and wlan1
 # and make sure that wlan1 configuration looks like this (replace /home/pi/iotempower
