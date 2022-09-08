@@ -17,16 +17,14 @@ channel: https://www.youtube.com/results?search_query=ulno.net+iotempower+instal
 Installation on Raspberry Pi from Pre-Prepared Image
 ++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-This section is currently outdated!
-Proceed with caution (look better at Linux installation).
-
 Tutorial videos for setup:
 
 - `On MacOS <https://www.youtube.com/watch?v=oHM-ojoST-c>`__
 
 - `On PC/Windows <https://youtu.be/DZ-PwxIc8wY>`__
 
-- On Linux: Please follow the installation steps below (or file an issue to ask
+- On Linux: Please follow the installation steps below
+  (`Installation on Linux (and WSL)`_ or file an issue to ask
   for specific Linux video).
 
 

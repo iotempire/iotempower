@@ -9,7 +9,7 @@ Setting up the WiFi-Router on the Pi
 
 - Open the SD-card.
 
-- Find the ``wifi-setup.txt`` file
+- Find the ``wifi.txt`` file
   (Windows might not show the ``.txt`` extension)
 
 - Edit this ``wifi.txt`` file. Change the default values under
@@ -19,7 +19,7 @@ Setting up the WiFi-Router on the Pi
 
   ..  code-block:: bash
 
-      ### WiFi Name (avoid blanks) ###
+      ### WiFi Name (avoid blanks), when commented out, pick iotempower+mac-id ###
       #iotempire-123456
       ### Password (at least 8 characters, max 32, avoid blanks) ###
       iotempire
@@ -28,7 +28,7 @@ Setting up the WiFi-Router on the Pi
   
   ..  code-block:: bash
 
-      ### WiFi Name (avoid blanks) ###
+      ### WiFi Name (avoid blanks), when commented out, pick iotempower+mac-id ###
       my-iot-network
       ### Password (at least 8 characters, max 32, avoid blanks) ###
       secretpassword
@@ -43,7 +43,7 @@ Setting up the WiFi-Router on the Pi
   internet - no extra configuration is necessary for this.
   You can also connect an Android-phone with its charging cable to one of
   the USB ports of the pi and enable USB-tethering (if the Android phone) was
-  connected to wifi before it forward its ethernet to the pi gateway.
+  connected to wifi before it will forward its ethernet to the pi gateway.
   If you do not have access to an ethernet port or an Android phone
   just move to the next step.
   [#f1]_
@@ -60,26 +60,33 @@ Accessing the Local Services on the Raspberry Pi
 
 - You can now access IoTempower via a web browser.
 
-- Point your browser at https://192.168.12.1, https://iotgateway,
+- Point your browser at https://gw.iotempire.net
+  Yes, this global url should work and when connected to the internet
+  also not complain about any certificate issues.
+  If you have trouble connecting with this global URL, you can also try
+  https://192.168.12.1, https://iotgateway,
   or https://iotgateway.local. One of them should open the homepage of
   your IoTempower pi gateway installation.
-  Accept
-  the security exception for the locally generated security certificate. You
-  should now see a link to the filesystem through cloud commander
+  (If you don't have internet on the gateway and use one of the latter options, accept
+  the security exception for the locally generated security certificate.)
+  
+  You should now see a link to the filesystem through cloud commander
   and an IoT system example configuration folder on the pi,
   as well as links to the Node-RED
   installation.
 
-- If you are asked for a user, use ``iot``, if you are asked for a password
-  use ``iotempire``.
+- If you are asked for a user, use ``iot`` (for Node-RED and portainer you want to use admin),
+  if you are asked for a password use ``iotempire``.
 
-- Keep this home-page for for later (remember or bookmark).
+- Keep this home-page for later (remember or bookmark).
 
 - Now open in another tab this documentation locally on the gateway:
 
-  This will be either https://192.168.12.1/doc/quickstart-pi.rst,
+  This should be 
+  https://gw.iotempire.net/doc/quickstart-pi.rst
+  (or https://192.168.12.1/doc/quickstart-pi.rst,
   https://iotgateway/doc/quickstart-pi.rst,
-  or https://iotgateway.local/doc/quickstart-pi.rst.
+  or https://iotgateway.local/doc/quickstart-pi.rst).
 
   Continue to read the documentation from there.
 
@@ -100,7 +107,7 @@ Accessing the Local Services on the Raspberry Pi
   right corner).
 
 - Navigate into the ``node1``-folder and check (as before) the content of
-  ``setup.cpp``. A tiny bit cryptic? Don't fear this just says, we want to
+  ``setup.cpp``. A tiny bit cryptic? Don't fear! This just says, we want to
   configure a device with a button and make the onboard blue led accessible,
   leave the content view of ``setup.cpp`` again.
 
@@ -112,7 +119,7 @@ You can now continue with `First IoT Node <first-node.rst>`_.
 .. rubric:: Footnotes
 
 .. [#f1] If the Pi is not connected to the internet, a computer logged into its
-         WiFi network might change the network back to another WiFi connecting
+         WiFi network might change the network back to another WiFi connection
          as it prefers WiFi networks that are connected to the internet.
          Make sure to check that you are connected to the Pi-network on a
          regular basis.

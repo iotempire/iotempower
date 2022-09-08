@@ -7,13 +7,16 @@ tools:
 
 - `PlatformIO <http://platform.io>`__
 - `Node-RED <https://nodered.org>`__
-- `mosquitto <https://mosquitto.org/>`__.
-- `The Tilde Texteditor <https://os.ghalkes.nl/tilde>`__
+- `mosquitto <https://mosquitto.org/>`__
+- `DietPi <https://dietpi.com>`__
 - `create_ap <https://github.com/oblique/create_ap>`__ forked for IoTempower
   `here <https://github.com/ulno/create_ap>`__.
-- `FastLed rgb-strip library <https://github.com/FastLED/FastLED>`__
-- `rpi-clone <https://github.com/billw2/rpi-clone>`__
 - `cloudcmd <https://github.com/coderaiser/cloudcmd>`__
+- `FastLed rgb-strip library <https://github.com/FastLED/FastLED>`__,
+  unfortunately unstable on teh esp8266 and now extended by
+  `NeoPixelBus <https://github.com/Makuna/NeoPixelBus>`__,
+- `rpi-clone <https://github.com/billw2/rpi-clone>`__
+- `The Tilde Texteditor <https://os.ghalkes.nl/tilde>`__
 
 
 As IoTempower relies heavily on MQTT, it also integrates very easily with

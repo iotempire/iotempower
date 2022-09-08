@@ -1,17 +1,25 @@
 Install IoTempower image onto an SD-card
 ========================================
 
-ATTENTION: The raspberry pi image is currently outdated as we are using
-transitioning to docker. Please stay tuned and be active on the issues
-or in the forum if you want the re-implemantation of this feature
-coming back.
+REMARK: The transitioning to docker is still not completed. (Any volunteers?)
+The 64 bit image has been updated and is now based on `DietPi <https://dietpi.com>`__,
+if you want to run updates or make changes, please check out their documentation
+(maybe one day IoTempower gateway functionality can be directly integrated).
+Make sure to resize the image at one point with the DietPi tools
+(DietPi-Drive_Manager -> / -> Resize).
 
-- Download the Raspberry Pi image from - this version is outdated!!!
-  `here on Google Drive <https://drive.google.com/open?id=1b0M93T2-suLFMjpmf8PLUTEGh_rKT6_6>`_
+- Download the 64 Bit Raspberry Pi (only Pi 4 and probably Pi 3) image:
+  `iotgateway-pi64.img.xz <https://drive.google.com/file/d/1zz-bvu_x7rynVBTDSdJqs3SnXT4-cLyP>`_ 
+  from Google Drive.
+
+  (Old 32 bit version for pi 1-2 and zero, needs to be updated
+  `here on Google Drive <https://drive.google.com/open?id=1b0M93T2-suLFMjpmf8PLUTEGh_rKT6_6>`_,
+  sha256sum: f3be2ba597f2b885eb573a8c8af14e7cf788d614d765ae99ae0223c4f887454a)
   
 - Make sure the sha256-checksum of the image is correct. It should be:
-
-  ``f3be2ba597f2b885eb573a8c8af14e7cf788d614d765ae99ae0223c4f887454a``
+  ```
+  d7d8fe78817b1ba35558e57c47e8394df6408223b730737086d5c6d9adec3a94
+  ```
 
   On Linux and MacOS, you can use ``sha256sum`` or ``shasum -a 256`` to verify
   the image, on Windows you can use
