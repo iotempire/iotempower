@@ -23,7 +23,7 @@ libraries with permissable licenses).
 If you are impatient and want to dive into it right now, fast forward to
 one of the following:
 
-- `Raspberry Pi Quickstart </doc/quickstart-pi.rst>`_ - currently outdated
+- `Raspberry Pi Quickstart </doc/quickstart-pi.rst>`_
 - `Installation </doc/installation.rst>`_
 - `First IoT Node </doc/first-node.rst>`_
 
