@@ -30,7 +30,7 @@ Here is *more documentation*:
 
 Here are some *navigational links* that only work on the raspbery pi installation:
 
-- `IoT system example configuration folder </cloudcmd/fs/home/iot/iot-test>`_
+- `IoT system example configuration folder </cloudcmd/fs/home/iot/iot-systems/test01>`_
 
 - `Your home-directory </cloudcmd/fs/home/iot>`_
 

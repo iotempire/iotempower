@@ -41,7 +41,7 @@ of the cloned git repository to the
 outside of the repository. Let's assume the new system is called "demo"
 and our first node should be called "test01".
 
-To create the initial folder, do the following:
+To create the initial folder via the command-line, do the following:
 
 .. code-block:: bash
 
@@ -50,10 +50,18 @@ To create the initial folder, do the following:
   cd ~/iot-systems/demo
   mv node_template test01
 
+If you have the pi-image version or cloudcmd installed, you can alternatively
+navigate to your `gateway's system folder </cloudcmd/fs/home/iot/iot-systems/test01>`_
+via cloudcmd. Tap F2 there and create a new node via that menu and then rename
+that folder to test01.
+
 You can, of course, use another system name than "demo" (and even move
-or rename this folder later). Renaming nodes at a later point
+or rename this folder later - on the pi image it's called also test01). Renaming nodes at a later point
 requires a re-flash of the corresponding microcontroller, so let's be a
 bit more careful here.
+
+If you have the pi-image version, you can skip all teh networking steps
+below as it takes care of all the network setup for you.
 
 Depending on your network setup, we now need to figure out some ``ipconfig``
 addresses and configure things accordingly to make sure our node can
@@ -111,7 +119,8 @@ Go to the folder we copied earlier:
 ``cd ~/iot-systems/demo``
 
 Edit the system.conf file (``nano system.conf``), uncomment and adjust
-the lines for ``IOTEMPOWER_MQTT_HOST``, :
+the lines for ``IOTEMPOWER_MQTT_HOST``, (if you use cloudcmd on the pi,
+you can use teh built in editor):
 
 .. code-block:: bash
 
@@ -163,7 +172,7 @@ First Deployment
    run the following command
 
    In Linux (if you run in a virtual machine, pass through your serial USB
-   of your microcontroller): ``deploy serial``
+   of your microcontroller): ``deploy serial`` (or select from cloudcmd menu)
 
    In Windows: 
    
