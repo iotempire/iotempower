@@ -12,20 +12,19 @@ Make sure to resize the image at one point with the DietPi tools
   `iotgateway-pi64.img.xz <https://drive.google.com/file/d/1zz-bvu_x7rynVBTDSdJqs3SnXT4-cLyP>`_ 
   from Google Drive.
 
-  (Old 32 bit version for pi 1-2 and zero, needs to be updated
+  The old 32 bit version for pi 1-2 and zero (needs to be updated) is
   `here on Google Drive <https://drive.google.com/open?id=1b0M93T2-suLFMjpmf8PLUTEGh_rKT6_6>`_,
-  sha256sum: f3be2ba597f2b885eb573a8c8af14e7cf788d614d765ae99ae0223c4f887454a)
+  sha256sum: ``f3be2ba597f2b885eb573a8c8af14e7cf788d614d765ae99ae0223c4f887454a``
   
 - Make sure the sha256-checksum of the image is correct. It should be:
-  ```
-  3bb5379aaca519005f0df227560618025bb40f45e6ab29528f4509ecfcd457ea
-  ```
+  ``3bb5379aaca519005f0df227560618025bb40f45e6ab29528f4509ecfcd457ea``
 
   On Linux and MacOS, you can use ``sha256sum`` or ``shasum -a 256`` to verify
   the image, on Windows you can use
   https://raylin.wordpress.com/downloads/md5-sha-1-checksum-utility/
 
-- Write the image to a (at least) 8GB class-10 sd-card with https://etcher.io/
+- Write the image to an (at least) 8GB class-10 sd-card with 
+  `Etcher <https://www.balena.io/etcher/>`_
   (works on Windows, MacOS, or Linux).
 
 Top: `ToC <index-doc.rst>`_, Previous: `Installation <installation.rst>`_,

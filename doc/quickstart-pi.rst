@@ -34,7 +34,7 @@ Setting up the WiFi-Router on the Pi
       secretpassword
 
   This configures the pi as a WiFi-router.
-  Remember the ``WiFi Name`` and ``Password`` so you can log in to
+  Remember the ``WiFi Name`` and ``Password`` so you can log into
   the WiFi network of the Pi from your computer.
 
 - If you have access to ethernet (for example a free ethernet lan port/socket
