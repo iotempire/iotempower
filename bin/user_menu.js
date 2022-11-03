@@ -336,7 +336,7 @@ function shell_escape() {
 function poweroff() {
     shell_command("This will cleanly shut down the gateway. "
         + "Are you sure you want to shutdown and power off the gateway?",
-        "sudo poweroff");
+        "sudo /usr/bin/poweroff");
 }
 
 function wifi_config() {
