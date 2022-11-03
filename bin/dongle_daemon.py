@@ -115,7 +115,7 @@ class UED_Listener(threading.Thread):
                         if answer == b"!daemon_check":
                             self.send_info()
                         elif answer == b"!shutdown":
-                            subprocess.run(["sudo","/usr/sbin/poweroff"],timeout=60)
+                            subprocess.run(["sudo","-S","/usr/sbin/poweroff"],timeout=60)
                             self.quit()
                         else:
                             logging.debug(answer)
