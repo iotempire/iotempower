@@ -1,0 +1,6 @@
+#!/bin/bash
+cd ~/iot/examples/iotknit/artificial-window/iotknit/
+while true; do
+    sleep 7
+    iot exec ./run.sh
+done

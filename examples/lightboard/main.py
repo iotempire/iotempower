@@ -83,8 +83,8 @@ def draw_image(im,startx,starty):
             imx += 1
 
 
-# use integriot for mqtt intgration
-from integriot import *
+# use iotknit for mqtt intgration
+from iotknit import *
 init("192.168.12.1")  # TODO: change to iotgateway
 prefix("lightboard00")  # prototype lightboard
 
@@ -157,7 +157,7 @@ begin()
 clear()
 show()
 print("Ready to accept commands, ctrl-c to stop.")
-# run integriot event loop
+# run iotknit event loop
 while True:
-    process()  # call integriot loop
+    process()  # call iotknit loop
     animation_next() # call update
