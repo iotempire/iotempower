@@ -6,7 +6,7 @@ It is therefore an IoT integration system (similar but much more
 barebones than `Node-RED <https//nodered.org>`_).
 It was called initially IntegrIoT since 2017, but that name was also adopted
 by `BM Communications <https://www.bmit.cz>`_ in 2022 and therefor
-had to be changed to forego any potential legal conflicts
+had to be changed to forego any confusion or even potential legal conflicts
 for this open source project here.
 
 It is a Python module and can be installed to your local
