@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61", "setuptools_scm[toml]>=6.2", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "iotknit"
+authors = [
+    { name = "Ulrich Norbisrath", email = "devel@mail.ulno.net" }
+]
+description = "The IoT integrator IoTknit."
+readme = "README.rst"
+requires-python = ">=3.6"
+keywords = ["IoT", "integration", "MQTT"]
+license = {text = "MIT License"}
+classifiers = [
+    "Programming Language :: Python :: 3",
+]
+dependencies = [
+    "paho-mqtt>=1.6.1"
+]
+#version = "0.0.1"
+dynamic = ["version"]
+
+[tool.setuptools_scm]
+root="../.."
+version_scheme = "post-release"
+local_scheme = "node-and-date"
+#write_to = "lib/iotknit/pkg/_version.py"
