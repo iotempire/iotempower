@@ -97,6 +97,7 @@ else
     pip install recommonmark
     # for later development
     pip install paho-mqtt  # also for iotknit
+	pip install git+https://github.com/iotempire/iotknit
     pip install ipython
     pushd . &> /dev/null
 	# platformio in python3
