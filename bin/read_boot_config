@@ -49,7 +49,9 @@ fi
 if [[ -e "$_WIFI_IN_CONFIG" ]]; then
     mapfile -t lines < <(sed 's/\r$//' "$_WIFI_IN_CONFIG" | egrep -v '\w*#|^$')
     count=${#lines[@]}
-    if [[ $count -eq 2 ]]; then  # only one param given -> IOTEMPOWER_AP_PASSWORD
+    if [[ $count -eq 1 ]]; then  # only one param given -> wifi without pw
+        uiot_wifi_name="${lines[0]}"
+    elif [[ $count -eq 2 ]]; then
         uiot_wifi_name="${lines[0]}"
         uiot_wifi_password="${lines[1]}"
     elif [[ $count -eq 3 ]]; then
