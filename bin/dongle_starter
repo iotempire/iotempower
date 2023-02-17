@@ -12,19 +12,26 @@ fi
 
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
-for i in {1..10}; do
-	echo "Scanning for dongle"
-	if find_dongle &>/dev/null ; then
-		break;
-	else
-		echo "No dongle connected. Exiting."
-		exit 1
-	fi
-done
-
 while true; do
     sleep 1
     dongle daemon
     sleep 1
+    dongle=""
+    for i in {1..10}; do
+        sleep 30
+        echo -n "$i/10) Scanning for dongle... "
+        if find_dongle &>/dev/null ; then
+            dongle="yes"
+            echo "found."
+            break;
+        else
+            echo "no dongle connected."
+        fi
+    done
+    if test "$dongle" != "yes"; then
+        echo "No dongle connected after several minutes, exiting"
+        exit 1
+    fi
 done
 
+# TODO: make daemon only come up when a dongle is plugged in
