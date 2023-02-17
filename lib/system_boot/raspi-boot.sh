@@ -40,10 +40,8 @@ if [[ "IOTEMPOWER_AP_PASSWORD" ]]; then # pw was given, so start an accesspoint
             new-window -d -n nodered  \
                 su - $IOTEMPOWER_USER -c 'iot exec nodered_starter' \; \
             new-window -d -n cloudcmd  \
-                su - $IOTEMPOWER_USER -c 'iot exec cloudcmd_starter' \; 
-            # TODO: fix that dongle search does not interrupt flashing
-            #     \
-            # new-window -d -n dongle  \
-            #     su - $IOTEMPOWER_USER -c 'iot exec dongle_starter' \;
+                su - $IOTEMPOWER_USER -c 'iot exec cloudcmd_starter' \; \
+            new-window -d -n dongle  \
+                su - $IOTEMPOWER_USER -c 'iot exec dongle_starter' \;
     ) &
 fi # accesspoint check

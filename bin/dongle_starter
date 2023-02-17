@@ -4,12 +4,23 @@ cat << EOF
 Syntax: dongle_starter
 
 Start dongle_daemon in a loop (restart when exit).
+If no dongle present in beginning, exit.
 
 EOF
 exit 1
 fi
 
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
+
+for i in {1..10}; do
+	echo "Scanning for dongle"
+	if find_dongle &>/dev/null ; then
+		break;
+	else
+		echo "No dongle connected. Exiting."
+		exit 1
+	fi
+done
 
 while true; do
     sleep 1

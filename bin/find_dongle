@@ -1,0 +1,25 @@
+#!/bin/bash
+# find dongle
+#
+# scan ports to see if there is a dogle connected
+#
+
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
+
+ports=$(platformio device list --serial|egrep '^/dev/tty'|\
+    sed s/ttyS/zzttyS/|sed s/ttyAMA/zzttyAMA/|sort|\
+    sed s/zzttyS/ttyS/|sed s/zzttyAMA/ttyAMA/) # get available serial ports with ttyS and ttyAMA in end
+port=""
+for p in $ports; do
+    if dongle probe -p "$p" &>/dev/null; then
+        port="$p"
+        break;
+    fi
+done
+if [[ "$port" ]]; then
+    echo $port
+    exit 0
+else
+    echo "No dongle connected."
+    exit 1
+fi    
