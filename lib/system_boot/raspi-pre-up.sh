@@ -35,7 +35,9 @@ key_mgmt=WPA-EAP
 }
 EOF
 
-        else # no user was given, try wpa
+        else # no user was given, try wpa or open
+
+        	if [[ "$uiot_wifi_password" ]]; then # a password was given, so try wpa
 
 cat << EOF >> "$cfg"
 
@@ -46,6 +48,19 @@ key_mgmt=WPA-PSK
 psk="$uiot_wifi_password"
 }
 EOF
+
+			else # no password, btu netwrok, try open
+
+cat << EOF >> "$cfg"
+
+network={
+ssid="$uiot_wifi_name"
+scan_ssid=1
+key_mgmt=NONE
+}
+EOF
+			 
+			fi
         fi # connect to which network type check
 
         # restart interface with new configuration
