@@ -43,7 +43,7 @@ remove_debug_from_make() {
     path="$(pwd)"
     cd "$1/src"
     # remove line with -D.*DEBUG
-    egrep -v '\-D.*DEBUG' Makefile > Makefile.new
+    grep -E -v '\-D.*DEBUG' Makefile > Makefile.new
     mv Makefile.new Makefile
     cd "$path"
 }

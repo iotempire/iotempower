@@ -7,11 +7,11 @@ _WIFI_IN_CONFIG="/boot/wifi-in.txt"
 
 if [[ -e "$_BOOT_CONFIG" ]]; then
     # check if otg-mode was enabled
-    sed 's/\r$//' "$_BOOT_CONFIG"|egrep '^\s*dtoverlay=dwc2\s*' &> /dev/null && otg_on=1
+    sed 's/\r$//' "$_BOOT_CONFIG"|grep -E '^\s*dtoverlay=dwc2\s*' &> /dev/null && otg_on=1
 fi
 
 if [[ -e "$_WIFI_CONFIG" ]]; then
-    mapfile -t lines < <(sed 's/\r$//' "$_WIFI_CONFIG"| egrep -v '\w*#|^$')
+    mapfile -t lines < <(sed 's/\r$//' "$_WIFI_CONFIG"| grep -E -v '\w*#|^$')
     count=${#lines[@]}
     if [[ $count -eq 1 ]]; then  # only one param given -> IOTEMPOWER_AP_PASSWORD
         add_id=1
@@ -47,7 +47,7 @@ if [[ -e "$_WIFI_CONFIG" ]]; then
 fi
 
 if [[ -e "$_WIFI_IN_CONFIG" ]]; then
-    mapfile -t lines < <(sed 's/\r$//' "$_WIFI_IN_CONFIG" | egrep -v '\w*#|^$')
+    mapfile -t lines < <(sed 's/\r$//' "$_WIFI_IN_CONFIG" | grep -E -v '\w*#|^$')
     count=${#lines[@]}
     if [[ $count -eq 1 ]]; then  # only one param given -> wifi without pw
         uiot_wifi_name="${lines[0]}"

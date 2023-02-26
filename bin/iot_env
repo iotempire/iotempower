@@ -28,4 +28,4 @@ else
 fi
 
 # output and quote result
-env|egrep "^IOTEMPOWER"|sed 's/^\([^=]*\)=\(.*\)$/export\ \1=\"\2\"/g'
+env|grep -E "^IOTEMPOWER"|sed 's/^\([^=]*\)=\(.*\)$/export\ \1=\"\2\"/g'

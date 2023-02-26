@@ -39,7 +39,7 @@ else
     #         break
     #     fi
     # done
-    ports=$(platformio device list --serial|egrep '^/dev/tty'|\
+    ports=$(platformio device list --serial|grep -E '^/dev/tty'|\
         sed s/ttyS/zzttyS/|sed s/ttyAMA/zzttyAMA/|sort|\
         sed s/zzttyS/ttyS/|sed s/zzttyAMA/ttyAMA/) # get available serial ports with ttyS and ttyAMA in end
     port=""
