@@ -31,7 +31,7 @@ fi
 
 cloudcmd_config=~/.cloudcmd.json
 
-jq '.prefix = "/cloudcmd" | .username = "iot" | '\
+jq '.auth = true | .prefix = "/cloudcmd" | .username = "iot" | '\
 '.password = "709d553e1a6e0b3f874408865d169870a945ceb25d72be561b7a50a23713d3452aea896e8e24783adcce86fddba087939ae3da9574997334e6362b5e767aa68a" | '\
 '.algo = "sha512WithRSAEncryption"' "$cloudcmd_config" > "$cloudcmd_config.new" || { echo "jq failed, aborting." 1>&2;exit 1; }
 mv "$cloudcmd_config" "$cloudcmd_config.backup"
