@@ -36,3 +36,5 @@ jq '.auth = true | .prefix = "/cloudcmd" | .username = "iot" | '\
 '.algo = "sha512WithRSAEncryption"' "$cloudcmd_config" > "$cloudcmd_config.new" || { echo "jq failed, aborting." 1>&2;exit 1; }
 mv "$cloudcmd_config" "$cloudcmd_config.backup"
 mv "$cloudcmd_config.new" "$cloudcmd_config"
+
+cp "$IOTEMPOWER_ROOT/lib/gateway_setup/cloudcmd/cloudcmd.menu.js" "$HOME/.cloudcmd.menu.js"
