@@ -30,9 +30,9 @@ Here is *more documentation*:
 
 Here are some *navigational links* that only work on the raspbery pi installation:
 
-- `IoT system example configuration folder </cloudcmd/fs/home/iot/iot-systems/demo01>`_
+- `IoT system example configuration folder`_
 
-- `Your home-directory </cloudcmd/fs/home/iot>`_
+- `Your home-directory`_
 
 Here are links to the local *Node-RED*
 (visual IoT system configuration) installation (also only on pi installation):
@@ -40,3 +40,5 @@ Here are links to the local *Node-RED*
 - `Node-RED </nodered/>`_
 
 - `Node-RED user interface page </nodered/ui>`_
+
+.. include:: _links.rst

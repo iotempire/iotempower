@@ -25,6 +25,13 @@ cd "$IOTEMPOWER_ROOT/doc"
 
 create_doc() {
     echo "Generating man pages."
+
+    cat << EOF > $IOTEMPOWER_ROOT/doc/_links.rst
+.. _IoT system example configuration folder: /cloudcmd/fs$HOME/iot-systems/demo01
+
+.. _Your home-directory: /cloudcmd/fs$HOME
+
+EOF
     make man
     echo "Generating web-viewable documentation."
     make html
