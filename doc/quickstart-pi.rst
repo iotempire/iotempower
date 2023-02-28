@@ -36,6 +36,7 @@ Setting up the WiFi-Router on the Pi
   This configures the pi as a WiFi-router.
   Remember the ``WiFi Name`` and ``Password`` so you can log into
   the WiFi network of the Pi from your computer.
+  (You can skip the password if you want to conenct to an open network.)
 
 - If you have access to ethernet (for example a free ethernet lan port/socket
   on your
@@ -48,7 +49,7 @@ Setting up the WiFi-Router on the Pi
   just move to the next step.
   [#f1]_
 
-- Put the sd-card into a Raspberry Pi 3 and power it up.
+- Put the sd-card into a Raspberry Pi 4 and power it up.
 
 - You should now see your IoTempower WiFi network as specified in ``WiFi Name``.
   Connect your computer (laptop or desktop pc) to this WiFi network

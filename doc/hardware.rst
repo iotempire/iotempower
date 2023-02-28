@@ -13,11 +13,12 @@ D1 Mini, ESP8266, NodeMCU, 37-in-1 Arduino sensor kit.
 
 The gateway services have been tested to run on:
 
-- Raspberry Pi 1 (B and B+), 2, 3, and Zero W - however,
-  the Raspberry Pi 3 is our first choice
-- Laptops running Ubuntu Linux > 18.04
+- Raspberry Pi 1 (B and B+), 2, 3, 4 and Zero W - however,
+  the Raspberry Pi 4 is our first and currently mainly
+  supported choice
+- Laptops running Ubuntu Linux > 18.04, Arch Linux, Termux
 
-We are trying to provide virtualbox images and cocker configurations
+We are trying to provide virtualbox images and docker configurations
 as soon as we find time
 and/or volunteers.
 

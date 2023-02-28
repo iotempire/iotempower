@@ -1,0 +1,18 @@
+{
+	skip_install_trust
+	http_port 40080
+	debug
+}
+localhost:40080 {
+	reverse_proxy /nodered/* localhost:1880
+	reverse_proxy /cloudcmd/* localhost:8000
+
+	@ext {
+		path_regexp static ^/(.*)(.rst)|(.md)$
+	}
+	rewrite @ext {re.static.1}.html
+	file_server {
+		root "{$IOTEMPOWER_LOCAL}/doc/html"
+	}
+
+}

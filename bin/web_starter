@@ -1,0 +1,27 @@
+#!/bin/bash
+if [[ $# -gt 1 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
+cat << EOF
+Syntax: web_starter [lan]
+
+Start all web services (and loop them when they fail).
+Starts local servies by defautl. If lan specified,
+it starts the services on http and https port.
+
+EOF
+exit 1
+fi
+
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
+
+config="local"
+if [[ "$1" == "lan" ]]; then
+    config="lan"
+fi
+
+cloudcmd_starter &
+nodered_starter &
+
+while true; do
+    caddy run --adapter caddyfile --config "$IOTEMPOWER_ROOT/etc/caddyfile.$config"
+    sleep 1
+done

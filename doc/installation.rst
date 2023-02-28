@@ -11,23 +11,13 @@ up and running:
    `Installation on Linux (and WSL)`_
 
 Please also check out the tutorial videos for this setup on ulno's youtube
-channel: https://www.youtube.com/results?search_query=ulno.net+iotempower+installation
+channel(s): https://www.youtube.com/@ut-teaching-ulno4928/search?query=gateway
 
 
 Installation on Raspberry Pi from Pre-Prepared Image
 ++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Tutorial videos for setup:
-
-- `On MacOS <https://www.youtube.com/watch?v=oHM-ojoST-c>`__
-
-- `On PC/Windows <https://youtu.be/DZ-PwxIc8wY>`__
-
-- On Linux: Please follow the installation steps below
-  (`Installation on Linux (and WSL)`_ or file an issue to ask
-  for specific Linux video).
-
-
+Tutorial video for setting up the sd-card for the pi: https://youtu.be/FrIIXsseZys
 
 Installation step by step:
 
@@ -117,13 +107,14 @@ You can now continue with `First IoT Nodes <first-node.rst>`_.
 Installation on Linux (and WSL)
 +++++++++++++++++++++++++++++++
 
-The steps for WSL (Windows Subsystem for Linux) and Linux should be the same. For information on how to run IoT Empower on a Raspberry Pi, 
+The steps for WSL (Windows Subsystem for Linux) and Linux should be the same.
+For information on how to run IoTempower on a Raspberry Pi, 
 please go to `this link </doc/installation.rst>`__.
 
 We highly recommend against using WSL 2 as the networking is currently
 a total mess and serial ports are nearly unsupported.
 WSL 1 kind of works, though a powerful computer (4 cores and min. 16GB) should still yield better
-results in with a lightweight Linux (like xubuntu or xfce manjaro) in
+results with a lightweight Linux (like xubuntu or xfce manjaro) in a
 virtual machine (using for example virtual box with bridged networking).
 If you don't have a computer running a dedicated Linux, consider dual
 booting Linux.
@@ -137,9 +128,12 @@ booting Linux.
       sudo apt-get update  # make sure system is up to date
       sudo apt install git haveged mosquitto mosquitto-clients virtualenv iptables 
       sudo apt install bridge-utils hostapd dnsmasq build-essential
-      sudo apt install nodejs npm  # if you have node-red, nodejs, npm running, skip this step as it might show errors
-      sudo apt install mc tilde # this is optional: mc is nicer file management in cli, tilde a nicer editor than nano
-      sudo npm install -g terminal-kit  # this is ugly as it uses root, but the simplest way
+      # installing nodejs on a debain system is currently a bit tricky, best compare
+      # https://github.com/nodesource/distributions/blob/master/README.md
+      curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash - &&\
+      sudo apt-get install -y nodejs npm
+      sudo apt install mc micro tilde # this is optional: 
+      # mc is nicer file management in cli, micro and tilde are nicer editor than nano
       # if you run on a native Ubuntu (not in WSL) consider running
       # (you can skip this if you like the default password-less mosquitto setup, but be warned)
       sudo systemctl stop mosquitto
@@ -156,7 +150,6 @@ booting Linux.
       sudo pacman -S iptables bridge-utils hostapd dnsmasq nodejs npm
       sudo pacman -S mc micro # this is optional: mc is nicer file management in cli, micro a nicer editor than nano
       # terminal-kit installation is done locally in iot environment and works on arch
-      # but if you want it globally, you can consider sudo npm install -g terminal-kit
       # if you run on a native Arch/Manjaro (not in WSL) consider running
       # (you can skip this if you like the default password-less mosquitto setup, but be warned)
       sudo systemctl stop mosquitto

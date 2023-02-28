@@ -12,7 +12,8 @@ if [[ ! "$IOTEMPOWER_ACTIVE" = "yes" ]]; then # only import once
 source "$IOTEMPOWER_ROOT/lib/shell_starter/config.bash" \
         || echo "trouble initializing, environment might not work." 1>&2
 
-export PYTHONPATH="$PYTHONPATH:$IOTEMPOWER_ROOT/lib"
+# not necessary with iotknit being installed via pip
+# export PYTHONPATH="$PYTHONPATH:$IOTEMPOWER_ROOT/lib" 
 
 ## if you type cd you go to iotempower-root
 #iot_cd() {

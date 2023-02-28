@@ -70,7 +70,7 @@ try:
 	server = HTTPServer(('', PORT_NUMBER), myHandler)
 	print('Started httpserver on port ' , PORT_NUMBER)
 	
-	#Wait forever for incoming htto requests
+	#Wait forever for incoming http requests
 	server.serve_forever()
 
 except KeyboardInterrupt:

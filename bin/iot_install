@@ -18,21 +18,30 @@
 function welcome() {
 cat << EOF
 IoTempower installer
-=================
+====================
 
 Welcome to the IoTempower environment installer. You are just a couple of steps
 from setting up a very simple and accessible system to deploy your own
 Internet of Things (IoT).
 
-You need build-essential, virtualenv, git, hostapd, dnsmasq, nodejs,
-python-dev, and haveged installed.
+You need build-essential, virtualenv, git, hostapd, dnsmasq, iptables,
+bridge-utils, python-dev, mosquitto-clients, haveged,
+and a current nodejs installed.
 
 On Ubuntu or Debian systems install these with:
-sudo apt install build-essential git mc mosquitto mosquitto-clients \
-         virtualenv iptables bridge-utils hostapd dnsmasq nodejs haveged \
-         python-dev python3-dev
+sudo apt install build-essential git mosquitto-clients \
+         virtualenv iptables bridge-utils hostapd dnsmasq haveged \
+         python3-dev
 
-(On raspberry pi, installing nodejs is more difficult. Search the web, how.)
+Installing a current nodejs on debian, ubuntu, and raspberry os
+is not trivial, best follow the instructions for the node install here:
+https://github.com/nodesource/distributions/blob/master/README.md
+
+
+Optionally you want the mqtt server mosquitto, midight commander (mc),
+the editor micro, and the fast simple webserver caddy.
+You can install these with:
+sudo apt install mc mosquitto micro caddy
 
 Do you want to set it up? (Y/n)
 EOF

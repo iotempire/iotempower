@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+#
+# install web services: node-red and cloudcmd
+# if called as install_web uninstall, it will uninstall the services
+#
+# Author: ulno
+# Create date: 2023-02-28
+#
+
+if [[ $# -gt 1 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
+cat << EOF
+Syntax: web_install [uninstall]
+
+Install node-red and cloudcmd. A working nodejs and npm  needs to be avaialble 
+in the system. Also teh webserver caddy needs to be installed.
+
+EOF
+exit 1
+fi
+
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
+
+# Check requirements.
+# caddy
+version="2.6"
+current="$(caddy version|cut -b2-)"
+if [ $(printf "${current}\n${version}"|sort -V|head -1) != "${version}" ]; then
+    echo "No caddy version >=$version installed, aborting." 1>&2; exit 1
+fi
+# nodejs
+version="18"
+current="$(node --version|cut -b2-)"
+if [ $(printf "${current}\n${version}"|sort -V|head -1) != "${version}" ]; then
+    echo "No nodejs version >=$version installed, aborting." 1>&2; exit 1
+fi
+# npm
+version="8.5"
+current="$(npm --version)"
+if [ $(printf "${current}\n${version}"|sort -V|head -1) != "${version}" ]; then
+    echo "No npm version >=$version installed, aborting." 1>&2; exit 1
+fi
+
+inst_str="install"
+if [[ "$1" == uninstall ]]; then
+    inst_str=uninstall
+fi
+
+cd "$IOTEMPOWER_LOCAL/nodejs"
+echo "==== ${inst_str}ing node-red ====="
+npm $inst_str node-red
+echo
+echo "==== ${inst_str}ing cloudcmd ====="
+npm $inst_str cloudcmd
+echo
+echo "==== ${inst_str}ing gritty for cloudcmd ====="
+npm $inst_str gritty
+echo
+
+if [[ ! "$1" == uninstall ]]; then
+    echo "Fixing configuration."
+    update_config_web
+    echo "Adding gritty to cloudcmd config."
+    cloudcmd --terminal --terminal-path `gritty --path` --save --no-server
+fi
+
+echo "Done."
+
+exit 0
+

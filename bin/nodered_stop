@@ -1,0 +1,15 @@
+#!/bin/bash
+if [[ $# -gt 0 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
+cat << EOF
+Syntax: nodered_stop
+
+Stops looping Node-RED.
+
+EOF
+exit 1
+fi
+
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
+
+pkill -f /bin/nodered_starter
+pkill node-red
