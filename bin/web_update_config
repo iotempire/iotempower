@@ -19,7 +19,7 @@ module.exports.adminAuth= {
     type: "credentials",
     users: [{
         username: "admin",
-        password: "$2b$08$W5LDP3eTaIYjz5iJkKVwMu9JDg3cPFMUvBypMCmYA3fpjYQlzFC4e",
+        password: "\$2b\$08\$W5LDP3eTaIYjz5iJkKVwMu9JDg3cPFMUvBypMCmYA3fpjYQlzFC4e",
         permissions: "*"
     }]
 };

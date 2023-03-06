@@ -23,20 +23,20 @@ fi
 # Check requirements.
 # caddy
 version="2.6"
-current="$(caddy version|cut -b2-)"
-if [ $(printf "${current}\n${version}"|sort -V|head -1) != "${version}" ]; then
+current="$(caddy version 2>/dev/null |cut -b2-)"
+if [ x$(printf "${current}\n${version}"|sort -V|head -1) != "x${version}" ]; then
     echo "No caddy version >=$version installed, aborting." 1>&2; exit 1
 fi
 # nodejs
-version="18"
+version="14.21"
 current="$(node --version|cut -b2-)"
-if [ $(printf "${current}\n${version}"|sort -V|head -1) != "${version}" ]; then
+if [ x$(printf "${current}\n${version}"|sort -V|head -1) != "x${version}" ]; then
     echo "No nodejs version >=$version installed, aborting." 1>&2; exit 1
 fi
 # npm
-version="8.5"
+version="6.14"
 current="$(npm --version)"
-if [ $(printf "${current}\n${version}"|sort -V|head -1) != "${version}" ]; then
+if [ x$(printf "${current}\n${version}"|sort -V|head -1) != "x${version}" ]; then
     echo "No npm version >=$version installed, aborting." 1>&2; exit 1
 fi
 
@@ -46,10 +46,10 @@ if [[ "$1" == uninstall ]]; then
 fi
 
 cd "$IOTEMPOWER_LOCAL/nodejs"
-echo "==== ${inst_str}ing node-red ====="
+echo "==== ${inst_str}ing node-red for IoTempower ====="
 npm $inst_str node-red
 echo
-echo "==== ${inst_str}ing cloudcmd ====="
+echo "==== ${inst_str}ing cloudcmd for IoTempower  ====="
 npm $inst_str cloudcmd
 echo
 echo "==== ${inst_str}ing gritty for cloudcmd ====="
@@ -58,7 +58,7 @@ echo
 
 if [[ ! "$1" == uninstall ]]; then
     echo "Fixing configuration."
-    update_config_web
+    web_update_config
     echo "Adding gritty to cloudcmd config."
     cloudcmd --terminal --terminal-path `gritty --path` --save --no-server
 fi
