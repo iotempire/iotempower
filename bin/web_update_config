@@ -15,6 +15,7 @@ nodered_config=~/.node-red/settings.js
 if ! grep -q "module.exports.httpAdminRoot = '/nodered';" "$nodered_config" ; then
 	cat << EOF >> "$nodered_config"
 module.exports.httpAdminRoot = '/nodered';
+module.exports.httpNodeRoot = '/nodered';
 module.exports.adminAuth= {
     type: "credentials",
     users: [{
