@@ -140,7 +140,7 @@ Visually Programming the Connections
 Congratulations!! You can remote control your led!
 
 If you still have some time, try using this new button to toggle the led.
-Study for this the filter/rbe and toggle node.
+Study for this the filter/rbe and toggle node. (If you don't have the toggle node in Node-RED, you can get it here: https://flows.nodered.org/flow/020546215faf4bb2ca4b1ebcac609154.)
 What is happening in them?
 
 
