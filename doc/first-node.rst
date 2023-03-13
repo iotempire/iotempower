@@ -146,7 +146,8 @@ Go to the folder we copied earlier:
 
 Edit the system.conf file (``nano system.conf``), uncomment and adjust
 the lines for ``IOTEMPOWER_MQTT_HOST``, (if you use cloudcmd on the pi,
-you can use the built in editor):
+you can use the built-in editor, but if you are actually on cloudcmd on the pi-image,
+you can skip this step as the defaults will be correct):
 
 .. code-block:: bash
 
