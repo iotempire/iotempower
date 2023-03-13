@@ -52,7 +52,7 @@ To create the initial folder via the command-line, do the following:
   cd ~/iot-systems/demo
   mv node_template test01
 
-If you look at ~/iot-systems/demo/system.conf, you should see teh following:
+If you look at ~/iot-systems/demo/system.conf, you should see the following:
 
 .. code-block:: bash
 
