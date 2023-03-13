@@ -60,7 +60,7 @@ or rename this folder later - on the pi image it's called also test01). Renaming
 requires a re-flash of the corresponding microcontroller, so let's be a
 bit more careful here.
 
-If you have the pi-image version, you can skip all teh networking steps
+If you have the pi-image version, you can skip all the networking steps
 below as it takes care of all the network setup for you.
 
 Depending on your network setup, we now need to figure out some ``ipconfig``
@@ -120,7 +120,7 @@ Go to the folder we copied earlier:
 
 Edit the system.conf file (``nano system.conf``), uncomment and adjust
 the lines for ``IOTEMPOWER_MQTT_HOST``, (if you use cloudcmd on the pi,
-you can use teh built in editor):
+you can use the built in editor):
 
 .. code-block:: bash
 
