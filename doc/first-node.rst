@@ -2,6 +2,9 @@
 First Node
 ==========
 
+If you are using the pi-image, you can find a short walkthrough of this here: 
+https://youtu.be/fTWNYXfet9E
+
 For this section, we assume that you have IoTempower successfully set-up in your
 a Linux environment (as described 
 `here </doc/installation.rst#installation-on-linux-and-wsl>`_) and that you can successfully
