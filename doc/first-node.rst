@@ -39,7 +39,9 @@ sonoff 3 channel switch and potential gestures on it (see also
 To create such a system folder, we need to copy one of the folders
 of the cloned git repository to the
 outside of the repository. Let's assume the new system is called "demo"
-and our first node should be called "test01".
+and our first node should be called "test01". (The pi image has such a folder
+setup in iot-systems. In older versions of the pi-image though there are some
+old variables in the system.conf. Pay attention too its content below.)
 
 To create the initial folder via the command-line, do the following:
 
@@ -49,6 +51,30 @@ To create the initial folder via the command-line, do the following:
   cp -R "$IOTEMPOWER_ROOT/lib/system_template" ~/iot-systems/demo
   cd ~/iot-systems/demo
   mv node_template test01
+
+If you look at ~/iot-systems/demo/system.conf, you should see teh following:
+
+.. code-block:: bash
+
+  # Configuration for a iotempower system
+  # Everything from etc/iotempower.conf can be overwritten here.
+  # However, you will usually just overwrite the MQTT-Host and maybe
+  # wifi access information
+
+  # Name of accesspoint to connect to
+  #IOTEMPOWER_AP_NAME="iotempire"
+
+  # Its wifi password
+  #IOTEMPOWER_AP_PASSWORD="internetofthings"
+
+  # Connect data for local MQTT broker
+  # If not defined, the same as IOTEMPOWERAP_IP from $IOTEMPWOER_ROOT/etc/iotempower.conf default
+  #IOTEMPOWER_MQTT_HOST="mosquitto-host"
+  
+As you see, everything is commented out and does not require immediate attention,
+but if you later want to take this folder to a different PC and deploy from there,
+use the correct variable names to overwrite some settings (so better check
+and eventually update now than being confused later).
 
 If you have the pi-image version or cloudcmd installed, you can alternatively
 navigate to your `gateway's system folder </cloudcmd/fs/home/iot/iot-systems/test01>`_
