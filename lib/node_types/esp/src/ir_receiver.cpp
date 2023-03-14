@@ -1,5 +1,5 @@
-// IRReceiver.cpp
-#include "IRReceiver.h"
+// ir_receiver.cpp
+#include "ir_receiver.h"
 
 IRReceiver::IRReceiver(const char* name, long signalPort) :
     Device(name, 100000) {

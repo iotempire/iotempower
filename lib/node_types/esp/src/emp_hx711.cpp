@@ -1,5 +1,5 @@
-// hx711.cpp
-#include "hx711.h"
+// emp_hx711.cpp
+#include "emp_hx711.h"
 
 // TODO: this might be just an i2c device, check if it can be defined as one
 

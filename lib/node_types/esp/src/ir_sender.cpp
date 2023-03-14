@@ -1,5 +1,5 @@
-// IRSender.cpp
-#include "IRSender.h"
+// ir_sender.cpp
+#include "ir_sender.h"
 
 IRSender::IRSender(const char* name, long nec, long signalPort) :
     Device(name, 100000) {

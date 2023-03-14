@@ -1,4 +1,4 @@
-// IRSender.h
+// ir_sender.h
 // Header File for controlling the IR sender/actor
 
 #ifndef _IOTEMPOWER_IRSender_H_

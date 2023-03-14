@@ -1,4 +1,4 @@
-// IRReceiver.h
+// ir_receiver.h
 // Header File for controlling the IR receiver
 
 #ifndef _IOTEMPOWER_IRReceiver_H_

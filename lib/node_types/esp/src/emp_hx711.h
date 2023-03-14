@@ -1,4 +1,4 @@
-// hx711.h
+// emp_hx711.h
 
 #ifndef _IOTEMPOWER_HX711_H_
 #define _IOTEMPOWER_HX711_H_
