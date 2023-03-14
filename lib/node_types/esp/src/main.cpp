@@ -1,7 +1,6 @@
 // main.cpp
 // main program for iotempower esp8266/esp32 firmware
 
-
 // TODO: enable when PJON works 
 // // for randomness, we need crypto library first
 // #include <hydrogen.h>
