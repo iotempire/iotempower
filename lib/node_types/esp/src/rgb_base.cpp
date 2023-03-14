@@ -15,7 +15,7 @@ static const String_Color color_map[] = {
     { "pink", CRGB::DeepPink },
     { "blue", CRGB::Blue },
     { "lightblue", CRGB::LightBlue },
-    { "green", CRGB::Green },
+    { "green", 0x00ff00 }, // broken in current fastled
     { "lightgreen", CRGB::LightGreen },
     { "yellow", CRGB::Yellow },
     { "magenta", CRGB::Magenta },
