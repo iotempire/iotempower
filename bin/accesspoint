@@ -113,6 +113,7 @@ EOF
     # enable ip-forwarding
     sudo sysctl -w net.ipv4.ip_forward=1
     sudo "$IOTEMPOWER_EXTERNAL/create_ap/create_ap" \
+	    -w 2 \
         -c "$CHANNEL" $HIDDEN \
         -g "$IP" \
         $HOSTAPD_EXTRA \
