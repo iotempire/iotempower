@@ -181,6 +181,10 @@ EOF
     diff -q -f "$fname.new" "$fname" 2>/dev/null || mv "$fname.new" "$fname"
     rm -f "$fname.new"
 
+    # clean out broken symlinks
+    find "$dest_dir/" -depth -type l -xtype l -delete # TODO: do some more testing that this doesn't accidentally delete something critical
+
+
 else
     echo "Not in node directory."
     exit 1
