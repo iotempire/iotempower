@@ -614,20 +614,19 @@ class Filter_Click_Detector : public Callback {
     with_filter_callback(*new Filter_Click_Detector(true, __VA_ARGS__))
 
 
-// new closures in esp8266 sdk are not allowing simple local callback closures anymore
-// /* Turn analog values into binary with a threshold level */
+/* Turn analog values into binary with a threshold level */
 // #define filter_binarize(cutoff, high, low) with_filter_callback( \
-//     *new Callback([](Device& dev) { \
-//         if(dev.value().equals(low)) return false; \
-//         if(dev.value().equals(high)) return false; \
-//         double sample = dev.value().as_float(); \
-//         if(sample>=cutoff) { \
-//             dev.value().from(high); \
-//         } else { \
-//             dev.value().from(low); \
-//         } \
-//         return true; \
-//     }))
+    // *new Callback([](Device& dev) { \
+        // if(dev.value().equals(low)) return false; \
+        // if(dev.value().equals(high)) return false; \
+        // double sample = dev.value().as_float(); \
+        // if(sample>=cutoff) { \
+            // dev.value().from(high); \
+        // } else { \
+            // dev.value().from(low); \
+        // } \
+        // return true; \
+    // }))
 class Filter_Binarize : public Callback {
     private:
         double _cutoff;
