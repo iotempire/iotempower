@@ -34,9 +34,16 @@ There are some pre-defined filters available:
     
     **description:** That's the same as above.
 
--   **filter:** ``filter_jmc_median(update_ms)``
+-   **filter:** ``filter_jmc_median()``
 
-    **example:** ``analog(a0).filter_jmc_median(500);``
+    **example:** ``analog(a0).filter_jmc_median();``
+
+    **description:** That's the estimated running median.
+    (The Jeff McClintock running median estimate.)
+
+-   **filter:** ``filter_jmc_interval_median(update_ms)``
+
+    **example:** ``analog(a0).filter_jmc_interval_median(500);``
 
     **description:** That's an estimated median giving a new value every 500ms.
     (The Jeff McClintock running median estimate.)

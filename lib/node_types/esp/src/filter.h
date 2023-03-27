@@ -409,7 +409,7 @@ class Filter_JMC_Median : public Callback {
             return true;
         }
 };
-#define filter_jmc_median(update_ms) with_filter_callback(*new Filter_JMC_Median(update_ms))
+#define filter_jmc_median() with_filter_callback(*new Filter_JMC_Median())
 
 /* Jmc median over small time intervals with reset after time runs out*/
 // TODO rewrite as class to avoid local closure issues
