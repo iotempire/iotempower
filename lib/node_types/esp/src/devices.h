@@ -118,7 +118,7 @@
 #define analog(name, ...) IOTEMPOWER_DEVICE(name, analog_, ##__VA_ARGS__)
 #endif // IOTEMPOWER_COMMAND_ANALOG
 
-// IOTEMPOWER_COMMAND: dht dht11 dht22 > none
+// IOTEMPOWER_COMMAND: dht dht11 dht22 dallas ds18b20 > none
 #ifdef IOTEMPOWER_COMMAND_DHT
 #include <th.h>
 #define dht11_(internal_name, ...) \
@@ -129,16 +129,13 @@
 #define dht11(name, ...) IOTEMPOWER_DEVICE(name, dht11_, ##__VA_ARGS__)
 #define dht(gcc_va_args...) dht11(gcc_va_args)
 #define dht22(name, ...) IOTEMPOWER_DEVICE(name, dht22_, ##__VA_ARGS__)
-#endif // IOTEMPOWER_COMMAND_DHT
 
-// IOTEMPOWER_COMMAND: dallas ds18b20 > none
-#ifdef IOTEMPOWER_COMMAND_DALLAS
 #define ds18b20_(internal_name, ...) \
     IOTEMPOWER_DEVICE_(Ds18b20, internal_name, ##__VA_ARGS__)
 #define dallas_(gcc_va_args...) ds18b20_(gcc_va_args)
 #define ds18b20(name, ...) IOTEMPOWER_DEVICE(name, ds18b20_, ##__VA_ARGS__)
 #define dallas(gcc_va_args...) ds18b20(gcc_va_args)
-#endif // IOTEMPOWER_COMMAND_DALLAS
+#endif // IOTEMPOWER_COMMAND_HT
 
 // IOTEMPOWER_COMMAND: bmp180 bmp085 > none
 #ifdef IOTEMPOWER_COMMAND_BMP180
