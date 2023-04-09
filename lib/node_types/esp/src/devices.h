@@ -224,12 +224,12 @@
 
 // after rgb because of WAIT macro overload
 // IOTEMPOWER_COMMAND: gesture_apds9960 > none
-#ifdef IOTEMPOWER_COMMAND_GESTURE_ADPS9660
+#ifdef IOTEMPOWER_COMMAND_GESTURE_APDS9960
 #include <gesture-apds9960.h>
-#define gesture_apds9960_(internal_name, ...) \
-    IOTEMPOWER_DEVICE_(Gesture_Apds9960, internal_name, ##__VA_ARGS__)
 #define gesture_apds9960(name, ...) IOTEMPOWER_DEVICE(name, gesture_apds9960_, ##__VA_ARGS__)
-#endif // IOTEMPOWER_COMMAND_GESTURE_ADPS9660
+#define gesture_apds9960_(internal_name, ...) \
+	IOTEMPOWER_DEVICE_(Gesture_Apds9960, internal_name, ##__VA_ARGS__)
+#endif // IOTEMPOWER_COMMAND_GESTURE_APDS_9960
 
 // IOTEMPOWER_COMMAND: animator > none
 #ifdef IOTEMPOWER_COMMAND_ANIMATOR
