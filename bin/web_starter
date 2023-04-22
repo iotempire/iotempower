@@ -1,10 +1,10 @@
 #!/bin/bash
 if [[ $# -gt 1 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF
-Syntax: web_starter [lan]
+Syntax: web_starter [full]
 
 Start all web services (and loop them when they fail).
-Starts local servies by defautl. If lan specified,
+Starts local services by default. If full specified,
 it starts the services on http and https port.
 
 EOF
@@ -14,8 +14,8 @@ fi
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
 config="local"
-if [[ "$1" == "lan" ]]; then
-    config="lan"
+if [[ "$1" == "full" ]]; then
+    config="full"
 fi
 
 cloudcmd_starter &

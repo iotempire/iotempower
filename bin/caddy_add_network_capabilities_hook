@@ -1,0 +1,57 @@
+#!/bin/bash
+
+# Check if running as root
+if [ "$(id -u)" != "0" ]; then
+  echo "This script must be run as root."
+  exit 1
+fi
+
+# Check if Arch Linux or Debian
+if command -v pacman >/dev/null 2>&1; then
+  # Arch Linux detected
+  HOOK_PATH="/etc/pacman.d/hooks/caddy-setcaps.hook"
+
+  if [ "$1" == "uninstall" ]; then
+    rm -f "$HOOK_PATH"
+    echo "Caddy capability hook uninstalled on Arch Linux."
+  else
+
+    cat << EOF > "$HOOK_PATH"
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = caddy
+
+[Action]
+Description = Set capabilities on caddy binary
+When = PostTransaction
+Exec = /usr/bin/setcap 'cap_net_bind_service=+ep' /usr/bin/caddy"
+EOF
+
+    echo "Caddy capability hook installed on Arch Linux."
+  fi
+elif command -v apt >/dev/null 2>&1; then
+  # Debian detected
+  HOOK_PATH="/etc/apt/apt.conf.d/99caddy-setcaps"
+
+  if [ "$1" == "uninstall" ]; then
+    rm -f "$HOOK_PATH"
+    echo "Caddy capability hook uninstalled on Debian."
+  else
+    echo "DPkg::Post-Invoke {\"/usr/bin/setcap 'cap_net_bind_service=+ep' /usr/bin/caddy\";};" > "$HOOK_PATH"
+
+    echo "Caddy capability hook installed on Debian like system."
+  fi
+else
+  echo "This script only supports Arch Linux and Debian like systems."
+  exit 1
+fi
+
+if [ "$1" == "uninstall" ]; then
+	echo "Removing capabilities from caddy."
+	setcap -r /usr/bin/caddy
+else
+	echo "Adding capabilities to caddy."
+	setcap 'cap_net_bind_service=+ep' /usr/bin/caddy
+fi
