@@ -5,8 +5,18 @@
 #include <Arduino.h>
 #include "device.h"
 
+// TODO - remove this after debugging
+#undef F
+#define F(param) (param)
+
 void Subdevice::init_log() {
     ulog(F("subdevice init: subname: >%s<"), name.as_cstr());
+}
+
+void Subdevice::init(bool subscribed) {
+    name.clear();
+    _subscribed = subscribed;
+    init_log();
 }
 
 void Subdevice::init(const char* subname, bool subscribed) {

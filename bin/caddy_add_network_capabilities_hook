@@ -26,7 +26,7 @@ Target = caddy
 [Action]
 Description = Set capabilities on caddy binary
 When = PostTransaction
-Exec = /usr/bin/setcap 'cap_net_bind_service=+ep' /usr/bin/caddy"
+Exec = setcap 'cap_net_bind_service=+ep' /usr/bin/caddy
 EOF
 
     echo "Caddy capability hook installed on Arch Linux."
@@ -39,7 +39,7 @@ elif command -v apt >/dev/null 2>&1; then
     rm -f "$HOOK_PATH"
     echo "Caddy capability hook uninstalled on Debian."
   else
-    echo "DPkg::Post-Invoke {\"/usr/bin/setcap 'cap_net_bind_service=+ep' /usr/bin/caddy\";};" > "$HOOK_PATH"
+    echo "DPkg::Post-Invoke {\"setcap 'cap_net_bind_service=+ep' /usr/bin/caddy\";};" > "$HOOK_PATH"
 
     echo "Caddy capability hook installed on Debian like system."
   fi

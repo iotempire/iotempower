@@ -1,4 +1,7 @@
-localhost {
+localhost, ulno-envy, iotgateway, iotgateway.localnet, gw.iotempire.net {
+    tls internal
+    # /home/ulno/tmp/root-ca-test/rootCA.crt /home/ulno/tmp/root-ca-test/rootCA.key
+
 	reverse_proxy /nodered/* localhost:1880
 	reverse_proxy /cloudcmd/* localhost:8000
 

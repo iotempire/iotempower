@@ -1,5 +1,5 @@
 #!/bin/bash
-# TUDO: as iotempower documentation is now creasted in sphinx, consider retiring this
+# TODO: as iotempower documentation is now created in sphinx, consider retiring this
 
 if [[ $# -gt 0 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF

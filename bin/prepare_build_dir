@@ -4,7 +4,7 @@ if [[ $# -ge 2 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF
 Syntax: prepare_build_dir [cache]
 
-create_node_dir prepares the compilation directory for a specific node.
+prepare_build_dir prepares the compilation directory for a specific node.
 The build directory will be created if it does not exist.
 If cache is given as a parameter, the build will be prepared so it links
 into the compile cache and can be compiled in the cache, slightly modifying
@@ -16,8 +16,23 @@ fi
 
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
-# TODO: remove dead links
+# TODO: remove dead links - kind of done below
 # TODO: only do it when no other process is active on that dir
+
+replace_if_new() {
+    # only replace if it's new and delete source
+    # $1 source
+    # $2 destination
+    # old: diff -q -f "$1" "$2" 2>/dev/null || mv "$1" "$2"
+    if [ -z "$1" ] || [ -z "$2" ] || 
+       [[ "$1" == "." ]] || [[ "$1" == ".." ]] || [[ "$1" == "/" ]] ||
+       [[ "$2" == "." ]] || [[ "$2" == ".." ]] || [[ "$2" == "/" ]]; then
+        echo "replace_if_new: Invalid source or destination <$1> <$2>."
+        return 1
+    fi
+    rsync -a --checksum "$1" "$2"
+    rm -rf "$1"
+}
 
 copy_type_through_base() {
     # $1: source directory
@@ -68,7 +83,8 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
 
     src_dir="$IOTEMPOWER_ROOT/lib/node_types/$node_type"
     dest_dir="build"
-    
+
+    # old way of handling cache    
     # if [[ "$1" == "cache" ]]; then
     #     rm -rf "$dest_dir" &> /dev/null
     #     ln -f -s "$IOTEMPOWER_COMPILE_CACHE" "$dest_dir"
@@ -92,7 +108,8 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
     #   mkdir -p "$dest_dir"
     # fi
     
-    # always create a cache-dir
+    # always create a real cache-dir - was necessary for transition from old cache version
+    # TODO: think of removing?
     if [[ -L "$dest_dir" ]]; then
         rm "$dest_dir"
     fi
@@ -108,12 +125,10 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
     password=$(tail -n1 key.txt|head -c64|md5sum -b|cut -d\  -f1)
     fname="$dest_dir/src/key.h"
     echo 'const char *keyhash = "'"$password"'";' > "$fname.new"
-    # only replace if it's new
-    diff -q -f "$fname.new" "$fname" 2>/dev/null || mv "$fname.new" "$fname"
-    rm -f "$fname.new"
+    replace_if_new "$fname.new" "$fname"
 
 
-    # create node-specific config file.
+    ## create node-specific config file.
     fname="$dest_dir/src/config.h"
     
     cat > "$fname.new" << EOF
@@ -135,51 +150,77 @@ EOF
     if [[ "$IOTEMPOWER_MQTT_DISCOVERY_PREFIX" ]]; then
         echo '#define mqtt_discovery_prefix "'$IOTEMPOWER_MQTT_DISCOVERY_PREFIX'"' >> "$fname.new"
     fi
+    replace_if_new "$fname.new" "$fname"
+    ## end: create node-specific config file.
 
-    # only replace if it's new
-    diff -q -f "$fname.new" "$fname" 2>/dev/null || mv "$fname.new" "$fname"
-    rm -f "$fname.new"
 
-# we hardcode wifi credentials now to allow easier re-flashing and
-# network migration
-#    echo "// no wifi credentials" > "$dest_dir/src/wifi-config.h"
+    ## wifi-config.h creation
+    # we hardcode wifi credentials now to allow easier re-flashing and
+    # network migration
+    # echo "// no wifi credentials" > "$dest_dir/src/wifi-config.h"
     fname="$dest_dir/src/wifi-config.h"
-cat > "$fname.new" << EOF
+    cat > "$fname.new" << EOF
 #define WIFI_SSID "$IOTEMPOWER_AP_NAME_FULL"
 #define WIFI_PASSWORD "$IOTEMPOWER_AP_PASSWORD"
 EOF
-    # only replace if it's new
-    diff -q -f "$fname.new" "$fname" 2>/dev/null || mv "$fname.new" "$fname"
-    rm -f "$fname.new"
+    replace_if_new "$fname.new" "$fname"
+    ## end: wifi-config.h creation
 
-    # create a list of all devices defined in devices.txt
-    fname="$dest_dir/src/all_devices.txt"
-    > "$fname.new" # empty file
-    while IFS= read -r line; do
-    if [[ $line =~ ^\/\/\ IOTEMPOWER_COMMAND:\ (.*)\ \>\ (.*)$ ]]; then
-        commands="${BASH_REMATCH[1]}"
-        first_command=$(echo "$commands" | cut -d\  -f1)
-        dependencies="${BASH_REMATCH[2]}"
-        if [[ "$dependencies" == none* ]]; then
-            dependencies=""
-        fi
-        for c in $commands; do
-            echo "$c $first_command $dependencies" >> "$fname.new"
-        done
-    fi
-    done < "$dest_dir/src/devices.h"
-    # only replace if it's new
-    diff -q -f "$fname.new" "$fname" 2>/dev/null || mv "$fname.new" "$fname"
-    rm -f "$fname.new"
+    # TODO: replace following with parsing devices.ini and extracting devices -> merge into python script
+
+    # # this is obsolete as now in ini file
+    # ## create a list of all devices defined in devices.txt
+    # fname="$dest_dir/src/all_devices.txt"
+    # > "$fname.new" # empty file
+    # while IFS= read -r line; do
+    # if [[ $line =~ ^\/\/\ IOTEMPOWER_COMMAND:\ (.*)\ \>\ (.*)$ ]]; then
+    #     commands="${BASH_REMATCH[1]}"
+    #     first_command=$(echo "$commands" | cut -d\  -f1)
+    #     dependencies="${BASH_REMATCH[2]}"
+    #     if [[ "$dependencies" == none* ]]; then
+    #         dependencies=""
+    #     fi
+    #     for c in $commands; do
+    #         echo "$c $first_command $dependencies" >> "$fname.new"
+    #     done
+    # fi
+    # done < "$dest_dir/src/devices.h"
+    # replace_if_new "$fname.new" "$fname"
+    # ## end: create a list of all devices defined in devices.txt
 
     # search devices
-    fname="$dest_dir/src/device-list.h"
-    python "$IOTEMPOWER_ROOT/bin/command_checker.py" \
+    # old command_checker that created only one include file:
+    # fname="$dest_dir/src/device-list.h"
+    # python "$IOTEMPOWER_ROOT/bin/command_checker.py" \
+    #     "$dest_dir/src/setup.h" \
+    #     "$dest_dir/src/all_devices.txt" > "$fname.new"
+    new_dir="$dest_dir/device-selection.tmp"
+    mkdir -p "$new_dir/src"
+    commands=$(python "$IOTEMPOWER_ROOT/bin/command_checker.py" \
+        "$dest_dir/src/devices.ini" \
         "$dest_dir/src/setup.h" \
-        "$dest_dir/src/all_devices.txt" > "$fname.new"
-    # only replace if it's new
-    diff -q -f "$fname.new" "$fname" 2>/dev/null || mv "$fname.new" "$fname"
-    rm -f "$fname.new"
+        "$new_dir")
+    commands=$(echo $commands) # remove newlines
+    echo "Used: $commands"
+    replace_if_new "$new_dir/" "$dest_dir/"
+
+    pushd "$dest_dir/src" >/dev/null
+    echo -n "Not used:"
+    for file in dev_*.h; do
+
+        if [[ $file =~ dev_(.*)\.h ]]; then
+            name="${BASH_REMATCH[1]}"
+
+            # Check if the name is not in the list
+            if [[ ! " $commands " =~ " $name " ]]; then
+                echo -n " $name"
+                rm "dev_$name.h" "dev_$name.cpp"
+            fi
+        fi
+
+    done
+    echo "."
+    popd >/dev/null
 
     # clean out broken symlinks
     find "$dest_dir/" -depth -type l -xtype l -delete # TODO: do some more testing that this doesn't accidentally delete something critical

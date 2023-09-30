@@ -3,6 +3,10 @@
 #include <Arduino.h>
 #include "toolbox.h"
 
+const PROGMEM char* str_on = "on";
+const PROGMEM char* str_off = "off";
+const PROGMEM char* str_empty = "";
+
 bool Ustring::add(const Ustring& other) {
     int ownlen = length();
     int otherlen = other.length();
@@ -84,19 +88,20 @@ bool Ustring::from(const char* _cstr) {
         otherlen = IOTEMPOWER_MAX_STRLEN;
         untruncated = false;
     }
-    strncpy(cstr,_cstr,IOTEMPOWER_MAX_STRLEN);
+    strncpy(cstr, _cstr, IOTEMPOWER_MAX_STRLEN);
     case_adjust();
     return untruncated;
 }
 
 bool Ustring::from(const __FlashStringHelper* _cstr) {
-    int otherlen = strnlen_P((PGM_P)_cstr,IOTEMPOWER_MAX_STRLEN+1);
+    int otherlen = strnlen_P((PGM_P)_cstr, IOTEMPOWER_MAX_STRLEN+1);
     bool untruncated = true;
     if(otherlen > IOTEMPOWER_MAX_STRLEN) {
         otherlen = IOTEMPOWER_MAX_STRLEN;
         untruncated = false;
     }
-    strncpy_P(cstr,(PGM_P)_cstr,IOTEMPOWER_MAX_STRLEN);
+    // cstr[IOTEMPOWER_MAX_STRLEN] = 0; // terminate properly - should be terminated after init
+    strncpy_P(cstr, (PGM_P)_cstr, IOTEMPOWER_MAX_STRLEN);
     case_adjust();
     return untruncated;
 }
@@ -246,7 +251,7 @@ void ulog(const char *fmt, ...) {
         Serial.println(F("Serial ready."));
     }
 	char buf[LOG_LINE_MAX_LEN];
-	va_list ap;
+    va_list ap;
 	va_start(ap, fmt);
 	vsnprintf(buf, LOG_LINE_MAX_LEN, fmt, ap);
 	va_end(ap);
@@ -263,17 +268,14 @@ void ulog(const __FlashStringHelper *fmt, ...) {
         Serial.println();
         Serial.println(F("Serial ready."));
     }
-	char buf[LOG_LINE_MAX_LEN];
-	va_list ap;
-	va_start(ap, (const char*)fmt);
+char buf[LOG_LINE_MAX_LEN];
+    va_list ap;
+    va_start(ap, (const char*)fmt);
 	vsnprintf(buf, LOG_LINE_MAX_LEN, (const char*)fmt, ap);
 	va_end(ap);
-	Serial.println(buf);
+    Serial.println(buf);
 }
 
 long urandom(long from, long upto_exclusive) {
     return random(from, upto_exclusive);
 }
-
-const PROGMEM char* str_on = "on";
-const PROGMEM char* str_off = "off";

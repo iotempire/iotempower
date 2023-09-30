@@ -5,23 +5,15 @@
 // // for randomness, we need crypto library first
 // #include <hydrogen.h>
 
-// TODO: check when this is actually not harmful
-#define BROWNOUT_DETECT_DISABLED
-
 ////// Standard libraries
 #include <ArduinoOTA.h>
 //#include <ESP8266WebServer.h> //Local WebServer used to serve the configuration portal - obsolete due to dongle
-
 #ifdef ESP32
     // // the flash string helper broke in 6.2 - see https://github.com/espressif/arduino-esp32/issues/8108
     // #define FPSTR(pstr_pointer) (reinterpret_cast<const __FlashStringHelper *>(pstr_pointer))
     // #define F(string_literal) (FPSTR(PSTR(string_literal)))
     #include <WiFi.h>
     #include <ESPmDNS.h>
-    #ifdef BROWNOUT_DETECT_DISABLED
-        #include "soc/soc.h"
-        #include "soc/rtc_cntl_reg.h"
-    #endif
 #else
     #include <ESP8266WiFi.h>
     #include <ESP8266mDNS.h>
@@ -748,6 +740,9 @@ void onWifiConnect(
 //     Serial.println(packetId);
 // }
 
+#include "soc/soc.h"
+#include "soc/rtc_cntl_reg.h"
+
 void setup() {
     // TODO: setup (another, the internal one seem quite ok) watchdog
     // TODO: consider not using serial at all and freeing it for other
@@ -756,9 +751,7 @@ void setup() {
     // Serial.println();
     // delay(1000);
     #ifdef ESP32
-        #ifdef BROWNOUT_DETECT_DISABLED
         WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0); //disable brownout detector TODO: verify that this reduces crashes
-        #endif
     #endif
 
     ulog(F("Booting."));

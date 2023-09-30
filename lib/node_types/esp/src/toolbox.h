@@ -12,6 +12,18 @@
 #include <Arduino.h>
 #include "iotempower-default.h"
 
+// // TODO - remove this after debugging
+// #undef F
+// #define F(param) (param)
+
+extern const PROGMEM char* str_on;
+extern const PROGMEM char* str_off;
+extern const PROGMEM char* str_empty;
+
+// Logging
+void ulog(const char *fmt, ...);
+void ulog(const __FlashStringHelper *fmt, ...);
+
 // a simple class for handling fixed-length strings.
 // Ustring stands for UlnoIoT (old framework name) - String
 class Ustring {
@@ -61,7 +73,7 @@ class Ustring {
             return from((byte*) payload, length);
         }
         /* ISO C++ says that these are ambiguous */
-        /* really!?! , so use copy - not from*/
+        /* really!?! , so use copy - not from */
         bool copy(const Ustring& other) { 
             strncpy(cstr,other.cstr,IOTEMPOWER_MAX_STRLEN);
             case_adjust();
@@ -244,7 +256,7 @@ class Fixed_Map {
         }
     public:
         bool add(VALUE_TYPE* element) {
-            if(count>=SIZE) {
+            if(count >= SIZE) {
                 count = SIZE;
                 return false;
             } else {
@@ -291,17 +303,11 @@ void reboot();
 
 void controlled_crash(const char * error_message);
 
-void ulog(const char *fmt, ...);
-
-void ulog(const __FlashStringHelper *fmt, ...);
-
 long urandom(long from, long upto_exclusive);
 
 // constrain or limit a number to an interval
 #define limit(nr, min, max) \
     ( (nr) < (min) ? (min):((nr) > (max) ? (max):(nr)) )
 
-extern const PROGMEM char* str_on;
-extern const PROGMEM char* str_off;
 
 #endif // _TOOLBOX_H_

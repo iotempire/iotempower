@@ -45,6 +45,8 @@ if [[ "$1" == uninstall ]]; then
     inst_str=uninstall
 fi
 
+export NPM_CONFIG_PREFIX
+
 cd "$IOTEMPOWER_LOCAL/nodejs"
 echo "==== ${inst_str}ing node-red for IoTempower ====="
 npm $inst_str node-red

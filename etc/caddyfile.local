@@ -1,7 +1,7 @@
 {
 	skip_install_trust
 	http_port 40080
-#	debug
+	#	debug
 }
 localhost:40080 {
 	reverse_proxy /nodered/* localhost:1880
@@ -14,5 +14,4 @@ localhost:40080 {
 	file_server {
 		root "{$IOTEMPOWER_LOCAL}/doc/html"
 	}
-
 }

@@ -14,7 +14,7 @@ fi
 
 MAX_UPLOAD_TRIES=3
 
-# TODO, decide if esp32 or esp8266 to use
+# TODO, decide if esp32 or esp8266 to use - based on selected board
 ESPOTAPY="$HOME/.platformio/packages/framework-arduinoespressif8266/tools/espota.py"
 # ESPOTAPY="$HOME/.platformio/packages/framework-arduinoespressif32/tools/espota.py"
 

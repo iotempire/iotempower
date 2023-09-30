@@ -75,6 +75,7 @@ class Subdevice {
         Ustring name; // subdevice name (added to the device name)
         bool _subscribed = false;
         void init_log();
+        void init(bool subscribed);
         void init(const char* subname, bool subscribed);
         void init(const __FlashStringHelper* subname, bool subscribed);
         #define IOTEMPOWER_ON_RECEIVE_CALLBACK std::function<bool(const Ustring&)>
@@ -92,6 +93,12 @@ class Subdevice {
         const Ustring& get_name() const { return name; }
         const Ustring& key() const { return name; }
         bool subscribed() { return _subscribed; }
+        Subdevice(bool subscribed) {
+            init(subscribed);
+        }
+        Subdevice() { 
+            init(false);
+        }
         Subdevice(const char* subname, bool subscribed) {
             init(subname, subscribed);
         }
@@ -311,9 +318,9 @@ class Device {
         // Subdevices
         Subdevice* add_subdevice(Subdevice* sd) {
             ulog(F("add_subdevice: device: %s subdev: >%s<"), name.as_cstr(), sd->get_name().as_cstr());
-            if(subdevices.add(sd)) {
+                        if(subdevices.add(sd)) {
                 ulog(F("add_subdevice >%s< succeeded."), sd->get_name().as_cstr());
-                return sd;
+                                return sd;
             } else {
                 ulog(F("add_subdevice >%s< failed."), sd->get_name().as_cstr());
                 return NULL;
