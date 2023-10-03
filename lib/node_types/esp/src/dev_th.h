@@ -71,7 +71,7 @@ class Dht22 : public Device {
 
 
 
-#include <OneWire.h>
+//#include <OneWire.h>
 #include <DallasTemperature.h>
 
 class Ds18b20 : public Device {

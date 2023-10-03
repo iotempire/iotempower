@@ -459,7 +459,8 @@ void onMqttMessage(char *topic, byte *payload, unsigned int len) {
     Serial.print(upayload.as_cstr());
     Serial.println(F("<"));
     
-    devices_receive(utopic, upayload);
+
+    device_manager.receive(utopic, upayload);
 }
 
 
@@ -494,13 +495,13 @@ void init_mqtt() {
 
 
 void onMqttConnect() {
-    Serial.println(F("Connected to MQTT."));
+    ulog(F("Connected to MQTT."));
 
     // publish IP on mqtt
     mqttClient.publish((mqtt_management_topic+String("ip")).c_str(),
         WiFi.localIP().toString().c_str(), true); // keep active until next update
-    devices_publish_discovery_info(mqttClient); // TODO: Check if this is necessary each time or should be somewhere else
-    devices_subscribe(mqttClient, node_topic);
+    device_manager.publish_discovery_info(mqttClient); // TODO: Check if this is necessary each time or should be somewhere else
+    device_manager.subscribe(mqttClient, node_topic);
 }
 
 
@@ -619,9 +620,8 @@ void onWifiConnect(
 //    const WiFiEventStationModeGotIP &event
 //#endif
         ) {
-    ulog(F("Connected to Wi-Fi with IP: "));
     IPAddress ip_obj = WiFi.localIP();
-    Serial.println(ip_obj.toString());
+    ulog(F("Connected to WiFi with IP: %s"), ip_obj.toString().c_str());
     wifi_connected = true;
     //mqtt_connected = false; // trigger reconnect <- should detect automatically
     //init_mqtt();
@@ -670,7 +670,7 @@ void onWifiConnect(
 
     // for(int i=0; i<4; i++) b.append_byte(ip_obj[i]);
 
-    // devices_get_report_list(b);
+    // device_manager.get_report_list(b);
 
     // Serial.print("sending via pjon a buffer with length ");
     // Serial.println(b.length());
@@ -684,7 +684,7 @@ void onWifiConnect(
 //     Serial.print(F("Session present: "));
 //     Serial.println(sessionPresent);
 
-//     devices_subscribe(mqttClient, node_topic);
+//     device_manager.subscribe(mqttClient, node_topic);
 //     mqtt_just_connected = true;
 // }
 //
@@ -739,7 +739,7 @@ void onWifiConnect(
 //     Serial.print(upayload.as_cstr());
 //     Serial.println(F("<"));
     
-//     devices_receive(utopic, upayload);
+//     device_manager.receive(utopic, upayload);
 // }
 
 // void onMqttPublish(uint16_t packetId) {
@@ -748,11 +748,27 @@ void onWifiConnect(
 //     Serial.println(packetId);
 // }
 
+
+__attribute__((constructor)) void early_init() {
+    ulog("in log_init:"); // TODO: remove
+    device_manager.log_length(); // TODO: remove
+ //   ulog(F("Free memory: %ld"),ESP.getFreeHeap());
+    ulog();
+    ulog();
+    ulog();
+}
+
 void setup() {
+    ulog("setup start:"); // TODO: remove
+    device_manager.log_length(); // TODO: remove
+    ulog(F("Free memory: %ld"),ESP.getFreeHeap()); // TODO: remove
+
+
+    // careful - devices are initialized before this due to class constructors
     // TODO: setup (another, the internal one seem quite ok) watchdog
     // TODO: consider not using serial at all and freeing it for other
     // connections, and offering other debug channels
-    // Serial.begin(115200);
+    // Serial.begin(115200); -> now in toolbox when first time ulog called
     // Serial.println();
     // delay(1000);
     #ifdef ESP32
@@ -762,6 +778,9 @@ void setup() {
     #endif
 
     ulog(F("Booting."));
+
+    device_manager.log_length(); // TODO: remove
+
 
     #ifdef ID_LED
         pinMode(ID_LED, OUTPUT); // initialize a potential onboardled // TODO: check if it's inverted
@@ -795,12 +814,16 @@ void setup() {
 
     connectToWifi();
 
+    ulog("Debug: 22"); // TODO: remove
+
     if (!reconfig_mode_active) {
         mqtt_management_topic = String(F(IOTEMPOWER)) + String(F("/_cfg_/")) 
                                 + String(F(HOSTNAME)) + String(F("/"));
 
         if(iotempower_init) iotempower_init(); // call user init from setup.cpp
-        devices_start(); // call start of all devices
+        ulog("Debug: before dev start"); // TODO: remove
+        device_manager.start(); // call start of all devices
+        ulog("Debug: after dev start"); // TODO: remove
         if(iotempower_start) iotempower_start(); // call user start from setup.cpp
         // init_mqtt(); //AsyncMqttClient disabled in favor of PubSubClient
     } else {  // do something to show that we are in adopt mode
@@ -839,7 +862,7 @@ void loop() {
         ////AsyncMqttClient disabled in favor of PubSubClient
         // if(mqtt_just_connected) {
         //     mqtt_just_connected = ! // only set to true when publish successful
-        //         devices_publish_discovery_info(mqttClient); // needs to happen here not to collide with other publishes
+        //         device_manager.publish_discovery_info(mqttClient); // needs to happen here not to collide with other publishes
         // }
         
         // TODO: enable PJON, when UDP works on esp8266 
@@ -863,23 +886,23 @@ void loop() {
         } // end WiFi exists
 
         // update physical connections as often as possible (they have their own pollrate built in)
-        devices_update();
+        device_manager.update();
         current_time = millis(); // device update might have taken time, so update
 
-        // sent out new values if mesaured (and time isn't too low)
+        // sent out new values if measured (and time isn't too low)
         if (mqttClient.connected()) {
             if (current_time - last_published >= MIN_PUBLISH_TIME_MS) {
                 // go through devices and send reports if necessary
                 if (transmission_delta > 0 &&
                     current_time - last_transmission >=
                         transmission_delta) {
-                    if (devices_publish(mqttClient, node_topic, true)) {
+                    if (device_manager.publish(mqttClient, node_topic, true)) {
                         ulog(F("Free memory: %ld"),ESP.getFreeHeap());
                         last_transmission = current_time;
                         last_published = current_time;
                     }
                 } else { // no full transmission necessary
-                    if (devices_publish(mqttClient, node_topic, false)) {
+                    if (device_manager.publish(mqttClient, node_topic, false)) {
                         last_published = current_time;
                     }
                 } // endif transmission delta

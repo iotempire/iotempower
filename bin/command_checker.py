@@ -96,10 +96,10 @@ if __name__ == "__main__":
     # now generate files
     libs = set()
     libs_esp32 = set()
+    filenames = set()
     with open(os.path.join(output_dir, "src", "devices_generated.h"), 'w') as devices_generated:
         for command in devices:
             if command in trimmed_commands:  # was found in setup.h
-                print(command)
                 print(f"// Begin: {command}", file=devices_generated)
                 print(f"#define IOTEMPOWER_COMMAND_{command.upper()}", file=devices_generated)
                 
@@ -107,16 +107,20 @@ if __name__ == "__main__":
                 aliases = data.get('aliases', '').split()
                 
                 filename = data.get('filename', None)
-                if filename:
-                    print(f"#include <{filename}.h>", file=devices_generated)
+                if filename is None:
+                    filename = command
+                print(f"#include <dev_{filename}.h>", file=devices_generated)
+                filenames.add(filename)
                 
                 lib = data.get('lib', None)
                 if lib:
-                    libs.add(lib)
+                    lib = lib.split()
+                    libs.update(lib)
                 
                 lib_esp32 = data.get('lib_esp32', None)
                 if lib_esp32:
-                    ibs_esp32.add(lib_esp32)
+                    lib_esp32 = lib_esp32.split()
+                    libs_esp32.update(lib_esp32)
                 
                 extra_code = data.get('extra_code', None)
                 if extra_code:
@@ -152,3 +156,5 @@ if __name__ == "__main__":
             print(f"  extra_lib_deps_esp32 = ", file=libs_include)
             for l in libs_esp32:
                 print(f"    {l}", file=libs_include)
+
+print(" ".join(sorted(filenames)))

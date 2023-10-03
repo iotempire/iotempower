@@ -7,6 +7,6 @@
  *
  * Or check out the command reference for potential devices you can add.
  * 
- * This whole comemnt block can be deleted
+ * This whole comment block can be deleted
  * */
 

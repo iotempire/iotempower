@@ -124,24 +124,37 @@ void do_later_check() {
     }
 }
 
-////// Device list
-static Fixed_Map<Device, IOTEMPOWER_MAX_DEVICES> 
-    __attribute__((init_priority(65525))) device_list;
+// ////// Device list - now singleton
+// static Fixed_Map<Device, IOTEMPOWER_MAX_DEVICES> 
+//     __attribute__((init_priority(65525))) device_list;
 
-/*static Device* find_device(const Ustring& name) {
-    return device_list.find(name);
+// TODO: timestack, do_later
+
+
+DeviceManager& DeviceManager::get_instance() {
+    static DeviceManager instance;
+    return instance;
 }
 
-static Device* find_device(const char* name) {
-    return device_list.find(name);
-}*/
-
-bool add_device(Device &device) {
-    ulog(F("add_device: Adding device: %s"), device.get_name().as_cstr());
-    return device_list.add(&device);
+DeviceManager::DeviceManager() {
+    // Constructor code, if needed
 }
 
-bool devices_start() {
+DeviceManager::~DeviceManager() {
+    // Destructor code, if needed
+}
+
+void DeviceManager::log_length() {
+    ulog("Number of devices: %d", device_list.length());
+}
+
+bool DeviceManager::add(Device &device) {
+    ulog(F("Adding device: Adding device: %s"), device.get_name().as_cstr());
+    bool retval = device_list.add(&device);
+    return retval;
+}
+
+bool DeviceManager::start() {
     bool all_success = true;
     device_list.for_each( [&] (Device& dev) {
         // dev.measure_init(); // init eventually i2c -> happens now if necessary in start
@@ -154,8 +167,7 @@ bool devices_start() {
     return all_success;
 }
 
-
-bool devices_update() {
+bool DeviceManager::update() {
     bool changed = false;
     device_list.for_each( [&] (Device& dev) {
         if(dev.poll_measure()) {
@@ -166,11 +178,12 @@ bool devices_update() {
     return changed;
 }
 
-////AsyncMqttClient disabled in favor of PubSubClient
-//bool devices_publish(AsyncMqttClient& mqtt_client, Ustring& node_topic, bool publish_all) {
-bool devices_publish(PubSubClient& mqtt_client, Ustring& node_topic, bool publish_all) {
+bool DeviceManager::publish(PubSubClient& mqtt_client, Ustring& node_topic, bool publish_all) {
+    ////AsyncMqttClient disabled in favor of PubSubClient
+    //bool devices_publish(AsyncMqttClient& mqtt_client, Ustring& node_topic, bool publish_all) {
     bool published = false;
     bool first = true;
+    // TODO: send publish into debug (use buffer to capture string)
     device_list.for_each( [&] (Device& dev) {
         if(dev.started()) {
             if(dev.get_report_change() && (publish_all || dev.needs_publishing())) {
@@ -197,9 +210,9 @@ bool devices_publish(PubSubClient& mqtt_client, Ustring& node_topic, bool publis
     return published;
 }
 
-////AsyncMqttClient disabled in favor of PubSubClient
-//bool devices_subscribe(AsyncMqttClient& mqtt_client, Ustring& node_topic) {
-bool devices_subscribe(PubSubClient& mqtt_client, Ustring& node_topic) {
+bool DeviceManager::subscribe(PubSubClient& mqtt_client, Ustring& node_topic) {
+    ////AsyncMqttClient disabled in favor of PubSubClient
+    //bool devices_subscribe(AsyncMqttClient& mqtt_client, Ustring& node_topic) {
     // subscribe to all devices that accept input
     Ustring topic;
 
@@ -227,26 +240,26 @@ bool devices_subscribe(PubSubClient& mqtt_client, Ustring& node_topic) {
     return true; // TODO: decide if error occurred
 }
 
-////AsyncMqttClient disabled in favor of PubSubClient
+bool DeviceManager::publish_discovery_info(PubSubClient& mqtt_client) {
+    ////AsyncMqttClient disabled in favor of PubSubClient
+    //bool devices_publish_discovery_info(AsyncMqttClient& mqtt_client) {
 
-//bool devices_publish_discovery_info(AsyncMqttClient& mqtt_client) {
-bool devices_publish_discovery_info(PubSubClient& mqtt_client) {
-#ifdef mqtt_discovery_prefix
+    #ifdef mqtt_discovery_prefix
 
-    device_list.for_each( [&] (Device& dev) {
-        if( dev.started() ) {
-            dev.publish_discovery_info(mqtt_client);
-        } // endif dev.started()
-        return true; //continue loop device loop
-    } ); // end foreach - iterate over devices
-    
-#endif
+        device_list.for_each( [&] (Device& dev) {
+            if( dev.started() ) {
+                dev.publish_discovery_info(mqtt_client);
+            } // endif dev.started()
+            return true; //continue loop device loop
+        } ); // end foreach - iterate over devices
+        
+    #endif
 
     return true; // TODO: decide if error ocurred
 }
 
 
-bool devices_receive(Ustring& subtopic, Ustring& payload) {
+bool DeviceManager::receive(Ustring& subtopic, Ustring& payload) {
     Ustring topic;
 
     // find matching subdevice for this topic/payload
@@ -278,7 +291,7 @@ bool devices_receive(Ustring& subtopic, Ustring& payload) {
     return true;
 }
 
-void devices_get_report_list(Fixed_Buffer& b) {
+void DeviceManager::get_report_list(Fixed_Buffer& b) {
     device_list.for_each( [&] (Device& dev) {
         b.append(dev.get_name().length(), (byte*)dev.get_name().as_cstr());
         byte sdc = dev.subdevices_count();
@@ -291,5 +304,10 @@ void devices_get_report_list(Fixed_Buffer& b) {
     } ); // devices
 }
 
-// TODO: timestack, do_later
+/*static Device* find_device(const Ustring& name) {
+    return device_list.find(name);
+}
 
+static Device* find_device(const char* name) {
+    return device_list.find(name);
+}*/

@@ -201,11 +201,11 @@ EOF
         "$dest_dir/src/setup.h" \
         "$new_dir")
     commands=$(echo $commands) # remove newlines
-    echo "Used: $commands"
+    echo "Used driver files: $commands"
     replace_if_new "$new_dir/" "$dest_dir/"
 
     pushd "$dest_dir/src" >/dev/null
-    echo -n "Not used:"
+    echo -n "Drivers not used:"
     for file in dev_*.h; do
 
         if [[ $file =~ dev_(.*)\.h ]]; then

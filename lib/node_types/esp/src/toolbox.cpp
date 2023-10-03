@@ -6,6 +6,8 @@
 const PROGMEM char* str_on = "on";
 const PROGMEM char* str_off = "off";
 const PROGMEM char* str_empty = "";
+const PROGMEM char* str_debug_tag = "IoT";
+const PROGMEM char* str_set = "set";
 
 bool Ustring::add(const Ustring& other) {
     int ownlen = length();
@@ -240,40 +242,63 @@ void controlled_crash(const char * error_message) {
     reboot();
 }
 
-void ulog(const char *fmt, ...) {
+static void check_serial_init() {
     static bool serial_initialized=false;
     if(!serial_initialized) {
         serial_initialized = true;
+        delay(200); // somehow things are a bit messed up here as logging might already have happened
         Serial.begin(115200);
         delay(500); // Wait for serial to get ready
         Serial.println();
         Serial.println();
         Serial.println(F("Serial ready."));
+        Serial.println(F("If in the last logline above is some weird output, that's normal."));
     }
+}
+
+// #ifdef ESP32
+//     __attribute__((constructor)) void log_init() { // execute before main
+//         esp_log_level_set("*", ESP_LOG_INFO); // set all components to INFO level - TODO: make configurable
+//         ESP_LOGE("test","%s 12345","debug test");
+//     }
+// #endif
+
+static bool ulog_serial_enabled = true;
+
+void ulog_serial_disable() {
+    ulog_serial_enabled = false;
+}
+
+void ulog_serial_enable() {
+    check_serial_init();
+    ulog_serial_enabled = true;
+}
+
+void ulog_output(const char *buf) {
+    if(ulog_serial_enabled) {
+        check_serial_init();
+	    Serial.println(buf);
+    }
+//    ESP_LOGE(str_debug_tag,buf);
+}
+
+void ulog_internal(const char *fmt, ...) {
 	char buf[LOG_LINE_MAX_LEN];
     va_list ap;
 	va_start(ap, fmt);
 	vsnprintf(buf, LOG_LINE_MAX_LEN, fmt, ap);
 	va_end(ap);
-	Serial.println(buf);
+    ulog_output(buf);
 }
 
-void ulog(const __FlashStringHelper *fmt, ...) {
-    static bool serial_initialized=false;
-    if(!serial_initialized) {
-        serial_initialized = true;
-        Serial.begin(115200);
-        delay(500); // Wait for serial to get ready
-        Serial.println();
-        Serial.println();
-        Serial.println(F("Serial ready."));
-    }
-char buf[LOG_LINE_MAX_LEN];
+void ulog_internal(const __FlashStringHelper *fmt, ...) {
+    char buf[LOG_LINE_MAX_LEN];
+    check_serial_init();
     va_list ap;
     va_start(ap, (const char*)fmt);
 	vsnprintf(buf, LOG_LINE_MAX_LEN, (const char*)fmt, ap);
 	va_end(ap);
-    Serial.println(buf);
+    ulog_output(buf);
 }
 
 long urandom(long from, long upto_exclusive) {

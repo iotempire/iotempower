@@ -93,7 +93,7 @@ Mfrc522::Mfrc522(const char* name, uint16_t data_size,
     add_subdevice(new Subdevice()); // data (0)
     add_subdevice(new Subdevice(F("uid"))); // uid (1)
     add_subdevice(new Subdevice(F("picc"))); // picc (2)
-    add_subdevice(new Subdevice(F("set"), true))->with_receive_cb(
+    add_subdevice(new Subdevice(str_set, true))->with_receive_cb(
         [&] (const Ustring& payload) {
             ulog(F("Mfrc522 set requested."));
             next_write.copy(payload);

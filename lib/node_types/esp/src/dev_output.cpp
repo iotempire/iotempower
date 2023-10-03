@@ -11,7 +11,7 @@ Output::Output(const char* name, const int pin,
     _pin = pin;
     _inverted = inverted;
     add_subdevice(new Subdevice());
-    add_subdevice(new Subdevice(F("set"),true))->with_receive_cb(
+    add_subdevice(new Subdevice(str_set,true))->with_receive_cb(
         [&] (const Ustring& payload) {
             set(payload.as_cstr());
             return true;

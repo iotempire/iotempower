@@ -24,28 +24,25 @@ void do_later_check(); // should not be called by user
 // send device soon to deep_sleep, duration 0 means wakeup only via RST line
 void deep_sleep(unsigned long time_from_now_ms, unsigned long duration_ms=0);
 
-// add a device to the static device list
-bool add_device(Device& device);
+
+class DeviceManager {
+public:
+    static DeviceManager& get_instance();
+
+    bool add(Device &device);
+    bool start();
+    bool update();
+    bool publish(PubSubClient& mqtt_client, Ustring& node_topic, bool publish_all);
+    bool subscribe(PubSubClient& mqtt_client, Ustring& node_topic);
+    bool publish_discovery_info(PubSubClient& mqtt_client);
+    bool receive(Ustring& subtopic, Ustring& payload);
+    void get_report_list(Fixed_Buffer& b);
+    void log_length(); // For debugging
 
 /* out of simplicity reasons, we don't allow the deletion of devices
  * as we dropped interactive configuration in the transition from
  * micropython to C */
 //bool remove_device(const char* name);
-
-/* Call start on all devices */
-bool devices_start();
-
-/* measure, filter, and check values
- * return true, when any values where updated */
-bool devices_update();
-
-/* Subscribe all devices */
-////AsyncMqttClient disabled in favor of PubSubClient
-//bool devices_subscribe(AsyncMqttClient& mqtt_client, Ustring& node_topic);
-bool devices_subscribe(PubSubClient& mqtt_client, Ustring& node_topic);
-
-/* match a receive-topic and deliver payload */
-bool devices_receive(Ustring& subtopic, Ustring& payload);
 
 /* check if changes have to be published
  * -> eventually publish
@@ -58,10 +55,17 @@ bool devices_receive(Ustring& subtopic, Ustring& payload);
 //bool devices_publish(AsyncMqttClient& mqtt_client, Ustring& node_topic, bool publish_all = false);
 //bool devices_publish_discovery_info(AsyncMqttClient& mqtt_client);
 
-bool devices_publish(PubSubClient& mqtt_client, Ustring& node_topic, bool publish_all = false);
-bool devices_publish_discovery_info(PubSubClient& mqtt_client);
+private:
+    DeviceManager();
+    ~DeviceManager();
 
-// Add the device and subdevice list to a buffer in abbreviated format
-void devices_get_report_list(Fixed_Buffer& b);
+    Fixed_Map<Device, IOTEMPOWER_MAX_DEVICES> device_list;
+
+    // Prevent copying and assignment
+    DeviceManager(const DeviceManager&) = delete;
+    DeviceManager& operator=(const DeviceManager&) = delete;
+};
+
+#define device_manager (DeviceManager::get_instance())
 
 #endif // _IOTEMPOWER_DEVICE_MANAGER_H_

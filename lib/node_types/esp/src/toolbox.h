@@ -10,19 +10,40 @@
 #include <string.h>
 #include <functional>
 #include <Arduino.h>
-#include "iotempower-default.h"
+#if defined(ESP32) || defined(ESP8266)
+    #include <esp_log.h>
+#endif
 
-// // TODO - remove this after debugging
-// #undef F
-// #define F(param) (param)
+#if defined(ESP32)
+    // PROGMEM and F-Strings seem to be utterly broken in new versions of arduino esp32 framework
+    // TODO - remove this after debugging
+    #ifdef F
+        #undef F
+        #define F(param) param
+    #endif
+#endif
+
+#include "iotempower-default.h"
 
 extern const PROGMEM char* str_on;
 extern const PROGMEM char* str_off;
 extern const PROGMEM char* str_empty;
+extern const PROGMEM char* str_debug_tag;
+extern const PROGMEM char* str_set;
 
 // Logging
-void ulog(const char *fmt, ...);
-void ulog(const __FlashStringHelper *fmt, ...);
+void ulog_serial_disable();
+void ulog_serial_enable();
+void ulog_internal(const char *fmt, ...);
+void ulog_internal(const __FlashStringHelper *fmt, ...);
+// TODO: work on making logging more configurable
+#ifdef ESP32
+    #define ulog(fmt, ...) ESP_LOGI(str_debug_tag, fmt, ##__VA_ARGS__)
+//    #define ulog(fmt, ...) log_e(fmt, ##__VA_ARGS__)
+//    #define ulog(fmt, ...) ulog_internal(fmt, ##__VA_ARGS__)
+#else
+    #define ulog(fmt, ...) ulog_internal(fmt, ##__VA_ARGS__)
+#endif
 
 // a simple class for handling fixed-length strings.
 // Ustring stands for UlnoIoT (old framework name) - String
@@ -239,14 +260,14 @@ class Fixed_Buffer {
 
 
 // small fixed size map with linear search functionality
-// VALUE_TYPE needs to have a member function key, returning a Ustring,
+// VALUE_TYPE needs to have a member function key(), returning a Ustring,
 // which is used for searching
 // TODO: sort
 template<class VALUE_TYPE, size_t SIZE>  
 class Fixed_Map {
     private:
         VALUE_TYPE* list[SIZE];
-        unsigned int count=0;
+        unsigned int count;
         unsigned int find_index(const Ustring& searchterm) {
             for(unsigned int i=0; i<SIZE; i++) {
                 if(searchterm.equals(list[i]->key()))
@@ -255,6 +276,11 @@ class Fixed_Map {
             return -1;
         }
     public:
+        // __attribute__((constructor(65535))) 
+        Fixed_Map() {
+            ulog(F("Fixed_Map constructor: count set to 0."));
+            count=0;
+        }
         bool add(VALUE_TYPE* element) {
             if(count >= SIZE) {
                 count = SIZE;

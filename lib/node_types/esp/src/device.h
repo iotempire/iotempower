@@ -318,9 +318,9 @@ class Device {
         // Subdevices
         Subdevice* add_subdevice(Subdevice* sd) {
             ulog(F("add_subdevice: device: %s subdev: >%s<"), name.as_cstr(), sd->get_name().as_cstr());
-                        if(subdevices.add(sd)) {
+            if(subdevices.add(sd)) {
                 ulog(F("add_subdevice >%s< succeeded."), sd->get_name().as_cstr());
-                                return sd;
+                return sd;
             } else {
                 ulog(F("add_subdevice >%s< failed."), sd->get_name().as_cstr());
                 return NULL;

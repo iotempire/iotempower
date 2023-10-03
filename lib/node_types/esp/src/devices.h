@@ -16,6 +16,7 @@
         = Class_Name(gcc_va_args); \
     Class_Name& internal_name = (Class_Name&) iotempower_dev_ ## internal_name
 
+
 // convenience macros for device definition
 // Internal name (IN) references the internal name created with DN
 #define IN(name) iotempower_dev_##name

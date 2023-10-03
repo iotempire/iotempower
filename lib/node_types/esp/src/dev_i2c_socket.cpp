@@ -15,7 +15,7 @@ I2C_Socket::I2C_Socket(const char* name, int client_address,
     set_master(master_address);
 
     add_subdevice(new Subdevice()); // 0
-    add_subdevice(new Subdevice(F("set"),true))->with_receive_cb(
+    add_subdevice(new Subdevice(str_setrue))->with_receive_cb(
         [&] (const Ustring& payload) {
             // TODO: check that correct i2c bus is selected
             Wire.beginTransmission(get_address());

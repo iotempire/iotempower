@@ -5,10 +5,6 @@
 #include <Arduino.h>
 #include "device.h"
 
-// TODO - remove this after debugging
-#undef F
-#define F(param) (param)
-
 void Subdevice::init_log() {
     ulog(F("subdevice init: subname: >%s<"), name.as_cstr());
 }
@@ -41,15 +37,13 @@ bool Subdevice::call_receive_cb(Ustring& payload) {
     return false;
 }
 
-//#include <device-manager.h>
-// Just define add_device from here - to avoid messed up dependencies
-bool add_device(Device& device);
+#include "device-manager.h"
 
 Device::Device(const char* _name, unsigned long __pollrate_us) {
     name.from(_name);
     pollrate_us(__pollrate_us);
     ulog(F("Device: Adding device: %s pollrate: %lu"), name.as_cstr(), _pollrate_us);
-    if(!add_device(*this)) {
+    if(!device_manager.add(*this)) {
         ulog(F("Device %s couldn't be added - max devices reached."), _name);
     }
 }

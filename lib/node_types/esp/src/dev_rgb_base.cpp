@@ -52,7 +52,7 @@ RGB_Base::RGB_Base(const char* name, int led_count) :
         Device(name, 0) { // pollrate=0: might need to be super fast for matrix and animation
     _led_count = led_count;
     add_subdevice(new Subdevice()); // 0
-    add_subdevice(new Subdevice(F("set"),true))->with_receive_cb( // 1
+    add_subdevice(new Subdevice(str_set, true))->with_receive_cb( // 1
         [&] (const Ustring& payload) {
             if(payload.equals(str_on)) high();
             else {
