@@ -10,13 +10,14 @@
 #include <string.h>
 #include <functional>
 #include <Arduino.h>
-#if defined(ESP32) || defined(ESP8266)
+// no special logging for esp8266
+#if defined(ESP32)
     #include <esp_log.h>
 #endif
 
 #if defined(ESP32)
     // PROGMEM and F-Strings seem to be utterly broken in new versions of arduino esp32 framework
-    // TODO - remove this after debugging
+    // TODO - remove this after fix found
     #ifdef F
         #undef F
         #define F(param) param
@@ -34,13 +35,12 @@ extern const PROGMEM char* str_set;
 // Logging
 void ulog_serial_disable();
 void ulog_serial_enable();
+void ulog_internal();
 void ulog_internal(const char *fmt, ...);
 void ulog_internal(const __FlashStringHelper *fmt, ...);
 // TODO: work on making logging more configurable
 #ifdef ESP32
     #define ulog(fmt, ...) ESP_LOGI(str_debug_tag, fmt, ##__VA_ARGS__)
-//    #define ulog(fmt, ...) log_e(fmt, ##__VA_ARGS__)
-//    #define ulog(fmt, ...) ulog_internal(fmt, ##__VA_ARGS__)
 #else
     #define ulog(fmt, ...) ulog_internal(fmt, ##__VA_ARGS__)
 #endif

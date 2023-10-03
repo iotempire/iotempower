@@ -750,8 +750,6 @@ void onWifiConnect(
 
 
 __attribute__((constructor)) void early_init() {
-    ulog("in log_init:"); // TODO: remove
-    device_manager.log_length(); // TODO: remove
  //   ulog(F("Free memory: %ld"),ESP.getFreeHeap());
     ulog();
     ulog();
@@ -759,11 +757,6 @@ __attribute__((constructor)) void early_init() {
 }
 
 void setup() {
-    ulog("setup start:"); // TODO: remove
-    device_manager.log_length(); // TODO: remove
-    ulog(F("Free memory: %ld"),ESP.getFreeHeap()); // TODO: remove
-
-
     // careful - devices are initialized before this due to class constructors
     // TODO: setup (another, the internal one seem quite ok) watchdog
     // TODO: consider not using serial at all and freeing it for other

@@ -282,6 +282,10 @@ void ulog_output(const char *buf) {
 //    ESP_LOGE(str_debug_tag,buf);
 }
 
+void ulog_internal() {
+    ulog_output(str_empty);
+}
+
 void ulog_internal(const char *fmt, ...) {
 	char buf[LOG_LINE_MAX_LEN];
     va_list ap;
