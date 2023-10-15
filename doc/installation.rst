@@ -11,7 +11,7 @@ up and running:
    `Installation on Linux (and WSL)`_
 
 Please also check out the tutorial videos for this setup on ulno's youtube
-channel(s): https://www.youtube.com/@ut-teaching-ulno4928/search?query=gateway
+channel(s): https://www.youtube.com/@ut-teaching-ulno/search?query=gateway
 
 
 Installation on Raspberry Pi from Pre-Prepared Image
@@ -127,7 +127,7 @@ booting Linux.
       cd  # go into your home directory also referred to as ~ or $HOME (it is something like /home/user)
       sudo apt-get update  # make sure system is up to date
       sudo apt install git haveged mosquitto mosquitto-clients virtualenv iptables 
-      sudo apt install bridge-utils hostapd dnsmasq build-essential
+      sudo apt install bridge-utils hostapd dnsmasq build-essential rsync
       # installing nodejs on a debain system is currently a bit tricky, best compare
       # https://github.com/nodesource/distributions/blob/master/README.md
       curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash - &&\
@@ -146,7 +146,7 @@ booting Linux.
 
       cd  # go into your home directory also referred to as ~ or $HOME (it is something like /home/user)
       sudo pacman -Syyu  # make sure system is up to date
-      sudo pacman -S git haveged mosquitto python-virtualenv 
+      sudo pacman -S git haveged mosquitto python-virtualenv rsync
       sudo pacman -S iptables bridge-utils hostapd dnsmasq nodejs npm
       sudo pacman -S mc micro # this is optional: mc is nicer file management in cli, micro a nicer editor than nano
       # terminal-kit installation is done locally in iot environment and works on arch
