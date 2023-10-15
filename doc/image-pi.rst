@@ -17,7 +17,7 @@ Make sure to resize the image at one point with the DietPi tools
   sha256sum: ``f3be2ba597f2b885eb573a8c8af14e7cf788d614d765ae99ae0223c4f887454a``
   
 - Make sure the sha256-checksum of the 64 Bit image is correct. It should be:
-  ``bee3c26f4a0a71ec3b9ae83e26c19a427bbd6960b3fb949e7a4b1efa594fe0e8``
+  ``057a3178bf69daea76dd10cb4904f2c56d4037a92ecd48b62c5a39e6948be442``
 
   On Linux and MacOS, you can use ``sha256sum`` or ``shasum -a 256`` to verify
   the image, on Windows you can use
