@@ -216,10 +216,9 @@ int Ustring::scanf(const char *fmt, ...) {
 }
 
 
-
 void reboot() {
     // TODO: add network debugging
-    Serial.println(F("Rebooting in 5 seconds."));
+    ulog(F("Rebooting in 5 seconds."));
     delay(5000);
     // TODO: Consider counting in rtc and going into reconfigure after a while
 
@@ -242,8 +241,13 @@ void controlled_crash(const char * error_message) {
     reboot();
 }
 
-static void check_serial_init() {
-    static bool serial_initialized=false;
+static bool serial_initialized=false;
+
+bool is_serial_initialized() {
+    return serial_initialized;
+}
+
+void initialize_serial() {
     if(!serial_initialized) {
         serial_initialized = true;
         delay(200); // somehow things are a bit messed up here as logging might already have happened
@@ -253,6 +257,7 @@ static void check_serial_init() {
         Serial.println();
         Serial.println(F("Serial ready."));
         Serial.println(F("If in the last logline above is some weird output, that's normal."));
+        ulog("This output is generated on start by ulog.");
     }
 }
 
@@ -270,16 +275,23 @@ void ulog_serial_disable() {
 }
 
 void ulog_serial_enable() {
-    check_serial_init();
+    initialize_serial();
     ulog_serial_enabled = true;
 }
 
 void ulog_output(const char *buf) {
-    if(ulog_serial_enabled) {
-        check_serial_init();
-	    Serial.println(buf);
+     if(ulog_serial_enabled) {
+        #ifdef ESP32
+            if(is_serial_initialized) {
+                Serial.println(buf);
+            } else {
+                ESP_LOGI(str_debug_tag, "%s", buf); // TODO: ESP_LOGI seem not be correctly defined
+            }
+        #else
+            initialize_serial();
+	        Serial.println(buf);
+        #endif
     }
-//    ESP_LOGE(str_debug_tag,buf);
 }
 
 void ulog_internal() {
@@ -290,19 +302,40 @@ void ulog_internal(const char *fmt, ...) {
 	char buf[LOG_LINE_MAX_LEN];
     va_list ap;
 	va_start(ap, fmt);
-	vsnprintf(buf, LOG_LINE_MAX_LEN, fmt, ap);
-	va_end(ap);
-    ulog_output(buf);
+    #ifdef ESP32
+    // TODO: improve
+        if(is_serial_initialized) {
+    	    vsnprintf(buf, LOG_LINE_MAX_LEN, fmt, ap);
+            ulog_output(buf);
+        } else {
+            esp_log_write(ESP_LOG_INFO, str_debug_tag, fmt, ap);
+        }
+    	va_end(ap);
+    #else
+	    vsnprintf(buf, LOG_LINE_MAX_LEN, fmt, ap);
+    	va_end(ap);
+        ulog_output(buf);
+    #endif
 }
 
 void ulog_internal(const __FlashStringHelper *fmt, ...) {
     char buf[LOG_LINE_MAX_LEN];
-    check_serial_init();
     va_list ap;
     va_start(ap, (const char*)fmt);
-	vsnprintf(buf, LOG_LINE_MAX_LEN, (const char*)fmt, ap);
-	va_end(ap);
-    ulog_output(buf);
+    #ifdef ESP32
+    // TODO: improve
+        if(is_serial_initialized) {
+    	    vsnprintf(buf, LOG_LINE_MAX_LEN, (const char*)fmt, ap);
+            ulog_output(buf);
+        } else {
+            esp_log_write(ESP_LOG_INFO, str_debug_tag, (const char*)fmt, ap);
+        }
+    	va_end(ap);
+    #else
+	    vsnprintf(buf, LOG_LINE_MAX_LEN, (const char*)fmt, ap);
+    	va_end(ap);
+        ulog_output(buf);
+    #endif
 }
 
 long urandom(long from, long upto_exclusive) {

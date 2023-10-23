@@ -445,20 +445,17 @@ bool mqtt_connected = false; // mqtt in process of connecting
 unsigned long mqtt_last_attempt = millis() - MQTT_RETRY_INTERVAL;
 
 void onMqttMessage(char *topic, byte *payload, unsigned int len) {
-    Serial.print(F("Publish received."));
-    Serial.print(F("  topic: "));
-    Serial.print(topic);
-    Serial.print(F("  len: "));
-    Serial.print(len);
+    Ustring log_buffer;
+    log_buffer.printf(F("Publish received.  topic: %s  len:  %u"),
+        topic, len);
 
     Ustring utopic(topic);
     utopic.remove(0, node_topic.length() + 1);
     Ustring upayload((char *)payload, (unsigned int)len);
 
-    Serial.print(F(" payload: >"));
-    Serial.print(upayload.as_cstr());
-    Serial.println(F("<"));
-    
+    log_buffer.add(F(" payload: >"));
+    log_buffer.add(upayload);
+    log_buffer.add(F("<"));
 
     device_manager.receive(utopic, upayload);
 }
@@ -514,8 +511,7 @@ void maintain_mqtt() {
     if(!mqttClient.connected()) {
         if(mqtt_connected) {
             mqtt_connected = false;
-            Serial.print(F("MQTT: just disconnected. Reason:"));
-            Serial.println(mqttClient.state());
+            ulog(F("MQTT: just disconnected. Reason: %d"), mqttClient.state());
         }
         if(millis() - mqtt_last_attempt >= MQTT_RETRY_INTERVAL) { // let's try again
             init_mqtt();
@@ -532,8 +528,7 @@ void maintain_mqtt() {
             #endif
             ) {
             } else { // mqtt failed
-                Serial.print(F("MQTT connection failed, rc="));
-                Serial.println(mqttClient.state());
+                ulog(F("MQTT connection failed, rc=%d"), mqttClient.state());
             }
             mqtt_last_attempt = millis();
         }
@@ -549,9 +544,7 @@ void maintain_mqtt() {
 
 void connectToWifi() {
     // Start WiFi connection and register hostname
-    Serial.print(F("Trying to connect to Wi-Fi with name "));
-    Serial.println(F(WIFI_SSID));
-    Serial.print(F("Registering hostname: "));
+    ulog(F("Trying to connect to Wi-Fi with name " WIFI_SSID));
     if(reconfig_mode_active) {
         my_hostname = (char *)"iotempower-adoptee"; // TODO: define in defaults
         // my_hostname = (char *)"iotempower-xxxxxx";
@@ -565,29 +558,28 @@ void connectToWifi() {
     WiFi.hostname(my_hostname);
     #endif
     ArduinoOTA.setHostname(my_hostname);
-    Serial.println(my_hostname);
+    ulog(F("Registering hostname: %s"), my_hostname);
     WiFi.mode(WIFI_STA);
 
     // Before wifi-start?
-    Serial.println(F("Starting MDNS."));
+    ulog(F("Starting MDNS."));
     MDNS.begin(my_hostname);
-    Serial.println(F("MDNS Ready."));
+    ulog(F("MDNS Ready."));
 
     // start ota
     ArduinoOTA.begin();
-    Serial.println(F("OTA Ready."));
+    ulog(F("OTA Ready."));
 
     if(reconfig_mode_active) {
-        Serial.println(F("Using default wifi credentials in adopt mode."));
+        ulog(F("Using default wifi credentials in adopt mode."));
         WiFi.begin();
     } else {
-        Serial.println(F("Setting wifi credentials."));
+        ulog(F("Setting wifi credentials."));
         WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
     }
-    Serial.println(F("Wifi begin called."));
+    ulog(F("Wifi begin called."));
     if(WiFi.isConnected()) {
-        Serial.print(F("Already connected to Wi-Fi with IP: "));
-        Serial.println(WiFi.localIP());
+        ulog(F("Already connected to Wi-Fi with IP: %s"), WiFi.localIP());
         wifi_connected = true;
         // init_mqtt(); //AsyncMqttClient disabled in favor of PubSubClient
     }
@@ -749,31 +741,27 @@ void onWifiConnect(
 // }
 
 
-__attribute__((constructor)) void early_init() {
- //   ulog(F("Free memory: %ld"),ESP.getFreeHeap());
-    ulog();
-    ulog();
-    ulog();
-}
+// __attribute__((constructor)) void early_init() {
+//  //   ulog(F("Free memory: %ld"),ESP.getFreeHeap());
+//     ulog();
+//     ulog();
+//     ulog();
+// }
 
 void setup() {
     // careful - devices are initialized before this due to class constructors
-    // TODO: setup (another, the internal one seem quite ok) watchdog
+    // TODO: setup (another, the internal one seems quite ok) watchdog
     // TODO: consider not using serial at all and freeing it for other
     // connections, and offering other debug channels
-    // Serial.begin(115200); -> now in toolbox when first time ulog called
-    // Serial.println();
-    // delay(1000);
     #ifdef ESP32
         #ifdef BROWNOUT_DETECT_DISABLED
         WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0); //disable brownout detector TODO: verify that this reduces crashes
         #endif
     #endif
 
+    initialize_serial();
+
     ulog(F("Booting."));
-
-    device_manager.log_length(); // TODO: remove
-
 
     #ifdef ID_LED
         pinMode(ID_LED, OUTPUT); // initialize a potential onboardled // TODO: check if it's inverted
@@ -806,8 +794,6 @@ void setup() {
     // #endif
 
     connectToWifi();
-
-    ulog("Debug: 22"); // TODO: remove
 
     if (!reconfig_mode_active) {
         mqtt_management_topic = String(F(IOTEMPOWER)) + String(F("/_cfg_/")) 

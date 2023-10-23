@@ -15,7 +15,7 @@ void Barometer_BMP280::i2c_start() {
 
     if(sensor) {
         if(!sensor->init()) { // TODO: timeout
-            Serial.println(F("BMP280 not connected or broken!"));
+            ulog(F("BMP280 not connected or broken!"));
         } else {
             _started = true;
         }

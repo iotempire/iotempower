@@ -190,7 +190,7 @@ class Device {
         // publish current value(s) and resets needs_publishing state
         ////AsyncMqttClient disabled in favor of PubSubClient
         //bool publish(AsyncMqttClient& mqtt_client, Ustring& node_topic);
-        bool publish(PubSubClient& mqtt_client, Ustring& node_topic);
+        bool publish(PubSubClient& mqtt_client, Ustring& node_topic, Ustring& log_buffer);
 
 #ifdef mqtt_discovery_prefix
         ////AsyncMqttClient disabled in favor of PubSubClient

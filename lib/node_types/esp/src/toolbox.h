@@ -40,7 +40,9 @@ void ulog_internal(const char *fmt, ...);
 void ulog_internal(const __FlashStringHelper *fmt, ...);
 // TODO: work on making logging more configurable
 #ifdef ESP32
-    #define ulog(fmt, ...) ESP_LOGI(str_debug_tag, fmt, ##__VA_ARGS__)
+// TODO: improve
+//    #define ulog(fmt, ...) ESP_LOGI(str_debug_tag, fmt, ##__VA_ARGS__)
+    #define ulog(fmt, ...) ulog_internal(fmt, ##__VA_ARGS__)
 #else
     #define ulog(fmt, ...) ulog_internal(fmt, ##__VA_ARGS__)
 #endif
@@ -330,6 +332,10 @@ void reboot();
 void controlled_crash(const char * error_message);
 
 long urandom(long from, long upto_exclusive);
+
+bool is_serial_initialized();
+
+void initialize_serial();
 
 // constrain or limit a number to an interval
 #define limit(nr, min, max) \

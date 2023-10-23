@@ -183,15 +183,12 @@ bool DeviceManager::publish(PubSubClient& mqtt_client, Ustring& node_topic, bool
     //bool devices_publish(AsyncMqttClient& mqtt_client, Ustring& node_topic, bool publish_all) {
     bool published = false;
     bool first = true;
-    // TODO: send publish into debug (use buffer to capture string)
+    Ustring log_buffer(F("Publishing"));
     device_list.for_each( [&] (Device& dev) {
         if(dev.started()) {
             if(dev.get_report_change() && (publish_all || dev.needs_publishing())) {
-                if(first) {
-                    Serial.print(F("Publishing"));
-                }
-                if(dev.publish(mqtt_client, node_topic)) {
-                    if(!first) Serial.print(F("; "));
+                if(dev.publish(mqtt_client, node_topic, log_buffer)) {
+                    if(!first) log_buffer.add(F("; "));
                     published = true;
                 }
                 mqtt_client.loop(); // give time to send things out -> seems necessary
@@ -203,10 +200,14 @@ bool DeviceManager::publish(PubSubClient& mqtt_client, Ustring& node_topic, bool
         return true; // Continue loop
     } );
     if(!first && !published) {
-        Serial.println(F(" nothing."));
-        return true; // If you did send nothing at all, say this publish was successful
+        log_buffer.add(F(" nothing"));
+        published = true; // If you did send nothing at all, say this publish was successful
+    } else {
+        if(log_buffer.length() > 10) { // more than "Publishing."
+            log_buffer.add(F("."));
+            ulog(log_buffer.as_cstr());
+        }
     }
-    if(published) Serial.println(F("."));
     return published;
 }
 

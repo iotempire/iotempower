@@ -99,7 +99,7 @@ void Device::create_discovery_info(const String& type,
 
 ////AsyncMqttClient disabled in favor of PubSubClient
 //bool Device::publish(AsyncMqttClient& mqtt_client, Ustring& node_topic) {
-bool Device::publish(PubSubClient& mqtt_client, Ustring& node_topic) {
+bool Device::publish(PubSubClient& mqtt_client, Ustring& node_topic, Ustring& log_buffer) {
     bool published = false;
     Ustring topic;
     bool first = true;
@@ -116,13 +116,14 @@ bool Device::publish(PubSubClient& mqtt_client, Ustring& node_topic) {
                 topic.add(sd.get_name());
             }
             if(first) {
-                Serial.print(F(" "));
+                log_buffer.add(F(" "));
                 first = false;
             }
-            else Serial.print(F("|"));
-            Serial.print(topic.as_cstr()+node_topic.length()+1);
-            Serial.print(F(":"));
-            Serial.print(val.as_cstr());
+            else log_buffer.add(F("|"));
+// TODO: seems wrong, check if fixed correctly            Serial.print(topic.as_cstr()+node_topic.length()+1);
+            log_buffer.add(topic);
+            log_buffer.add(F(":"));
+            log_buffer.add(val);
 
             ////AsyncMqttClient disabled in favor of PubSubClient
             // if(!mqtt_client.publish(topic.as_cstr(), 0, false, val.as_cstr())) {
@@ -131,7 +132,7 @@ bool Device::publish(PubSubClient& mqtt_client, Ustring& node_topic) {
             mqtt_client.loop();
             yield();
             if(!mqtt_client.publish(topic.as_cstr(), (uint8_t*) val.as_cstr(), (unsigned int)val.length(), false)) {
-                Serial.print(F("!publish error!"));
+                log_buffer.add(F("!publish error!"));
                 // TODO: signal error and trigger reconnect - necessary?
                 return false;
             }
@@ -251,14 +252,15 @@ bool Device::check_changes() {
                     if(_report_change) {
                         updated = true;
                         _needs_publishing = true;
-                        Serial.print(F("Needs publishing: "));
-                        Serial.print(name.as_cstr());
+                        Ustring log_buffer(F("Needs publishing: "));
+                        log_buffer.add(name);
                         if(!sd.get_name().empty()) {
-                            Serial.print(F("/"));
-                            Serial.print(sd.get_name().as_cstr());
+                            log_buffer.add(F("/"));
+                            log_buffer.add(sd.get_name());
                         }
-                        Serial.print(F(":"));
-                        Serial.println(sd.measured_value.as_cstr());
+                        log_buffer.add(F(":"));
+                        log_buffer.add(sd.measured_value);
+                        ulog(log_buffer.as_cstr());
                     }
                     sd.last_confirmed_value.copy(sd.measured_value);
                 }

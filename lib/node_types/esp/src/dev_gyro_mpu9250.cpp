@@ -30,24 +30,18 @@ void Gyro_MPU9250::i2c_start()
             // Start by performing self test and reporting values
             mpu9250->MPU9250SelfTest(mpu9250->selfTest);
             // TODO: consider removing the following debug messages
-            Serial.print(F("x-axis self test: acceleration trim within : "));
-            Serial.print(mpu9250->selfTest[0], 1);
-            Serial.println("% of factory value");
-            Serial.print(F("y-axis self test: acceleration trim within : "));
-            Serial.print(mpu9250->selfTest[1], 1);
-            Serial.println("% of factory value");
-            Serial.print(F("z-axis self test: acceleration trim within : "));
-            Serial.print(mpu9250->selfTest[2], 1);
-            Serial.println("% of factory value");
-            Serial.print(F("x-axis self test: gyration trim within : "));
-            Serial.print(mpu9250->selfTest[3], 1);
-            Serial.println("% of factory value");
-            Serial.print(F("y-axis self test: gyration trim within : "));
-            Serial.print(mpu9250->selfTest[4], 1);
-            Serial.println("% of factory value");
-            Serial.print(F("z-axis self test: gyration trim within : "));
-            Serial.print(mpu9250->selfTest[5], 1);
-            Serial.println("% of factory value");
+            ulog(F("x-axis self test: acceleration trim within %f %% of factory value."),
+                mpu9250->selfTest[0]);
+            ulog(F("y-axis self test: acceleration trim within %f %% of factory value."),
+                mpu9250->selfTest[1]);
+            ulog(F("z-axis self test: acceleration trim within %f %% of factory value."));
+                mpu9250->selfTest[2]);
+            ulog(F("x-axis self test: gyration trim within %f %% of factory value."), 
+                mpu9250->selfTest[3], 1); 
+            ulog(F("y-axis self test: gyration trim within %f %% of factory value."), 
+                mpu9250->selfTest[4], 1);
+            ulog(F("z-axis self test: gyration trim within %f %% of factory value."), 
+                mpu9250->selfTest[5], 1);
 
             // Calibrate gyro and accelerometers, load biases in bias registers
             mpu9250->calibrateMPU9250(mpu9250->gyroBias, mpu9250->accelBias);
@@ -55,7 +49,7 @@ void Gyro_MPU9250::i2c_start()
             mpu9250->initMPU9250();
             // Initialize device for active mode read of accelerometer, gyroscope, and
             // temperature
-            Serial.println("MPU9250 initialized for active data mode....");
+            ulog("MPU9250 initialized for active data mode....");
 
             // Read the WHO_AM_I register of the magnetometer, this is a good test of
             // communication
@@ -63,7 +57,7 @@ void Gyro_MPU9250::i2c_start()
             if (d != 0x48)
             {
                 // Communication failed, stop here
-                Serial.println(F("Communication to magnetometer of MPU9250 failed."));
+                ulog(F("Communication to magnetometer of MPU9250 failed."));
             }
             else
             {
@@ -80,15 +74,15 @@ void Gyro_MPU9250::i2c_start()
                 // The next call delays for 4 seconds, and then records about 15 seconds of
                 // data to calculate bias and scale.
                 //    mpu9250->magCalMPU9250(mpu9250->magBias, mpu9250->magScale); // TODO: does this need to be activated
-                Serial.println("AK8963 mag biases (mG)");
-                Serial.println(mpu9250->magBias[0]);
-                Serial.println(mpu9250->magBias[1]);
-                Serial.println(mpu9250->magBias[2]);
+                ulog("AK8963 mag biases (mG)");
+                ulog(mpu9250->magBias[0]);
+                ulog(mpu9250->magBias[1]);
+                ulog(mpu9250->magBias[2]);
 
-                Serial.println("AK8963 mag scale (mG)");
-                Serial.println(mpu9250->magScale[0]);
-                Serial.println(mpu9250->magScale[1]);
-                Serial.println(mpu9250->magScale[2]);
+                ulog("AK8963 mag scale (mG)");
+                ulog(mpu9250->magScale[0]);
+                ulog(mpu9250->magScale[1]);
+                ulog(mpu9250->magScale[2]);
 
                 _started = true;
             }

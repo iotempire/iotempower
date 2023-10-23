@@ -14,29 +14,27 @@ void static printError(byte error)
   // If there's an I2C error, this function will
   // print out an explanation.
 {
-  Serial.print(F("I2C error: "));
-  Serial.print(error,DEC);
-  Serial.print(F(", "));
+  ulog(F("I2C error %d: "), (int)error);
   
   switch(error)
   {
     case 0:
-      Serial.println(F("success"));
+      ulog(F("success"));
       break;
     case 1:
-      Serial.println(F("data too long for transmit buffer"));
+      ulog(F("data too long for transmit buffer"));
       break;
     case 2:
-      Serial.println(F("received NACK on address (disconnected?)"));
+      ulog(F("received NACK on address (disconnected?)"));
       break;
     case 3:
-      Serial.println(F("received NACK on data"));
+      ulog(F("received NACK on data"));
       break;
     case 4:
-      Serial.println(F("other error"));
+      ulog(F("other error"));
       break;
     default:
-      Serial.println(F("unknown error"));
+      ulog(F("unknown error"));
   }
 }
 
@@ -51,9 +49,7 @@ void Lux_TSL2561::i2c_start() {
 
         if (sensor->getID(ID))
         {
-            Serial.print(F("Got factory ID: 0X"));
-            Serial.print(ID,HEX);
-            Serial.println(F(", should be 0X5X"));
+            ulog(F("Got factory ID: 0X%X, should be 0X5X"), ID);
             sensor->setTiming(_gain, 3);
             // To start taking measurements, power up the sensor:
             sensor->setPowerUp();
@@ -111,7 +107,7 @@ bool Lux_TSL2561::measure() {
         } else {
             value().from((int)round(lux)); // lx
         }
-        //if (good) Serial.println(F(" (good)"); else Serial.println(" (BAD)"));
+        //if (good) ulog(F(" (good)"); else ulog(" (BAD)"));
     }
     else
     {
