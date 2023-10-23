@@ -446,7 +446,8 @@ unsigned long mqtt_last_attempt = millis() - MQTT_RETRY_INTERVAL;
 
 void onMqttMessage(char *topic, byte *payload, unsigned int len) {
     Ustring log_buffer;
-    log_buffer.printf(F("Publish received.  topic: %s  len:  %u"),
+//    log_buffer.printf(F("Publish received.  topic: %s  len:  %u"), // TODO: allow use of flash-string
+    log_buffer.printf(("Publish received.  topic: %s  len:  %u"),
         topic, len);
 
     Ustring utopic(topic);

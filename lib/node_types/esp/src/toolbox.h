@@ -194,6 +194,9 @@ class Ustring {
             strncpy(cstr,initstr,IOTEMPOWER_MAX_STRLEN);
             case_adjust();
         }
+        Ustring(const __FlashStringHelper* initstr) {
+            from(initstr);
+        }
         Ustring(int i) { clear(); from(i); case_adjust();}
         Ustring(long i) { clear(); from(i); }
         Ustring(float f) { clear(); from(f); }
