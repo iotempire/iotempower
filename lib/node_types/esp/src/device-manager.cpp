@@ -220,6 +220,7 @@ bool DeviceManager::subscribe(PubSubClient& mqtt_client, Ustring& node_topic) {
     device_list.for_each( [&] (Device& dev) {
         if( dev.started() ) {
             dev.subdevices_for_each( [&] (Subdevice& sd) {
+                ulog("device: %s subdevice: %s", node_topic.as_cstr(),  sd.get_name().as_cstr()); // TODO: remove
                 if(sd.subscribed()) {
                     // construct full topic
                     topic.copy(node_topic);

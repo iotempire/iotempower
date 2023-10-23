@@ -6,7 +6,8 @@
 #include "device.h"
 
 void Subdevice::init_log() {
-    ulog(F("subdevice init: subname: >%s<"), name.as_cstr());
+    ulog(F("subdevice init: subname: >%s<"), name.as_cstr()); 
+    // ESP_LOGI("mydebug",F("subdevice init: subname: >%s<"), name.as_cstr()); // back to ulog
 }
 
 void Subdevice::init(bool subscribed) {
