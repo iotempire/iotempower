@@ -7,7 +7,7 @@ Gyro_MPU9250::Gyro_MPU9250(const char *name) : I2C_Device(name)
     add_subdevice(new Subdevice(F("acc"))); // 1
     add_subdevice(new Subdevice(F("mag"))); // 2
     add_subdevice(new Subdevice(F("temperature"))); // 3
-    add_subdevice(new Subdevice(str_setrue))->with_receive_cb(
+    add_subdevice(new Subdevice(str_set))->with_receive_cb(
         [&] (const Ustring& payload) {
             declination = payload.as_float();
             return true;

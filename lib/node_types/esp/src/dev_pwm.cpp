@@ -11,7 +11,8 @@ Pwm::Pwm(const char* name, uint8_t pin, int frequency)
         return;
     }
     add_subdevice(new Subdevice());
-    add_subdevice(new Subdevice(str_set))->with_receive_cb(
+//    add_subdevice(new Subdevice(str_set))->with_receive_cb(
+    add_subdevice(new Subdevice(F("set")))->with_receive_cb(
         [&] (const Ustring& payload) {
             int duty=payload.as_int();
             set_duty(duty);
