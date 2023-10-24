@@ -66,6 +66,9 @@ Example
     // Only runs stable on D4 on esp8266 based boards
     rgb_strip_bus(strip2, 10, F_GRB, NeoEsp8266Uart1800KbpsMethod, D4);
 
+    // Same version for esp32 minikit, you can use otehr pins than D4 on the esp32
+    rgb_strip_bus(strip2, 10, F_GRB, NeoWs2812xMethod, D4);
+
     // old obsolete and probably instabel version, use on your own risk
     rgb_strip(strip2, 10, WS2811, D6, BRG); // <- do not use!
 
