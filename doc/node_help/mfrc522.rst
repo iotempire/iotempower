@@ -41,13 +41,14 @@ Wiring
 
    Wemos
    D1 Mini/    mfrc522/
-   NodeMCU  -  rfid-rc522 board
+   NodeMCU      -  rfid-rc522 board
+   (esp32)
 
-       3V3  -  3.3V
-        D8  -  sda
-        D7  -  MOSI
-        D6  -  MISO
-        D5  -  SCK
-        D0  -  RST
-         G  -  GND
-       N/C  -  IRQ (IRQ is not connected for use in IoTempower)
+       3V3      -  3.3V
+        D8 ( 5) -  sda
+        D7 (23) -  MOSI
+        D6 (19) -  MISO
+        D5 (18) -  SCK
+        D0 (26) -  RST
+         G      -  GND
+       N/C      -  IRQ (IRQ is not connected for use in IoTempower)

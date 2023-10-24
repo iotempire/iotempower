@@ -114,7 +114,8 @@ Mfrc522::Mfrc522(const char* name, uint16_t data_size,
 void Mfrc522::start() {
     ulog(F("Starting MFRC522 initialization."));
     // TODO: check on esp32
-    sensor = new MFRC522(15, 0); // D8, D3 on Wemos TODO: make configurable?
+//    sensor = new MFRC522(15, 0); // D8, D3 on Wemos TODO: make configurable?
+    sensor = new MFRC522(D8, D0); // D8, D0 on Wemos TODO: make configurable?
     if(sensor) {
         SPI.begin(); // Init SPI bus
         sensor->PCD_Init(); // Init MFRC522 card
