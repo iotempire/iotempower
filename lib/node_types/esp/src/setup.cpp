@@ -11,7 +11,7 @@ void (iotempower_init)() __attribute__((weak));
 void (iotempower_start)() __attribute__((weak));
 
 #define init() \
-    iotempower_start()
+     iotempower_init()
 
 #define start() \
     iotempower_start()
@@ -19,3 +19,6 @@ void (iotempower_start)() __attribute__((weak));
 // That's the user file (called in folder setup.cpp, but linked as setup.h
 // here)
 #include "setup.h"
+
+#undef start
+#undef init
