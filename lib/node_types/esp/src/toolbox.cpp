@@ -6,7 +6,6 @@
 const PROGMEM char* str_on = "on";
 const PROGMEM char* str_off = "off";
 const PROGMEM char* str_empty = "";
-const PROGMEM char* str_debug_tag = "IoT";
 const PROGMEM char* str_set = "set";
 
 bool Ustring::add(const Ustring& other) {
@@ -256,8 +255,10 @@ void initialize_serial() {
         Serial.println();
         Serial.println();
         Serial.println(F("Serial ready."));
-        Serial.println(F("If in the last logline above is some weird output, that's normal."));
-        ulog("This output is generated on start by ulog.");
+        #ifdef ESP32
+        Serial.println(F("It's normal if one of the last logline above has some weird output."));
+        #endif
+        ulog(F("Logging is now active."));
     }
 }
 
@@ -285,7 +286,7 @@ void ulog_output(const char *buf) {
             if(is_serial_initialized) {
                 Serial.println(buf);
             } else {
-                ESP_LOGI(str_debug_tag, "%s", buf); // TODO: ESP_LOGI seem not be correctly defined
+                log_i("%s", buf); 
             }
         #else
             initialize_serial();
@@ -302,40 +303,18 @@ void ulog_internal(const char *fmt, ...) {
 	char buf[LOG_LINE_MAX_LEN];
     va_list ap;
 	va_start(ap, fmt);
-    #ifdef ESP32
-    // TODO: improve
-        if(is_serial_initialized) {
-    	    vsnprintf(buf, LOG_LINE_MAX_LEN, fmt, ap);
-            ulog_output(buf);
-        } else {
-            esp_log_write(ESP_LOG_INFO, str_debug_tag, fmt, ap);
-        }
-    	va_end(ap);
-    #else
-	    vsnprintf(buf, LOG_LINE_MAX_LEN, fmt, ap);
-    	va_end(ap);
-        ulog_output(buf);
-    #endif
+    vsnprintf(buf, LOG_LINE_MAX_LEN, fmt, ap);
+    va_end(ap);
+    ulog_output(buf);
 }
 
 void ulog_internal(const __FlashStringHelper *fmt, ...) {
     char buf[LOG_LINE_MAX_LEN];
     va_list ap;
     va_start(ap, (const char*)fmt);
-    #ifdef ESP32
-    // TODO: improve
-        if(is_serial_initialized) {
-    	    vsnprintf(buf, LOG_LINE_MAX_LEN, (const char*)fmt, ap);
-            ulog_output(buf);
-        } else {
-            esp_log_write(ESP_LOG_INFO, str_debug_tag, (const char*)fmt, ap);
-        }
-    	va_end(ap);
-    #else
-	    vsnprintf(buf, LOG_LINE_MAX_LEN, (const char*)fmt, ap);
-    	va_end(ap);
-        ulog_output(buf);
-    #endif
+    vsnprintf(buf, LOG_LINE_MAX_LEN, (const char*)fmt, ap);
+    va_end(ap);
+    ulog_output(buf);
 }
 
 long urandom(long from, long upto_exclusive) {

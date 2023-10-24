@@ -204,7 +204,6 @@ bool DeviceManager::publish(PubSubClient& mqtt_client, Ustring& node_topic, bool
         published = true; // If you did send nothing at all, say this publish was successful
     } else {
         if(log_buffer.length() > 10) { // more than "Publishing."
-            log_buffer.add(F("."));
             ulog(log_buffer.as_cstr());
         }
     }

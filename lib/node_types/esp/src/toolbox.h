@@ -29,7 +29,6 @@
 extern const PROGMEM char* str_on;
 extern const PROGMEM char* str_off;
 extern const PROGMEM char* str_empty;
-extern const PROGMEM char* str_debug_tag;
 extern const PROGMEM char* str_set;
 
 // Logging
@@ -39,11 +38,14 @@ void ulog_internal();
 void ulog_internal(const char *fmt, ...);
 void ulog_internal(const __FlashStringHelper *fmt, ...);
 // TODO: work on making logging more configurable
+#define ULOG_FORMAT  F("[%6u][%s:%u] %s(): "), (unsigned long) (esp_timer_get_time() / 1000ULL), pathToFileName(__FILE__), __LINE__, __FUNCTION__
 #ifdef ESP32
-// TODO: improve
-//    #define ulog(fmt, ...) ESP_LOGI(str_debug_tag, fmt, ##__VA_ARGS__)
-    #define ulog(fmt, ...) ulog_internal(fmt, ##__VA_ARGS__)
+//    #define ulog(fmt, ...) log_i(__VA_OPT__(fmt) "%s" __VA_OPT__(, __VA_ARGS__))
+//    #define ulog(fmt, ...) log_i(__VA_OPT__(fmt) __VA_OPT__(, __VA_ARGS__));
+//    #define ulog(fmt, ...) ESP_LOGI("IoT", fmt, ##__VA_ARGS__);
+    #define ulog(fmt, ...) log_printf(ULOG_FORMAT); log_printf(fmt, ##__VA_ARGS__); log_printf("\n")
 #else
+//    #define ulog(fmt, ...) log_printf(ULOG_FORMAT); log_printf(fmt, ##__VA_ARGS__); log_printf("\n")
     #define ulog(fmt, ...) ulog_internal(fmt, ##__VA_ARGS__)
 #endif
 
