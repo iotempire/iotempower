@@ -131,7 +131,7 @@ bool Device::publish(PubSubClient& mqtt_client, Ustring& node_topic, Ustring& lo
             yield();
             mqtt_client.loop();
             yield();
-            if(!mqtt_client.publish(topic.as_cstr(), (uint8_t*) val.as_cstr(), (unsigned int)val.length(), false)) {
+            if(!mqtt_client.publish(topic.as_cstr(), (uint8_t*) val.as_cstr(), (unsigned int)val.length(), _retained)) {
                 log_buffer.add(F("!publish error!"));
                 // TODO: signal error and trigger reconnect - necessary?
                 return false;

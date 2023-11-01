@@ -130,6 +130,7 @@ class Device {
         bool _ignore_case = true;
         bool _report_change = true;
         bool _needs_publishing = false;
+        bool _retained = false; // allow setting retained for publishing
 
 
         // This is a chain of callbacks called for every measuring iteration of the
@@ -260,6 +261,22 @@ class Device {
         bool get_report_change() { 
             return _report_change;
         }
+
+        //// set if published mqtt messages should be reatined
+        Device& set_retained(bool retained) { 
+            _retained = retained;
+            return *this;
+        }
+        Device& with_retained(bool retained) {
+            return set_retained(retained);
+        } 
+        Device& retained(bool retained=true) {
+            return set_report_change(retained);
+        } 
+        bool get_retained() {
+            return _retained;
+        }
+
 
         //// on_change_callback
         Device& set_on_change_callback(Callback& on_change_cb) {
