@@ -271,7 +271,7 @@ class Device {
             return set_retained(retained);
         } 
         Device& retained(bool retained=true) {
-            return set_report_change(retained);
+            return set_retained(retained);
         } 
         bool get_retained() {
             return _retained;
