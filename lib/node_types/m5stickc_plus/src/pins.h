@@ -8,6 +8,7 @@
 #define IRQ  35
 #define FLASHBUTTON BUTTON_HOME
 #define ONBOARDLED 10
+// TODO: re-investigate, why pwm doesn't work on this led 
 #define ONBOARDLED_FULL_GPIO 0
 #ifndef BUZZER
 #define BUZZER 2
