@@ -6,7 +6,7 @@
 
 #include <device.h>
 // TODO: should these dependencies softened to classes having a show-method?
-#include <rgb_matrix.h>
+#include <dev_rgb_matrix.h>
 
 #define ANIMATOR_COMMAND_HANDLER std::function<void(Ustring& command)>
 typedef struct {
