@@ -8,6 +8,18 @@
 
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
+minimal_firmware_path="/lib/firmware/cypress/cyfmac43455-sdio-minimal.bin"
+default_firmware_path="/lib/firmware/brcm/brcmfmac43455-sdio.bin"
+
+# Check if we have the right firmware in use right now already
+symlink_check=$(readlink -f "$default_firmware_path")
+
+if [[ $symlink_check == *"minimal"* ]]; then
+  # Minimal firmware is already activated, exit
+  echo "The minimal firmware version is already activated! Abandoning operation"
+  exit
+fi
+
 
 # First gather some version information
 raspberry_pi_version=$(cat /proc/cpuinfo | grep Model | awk -F ': ' '{print $2}')
@@ -20,9 +32,7 @@ else
     exit
 fi
 
-minimal_firmware_path="/lib/firmware/cypress/cyfmac43455-sdio-minimal.bin"
-default_firmware_path="/lib/firmware/brcm/brcmfmac43455-sdio.bin"
-
+# Check if the required firmware file exists on this system
 if [ -e "$minimal_firmware_path" ]; then
     echo "Minimal firmware file found, going on..."
 else
@@ -30,20 +40,12 @@ else
     exit
 fi
 
-# Now check some paths to see if we have the right firmware in use right now
-# ...
-
-# Minimal firmware is already activated, exit
-# ...
-
-
 # Everything OK and we can activate the minimal firmware by setting up a syslink to it
-# ...
 echo "Replacing default firmware file with the minimal version. NB! sudo access is required for the following operation!
 
-sudo ln -sf $minimal_firmware_path $default_firmware_path
-
+sudo ln -sf "$minimal_firmware_path" "$default_firmware_path"
 
 # Finally, need a reboot to finalize things
-echo "A reboot of your device is required to active the new minimal firmware version"
-# ...
+echo "Done!"
+echo "A reboot of your device is required to active the new minimal firmware version."
+echo "Please make sure to do so before using the Access Point."
