@@ -131,6 +131,17 @@ else
     cd nodejs
     npm install terminal-kit
 
+    # activate minimal firmware
+    echo "In order to support a larger amount of connected devices, a special minimal version 
+		of the wireless chip firmware has to be enabled. Do you want to proceed? (Y/n)"
+    read answer
+
+    if [ "$answer" == "Y" ] || [ "$answer" == "y" ]; then
+        unbreak_ap_limit
+    else
+        echo "NB! A maximum of 8 connected clients are supported without the use of minimal broadcom firmware."
+    fi
+
     popd  &> /dev/null
 
     bash "$IOTEMPOWER_ROOT/bin/fix_bin"
