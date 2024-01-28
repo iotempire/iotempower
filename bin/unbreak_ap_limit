@@ -6,7 +6,7 @@
 # Author: Anton Slavin
 # Create date: 2024-01-25
 
-[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
+# [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
 minimal_firmware_path="/lib/firmware/cypress/cyfmac43455-sdio-minimal.bin"
 default_firmware_path="/lib/firmware/brcm/brcmfmac43455-sdio.bin"
@@ -41,7 +41,7 @@ else
 fi
 
 # Everything OK and we can activate the minimal firmware by setting up a syslink to it
-echo "Replacing default firmware file with the minimal version. NB! sudo access is required for the following operation!
+echo "Replacing default firmware file with the minimal version. NB! sudo access is required for the following operation!"
 
 sudo ln -sf "$minimal_firmware_path" "$default_firmware_path"
 
