@@ -13,8 +13,6 @@
 # Create date: 2017-05-17
 
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
-echo "Installing"
-echo "$@"
 
 function welcome() {
 cat << EOF
@@ -30,9 +28,7 @@ bridge-utils, python-dev, mosquitto-clients, haveged,
 and a current nodejs installed.
 
 On Ubuntu or Debian systems install these with:
-sudo apt install build-essential git mosquitto-clients \n
-         virtualenv iptables bridge-utils hostapd dnsmasq haveged \
-         python3-dev
+sudo apt install build-essential git mosquitto-clients virtualenv iptables bridge-utils hostapd dnsmasq haveged python3-dev
 
 Installing a current nodejs on debian, ubuntu, and raspberry os
 is not trivial, best follow the instructions for the node install here:
@@ -56,8 +52,56 @@ function install_package_if_missing(){
   fi
 }
 
+# Parsing options
+help_string="Possible options:
+      --clean: clears installations and starts a new environment
+      --quite: install all dependencies(optional & required)
+      --cloudcmd: install Cloud Commander
+      --node-red: install Node Red
+      --caddy: install Caddy
+      --mqtt: install Mosquito
+      --un-break: install Raspberry pi wireless firmware chip
+      "
+while getopts ":h-:" opt; do
+  case $opt in
+    h)
+      echo "$help_string"
+      exit 0
+      ;;
+    -)
+      case "${OPTARG}" in
+        help)
+          echo "$help_string"
+          exit 0;;
+        clean)
+          clean=1;;
+        quite)
+          quite=1;;
+        cloudcmd)
+          answer_commander=y;;
+        node-red)
+          answer_node_red=y;;
+        caddy)
+          answer_caddy=y;;
+        mqtt)
+          answer_mqtt=y;;
+        un-break)
+          answer_un_break=y;;
+        *)
+          echo "Invalid option: --${OPTARG}"
+          exit 1
+          ;;
+      esac
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG"
+      exit 1
+      ;;
+  esac
+done
 
-if [[ "$1" == clean ]]; then
+
+if [[ "$clean" == 1 ]]; then
   echo "Deleting external cache."
   echo
   rm -rf "$IOTEMPOWER_VPYTHON"
@@ -68,8 +112,7 @@ fi
 if [[ -e "$IOTEMPOWER_VPYTHON/bin/activate" ]]; then # check for existing venv
     source "$IOTEMPOWER_VPYTHON/bin/activate"
 else
-	if [[ "$1" == *quiet* ]]; then
-
+	if [[ "$quite" == 1 ]]; then
 		answer=y
 		answer_commander=y
 		answer_node_red=y
@@ -80,7 +123,8 @@ else
 	    welcome
     	read -r answer
     	optional_message="Do you want to install optional dependency"
-
+      if [ -z "$answer_commander" ] && [ -z "$answer_node_red" ] &&
+         [ -z "$answer_caddy" ] && [ -z "$answer_mqtt" ] && [ -z "$answer_un_break" ]; then
       echo "${optional_message} CLOUD COMMANDER (Details -> https://cloudcmd.io/)? (Y/n)"
       read -r answer_commander
 
@@ -99,9 +143,10 @@ else
             NB! A maximum of 8 connected clients are supported without the use of minimal broadcom firmware.
             Do you want to proceed? (Y/n)"
       read -r answer_un_break
-
+      fi
     fi
     if [[ "$answer" == "y" ||  "$answer" == "Y" || "$answer" == "" ]]; then
+      echo "Installing general packages"
       install_package_if_missing "python3.11-venv"
       install_package_if_missing "git"
       install_package_if_missing "python3-dev"
@@ -148,6 +193,7 @@ else
     echo "All necessary packages have been installed the rest is optional packages."
 
     if [[ "$answer_commander" == "y" ||  "$answer_commander" == "Y" ]]; then
+      echo "Installing Cloud Commander"
       apt install g++ -y
       npm install -g gritty
       npm install -g cloudcmd
@@ -155,10 +201,12 @@ else
     fi
 
     if [[ "$answer_node_red" == "y" ||  "$answer_node_red" == "Y" ]]; then
+      echo "Installing Node Red"
       npm install -g --unsafe-perm node-red
     fi
 
     if [[ "$answer_caddy" == "y" ||  "$answer_caddy" == "Y" ]]; then
+      echo "Installing Caddy"
       apt install -y debian-keyring debian-archive-keyring apt-transport-https
       curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
       curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list
@@ -167,6 +215,7 @@ else
     fi
 
     if [[ "$answer_mqtt" == "y" ||  "$answer_mqtt" == "Y" ]]; then
+      echo "Installing Mosquito"
       apt install mosquitto-clients -y
       apt install mosquitto -y
     fi

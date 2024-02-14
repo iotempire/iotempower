@@ -10,6 +10,6 @@ WORKDIR $WORKDIR
 RUN apt-get update -y && \
     apt-get install git -y && \
     git clone https://github.com/iotempire/iotempower.git iot
-RUN iot/bin/iot_install quiet
-ENTRYPOINT "iot/bin/docker_web_starter"
+RUN iot_install --quite
+ENTRYPOINT "docker_web_starter"
 EXPOSE 40080
