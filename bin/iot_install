@@ -143,7 +143,7 @@ else
     curl -fsSL https://deb.nodesource.com/setup_21.x | bash - && apt-get install -y nodejs
 
     # install node.js related stuff
-    npm install terminal-kit
+    npm install -g terminal-kit
 
     echo "All necessary packages have been installed the rest is optional packages."
 
@@ -183,9 +183,15 @@ else
     iot doc make
     # Save the state
     python3 "$IOTEMPOWER_ROOT"/utils/save_arguments_as_json.py --splitter '=' --path "$IOTEMPOWER_LOCAL"/installation_options.json \
-    answer="$answer" answer_commander="$answer_commander" \
-     answer_node_red="$answer_node_red" answer_caddy="$answer_caddy" \
-     answer_mqtt="$answer_mqtt" answer_un_break="$answer_un_break"
+    general="$answer" cloud_commander="$answer_commander" \
+     node_red="$answer_node_red" caddy="$answer_caddy" \
+     mosquitto="$answer_mqtt" answer_un_break="$answer_un_break"
+
+    # Testing the installation
+    if ! pytest "$IOTEMPOWER_ROOT"/tests/test_installations.py;
+    then
+     exit 1
+    fi
 fi
 
 exit 0

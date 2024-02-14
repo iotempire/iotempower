@@ -10,3 +10,4 @@ recommonmark==0.7.1
 Sphinx==7.2.6
 sphinx-bootstrap-theme==0.8.1
 websocket-client==1.7.0
+pytest==8.0.0
