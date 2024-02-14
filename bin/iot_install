@@ -181,7 +181,11 @@ else
     update_cache
 
     iot doc make
-
+    # Save the state
+    python3 "$IOTEMPOWER_ROOT"/utils/save_arguments_as_json.py --splitter '=' --path "$IOTEMPOWER_LOCAL"/installation_options.json \
+    answer="$answer" answer_commander="$answer_commander" \
+     answer_node_red="$answer_node_red" answer_caddy="$answer_caddy" \
+     answer_mqtt="$answer_mqtt" answer_un_break="$answer_un_break"
 fi
 
 exit 0
