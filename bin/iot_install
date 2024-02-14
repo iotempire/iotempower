@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 # if not available, install all dependencies
 # and also allow to fix shebangs in local bin folder
 #
@@ -10,10 +11,10 @@
 #
 # Author: ulno
 # Create date: 2017-05-17
-#
 
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
-
+echo "Installing"
+echo "$@"
 
 function welcome() {
 cat << EOF
@@ -29,7 +30,7 @@ bridge-utils, python-dev, mosquitto-clients, haveged,
 and a current nodejs installed.
 
 On Ubuntu or Debian systems install these with:
-sudo apt install build-essential git mosquitto-clients \
+sudo apt install build-essential git mosquitto-clients \n
          virtualenv iptables bridge-utils hostapd dnsmasq haveged \
          python3-dev
 
@@ -38,13 +39,21 @@ is not trivial, best follow the instructions for the node install here:
 https://github.com/nodesource/distributions/blob/master/README.md
 
 
-Optionally you want the mqtt server mosquitto, midight commander (mc),
+Optionally you want the mqtt server mosquitto, midnight commander (mc),
 the editor micro, and the fast simple webserver caddy.
 You can install these with:
 sudo apt install mc mosquitto micro caddy
 
 Do you want to set it up? (Y/n)
 EOF
+}
+
+function install_package_if_missing(){
+  if [[ $(which "$1") == "" ]]; then
+    echo "$1 has not been found in your system, installing. Please wait..."
+    apt-get install -y -q "$1"
+    echo "$1 has been installed successfully"
+  fi
 }
 
 
@@ -60,20 +69,46 @@ if [[ -e "$IOTEMPOWER_VPYTHON/bin/activate" ]]; then # check for existing venv
     source "$IOTEMPOWER_VPYTHON/bin/activate"
 else
 	if [[ "$1" == *quiet* ]]; then
+
 		answer=y
+		answer_commander=y
+		answer_node_red=y
+		answer_caddy=y
+		answer_mqtt=y
+		answer_un_break=y
 	else
 	    welcome
-    	read answer
+    	read -r answer
+    	optional_message="Do you want to install optional dependency"
+
+      echo "${optional_message} CLOUD COMMANDER (Details -> https://cloudcmd.io/)? (Y/n)"
+      read -r answer_commander
+
+      echo "${optional_message} NODE-RED (Details -> https://nodered.org/)? (Y/n)"
+      read -r answer_node_red
+
+      echo "${optional_message} CADDY (Details -> https://caddyserver.com/)? (Y/n)"
+      read -r answer_caddy
+
+      echo "${optional_message} MOSQUITTO (MQTT broker) (Details -> https://mosquitto.org/)? (Y/n)"
+      read -r answer_mqtt
+
+      # activate minimal firmware
+      echo "In order to support a larger amount of connected devices, a special minimal version
+            of the wireless chip firmware has to be enabled.
+            NB! A maximum of 8 connected clients are supported without the use of minimal broadcom firmware.
+            Do you want to proceed? (Y/n)"
+      read -r answer_un_break
+
     fi
     if [[ "$answer" == "y" ||  "$answer" == "Y" || "$answer" == "" ]]; then
-        if [[ $(which virtualenv) == "" ]]; then
-            echo "You need to install virtualenv. Exiting."
-            exit 1
-        fi
-        if [[ $(which git) == "" ]]; then
-            echo "You need to install git. Exiting."
-            exit 1
-        fi
+      install_package_if_missing "python3.11-venv"
+      install_package_if_missing "git"
+      install_package_if_missing "python3-dev"
+      install_package_if_missing "gcc-aarch64-linux-gnu"
+      install_package_if_missing "make"
+      install_package_if_missing "apt-utils"
+      install_package_if_missing "jq"
     else
         echo "Can't continue, exiting now."
         exit 1
@@ -85,70 +120,68 @@ else
     # virtualenv -p "$(which python2)" "$IOTEMPOWER_VPYTHON2"
     # source "$IOTEMPOWER_VPYTHON2/bin/activate"
     # pip install --upgrade pip
-# #    pip install --upgrade platformio
-# # TODO: go back to normal install, but for now we need version4 (development version)
+    #    pip install --upgrade platformio
+    # TODO: go back to normal install, but for now we need version4 (development version)
     # pip install --upgrade https://github.com/platformio/platformio-core/archive/develop.zip
     # deactivate # disable python 2 environment
 
     # install virtualenv
-    mkdir -p "$IOTEMPOWER_VPYTHON"
-    virtualenv -p "$(which python3)" "$IOTEMPOWER_VPYTHON"
+    python3 -m venv "$IOTEMPOWER_VPYTHON"
     source "$IOTEMPOWER_VPYTHON/bin/activate"
-    pip install --upgrade pip
+    pip install --no-cache-dir --upgrade pip
     # dependencies
-    pip install pyserial
-    pip install colorama
-    pip install websocket_client
-    #pip install restview  # for looking at documentation
-    # documentaion viewer
-    pip install sphinx
-    pip install sphinx_bootstrap_theme
-    pip install recommonmark
-    # for later development
-    pip install paho-mqtt  # also for iotknit
-	pip install git+https://github.com/iotempire/iotknit
-    pip install ipython
-    pushd . &> /dev/null
-	# platformio in python3
-    pip install --upgrade platformio
-    # for dongle
-    pip install psutil
-    # TODO: fix more dependencies
-    # Termux needs: ncurses-utils
-    # esptool
-    git clone https://github.com/espressif/esptool "$IOTEMPOWER_EXTERNAL/esptool.git"
-    cd "$IOTEMPOWER_EXTERNAL/esptool.git"
-    python setup.py install
-    ln -s "$IOTEMPOWER_EXTERNAL/esptool.git/esptool.py" "$IOTEMPOWER_VPYTHON/bin/esptool"
+    pip install --no-cache-dir -r "$IOTEMPOWER_ROOT/bin/requirements.txt"
 
-    # accesspoint
+    # access point
     git clone https://github.com/ulno/create_ap "$IOTEMPOWER_EXTERNAL/create_ap"
     #cd "$IOTEMPOWER_EXTERNAL/create_ap"
 
+    # install node.js
+    cd "$IOTEMPOWER_LOCAL" || exit
+    mkdir nodejs && cd nodejs || exit
+    install_package_if_missing "curl"
+    curl -fsSL https://deb.nodesource.com/setup_21.x | bash - && apt-get install -y nodejs
+
     # install node.js related stuff
-    cd "$IOTEMPOWER_LOCAL"
-    mkdir -p nodejs
-    cd nodejs
     npm install terminal-kit
 
-    # activate minimal firmware
-    echo "In order to support a larger amount of connected devices, a special minimal version 
-of the wireless chip firmware has to be enabled. Do you want to proceed? (Y/n)"
-    read answer
+    echo "All necessary packages have been installed the rest is optional packages."
 
-    if [ "$answer" == "Y" ] || [ "$answer" == "y" ]; then
-        "$IOTEMPOWER_LOCAL"/bin/unbreak_ap_limit
-    else
-        echo "NB! A maximum of 8 connected clients are supported without the use of minimal broadcom firmware."
+    if [[ "$answer_commander" == "y" ||  "$answer_commander" == "Y" ]]; then
+      apt install g++ -y
+      npm install -g gritty
+      npm install -g cloudcmd
+      cloudcmd --terminal --terminal-path "$(gritty --path)" --save --no-server
     fi
 
-    popd  &> /dev/null
+    if [[ "$answer_node_red" == "y" ||  "$answer_node_red" == "Y" ]]; then
+      npm install -g --unsafe-perm node-red
+    fi
+
+    if [[ "$answer_caddy" == "y" ||  "$answer_caddy" == "Y" ]]; then
+      apt install -y debian-keyring debian-archive-keyring apt-transport-https
+      curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+      curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list
+      apt update
+      apt install caddy
+    fi
+
+    if [[ "$answer_mqtt" == "y" ||  "$answer_mqtt" == "Y" ]]; then
+      apt install mosquitto-clients -y
+      apt install mosquitto -y
+    fi
+
+    if [[ "$answer_un_break" == "y" ||  "$answer_un_break" == "Y" ]]; then
+      echo "Unbreak entered"
+      unbreak_ap_limit
+    fi
 
     bash "$IOTEMPOWER_ROOT/bin/fix_bin"
 
     update_cache
 
+    iot doc make
+
 fi
 
 exit 0
-
