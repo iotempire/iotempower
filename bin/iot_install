@@ -52,10 +52,21 @@ function install_package_if_missing(){
   fi
 }
 
+function echo_message_read_answer(){
+  if [[ "$1" != "" ]]; then
+  echo "$1"
+  fi
+  read -r temp_answer
+    if [[ "$temp_answer" == "y" ||  "$temp_answer" == "Y" || "$temp_answer" == "" ]]; then
+      return 1
+    fi
+    return 0
+}
+
 # Parsing options
 help_string="Possible options:
       --clean: clears installations and starts a new environment
-      --quite: install all dependencies(optional & required)
+      --quiet: install all dependencies(optional & required)
       --cloudcmd: install Cloud Commander
       --node-red: install Node Red
       --caddy: install Caddy
@@ -75,18 +86,18 @@ while getopts ":h-:" opt; do
           exit 0;;
         clean)
           clean=1;;
-        quite)
-          quite=1;;
+        quiet)
+          quiet=1;;
         cloudcmd)
-          answer_commander=y;;
+          answer_commander=1;;
         node-red)
-          answer_node_red=y;;
+          answer_node_red=1;;
         caddy)
-          answer_caddy=y;;
+          answer_caddy=1;;
         mqtt)
-          answer_mqtt=y;;
+          answer_mqtt=1;;
         un-break)
-          answer_un_break=y;;
+          answer_un_break=1;;
         *)
           echo "Invalid option: --${OPTARG}"
           exit 1
@@ -112,40 +123,41 @@ fi
 if [[ -e "$IOTEMPOWER_VPYTHON/bin/activate" ]]; then # check for existing venv
     source "$IOTEMPOWER_VPYTHON/bin/activate"
 else
-	if [[ "$quite" == 1 ]]; then
-		answer=y
-		answer_commander=y
-		answer_node_red=y
-		answer_caddy=y
-		answer_mqtt=y
-		answer_un_break=y
+	if [[ "$quiet" == 1 ]]; then
+		answer=1
+		answer_commander=1
+		answer_node_red=1
+		answer_caddy=1
+		answer_mqtt=1
+		answer_un_break=1
 	else
 	    welcome
-    	read -r answer
+      echo_message_read_answer ""
+      answer=$?
     	optional_message="Do you want to install optional dependency"
       if [ -z "$answer_commander" ] && [ -z "$answer_node_red" ] &&
          [ -z "$answer_caddy" ] && [ -z "$answer_mqtt" ] && [ -z "$answer_un_break" ]; then
-      echo "${optional_message} CLOUD COMMANDER (Details -> https://cloudcmd.io/)? (Y/n)"
-      read -r answer_commander
+      echo_message_read_answer "${optional_message} CLOUD COMMANDER (Details -> https://cloudcmd.io/)? (Y/n)"
+      answer_commander=$?
 
-      echo "${optional_message} NODE-RED (Details -> https://nodered.org/)? (Y/n)"
-      read -r answer_node_red
+      echo_message_read_answer "${optional_message} NODE-RED (Details -> https://nodered.org/)? (Y/n)"
+      answer_node_red=$?
 
-      echo "${optional_message} CADDY (Details -> https://caddyserver.com/)? (Y/n)"
-      read -r answer_caddy
+      echo_message_read_answer "${optional_message} CADDY (Details -> https://caddyserver.com/)? (Y/n)"
+      answer_caddy=$?
 
-      echo "${optional_message} MOSQUITTO (MQTT broker) (Details -> https://mosquitto.org/)? (Y/n)"
-      read -r answer_mqtt
+      echo_message_read_answer "${optional_message} MOSQUITTO (MQTT broker) (Details -> https://mosquitto.org/)? (Y/n)"
+      answer_mqtt=$?
 
       # activate minimal firmware
-      echo "In order to support a larger amount of connected devices, a special minimal version
+      echo_message_read_answer "In order to support a larger amount of connected devices, a special minimal version
             of the wireless chip firmware has to be enabled.
             NB! A maximum of 8 connected clients are supported without the use of minimal broadcom firmware.
             Do you want to proceed? (Y/n)"
-      read -r answer_un_break
+      answer_un_break=$?
       fi
     fi
-    if [[ "$answer" == "y" ||  "$answer" == "Y" || "$answer" == "" ]]; then
+    if [[ "$answer" == 1 ]]; then
       echo "Installing general packages"
       install_package_if_missing "python3.11-venv"
       install_package_if_missing "git"
@@ -154,6 +166,7 @@ else
       install_package_if_missing "make"
       install_package_if_missing "apt-utils"
       install_package_if_missing "jq"
+      install_package_if_missing "haveged"
     else
         echo "Can't continue, exiting now."
         exit 1
@@ -188,24 +201,26 @@ else
     curl -fsSL https://deb.nodesource.com/setup_21.x | bash - && apt-get install -y nodejs
 
     # install node.js related stuff
-    npm install -g terminal-kit
+    npm install terminal-kit
 
     echo "All necessary packages have been installed the rest is optional packages."
 
-    if [[ "$answer_commander" == "y" ||  "$answer_commander" == "Y" ]]; then
+    if [[ "$answer_commander" == 1 ]]; then
       echo "Installing Cloud Commander"
       apt install g++ -y
-      npm install -g gritty
-      npm install -g cloudcmd
+      npm install gritty
+      npm install cloudcmd
       cloudcmd --terminal --terminal-path "$(gritty --path)" --save --no-server
     fi
 
-    if [[ "$answer_node_red" == "y" ||  "$answer_node_red" == "Y" ]]; then
+    if [[ "$answer_node_red" == 1 ]]; then
       echo "Installing Node Red"
-      npm install -g --unsafe-perm node-red
+      npm install --unsafe-perm node-red
+      mkdir ~/.node-red/
+      cp "$IOTEMPOWER_LOCAL"/nodejs/node_modules/node-red/settings.js ~/.node-red/
     fi
 
-    if [[ "$answer_caddy" == "y" ||  "$answer_caddy" == "Y" ]]; then
+    if [[ "$answer_caddy" == 1 ]]; then
       echo "Installing Caddy"
       apt install -y debian-keyring debian-archive-keyring apt-transport-https
       curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
@@ -214,13 +229,13 @@ else
       apt install caddy
     fi
 
-    if [[ "$answer_mqtt" == "y" ||  "$answer_mqtt" == "Y" ]]; then
+    if [[ "$answer_mqtt" == 1 ]]; then
       echo "Installing Mosquito"
       apt install mosquitto-clients -y
       apt install mosquitto -y
     fi
 
-    if [[ "$answer_un_break" == "y" ||  "$answer_un_break" == "Y" ]]; then
+    if [[ "$answer_un_break" == 1 ]]; then
       echo "Unbreak entered"
       unbreak_ap_limit
     fi

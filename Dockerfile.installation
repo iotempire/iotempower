@@ -1,15 +1,11 @@
 FROM debian:bookworm-slim
 LABEL authors="ARAZ.HEYDAROV"
 ENV WORKDIR /root
-ENV IOTEMPOWER_ACTIVE=yes
-ENV IOTEMPOWER_ROOT=$WORKDIR/iot
-ENV IOTEMPOWER_LOCAL=$IOTEMPOWER_ROOT/.local
-ENV IOTEMPOWER_VPYTHON=$IOTEMPOWER_LOCAL/vp
-ENV PATH=$PATH:$IOTEMPOWER_ROOT/bin
 WORKDIR $WORKDIR
 RUN apt-get update -y && \
     apt-get install git -y && \
     git clone https://github.com/iotempire/iotempower.git iot
-RUN iot_install --quite
-ENTRYPOINT "docker_web_starter"
+WORKDIR $WORKDIR/iot
+RUN ./run x ./bin/iot_install --quiet
+ENTRYPOINT ["./run", "x", "docker_web_starter"]
 EXPOSE 40080

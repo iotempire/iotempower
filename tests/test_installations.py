@@ -21,6 +21,7 @@ packages = [
     {"name": "make", "package_manager": "apt", "module": "general"},
     {"name": "curl", "package_manager": "apt", "module": "general"},
     {"name": "nodejs", "package_manager": "apt", "module": "general"},
+    {"name": "haveged", "package_manager": "apt", "module": "general"},
     {"name": "python3-dev", "package_manager": "apt", "module": "general"},
     {"name": "terminal-kit", "package_manager": "npm", "module": "general"},
     {"name": "g++", "package_manager": "apt", "module": "cloud_commander"},
@@ -37,7 +38,7 @@ packages = [
 
 packages_to_test = []
 for key, value in installation_options.items():
-    if value.lower() == "y":
+    if value.lower() == "1":
         packages_to_test += [tuple(package.values()) for package in packages if package["module"] == key]
 
 
@@ -46,8 +47,8 @@ def test_eval(package_name, package_manager, module) -> None:
     if package_manager == "apt":
         command = f"dpkg -s {package_name}"
     elif package_manager == "npm":
-        command = f"npm list -g {package_name}"
+        command = f"cd {local_dir}/nodejs && npm list {package_name}"
     else:
         raise NotImplementedError("Only apt and npm packages are supported for now")
-    result = subprocess.run(command.split())
+    result = subprocess.run(command, shell=True)
     assert result.returncode == 0, f"Cannot found {package_name} in your system which is need for {module}"
