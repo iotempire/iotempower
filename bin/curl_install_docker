@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+apt-get update
+apt-get install -y git
+git clone https://github.com/iotempire/iotempower ~/iot
+cd ~/iot || exit 1
+docker-compose build
+docker-compose up -d
