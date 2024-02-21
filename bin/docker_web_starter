@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+web_update_config
+web_starter

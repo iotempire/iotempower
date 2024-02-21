@@ -156,7 +156,8 @@ if check_root; then
     check_install
     installed=$?
     cd "$current_path" # back to where we have been called
-    if [ $installed -eq 0 ]; then
+    # If installed is detected or any argument is given
+    if [ $installed -eq 0 ] || [ $# -gt 0 ]; then
         run "$@"
     else
         if install; then # if it failed, try to install first

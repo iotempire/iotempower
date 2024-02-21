@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 # if not available, install all dependencies
 # and also allow to fix shebangs in local bin folder
 #
@@ -10,10 +11,8 @@
 #
 # Author: ulno
 # Create date: 2017-05-17
-#
 
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
-
 
 function welcome() {
 cat << EOF
@@ -29,16 +28,14 @@ bridge-utils, python-dev, mosquitto-clients, haveged,
 and a current nodejs installed.
 
 On Ubuntu or Debian systems install these with:
-sudo apt install build-essential git mosquitto-clients \
-         virtualenv iptables bridge-utils hostapd dnsmasq haveged \
-         python3-dev
+sudo apt install build-essential git mosquitto-clients virtualenv iptables bridge-utils hostapd dnsmasq haveged python3-dev
 
 Installing a current nodejs on debian, ubuntu, and raspberry os
 is not trivial, best follow the instructions for the node install here:
 https://github.com/nodesource/distributions/blob/master/README.md
 
 
-Optionally you want the mqtt server mosquitto, midight commander (mc),
+Optionally you want the mqtt server mosquitto, midnight commander (mc),
 the editor micro, and the fast simple webserver caddy.
 You can install these with:
 sudo apt install mc mosquitto micro caddy
@@ -47,8 +44,75 @@ Do you want to set it up? (Y/n)
 EOF
 }
 
+function install_package_if_missing(){
+  if [[ $(which "$1") == "" ]]; then
+    echo "$1 has not been found in your system, installing. Please wait..."
+    apt-get install -y -q "$1"
+    echo "$1 has been installed successfully"
+  fi
+}
 
-if [[ "$1" == clean ]]; then
+function echo_message_read_answer(){
+  if [[ "$1" != "" ]]; then
+  echo "$1"
+  fi
+  read -r temp_answer
+    if [[ "$temp_answer" == "y" ||  "$temp_answer" == "Y" || "$temp_answer" == "" ]]; then
+      return 1
+    fi
+    return 0
+}
+
+# Parsing options
+help_string="Possible options:
+      --clean: clears installations and starts a new environment
+      --quiet: install all dependencies(optional & required)
+      --cloudcmd: install Cloud Commander
+      --node-red: install Node Red
+      --caddy: install Caddy
+      --mqtt: install Mosquito
+      --un-break: install Raspberry pi wireless firmware chip
+      "
+while getopts ":h-:" opt; do
+  case $opt in
+    h)
+      echo "$help_string"
+      exit 0
+      ;;
+    -)
+      case "${OPTARG}" in
+        help)
+          echo "$help_string"
+          exit 0;;
+        clean)
+          clean=1;;
+        quiet)
+          quiet=1;;
+        cloudcmd)
+          answer_commander=1;;
+        node-red)
+          answer_node_red=1;;
+        caddy)
+          answer_caddy=1;;
+        mqtt)
+          answer_mqtt=1;;
+        un-break)
+          answer_un_break=1;;
+        *)
+          echo "Invalid option: --${OPTARG}"
+          exit 1
+          ;;
+      esac
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG"
+      exit 1
+      ;;
+  esac
+done
+
+
+if [[ "$clean" == 1 ]]; then
   echo "Deleting external cache."
   echo
   rm -rf "$IOTEMPOWER_VPYTHON"
@@ -59,21 +123,50 @@ fi
 if [[ -e "$IOTEMPOWER_VPYTHON/bin/activate" ]]; then # check for existing venv
     source "$IOTEMPOWER_VPYTHON/bin/activate"
 else
-	if [[ "$1" == *quiet* ]]; then
-		answer=y
+	if [[ "$quiet" == 1 ]]; then
+		answer=1
+		answer_commander=1
+		answer_node_red=1
+		answer_caddy=1
+		answer_mqtt=1
+		answer_un_break=1
 	else
 	    welcome
-    	read answer
+      echo_message_read_answer ""
+      answer=$?
+    	optional_message="Do you want to install optional dependency"
+      if [ -z "$answer_commander" ] && [ -z "$answer_node_red" ] &&
+         [ -z "$answer_caddy" ] && [ -z "$answer_mqtt" ] && [ -z "$answer_un_break" ]; then
+      echo_message_read_answer "${optional_message} CLOUD COMMANDER (Details -> https://cloudcmd.io/)? (Y/n)"
+      answer_commander=$?
+
+      echo_message_read_answer "${optional_message} NODE-RED (Details -> https://nodered.org/)? (Y/n)"
+      answer_node_red=$?
+
+      echo_message_read_answer "${optional_message} CADDY (Details -> https://caddyserver.com/)? (Y/n)"
+      answer_caddy=$?
+
+      echo_message_read_answer "${optional_message} MOSQUITTO (MQTT broker) (Details -> https://mosquitto.org/)? (Y/n)"
+      answer_mqtt=$?
+
+      # activate minimal firmware
+      echo_message_read_answer "In order to support a larger amount of connected devices, a special minimal version
+            of the wireless chip firmware has to be enabled.
+            NB! A maximum of 8 connected clients are supported without the use of minimal broadcom firmware.
+            Do you want to proceed? (Y/n)"
+      answer_un_break=$?
+      fi
     fi
-    if [[ "$answer" == "y" ||  "$answer" == "Y" || "$answer" == "" ]]; then
-        if [[ $(which virtualenv) == "" ]]; then
-            echo "You need to install virtualenv. Exiting."
-            exit 1
-        fi
-        if [[ $(which git) == "" ]]; then
-            echo "You need to install git. Exiting."
-            exit 1
-        fi
+    if [[ "$answer" == 1 ]]; then
+      echo "Installing general packages"
+      install_package_if_missing "python3.11-venv"
+      install_package_if_missing "git"
+      install_package_if_missing "python3-dev"
+      install_package_if_missing "gcc-aarch64-linux-gnu"
+      install_package_if_missing "make"
+      install_package_if_missing "apt-utils"
+      install_package_if_missing "jq"
+      install_package_if_missing "haveged"
     else
         echo "Can't continue, exiting now."
         exit 1
@@ -85,70 +178,84 @@ else
     # virtualenv -p "$(which python2)" "$IOTEMPOWER_VPYTHON2"
     # source "$IOTEMPOWER_VPYTHON2/bin/activate"
     # pip install --upgrade pip
-# #    pip install --upgrade platformio
-# # TODO: go back to normal install, but for now we need version4 (development version)
+    #    pip install --upgrade platformio
+    # TODO: go back to normal install, but for now we need version4 (development version)
     # pip install --upgrade https://github.com/platformio/platformio-core/archive/develop.zip
     # deactivate # disable python 2 environment
 
     # install virtualenv
-    mkdir -p "$IOTEMPOWER_VPYTHON"
-    virtualenv -p "$(which python3)" "$IOTEMPOWER_VPYTHON"
+    python3 -m venv "$IOTEMPOWER_VPYTHON"
     source "$IOTEMPOWER_VPYTHON/bin/activate"
-    pip install --upgrade pip
+    pip install --no-cache-dir --upgrade pip
     # dependencies
-    pip install pyserial
-    pip install colorama
-    pip install websocket_client
-    #pip install restview  # for looking at documentation
-    # documentaion viewer
-    pip install sphinx
-    pip install sphinx_bootstrap_theme
-    pip install recommonmark
-    # for later development
-    pip install paho-mqtt  # also for iotknit
-	pip install git+https://github.com/iotempire/iotknit
-    pip install ipython
-    pushd . &> /dev/null
-	# platformio in python3
-    pip install --upgrade platformio
-    # for dongle
-    pip install psutil
-    # TODO: fix more dependencies
-    # Termux needs: ncurses-utils
-    # esptool
-    git clone https://github.com/espressif/esptool "$IOTEMPOWER_EXTERNAL/esptool.git"
-    cd "$IOTEMPOWER_EXTERNAL/esptool.git"
-    python setup.py install
-    ln -s "$IOTEMPOWER_EXTERNAL/esptool.git/esptool.py" "$IOTEMPOWER_VPYTHON/bin/esptool"
+    pip install --no-cache-dir -r "$IOTEMPOWER_ROOT/bin/requirements.txt"
 
-    # accesspoint
+    # access point
     git clone https://github.com/ulno/create_ap "$IOTEMPOWER_EXTERNAL/create_ap"
     #cd "$IOTEMPOWER_EXTERNAL/create_ap"
 
+    # install node.js
+    cd "$IOTEMPOWER_LOCAL" || exit
+    mkdir nodejs && cd nodejs || exit
+    install_package_if_missing "curl"
+    curl -fsSL https://deb.nodesource.com/setup_21.x | bash - && apt-get install -y nodejs
+
     # install node.js related stuff
-    cd "$IOTEMPOWER_LOCAL"
-    mkdir -p nodejs
-    cd nodejs
     npm install terminal-kit
 
-    # activate minimal firmware
-    echo "In order to support a larger amount of connected devices, a special minimal version 
-of the wireless chip firmware has to be enabled. Do you want to proceed? (Y/n)"
-    read answer
+    echo "All necessary packages have been installed the rest is optional packages."
 
-    if [ "$answer" == "Y" ] || [ "$answer" == "y" ]; then
-        "$IOTEMPOWER_LOCAL"/bin/unbreak_ap_limit
-    else
-        echo "NB! A maximum of 8 connected clients are supported without the use of minimal broadcom firmware."
+    if [[ "$answer_commander" == 1 ]]; then
+      echo "Installing Cloud Commander"
+      apt install g++ -y
+      npm install gritty
+      npm install cloudcmd
+      cloudcmd --terminal --terminal-path "$(gritty --path)" --save --no-server
     fi
 
-    popd  &> /dev/null
+    if [[ "$answer_node_red" == 1 ]]; then
+      echo "Installing Node Red"
+      npm install --unsafe-perm node-red
+      mkdir ~/.node-red/
+      cp "$IOTEMPOWER_LOCAL"/nodejs/node_modules/node-red/settings.js ~/.node-red/
+    fi
+
+    if [[ "$answer_caddy" == 1 ]]; then
+      echo "Installing Caddy"
+      apt install -y debian-keyring debian-archive-keyring apt-transport-https
+      curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+      curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list
+      apt update
+      apt install caddy
+    fi
+
+    if [[ "$answer_mqtt" == 1 ]]; then
+      echo "Installing Mosquito"
+      apt install mosquitto-clients -y
+      apt install mosquitto -y
+    fi
+
+    if [[ "$answer_un_break" == 1 ]]; then
+      echo "Unbreak entered"
+      unbreak_ap_limit
+    fi
 
     bash "$IOTEMPOWER_ROOT/bin/fix_bin"
 
     update_cache
 
+    iot doc make
+    # Save the state
+    python3 "$IOTEMPOWER_ROOT"/utils/save_arguments_as_json.py --splitter '=' --path "$IOTEMPOWER_LOCAL"/installation_options.json \
+    general="$answer" cloud_commander="$answer_commander" \
+     node_red="$answer_node_red" caddy="$answer_caddy" \
+     mosquitto="$answer_mqtt" answer_un_break="$answer_un_break"
+
+    # Testing the installation
+    if ! pytest "$IOTEMPOWER_ROOT"/tests/test_installations.py;
+    then
+     exit 1
+    fi
 fi
 
 exit 0
-

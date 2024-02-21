@@ -1,0 +1,13 @@
+colorama==0.4.6
+esptool==4.7.0
+iotknit @ git+https://github.com/iotempire/iotknit@0bc4479b104260025372c97b881308fcc1f57243
+ipython==8.20.0
+paho-mqtt==1.6.1
+platformio==6.1.13
+psutil==5.9.8
+pyserial==3.5
+recommonmark==0.7.1
+Sphinx==7.2.6
+sphinx-bootstrap-theme==0.8.1
+websocket-client==1.7.0
+pytest==8.0.0
