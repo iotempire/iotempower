@@ -1,2 +1,2 @@
 #!/bin/bash
-echo exec sudo pacman -Sy --noconfirm "$@"
+exec sudo pacman -S --noconfirm "$@"
