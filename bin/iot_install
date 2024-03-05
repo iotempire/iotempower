@@ -28,7 +28,7 @@ bridge-utils, python-dev, mosquitto-clients, haveged,
 and a current nodejs installed.
 
 On Ubuntu or Debian systems install these with:
-sudo apt install build-essential git mosquitto-clients virtualenv iptables bridge-utils hostapd dnsmasq haveged python3-dev
+sudo apt-get install build-essential git mosquitto-clients virtualenv iptables bridge-utils hostapd dnsmasq haveged python3-dev
 
 Installing a current nodejs on debian, ubuntu, and raspberry os
 is not trivial, best follow the instructions for the node install here:
@@ -38,16 +38,21 @@ https://github.com/nodesource/distributions/blob/master/README.md
 Optionally you want the mqtt server mosquitto, midnight commander (mc),
 the editor micro, and the fast simple webserver caddy.
 You can install these with:
-sudo apt install mc mosquitto micro caddy
+sudo apt-get install mc mosquitto micro caddy
 
 Do you want to set it up? (Y/n)
 EOF
 }
 
 function install_package_if_missing(){
-  if [[ $(which "$1") == "" ]]; then
-    echo "$1 has not been found in your system, installing. Please wait..."
-    apt-get install -y -q "$1"
+  if [[ $(which "$1" 2>/dev/null) == "" ]]; then
+    echo "$1 could not be found in your system, installing. Please wait..."
+    apt-get install -y -q --no-install-recommends "$1"
+    # check error and return 1 if not found
+    if [[ $? != 0 ]]; then
+      echo "$1 could not be installed, exiting now."
+      exit 1
+    fi
     echo "$1 has been installed successfully"
   fi
 }
@@ -66,12 +71,12 @@ function echo_message_read_answer(){
 # Parsing options
 help_string="Possible options:
       --clean: clears installations and starts a new environment
-      --quiet: install all dependencies(optional & required)
+      --quiet: install all dependencies (optional & required)
       --cloudcmd: install Cloud Commander
-      --node-red: install Node Red
+      --node-red: install Node-RED
       --caddy: install Caddy
-      --mqtt: install Mosquito
-      --un-break: install Raspberry pi wireless firmware chip
+      --mqtt: install Mosquitto
+      --fix-pi-wifi-ap: Fix Raspberry Pi wireless firmware for access point usage
       "
 while getopts ":h-:" opt; do
   case $opt in
@@ -96,8 +101,8 @@ while getopts ":h-:" opt; do
           answer_caddy=1;;
         mqtt)
           answer_mqtt=1;;
-        un-break)
-          answer_un_break=1;;
+        fix-pi-wifi-ap)
+          answer_fix_pi_wifi_ap=1;;
         *)
           echo "Invalid option: --${OPTARG}"
           exit 1
@@ -129,14 +134,14 @@ else
 		answer_node_red=1
 		answer_caddy=1
 		answer_mqtt=1
-		answer_un_break=1
+		answer_fix_pi_wifi_ap=1
 	else
 	    welcome
       echo_message_read_answer ""
       answer=$?
     	optional_message="Do you want to install optional dependency"
       if [ -z "$answer_commander" ] && [ -z "$answer_node_red" ] &&
-         [ -z "$answer_caddy" ] && [ -z "$answer_mqtt" ] && [ -z "$answer_un_break" ]; then
+         [ -z "$answer_caddy" ] && [ -z "$answer_mqtt" ] && [ -z "$answer_fix_pi_wifi_ap" ]; then
       echo_message_read_answer "${optional_message} CLOUD COMMANDER (Details -> https://cloudcmd.io/)? (Y/n)"
       answer_commander=$?
 
@@ -154,17 +159,17 @@ else
             of the wireless chip firmware has to be enabled.
             NB! A maximum of 8 connected clients are supported without the use of minimal broadcom firmware.
             Do you want to proceed? (Y/n)"
-      answer_un_break=$?
+      answer_fix_pi_wifi_ap=$?
       fi
     fi
     if [[ "$answer" == 1 ]]; then
       echo "Installing general packages"
-      install_package_if_missing "python3.11-venv"
+      install_package_if_missing "apt-utils"
+      install_package_if_missing "make"
       install_package_if_missing "git"
+      install_package_if_missing "python3.11-venv"
       install_package_if_missing "python3-dev"
       install_package_if_missing "gcc-aarch64-linux-gnu"
-      install_package_if_missing "make"
-      install_package_if_missing "apt-utils"
       install_package_if_missing "jq"
       install_package_if_missing "haveged"
     else
@@ -207,7 +212,7 @@ else
 
     if [[ "$answer_commander" == 1 ]]; then
       echo "Installing Cloud Commander"
-      apt install g++ -y
+      apt-get install g++ -y
       npm install gritty
       npm install cloudcmd
       cloudcmd --terminal --terminal-path "$(gritty --path)" --save --no-server
@@ -222,22 +227,22 @@ else
 
     if [[ "$answer_caddy" == 1 ]]; then
       echo "Installing Caddy"
-      apt install -y debian-keyring debian-archive-keyring apt-transport-https
+      apt-get install -y debian-keyring debian-archive-keyring apt-transport-https
       curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
       curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list
-      apt update
-      apt install caddy
+      apt-get update
+      apt-get install caddy
     fi
 
     if [[ "$answer_mqtt" == 1 ]]; then
       echo "Installing Mosquito"
-      apt install mosquitto-clients -y
-      apt install mosquitto -y
+      apt-get install mosquitto-clients -y
+      apt-get install mosquitto -y
     fi
 
-    if [[ "$answer_un_break" == 1 ]]; then
-      echo "Unbreak entered"
-      unbreak_ap_limit
+    if [[ "$answer_fix_pi_wifi_ap" == 1 ]]; then
+      echo "Fix pi wifi ap firmware for more clients."
+      # unbreak_ap_limit TODO: find function and integrate correctly
     fi
 
     bash "$IOTEMPOWER_ROOT/bin/fix_bin"
@@ -249,7 +254,7 @@ else
     python3 "$IOTEMPOWER_ROOT"/utils/save_arguments_as_json.py --splitter '=' --path "$IOTEMPOWER_LOCAL"/installation_options.json \
     general="$answer" cloud_commander="$answer_commander" \
      node_red="$answer_node_red" caddy="$answer_caddy" \
-     mosquitto="$answer_mqtt" answer_un_break="$answer_un_break"
+     mosquitto="$answer_mqtt" answer_fix_pi_wifi_ap="$answer_fix_pi_wifi_ap"
 
     # Testing the installation
     if ! pytest "$IOTEMPOWER_ROOT"/tests/test_installations.py;

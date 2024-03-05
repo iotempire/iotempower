@@ -1,17 +1,16 @@
 .git
 .gitignore
+.dockerignore
 node_modules
 npm-debug.log
 Dockerfile*
 docker-compose*
-README.md
-LICENSE
 .vscode
 *~
 *.bin
 *.pyc
-key.txt
-system.conf
+#key.txt
+#system.conf
 
 examples/private/
 tmp/

@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
 web_update_config
-web_starter
+web_starter &
+mqtt_broker # TODO fix ip
