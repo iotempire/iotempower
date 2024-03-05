@@ -10,7 +10,7 @@ not_installed_packages=()
 # Loop through all remaining parameters
 for param in "$@"; do
   # Call the script with the current parameter
-  if ! "$called_script" "$param"; then
+  if ! "$called_script" "$param" &> /dev/null; then
     # If the script exits with non-zero, assume the package is not installed
     # and add the parameter to the list
     not_installed_packages+=("$param")
