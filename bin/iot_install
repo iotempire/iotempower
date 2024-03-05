@@ -95,7 +95,7 @@ function echo_message_read_answer() {
     esac
 }
 
-# make installers availabel in PATH
+# make installers available in PATH
 export PATH="$IOTEMPOWER_ROOT/lib/iot_installs:$PATH"
 
 # Parsing options

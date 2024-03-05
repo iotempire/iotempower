@@ -1,2 +1,2 @@
 #!/bin/bash
-exec pacman -Sy
+exec sudo pacman -Sy
