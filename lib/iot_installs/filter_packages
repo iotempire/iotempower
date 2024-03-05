@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Script or command to call
+called_script="$1"
+shift # Remove the first argument, so only the parameters remain
+
+# Array to hold parameters for which the called script indicates not installed
+not_installed_packages=()
+
+# Loop through all remaining parameters
+for param in "$@"; do
+  # Call the script with the current parameter
+  if ! "$called_script" "$param"; then
+    # If the script exits with non-zero, assume the package is not installed
+    # and add the parameter to the list
+    not_installed_packages+=("$param")
+  fi
+done
+
+# Echo the parameters (packages) that are not installed
+echo "${not_installed_packages[@]}"

@@ -1,0 +1,2 @@
+#!/bin/bash
+exec apt-get install -y -q --no-install-recommends "$@"

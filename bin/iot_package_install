@@ -1,0 +1,65 @@
+#!/bin/bash
+
+CONFIG_FILE="$1"
+INSTALL_COMMAND=""
+QUERY_COMMAND=""
+PACKAGE_MANAGER_INDEX=0
+
+# Detects the package manager and sets the install and query commands
+setup_package_manager() {
+    local managers_line=$1
+    local install_commands_line=$2
+    local query_commands_line=$3
+    IFS=',' read -ra MANAGERS <<< "$managers_line"
+    IFS=',' read -ra INSTALL_COMMANDS <<< "$install_commands_line"
+    IFS=',' read -ra QUERY_COMMANDS <<< "$query_commands_line"
+    for i in "${!MANAGERS[@]}"; do
+        if command -v "${MANAGERS[$i]}" > /dev/null; then
+            PACKAGE_MANAGER_INDEX=$i
+            INSTALL_COMMAND="${MANAGERS[$i]} ${INSTALL_COMMANDS[$i]}"
+            QUERY_COMMAND="${MANAGERS[$i]} ${QUERY_COMMANDS[$i]}"
+            echo "Detected package manager: ${MANAGERS[$i]}"
+            break
+        fi
+    done
+}
+
+# Checks if a package is installed and installs it if not
+ensure_package_installed() {
+    local package_identifier=$1
+    shift
+    local package_names=("$@")
+
+    local package_name=${package_names[$PACKAGE_MANAGER_INDEX]}
+    if eval "${QUERY_COMMAND} ${package_name}" &> /dev/null; then
+        echo "Package $package_identifier ($package_name) is already installed."
+    else
+        echo "Installing package $package_identifier ($package_name)..."
+        eval "$INSTALL_COMMAND $package_name"
+    fi
+}
+
+# Main logic to read config and ensure packages are installed
+LINE_NUMBER=0
+while IFS= read -r line; do
+    if [[ $line == \#* ]]; then
+        continue
+    fi
+
+    ((LINE_NUMBER++))
+    if [ $LINE_NUMBER -eq 1 ]; then
+        PACKAGE_MANAGERS_LINE="$line"
+    elif [ $LINE_NUMBER -eq 2 ]; then
+        INSTALL_COMMANDS_LINE="$line"
+    elif [ $LINE_NUMBER -eq 3 ]; then
+        QUERY_COMMANDS_LINE="$line"
+        setup_package_manager "$PACKAGE_MANAGERS_LINE" "$INSTALL_COMMANDS_LINE" "$QUERY_COMMANDS_LINE"
+        if [ -z "$INSTALL_COMMAND" ] || [ -z "$QUERY_COMMAND" ]; then
+            echo "No supported package manager found. Exiting."
+            exit 1
+        fi
+    else
+        IFS=',' read -r package_identifier packages <<< "$line"
+        ensure_package_installed "$package_identifier" ${packages[@]}
+    fi
+done < "$CONFIG_FILE"

@@ -57,16 +57,46 @@ function install_package_if_missing(){
   fi
 }
 
-function echo_message_read_answer(){
-  if [[ "$1" != "" ]]; then
-  echo "$1"
-  fi
-  read -r temp_answer
-    if [[ "$temp_answer" == "y" ||  "$temp_answer" == "Y" || "$temp_answer" == "" ]]; then
-      return 1
-    fi
-    return 0
+function echo_message_read_answer() {
+    local question="$1"
+    local default="${2:-y}" # Set 'y' as the default value if not provided
+    local reply
+
+    # Check default value to adjust the prompt accordingly
+    case "$default" in
+        y|Y)
+            printf "%s (Y/n): " "$question"
+            ;;
+        n|N)
+            printf "%s (y/N): " "$question"
+            ;;
+        *)
+            echo "Invalid default value. Please use 'y' or 'n'."
+            return 2
+            ;;
+    esac
+
+    # Read the user input
+    read -r reply
+    reply="${reply:-$default}"
+
+    # Return based on the user input or default
+    case "$reply" in
+        y|Y)
+            return 0
+            ;;
+        n|N)
+            return 1
+            ;;
+        *)
+            echo "Invalid input. Please use 'y' or 'n'."
+            ask_question "$question" "$default" # Ask again if invalid input
+            ;;
+    esac
 }
+
+# make installers availabel in PATH
+export PATH="$IOTEMPOWER_ROOT/lib/iot_installs:$PATH"
 
 # Parsing options
 help_string="Possible options:
@@ -142,36 +172,38 @@ else
     	optional_message="Do you want to install optional dependency"
       if [ -z "$answer_commander" ] && [ -z "$answer_node_red" ] &&
          [ -z "$answer_caddy" ] && [ -z "$answer_mqtt" ] && [ -z "$answer_fix_pi_wifi_ap" ]; then
-      echo_message_read_answer "${optional_message} CLOUD COMMANDER (Details -> https://cloudcmd.io/)? (Y/n)"
-      answer_commander=$?
+        echo_message_read_answer "${optional_message} CLOUD COMMANDER (Details -> https://cloudcmd.io/)?"
+        answer_commander=$?
 
-      echo_message_read_answer "${optional_message} NODE-RED (Details -> https://nodered.org/)? (Y/n)"
-      answer_node_red=$?
+        echo_message_read_answer "${optional_message} NODE-RED (Details -> https://nodered.org/)?"
+        answer_node_red=$?
 
-      echo_message_read_answer "${optional_message} CADDY (Details -> https://caddyserver.com/)? (Y/n)"
-      answer_caddy=$?
+        echo_message_read_answer "${optional_message} CADDY (Details -> https://caddyserver.com/)?"
+        answer_caddy=$?
 
-      echo_message_read_answer "${optional_message} MOSQUITTO (MQTT broker) (Details -> https://mosquitto.org/)? (Y/n)"
-      answer_mqtt=$?
+        echo_message_read_answer "${optional_message} MOSQUITTO (MQTT broker) (Details -> https://mosquitto.org/)?"
+        answer_mqtt=$?
 
-      # activate minimal firmware
-      echo_message_read_answer "In order to support a larger amount of connected devices, a special minimal version
-            of the wireless chip firmware has to be enabled.
-            NB! A maximum of 8 connected clients are supported without the use of minimal broadcom firmware.
-            Do you want to proceed? (Y/n)"
-      answer_fix_pi_wifi_ap=$?
+        # TODO: access point ask (and point below nested)
+      
+        # activate minimal firmware
+        echo_message_read_answer "In order to support a larger amount of connected devices,
+              on the raspberry pi a special minimal version
+              of the wireless chip firmware has to be enabled.
+              NB! A maximum of 8 connected clients are supported without the use of minimal broadcom firmware.
+              Do you want to proceed? (Y/n)"
+        answer_fix_pi_wifi_ap=$?
       fi
     fi
+
+    # make sure package lists are uptodate
+    echo "Updating package lists..."
+    call_by_system update
+    echo "Updating package lists done."
+    echo
+
     if [[ "$answer" == 1 ]]; then
-      echo "Installing general packages"
-      install_package_if_missing "apt-utils"
-      install_package_if_missing "make"
-      install_package_if_missing "git"
-      install_package_if_missing "python3.11-venv"
-      install_package_if_missing "python3-dev"
-      install_package_if_missing "gcc-aarch64-linux-gnu"
-      install_package_if_missing "jq"
-      install_package_if_missing "haveged"
+      call_by_system install-general
     else
         echo "Can't continue, exiting now."
         exit 1
@@ -195,24 +227,20 @@ else
     # dependencies
     pip install --no-cache-dir -r "$IOTEMPOWER_ROOT/bin/requirements.txt"
 
-    # access point
+    # access point - TODO: make this optional
     git clone https://github.com/ulno/create_ap "$IOTEMPOWER_EXTERNAL/create_ap"
     #cd "$IOTEMPOWER_EXTERNAL/create_ap"
 
-    # install node.js
-    cd "$IOTEMPOWER_LOCAL" || exit
-    mkdir nodejs && cd nodejs || exit
-    install_package_if_missing "curl"
-    curl -fsSL https://deb.nodesource.com/setup_21.x | bash - && apt-get install -y nodejs
-
     # install node.js related stuff
+    cd "$IOTEMPOWER_LOCAL" || { echo "$IOTEMPOWER_LOCAL not found, aborting." 1>&2;exit 1; }
+    mkdir nodejs && cd nodejs || { echo "Can't create nodejs folder, aborting." 1>&2;exit 1; }
     npm install terminal-kit
 
-    echo "All necessary packages have been installed the rest is optional packages."
+    echo "All necessary packages have been installed. The rest consits of optional packages."
 
     if [[ "$answer_commander" == 1 ]]; then
       echo "Installing Cloud Commander"
-      apt-get install g++ -y
+      # apt-get install g++ -y - Obsolete: should be in build-essential or default on arch
       npm install gritty
       npm install cloudcmd
       cloudcmd --terminal --terminal-path "$(gritty --path)" --save --no-server
@@ -235,7 +263,7 @@ else
     fi
 
     if [[ "$answer_mqtt" == 1 ]]; then
-      echo "Installing Mosquito"
+      echo "Installing Mosquitto"
       apt-get install mosquitto-clients -y
       apt-get install mosquitto -y
     fi
