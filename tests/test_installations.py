@@ -20,6 +20,8 @@ packages = [
     {"name": "jq", "package_manager": "binary", "module": "general"},
     {"name": "make", "package_manager": "binary", "module": "general"},
     {"name": "curl", "package_manager": "binary", "module": "general"},
+    {"name": "mosquitto_sub", "package_manager": "binary", "module": "general"},
+    {"name": "mosquitto_pub", "package_manager": "binary", "module": "general"},
     {"name": "nodejs", "package_manager": "binary", "module": "general"},
     {"name": "haveged", "package_manager": "binary", "module": "general"},
     {"name": "python3-dev", "package_manager": "binary", "module": "general"},
@@ -28,11 +30,10 @@ packages = [
     {"name": "gritty", "package_manager": "npm", "module": "cloud_commander"},
     {"name": "cloudcmd", "package_manager": "npm", "module": "cloud_commander"},
     {"name": "node-red", "package_manager": "npm", "module": "node_red"},
-    {"name": "debian-keyring", "package_manager": "binary", "module": "caddy"},
-    {"name": "apt-transport-https", "package_manager": "binary", "module": "caddy"},
-    {"name": "debian-archive-keyring", "package_manager": "binary", "module": "caddy"},
+#    {"name": "debian-keyring", "package_manager": "binary", "module": "caddy"},
+#    {"name": "apt-transport-https", "package_manager": "binary", "module": "caddy"},
+#    {"name": "debian-archive-keyring", "package_manager": "binary", "module": "caddy"},
     {"name": "caddy", "package_manager": "binary", "module": "caddy"},
-    {"name": "mosquitto-clients", "package_manager": "binary", "module": "mosquitto"},
     {"name": "mosquitto", "package_manager": "binary", "module": "mosquitto"},
 ]
 
