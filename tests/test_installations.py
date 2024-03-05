@@ -22,7 +22,7 @@ packages = [
     {"name": "curl", "package_manager": "binary", "module": "general"},
     {"name": "mosquitto_sub", "package_manager": "binary", "module": "general"},
     {"name": "mosquitto_pub", "package_manager": "binary", "module": "general"},
-    {"name": "node", "package_manager": "binary", "module": "general"}, # TODO: check version?
+    {"name": "node", "package_manager": "binary", "module": "general"}, # TODO: check min version
     {"name": "haveged", "package_manager": "binary", "module": "general"},
 #    {"name": "python3-dev", "package_manager": "binary", "module": "general"}, # FIXME: could be quieried with query script
     {"name": "terminal-kit", "package_manager": "npm", "module": "general"},
@@ -33,7 +33,7 @@ packages = [
 #    {"name": "debian-keyring", "package_manager": "binary", "module": "caddy"},
 #    {"name": "apt-transport-https", "package_manager": "binary", "module": "caddy"},
 #    {"name": "debian-archive-keyring", "package_manager": "binary", "module": "caddy"},
-    {"name": "caddy", "package_manager": "binary", "module": "caddy"},
+    {"name": "caddy", "package_manager": "binary", "module": "caddy"}, # TODO: also better chek min version here
     {"name": "mosquitto", "package_manager": "binary", "module": "mosquitto"},
 ]
 
