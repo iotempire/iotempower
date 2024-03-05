@@ -12,6 +12,8 @@ fi
 
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
+FAILED_NODES="failed_compile_nodes.txt"
+
 if [[ -e "node.conf" ]]; then  # started from node-directory
     deploy compile
     if [[ $? -ne 0 ]]; then # error happened
@@ -37,7 +39,20 @@ else # started from somewhere else, so search for node.conf in subdirs
             cd "$path"
             cd $(dirname "$n")
             compile # call recursive for node-dir
+            result=$?
+            cd "$path"
+            if [[ $result -ne 0 ]]; then # failed
+                echo $(dirname "$n") >> "$FAILED_NODES"
+            fi
         done
+
+    if [[ -e "$FAILED_NODES" ]]; then
+        echo "The following nodes failed to compile."
+        cat "$FAILED_NODES"
+        echo "Check log above for specific problems."
+        echo "List of failed nodes is in the file $FAILED_NODES."
+        exit 1
+    fi
 
     echo
     echo "compile process for all nodes in $path done."
