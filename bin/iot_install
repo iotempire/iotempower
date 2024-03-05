@@ -40,7 +40,6 @@ the editor micro, and the fast simple webserver caddy.
 You can install these with:
 sudo apt-get install mc mosquitto micro caddy
 
-Do you want to set it up? (Y/n)
 EOF
 }
 
@@ -83,10 +82,10 @@ function echo_message_read_answer() {
     # Return based on the user input or default
     case "$reply" in
         y|Y)
-            return 0
+            return 1
             ;;
         n|N)
-            return 1
+            return 0
             ;;
         *)
             echo "Invalid input. Please use 'y' or 'n'."
@@ -167,7 +166,7 @@ else
 		answer_fix_pi_wifi_ap=1
 	else
 	    welcome
-      echo_message_read_answer ""
+      echo_message_read_answer "Do you want to set it up?"
       answer=$?
     	optional_message="Do you want to install optional dependency"
       if [ -z "$answer_commander" ] && [ -z "$answer_node_red" ] &&
