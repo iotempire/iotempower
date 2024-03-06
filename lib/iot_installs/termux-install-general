@@ -2,6 +2,8 @@
 
 # TODO: potentially also install sudo?
 
+termux-install which
+
 # make sure curl is not installed
 if ! termux-query curl > /dev/null; then
     echo "curl is not installed, installing. Please wait..."
@@ -34,8 +36,7 @@ else
     curl -fsSL "https://deb.nodesource.com/setup_""$min_version"".x" | bash - && termux-install nodejs
 fi
 
-# Why do we need python3.11-venv?
-PACKAGE_LIST="build-essential git mosquitto python make rsync jq nodejs npm"
+PACKAGE_LIST="which build-essential git mosquitto python make rsync jq nodejs npm"
 to_install=$(filter_packages debian-query $PACKAGE_LIST)
 
 echo "Installing: $to_install..."
