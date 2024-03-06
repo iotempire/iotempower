@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# check nodejs version
+installed_version=$(caddy -v | sed 's/v//') # Remove the 'v' prefix from version
+
+# Define the minimum required version
+min_version="2.5"
+
+# Use sort with version sort flag to compare versions, and check the first line
+if [ "$(printf "%s\n%s" "$min_version" "$installed_version" | sort -V | head -n1)" = "$min_version" ]; then
+    if [ "$installed_version" = "$min_version" ] || [ "$(printf "%s\n%s" "$min_version" "$installed_version" | sort -V | head -n2 | tail -n1)" = "$installed_version" ]; then
+        echo "Caddy version $installed_version is installed, meets the minimum required version $min_version."
+    else
+        echo "Caddy version is higher than the minimum required version $min_version."
+    fi
+else
+    echo "Caddy version $installed_version is installed, does not meet the minimum required version $min_version."
+    # install current caddy
+    echo "Installing: $to_install..."
+    debian-install debian-keyring debian-archive-keyring apt-transport-https
+    curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+    curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list
+    debian-install caddy
+    echo "Installation of $to_install complete."
+fi
+
+

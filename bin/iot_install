@@ -232,7 +232,7 @@ else
 
     # install node.js related stuff
     cd "$IOTEMPOWER_LOCAL" || { echo "$IOTEMPOWER_LOCAL not found, aborting." 1>&2;exit 1; }
-    mkdir nodejs && cd nodejs || { echo "Can't create nodejs folder, aborting." 1>&2;exit 1; }
+    mkdir -p nodejs && cd nodejs || { echo "Can't create nodejs folder, aborting." 1>&2;exit 1; }
     npm install terminal-kit
 
     echo "All necessary packages have been installed. The rest consits of optional packages."
@@ -254,22 +254,20 @@ else
 
     if [[ "$answer_caddy" == 1 ]]; then
       echo "Installing Caddy"
-      apt-get install -y debian-keyring debian-archive-keyring apt-transport-https
-      curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
-      curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list
-      apt-get update
-      apt-get install caddy
+      call_by_system install-caddy
     fi
 
     if [[ "$answer_mqtt" == 1 ]]; then
       echo "Installing Mosquitto"
-      apt-get install mosquitto-clients -y
-      apt-get install mosquitto -y
+      call_by_system install-mosquitto
     fi
 
-    if [[ "$answer_fix_pi_wifi_ap" == 1 ]]; then
-      echo "Fix pi wifi ap firmware for more clients."
-      # unbreak_ap_limit TODO: find function and integrate correctly
+    # check if this is a raspberry pi
+    if lscpu | grep -q "Raspberry Pi"; then
+      if [[ "$answer_fix_pi_wifi_ap" == 1 ]]; then
+        echo "Fix pi wifi ap firmware for more clients."
+        unbreak_ap_limit # TODO: integrate correctly, and check if we are on the pi
+      fi
     fi
 
     bash "$IOTEMPOWER_ROOT/bin/fix_bin"

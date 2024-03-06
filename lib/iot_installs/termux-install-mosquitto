@@ -1,0 +1,15 @@
+#!/bin/bash
+
+PACKAGE_LIST="mosquitto-clients mosquitto"
+to_install=$(filter_packages debian-query $PACKAGE_LIST)
+
+echo "Installing: $to_install..."
+termux-install $to_install
+echo "Installation of $to_install complete."
+
+# not on Android
+# # TODO: ask if this should be done?
+# sudo systemctl stop mosquitto
+# sudo systemctl disable mosquitto
+
+
