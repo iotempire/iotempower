@@ -35,7 +35,7 @@ else
 fi
 
 # Why do we need python3.11-venv?
-PACKAGE_LIST="build-essential git mosquitto-clients virtualenv python3-venv python3.11-venv make rsync haveged jq nodejs npm"
+PACKAGE_LIST="build-essential git mosquitto python make rsync jq nodejs npm"
 to_install=$(filter_packages debian-query $PACKAGE_LIST)
 
 echo "Installing: $to_install..."

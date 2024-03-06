@@ -1,24 +1,14 @@
 #!/bin/bash
-
-# check nodejs version
-installed_version=$(caddy -v &> /dev/null| sed 's/v//') # Remove the 'v' prefix from version
-
-# Define the minimum required version
-min_version="2.5"
-
-# Use sort with version sort flag to compare versions, and check the first line
-if [[ "$installed_version" && "$(printf "%s\n%s" "$min_version" "$installed_version" | sort -V | head -n1)" = "$min_version" ]]; then
-    echo "Caddy version is higher or equal than the minimum required version $min_version."
-    exit 0
+if command -v caddy >/dev/null; then
+    if apt list --installed | grep -q caddy; then
+        caddy_version=$(apt list --installed | grep caddy | awk -F'/' '{print $2}')
+        echo "Caddy is installed via apt. Version: $caddy_version"
+        exit 0
+    else
+        echo "Caddy is installed, but not via apt or version info not available."
+    fi
 else
-    echo "Caddy version $installed_version is installed, it does not meet the minimum required version $min_version."
-    # install current caddy
-    echo "Installing: $to_install..."
-    termux-install debian-keyring debian-archive-keyring apt-transport-https
-    curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
-    curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list
-    termux-install caddy
-    echo "Installation of $to_install complete."
+    echo "Caddy is not installed, installing"
 fi
 
-
+termux-install caddy

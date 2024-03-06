@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PACKAGE_LIST="mosquitto-clients mosquitto"
+PACKAGE_LIST="mosquitto"
 to_install=$(filter_packages debian-query $PACKAGE_LIST)
 
 echo "Installing: $to_install..."
