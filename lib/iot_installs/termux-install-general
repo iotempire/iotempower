@@ -38,3 +38,14 @@ echo "Installation of $to_install complete."
 # sudo systemctl disable mosquitto
 
 
+echo "Implementing a fix for node-gyp." # TODO verify how long that is happening
+mkdir -p "~/.gyp"
+if [ ! -f "~/.gyp/include.gypi" ]; then
+    cat << EOF > "~/.gyp/include.gypi"
+{
+ 'variables': {
+  'android_ndk_path': ''
+ }
+}
+EOF
+fi
