@@ -168,6 +168,9 @@ else
 	    welcome
       echo_message_read_answer "Do you want to set it up?"
       answer=$?
+      if [[ -z "$answer" ]]; then
+        echo Not installing as requested. You can restart with bash runin the iot folder later.
+      fi
     	optional_message="Do you want to install optional dependency"
       if [ -z "$answer_commander" ] && [ -z "$answer_node_red" ] &&
          [ -z "$answer_caddy" ] && [ -z "$answer_mqtt" ] && [ -z "$answer_fix_pi_wifi_ap" ]; then
