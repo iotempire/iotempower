@@ -163,7 +163,7 @@ else
 		answer_node_red=1
 		answer_caddy=1
 		answer_mqtt=1
-		answer_fix_pi_wifi_ap=1
+		answer_fix_pi_wifi_ap=0
 	else
 	    welcome
       echo_message_read_answer "Do you want to set it up?"
@@ -183,15 +183,18 @@ else
         echo_message_read_answer "${optional_message} MOSQUITTO (MQTT broker) (Details -> https://mosquitto.org/)?"
         answer_mqtt=$?
 
-        # TODO: access point ask (and point below nested)
-      
-        # activate minimal firmware
-        echo_message_read_answer "In order to support a larger amount of connected devices,
-              on the raspberry pi a special minimal version
-              of the wireless chip firmware has to be enabled.
-              NB! A maximum of 8 connected clients are supported without the use of minimal broadcom firmware.
-              Do you want to proceed? (Y/n)"
-        answer_fix_pi_wifi_ap=$?
+        # check if this is a raspberry pi
+        if lscpu | grep -q "Raspberry Pi"; then
+          # activate minimal firmware
+          echo_message_read_answer \
+"In order to support a larger amount of connected devices,
+on the raspberry pi a special minimal version
+of the wireless chip firmware has to be enabled.
+NB! A maximum of 8 connected clients are supported
+without the use of minimal broadcom firmware.
+Do you want to install the fixed firmware?"
+          answer_fix_pi_wifi_ap=$?
+        fi
       fi
     fi
 
@@ -262,12 +265,9 @@ else
       call_by_system install-mosquitto
     fi
 
-    # check if this is a raspberry pi
-    if lscpu | grep -q "Raspberry Pi"; then
-      if [[ "$answer_fix_pi_wifi_ap" == 1 ]]; then
-        echo "Fix pi wifi ap firmware for more clients."
-        unbreak_ap_limit # TODO: integrate correctly, and check if we are on the pi
-      fi
+    if [[ "$answer_fix_pi_wifi_ap" == 1 ]]; then
+      echo "Fix pi wifi ap firmware for more clients."
+      unbreak_ap_limit # TODO: integrate correctly, and check if we are on the pi
     fi
 
     bash "$IOTEMPOWER_ROOT/bin/fix_bin"
