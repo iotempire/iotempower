@@ -7,7 +7,7 @@ command -v git &>/dev/null || {
 
 git clone https://github.com/iotempire/iotempower ~/iot
 cd ~/iot || exit 1
-bash run
+bash run < /dev/tty
 
 # TODO: make sure user is in uucp or dialout group
 # TODO: add iot to binary folder and PATH
