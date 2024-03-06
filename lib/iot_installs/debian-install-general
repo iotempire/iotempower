@@ -32,7 +32,7 @@ else
 fi
 
 
-PACKAGE_LIST="build-essential git mosquitto-clients virtualenv python-venv make rsync haveged jq nodejs npm"
+PACKAGE_LIST="build-essential git mosquitto-clients virtualenv python3-venv make rsync haveged jq nodejs npm"
 to_install=$(filter_packages debian-query $PACKAGE_LIST)
 
 echo "Installing: $to_install..."
