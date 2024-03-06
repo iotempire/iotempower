@@ -1,9 +1,9 @@
-version: '3'
+version: '0.9'
 services:
   iot:
     build:
       context: .
-      dockerfile: Dockerfile.installation
+      dockerfile: Dockerfile
     image: iotempower:latest
     ports:
       - "40080:40080"
