@@ -21,7 +21,7 @@ installed_version=$(node -v | sed 's/v//') # Remove the 'v' prefix from version
 min_version="21"
 
 # Use sort with version sort flag to compare versions, and check the first line
-if [ "$(printf "%s\n%s" "$min_version" "$installed_version" | sort -V | head -n1)" = "$min_version" ]; then
+if [[ "$installed_version" && "$(printf "%s\n%s" "$min_version" "$installed_version" | sort -V | head -n1)" = "$min_version" ]]; then
     if [ "$installed_version" = "$min_version" ] || [ "$(printf "%s\n%s" "$min_version" "$installed_version" | sort -V | head -n2 | tail -n1)" = "$installed_version" ]; then
         echo "Node.js version $installed_version is installed, meets the minimum required version $min_version."
     else
