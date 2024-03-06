@@ -125,13 +125,13 @@ booting Linux.
    .. code-block:: bash
    
       cd  # go into your home directory also referred to as ~ or $HOME (it is something like /home/user)
-      sudo apt-get update  # make sure system is up to date
+      sudo apt update  # make sure system is up to date
       sudo apt install git haveged mosquitto mosquitto-clients virtualenv iptables 
       sudo apt install bridge-utils hostapd dnsmasq build-essential rsync
       # installing nodejs on a debain system is currently a bit tricky, best compare
       # https://github.com/nodesource/distributions/blob/master/README.md
       curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash - &&\
-      sudo apt-get install -y nodejs npm
+      sudo apt install -y nodejs npm
       sudo apt install mc micro tilde # this is optional: 
       # mc is nicer file management in cli, micro and tilde are nicer editor than nano
       # if you run on a native Ubuntu (not in WSL) consider running
