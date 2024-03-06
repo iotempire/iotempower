@@ -22,21 +22,7 @@ installed_version=$(node -v | sed 's/v//') # Remove the 'v' prefix from version
 # Define the minimum required version
 min_version="21"
 
-# TODO: maybe not necessary?
-# Use sort with version sort flag to compare versions, and check the first line
-if [ "$(printf "%s\n%s" "$min_version" "$installed_version" | sort -V | head -n1)" = "$min_version" ]; then
-    if [ "$installed_version" = "$min_version" ] || [ "$(printf "%s\n%s" "$min_version" "$installed_version" | sort -V | head -n2 | tail -n1)" = "$installed_version" ]; then
-        echo "Node.js version $installed_version is installed, meets the minimum required version $min_version."
-    else
-        echo "Node.js version is higher than the minimum required version $min_version."
-    fi
-else
-    echo "Node.js version $installed_version is installed, does not meet the minimum required version $min_version."
-    # install current node.js   
-    curl -fsSL "https://deb.nodesource.com/setup_""$min_version"".x" | bash - && termux-install nodejs
-fi
-
-PACKAGE_LIST="which build-essential git mosquitto python make rsync jq nodejs npm"
+PACKAGE_LIST="which build-essential git mosquitto python make rsync jq nodejs"
 to_install=$(filter_packages debian-query $PACKAGE_LIST)
 
 echo "Installing: $to_install..."

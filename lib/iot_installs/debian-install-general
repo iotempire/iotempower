@@ -30,7 +30,7 @@ if [[ "$installed_version" && "$(printf "%s\n%s" "$min_version" "$installed_vers
 else
     echo "Node.js version $installed_version is installed, does not meet the minimum required version $min_version."
     # install current node.js   
-    curl -fsSL "https://deb.nodesource.com/setup_""$min_version"".x" | bash - && debian-install nodejs
+    curl -fsSL "https://deb.nodesource.com/setup_""$min_version"".x" | bash -
 fi
 
 # Why do we need python3.11-venv?
