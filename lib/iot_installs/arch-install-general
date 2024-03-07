@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PACKAGE_LIST="curl git mosquitto python-virtualenv rsync haveged jq nodejs npm"
+PACKAGE_LIST="curl git base-devel mosquitto python-virtualenv rsync haveged jq nodejs npm"
 to_install=$(filter_packages arch-query $PACKAGE_LIST)
 
 echo "Installing: $to_install..."
