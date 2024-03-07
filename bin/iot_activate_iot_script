@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
+
+# Define potential installation directories
+dirs=("$HOME/bin" "$HOME/.local/bin")
+
+# Check if 'iot' exists in any of the defined directories
+for dir in "${dirs[@]}"; do
+    if [ -f "$dir/iot" ]; then
+        echo "'iot' already exists in $dir. Installation aborted."
+        exit 1
+    fi
+done
+
+# Check if either directory is in the PATH and set it as the install directory
+install_dir=""
+for dir in "${dirs[@]}"; do
+    if [[ ":$PATH:" == *":$dir:"* ]]; then
+        install_dir=$dir
+        break
+    fi
+done
+
+# If neither directory is in the PATH, prefer .local/bin and add it to PATH
+if [ -z "$install_dir" ]; then
+    install_dir="$HOME/.local/bin"
+    echo "Adding $install_dir to PATH in .bashrc"
+    echo "export PATH=\$PATH:$install_dir" >> "$HOME/.bashrc"
+    echo "Please run 'source ~/.bashrc' or restart your terminal to update your PATH."
+fi
+
+# Create the installation directory if it does not exist
+if [ ! -d "$install_dir" ]; then
+    echo "Creating directory $install_dir"
+    mkdir -p "$install_dir"
+fi
+
+# Proceed with installation if 'iot' does not exist in the chosen directory
+if [ ! -f "$install_dir/iot" ]; then
+    echo "Installing 'iot' to $install_dir"
+    cat << EOF > "$install_dir/iot"
+#!/usr/bin/env bash
+export IOTEMPOWER_ROOT="$IOTEMPOWER_ROOT"
+exec bash "\$IOTEMPOWER_ROOT/run" "\$@"
+EOF
+    chmod +x "$install_dir/iot"
+    echo "This is the content of the installed script (cat "\""$install_dir/iot"\""):"
+    cat "$install_dir/iot"
+    echo
+    echo "Installation complete. You can now run 'iot' from the command line"
+    echo "(you might have to open a new terminal once)."
+else
+    echo "'iot' already exists in $install_dir. Installation aborted to prevent overwriting."
+fi

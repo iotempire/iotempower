@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PACKAGE_LIST="caddy"
+PACKAGE_LIST="mc micro tilde"
 to_install=$(filter_packages arch-query $PACKAGE_LIST)
 
 echo "Installing: $to_install..."

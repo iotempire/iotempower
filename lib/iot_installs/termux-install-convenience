@@ -1,0 +1,10 @@
+#!/bin/bash
+
+PACKAGE_LIST="mc micro tilde"
+to_install=$(filter_packages termux-query $PACKAGE_LIST)
+
+echo "Installing: $to_install..."
+termux-install $to_install
+echo "Installation of $to_install complete."
+
+

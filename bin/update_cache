@@ -22,14 +22,14 @@ mkdir -p "$CACHE_ROOT/platformio"
 #mkdir -p "$CACHE_ROOT/scons"
 mkdir -p "$CACHE_ROOT/libs"
 
-#mkdir -p "$CACHE_ROOT/node"
-#echo "# empty" > "$CACHE_ROOT/system.conf"
-#cd "$CACHE_ROOT/node"
-#echo 'board="esp8266"' > node.conf
-#echo "// empty" > setup.cpp
-#touch key.txt
-#prepare_build_dir # no cache here as this is the cache
-#cd build
-#echo
-#echo "==== Trying to download and build all ===="
-#pio run # build all targets
+mkdir -p "$CACHE_ROOT/node"
+echo "# empty" > "$CACHE_ROOT/system.conf"
+cd "$CACHE_ROOT/node"
+echo 'board="esp8266"' > node.conf
+echo "// empty" > setup.cpp
+touch key.txt
+prepare_build_dir # no cache here as this is the cache
+cd build
+echo
+echo "==== Trying to download and build all ===="
+pio run # build all targets

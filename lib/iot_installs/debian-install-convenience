@@ -1,0 +1,10 @@
+#!/bin/bash
+
+PACKAGE_LIST="mc micro tilde"
+to_install=$(filter_packages debian-query $PACKAGE_LIST)
+
+echo "Installing: $to_install..."
+debian-install $to_install
+echo "Installation of $to_install complete."
+
+
