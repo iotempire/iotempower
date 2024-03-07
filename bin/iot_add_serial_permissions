@@ -1,34 +1,54 @@
 #!/usr/bin/env bash
 
-# Define a list of possible groups for serial port access
-GROUPS=("dialout" "uucp" "modem" "plugdev")
+echo "Trying to enable serial port access for the currently logged in user $USER."
 
-# Function to check if a group exists
-group_exists() {
-    getent group "$1" >/dev/null 2>&1
-}
+# Determine OS platform
+OS_PLATFORM="$(uname)"
 
-# Function to check if the current user is already in the group
-user_in_group() {
-    id -nG "$USER" | grep -qw "$1"
-}
+if [ "$OS_PLATFORM" = "Darwin" ]; then
+    # macOS specific commands
+    echo "Detected macOS. Attempting to add $USER to admin and wheel groups (using sudo - password might be required)."
 
-# Attempt to add the user to one of the groups if not already a member
-for GROUP in "${GROUPS[@]}"; do
-    if group_exists "$GROUP" && ! user_in_group "$GROUP"; then
-        echo "Adding $USER to the $GROUP group (using sudo - password might be required)."
-        sudo usermod -a -G "$GROUP" "$USER"
-        if [ $? -eq 0 ]; then
-            echo "User $USER successfully added to $GROUP group."
-            echo "You may need to log out and back in for this to take effect."
-            exit 0
+    # Add the current user to 'admin' and 'wheel' if not already added
+    for group in admin wheel; do
+        if ! dscl . -list /Groups/$group GroupMembership | grep -q $USER; then
+            sudo dseditgroup -o edit -a $USER -t user $group
+            echo "User $USER added to $group group."
         else
-            echo "Failed to add $USER to $GROUP group."
-            exit 1
+            echo "User $USER is already a member of $group group."
         fi
-    elif user_in_group "$GROUP"; then
-        echo "User $USER is already a member of $GROUP group."
-    fi
-done
+    done
+else
+    # Define a list of possible groups for serial port access on UNIX/Linux
+    GROUPS=("dialout" "uucp" "modem" "plugdev")
 
-echo "None of the target groups were found on this system or the user is already in the group."
+    # Function to check if a group exists
+    group_exists() {
+        getent group "$1" >/dev/null 2>&1
+    }
+
+    # Function to check if the current user is already in the group
+    user_in_group() {
+        id -nG "$USER" | grep -qw "$1"
+    }
+
+    # Attempt to add the user to one of the groups if not already a member
+    for GROUP in "${GROUPS[@]}"; do
+        if group_exists "$GROUP" && ! user_in_group "$GROUP"; then
+            echo "Adding $USER to the $GROUP group (using sudo - password might be required)."
+            sudo usermod -a -G "$GROUP" "$USER"
+            if [ $? -eq 0 ]; then
+                echo "User $USER successfully added to $GROUP group."
+                echo "You may need to log out and back in for this to take effect."
+                exit 0
+            else
+                echo "Failed to add $USER to $GROUP group."
+                exit 1
+            fi
+        elif user_in_group "$GROUP"; then
+            echo "User $USER is already a member of $GROUP group."
+        fi
+    done
+
+    echo "None of the target groups were found on this system, or the user is already in the group."
+fi
