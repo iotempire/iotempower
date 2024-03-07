@@ -39,9 +39,9 @@ echo "Installation of $to_install complete."
 
 
 echo "Implementing a fix for node-gyp." # TODO verify how long that is happening
-mkdir -p "~/.gyp"
-if [ ! -f "~/.gyp/include.gypi" ]; then
-    cat << EOF > "~/.gyp/include.gypi"
+mkdir -p "$HOME/.gyp"
+if [ ! -f "$HOME/.gyp/include.gypi" ]; then
+    cat << EOF > "$HOME/.gyp/include.gypi"
 {
  'variables': {
   'android_ndk_path': ''

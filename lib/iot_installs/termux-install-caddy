@@ -1,11 +1,8 @@
 #!/bin/bash
 if command -v caddy >/dev/null; then
-    if apt-get list --installed | grep -q caddy; then
-        caddy_version=$(apt list --installed | grep caddy | awk -F'/' '{print $2}')
-        echo "Caddy is installed via apt. Version: $caddy_version"
+    if apt list 2>/dev/null|grep '\[installed'|grep -qcaddy; then
+        echo "Caddy is installed"
         exit 0
-    else
-        echo "Caddy is installed, but not via apt or version info not available."
     fi
 else
     echo "Caddy is not installed, installing"
