@@ -226,7 +226,7 @@ Do you want to install the fixed firmware?"
     # deactivate # disable python 2 environment
 
     # install virtualenv
-    python3 -m venv "$IOTEMPOWER_VPYTHON"
+    python3 -m venv --system-site-packages "$IOTEMPOWER_VPYTHON"
     source "$IOTEMPOWER_VPYTHON/bin/activate"
     pip install --no-cache-dir --upgrade pip
     # dependencies
