@@ -22,7 +22,7 @@ installed_version=$(node -v | sed 's/v//') # Remove the 'v' prefix from version
 # Define the minimum required version
 min_version="21"
 
-PACKAGE_LIST="which build-essential git mosquitto python python-ensurepip-wheels python-pip make rsync jq nodejs"
+PACKAGE_LIST="which build-essential git mosquitto python python-ensurepip-wheels python-pip make rust rsync jq nodejs"
 to_install=$(filter_packages debian-query $PACKAGE_LIST)
 
 echo "Installing: $to_install..."
