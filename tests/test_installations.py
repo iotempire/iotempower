@@ -15,7 +15,7 @@ with open(installation_options_file, "r") as f:
     installation_options = json.load(f)
 
 packages = [
-    {"name": "virtualenv", "package_manager": "binary", "module": "general"},
+#    {"name": "virtualenv", "package_manager": "binary", "module": "general"}, # can't be tested this way on modern python envs
     {"name": "git", "package_manager": "binary", "module": "general"},
     {"name": "jq", "package_manager": "binary", "module": "general"},
     {"name": "make", "package_manager": "binary", "module": "general"},
@@ -23,7 +23,7 @@ packages = [
     {"name": "mosquitto_sub", "package_manager": "binary", "module": "general"},
     {"name": "mosquitto_pub", "package_manager": "binary", "module": "general"},
     {"name": "node", "package_manager": "binary", "module": "general"}, # TODO: check min version
-    {"name": "haveged", "package_manager": "binary", "module": "general"},
+#    {"name": "haveged", "package_manager": "binary", "module": "general"}, # not needed on termux, macos
 #    {"name": "python3-dev", "package_manager": "binary", "module": "general"}, # FIXME: could be quieried with query script
     {"name": "terminal-kit", "package_manager": "npm", "module": "general"},
     {"name": "g++", "package_manager": "binary", "module": "cloud_commander"},
