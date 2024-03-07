@@ -1,14 +1,9 @@
 #!/bin/bash
 
-PACKAGE_LIST="mosquitto"
+PACKAGE_LIST="caddy"
 to_install=$(filter_packages debian-query $PACKAGE_LIST)
 
 echo "Installing: $to_install..."
-debian-install $to_install
+arch-install $to_install
 echo "Installation of $to_install complete."
-
-# TODO: ask if this should be done?
-sudo systemctl stop mosquitto
-sudo systemctl disable mosquitto
-
 
