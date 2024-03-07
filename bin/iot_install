@@ -308,6 +308,9 @@ Do you want to install the fixed firmware?"
     # compile man-pages and html-pages of documentation
     iot_doc make
 
+    # add permissions to access serial port for current user
+    iot_add_serial_permissions
+
     # Save the state
     python3 "$IOTEMPOWER_ROOT"/utils/save_arguments_as_json.py --splitter '=' --path "$IOTEMPOWER_LOCAL"/installation_options.json \
       general="$answer" cloud_commander="$answer_commander" \
