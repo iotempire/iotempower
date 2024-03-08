@@ -2,7 +2,7 @@
 
 # TODO: potentially also install sudo?
 
-# make sure curl is not installed
+# check if curl is installed
 if ! debian-query curl > /dev/null; then
     echo "curl is not installed, installing. Please wait..."
     debian-install curl
@@ -33,8 +33,8 @@ else
     curl -fsSL "https://deb.nodesource.com/setup_""$min_version"".x" | bash -
 fi
 
-# Why do we need python3.11-venv?
-PACKAGE_LIST="build-essential git mosquitto-clients virtualenv python3-venv python3.11-venv make rsync haveged jq nodejs npm"
+# Why do we need python3.11-venv? For testing?
+PACKAGE_LIST="build-essential git mosquitto-clients virtualenv python3-venv python3.11-venv make rsync haveged jq nodejs"
 to_install=$(filter_packages debian-query $PACKAGE_LIST)
 
 echo "Installing: $to_install..."
