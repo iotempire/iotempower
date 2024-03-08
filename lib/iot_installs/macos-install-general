@@ -40,7 +40,7 @@ if [ ! -f "$HOME/.gyp/include.gypi" ]; then
 EOF
 fi
 
-# solve small mess up with global and local modules on macos (also on termux the problem)
-mkdir -p "$HOME/node_modules"
+# # solve small mess up with global and local modules on macos (also on termux the problem)
+# mkdir -p "$HOME/node_modules"
 mkdir -p "$IOTEMPOWER_LOCAL/nodejs"
-ln -s "$HOME/node_modules" "$IOTEMPOWER_LOCAL/nodejs"
+# ln -s "$HOME/node_modules" "$IOTEMPOWER_LOCAL/nodejs"

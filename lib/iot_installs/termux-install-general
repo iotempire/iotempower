@@ -44,6 +44,7 @@ if [ ! -f "$HOME/.gyp/include.gypi" ]; then
 EOF
 fi
 
-# solve small mess up with global and local modules on termux
-mkdir -p "$HOME/node_modules"
-ln -s "$HOME/node_modules" "$IOTEMPOWER_LOCAL/nodejs"
+# # solve small mess up with global and local modules on termux
+# mkdir -p "$HOME/node_modules"
+mkdir -p "$IOTEMPOWER_LOCAL/nodejs"
+# ln -s "$HOME/node_modules" "$IOTEMPOWER_LOCAL/nodejs"
