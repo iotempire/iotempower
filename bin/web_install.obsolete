@@ -11,8 +11,8 @@ if [[ $# -gt 1 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF
 Syntax: web_install [uninstall]
 
-Install node-red and cloudcmd. A working nodejs and npm  needs to be avaialble 
-in the system. Also teh webserver caddy needs to be installed.
+Install node-red and cloudcmd. A working nodejs and npm  needs to be available 
+in the system. Also the webserver caddy needs to be installed.
 
 EOF
 exit 1

@@ -271,6 +271,15 @@ Do you want to install the fixed firmware?"
       # copy menu files
       cp -a "$IOTEMPOWER_ROOT/lib/gateway_setup/cloudcmd/cloudcmd.menu.js" "$HOME/.cloudcmd.menu.js"
       cp -a "$IOTEMPOWER_ROOT/lib/gateway_setup/cloudcmd/cloudcmd.json" "$HOME/.cloudcmd.json"
+
+
+      cloudcmd_config=~/.cloudcmd.json
+      jq '.auth = true | .prefix = "/cloudcmd" | .username = "iot" | '\
+      '.password = "709d553e1a6e0b3f874408865d169870a945ceb25d72be561b7a50a23713d3452aea896e8e24783adcce86fddba087939ae3da9574997334e6362b5e767aa68a" | '\
+      '.algo = "sha512WithRSAEncryption"' "$cloudcmd_config" > "$cloudcmd_config.new" || { echo "jq failed, aborting." 1>&2;exit 1; }
+      mv "$cloudcmd_config" "$cloudcmd_config.backup" &>/dev/null
+      mv "$cloudcmd_config.new" "$cloudcmd_config"
+
       cloudcmd --terminal --terminal-path "$(gritty --path)" --save --no-server
     fi
 
@@ -279,6 +288,22 @@ Do you want to install the fixed firmware?"
       npm install --unsafe-perm node-red
       mkdir ~/.node-red/
       cp "$IOTEMPOWER_LOCAL"/nodejs/node_modules/node-red/settings.js ~/.node-red/
+      nodered_config=~/.node-red/settings.js
+
+      if ! grep -q "module.exports.httpAdminRoot = '/nodered';" "$nodered_config" ; then
+	    cat << EOF >> "$nodered_config"
+module.exports.httpAdminRoot = '/nodered';
+module.exports.httpNodeRoot = '/nodered';
+module.exports.adminAuth= {
+    type: "credentials",
+    users: [{
+        username: "admin",
+        password: "\$2b\$08\$W5LDP3eTaIYjz5iJkKVwMu9JDg3cPFMUvBypMCmYA3fpjYQlzFC4e",
+        permissions: "*"
+    }]
+};
+EOF
+    echo "Changed $nodered_config."
     fi
 
     if [[ "$answer_caddy" == 1 ]]; then
