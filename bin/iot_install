@@ -108,6 +108,7 @@ help_string="Possible options:
       --mqtt: install Mosquitto
       --convenience: install mc, micro, and tilde
       --templates: create iot-systems template
+      --cache: pre-fill cache to accelerate compilations
       --fix-pi-wifi-ap: Fix Raspberry Pi wireless firmware for access point usage
       "
 while getopts ":h-:" opt; do
@@ -139,6 +140,8 @@ while getopts ":h-:" opt; do
           answer_convenience=1;;
         templates)
           answer_templates=1;;
+        cache)
+          answer_cache=1;;
         fix-pi-wifi-ap)
           answer_fix_pi_wifi_ap=1;;
         *)
@@ -175,6 +178,7 @@ else
 		answer_fix_pi_wifi_ap=0
     answer_convenience=0
     answer_templates=1
+    answer_cache=0
 	else
 	    welcome
       echo_message_read_answer "Do you want to set up IoTempower core (compilation and deployment environment)?"
@@ -199,6 +203,11 @@ else
 
         echo_message_read_answer "Do you want to setup the iot-systems template folder."
         answer_templates=$?
+
+        echo_message_read_answer \
+        "Do you want to pre-populate the compile cache to 
+accelerate future compilations (can take a long time)." n
+        answer_cache=$?
 
         # check if this is a raspberry pi
         if lscpu | grep -q "Raspberry Pi"; then # TODO: this is does not work on pi
@@ -306,8 +315,10 @@ Do you want to install the fixed firmware?"
     # activate iot script
     iot_activate_iot_script
 
-    # populate the cache TODO: potentially integrate with testing
-    update_cache
+    if [[ "$answer_cache" == 1 ]]; then
+      # populate the cache TODO: potentially integrate with testing
+      update_cache
+    fi
 
     # compile man-pages and html-pages of documentation
     iot_doc make
@@ -320,7 +331,8 @@ Do you want to install the fixed firmware?"
       core="$answer_core" cloud_commander="$answer_commander" \
       node_red="$answer_node_red" caddy="$answer_caddy" \
       mosquitto="$answer_mqtt" answer_fix_pi_wifi_ap="$answer_fix_pi_wifi_ap" \
-      convenience="$answer_convenience" templates="$answer_templates"
+      convenience="$answer_convenience" templates="$answer_templates" \
+      cache="$answer_cache"
 
     # Testing the installation
     if ! pytest "$IOTEMPOWER_ROOT"/tests/test_installations.py;
