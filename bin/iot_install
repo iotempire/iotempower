@@ -255,13 +255,16 @@ Do you want to install the fixed firmware?"
     mkdir -p nodejs && cd nodejs || { echo "Can't create nodejs folder, aborting." 1>&2;exit 1; }
     npm install terminal-kit
 
-    echo "All necessary packages have been installed. The rest consits of optional packages."
+    echo "All necessary packages have been installed. The rest consists of optional packages."
 
     if [[ "$answer_commander" == 1 ]]; then
       echo "Installing Cloud Commander"
       # apt-get install g++ -y - Obsolete: should be in build-essential or default on arch
       npm install gritty
       npm install cloudcmd
+      # copy menu files
+      cp -a "$IOTEMPOWER_ROOT/lib/gateway_setup/cloudcmd/cloudcmd.menu.js" "$HOME/.cloudcmd.menu.js"
+      cp -a "$IOTEMPOWER_ROOT/lib/gateway_setup/cloudcmd/cloudcmd.json" "$HOME/.cloudcmd.json"
       cloudcmd --terminal --terminal-path "$(gritty --path)" --save --no-server
     fi
 
@@ -288,8 +291,12 @@ Do you want to install the fixed firmware?"
     fi
 
     if [[ "$answer_templates" == 1 ]]; then
-      echo "Creating iot-systems template"
-      call_by_system install-templates
+      echo "Creating iot-systems folder from template"
+      if [ ! -d "iot-systems" ]; then
+        cp -a "$IOTEMPOWER_ROOT/examples/iot-systems-template" "$HOME/iot-systems"
+      else
+        echo "iot-systems already exists."
+      fi
     fi
     
     if [[ "$answer_fix_pi_wifi_ap" == 1 ]]; then
@@ -300,7 +307,7 @@ Do you want to install the fixed firmware?"
     bash "$IOTEMPOWER_ROOT/bin/fix_bin"
 
     # activate iot script
-    iot_activite_iot_script
+    iot_activate_iot_script
 
     # populate the cache TODO: potentially integrate with testing
     update_cache

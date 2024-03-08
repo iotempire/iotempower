@@ -9,10 +9,10 @@
 # Modified since 2015-09-18 from Pascal Gollor (https://github.com/pgollor)
 # Modified since 2015-11-09 from Hristo Gochkov (https://github.com/me-no-dev)
 # Modified since 2016-01-03 from Matthew O'Gorman (https://githumb.com/mogorman)
-# Modified to support iotempower dongle adopt by ulno starting 2019-02-35
+# Modified to support IoTempower dongle adopt by ulno starting 2019-02-35
 #
 # This script will push an initial OTA update through a ESP dongle in the
-# iotempower environment
+# IoTempower environment
 #
 # Use it like this: python dongle_adopt.py -p <usbport> -f <firmware.bin>
 
