@@ -262,14 +262,14 @@ Do you want to install the fixed firmware?"
       #cd "$IOTEMPOWER_EXTERNAL/create_ap"
 
       # install node.js related stuff
-      init_nodejs()
+      init_nodejs
       npm install terminal-kit
 
       echo "All core packages have been installed. The rest consists of optional packages."
     fi
 
     if [[ "$answer_commander" == 1 ]]; then
-      init_nodejs()
+      init_nodejs
       echo "Installing Cloud Commander"
       # apt-get install g++ -y - Obsolete: should be in build-essential or default on arch
       npm install gritty
@@ -289,7 +289,7 @@ Do you want to install the fixed firmware?"
     fi
 
     if [[ "$answer_node_red" == 1 ]]; then
-      init_nodejs()
+      init_nodejs
       echo "Installing Node Red"
       npm install --unsafe-perm node-red
       mkdir ~/.node-red/
