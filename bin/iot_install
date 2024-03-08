@@ -201,7 +201,7 @@ else
         answer_templates=$?
 
         # check if this is a raspberry pi
-        if lscpu | grep -q "Raspberry Pi"; then
+        if lscpu | grep -q "Raspberry Pi"; then # TODO: this is does not work on pi
           # activate minimal firmware
           echo_message_read_answer \
 "In order to support a larger amount of connected devices,

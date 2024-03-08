@@ -12,6 +12,7 @@ if [ "$OS_PLATFORM" = "Darwin" ]; then
     # Add the current user to 'admin' and 'wheel' if not already added
     for group in admin wheel; do
         if ! dscl . -list /Groups/$group GroupMembership | grep -q $USER; then
+            echo "Adding $USER to $group group (using sudo - password might be required)."
             sudo dseditgroup -o edit -a $USER -t user $group
             echo "User $USER added to $group group."
         else

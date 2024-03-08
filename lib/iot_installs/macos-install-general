@@ -1,13 +1,9 @@
 #!/bin/bash
 
-# TODO: potentially also install sudo?
-
-termux-install which
-
-# make sure curl is not installed
-if ! termux-query curl > /dev/null; then
+# install curl if necessary
+if ! macos-query curl > /dev/null; then
     echo "curl is not installed, installing. Please wait..."
-    termux-install curl
+    macos-install curl
     # check error and return 1 if not found
     if [[ $? != 0 ]]; then
         echo "curl could not be installed, exiting now."
@@ -16,11 +12,11 @@ if ! termux-query curl > /dev/null; then
     echo "curl has been installed successfully"
 fi
 
-PACKAGE_LIST="which build-essential git mosquitto python python-ensurepip-wheels python-pip python-cryptography make rsync jq nodejs"
+PACKAGE_LIST="make gcc git mosquitto python python-pip python-cryptography rsync jq nodejs npm"
 to_install=$(filter_packages debian-query $PACKAGE_LIST)
 
 echo "Installing: $to_install..."
-termux-install $to_install
+macos-install $to_install
 echo "Installation of $to_install complete."
 
 # curl git mosquitto python-virtualenv rsync haveged jq # general
