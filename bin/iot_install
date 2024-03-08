@@ -97,7 +97,9 @@ function echo_message_read_answer() {
 function init_nodejs() {
     cd "$IOTEMPOWER_LOCAL" || { echo "$IOTEMPOWER_LOCAL not found, aborting." 1>&2;exit 1; }
     mkdir -p nodejs && cd nodejs || { echo "Can't create nodejs folder, aborting." 1>&2;exit 1; }
-    npm init
+    # if package.json does not exist, run nmp init to create it
+
+    npm init -y
 }
 
 # make installers available in PATH
@@ -121,8 +123,7 @@ while getopts ":h-:" opt; do
   case $opt in
     h)
       echo "$help_string"
-      exit 0
-      ;;
+      exit 0;;
     -)
       case "${OPTARG}" in
         help)
@@ -152,14 +153,12 @@ while getopts ":h-:" opt; do
           answer_fix_pi_wifi_ap=1;;
         *)
           echo "Invalid option: --${OPTARG}"
-          exit 1
-          ;;
+          exit 1;;
       esac
       ;;
     \?)
       echo "Invalid option: -$OPTARG"
-      exit 1
-      ;;
+      exit 1;;
   esac
 done
 
@@ -186,190 +185,201 @@ else
     answer_templates=1
     answer_cache=0
 	else
-	    welcome
-      echo_message_read_answer "Do you want to set up IoTempower core (compilation and deployment environment)?"
-      answer_core=$?
-    	optional_message="Do you want to install the optional dependency"
-      if [ -z "$answer_commander" ] && [ -z "$answer_node_red" ] &&
-         [ -z "$answer_caddy" ] && [ -z "$answer_mqtt" ] && [ -z "$answer_fix_pi_wifi_ap" ]; then
-        echo_message_read_answer "${optional_message} CLOUD COMMANDER (Details -> https://cloudcmd.io/)"
-        answer_commander=$?
+    welcome
+    echo_message_read_answer "Do you want to set up IoTempower core (compilation and deployment environment)?"
+    answer_core=$?
+    optional_message="Do you want to install the optional dependency"
+    if [ -z "$answer_commander" ] && [ -z "$answer_node_red" ] &&
+        [ -z "$answer_caddy" ] && [ -z "$answer_mqtt" ] && [ -z "$answer_fix_pi_wifi_ap" ]; then
+      echo_message_read_answer "${optional_message} CLOUD COMMANDER (Details -> https://cloudcmd.io/)"
+      answer_commander=$?
 
-        echo_message_read_answer "${optional_message} NODE-RED (Details -> https://nodered.org/)"
-        answer_node_red=$?
+      echo_message_read_answer "${optional_message} NODE-RED (Details -> https://nodered.org/)"
+      answer_node_red=$?
 
-        echo_message_read_answer "${optional_message} CADDY (Details -> https://caddyserver.com/)"
-        answer_caddy=$?
+      echo_message_read_answer "${optional_message} CADDY (Details -> https://caddyserver.com/)"
+      answer_caddy=$?
 
-        echo_message_read_answer "${optional_message} MOSQUITTO (MQTT broker) (Details -> https://mosquitto.org/)"
-        answer_mqtt=$?
+      echo_message_read_answer "${optional_message} MOSQUITTO (MQTT broker) (Details -> https://mosquitto.org/)"
+      answer_mqtt=$?
 
-        echo_message_read_answer "${optional_message} convenience tools (mc, micro, tilde)"
-        answer_mqtt=$?
+      echo_message_read_answer "${optional_message} convenience tools (mc, micro, tilde)"
+      answer_mqtt=$?
 
-        echo_message_read_answer "Do you want to setup the iot-systems template folder."
-        answer_templates=$?
+      echo_message_read_answer "Do you want to setup the iot-systems template folder."
+      answer_templates=$?
 
-        echo_message_read_answer \
-        "Do you want to pre-populate the compile cache to 
-accelerate future compilations (can take a long time)." n
-        answer_cache=$?
+      echo_message_read_answer "$(printf "%b" \
+        "Do you want to pre-populate the compile cache to\n" \
+        "accelerate future compilations (can take a long time)." \
+        )" n
+      answer_cache=$?
 
-        # check if this is a raspberry pi
-        if lscpu | grep -q "Raspberry Pi"; then # TODO: this is does not work on pi
-          # activate minimal firmware
-          echo_message_read_answer \
-"In order to support a larger amount of connected devices,
-on the raspberry pi a special minimal version
-of the wireless chip firmware has to be enabled.
-NB! A maximum of 8 connected clients are supported
-without the use of minimal broadcom firmware.
-Do you want to install the fixed firmware?"
-          answer_fix_pi_wifi_ap=$?
-        fi
+      # check if this is a raspberry pi
+      if lscpu | grep -q "Raspberry Pi"; then # TODO: this is does not work on pi
+        # activate minimal firmware
+        echo_message_read_answer "$(printf "%b\n" \
+          "In order to support a larger amount of connected devices,"\
+          "on the raspberry pi a special minimal version"\
+          "of the wireless chip firmware has to be enabled."\
+          "NB! A maximum of 8 connected clients are supported"\
+          "without the use of minimal broadcom firmware."\
+          "Do you want to install the fixed firmware?")"
+        answer_fix_pi_wifi_ap=$?
       fi
     fi
+  fi
 
-    # make sure package lists are uptodate
-    echo "Updating package lists..."
-    call_by_system update
-    echo "Updating package lists done."
-    echo
 
-    if [[ "$answer_core" == 1 ]]; then
-      call_by_system install-general
-      # python2 seems not to be necessary anymore
-      # # TODO: recheck, installation seems to fail first time -> path problems (wrong pip used?)
-      # # install virtualenv for python2 for platformio
-      # mkdir -p "$IOTEMPOWER_VPYTHON2"
-      # virtualenv -p "$(which python2)" "$IOTEMPOWER_VPYTHON2"
-      # source "$IOTEMPOWER_VPYTHON2/bin/activate"
-      # pip install --upgrade pip
-      #    pip install --upgrade platformio
-      # TODO: go back to normal install, but for now we need version4 (development version)
-      # pip install --upgrade https://github.com/platformio/platformio-core/archive/develop.zip
-      # deactivate # disable python 2 environment
+  # make sure package lists are uptodate
+  echo "Updating package lists..."
+  call_by_system update
+  echo "Updating package lists done."
+  echo
 
-      # install virtualenv
-      python3 -m venv --system-site-packages "$IOTEMPOWER_VPYTHON"
-      source "$IOTEMPOWER_VPYTHON/bin/activate"
-      pip install --no-cache-dir --upgrade pip
-      # dependencies
-      pip install --no-cache-dir -r "$IOTEMPOWER_ROOT/bin/requirements.txt"
+  if [[ "$answer_core" == 1 ]]; then
+    call_by_system install-general
+    # python2 seems not to be necessary anymore
+    # # TODO: recheck, installation seems to fail first time -> path problems (wrong pip used?)
+    # # install virtualenv for python2 for platformio
+    # mkdir -p "$IOTEMPOWER_VPYTHON2"
+    # virtualenv -p "$(which python2)" "$IOTEMPOWER_VPYTHON2"
+    # source "$IOTEMPOWER_VPYTHON2/bin/activate"
+    # pip install --upgrade pip
+    #    pip install --upgrade platformio
+    # TODO: go back to normal install, but for now we need version4 (development version)
+    # pip install --upgrade https://github.com/platformio/platformio-core/archive/develop.zip
+    # deactivate # disable python 2 environment
 
-      # access point - TODO: make this optional
-      git clone https://github.com/ulno/create_ap "$IOTEMPOWER_EXTERNAL/create_ap"
-      #cd "$IOTEMPOWER_EXTERNAL/create_ap"
+    # install virtualenv
+    python3 -m venv --system-site-packages "$IOTEMPOWER_VPYTHON"
+    source "$IOTEMPOWER_VPYTHON/bin/activate"
+    pip install --no-cache-dir --upgrade pip
+    # dependencies
+    pip install --no-cache-dir -r "$IOTEMPOWER_ROOT/bin/requirements.txt"
 
-      # install node.js related stuff
-      init_nodejs
-      npm install terminal-kit
+    # access point - TODO: make this optional
+    git clone https://github.com/ulno/create_ap "$IOTEMPOWER_EXTERNAL/create_ap"
+    #cd "$IOTEMPOWER_EXTERNAL/create_ap"
 
-      echo "All core packages have been installed. The rest consists of optional packages."
-    fi
+    # install node.js related stuff
+    init_nodejs
+    npm install terminal-kit
 
-    if [[ "$answer_commander" == 1 ]]; then
-      init_nodejs
-      echo "Installing Cloud Commander"
-      # apt-get install g++ -y - Obsolete: should be in build-essential or default on arch
-      npm install gritty
-      npm install cloudcmd
-      # copy menu files
-      cp -a "$IOTEMPOWER_ROOT/lib/gateway_setup/cloudcmd/cloudcmd.menu.js" "$HOME/.cloudcmd.menu.js"
-      cp -a "$IOTEMPOWER_ROOT/lib/gateway_setup/cloudcmd/cloudcmd.json" "$HOME/.cloudcmd.json"
+    echo "All core packages have been installed. The rest consists of optional packages."
+  fi # core
 
-      cloudcmd_config=~/.cloudcmd.json
-      jq '.auth = true | .prefix = "/cloudcmd" | .username = "iot" | '\
-      '.password = "709d553e1a6e0b3f874408865d169870a945ceb25d72be561b7a50a23713d3452aea896e8e24783adcce86fddba087939ae3da9574997334e6362b5e767aa68a" | '\
-      '.algo = "sha512WithRSAEncryption"' "$cloudcmd_config" > "$cloudcmd_config.new" || { echo "jq failed, aborting." 1>&2;exit 1; }
-      mv "$cloudcmd_config" "$cloudcmd_config.backup" &>/dev/null
-      mv "$cloudcmd_config.new" "$cloudcmd_config"
+  if [[ "$answer_commander" == 1 ]]; then
+    init_nodejs
+    echo "Installing Cloud Commander"
+    # apt-get install g++ -y - Obsolete: should be in build-essential or default on arch
+    npm install gritty
+    npm install cloudcmd
+    # copy menu files
+    cp -a "$IOTEMPOWER_ROOT/lib/gateway_setup/cloudcmd/cloudcmd.menu.js" "$HOME/.cloudcmd.menu.js"
+    cp -a "$IOTEMPOWER_ROOT/lib/gateway_setup/cloudcmd/cloudcmd.json" "$HOME/.cloudcmd.json"
 
-      cloudcmd --terminal --terminal-path "$(gritty --path)" --save --no-server
-    fi
+    cloudcmd_config=~/.cloudcmd.json
+    jq "$(printf "%s" \
+        '.auth = true | '\
+        '.prefix = "/cloudcmd" | '\
+        '.username = "iot" | '\
+        '.password = "709d553e1a6e0b3f874408865d169870a945ceb25d72be561b7a50a23713d3452aea896e8e24783adcce86fddba087939ae3da9574997334e6362b5e767aa68a" | '\
+        '.algo = "sha512WithRSAEncryption"'\
+      )" \
+      "$cloudcmd_config" > "$cloudcmd_config.new" \
+    || { echo "jq failed, aborting." 1>&2;exit 1; }
+    mv "$cloudcmd_config" "$cloudcmd_config.backup" &>/dev/null
+    mv "$cloudcmd_config.new" "$cloudcmd_config"
 
-    if [[ "$answer_node_red" == 1 ]]; then
-      init_nodejs
-      echo "Installing Node Red"
-      npm install --unsafe-perm node-red
-      mkdir ~/.node-red/
-      cp "$IOTEMPOWER_LOCAL"/nodejs/node_modules/node-red/settings.js ~/.node-red/
-      nodered_config=~/.node-red/settings.js
+    cloudcmd --terminal --terminal-path "$(gritty --path)" --save --no-server
+  fi # commander
 
-      if ! grep -q "module.exports.httpAdminRoot = '/nodered';" "$nodered_config" ; then
-	    cat << EOF >> "$nodered_config"
+  if [[ "$answer_node_red" == 1 ]]; then
+    init_nodejs
+    echo "Installing Node Red"
+    npm install --unsafe-perm node-red
+    mkdir ~/.node-red/
+    cp "$IOTEMPOWER_LOCAL"/nodejs/node_modules/node-red/settings.js ~/.node-red/
+    nodered_config=~/.node-red/settings.js
+
+    if ! grep -q "module.exports.httpAdminRoot = '/nodered';" "$nodered_config" ; then
+      cat << EOF >> "$nodered_config"
 module.exports.httpAdminRoot = '/nodered';
 module.exports.httpNodeRoot = '/nodered';
 module.exports.adminAuth= {
-    type: "credentials",
-    users: [{
-        username: "admin",
-        password: "\$2b\$08\$W5LDP3eTaIYjz5iJkKVwMu9JDg3cPFMUvBypMCmYA3fpjYQlzFC4e",
-        permissions: "*"
-    }]
+  type: "credentials",
+  users: [{
+      username: "admin",
+      password: "\$2b\$08\$W5LDP3eTaIYjz5iJkKVwMu9JDg3cPFMUvBypMCmYA3fpjYQlzFC4e",
+      permissions: "*"
+  }]
 };
 EOF
-    echo "Changed $nodered_config."
-    fi
+      echo "Changed $nodered_config."
+    fi # node-red config
 
-    if [[ "$answer_caddy" == 1 ]]; then
-      echo "Installing Caddy"
-      call_by_system install-caddy
-    fi
+  fi # node-red
 
-    if [[ "$answer_mqtt" == 1 ]]; then
-      echo "Installing Mosquitto"
-      call_by_system install-mosquitto
-    fi
+  if [[ "$answer_caddy" == 1 ]]; then
+    echo "Installing Caddy"
+    call_by_system install-caddy
+  fi # caddy
 
-    if [[ "$answer_convenience" == 1 ]]; then
-      echo "Installing convenience tools"
-      call_by_system install-convenience
-    fi
+  if [[ "$answer_mqtt" == 1 ]]; then
+    echo "Installing Mosquitto"
+    call_by_system install-mosquitto
+  fi # mosquitto
 
-    if [[ "$answer_templates" == 1 ]]; then
-      echo "Creating iot-systems folder from template"
-      if [ ! -d "iot-systems" ]; then
-        cp -a "$IOTEMPOWER_ROOT/examples/iot-systems-template" "$HOME/iot-systems"
-      else
-        echo "iot-systems already exists."
-      fi
-    fi
-    
-    if [[ "$answer_fix_pi_wifi_ap" == 1 ]]; then
-      echo "Fix pi wifi ap firmware for more clients."
-      unbreak_ap_limit # TODO: integrate correctly, and check if we are on the pi
-    fi
+  if [[ "$answer_convenience" == 1 ]]; then
+    echo "Installing convenience tools"
+    call_by_system install-convenience
+  fi # convenience
 
-    bash "$IOTEMPOWER_ROOT/bin/fix_bin"
+  if [[ "$answer_templates" == 1 ]]; then
+    echo "Creating iot-systems folder from template"
+    if [ ! -d "iot-systems" ]; then
+      cp -a "$IOTEMPOWER_ROOT/examples/iot-systems-template" "$HOME/iot-systems"
+    else
+      echo "iot-systems already exists."
+    fi # iot-systems exist?
+  fi # templates
+  
+  if [[ "$answer_fix_pi_wifi_ap" == 1 ]]; then
+    echo "Fix pi wifi ap firmware for more clients."
+    unbreak_ap_limit # TODO: integrate correctly, and check if we are on the pi
+  fi # fix wifi raspi
 
-    # activate iot script
-    iot_activate_iot_script
+  bash "$IOTEMPOWER_ROOT/bin/fix_bin"
 
-    if [[ "$answer_cache" == 1 ]]; then
-      # populate the cache TODO: potentially integrate with testing
-      update_cache
-    fi
+  # activate iot script
+  iot_activate_iot_script
 
-    # compile man-pages and html-pages of documentation
-    iot_doc make
+  if [[ "$answer_cache" == 1 ]]; then
+    # populate the cache TODO: potentially integrate with testing
+    update_cache
+  fi # cache
 
-    # add permissions to access serial port for current user
-    iot_add_serial_permissions
+  # compile man-pages and html-pages of documentation
+  bash -x iot_doc make
+  exit 0 # debug
 
-    # Save the state
-    python3 "$IOTEMPOWER_ROOT"/utils/save_arguments_as_json.py --splitter '=' --path "$IOTEMPOWER_LOCAL"/installation_options.json \
-      core="$answer_core" cloud_commander="$answer_commander" \
-      node_red="$answer_node_red" caddy="$answer_caddy" \
-      mosquitto="$answer_mqtt" answer_fix_pi_wifi_ap="$answer_fix_pi_wifi_ap" \
-      convenience="$answer_convenience" templates="$answer_templates" \
-      cache="$answer_cache"
+  # add permissions to access serial port for current user
+  iot_add_serial_permissions
 
-    # Testing the installation
-    if ! pytest "$IOTEMPOWER_ROOT"/tests/test_installations.py;
-    then
-     exit 1
-    fi
+  # Save the state
+  python3 "$IOTEMPOWER_ROOT"/utils/save_arguments_as_json.py --splitter '=' --path "$IOTEMPOWER_LOCAL"/installation_options.json \
+    core="$answer_core" cloud_commander="$answer_commander" \
+    node_red="$answer_node_red" caddy="$answer_caddy" \
+    mosquitto="$answer_mqtt" answer_fix_pi_wifi_ap="$answer_fix_pi_wifi_ap" \
+    convenience="$answer_convenience" templates="$answer_templates" \
+    cache="$answer_cache"
+
+  # Testing the installation
+  if ! pytest "$IOTEMPOWER_ROOT"/tests/test_installations.py;
+  then
+    exit 1
+  fi
 fi
 
 exit 0
