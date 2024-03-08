@@ -101,6 +101,7 @@ export PATH="$IOTEMPOWER_ROOT/lib/iot_installs:$PATH"
 help_string="Possible options:
       --clean: clears installations and starts a new environment
       --quiet: install all dependencies (optional & required)
+      --core: install IoTempower core (deployment and compilation environment)
       --cloudcmd: install Cloud Commander
       --node-red: install Node-RED
       --caddy: install Caddy
@@ -124,6 +125,8 @@ while getopts ":h-:" opt; do
           clean=1;;
         quiet)
           quiet=1;;
+        core)
+          answer_core=1;;
         cloudcmd)
           answer_commander=1;;
         node-red)
@@ -164,7 +167,7 @@ if [[ -e "$IOTEMPOWER_VPYTHON/bin/activate" ]]; then # check for existing venv
     source "$IOTEMPOWER_VPYTHON/bin/activate"
 else
 	if [[ "$quiet" == 1 ]]; then
-		answer=1
+		answer_core=1
 		answer_commander=1
 		answer_node_red=1
 		answer_caddy=1
@@ -174,12 +177,9 @@ else
     answer_templates=1
 	else
 	    welcome
-      echo_message_read_answer "Do you want to set it up?"
-      answer=$?
-      if [[ -z "$answer" ]]; then
-        echo Not installing as requested. You can restart with \'bash run\' in the iot folder later.
-      fi
-    	optional_message="Do you want to install optional dependency"
+      echo_message_read_answer "Do you want to set up IoTempower core (compilation and deployment environment)?"
+      answer_core=$?
+    	optional_message="Do you want to install the optional dependency"
       if [ -z "$answer_commander" ] && [ -z "$answer_node_red" ] &&
          [ -z "$answer_caddy" ] && [ -z "$answer_mqtt" ] && [ -z "$answer_fix_pi_wifi_ap" ]; then
         echo_message_read_answer "${optional_message} CLOUD COMMANDER (Details -> https://cloudcmd.io/)"
@@ -194,10 +194,10 @@ else
         echo_message_read_answer "${optional_message} MOSQUITTO (MQTT broker) (Details -> https://mosquitto.org/)"
         answer_mqtt=$?
 
-        echo_message_read_answer "${optional_message} Convenience tools (mc, micro, tilde)"
+        echo_message_read_answer "${optional_message} convenience tools (mc, micro, tilde)"
         answer_mqtt=$?
 
-        echo_message_read_answer "${optional_message} Install the iot-system template"
+        echo_message_read_answer "Do you want to setup the iot-systems template folder."
         answer_templates=$?
 
         # check if this is a raspberry pi
@@ -221,41 +221,38 @@ Do you want to install the fixed firmware?"
     echo "Updating package lists done."
     echo
 
-    if [[ "$answer" == 1 ]]; then
+    if [[ "$answer_core" == 1 ]]; then
       call_by_system install-general
-    else
-        echo "Not installing. You can restart with \'bash run\' in the iot folder later."
-        exit 1
+      # python2 seems not to be necessary anymore
+      # # TODO: recheck, installation seems to fail first time -> path problems (wrong pip used?)
+      # # install virtualenv for python2 for platformio
+      # mkdir -p "$IOTEMPOWER_VPYTHON2"
+      # virtualenv -p "$(which python2)" "$IOTEMPOWER_VPYTHON2"
+      # source "$IOTEMPOWER_VPYTHON2/bin/activate"
+      # pip install --upgrade pip
+      #    pip install --upgrade platformio
+      # TODO: go back to normal install, but for now we need version4 (development version)
+      # pip install --upgrade https://github.com/platformio/platformio-core/archive/develop.zip
+      # deactivate # disable python 2 environment
+
+      # install virtualenv
+      python3 -m venv --system-site-packages "$IOTEMPOWER_VPYTHON"
+      source "$IOTEMPOWER_VPYTHON/bin/activate"
+      pip install --no-cache-dir --upgrade pip
+      # dependencies
+      pip install --no-cache-dir -r "$IOTEMPOWER_ROOT/bin/requirements.txt"
+
+      # access point - TODO: make this optional
+      git clone https://github.com/ulno/create_ap "$IOTEMPOWER_EXTERNAL/create_ap"
+      #cd "$IOTEMPOWER_EXTERNAL/create_ap"
+
+      # install node.js related stuff
+      cd "$IOTEMPOWER_LOCAL" || { echo "$IOTEMPOWER_LOCAL not found, aborting." 1>&2;exit 1; }
+      mkdir -p nodejs && cd nodejs || { echo "Can't create nodejs folder, aborting." 1>&2;exit 1; }
+      npm install terminal-kit
+
+      echo "All necessary packages have been installed. The rest consists of optional packages."
     fi
-    # python2 seems not to be necessary anymore
-    # # TODO: recheck, installation seems to fail first time -> path problems (wrong pip used?)
-    # # install virtualenv for python2 for platformio
-    # mkdir -p "$IOTEMPOWER_VPYTHON2"
-    # virtualenv -p "$(which python2)" "$IOTEMPOWER_VPYTHON2"
-    # source "$IOTEMPOWER_VPYTHON2/bin/activate"
-    # pip install --upgrade pip
-    #    pip install --upgrade platformio
-    # TODO: go back to normal install, but for now we need version4 (development version)
-    # pip install --upgrade https://github.com/platformio/platformio-core/archive/develop.zip
-    # deactivate # disable python 2 environment
-
-    # install virtualenv
-    python3 -m venv --system-site-packages "$IOTEMPOWER_VPYTHON"
-    source "$IOTEMPOWER_VPYTHON/bin/activate"
-    pip install --no-cache-dir --upgrade pip
-    # dependencies
-    pip install --no-cache-dir -r "$IOTEMPOWER_ROOT/bin/requirements.txt"
-
-    # access point - TODO: make this optional
-    git clone https://github.com/ulno/create_ap "$IOTEMPOWER_EXTERNAL/create_ap"
-    #cd "$IOTEMPOWER_EXTERNAL/create_ap"
-
-    # install node.js related stuff
-    cd "$IOTEMPOWER_LOCAL" || { echo "$IOTEMPOWER_LOCAL not found, aborting." 1>&2;exit 1; }
-    mkdir -p nodejs && cd nodejs || { echo "Can't create nodejs folder, aborting." 1>&2;exit 1; }
-    npm install terminal-kit
-
-    echo "All necessary packages have been installed. The rest consists of optional packages."
 
     if [[ "$answer_commander" == 1 ]]; then
       echo "Installing Cloud Commander"
@@ -320,7 +317,7 @@ Do you want to install the fixed firmware?"
 
     # Save the state
     python3 "$IOTEMPOWER_ROOT"/utils/save_arguments_as_json.py --splitter '=' --path "$IOTEMPOWER_LOCAL"/installation_options.json \
-      general="$answer" cloud_commander="$answer_commander" \
+      core="$answer_core" cloud_commander="$answer_commander" \
       node_red="$answer_node_red" caddy="$answer_caddy" \
       mosquitto="$answer_mqtt" answer_fix_pi_wifi_ap="$answer_fix_pi_wifi_ap" \
       convenience="$answer_convenience" templates="$answer_templates"
