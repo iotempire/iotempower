@@ -1,6 +1,7 @@
 #!/bin/bash
 
-PACKAGE_LIST="mc micro tilde"
+# TODO: What about tealdir ipython xonsh darkhttpd
+PACKAGE_LIST="mc micro tilde tmux"
 to_install=$(filter_packages termux-query $PACKAGE_LIST)
 
 echo "Installing: $to_install..."
