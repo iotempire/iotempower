@@ -3,25 +3,28 @@
 # The base script name provided as an argument
 base_script_name="$1"
 
+shift 1
+
 # Function to call the constructed script name based on OS type
 call_script() {
   os_prefix=$1
+  shift 1
   script="${os_prefix}-${base_script_name}"
   echo "Running script: $script"
-  exec "$script"
+  exec "$script" "$@"
 }
 
 # Check for package managers and environment variables to determine the OS/environment
 if [[ -n "$PREFIX" ]] && command -v apt-get &> /dev/null; then
-  call_script "termux"
+  call_script "termux" "$@"
 elif command -v apt-get &> /dev/null; then
-  call_script "debian"
+  call_script "debian" "$@"
 elif command -v pacman &> /dev/null; then
-  call_script "arch"
+  call_script "arch" "$@"
 elif command -v brew &> /dev/null; then
   # Additional check for macOS using uname
   if [[ "$(uname)" == "Darwin" ]]; then
-    call_script "macos"
+    call_script "macos" "$@"
   else
     echo "brew found, but not running on macOS. Please check your configuration."
   fi

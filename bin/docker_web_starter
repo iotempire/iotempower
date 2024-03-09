@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
-web_update_config
+#web_update_config # should now be done in install
 web_starter &
 mqtt_broker # TODO fix ip

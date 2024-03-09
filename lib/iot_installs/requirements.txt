@@ -1,0 +1,11 @@
+colorama>=0.4.6
+ipython>=8.20.0
+websocket-client>=1.7.0
+iotknit @ git+https://github.com/iotempire/iotknit@0bc4479b104260025372c97b881308fcc1f57243
+platformio>=6.1.13
+psutil>=5.9.8
+pyserial>=3.5
+recommonmark>=0.7.1
+sphinx-bootstrap-theme>=0.8.1
+Sphinx>=7.2.6
+pytest>=8.0.0

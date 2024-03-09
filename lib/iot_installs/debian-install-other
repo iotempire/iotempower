@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PACKAGE_LIST="mc micro tilde"
+PACKAGE_LIST="$@"
 to_install=$(filter_packages debian-query $PACKAGE_LIST)
 
 echo "Installing: $to_install..."

@@ -32,9 +32,9 @@ create_doc() {
 .. _Your home-directory: /cloudcmd/fs$HOME
 
 EOF
-    make man
+    make man SPHINXOPTS=-v
     echo "Generating web-viewable documentation."
-    make html
+    make html SPHINXOPTS=-v
     # TODO: do eventually a matching specific version here
     ln -s -f "$IOTEMPOWER_LOCAL/doc/html/doc/index-pi.html" \
         "$IOTEMPOWER_LOCAL/doc/html/index.html"

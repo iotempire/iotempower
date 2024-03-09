@@ -9,7 +9,8 @@ endif
 
 # You can set these variables from the command line.
 SPHINXOPTS    = -Q
-SPHINXBUILD   = sphinx-build
+#SPHINXBUILD   = sphinx-build
+SPHINXBUILD   = python3 $(shell which sphinx-build)
 BUILDDIR      = "$(IOTEMPOWER_LOCAL)/doc"
 SOURCEDIR     = "$(BUILDDIR)/_src"
 

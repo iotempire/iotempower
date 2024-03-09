@@ -1,0 +1,23 @@
+#!/bin/bash
+
+PACKAGE_LIST="$@"
+to_install=$(filter_packages arch-query $PACKAGE_LIST)
+
+if ! command -v yay &>/dev/null; then
+    yay_install_dir=/tmp/yay_install
+    mkdir -p "$yay_install_dir"
+    pushd . &> /dev/null
+    cd "$yay_install_dir"
+    pacman -S --needed git base-devel
+    git clone https://aur.archlinux.org/yay-bin.git
+    cd yay-bin
+    makepkg -si
+    popd &> /dev/null
+    rm -rf "$yay_install_dir"
+fi
+
+echo "Installing: $to_install..."
+#arch-install $to_install
+yay -S --noconfirm $to_install
+echo "Installation of $to_install complete."
+

@@ -99,7 +99,7 @@ function init_nodejs() {
     mkdir -p nodejs && cd nodejs || { echo "Can't create nodejs folder, aborting." 1>&2;exit 1; }
     # if package.json does not exist, run nmp init to create it
 
-    npm init -y
+    npm init -y > /dev/null
 }
 
 # make installers available in PATH
@@ -216,7 +216,7 @@ else
       answer_cache=$?
 
       # check if this is a raspberry pi
-      if lscpu | grep -q "Raspberry Pi"; then # TODO: this is does not work on pi
+      if vcgencmd version &> /dev/null; then
         # activate minimal firmware
         echo_message_read_answer "$(printf "%b\n" \
           "In order to support a larger amount of connected devices,"\
@@ -256,7 +256,7 @@ else
     source "$IOTEMPOWER_VPYTHON/bin/activate"
     pip install --no-cache-dir --upgrade pip
     # dependencies
-    pip install --no-cache-dir -r "$IOTEMPOWER_ROOT/bin/requirements.txt"
+    pip install --no-cache-dir -r "$IOTEMPOWER_ROOT/lib/iot_installs/requirements.txt"
 
     # access point - TODO: make this optional
     git clone https://github.com/ulno/create_ap "$IOTEMPOWER_EXTERNAL/create_ap"
@@ -299,8 +299,8 @@ else
     init_nodejs
     echo "Installing Node Red"
     npm install --unsafe-perm node-red
-    mkdir ~/.node-red/
-    cp "$IOTEMPOWER_LOCAL"/nodejs/node_modules/node-red/settings.js ~/.node-red/
+    mkdir -p "$HOME/.node-red"
+    cp "$IOTEMPOWER_LOCAL"/nodejs/node_modules/node-red/settings.js "$HOME/.node-red/"
     nodered_config=~/.node-red/settings.js
 
     if ! grep -q "module.exports.httpAdminRoot = '/nodered';" "$nodered_config" ; then
@@ -333,7 +333,8 @@ EOF
 
   if [[ "$answer_convenience" == 1 ]]; then
     echo "Installing convenience tools"
-    call_by_system install-convenience
+    call_by_system install-other tmux mc micro tilde
+    # consider installing convenience settings for mc (add user-menu to it)
   fi # convenience
 
   if [[ "$answer_templates" == 1 ]]; then
@@ -350,6 +351,7 @@ EOF
     unbreak_ap_limit # TODO: integrate correctly, and check if we are on the pi
   fi # fix wifi raspi
 
+  # fix shebangs for environments like termux
   bash "$IOTEMPOWER_ROOT/bin/fix_bin"
 
   # activate iot script
@@ -361,9 +363,8 @@ EOF
   fi # cache
 
   # compile man-pages and html-pages of documentation
-  bash -x iot_doc make
-  exit 0 # debug
-
+  iot_doc make
+  
   # add permissions to access serial port for current user
   iot_add_serial_permissions
 
