@@ -3,8 +3,8 @@ LABEL authors="Ulrich Norbisrath <devel@mail.ulno.net>, Araz Heydarov"
 
 ENV HOME=/home/iot
 
-# add new iot user with the iot command as shell
-RUN useradd -ms $HOME/bin/iot iot
+# add new iot user with the iot command as shell (will complain that it doesn't find shell)
+RUN useradd -ms $HOME/bin/iot iot 2>/dev/null
 
 # Use DEBIAN_FRONTEND=noninteractive to suppress debconf warnings.
 ENV DEBIAN_FRONTEND=noninteractive 
@@ -59,19 +59,5 @@ WORKDIR $HOME
 
 EXPOSE 1883 40080
 
-# TODO: iot-systems template like on pi
-# for building run: 
-# docker build -t ulno/iotempower:$(cat VERSION) -t ulno/iotempower:latest . # dot at end
-# if you forget to tag it as latest, you can run this:
-# docker tag ulno/iotempower:$(cat VERSION) ulno/iotempower:latest
-#
-# to run: 
-# docker run -d -p 40080:40080 -p 1883:1883 --name iotempower-test ulno/iotempower
-#
-# to push to docker hub:
-# docker push ulno/iotempower:$(cat VERSION)
-# docker push ulno/iotempower:latest
-#
 # TODO:
-# - fix IP detection for mosquitto
 # - integrate home directory as volumes nicely - maybe only share iot-systems?
