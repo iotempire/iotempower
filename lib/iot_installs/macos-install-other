@@ -2,6 +2,8 @@
 
 PACKAGE_LIST="$@"
 
+# elinks is not maintained anymore, needs felinks on mac
+
 to_install=$(filter_packages macos-query-nonexists $PACKAGE_LIST) # check if exists
 to_install=$(filter_packages macos-query $to_install)
 echo "Installing: $to_install..."
