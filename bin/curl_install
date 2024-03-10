@@ -2,8 +2,8 @@
 # This can be called as:
 # curl -L bit.ly/iotempower | bash -
 # If you use -s, you can add parameters to the install script
-# (all the ones that iot_install understand)
-# Example: curl -L bit.ly/iotempower | bash -s x bin/iot_install --quiet
+# (all the ones that iot_install understand,, --something commands have to be added after --)
+# Example: curl -L bit.ly/iotempower | bash -s -- --quiet
 
 command -v git &>/dev/null || { 
     echo "git is not installed. Please install it."
@@ -14,7 +14,5 @@ command -v git &>/dev/null || {
 git clone https://github.com/iotempire/iotempower "$HOME/iot"
 cd "$HOME/iot" || exit 1
 git config pull.rebase false
-#bash run "$@" < /dev/tty
-# TODO test if termux still allows directly calling run x bin/iot_install
-bash run x bin/iot_install "$@"< /dev/tty
+bash run x bin/iot_install "$@" < /dev/tty
 
