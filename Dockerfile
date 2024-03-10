@@ -13,13 +13,18 @@ WORKDIR $HOME
 # Use apt-get for a stable CLI interface and suppress warning messages.
 USER root
 # as we are doing a "desktop" install, we need sudo
+# a bit more for debbugging
 RUN apt-get update -y && \
-    apt-get install -y --no-install-recommends sudo
+    apt-get install -y --no-install-recommends sudo \
+        git net-tools psmisc iproute2 less vim \
+        nano \
+        apt-utils gnupg ca-certificates && \
+    update-ca-certificates
 
 # Copy the local repository into the image, excluding what's listed in .dockerignore
 COPY . $HOME/iot
 
-# # get iot script into bin
+# # get iot script into bin - now in installer
 # RUN mkdir -p $HOME/bin
 # COPY examples/scripts/iot $HOME/bin
 
@@ -55,6 +60,18 @@ WORKDIR $HOME
 EXPOSE 1883 40080
 
 # TODO: iot-systems template like on pi
-# for building run: docker build -t ulno/iotempower:0.9.0 .
-# to run: docker run -d -p 40080:40080 -p 1883:1883 --name iotempower-test ulno/iotempower:0.9.0
-# fix IP detection for mosquitto
+# for building run: 
+# docker build -t ulno/iotempower:$(cat VERSION) -t ulno/iotempower:latest .
+# if you forget to tag it as latest, you can run this:
+# docker tag ulno/iotempower:$(cat VERSION) ulno/iotempower:latest
+#
+# to run: 
+# docker run -d -p 40080:40080 -p 1883:1883 --name iotempower-test ulno/iotempower
+#
+# to push to docker hub:
+# docker push ulno/iotempower:$(cat VERSION)
+# docker push ulno/iotempower:latest
+#
+# TODO:
+# - fix IP detection for mosquitto
+# - integrate home directory as volumes nicely - maybe only share iot-systems?

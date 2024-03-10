@@ -25,7 +25,11 @@ if ! debian-query curl > /dev/null; then
 fi
 
 # check nodejs version
-installed_version=$(node -v | sed 's/v//') # Remove the 'v' prefix from version
+if command -v node &> /dev/null; then
+    installed_version=$(node -v 2>/dev/null| sed 's/v//') # Remove the 'v' prefix from version
+else
+    installed_version="0.0.0"
+fi
 
 # Define the minimum required version
 min_version="21"
@@ -38,7 +42,8 @@ if [[ "$installed_version" && "$(printf "%s\n%s" "$min_version" "$installed_vers
         echo "Node.js version is higher than the minimum required version $min_version."
     fi
 else
-    echo "Node.js version $installed_version is installed, does not meet the minimum required version $min_version."
+    echo "Node.js version is $installed_version, and "
+    echo "does not meet the minimum required version $min_version."
     # install current node.js   
     curl -fsSL "https://deb.nodesource.com/setup_""$min_version"".x" | bash -
 fi
@@ -54,9 +59,9 @@ echo "Installation of $to_install complete."
 # curl git mosquitto python-virtualenv rsync haveged jq # general
 # ./arch-install iptables bridge-utils hostapd dnsmasq # router and networking
 
-# ./arch-install mc micro # this is optional: mc is nicer file management in cli, micro a nicer editor than nano
-
-# sudo systemctl stop mosquitto
-# sudo systemctl disable mosquitto
+if command -v systemctl > /dev/null; then # docker does not have systemctl
+    sudo systemctl stop mosquitto
+    sudo systemctl disable mosquitto
+fi
 
 

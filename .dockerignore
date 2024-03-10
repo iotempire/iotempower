@@ -19,7 +19,7 @@ external/
 
 etc/iotempower.conf
 etc/yaota8266-keys/
-.local
+.local*
 
 .directory
 .vscode

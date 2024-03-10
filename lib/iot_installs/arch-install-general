@@ -10,12 +10,6 @@ echo "Installation of $to_install complete."
 # curl git mosquitto python-virtualenv rsync haveged jq # general
 # ./arch-install iptables bridge-utils hostapd dnsmasq # router and networking
 
-# ./arch-install mc micro # this is optional: mc is nicer file management in cli, micro a nicer editor than nano
-
-# sudo systemctl stop mosquitto
-# sudo systemctl disable mosquitto
-
-
 #     #   install_package_if_missing "apt-utils"
 #     #   install_package_if_missing "make"
 #     #   install_package_if_missing "git"
