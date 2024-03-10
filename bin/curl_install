@@ -1,14 +1,17 @@
 #!/usr/bin/env bash
+# This can be called as:
+# curl -L https://bit.ly/iotempower | bash -s
+#| you can add --quiet behind bash -s like --quiet (all the ones that iot_install understand)
+
 command -v git &>/dev/null || { 
     echo "git is not installed. Please install it."
     echo "On Debian systems, you can do this using 'sudo apt update && sudo apt install git'."; 
     exit 1 
     }
 
-git clone https://github.com/iotempire/iotempower ~/iot
-cd ~/iot || exit 1
+git clone https://github.com/iotempire/iotempower "$HOME/iot"
+cd "$HOME/iot" || exit 1
 git config pull.rebase false
 bash run "$@" < /dev/tty
 
-# TODO: make sure user is in uucp or dialout group
-# TODO: add iot to binary folder and PATH
+
