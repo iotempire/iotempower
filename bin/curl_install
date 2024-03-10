@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # This can be called as:
-# curl -L https://bit.ly/iotempower | bash -s
+# curl -L bit.ly/iotempower | bash -s
 #| you can add --quiet behind bash -s like --quiet (all the ones that iot_install understand)
 
 command -v git &>/dev/null || { 
