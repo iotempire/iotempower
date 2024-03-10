@@ -1,2 +1,2 @@
 #!/bin/bash
-exec brew info "$@" &> /dev/null
+exec brew list "$@" &> /dev/null

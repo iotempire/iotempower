@@ -1,8 +1,9 @@
 #!/bin/bash
 
-PACKAGE_LIST="mc micro tilde $@"
-to_install=$(filter_packages termux-query $PACKAGE_LIST)
+PACKAGE_LIST="$@"
 
+to_install=$(filter_packages macos-query-nonexists $PACKAGE_LIST) # check if exists
+to_install=$(filter_packages macos-query $to_install)
 echo "Installing: $to_install..."
 macos-install $to_install
 echo "Installation of $to_install complete."

@@ -1,0 +1,3 @@
+#!/bin/bash
+exec brew info "$@" &> /dev/null
+test 1 -ne 0
