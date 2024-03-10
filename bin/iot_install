@@ -208,7 +208,7 @@ else
       answer_mqtt=$?
 
       echo_message_read_answer "${optional_message} convenience tools (tmux, mc, micro, tilde, elinks)"
-      answer_mqtt=$?
+      answer_convenience=$?
 
       echo_message_read_answer "Do you want to setup the iot-systems template folder"
       answer_templates=$?
