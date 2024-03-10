@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # This can be called as:
 # curl -L bit.ly/iotempower | bash -s
-#| you can add --quiet behind bash -s like --quiet (all the ones that iot_install understand)
+# You can add --quiet behind bash -s -- like --quiet
+# (all the ones that iot_install understand)
+# Example: curl -L bit.ly/iotempower | bash -s -- --quiet
 
 command -v git &>/dev/null || { 
     echo "git is not installed. Please install it."
