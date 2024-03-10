@@ -2,6 +2,16 @@
 
 # TODO: potentially also install sudo?
 
+# check if sudo is installed
+if ! debian-query sudo > /dev/null; then
+    echo "sudo is not installed, no packages can be installed."
+    echo "Either install all dependencies yourself or install sudo"
+    echo "and add yourself to the sudo group."
+    echo "Lots of error messages will potentially follow."
+    echo
+    exit 1
+fi
+
 # check if curl is installed
 if ! debian-query curl > /dev/null; then
     echo "curl is not installed, installing. Please wait..."

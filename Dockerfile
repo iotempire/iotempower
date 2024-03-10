@@ -12,19 +12,16 @@ WORKDIR $HOME
 
 # Use apt-get for a stable CLI interface and suppress warning messages.
 USER root
+# as we are doing a "desktop" install, we need sudo
 RUN apt-get update -y && \
-    apt-get install -y \
-    ca-certificates git procps psmisc iproute2 less net-tools \
-    mc nano vim micro elinks \
-    --no-install-recommends && \
-    update-ca-certificates
+    apt-get install -y --no-install-recommends sudo
 
 # Copy the local repository into the image, excluding what's listed in .dockerignore
 COPY . $HOME/iot
 
-# get iot script into bin
-RUN mkdir -p $HOME/bin
-COPY examples/scripts/iot $HOME/bin
+# # get iot script into bin
+# RUN mkdir -p $HOME/bin
+# COPY examples/scripts/iot $HOME/bin
 
 # make iot script executable
 ENV PATH="$PATH:$HOME/bin"

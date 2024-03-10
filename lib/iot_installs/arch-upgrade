@@ -1,2 +1,3 @@
 #!/bin/bash
+echo Upgrading all installed packages.
 exec sudo pacman -Su
