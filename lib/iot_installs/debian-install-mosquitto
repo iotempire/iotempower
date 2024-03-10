@@ -8,7 +8,10 @@ debian-install $to_install
 echo "Installation of $to_install complete."
 
 # TODO: ask if this should be done?
-sudo systemctl stop mosquitto
-sudo systemctl disable mosquitto
+if command -v systemctl > /dev/null; then # docker does not have systemctl
+    sudo systemctl stop mosquitto
+    sudo systemctl disable mosquitto
+fi
+
 
 

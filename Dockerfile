@@ -61,7 +61,7 @@ EXPOSE 1883 40080
 
 # TODO: iot-systems template like on pi
 # for building run: 
-# docker build -t ulno/iotempower:$(cat VERSION) -t ulno/iotempower:latest .
+# docker build -t ulno/iotempower:$(cat VERSION) -t ulno/iotempower:latest . # dot at end
 # if you forget to tag it as latest, you can run this:
 # docker tag ulno/iotempower:$(cat VERSION) ulno/iotempower:latest
 #
