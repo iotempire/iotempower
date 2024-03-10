@@ -16,5 +16,5 @@ cd "$HOME/iot" || exit 1
 git config pull.rebase false
 #bash run "$@" < /dev/tty
 # TODO test if termux still allows directly calling run x bin/iot_install
-bash run bin/iot_install "$@"< /dev/tty
+bash run x bin/iot_install "$@"< /dev/tty
 
