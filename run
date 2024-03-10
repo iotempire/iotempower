@@ -110,7 +110,7 @@ function install() {
     echo "Installing now."
     echo
     bash "$IOTEMPOWER_ROOT/bin/iot_install"
-    run upgrade
+    # run upgrade should not be necessary anymore - TODO: verify
 }
 
 function run() {
