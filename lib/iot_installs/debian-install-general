@@ -48,7 +48,8 @@ else
     curl -fsSL "https://deb.nodesource.com/setup_""$min_version"".x" | bash -
 fi
 
-PACKAGE_LIST="build-essential git mosquitto-clients virtualenv python3-venv python3-dev make rsync haveged jq nodejs"
+# procps allows pkill and ps
+PACKAGE_LIST="build-essential git procps mosquitto-clients virtualenv python3-venv python3-dev make rsync haveged jq nodejs"
 to_install=$(filter_packages debian-query $PACKAGE_LIST)
 
 echo "Installing: $to_install..."

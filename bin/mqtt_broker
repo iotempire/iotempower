@@ -4,7 +4,7 @@ cat << EOF
 Syntax: mqtt_broker [interface]
 
 mqtt_broker starts a local mosquitto-mqtt-server corresponding to parameters
-set in iotempower/etc/iotempower.conf. If an interfae is given it overwrited
+set in iotempower/etc/iotempower.conf. If an interface is given it overwrites
 the listener address with this interface.
 EOF
 exit 1
