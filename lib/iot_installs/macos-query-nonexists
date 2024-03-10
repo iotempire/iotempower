@@ -1,5 +1,6 @@
 #!/bin/bash
-if exec brew info "$@" &> /dev/null; then
+# test if given package is not in installable package list
+if brew info "$@" &> /dev/null; then
     exit 1
 else
     exit 0
