@@ -24,32 +24,50 @@ if ! debian-query curl > /dev/null; then
     echo "curl has been installed successfully"
 fi
 
-# check nodejs version
-if command -v node &> /dev/null; then
-    installed_version=$(node -v 2>/dev/null| sed 's/v//') # Remove the 'v' prefix from version
-else
-    installed_version="0.0.0-notinstalled"
-fi
-
 # Define the minimum required version
 min_version="21"
 
-# Use sort with version sort flag to compare versions, and check the first line
-if [[ "$installed_version" && "$(printf "%s\n%s" "$min_version" "$installed_version" | sort -V | head -n1)" = "$min_version" ]]; then
-    if [ "$installed_version" = "$min_version" ] || [ "$(printf "%s\n%s" "$min_version" "$installed_version" | sort -V | head -n2 | tail -n1)" = "$installed_version" ]; then
-        echo "Node.js version $installed_version is installed, meets the minimum required version $min_version."
+function check_node() {
+    # check nodejs version
+    if command -v node &> /dev/null; then
+        installed_version=$(node -v 2>/dev/null| sed 's/v//') # Remove the 'v' prefix from version
     else
-        echo "Node.js version is higher than the minimum required version $min_version."
+        installed_version="0.0.0-notinstalled"
     fi
-else
-    echo "Node.js version is $installed_version, and "
-    echo "does not meet the minimum required version $min_version."
-    # install current node.js - seems to need suddenly sudo # TODO: check other install methods
-    curl -fsSL "https://deb.nodesource.com/setup_""$min_version"".x" | sudo bash -
+    # Use sort with version sort flag to compare versions, and check the first line
+    if [[ "$installed_version" && "$(printf "%s\n%s" "$min_version" "$installed_version" | sort -V | head -n1)" = "$min_version" ]]; then
+        if [ "$installed_version" = "$min_version" ] || [ "$(printf "%s\n%s" "$min_version" "$installed_version" | sort -V | head -n2 | tail -n1)" = "$installed_version" ]; then
+            echo "Node.js version $installed_version is installed, meets the minimum required version $min_version."
+        else
+            echo "Node.js version is higher than the minimum required version $min_version."
+        fi
+        return 0 # all good
+    else
+        echo "Node.js version is $installed_version, and "
+        echo "does not meet the minimum required version $min_version."
+        return 1
+    fi
+}
+
+if ! check_node; then
+    # # the curl thing seems broken
+    # # install current node.js - seems to need suddenly sudo # TODO: check other install methods
+    # curl -fsSL "https://deb.nodesource.com/setup_""$min_version"".x" | sudo bash -
+
+    echo "Trying to install current node version."
+    sudo apt-get install -y ca-certificates curl gnupg
+    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
+    NODE_MAJOR=$min_version
+    echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list
+    sudo apt-get update && sudo apt-get install nodejs -y
+    if ! check_node; then
+        echo "A current node version could not be installed."
+        exit 1
+    fi
 fi
 
 # procps allows pkill and ps
-PACKAGE_LIST="build-essential git procps mosquitto-clients virtualenv python3-venv python3-dev make rsync haveged jq nodejs"
+PACKAGE_LIST="build-essential git procps mosquitto-clients virtualenv python3-venv python3-dev make rsync haveged jq"
 to_install=$(filter_packages debian-query $PACKAGE_LIST)
 
 echo "Installing: $to_install..."
@@ -64,4 +82,4 @@ if command -v systemctl > /dev/null; then # docker does not have systemctl
     sudo systemctl disable mosquitto
 fi
 
-
+exit 0

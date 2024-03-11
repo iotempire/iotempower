@@ -102,6 +102,11 @@ function init_nodejs() {
     npm init -y > /dev/null
 }
 
+function check_pi() {
+  # check if this is a raspberry pi - TODO: seems not to work, verify
+  vcgencmd version &> /dev/null
+}
+
 # make installers available in PATH
 export PATH="$IOTEMPOWER_ROOT/lib/iot_installs:$PATH"
 
@@ -183,8 +188,12 @@ else
 		answer_node_red=1
 		answer_caddy=1
 		answer_mqtt=1
-		answer_fix_pi_wifi_ap=0
-    answer_convenience=0
+    if check_pi; then
+      answer_fix_pi_wifi_ap=1
+    else
+  		answer_fix_pi_wifi_ap=0
+    fi
+    answer_convenience=1
     answer_templates=1
     answer_cache=0
     answer_upgrade=1
@@ -219,8 +228,7 @@ else
         )" n
       answer_cache=$?
 
-      # check if this is a raspberry pi
-      if vcgencmd version &> /dev/null; then
+      if check_pi; then
         # activate minimal firmware
         echo_message_read_answer "$(printf "%b\n" \
           "In order to support a larger amount of connected devices,"\
@@ -252,7 +260,10 @@ else
   fi
 
   if [[ "$answer_core" == 1 ]]; then
-    call_by_system install-general
+    if ! call_by_system install-general; then
+      echo "Installation of general requirements failed. Aborting installation."
+      exit 1
+    fi
     # python2 seems not to be necessary anymore
     # # TODO: recheck, installation seems to fail first time -> path problems (wrong pip used?)
     # # install virtualenv for python2 for platformio
