@@ -28,7 +28,7 @@ fi
 if command -v node &> /dev/null; then
     installed_version=$(node -v 2>/dev/null| sed 's/v//') # Remove the 'v' prefix from version
 else
-    installed_version="0.0.0"
+    installed_version="0.0.0-notinstalled"
 fi
 
 # Define the minimum required version
