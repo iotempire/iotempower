@@ -13,15 +13,29 @@ fi
 
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
-config="local"
-if [[ "$1" == "full" ]]; then
-    config="full"
-fi
+# Function to add prefix to logs
+function add_prefix {
+    while IFS= read -r line; do
+        echo "[$1] $line"
+    done
+}
 
-cloudcmd_starter &
-nodered_starter &
+# Function to handle cleanup
+function cleanup {
+    echo
+    echo "Caught SIGINT signal. Stopping all services..."
+    kill $(jobs -p)
+    echo "All jobs should be stopped now. Exiting."
+    exit 0
+}
 
-while true; do
-    caddy run --adapter caddyfile --config "$IOTEMPOWER_ROOT/etc/caddyfile.$config"
-    sleep 1
-done
+# Trap SIGINT
+trap cleanup SIGINT
+
+# Start your services with prefixed logs
+cloudcmd_starter 2>&1| add_prefix "cloudcmd" &
+nodered_starter 2>&1 | add_prefix "nodered" &
+caddy_starter 2>&1 | add_prefix "caddy" &
+
+# Wait for all background jobs to finish
+wait

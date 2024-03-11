@@ -19,19 +19,19 @@ rm -rf "$APTEMP" &> /dev/null
 mkdir -p "$APTEMP"
 while true; do
 
-if [[ "$1" ]]; then
-    IF="$1"
-    if [[ "$IF" = "scanif" ]]; then
-        # scan for network interface
-        IF=$(ip -o link show | awk -F': ' '!/lo:/{sub(/@.*$/, "", $2); print $2; exit}')
+    if [[ "$1" ]]; then
+        IF="$1"
+        if [[ "$IF" = "scanif" ]]; then
+            # scan for network interface
+            IF=$(ip -o link show | awk -F': ' '!/lo:/{sub(/@.*$/, "", $2); print $2; exit}')
+        fi
+        export IOTEMPOWER_MQTT_HOST=$(ip a show "$IF"|grep " inet "|head -n1|cut -dt -f2|cut -d\  -f2|cut -d/ -f1)
     fi
-    export IOTEMPOWER_MQTT_HOST=$(ip a show "$IF"|grep " inet "|head -n1|cut -dt -f2|cut -d\  -f2|cut -d/ -f1)
-fi
 
-echo "Listening on $IOTEMPOWER_MQTT_HOST."
+    echo "Listening on $IOTEMPOWER_MQTT_HOST."
 
-# create mosquitto config
-cat << EOF > "$APTEMP/mosquitto.conf"
+    # create mosquitto config
+    cat << EOF > "$APTEMP/mosquitto.conf"
 pid_file $APTEMP/pid
 persistence false
 persistence_location $APTEMP/mosquitto.db
@@ -43,11 +43,11 @@ listener 1883 $IOTEMPOWER_MQTT_HOST
 allow_anonymous true
 EOF
 
-# create bridge
-if [ "$IOTEMPOWER_MQTT_BRIDGE_HOST" ]; then
+    # create bridge
+    if [ "$IOTEMPOWER_MQTT_BRIDGE_HOST" ]; then
 
-# bridge config based on example in http://owntracks.org/booklet/guide/bridge/
-cat << EOF >> "$APTEMP/mosquitto.conf"
+    # bridge config based on example in http://owntracks.org/booklet/guide/bridge/
+    cat << EOF >> "$APTEMP/mosquitto.conf"
 connection bridge-to-$IOTEMPOWER_MQTT_BRIDGE_HOST
 bridge_capath $IOTEMPOWER_MQTT_BRIDGE_CERTPATH
 bridge_insecure false
@@ -62,7 +62,7 @@ try_private true
 topic # both 2 ${IOTEMPOWER_MQTT_BRIDGE_TOPIC}/ ${IOTEMPOWER_MQTT_BRIDGE_TOPIC}/
 EOF
 
-fi # bridge-config
+    fi # bridge-config
 
     echo "Stopping all existing services."
     pkill mosquitto

@@ -1,0 +1,24 @@
+#!/bin/bash
+if [[ $# -gt 1 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
+cat << EOF
+Syntax: caddy_starter
+
+Start caddy webserver in a loop (restart when exit).
+If first parameter is full, it starts caddy on port 80 and 443.
+
+EOF
+exit 1
+fi
+
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
+
+config="local"
+if [[ "$1" == "full" ]]; then
+    config="full"
+fi
+
+while true; do
+    caddy run --adapter caddyfile --config "$IOTEMPOWER_ROOT/etc/caddyfile.$config"
+    sleep 1
+done
+
