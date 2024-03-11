@@ -48,7 +48,7 @@ Convenience tools are optional but we recommend them because. Midnight Commander
 .. code-block:: bash
 
    # On your terminal, run the following line:
- ``curl -L https://bit.ly/iotempower | bash -s -- --quiet``
+   curl -L https://bit.ly/iotempower | bash -s -- --quiet
 
 After the installation is finished, open a new terminal, and just run ``iot`` from anywhere
 or you can also run ``bash run`` in the iot directory.
