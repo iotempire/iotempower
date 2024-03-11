@@ -23,7 +23,7 @@ while true; do
         IF="$1"
         if [[ "$IF" = "scanif" ]]; then
             # scan for network interface
-            IF=$(ip -o link show | awk -F': ' '!/lo:/{sub(/@.*$/, "", $2); print $2; exit}')
+            IF=$(ip -o link show | awk -F': ' '$2 != "lo" && $9 == "UP" {sub(/@.*/, "", $2); print $2; exit}')
         fi
         export IOTEMPOWER_MQTT_HOST=$(ip a show "$IF"|grep " inet "|head -n1|cut -dt -f2|cut -d\  -f2|cut -d/ -f1)
     fi
