@@ -22,9 +22,29 @@ while true; do
     if [[ "$1" ]]; then
         IF="$1"
         if [[ "$IF" = "scanif" ]]; then
-            # scan for network interface
-            IF=$(ip -o link show | awk -F': ' '$2 != "lo" && $9 == "UP" {sub(/@.*/, "", $2); print $2; exit}')
+            # Get all non-loopback, UP interfaces
+            interfaces=$(ip -o link show | awk '$2 != "lo:" && $9 == "UP" {print $2}' | sed 's/://')
+
+            # Check each interface for a local IP address, prefer the first one found
+            for intf in $interfaces; do
+                if ip -o addr show $intf | grep -q "inet "; then
+                    interface=$intf
+                    break
+                fi
+            done
+
+            # If no interface with a local IP is found, use the first UP interface
+            if [ -z "$interface" ]; then
+                interface=$(echo "$interfaces" | head -n 1)
+            fi
+
+            IF=$interface
+
+            # Print the interface name
+            echo "Preferred interface: $interface"
+
         fi
+
         export IOTEMPOWER_MQTT_HOST=$(ip a show "$IF"|grep " inet "|head -n1|cut -dt -f2|cut -d\  -f2|cut -d/ -f1)
     fi
 
