@@ -5,7 +5,8 @@ Syntax: mqtt_broker [interface]
 
 mqtt_broker starts a local mosquitto-mqtt-server corresponding to parameters
 set in iotempower/etc/iotempower.conf. If an interface is given it overwrites
-the listener address with this interface.
+the listener address with this interface. If the option scanif is given it will
+try to guess the interface itself.
 EOF
 exit 1
 fi
@@ -16,9 +17,15 @@ source <( iot_env ignore_system )
 APTEMP="$IOTEMPOWER_LOCAL/tmp/mosquitto"
 rm -rf "$APTEMP" &> /dev/null
 mkdir -p "$APTEMP"
+while true; do
 
 if [[ "$1" ]]; then
-    export IOTEMPOWER_MQTT_HOST=$(ip a show "$1"|grep " inet "|head -n1|cut -dt -f2|cut -d\  -f2|cut -d/ -f1)
+    IF="$1"
+    if [[ "$IF" = "scanif" ]]; then
+        # scan for network interface
+        IF=$(ip -o link show | awk -F': ' '!/lo:/{sub(/@.*$/, "", $2); print $2; exit}')
+    fi
+    export IOTEMPOWER_MQTT_HOST=$(ip a show "$IF"|grep " inet "|head -n1|cut -dt -f2|cut -d\  -f2|cut -d/ -f1)
 fi
 
 echo "Listening on $IOTEMPOWER_MQTT_HOST."
@@ -57,7 +64,6 @@ EOF
 
 fi # bridge-config
 
-while true; do
     echo "Stopping all existing services."
     pkill mosquitto
     sleep 1

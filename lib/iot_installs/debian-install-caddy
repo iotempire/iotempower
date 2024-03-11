@@ -3,6 +3,10 @@
 # check caddy version
 installed_version=$(caddy -v &> /dev/null| sed 's/v//') # Remove the 'v' prefix from version
 
+if [[ -z "$installed_version" ]]; then
+    installed_version="0.0.0-notinstalled"
+fi
+
 # Define the minimum required version
 min_version="2.5"
 
