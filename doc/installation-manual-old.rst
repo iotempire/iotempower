@@ -108,10 +108,9 @@ Installation on Linux (and WSL)
 +++++++++++++++++++++++++++++++
 
 The steps for WSL (Windows Subsystem for Linux) and Linux should be the same.
-For information on how to run IoTempower on a Raspberry Pi, 
-please go to `this link </doc/installation.rst>`__.
 
-We highly recommend against using WSL 2 as the networking is currently
+
+We highly recommend **against** using WSL 2 as the networking is currently
 a total mess and serial ports are nearly unsupported.
 WSL 1 kind of works, though a powerful computer (4 cores and min. 16GB) should still yield better
 results with a lightweight Linux (like xubuntu or xfce manjaro) in a
