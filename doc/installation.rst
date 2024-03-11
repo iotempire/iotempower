@@ -3,10 +3,8 @@ Installation
 ============
 
 There are several ways to get the IoTempower configuration management software
-up and running:
+up and running. The easiest is to run our install script like described below.
 
-Please also check out the tutorial videos for this setup on ulno's youtube
-channel(s): https://www.youtube.com/@ut-teaching-ulno/search?query=gateway
 
 
 Linux, MacOS, Termux and WSL
@@ -55,14 +53,25 @@ After the installation is finished, open a new terminal, and just run ``iot`` fr
 (you can also run ``bash run`` in the iot directory if things go wrong,
 but only for debugging purposes).
 
-
 After successfully entering IoTempower (the prompt
 should have changed and started now with IoT),
 start configuring your first IoT node,
 see `First IoT Node <first-node.rst>`_.
 
+Manual Installation
+-------------------
 
-Installation on Raspberry Pi with image
+If you do not trust the install via curl, execute the following (and verify after
+cloning the content of bin/iot_install) to do a manual install:
+.. code-block:: bash
+   cd # go to home directory
+   my_iot_folder=iot
+   git clone https://github.com/iotempire/iotempower "$my_iot_folder"
+   cd "$my_iot_folder"
+   bash run
+
+
+Installation on Raspberry Pi with Image
 ---------------------------------------
 
 You can download and flash a pre-prepared Raspberry Pi image to an sd card

@@ -1,4 +1,4 @@
-Please also check out the tutorial videos for this setup on ulno's youtube
+Please also check out the tutorial videos for this setup on ulno's teaching youtube
 channel(s): https://www.youtube.com/@ut-teaching-ulno/search?query=gateway
 
 

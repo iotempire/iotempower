@@ -35,7 +35,7 @@ trap cleanup SIGINT
 # Start your services with prefixed logs
 cloudcmd_starter 2>&1| add_prefix "cloudcmd" &
 nodered_starter 2>&1 | add_prefix "nodered" &
-caddy_starter 2>&1 | add_prefix "caddy" &
+caddy_starter "$@" 2>&1 | add_prefix "caddy" &
 
 # Wait for all background jobs to finish
 wait
