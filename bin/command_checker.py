@@ -114,12 +114,12 @@ if __name__ == "__main__":
                 
                 lib = data.get('lib', None)
                 if lib:
-                    lib = lib.split()
+                    lib = lib.split(',')
                     libs.update(lib)
                 
                 lib_esp32 = data.get('lib_esp32', None)
                 if lib_esp32:
-                    lib_esp32 = lib_esp32.split()
+                    lib_esp32 = lib_esp32.split(',')
                     libs_esp32.update(lib_esp32)
                 
                 extra_code = data.get('extra_code', None)
