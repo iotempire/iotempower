@@ -10,7 +10,7 @@ up and running. The easiest is to run our install script like described below.
 Linux, MacOS, Termux and WSL
 ----------------------------
 
-For all systems, make sure you have **git** and **curl** install.
+For all systems, make sure you have **git** and **curl** installed.
 
 * Arch-based system (like vanilla Arch or Manjaro)
 
