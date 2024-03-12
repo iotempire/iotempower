@@ -90,8 +90,12 @@
 // reserved
 // reserved
 // #define D10 10
-#define SD3 = D10
-#define SDD3 = S10
+#define SD3 D10
+#define SDD3 S10
 // #define D9 9
-#define SD2 = D9
-#define SDD2 = D9
+#define SD2 D9
+#define SDD2 D9
+
+// test pins for IoTempower 
+#define IOT_TEST_INPUT D3
+#define IOT_TEST_OUTPUT D4
