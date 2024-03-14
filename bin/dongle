@@ -9,8 +9,29 @@
 daemon_fifo=/var/tmp/iotempower_dongle
 daemon_port="$daemon_fifo.port"
 
+# Check if a command is provided
+if [[ $# -lt 1 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
+    echo "Error: No command provided."
+    echo "Usage: dongle <command> [options]"
+    echo "Available commands:"
+    
+    # List all commands that match the pattern
+    for cmd in "$IOTEMPOWER_ROOT/bin/dongle_"*".py"; do
+        # Extract the command name without path and .py extension
+        cmd_name=$(basename "${cmd%.*}")
+        echo "  - ${cmd_name#dongle_}"
+    done
+    
+    exit 1
+fi
+
 command="$1"
+
+
 shift 1
+
+
+
 
 function dongle_release() {
     if [[ -e "$daemon_fifo" ]]; then
