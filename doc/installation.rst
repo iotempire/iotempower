@@ -63,7 +63,9 @@ Manual Installation
 
 If you do not trust the install via curl, execute the following (and verify after
 cloning the content of bin/iot_install) to do a manual install:
+
 .. code-block:: bash
+
    cd # go to home directory
    my_iot_folder=iot
    git clone https://github.com/iotempire/iotempower "$my_iot_folder"
