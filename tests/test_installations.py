@@ -34,7 +34,7 @@ packages = [
 #    {"name": "apt-transport-https", "package_manager": "binary", "module": "caddy"},
 #    {"name": "debian-archive-keyring", "package_manager": "binary", "module": "caddy"},
     {"name": "caddy", "package_manager": "binary", "module": "caddy"}, # TODO: also better chek min version here
-    {"name": "mosquitto", "package_manager": "binary", "module": "mosquitto"},
+    {"name": "mosquitto", "package_manager": "binary", "module": "mosquitto_pub"},
 ]
 
 packages_to_test = []
