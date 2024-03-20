@@ -23,6 +23,9 @@ else
     curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | sudo tee /etc/apt/sources.list.d/caddy-stable.list
     debian-update
     debian-install caddy
+    # is started on old ubuntus
+    sudo systemctl stop caddy
+    sudo systemctl disable caddy
     echo "Installation of $to_install complete."
 fi
 
