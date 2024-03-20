@@ -320,3 +320,18 @@ void ulog_internal(const __FlashStringHelper *fmt, ...) {
 long urandom(long from, long upto_exclusive) {
     return random(from, upto_exclusive);
 }
+
+uint16_t toRGB565(uint32_t rgb888) {
+    // Extract individual components
+    uint8_t r = (rgb888 >> 16) & 0xFF; // Extract red component
+    uint8_t g = (rgb888 >> 8) & 0xFF;  // Extract green component
+    uint8_t b = rgb888 & 0xFF;         // Extract blue component
+
+    // Downscale components to fit in 5-6-5 format
+    uint8_t r5 = r >> 3; // Convert 8-bit red to 5-bit red
+    uint8_t g6 = g >> 2; // Convert 8-bit green to 6-bit green
+    uint8_t b5 = b >> 3; // Convert 8-bit blue to 5-bit blue
+
+    // Combine the downscaled components into a single 16-bit value
+    return (r5 << 11) | (g6 << 5) | b5;
+}

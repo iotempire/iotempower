@@ -7,10 +7,12 @@ bool M5StickC_Display::init() {
     M5.begin(true, true, false); // init all but serial
     // M5.Lcd.begin();
     // M5.Axp.begin();
-    M5.Lcd.fillScreen(BLACK);
-//    M5.Lcd.fillScreen(RED);
+    M5.Lcd.setRotation(_rotation);
+    set_color_bg(0,0,0);
+    M5.Lcd.fillScreen(_color_bg);
+    set_color_fg(255,255,255);
     M5.Lcd.setTextSize(_font);
-    M5.Lcd.setTextColor(WHITE);
+    M5.Lcd.setTextWrap(false);
     char_height = M5.Lcd.fontHeight();
     char_width = M5.Lcd.textWidth("W");
     set_fps(10); // can be low for these type of displays and just showing text
@@ -46,6 +48,20 @@ bool M5StickC_Display::init() {
                     command.strip_param();
                     cursor(x,y);
                     if(command.length()==0) return true; // skip newline at end
+                } else if(command.starts_with(F("fg"))) {
+                    command.strip_param();
+                    char *endptr;
+                    long color = strtol(command.as_cstr(), &endptr, 16);
+                    command.strip_param();
+                    set_color_fg(color);
+                    if(command.length()==0) return true; // skip newline at end
+                } else if(command.starts_with(F("bg"))) {
+                    command.strip_param();
+                    char *endptr;
+                    long color = strtol(command.as_cstr(), &endptr, 16);
+                    command.strip_param();
+                    set_color_bg(color);
+                    if(command.length()==0) return true; // skip newline at end
                 } else { // unknown
                     print(F("&&"));
                 }
@@ -78,11 +94,12 @@ void M5StickC_Display::show() {
     int columns = get_columns();
     const char* buffer = get_buffer();
 
-    M5.Lcd.fillScreen(BLACK);
+    M5.Lcd.fillScreen(_color_bg);
+
     for(int y=0; y<lines; y++) {
         for(int x=0; x<columns; x++) {
             charstr[0] = buffer[y * columns + x];
-            M5.Lcd.drawString(charstr, x*char_width, (y+1)*char_height-1 );
+            M5.Lcd.drawString(charstr, x*char_width, y*char_height + 1 );
         }
     }
 }

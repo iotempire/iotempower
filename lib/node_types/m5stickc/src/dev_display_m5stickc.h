@@ -20,16 +20,26 @@ class M5StickC_Display : public Device {
         int _fps;
         unsigned long frame_len;
         unsigned long last_frame=millis();
+        u_int16_t _color_fg;
+        u_int16_t _color_bg;
         int _font = 1;
+        int _rotation = 0;
     protected:
         // allocate text buffer (return true if successful, false otherwise)
         bool init();
         int char_height, char_width;
     public:
         // this only supports the M5StickC displays so far
-        M5StickC_Display(const char* name, int font=1) : Device(name, 1000) { // small font by default
+        M5StickC_Display(const char* name, int font=1, int rotation=0) : Device(name, 1000) { // small font by default
             _tdb = new Text_Display_Buffer();
             _font = font;
+            if(rotation>3) {
+                if(rotation==90) rotation = 1;
+                else if(rotation==180) rotation = 2;
+                else if(rotation==270) rotation = 3;
+                else rotation = 0;
+            }
+            _rotation = rotation;
         }
 
         M5StickC_Display& scroll_up(int lines=1) {_tdb->scroll_up(lines); return *this;};
@@ -42,6 +52,23 @@ class M5StickC_Display : public Device {
         M5StickC_Display& println(const __FlashStringHelper* str) {_tdb->println(str); return *this;}
         M5StickC_Display& cursor(int x, int y) {_tdb->cursor(x,y); return *this;}
         M5StickC_Display& clear() {_tdb->clear(); return *this;};
+
+        void set_color_bg(u_int32_t c) {
+            _color_bg = toRGB565(c);
+        }
+
+        void set_color_bg(u_int8_t r, u_int8_t g, u_int8_t b){
+            set_color_bg((r<<16) + (g<<8) + b);
+        }
+
+        void set_color_fg(u_int32_t c) {
+            _color_fg = toRGB565(c);
+            M5.Lcd.setTextColor(_color_fg);
+        }
+
+        void set_color_fg(u_int8_t r, u_int8_t g, u_int8_t b) {
+            set_color_fg((r<<16) + (g<<8) + b);
+        }
 
         int get_lines() {return _tdb->get_lines();}
         int get_columns() {return _tdb->get_columns();}
@@ -59,10 +86,10 @@ class M5StickC_Display : public Device {
         }
 
         int width_pixels() {
-            return 80;
+            return M5.Lcd.width();
         }
         int height_pixels() {
-            return 160;
+            return M5.Lcd.height();
         }
 
         void show();

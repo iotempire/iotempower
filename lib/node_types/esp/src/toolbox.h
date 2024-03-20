@@ -338,6 +338,8 @@ void controlled_crash(const char * error_message);
 
 long urandom(long from, long upto_exclusive);
 
+uint16_t toRGB565(uint32_t rgb888);
+
 bool is_serial_initialized();
 
 void initialize_serial();
