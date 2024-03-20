@@ -1,16 +1,9 @@
 // display.cpp
-#include <dev_display.h>
+#include <dev_display_i2c.h>
 
 bool Display_Base::init(int w, int h) {
-    set_ignore_case(false); // want to use capital letters
-    columns = w;
-    lines = h;
-    ulog(F("Display with %d columns and %d lines."), columns, lines);
-    // create our own textbuffer
-    textbuffer = (char *)malloc(lines*columns);
-    if(!textbuffer) {
-        ulog(F("Could not allocate textbuffer."));
-        // TODO: anything which should be destructed now?
+    if( ! _tdb->init(w,h) ) {
+        ulog(F("Failed to allocate display buffer."));
         return false;
     }
     add_subdevice(new Subdevice("",true))->with_receive_cb(
@@ -50,96 +43,14 @@ bool Display_Base::init(int w, int h) {
     return true;
 }
 
-Display_Base& Display_Base::scroll_up(int nr_lines) {
-    // TODO: add cyclic scrolling
-    char* from = textbuffer + nr_lines*columns;
-    int block_h = lines-nr_lines;
-    memmove(textbuffer, from, block_h*columns);
-    memset(textbuffer + block_h*columns, ' ', nr_lines*columns);
-    return *this;
-}
-
-Display_Base& Display_Base::print(const char* str) {
-    // TODO: not capped by maxlen -> should not overflow because of Ustring given, but maybe better cap?
-    char ch;
-    while(*str) {
-        ch = *str;
-        switch(ch) {
-            case '\n':
-                cursor_y++;
-                // no break to do next by default
-            case '\r':
-                cursor_x=0;
-                ch=0;
-                break;
-            default:
-                if(ch<' ') ch = ' ';
-                break; 
-        }
-        if(ch!=0) {
-            if(delayed_scroll) {
-                scroll_up(1);
-                delayed_scroll=false;
-            }
-            textbuffer[cursor_y * columns + cursor_x] = ch;
-            changed = true;
-            cursor_x ++;
-            if(cursor_x >= columns) {
-                cursor_x=0;
-                cursor_y++;
-            }
-        }
-        if(cursor_y >= lines) {
-            // if(delayed_scroll) {
-            //     scroll_up(1);
-            // }
-            delayed_scroll=true;
-            cursor_y = lines-1;
-        }
-        str++;
-    }
-    return *this;
-}
-
-Display_Base& Display_Base::print(Ustring& ustr) {
-    return print(ustr.as_cstr());
-}
-
-Display_Base& Display_Base::println() {
-    return print(F("\n"));
-}
-
-Display_Base& Display_Base::println(const char* str) {
-    print(str);
-    return println();
-}
-
-Display_Base& Display_Base::println(Ustring& ustr) {
-    return println(ustr.as_cstr());
-}
-
-Display_Base& Display_Base::cursor(int x, int y) {
-    cursor_x = limit(x, 0, columns-1);
-    cursor_y = limit(y, 0, lines-1);
-    delayed_scroll = false;
-    return *this;
-}
-
-Display_Base& Display_Base::clear() {
-    memset(textbuffer, ' ', lines*columns);
-    changed = true;
-    cursor(0,0);
-    delayed_scroll = false;
-    return *this;
-}
 
 bool Display_Base::measure() {
-    // TODO: only update when changed?
+    // only update when changed
     unsigned long current = millis();
     if(current - last_frame >= frame_len) {
-        if(changed) {
-            show(textbuffer);
-            changed = false;
+        if(_tdb->get_changed()) {
+            show();
+            _tdb->reset_changed();
         }
         last_frame = current;
     }
@@ -161,8 +72,11 @@ bool Display::init_u8g2() {
     return false;
 }
 
-void Display::show(const char* buffer) {
+void Display::show() {
     char charstr[2]=" ";
+    int lines = get_lines();
+    int columns = get_columns();
+    const char* buffer = get_buffer();
     _display->firstPage();
     do {
         for(int y=0; y<lines; y++) {
@@ -196,8 +110,11 @@ void Display_HD44780_I2C::i2c_start() {
     _started = true;
 }
 
-void Display_HD44780_I2C::show(const char* buffer) {
+void Display_HD44780_I2C::show() {
     char charstr[2]=" ";
+    int lines = get_lines();
+    int columns = get_columns();
+    const char* buffer = get_buffer();
     for(int y=0; y<lines; y++) {
         _display->setCursor(0,y);
         for(int x=0; x<columns; x++) {

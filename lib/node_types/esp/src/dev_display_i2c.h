@@ -15,6 +15,7 @@
 #include <SPI.h>
 #include <Wire.h>
 #include <i2c-device.h>
+#include <text_display_buffer.h>
 
 #define font_tiny u8g2_font_4x6_tr
 #define font_medium u8g2_font_5x8_tr
@@ -24,43 +25,32 @@
 
 class Display_Base : public I2C_Device {
     private:
+        Text_Display_Buffer* _tdb;
         int _fps;
         unsigned long frame_len;
         unsigned long last_frame=millis();
-        char* textbuffer;
-        bool changed=true;
     protected:
-        bool delayed_scroll=false;
-        int cursor_x=0, cursor_y=0;
-        int columns;
-        int lines;
         // allocate text buffer (return true if successful, false otherwise)
         bool init(int w, int h);
-
         int char_height, char_width;
     public:
-        Display_Base(const char* name) : I2C_Device(name) { }
+        Display_Base(const char* name) : I2C_Device(name) {
+            _tdb = new Text_Display_Buffer();
+        }
+        Display_Base& scroll_up(int lines=1) {_tdb->scroll_up(lines); return *this;};
+        Display_Base& print(const char* str) {_tdb->print(str); return *this;};
+        Display_Base& print(Ustring& ustr) {_tdb->print(ustr); return *this;};
+        Display_Base& print(const __FlashStringHelper* str) {_tdb->print(str); return *this;}
+        Display_Base& println() {_tdb->println(); return *this;}
+        Display_Base& println(const char* str) {_tdb->println(str); return *this;};
+        Display_Base& println(Ustring& ustr) {_tdb->println(ustr); return *this;};
+        Display_Base& println(const __FlashStringHelper* str) {_tdb->println(str); return *this;}
+        Display_Base& cursor(int x, int y) {_tdb->cursor(x,y); return *this;}
+        Display_Base& clear() {_tdb->clear(); return *this;};
 
-        Display_Base& scroll_up(int lines=1);
-        Display_Base& print(const char* str);
-        Display_Base& print(Ustring& ustr);
-        Display_Base& print(const __FlashStringHelper* str) {
-            Ustring str_u;
-            str_u.from(str);
-            print(str_u);
-            return *this;
-        }
-        Display_Base& println();
-        Display_Base& println(const char* str);
-        Display_Base& println(Ustring& ustr);
-        Display_Base& println(const __FlashStringHelper* str) {
-            Ustring str_u;
-            str_u.from(str);
-            println(str_u);
-            return *this;
-        }
-        Display_Base& cursor(int x, int y);
-        Display_Base& clear();
+        int get_lines() {return _tdb->get_lines();}
+        int get_columns() {return _tdb->get_columns();}
+        const char* get_buffer() {return _tdb->get_buffer();}
 
         void set_fps(int fps) {
             if(fps<1) fps=1;
@@ -74,7 +64,7 @@ class Display_Base : public I2C_Device {
         }
 
         virtual void i2c_start() { }; // keep _started false if this was not overwritten
-        virtual void show(const char* buffer) {};
+        virtual void show() {};
         
         bool measure();
 };
@@ -141,7 +131,7 @@ class Display : public Display_Base {
                     }
             }
         }
-        virtual void show(const char* buffer);
+        virtual void show();
 };
 
 class Display_HD44780_I2C : public Display_Base {
@@ -164,7 +154,7 @@ class Display_HD44780_I2C : public Display_Base {
 
         // TODO: check what happens when we use this together with the I2C hardware pins
 
-        virtual void show(const char* buffer);
+        virtual void show();
 };
 
 // TODO: implement 4bit (7outputs) control of HD44780 display (without I2C adapter)

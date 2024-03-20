@@ -175,8 +175,8 @@ void id_blinker() {
     lasttime = currenttime;
 }
 
-
-#include <dev_display.h>
+// TODO: refactor this out so that it can be overwritten for m5 display
+#include <dev_display_i2c.h>
 Display* ota_display=NULL;
 bool ota_display_present = false;
 

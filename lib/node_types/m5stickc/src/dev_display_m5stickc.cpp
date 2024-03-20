@@ -1,0 +1,83 @@
+// display.cpp
+#include <dev_display_m5stickc.h>
+
+bool M5StickC_Display::init(int w, int h) {
+    set_ignore_case(false); // be case sensitive
+
+    M5.Lcd.setTextSize(_font);
+    M5.Lcd.setTextColor(WHITE);
+    char_height = M5.Lcd.textHeight();
+    char_width = M5.Lcd.textWidth("W");
+    set_fps(10); // can be low for these type of displays and just showing text
+    M5.Lcd.begin();
+    if( !_tdb->init( width_pixels() / char_width, height_pixels() / char_height)) {
+        ulog(F("Failed to allocate display buffer."));
+        return false;
+    }
+
+    clear(); // empty text buffer
+
+    add_subdevice(new Subdevice("",true))->with_receive_cb(
+        [&] (const Ustring& payload) {
+            Ustring command(payload);
+            Ustring subcommand;
+            while(true) {
+                int pos=command.find(F("&&"));
+                if(pos<0) break;
+                subcommand.copy(command, pos);
+                print(subcommand.as_cstr());
+                command.remove(pos+2);
+                if(command.starts_with(F("nl")) || command.starts_with(F("ln"))) {
+                    command.strip_param();
+                    println();
+                } else if(command.starts_with(F("cl"))) {
+                    command.strip_param();
+                    clear();
+                    if(command.length()==0) return true; // skip newline at end
+                } else if(command.starts_with(F("go"))) {
+                    command.strip_param();
+                    int x=command.as_int()-1;
+                    command.strip_param();
+                    int y=command.as_int()-1;
+                    command.strip_param();
+                    cursor(x,y);
+                    if(command.length()==0) return true; // skip newline at end
+                } else { // unknown
+                    print(F("&&"));
+                }
+            }
+            // Anything coming here should usually just be printed
+            println(command.as_cstr());
+            return true;
+        }
+    );
+    return true;
+}
+
+
+bool M5StickC_Display::measure() {
+    unsigned long current = millis();
+    if(current - last_frame >= frame_len) {
+        // only update when changed
+        if(_tdb->get_changed()) {
+            show();
+            _tdb->reset_changed();
+        }
+        last_frame = current;
+    }
+    return false;
+}
+
+void M5StickC_Display::show(const char* buffer) {
+    char c;
+    int lines = get_lines();
+    int columns = get_columns();
+    const char* buffer = get_buffer();
+
+    for(int y=0; y<lines; y++) {
+        for(int x=0; x<columns; x++) {
+            c = buffer[y * columns + x];
+            _display->drawChar(x*char_width, (y+1)*char_height-1, c );
+        }
+    }
+}
