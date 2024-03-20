@@ -6,11 +6,12 @@
 
 #include <M5StickC.h>
 #include <device.h>
-#include <Text_Display_Buffer.h>
+#include <text_display_buffer.h>
 
-#define font_tiny 1
-#define font_medium 2
-#define font_large 3
+// using font sizes here 1-7
+// #define font_tiny 1
+// #define font_medium 2
+// #define font_large 3
 
 
 class M5StickC_Display : public Device {
@@ -22,15 +23,13 @@ class M5StickC_Display : public Device {
         int _font = 1;
     protected:
         // allocate text buffer (return true if successful, false otherwise)
-        bool init(int w, int h);
+        bool init();
         int char_height, char_width;
     public:
         // this only supports the M5StickC displays so far
-        M5StickC_Display(const char* name, int font=1) : Device(name) { // small font by default
+        M5StickC_Display(const char* name, int font=1) : Device(name, 1000) { // small font by default
             _tdb = new Text_Display_Buffer();
             _font = font;
-            M5.begin();
-            M5.Lcd.fillScreen(BLACK);
         }
 
         M5StickC_Display& scroll_up(int lines=1) {_tdb->scroll_up(lines); return *this;};
@@ -60,14 +59,20 @@ class M5StickC_Display : public Device {
         }
 
         int width_pixels() {
-            return 160;
-        }
-        int height_pixels() {
             return 80;
         }
+        int height_pixels() {
+            return 160;
+        }
 
-        virtual void show() {};
+        void show();
         
+        void start() {
+            if (init()) {
+                _started = true;
+            }
+        }
+
         bool measure();
 };
 

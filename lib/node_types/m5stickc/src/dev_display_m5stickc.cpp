@@ -1,15 +1,19 @@
 // display.cpp
 #include <dev_display_m5stickc.h>
 
-bool M5StickC_Display::init(int w, int h) {
+bool M5StickC_Display::init() {
     set_ignore_case(false); // be case sensitive
 
+    M5.begin(true, true, false); // init all but serial
+    // M5.Lcd.begin();
+    // M5.Axp.begin();
+    M5.Lcd.fillScreen(BLACK);
+//    M5.Lcd.fillScreen(RED);
     M5.Lcd.setTextSize(_font);
     M5.Lcd.setTextColor(WHITE);
-    char_height = M5.Lcd.textHeight();
+    char_height = M5.Lcd.fontHeight();
     char_width = M5.Lcd.textWidth("W");
     set_fps(10); // can be low for these type of displays and just showing text
-    M5.Lcd.begin();
     if( !_tdb->init( width_pixels() / char_width, height_pixels() / char_height)) {
         ulog(F("Failed to allocate display buffer."));
         return false;
@@ -68,16 +72,17 @@ bool M5StickC_Display::measure() {
     return false;
 }
 
-void M5StickC_Display::show(const char* buffer) {
-    char c;
+void M5StickC_Display::show() {
+    char charstr[2]=" ";
     int lines = get_lines();
     int columns = get_columns();
     const char* buffer = get_buffer();
 
+    M5.Lcd.fillScreen(BLACK);
     for(int y=0; y<lines; y++) {
         for(int x=0; x<columns; x++) {
-            c = buffer[y * columns + x];
-            _display->drawChar(x*char_width, (y+1)*char_height-1, c );
+            charstr[0] = buffer[y * columns + x];
+            M5.Lcd.drawString(charstr, x*char_width, (y+1)*char_height-1 );
         }
     }
 }
