@@ -25,6 +25,7 @@ cd "$IOTEMPOWER_ROOT/doc"
 
 create_doc() {
     echo "Generating man pages."
+    export LC_ALL=C # fails for some non English language settings else
 
     cat << EOF > $IOTEMPOWER_ROOT/doc/_links.rst
 .. _IoT system example configuration folder: /cloudcmd/fs$HOME/iot-systems/demo01
