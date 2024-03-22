@@ -11,10 +11,7 @@ echo "Installation of $to_install complete."
 # Check if mosquitto binary exists in dpkg -L output
 if dpkg -L mosquitto | grep -q '/usr/sbin/mosquitto'; then
     echo "Mosquitto binary found in /usr/sbin/mosquitto"
-else
     if [[ ! -L "/usr/local/bin/mosquitto" ]]; then
-
-        echo "Mosquitto binary not found in /usr/sbin/mosquitto"
         # Check if /usr/local/bin exists and create symlink
         if [[ ! -d "/usr/local/bin" ]]; then
             sudo mkdir -p "/usr/local/bin"
