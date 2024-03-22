@@ -7,11 +7,26 @@ echo "Installing: $to_install..."
 debian-install $to_install
 echo "Installation of $to_install complete."
 
-# TODO: ask if this should be done?
-if command -v systemctl > /dev/null; then # docker does not have systemctl
-    sudo systemctl stop mosquitto
-    sudo systemctl disable mosquitto
+# Fix for some debian systems where mosquitto is only in /usr/sbin
+# Check if mosquitto binary exists in dpkg -L output
+if dpkg -L mosquitto | grep -q '/usr/sbin/mosquitto'; then
+    echo "Mosquitto binary found in /usr/sbin/mosquitto"
+else
+    if [[ ! -L "/usr/local/bin/mosquitto" ]]; then
+
+        echo "Mosquitto binary not found in /usr/sbin/mosquitto"
+        # Check if /usr/local/bin exists and create symlink
+        if [[ ! -d "/usr/local/bin" ]]; then
+            sudo mkdir -p "/usr/local/bin"
+        fi
+
+        echo "Creating symlink for mosquitto at /usr/local/bin/mosquitto"
+        sudo ln -s "/usr/sbin/mosquitto" "/usr/local/bin/mosquitto"
+    fi
 fi
 
-
-
+# TODO: ask if this should be done?
+if command -v systemctl > /dev/null; then # docker does not have systemctl
+    sudo systemctl stop mosquitto &> /dev/null
+    sudo systemctl disable mosquitto  &> /dev/null
+fi
