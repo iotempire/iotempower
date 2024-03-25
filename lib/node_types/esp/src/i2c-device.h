@@ -34,7 +34,7 @@ class I2C_Device : public Device {
     #endif
         uint8_t sda_pin;
         uint8_t scl_pin;
-        uint8_t _i2c_address = 255; // This is the client device adddress
+        uint8_t _i2c_address = 255; // This is the client device address
         uint8_t _master_address = IOTEMPOWER_DEFAULT_I2C_MASTER_ADDRESS;
         unsigned int clock_speed;
         void init_i2c(uint8_t sda, uint8_t scl, unsigned int clock,

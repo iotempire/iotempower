@@ -113,11 +113,43 @@ class Ustring {
         bool copy(const Ustring& other, int len) {
             return from(other.as_cstr(), len);
         }
+
         bool add(const Ustring& other);
         bool add(const char* other);
         bool add(const __FlashStringHelper* other);
         bool add(char c);
         bool add_hex(uint8_t c);
+        bool add(int i) {
+            Ustring buf;
+            buf.from(i);
+            return add(buf);
+        }
+        bool add(long i) { 
+            Ustring buf;
+            buf.from(i);
+            return add(buf);
+        }
+        bool add(unsigned int i) { 
+            Ustring buf;
+            buf.from(i);
+            return add(buf);
+        }
+        bool add(unsigned long i) { 
+            Ustring buf;
+            buf.from(i);
+            return add(buf);
+        }
+        bool add(float f) { 
+            Ustring buf;
+            buf.from(f);
+            return add(buf);
+        }
+        bool add(double f) {
+            Ustring buf;
+            buf.from(f);
+            return add(buf);
+        }
+
 
         int compare(const char* other) const;
         int compare(const Ustring& other) const { return compare(other.cstr); }
