@@ -126,6 +126,7 @@ class Device {
             const String& extra_json=String());
 #endif
     private:
+        bool requires_precision = false; // usually precision not needed (only for buffers)
         Ustring name; // device name and mqtt-topic extension
         bool _ignore_case = true;
         bool _report_change = true;
@@ -167,6 +168,8 @@ class Device {
         unsigned int subdevices_count() {
             return subdevices.length();
         }
+        void demand_precision() { requires_precision = true; }
+        bool needs_precision() { return requires_precision; }
         Device& with_ignore_case(bool ignore_case) { 
             _ignore_case = ignore_case;
             return *this;
@@ -410,6 +413,13 @@ class Device {
          * TODO: make protected?
          * */
         virtual bool measure() { return true; }
+
+        /* buffer_reset
+         * This usually needs to be overwritten
+         * For input functions this allows to reset the precise buffer if used.
+         * Does nothing by default.
+         */
+        virtual void buffer_reset() {};
 };
 
 // helpers for callbacks

@@ -1,21 +1,18 @@
-// input.h
+// dev_input_digital.h
 // Header File for input device (simple gpio, button, contact)
 
-#ifndef _INPUT_H_
-#define _INPUT_H_
+#ifndef _INPUT_DIGITAL_H_
+#define _INPUT_DIGITAL_H_
 
 #include <Arduino.h>
-#include <device.h>
+#include <dev_input_base.h>
 
 
-
-
-class Input : public Device {
+class Input : public Input_Base {
     private:
         const char* _high;
         const char* _low;
         bool _inverted;
-        int _pin;
         int _threshold;
         bool _pull_up = true;
         int debouncer = 0;
@@ -31,16 +28,14 @@ class Input : public Device {
     public:
         Input(const char* name, int pin, 
             const char* high=str_on, const char* low=str_off, bool inverted = false) :
-            Device(name, 1000) { // faster default pollrate (1ms) than other devices
+            Input_Base(name, pin, 1000) { // faster default pollrate (1ms) than other devices
             _high = high;
             _low = low;
-            _pin = pin;
             _inverted = inverted;
             with_threshold(0);
-            add_subdevice(new Subdevice());
         }
         void start() {
-            _started = true;
+            Input_Base::start();
             reinit();
         }
         bool measure();
@@ -79,6 +74,10 @@ class Input : public Device {
         bool is(const char* test_value) {
             return value().equals(test_value);
         }
+
+        int read() { return fill_buffer(digitalRead(_pin)); }
+        
+
 };
 
-#endif // _INPUT_H_
+#endif // _INPUT_DIGITAL_H_

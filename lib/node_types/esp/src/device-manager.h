@@ -31,7 +31,8 @@ public:
 
     bool add(Device &device);
     bool start();
-    bool update();
+    bool update(bool in_precision_interval);
+    void reset_buffers();
     bool publish(PubSubClient& mqtt_client, Ustring& node_topic, bool publish_all);
     bool subscribe(PubSubClient& mqtt_client, Ustring& node_topic);
     bool publish_discovery_info(PubSubClient& mqtt_client);

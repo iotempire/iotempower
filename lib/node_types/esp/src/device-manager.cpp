@@ -167,15 +167,25 @@ bool DeviceManager::start() {
     return all_success;
 }
 
-bool DeviceManager::update() {
+bool DeviceManager::update(bool in_precision_interval) {
     bool changed = false;
     device_list.for_each( [&] (Device& dev) {
-        if(dev.poll_measure()) {
-            changed |= dev.check_changes();
+        if(dev.needs_precision() == in_precision_interval) { // execute precision devices according to what interval is selected
+            if(dev.poll_measure()) {
+                changed |= dev.check_changes();
+            }
+            if (!in_precision_interval) yield(); // give time if not in precision mode
         }
         return true; // Continue loop
     } );
     return changed;
+}
+
+void DeviceManager::reset_buffers() {
+    device_list.for_each( [&] (Device& dev) {
+        dev.buffer_reset();
+        return true; // Continue loop
+    } );
 }
 
 bool DeviceManager::publish(PubSubClient& mqtt_client, Ustring& node_topic, bool publish_all) {

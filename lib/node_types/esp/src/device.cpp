@@ -99,6 +99,9 @@ void Device::create_discovery_info(const String& type,
 
 ////AsyncMqttClient disabled in favor of PubSubClient
 //bool Device::publish(AsyncMqttClient& mqtt_client, Ustring& node_topic) {
+// As we cannot use AsyncMqttClient (too many conflicts with other libraries that use interrupts)
+// and being archived, we need to assuem for this publish process that no new sensor data will
+// be acquired while publishing.
 bool Device::publish(PubSubClient& mqtt_client, Ustring& node_topic, Ustring& log_buffer) {
     bool published = false;
     Ustring topic;
@@ -201,7 +204,7 @@ bool Device::poll_measure() {
             measure_init(); // something might have to be executed here to init each time, for example i2c-setup
             bool measure_result = measure(); // measure new value or trigger physical update
 //            ulog("poll measure val: %s, %lu", name.as_cstr(), _pollrate_us); // TODO: remove/debug
-            yield(); // measure might have taken long, give some time to system TODO: do we have to take care of mqtt here too?
+//            yield(); // measure might have taken long, give some time to system TODO: do we have to take care of mqtt here too? - only yield in unprecision interval
             measure_exit(); // something might have to be executed here to exit each time, for example i2c-exit
             if(measure_result) { // new value generated
                 if(_ignore_case) { // if necessary, lower them all

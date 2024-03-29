@@ -776,7 +776,7 @@ void setup() {
     #ifdef ESP32
     // TODO: anything equivalent for ESP32 necessary?
     #else
-    WiFi.setSleepMode(WIFI_NONE_SLEEP); // TODO: check if this works -> for better rgb-strip-smoothness
+    WiFi.setSleepMode(WIFI_NONE_SLEEP); // TODO: check if this works -> for better rgb-strip-smoothness - should be obsolete when using neopixelbus
     #endif
 
     setup_ota();
@@ -822,82 +822,108 @@ void setup() {
 // global variables for loop
 static unsigned long last_transmission = millis();
 static unsigned long last_published = millis();
+static unsigned long last_micros = micros();
 static unsigned long last_measured = millis();
 static unsigned long transmission_delta = 5000;
-static unsigned long current_time;
+static unsigned long current_micros = micros();
+static unsigned long current_time = millis();
+static unsigned long precision_delta = 0;
+static unsigned long unprecision_delta = 1000;
+bool in_precision_interval = false;
 
 void transmission_interval(int interval) {
     transmission_delta = ((unsigned long)interval) * 1000;
 }
 
+void precision_interval(int interval, int unprecision_interval=-1) {
+    if(unprecision_interval==-1) {
+        unprecision_interval = interval*2;
+    }
+    precision_delta = interval;
+    unprecision_delta = unprecision_interval;
+}
+
 // main loop managing the cooperative multitasking
 void loop() {
-    yield(); // do necessary things for  maintaining WiFi and other system tasks
+    //yield(); // do necessary things for  maintaining WiFi and other system tasks
+    // yield at start of loop doesn't make sense by its definition
 
     // TODO: make sure nothing weird happens -> watchdog
     //MDNS.update(); TODO: needed???
-    ArduinoOTA.handle();
     current_time = millis();
-    if (!reconfig_mode_active) { // not in reconfig mode -> normal mode
-        ////AsyncMqttClient disabled in favor of PubSubClient
-        // if(mqtt_just_connected) {
-        //     mqtt_just_connected = ! // only set to true when publish successful
-        //         device_manager.publish_discovery_info(mqttClient); // needs to happen here not to collide with other publishes
-        // }
-        
-        // TODO: enable PJON, when UDP works on esp8266 
-        // // handle pjon communication
-        // pjon_bus.update();
-        // //ulog(F("Packages left: %d"), pjon_bus.update());
-        // pjon_bus.receive();
-
-        do_later_check(); // work the scheduler
-
-        // Network connection maintainance
-        if(WiFi.status() != WL_CONNECTED) { /// No WiFi connection
-            if(wifi_connected) { // It was before
-                onWifiDisconnect();
-            }
-        } else { // WiFi connection exists
-            if(!wifi_connected) { // It was not connected before
-                onWifiConnect();
-            }
-            maintain_mqtt();
-        } // end WiFi exists
-
+    if (!reconfig_mode_active) { // not in reconfig mode -> normal mode after boot
+        current_micros = micros();
+        in_precision_interval = (current_micros - last_micros) < precision_delta;
         // update physical connections as often as possible (they have their own pollrate built in)
-        device_manager.update();
+        device_manager.update(in_precision_interval);
         current_time = millis(); // device update might have taken time, so update
+        if(!in_precision_interval) {
+            ////AsyncMqttClient disabled in favor of PubSubClient
+            // if(mqtt_just_connected) {
+            //     mqtt_just_connected = ! // only set to true when publish successful
+            //         device_manager.publish_discovery_info(mqttClient); // needs to happen here not to collide with other publishes
+            // }
+            
+            // TODO: enable PJON, when UDP works on esp8266 
+            // // handle pjon communication
+            // pjon_bus.update();
+            // //ulog(F("Packages left: %d"), pjon_bus.update());
+            // pjon_bus.receive();
 
-        // sent out new values if measured (and time isn't too low)
-        if (mqttClient.connected()) {
-            if (current_time - last_published >= MIN_PUBLISH_TIME_MS) {
-                // go through devices and send reports if necessary
-                if (transmission_delta > 0 &&
-                    current_time - last_transmission >=
-                        transmission_delta) {
-                    if (device_manager.publish(mqttClient, node_topic, true)) {
-                        ulog(F("Free memory: %ld"),ESP.getFreeHeap());
-                        last_transmission = current_time;
-                        last_published = current_time;
-                    }
-                } else { // no full transmission necessary
-                    if (device_manager.publish(mqttClient, node_topic, false)) {
-                        last_published = current_time;
-                    }
-                } // endif transmission delta
-            } // endif update delay
-        } else {
-            // ulog(F("Trouble connecting to mqtt server."));
-            // Don't block here with delay as other processes might
-            // be running in background
-            // TODO: wait a bit before trying to reconnect.
-        } // endif mqtt connect
-        // mqtt_client->yield(_loop_delay);
-        // iotempower_loop(); // TODO: think if this can actually be
-        // skipped in the iotempower-philosophy -> maybe move to driver
-        // callbacks
+            ArduinoOTA.handle(); // check for firmware update requests
+
+            do_later_check(); // work the scheduler
+
+            // Network connection maintainance
+            if(WiFi.status() != WL_CONNECTED) { /// No WiFi connection
+                if(wifi_connected) { // It was before
+                    onWifiDisconnect();
+                }
+            } else { // WiFi connection exists
+                if(!wifi_connected) { // It was not connected before
+                    onWifiConnect();
+                }
+                maintain_mqtt();
+            } // end WiFi exists
+
+            // sent out new values if measured (and time isn't too low)
+            if (mqttClient.connected()) {
+                // careful, we are not reading any new sensor data during the publishing process
+                // That means, if we have sesnsors that need to monitor data over time
+                if (current_time - last_published >= MIN_PUBLISH_TIME_MS) {
+                    // go through devices and send reports if necessary
+                    if (transmission_delta > 0 &&
+                        current_time - last_transmission >=
+                            transmission_delta) {
+                        if (device_manager.publish(mqttClient, node_topic, true)) {
+                            ulog(F("Free memory: %ld"),ESP.getFreeHeap());
+                            last_transmission = current_time;
+                            last_published = current_time;
+                        }
+                    } else { // no full transmission necessary
+                        if (device_manager.publish(mqttClient, node_topic, false)) {
+                            last_published = current_time;
+                        }
+                    } // endif transmission delta
+                } // endif update delay
+            } else {
+                // ulog(F("Trouble connecting to mqtt server."));
+                // Don't block here with delay as other processes might
+                // be running in background
+                // TODO: wait a bit before trying to reconnect.
+            } // endif mqtt connect
+            // mqtt_client->yield(_loop_delay);
+            // iotempower_loop(); // TODO: think if this can actually be
+            // skipped in the iotempower-philosophy -> maybe move to driver
+            // callbacks
+        } // endif in_precision_interval
+        if(current_micros - last_micros > precision_delta + unprecision_delta){
+            last_micros = micros();
+            device_manager.reset_buffers();
+        }
     } else { // reconfig mode is active
+        ArduinoOTA.handle(); // check for firmware update requests
+
         #ifdef ID_LED
         // flashing very rapidly
         if (wifi_connected && current_time - last_measured >= 80) {

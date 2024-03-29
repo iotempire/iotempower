@@ -1,8 +1,8 @@
-// input.cc
-#include "dev_input.h"
+// dev_input_digital.cpp
+#include "dev_input_digital.h"
 
 bool Input::measure() {
-    if(digitalRead(_pin)) {
+    if(read()) {
         debouncer ++;
         if(debouncer > _threshold * 2 - 1)
             debouncer = _threshold * 2 - 1; 
