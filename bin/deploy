@@ -53,7 +53,7 @@ fi
 export IOTEMPOWER_DEPLOY=active
 
 # use tmp directory as refreshed at restart/crash
-LOCK="/tmp/.net.ulno.iotempower.deploy_lock"
+LOCK="$TMPDIR/.net.ulno.iotempower.deploy_lock"
 
 FAILED_NODES="failed_nodes.txt"
 
