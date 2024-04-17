@@ -1,4 +1,4 @@
-#!/bin/env bashbash
+#!/bin/env bash
 if [[ "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF
 Syntax: mqtt_broker [interface]
