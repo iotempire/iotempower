@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/env bash
 
 # if not available, install all dependencies
 # and also allow to fix shebangs in local bin folder

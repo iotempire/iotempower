@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/env bash
 
 # check caddy version
 installed_version=$(caddy -v &> /dev/null| sed 's/v//') # Remove the 'v' prefix from version

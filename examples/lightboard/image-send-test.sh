@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/env bash
 SERVER=192.168.12.1
 
 mqtt_send lightboard00/imagelist \

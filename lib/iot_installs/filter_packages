@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/env bash
 
 # Script or command to call
 called_script="$1"

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/env bash
 
 PACKAGE_LIST="caddy"
 to_install=$(filter_packages arch-query $PACKAGE_LIST)

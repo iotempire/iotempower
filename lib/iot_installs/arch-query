@@ -1,2 +1,2 @@
-#!/bin/bash
+#!/bin/env bash
 exec pacman -Q "$@"

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/env bash
 
 # The base script name provided as an argument
 base_script_name="$1"

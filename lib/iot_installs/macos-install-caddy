@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/env bash
 if command -v caddy >/dev/null; then
     if apt list 2>/dev/null | grep '\[installed'  |grep -q caddy; then
         echo "Caddy is installed"

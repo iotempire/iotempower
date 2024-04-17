@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/env bash
 
 # TODO: What about tealdir ipython xonsh darkhttpd
 PACKAGE_LIST="mc micro tilde tmux"

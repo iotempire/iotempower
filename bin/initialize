@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/env bashbash
 if [[ $# -gt 3 || $# -eq 0 ||"$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF
 Syntax: initialize|adopt uiot-node-id-nL-mS|serial [port] [force]

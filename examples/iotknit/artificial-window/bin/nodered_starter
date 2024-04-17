@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/env bashbash
 export DISPLAY=:0
 while true; do
     sleep 2

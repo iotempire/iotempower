@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/env bashbash
 export PATH="/home/pi/iot/examples/iotknit/artificial-window/bin/:$PATH"
 nodered_starter &
 browser_starter &

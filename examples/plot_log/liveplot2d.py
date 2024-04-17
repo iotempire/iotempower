@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/bin/env python3
 # tail a file into a plot
 #
 # take parameter of filename

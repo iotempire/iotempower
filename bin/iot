@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/env bash
 # enable local bin and python environment in modified shell
 #
 

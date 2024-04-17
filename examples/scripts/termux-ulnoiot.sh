@@ -1,4 +1,4 @@
-#!/data/data/com.termux/files/usr/bin/bash
+#!/data/data/com.termux/files/usr/bin/env bash
 # Get dependencies for iotempower in termux
 apt update
 apt upgrade

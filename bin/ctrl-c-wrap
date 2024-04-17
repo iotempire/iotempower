@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/env bash
 # wrap given command to trap ctrl-c and kill cleanly
 
 interrupt () {

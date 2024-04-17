@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/bin/env python
 #
 # Communicate with the IoTempower esp dongle
 # and display some text on the locally connected display

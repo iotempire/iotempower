@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/env bash
 topic="test1"
 file1="$HOME/tmp/temp1-new.log"
 file2="$HOME/tmp/temp2-new.log"

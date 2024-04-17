@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/env bash
 # find esp port
 #
 # scan ports to see if there is an esp

@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/env bash
 
 echo "Trying to enable serial port access for the currently logged in user $USER."
 

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/env bash
 MY_PATH=`dirname "$0"`
 cd "$MY_PATH"
 MY_PATH=`pwd`

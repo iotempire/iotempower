@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/bin/env python
 # Do a rough tokenization of the given input source file and check which
 # of the given commands are used in this code.
 # Prints out the found commands as a list of defines to be included.

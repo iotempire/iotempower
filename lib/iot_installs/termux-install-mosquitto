@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/env bash
 
 PACKAGE_LIST="mosquitto"
 to_install=$(filter_packages debian-query $PACKAGE_LIST)

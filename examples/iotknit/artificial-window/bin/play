@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/env bashbash
 loop=""
 if [[ "$1" == loop ]]; then
     stop_play  # stop others when loop requested

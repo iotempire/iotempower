@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/env bash
 # TODO: as iotempower documentation is now created in sphinx, consider retiring this
 
 if [[ $# -gt 0 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then

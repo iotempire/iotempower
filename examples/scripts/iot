@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/env bash
 # Example script for starting the IoT Empower environment
 # Modify IOTEMPOWER_ROOT accordingly to your setup
 #

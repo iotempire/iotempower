@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/env bashbash
 cd ~/iot/examples/iotknit/artificial-window/iotknit/
 while true; do
     sleep 7

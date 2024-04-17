@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/env bash
 
 if [[ $# -ne 0 ]]; then
 cat << EOF

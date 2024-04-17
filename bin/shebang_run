@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/env bash
 # fixes problems with shebangs (if this shebang here is fixed)
 # will try to start a symbolically linked corresponing binary in ../bin
 #
