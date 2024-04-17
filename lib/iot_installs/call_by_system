@@ -15,12 +15,12 @@ call_script() {
 }
 
 # Check for package managers and environment variables to determine the OS/environment
-if [[ -n "$PREFIX" ]] && command -v apt-get &> /dev/null; then
+if command -v pacman &> /dev/null; then
+  call_script "arch" "$@"
+elif [[ -n "$PREFIX" ]] && command -v apt-get &> /dev/null; then
   call_script "termux" "$@"
 elif command -v apt-get &> /dev/null; then
   call_script "debian" "$@"
-elif command -v pacman &> /dev/null; then
-  call_script "arch" "$@"
 elif command -v brew &> /dev/null; then
   # Additional check for macOS using uname
   if [[ "$(uname)" == "Darwin" ]]; then
