@@ -1,7 +1,7 @@
-// mpr121.h
+// dev_barometer_bmp180.h
 // Header File for controlling the mpr121 capacitive touch sensor
 
-#ifndef _IOTEMPOWER_MPR121_H_
+#ifndef _IOTEMPOWER_BMP180_H_
 #define _IOTEMPOWER__H_
 
 #include <Arduino.h>
