@@ -1,4 +1,4 @@
-#!/bin/env python3
+#!/usr/bin/env python3
 # This is an mqtt controlle for the lightboard of the IoTInArts-GMU-project
 
 # work on images in python

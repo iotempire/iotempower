@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/usr/bin/env bash
 
 # Un-break the 8 client AP limit on some RPi boards by activating "minimal" broadcom firmware, 
 # bumping the new limit up to 20.

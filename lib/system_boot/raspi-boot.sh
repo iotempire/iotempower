@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/usr/bin/env bash
 # Run a raspberry pi as iotempower gateway (wifi router and mqtt_broker)
 #
 # To enable this,

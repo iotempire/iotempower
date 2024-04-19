@@ -1,2 +1,2 @@
-#!/bin/env bash
+#!/usr/bin/env bash
 exec brew list "$@" &> /dev/null

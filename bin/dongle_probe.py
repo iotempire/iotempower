@@ -1,4 +1,4 @@
-#!/bin/env python
+#!/usr/bin/env python
 #
 # Check if an IoTempower dongle is on the given port
 

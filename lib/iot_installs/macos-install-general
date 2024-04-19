@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/usr/bin/env bash
 
 # install curl if necessary
 if ! macos-query curl > /dev/null; then

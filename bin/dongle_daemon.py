@@ -1,4 +1,4 @@
-#!/bin/env python
+#!/usr/bin/env python
 #
 # Communicate with the IoTempower esp dongle
 # implement some watchdog functions
