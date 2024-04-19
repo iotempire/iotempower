@@ -835,29 +835,44 @@ void transmission_interval(int interval) {
     transmission_delta = ((unsigned long)interval) * 1000;
 }
 
-void precision_interval(int interval, int unprecision_interval=-1) {
-    if(unprecision_interval==-1) {
-        unprecision_interval = interval*2;
+void set_precision_interval(long interval_us, long unprecision_interval_us=-1) {
+    if(unprecision_interval_us<0) {
+        unprecision_interval_us = interval_us*2;
     }
-    precision_delta = interval;
-    unprecision_delta = unprecision_interval;
+    // if called several times, pick always the biggest
+    if(precision_delta < interval_us)
+        precision_delta = interval_us;
+    if(unprecision_delta < unprecision_interval_us)
+        unprecision_delta = unprecision_interval_us;
+    ulog(F("precision_delta: %lu, unprecision_delta: %lu"), precision_delta, unprecision_delta);
 }
+
+// Variables for performance metrics
+unsigned long performance_last_reset_time = 0;
+const unsigned long performance_interval = 5000; // Interval of 5 seconds in milliseconds
+unsigned long performance_iteration_count = 0;
+double performance_total_execution_time = 0; // Total execution time in microseconds
 
 // main loop managing the cooperative multitasking
 void loop() {
     //yield(); // do necessary things for  maintaining WiFi and other system tasks
     // yield at start of loop doesn't make sense by its definition
 
+    current_time = millis();
+    current_micros = micros();
+
+    // Start performace timing this iteration
+    unsigned long performance_iteration_start_time = current_micros;
+
+
     // TODO: make sure nothing weird happens -> watchdog
     //MDNS.update(); TODO: needed???
-    current_time = millis();
     if (!reconfig_mode_active) { // not in reconfig mode -> normal mode after boot
-        current_micros = micros();
         in_precision_interval = (current_micros - last_micros) < precision_delta;
         // update physical connections as often as possible (they have their own pollrate built in)
         device_manager.update(in_precision_interval);
-        current_time = millis(); // device update might have taken time, so update
         if(!in_precision_interval) {
+            current_time = millis(); // device update might have taken time, so update (if in precision interval they shoudl barely use time)
             ////AsyncMqttClient disabled in favor of PubSubClient
             // if(mqtt_just_connected) {
             //     mqtt_just_connected = ! // only set to true when publish successful
@@ -917,8 +932,9 @@ void loop() {
             // skipped in the iotempower-philosophy -> maybe move to driver
             // callbacks
         } // endif in_precision_interval
+        current_micros = micros();
         if(current_micros - last_micros > precision_delta + unprecision_delta){
-            last_micros = micros();
+            last_micros = current_micros;
             device_manager.reset_buffers();
         }
     } else { // reconfig mode is active
@@ -937,4 +953,27 @@ void loop() {
         }
         #endif
     } // endif !reconfig_mode_active
+
+    // End performance timing this iteration
+    unsigned long performance_iteration_end_time = micros();
+    double performance_execution_time = performance_iteration_end_time - performance_iteration_start_time;
+    performance_total_execution_time += performance_execution_time;
+    performance_iteration_count++;
+
+    // Check if 5 seconds for performace have passed
+    if (millis() - performance_last_reset_time >= performance_interval) {
+        double performance_average_execution_time = performance_total_execution_time / performance_iteration_count;
+        double performance_average_calls_per_second = performance_iteration_count / 5.0; // Dividing by 5 seconds directly
+
+        // Display the results
+        Serial.print("Average Execution Time (us): ");
+        Serial.println(performance_average_execution_time);
+        Serial.print("Average Calls Per Second: ");
+        Serial.println(performance_average_calls_per_second);
+
+        // Reset for the next interval
+        performance_last_reset_time = millis();
+        performance_iteration_count = 0;
+        performance_total_execution_time = 0;
+    }
 }

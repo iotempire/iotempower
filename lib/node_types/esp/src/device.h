@@ -232,6 +232,7 @@ class Device {
             return set_pollrate_us(rate_us);
         }
         Device& pollrate_us(unsigned long rate_us) { 
+            ulog("Debug: setting pollrate_us: %lu", rate_us); // TODO: remove
             return set_pollrate_us(rate_us);
         }
         Device& set_pollrate(unsigned long rate_ms) { 

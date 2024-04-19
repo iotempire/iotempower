@@ -6,6 +6,7 @@
 //// left (antenna front and up, usb back down)
 // RST
 // A0 ADC 0 SVP?
+// #define A0 36
 #define D0 26
 #define WAKE D0
 #define D5 18
