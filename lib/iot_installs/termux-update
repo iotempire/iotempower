@@ -1,2 +1,2 @@
-#!/usr/bin/env bash
+#!/bin/env bash
 apt-get update

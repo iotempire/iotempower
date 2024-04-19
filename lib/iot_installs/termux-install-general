@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/env bash
 
 # TODO: potentially also install sudo?
 
@@ -16,7 +16,7 @@ if ! termux-query curl > /dev/null; then
     echo "curl has been installed successfully"
 fi
 
-PACKAGE_LIST="which build-essential git mosquitto python python-ensurepip-wheels python-pip python-cryptography make rsync jq nodejs"
+PACKAGE_LIST="which glibc-repo glibc-runner build-essential git mosquitto python python-ensurepip-wheels python-pip python-cryptography make rsync jq nodejs"
 to_install=$(filter_packages debian-query $PACKAGE_LIST)
 
 echo "Installing: $to_install..."
