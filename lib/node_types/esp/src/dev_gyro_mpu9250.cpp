@@ -34,9 +34,9 @@ void Gyro_MPU9250::i2c_start()
                 mpu9250->selfTest[0]);
             ulog(F("y-axis self test: acceleration trim within %f %% of factory value."),
                 mpu9250->selfTest[1]);
-            ulog(F("z-axis self test: acceleration trim within %f %% of factory value."));
+            ulog(F("z-axis self test: acceleration trim within %f %% of factory value."),
                 mpu9250->selfTest[2]);
-            ulog(F("x-axis self test: gyration trim within %f %% of factory value."), 
+            ulog(F("x-axis self test: gyration trim within %f %% of factory value."),
                 mpu9250->selfTest[3], 1); 
             ulog(F("y-axis self test: gyration trim within %f %% of factory value."), 
                 mpu9250->selfTest[4], 1);
@@ -75,14 +75,14 @@ void Gyro_MPU9250::i2c_start()
                 // data to calculate bias and scale.
                 //    mpu9250->magCalMPU9250(mpu9250->magBias, mpu9250->magScale); // TODO: does this need to be activated
                 ulog("AK8963 mag biases (mG)");
-                ulog(mpu9250->magBias[0]);
-                ulog(mpu9250->magBias[1]);
-                ulog(mpu9250->magBias[2]);
+                ulog("magBias: %f", mpu9250->magBias[0]);
+                ulog("magBias: %f", mpu9250->magBias[1]);
+                ulog("magBias: %f", mpu9250->magBias[2]);
 
                 ulog("AK8963 mag scale (mG)");
-                ulog(mpu9250->magScale[0]);
-                ulog(mpu9250->magScale[1]);
-                ulog(mpu9250->magScale[2]);
+                ulog("magScale: %f", mpu9250->magScale[0]);
+                ulog("magScale: %f", mpu9250->magScale[1]);
+                ulog("magScale: %f", mpu9250->magScale[2]);
 
                 _started = true;
             }

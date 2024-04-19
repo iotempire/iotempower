@@ -3,6 +3,7 @@
 #define _IOTEMPOWER_H_
 
 #include <Arduino.h>
+#include "platform_includes.h"
 #include "iotempower-default.h"
 #include "config.h"
 #include "device.h"
