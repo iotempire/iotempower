@@ -72,7 +72,7 @@ Wiring
 
 The Grove sgp30 sensor uses the Grove i2c cable.
 
-More about the `Grove ecosystem <https://wiki.seeedstudio.com/Grove_System/>`__ here.
+More about the Grove ecosystem here: https://wiki.seeedstudio.com/Grove_System/
 
 Grove connector pinout:
 
@@ -88,8 +88,11 @@ Grove connector pinout:
 Resources
 ---------
 
-- `Seeed Studio Grove VOC and eCO2 Gas Sensor WiKi <https://wiki.seeedstudio.com/Grove-VOC_and_eCO2_Gas_Sensor-SGP30/>`_
+Seeed Studio Grove VOC and eCO2 Gas Sensor WiKi: 
+    https://wiki.seeedstudio.com/Grove-VOC_and_eCO2_Gas_Sensor-SGP30
 
-- `Sensirion sgp30 Datasheet <https://sensirion.com/media/documents/984E0DD5/61644B8B/Sensirion_Gas_Sensors_Datasheet_SGP30.pdf/>`_
+Sensirion sgp30 Datasheet: 
+    https://sensirion.com/media/documents/984E0DD5/61644B8B/Sensirion_Gas_Sensors_Datasheet_SGP30.pdf
 
-- `Sensirion sgp30 Product Page <https://sensirion.com/products/catalog/SGP30/>`_
+Sensirion sgp30 Product Page: 
+    https://sensirion.com/products/catalog/SGP30
