@@ -6,3 +6,8 @@
 // #define ONBOARDLED 2
 
 #define RELAIS 5
+
+// test pins for IoTempower
+#define IOT_TEST_INPUT 0
+#define IOT_TEST_OUTPUT RELAIS
+#define IOT_TEST_DIGITAL 1

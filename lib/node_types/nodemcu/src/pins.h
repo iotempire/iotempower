@@ -99,3 +99,4 @@
 // test pins for IoTempower 
 #define IOT_TEST_INPUT D3
 #define IOT_TEST_OUTPUT D4
+#define IOT_TEST_DIGITAL D1
