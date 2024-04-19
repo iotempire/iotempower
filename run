@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/usr/bin/env bash
 # This file might be not executable as is (for example when run in Termux on
 # Android). This file is best run as: bash run
 # (after changing into this iotempower directory)

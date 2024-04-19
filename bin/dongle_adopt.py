@@ -1,4 +1,4 @@
-#!/bin/env python
+#!/usr/bin/env python
 #
 # IoTempower esp dongle adopt/ota driver
 # based on espota.py, modified by ulno

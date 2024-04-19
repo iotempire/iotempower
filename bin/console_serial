@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/usr/bin/env bash
 # open a terminal on the given port (USB..)
 # $1: suggested port or host
 password="$2"

@@ -9,7 +9,9 @@
 #define FLASHBUTTON BUTTON_HOME
 #define ONBOARDLED 10
 #define ONBOARDLED_FULL_GPIO 0
-#define A0 36
+#ifndef A0
+    #define A0 36
+#endif
 
 // test pins for IoTempower
 #define IOT_TEST_INPUT BUTTON_HOME

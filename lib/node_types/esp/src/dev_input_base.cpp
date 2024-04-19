@@ -1,12 +1,13 @@
 // dev_input_base.cpp
 #include "dev_input_base.h"
 
-void precision_interval(int interval, int unprecision_interval=-1);
+void set_precision_interval(long interval_us, long unprecision_interval_us=-1);
 
-Input_Base& Input_Base::precise_buffer(int interval_ms, int reads) {
-    pollrate_us(interval_ms*1000/reads);
-    precision_interval(interval_ms);
+Input_Base& Input_Base::precise_buffer(unsigned long interval_ms, unsigned int reads) {
+    pollrate_us(interval_ms*1000L/reads);
+    set_precision_interval(interval_ms*1000L);
     _precise_reads = reads;
+    demand_precision(); // make sure you end in precision interval
     return *this;
 }
 

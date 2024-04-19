@@ -1,4 +1,4 @@
-#!/bin/env python
+#!/usr/bin/env python
 #
 # Communicate with the IoTempower esp dongle
 # and scan for uiot-node networks

@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/usr/bin/env bash
 # Run a raspberry pi as IoTempower gateway (wifi router and mqtt_broker)
 #
 # network pre-up script -> more documentation in raspi-boot.sh

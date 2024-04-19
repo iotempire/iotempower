@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/usr/bin/env bash
 
 # Initialize a flag to track missing tools
 missing_tools=0
