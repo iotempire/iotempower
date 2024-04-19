@@ -1,4 +1,4 @@
-transmission
+Transmission
 ============
 
 ..  code-block:: cpp
@@ -14,7 +14,7 @@ Parameter
 - ``transmission_interval``: send every transmission_interval seconds a complete
   status update. If ``transmission_interval=0``, send never status updates.
 
-example
+Example
 -------
 
 ..  code-block:: cpp

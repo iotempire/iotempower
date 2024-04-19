@@ -151,8 +151,7 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
 
     if [[ "$port" ]]; then
         echo
-        echo "IMPORTANT:"
-        echo "Please, disconnect the esp from power now (once) to make OTA updates work."
+        echo "OTA updates are now enabled."
     fi
 
 else # started from somewhere else, so search for node.conf in subdirs
