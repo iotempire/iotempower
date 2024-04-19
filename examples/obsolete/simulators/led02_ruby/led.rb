@@ -1,4 +1,4 @@
-#! /bin/env ruby
+#! /usr/bin/env ruby
 
 require 'rubygems'
 require 'mqtt'
@@ -13,8 +13,8 @@ input_array = ARGV
 
 def color_window(color)
   system('clear') 
-  term_width = `/bin/env tput cols`.to_i
-  term_height = `/bin/env tput lines`.to_i
+  term_width = `/usr/bin/env tput cols`.to_i
+  term_height = `/usr/bin/env tput lines`.to_i
   fill_string = ""
 
   for i in 1..term_height

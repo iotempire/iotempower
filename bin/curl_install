@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/usr/bin/env bash
 # This can be called as:
 # curl -L bit.ly/iotempower | bash -
 # If you use -s, you can add parameters to the install script

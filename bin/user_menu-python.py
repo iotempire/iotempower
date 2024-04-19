@@ -1,4 +1,4 @@
-#!/bin/env python
+#!/usr/bin/env python
 """
 A simple shell replacement for doing the most important tasks in iotempower
 in combination with cloudcmd.

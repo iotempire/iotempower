@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/usr/bin/env bash
 # find dongle
 #
 # scan ports to see if there is a dogle connected

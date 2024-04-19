@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/usr/bin/env bash
 
 if [[ "$1" == "multi" ]]; then
     # make sure to install docker-buildx, qemu-user-static, and qemu-user-static-binfmt for multi platform

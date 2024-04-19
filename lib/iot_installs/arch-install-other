@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/usr/bin/env bash
 
 PACKAGE_LIST="$@"
 to_install=$(filter_packages arch-query $PACKAGE_LIST)

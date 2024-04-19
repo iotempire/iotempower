@@ -1,4 +1,4 @@
-// barometer-bmp280.h
+// dev_barometer_bmp280.h
 // Header File for controlling the BMP280 barometer
 
 #ifndef _IOTEMPOWER_BMP280_H_

@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/usr/bin/env bash
 # test if given package is not in installable package list
 if brew info "$@" &> /dev/null; then
     exit 1

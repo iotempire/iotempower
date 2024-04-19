@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/usr/bin/env bash
 # Get all ips of registered devices
 #
 # if parameter ($1) is given, match against that as a topic

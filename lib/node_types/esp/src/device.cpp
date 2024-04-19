@@ -199,8 +199,21 @@ bool Device::publish_discovery_info(PubSubClient& mqtt_client) {
 
 bool Device::poll_measure() {
     if(started()) { // only if device active
-        if( micros() - last_poll >= _pollrate_us) { // only measure so often
-            last_poll = micros();
+        unsigned long current_micros = micros();
+
+        if (current_micros - last_poll >= _pollrate_us) {
+            // Calculate the number of _pollrate_us intervals that have passed
+            unsigned long intervals = (current_micros - last_poll) / _pollrate_us;
+
+            // Update last_poll by adding the total amount of passed intervals
+            last_poll += intervals * _pollrate_us;
+
+            // // Optionally log if intervals > 1, meaning some measures were skipped
+            // if (intervals > 1) {
+            //     ulog(F("Skipping %u measures of %u"), intervals, _pollrate_us);
+            //     // TODO: Note: Ensure logging does not take too long or consider removing it
+            // }
+
             measure_init(); // something might have to be executed here to init each time, for example i2c-setup
             bool measure_result = measure(); // measure new value or trigger physical update
 //            ulog("poll measure val: %s, %lu", name.as_cstr(), _pollrate_us); // TODO: remove/debug

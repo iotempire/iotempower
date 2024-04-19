@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/usr/bin/env bash
 
 # install curl if necessary
 if ! macos-query curl > /dev/null; then
@@ -12,7 +12,7 @@ if ! macos-query curl > /dev/null; then
     echo "curl has been installed successfully"
 fi
 
-PACKAGE_LIST="make gcc git mosquitto python python-pip python-cryptography rsync jq nodejs npm iproute2mac coreutils"
+PACKAGE_LIST="make gcc git mosquitto python python-cryptography rsync jq nodejs npm iproute2mac coreutils"
 to_install=$(filter_packages debian-query $PACKAGE_LIST)
 
 echo "Installing: $to_install..."

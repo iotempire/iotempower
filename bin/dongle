@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/usr/bin/env bash
 # run different IoTempower esp dongle programs
 #
 # TODO: help

@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/usr/bin/env bash
 h=$(date "+%H")
 sudo date -s "$h:$1"
 sleep 0.3  # else timeout in hwclock

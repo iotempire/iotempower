@@ -17,9 +17,9 @@ class Input_Base : public Device {
         Input_Base& _mux(int num_pins, ...);
     protected:
         int _pin=-1;
-        int _precise_reads = 0;
-        int* buffer;
-        int buffer_fill = 0;
+        int _precise_reads = 0; // number of samples to store in buffer
+        int* buffer; // pointer to buffer
+        int buffer_fill = 0; // number of samples currently stored in buffer
     public:
         Input_Base(const char* name, int pin, unsigned long pollrate_us = 10000) :
             Device(name, pollrate_us) { // faster default pollrate (1ms) than other devices
@@ -28,18 +28,19 @@ class Input_Base : public Device {
         }
 
         void buffer_reset();
+        int* get_buffer() { return buffer; }
+        int get_buffer_size() {return buffer_fill; }
         bool measure();
-        Input_Base& precise_buffer(int interval_ms, int reads);
+        Input_Base& precise_buffer(unsigned long interval_ms, unsigned int reads);
 
         int fill_buffer(int val) {
             if (_precise_reads > 0)
             {
-                buffer[buffer_fill] = val;
-                buffer_fill ++;
-                if (buffer_fill > _precise_reads) {
-                    buffer_fill = _precise_reads;
+                // only add if still space
+                if (buffer_fill < _precise_reads) {
+                    buffer[buffer_fill] = val;
+                    buffer_fill ++;
                 }
-
             }
             return val;
         };

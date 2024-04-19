@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/usr/bin/env bash
 #
 # install web services: node-red and cloudcmd
 # if called as install_web uninstall, it will uninstall the services

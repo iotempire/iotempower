@@ -44,3 +44,8 @@
 
 #define D10 10
 #define BUTTON3 D10
+
+// test pins for IoTempower
+#define IOT_TEST_INPUT BUTTON1
+#define IOT_TEST_OUTPUT 13
+#define IOT_TEST_DIGITAL D10
