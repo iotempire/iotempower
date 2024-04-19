@@ -13,3 +13,7 @@
 #ifndef BUZZER
 #define BUZZER 2
 #endif
+
+// test pins for IoTempower
+#define IOT_TEST_INPUT BUTTON_HOME
+#define IOT_TEST_OUTPUT ONBOARDLED

@@ -17,15 +17,15 @@ home automation.
 
 However, it also supports existing IoT deployments and brings
 mechanisms for over the air (OTA) updates and automatic
-multi-device deployment. All with a permissable license (and using only
+multi-device deployment. All with a permissible license (and using only
 libraries with permissable licenses).
 
 If you are impatient and want to dive into it right now, fast forward to
 one of the following:
 
-- `Raspberry Pi Quickstart </doc/quickstart-pi.rst>`_
 - `Installation </doc/installation.rst>`_
 - `First IoT Node </doc/first-node.rst>`_
+- `Raspberry Pi Quickstart </doc/quickstart-pi.rst>`_
 
 .. showcases
 

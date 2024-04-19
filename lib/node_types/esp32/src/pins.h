@@ -91,3 +91,8 @@
 // #define D9 9
 //#define SD2 = D9
 //#define SDD2 = D9
+
+// test pins for IoTempower
+#define IOT_TEST_INPUT 0
+#define IOT_TEST_OUTPUT 16
+#define IOT_TEST_DIGITAL 15
