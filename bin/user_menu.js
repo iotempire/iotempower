@@ -145,7 +145,16 @@ async function choice(items, pre_select=0, pad_last=0) {
 }
 
 function run_command(command, directory = null) {
-    var args = ['-q', '-e', '-c', command, '/dev/null' ];
+    // check for Mac OSX and skip '-c' (command) flag because the Darwin/BSD version
+    // of the script tool does not use this flag!
+    // Darwin/BSD style: script [-aeFfkqr] [-t time] [file [command ...]]
+    // therefore, /dev/null at the end is handled as input to the command and not as redirection of file.
+    var opsys = process.platform;
+    if (opsys == "darwin") {
+        var args = ['-q', '-e', '/dev/null', command ];  
+    } else {
+        var args = ['-q', '-e', '-c', command, '/dev/null' ];
+    }
 //    if(directory)
 //        cmd = 'cd "' + directory + '"; ' + cmd;
     term.wrap("\nRunning ", command, "\n\n");
