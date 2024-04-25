@@ -293,6 +293,16 @@ function adopt() {
     }
 }
 
+function system_configuration(back) {
+    choice([
+    	["Change Wifi-Credentials for your current system (W)", "C", set_wificredentials_systemconf],
+        ["Change Wifi-RouterConfiguration on the Raspberry Pi (P)", "G", wifi_config],
+        ["Back (B,X,ESC)", ["B","X"], back?menu_default:terminate]
+    ], pre_select=-1, pad_last=1);
+}
+function system_configuration_back() {
+    system_configuration(true);
+}
 
 function create_node_template() {
     shell_command_in_path("You are about to create a folder called new-node"
@@ -347,6 +357,13 @@ function wifi_config() {
         "sudo /usr/bin/mcedit /boot/wifi.txt");
 }
 
+function set_wificredentials_systemconf() {
+    shell_command("This will open an editor with the project system configuration file where you can assign the gateway credentials for your project."
+        + " Please make corresponding changes. You will have to power off and on"
+        + " the gateway after this edit to activate the new configuration. "
+        + "\nDo you want to continue editing the WiFi-router configuration for your system?",
+        " set_wificredentials_systemconf");
+}
 
 function advanced(back) {
     choice([
@@ -354,7 +371,6 @@ function advanced(back) {
         ["Initialize Serial (I)", "I", initialize_serial], 
         // confusing - better through shell ["Compile (C)", "C", compile], 
         ["Upgrade (U)", "U", upgrade],
-        ["Change Wifi-Router Configuration (W)", "W", wifi_config],
         ["Shell Escape (S)", "S", shell_escape],
         ["Shutdown/Poweroff (O)", "O", poweroff],
         ["Back (B,X,ESC)", ["B","X"], back?menu_default:terminate]
@@ -378,6 +394,7 @@ function menu_default() {
     choice([
         ["Deploy (D)", "D", deploy], 
         ["Adopt (A)", "A", adopt],
+        ["Configuration (C)", "C", system_configuration],
         ["Create New Node Folder (N)", "N", create_node_template],
         ["Advanced (V)", "V", advanced_back],
         ["Exit (X,ESC)", "X", terminate]
@@ -393,6 +410,9 @@ switch(process.argv[process.argv.length - 1]) {
     case "adopt":
         adopt();
         break;
+    case "system_configuration":
+        system_configuration(false);
+        break;       
     case "create_node_template":
         create_node_template();
         break;
