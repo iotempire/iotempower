@@ -48,6 +48,9 @@ devices = [
     {"device_name": "gyro9250", "example_syntax": "gyro9250(example_name);"},
     {"device_name": "gesture_apds9960", "example_syntax": "gesture_apds9960(example_name);"},
     {"device_name": "sgp30", "example_syntax": "sgp30(example_name);"},
+    {"device_name": "edge_counter", "example_syntax": "edge_counter(example_name, IOT_TEST_DIGITAL);"},
+    {"device_name": "dht", "example_syntax": "dht(example_name, IOT_TEST_DIGITAL);"},
+    {"device_name": "ds18b20", "example_syntax": "ds18b20(example_name, IOT_TEST_DIGITAL);"},
 ]
 
 isolated_combinations_to_test = [
