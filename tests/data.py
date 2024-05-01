@@ -51,11 +51,25 @@ devices = [
     {"device_name": "edge_counter", "example_syntax": "edge_counter(example_name, IOT_TEST_DIGITAL);"},
     {"device_name": "dht", "example_syntax": "dht(example_name, IOT_TEST_DIGITAL);"},
     {"device_name": "ds18b20", "example_syntax": "ds18b20(example_name, IOT_TEST_DIGITAL);"},
+    {"device_name": "servo", "example_syntax": "servo(example_name, IOT_TEST_DIGITAL, 800);"},
+    {"device_name": "acoustic_distance", "example_syntax": "hcsr04(distance, IOT_TEST_DIGITAL, IOT_TEST_DIGITAL_2);"},
+    {"device_name": "laser_distance", "example_syntax": "vl53l0x(example_name);"},
+    {"device_name": "weight_sensor", "example_syntax": "hx711(example_name, IOT_TEST_DIGITAL, IOT_TEST_DIGITAL_2, 419.0, true);"},
+    {"device_name": "light_sensor_1", "example_syntax": "bh1750(example_name);"},
+    {"device_name": "light_sensor_2", "example_syntax": "tsl2561(example_name);"},
+    {"device_name": "capacity_touch", "example_syntax": "mpr121(example_name);"},
+    # {"device_name": "rgb_strip", "example_syntax": "rgb_strip(example_name, 7, WS2812B, IOT_TEST_DIGITAL, GRB);"},
+
 ]
 
 isolated_combinations_to_test = [
     (board, device["device_name"], device["example_syntax"]) for device in devices for board in boards
 ]
+# This additional tests are for the devices which are not supported by all devices
+isolated_combinations_to_test += [
+    (board, "rfid", "mfrc522(example_name);") for board in ["wemos_d1_mini", "nodemcu", "wroom_02", "esp32", "esp32miniki"]
+]
+isolated_combinations_to_test += [("wemos_d1_mini", "rgb_single", "rgb_single(r0, D6, D5, D0, true);")]
 
 rooms = ["room1", "room2", "room3"]
 nodes = ["node1", "node2"]
