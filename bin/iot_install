@@ -14,25 +14,38 @@
 
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
+function printf_format() {
+  format_command="fold -s -w $(tput cols)"
+  if [ $# -gt 0 ]; then
+    printf "$@" | $format_command
+  else # take stdiput
+    $format_command
+  fi 
+}
+
+function echo_format() {
+  echo "$@" | printf_format
+}
+
 function welcome() {
-cat << EOF
+cat << EOF | printf_format
 IoTempower installer
 ====================
 
-Welcome to the IoTempower environment installer. You are just a couple of steps
-from setting up a very simple and accessible system to deploy your own
-Internet of Things (IoT).
+Welcome to the IoTempower environment installer. \
+You are just a couple of steps from setting up a very simple and accessible system \
+to deploy your own Internet of Things (IoT).
 
-Make sure that this is the script from
-https://github.com/iotempire/iotempower/blob/master/bin/curl_install
-and that it clones teh software from https://github.com/iotempire/iotempower
+Make sure that this is the script from \
+https://github.com/iotempire/iotempower/blob/master/bin/curl_install \
+and that it clones the software from https://github.com/iotempire/iotempower
 
-Depending on your system configuration, we will use
-sudo several times to install missing packages and give you access to serial ports.
-Make sure you check above script and files in 
-https://github.com/iotempire/iotempower/tree/master/lib/iot_installs
-to see how we make use of sudo. If you cannot trust this source, please follow
-the manual installation here:
+Depending on your system configuration, we will use \
+sudo several times to install missing packages and give you access to serial ports. \
+Make sure you check above script and files in \
+https://github.com/iotempire/iotempower/tree/master/lib/iot_installs \
+to see how we make use of sudo. If you cannot trust this source, please follow \
+the manual installation here: \
 https://github.com/iotempire/iotempower/blob/master/doc/installation.rst
 
 And now have fun installing IoTempower and welcome to the IoTempire!
@@ -40,20 +53,17 @@ And now have fun installing IoTempower and welcome to the IoTempire!
 EOF
 }
 
-function install_package_if_missing(){
-  if [[ $(which "$1" 2>/dev/null) == "" ]]; then
-    echo "$1 could not be found in your system, installing. Please wait..."
-    apt-get install -y -q --no-install-recommends "$1"
-    # check error and return 1 if not found
-    if [[ $? != 0 ]]; then
-      echo "$1 could not be installed, exiting now."
-      exit 1
-    fi
-    echo "$1 has been installed successfully"
-  fi
-}
 
+# Function to echo a message and read the user's answer.
+#
+# Parameters:
+#     question (str): The question to be echoed.
+#     default (str, optional): The default value if no input is provided. Defaults to 'y'.
+#
+# Returns:
+#     int: Returns 1 if the user input is 'y' or 'Y', 0 if the user input is 'n' or 'N', and asks again if the input is invalid.
 function echo_message_read_answer() {
+    # TODO: this is not comment practice in scripting: 0 is the sign for ok, everything else is an error, needs to be refactored
     local question="$1"
     local default="${2:-y}" # Set 'y' as the default value if not provided
     local reply
@@ -61,13 +71,13 @@ function echo_message_read_answer() {
     # Check default value to adjust the prompt accordingly
     case "$default" in
         y|Y)
-            printf "%s (Y/n)? " "$question"
+            printf_format "%s (Y/n)? " "$question"
             ;;
         n|N)
-            printf "%s (y/N)? " "$question"
+            printf_format "%s (y/N)? " "$question"
             ;;
         *)
-            echo "Invalid default value. Please use 'y' or 'n'."
+            echo_format "Invalid default value. Please use 'y' or 'n'."
             return 2
             ;;
     esac
@@ -85,7 +95,7 @@ function echo_message_read_answer() {
             return 0
             ;;
         *)
-            echo "Invalid input. Please use 'y' or 'n'."
+            echo_format "Invalid input. Please use 'y' or 'n'."
             ask_question "$question" "$default" # Ask again if invalid input
             ;;
     esac
@@ -101,7 +111,8 @@ function init_nodejs() {
 
 function check_pi() {
   # check if this is a raspberry pi - TODO: seems not to work, verify
-  vcgencmd version &> /dev/null
+  #vcgencmd version &> /dev/null
+  grep -q -i "raspberry" /proc/device-tree/model 2> /dev/null
 }
 
 # make installers available in PATH
@@ -109,121 +120,151 @@ export PATH="$IOTEMPOWER_ROOT/lib/iot_installs:$PATH"
 
 # Parsing options
 help_string="Possible options:
-      --clean: clears installations and starts a new environment
-      --quiet: install all dependencies (optional & required)
-      --upgrade: run an upgrade of all installed packages before starting
-      --core: install IoTempower core (deployment and compilation environment)
-      --cloudcmd: install Cloud Commander
-      --node-red: install Node-RED
-      --caddy: install Caddy
-      --mqtt: install Mosquitto
-      --convenience: install mc, micro, and tilde
+      --clean: cleans core installation and starts a new virtual environment removing all locally installed packages
+      --default and --quiet: install all dependencies (optional & required)
+      --upgrade: run a system upgrade of all installed system packages before starting
+      --core: install IoTempower core (platformio, deployment and compilation environment)
+      --cloudcmd: install Cloud Commander web file manager into local environment
+      --node-red: install Node-RED IoT integration platform into local environment
+      --caddy: install Caddy web server into system
+      --mqtt: install Mosquitto mqtt broker into system
+      --convenience: install mc, tmux, micro, tilde, elinks (if possible) into system
       --templates: create iot-systems template
       --cache: pre-fill cache to accelerate compilations
+      --fix-serial: Fix/add serial port permissions for current user
       --fix-pi-wifi-ap: Fix Raspberry Pi wireless firmware for access point usage
       "
+if [[ "$@" == *help* ]]; then # overwrite if help was given
+  set -- "-h"
+fi
 while getopts ":h-:" opt; do
   case $opt in
     h)
-      echo "$help_string"
+      echo_format "$help_string"
       exit 0;;
     -)
       case "${OPTARG}" in
         help)
-          echo "$help_string"
+          echo_format "$help_string"
           exit 0;;
         clean)
           clean=1;;
         quiet)
-          quiet=1;;
+          default=1;;
+        default)
+          default=1;;
         upgrade)
-          answer_upgrade=1;;
+          do_upgrade=1;;
         core)
-          answer_core=1;;
+          install_core=1;;
         cloudcmd)
-          answer_commander=1;;
+          install_cloudcmd=1;;
         node-red)
-          answer_node_red=1;;
+          install_node_red=1;;
         caddy)
-          answer_caddy=1;;
+          install_caddy=1;;
         mqtt)
-          answer_mqtt=1;;
+          install_mqtt=1;;
         convenience)
-          answer_convenience=1;;
+          install_convenience=1;;
         templates)
-          answer_templates=1;;
+          install_template=1;;
         cache)
-          answer_cache=1;;
+          fill_cache=1;;
+        fix-serial)
+          fix_serial_permissions=1;;
         fix-pi-wifi-ap)
-          answer_fix_pi_wifi_ap=1;;
+          fix_pi_wifi_ap=1;;
         *)
-          echo "Invalid option: --${OPTARG}"
+          echo_format "Invalid option: --${OPTARG}"
           exit 1;;
       esac
       ;;
     \?)
-      echo "Invalid option: -$OPTARG"
+      echo_format "Invalid option: -$OPTARG"
       exit 1;;
   esac
 done
 
-
 if [[ "$clean" == 1 ]]; then
-  echo "Deleting external cache."
-  echo
+  # TODO: skip this if quiet is set (and don't make quiet the same as default)')
+  echo_message_read_answer "Are you sure you want to clean all core installation and start a new virtual environment?" "n"
+  if [[ "$?" == 0 ]]; then
+    exit 0
+  fi
+  echo_format "Deleting core environment... "
   rm -rf "$IOTEMPOWER_VPYTHON"
   rm -rf "$IOTEMPOWER_EXTERNAL"
+  echo_format "... done deleting core environment."
+  echo
+  if [ "$#" -eq 1 ]; then # only clean was given, so set to default install with questions after this deletion
+    set --
+  fi
 fi
 
-# check if virtualenv is configured
+# check if virtualenv is already set up
 if [[ -e "$IOTEMPOWER_VPYTHON/bin/activate" ]]; then # check for existing venv
     source "$IOTEMPOWER_VPYTHON/bin/activate"
-else
-	if [[ "$quiet" == 1 ]]; then
-		answer_core=1
-		answer_commander=1
-		answer_node_red=1
-		answer_caddy=1
-		answer_mqtt=1
-    if check_pi; then
-      answer_fix_pi_wifi_ap=1
-    else
-  		answer_fix_pi_wifi_ap=0
-    fi
-    answer_convenience=1
-    answer_templates=1
-    answer_cache=0
-    answer_upgrade=1
-	else
+else # no virtualenv exists, so create new one
+  install_core=1
+fi
+
+if [[ "$default" == 1 ]]; then
+  install_cloudcmd=1
+  install_node_red=1
+  install_caddy=1
+  install_mqtt=1
+  if check_pi; then
+    fix_pi_wifi_ap=1
+  else
+    fix_pi_wifi_ap=0
+  fi
+  install_convenience=1
+  install_template=1
+  fill_cache=0
+  do_upgrade=1
+else # not default
+  if [ "$#" -eq 0 ]; then # no arguments given, so ask what the user wants
     welcome
-    echo_message_read_answer "Do you want to set up IoTempower core (compilation and deployment environment)"
-    answer_core=$?
+    # this is essential for the default installation
+    # echo_message_read_answer "Do you want to set up IoTempower core (compilation and deployment environment)"
+    # install_core=$?
+    echo_format "We are going to set up IoTempower core (compilation and deployment environment)."
+    echo 
+
+    echo_message_read_answer "Do you want to upgrade all system packages before the installation starts"
+    do_upgrade=$?
+
     optional_message="Do you want to install the optional dependency"
-    if [ -z "$answer_commander" ] && [ -z "$answer_node_red" ] &&
-        [ -z "$answer_caddy" ] && [ -z "$answer_mqtt" ] && [ -z "$answer_fix_pi_wifi_ap" ]; then
+    # as we have already checked that there have ben no otehr arguments given, this is not necessary
+    # if [ -z "$install_cloudcmd" ] && [ -z "$install_node_red" ] &&
+    #     [ -z "$install_caddy" ] && [ -z "$install_mqtt" ] && [ -z "$fix_pi_wifi_ap" ]; then
       echo_message_read_answer "${optional_message} CLOUD COMMANDER (Details -> https://cloudcmd.io/)"
-      answer_commander=$?
+      install_cloudcmd=$?
 
       echo_message_read_answer "${optional_message} NODE-RED (Details -> https://nodered.org/)"
-      answer_node_red=$?
+      install_node_red=$?
 
       echo_message_read_answer "${optional_message} CADDY (Details -> https://caddyserver.com/)"
-      answer_caddy=$?
+      install_caddy=$?
 
-      echo_message_read_answer "${optional_message} MOSQUITTO (MQTT broker) (Details -> https://mosquitto.org/)"
-      answer_mqtt=$?
+      echo_message_read_answer "${optional_message} MOSQUITTO MQTT broker (Details -> https://mosquitto.org/)"
+      install_mqtt=$?
 
       echo_message_read_answer "${optional_message} convenience tools (tmux, mc, micro, tilde, elinks)"
-      answer_convenience=$?
+      install_convenience=$?
 
       echo_message_read_answer "Do you want to setup the iot-systems template folder"
-      answer_templates=$?
+      install_template=$?
 
       echo_message_read_answer "$(printf "%b" \
-        "Do you want to pre-populate the compile cache to\n" \
+        "Do you want to pre-populate the compile cache to " \
         "accelerate future compilations (can take a long time)." \
         )" n
-      answer_cache=$?
+      fill_cache=$?
+
+      echo_message_read_answer "Do you want to add permissions for accessing the serial port for your user?"
+      fix_serial_permissions=$?
 
       if check_pi; then
         # activate minimal firmware
@@ -234,175 +275,179 @@ else
           "NB! A maximum of 8 connected clients are supported"\
           "without the use of minimal broadcom firmware."\
           "Do you want to install the fixed firmware?")"
-        answer_fix_pi_wifi_ap=$?
-      fi
+        fix_pi_wifi_ap=$?
+      fi # check pi
+ 
+    # fi # have arguments been given
+  fi # no arguments given, user asked
+fi # not default
 
-      echo_message_read_answer "Do you want to upgrade all packages before the installation starts"
-      answer_upgrade=$?
+# make sure package lists are uptodate
+echo_format "Updating package lists..."
+call_by_system update
+echo_format "Updating package lists done."
+echo
 
-    fi
-  fi
-
-
-
-  # make sure package lists are uptodate
-  echo "Updating package lists..."
-  call_by_system update
-  echo "Updating package lists done."
+if [[ "$do_upgrade" == 1 ]]; then
+  call_by_system upgrade
   echo
+fi
 
-  if [[ "$answer_upgrade" == 1 ]]; then
-    call_by_system upgrade
-    echo
+if [[ "$install_core" == 1 ]]; then
+  # TODO: extract the install_general into its own point
+  if ! call_by_system install-general; then
+    echo_format "Installation of general requirements failed. Aborting installation."
+    exit 1
   fi
+  # python2 seems not to be necessary anymore
+  # # TODO: recheck, installation seems to fail first time -> path problems (wrong pip used?)
+  # # install virtualenv for python2 for platformio
+  # mkdir -p "$IOTEMPOWER_VPYTHON2"
+  # virtualenv -p "$(which python2)" "$IOTEMPOWER_VPYTHON2"
+  # source "$IOTEMPOWER_VPYTHON2/bin/activate"
+  # pip install --upgrade pip
+  #    pip install --upgrade platformio
+  # TODO: go back to normal install, but for now we need version4 (development version)
+  # pip install --upgrade https://github.com/platformio/platformio-core/archive/develop.zip
+  # deactivate # disable python 2 environment
 
-  if [[ "$answer_core" == 1 ]]; then
-    if ! call_by_system install-general; then
-      echo "Installation of general requirements failed. Aborting installation."
-      exit 1
-    fi
-    # python2 seems not to be necessary anymore
-    # # TODO: recheck, installation seems to fail first time -> path problems (wrong pip used?)
-    # # install virtualenv for python2 for platformio
-    # mkdir -p "$IOTEMPOWER_VPYTHON2"
-    # virtualenv -p "$(which python2)" "$IOTEMPOWER_VPYTHON2"
-    # source "$IOTEMPOWER_VPYTHON2/bin/activate"
-    # pip install --upgrade pip
-    #    pip install --upgrade platformio
-    # TODO: go back to normal install, but for now we need version4 (development version)
-    # pip install --upgrade https://github.com/platformio/platformio-core/archive/develop.zip
-    # deactivate # disable python 2 environment
+  # install virtualenv
+  python3 -m venv --system-site-packages "$IOTEMPOWER_VPYTHON"
+  source "$IOTEMPOWER_VPYTHON/bin/activate"
+  pip install --no-cache-dir --upgrade pip
+  # dependencies
+  pip install --no-cache-dir -r "$IOTEMPOWER_ROOT/lib/iot_installs/requirements.txt"
 
-    # install virtualenv
-    python3 -m venv --system-site-packages "$IOTEMPOWER_VPYTHON"
-    source "$IOTEMPOWER_VPYTHON/bin/activate"
-    pip install --no-cache-dir --upgrade pip
-    # dependencies
-    pip install --no-cache-dir -r "$IOTEMPOWER_ROOT/lib/iot_installs/requirements.txt"
+  # access point - TODO: make this optional
+  git clone https://github.com/ulno/create_ap "$IOTEMPOWER_EXTERNAL/create_ap"
+  #cd "$IOTEMPOWER_EXTERNAL/create_ap"
 
-    # access point - TODO: make this optional
-    git clone https://github.com/ulno/create_ap "$IOTEMPOWER_EXTERNAL/create_ap"
-    #cd "$IOTEMPOWER_EXTERNAL/create_ap"
+  # install node.js related stuff
+  init_nodejs
+  npm install terminal-kit
 
-    # install node.js related stuff
-    init_nodejs
-    npm install terminal-kit
+  echo "All core packages have been installed. The rest consists of optional packages."
+fi # core
 
-    echo "All core packages have been installed. The rest consists of optional packages."
-  fi # core
+if [[ "$install_cloudcmd" == 1 ]]; then
+  init_nodejs
+  echo_format "Installing Cloud Commander"
+  # apt-get install g++ -y - Obsolete: should be in build-essential or default on arch
+  npm install gritty
+  npm install cloudcmd
+  # copy menu files
+  cp -a "$IOTEMPOWER_ROOT/lib/gateway_setup/cloudcmd/cloudcmd.menu.js" "$HOME/.cloudcmd.menu.js"
+  cp -a "$IOTEMPOWER_ROOT/lib/gateway_setup/cloudcmd/cloudcmd.json" "$HOME/.cloudcmd.json"
 
-  if [[ "$answer_commander" == 1 ]]; then
-    init_nodejs
-    echo "Installing Cloud Commander"
-    # apt-get install g++ -y - Obsolete: should be in build-essential or default on arch
-    npm install gritty
-    npm install cloudcmd
-    # copy menu files
-    cp -a "$IOTEMPOWER_ROOT/lib/gateway_setup/cloudcmd/cloudcmd.menu.js" "$HOME/.cloudcmd.menu.js"
-    cp -a "$IOTEMPOWER_ROOT/lib/gateway_setup/cloudcmd/cloudcmd.json" "$HOME/.cloudcmd.json"
+  cloudcmd_config=~/.cloudcmd.json
+  jq "$(printf "%s" \
+      '.auth = true | '\
+      '.prefix = "/cloudcmd" | '\
+      '.username = "iot" | '\
+      '.password = "709d553e1a6e0b3f874408865d169870a945ceb25d72be561b7a50a23713d3452aea896e8e24783adcce86fddba087939ae3da9574997334e6362b5e767aa68a" | '\
+      '.algo = "sha512WithRSAEncryption"'\
+    )" \
+    "$cloudcmd_config" > "$cloudcmd_config.new" \
+  || { echo_format "jq failed, aborting." 1>&2;exit 1; }
+  mv "$cloudcmd_config" "$cloudcmd_config.backup" &>/dev/null
+  mv "$cloudcmd_config.new" "$cloudcmd_config"
 
-    cloudcmd_config=~/.cloudcmd.json
-    jq "$(printf "%s" \
-        '.auth = true | '\
-        '.prefix = "/cloudcmd" | '\
-        '.username = "iot" | '\
-        '.password = "709d553e1a6e0b3f874408865d169870a945ceb25d72be561b7a50a23713d3452aea896e8e24783adcce86fddba087939ae3da9574997334e6362b5e767aa68a" | '\
-        '.algo = "sha512WithRSAEncryption"'\
-      )" \
-      "$cloudcmd_config" > "$cloudcmd_config.new" \
-    || { echo "jq failed, aborting." 1>&2;exit 1; }
-    mv "$cloudcmd_config" "$cloudcmd_config.backup" &>/dev/null
-    mv "$cloudcmd_config.new" "$cloudcmd_config"
+  cloudcmd --terminal --terminal-path "$(gritty --path)" --save --no-server
+fi # cloudcmd
 
-    cloudcmd --terminal --terminal-path "$(gritty --path)" --save --no-server
-  fi # commander
+if [[ "$install_node_red" == 1 ]]; then
+  init_nodejs
+  echo_format "Installing Node Red"
+  npm install --unsafe-perm node-red
+  mkdir -p "$HOME/.node-red"
+  cp "$IOTEMPOWER_LOCAL"/nodejs/node_modules/node-red/settings.js "$HOME/.node-red/"
+  nodered_config=~/.node-red/settings.js
 
-  if [[ "$answer_node_red" == 1 ]]; then
-    init_nodejs
-    echo "Installing Node Red"
-    npm install --unsafe-perm node-red
-    mkdir -p "$HOME/.node-red"
-    cp "$IOTEMPOWER_LOCAL"/nodejs/node_modules/node-red/settings.js "$HOME/.node-red/"
-    nodered_config=~/.node-red/settings.js
-
-    if ! grep -q "module.exports.httpAdminRoot = '/nodered';" "$nodered_config" ; then
-      cat << EOF >> "$nodered_config"
+  if ! grep -q "module.exports.httpAdminRoot = '/nodered';" "$nodered_config" ; then
+    cat << EOF >> "$nodered_config"
 module.exports.httpAdminRoot = '/nodered';
 module.exports.httpNodeRoot = '/nodered';
 module.exports.adminAuth= {
-  type: "credentials",
-  users: [{
-      username: "admin",
-      password: "\$2b\$08\$W5LDP3eTaIYjz5iJkKVwMu9JDg3cPFMUvBypMCmYA3fpjYQlzFC4e",
-      permissions: "*"
-  }]
+type: "credentials",
+users: [{
+    username: "admin",
+    password: "\$2b\$08\$W5LDP3eTaIYjz5iJkKVwMu9JDg3cPFMUvBypMCmYA3fpjYQlzFC4e",
+    permissions: "*"
+}]
 };
 EOF
-      echo "Changed $nodered_config."
-    fi # node-red config
+    echo_format "Changed $nodered_config."
+  fi # node-red config
 
-  fi # node-red
+fi # node-red
 
-  if [[ "$answer_caddy" == 1 ]]; then
-    echo "Installing Caddy"
-    call_by_system install-caddy
-  fi # caddy
+if [[ "$install_caddy" == 1 ]]; then
+  echo_format "Installing Caddy"
+  call_by_system install-caddy
+fi # caddy
 
-  if [[ "$answer_mqtt" == 1 ]]; then
-    echo "Installing Mosquitto"
-    call_by_system install-mosquitto
-  fi # mosquitto
+if [[ "$install_mqtt" == 1 ]]; then
+  echo_format "Installing Mosquitto"
+  call_by_system install-mosquitto
+fi # mosquitto
 
-  if [[ "$answer_convenience" == 1 ]]; then
-    echo "Installing convenience tools"
-    call_by_system install-other tmux mc micro tilde elinks
-    # consider installing convenience settings for mc (add user-menu to it)
-  fi # convenience
+if [[ "$install_convenience" == 1 ]]; then
+  echo_format "Installing convenience tools"
+  call_by_system install-other tmux mc micro tilde elinks
+  # consider installing convenience settings for mc (add user-menu to it)
+fi # convenience
 
-  if [[ "$answer_templates" == 1 ]]; then
-    echo "Creating iot-systems folder from template"
-    if [ ! -d "iot-systems" ]; then
-      cp -a "$IOTEMPOWER_ROOT/examples/iot-systems-template" "$HOME/iot-systems"
-    else
-      echo "iot-systems already exists."
-    fi # iot-systems exist?
-  fi # templates
-  
-  if [[ "$answer_fix_pi_wifi_ap" == 1 ]]; then
-    echo "Fix pi wifi ap firmware for more clients."
-    unbreak_ap_limit # TODO: integrate correctly, and check if we are on the pi
-  fi # fix wifi raspi
+if [[ "$install_template" == 1 ]]; then
+  echo_format "Creating iot-systems folder from template"
+  if [ ! -d "iot-systems" ]; then
+    cp -a "$IOTEMPOWER_ROOT/examples/iot-systems-template" "$HOME/iot-systems"
+  else
+    echo_format "iot-systems already exists, skipping the copy."
+  fi # iot-systems exist?
+fi # templates
 
-  # fix shebangs for environments like termux
-  bash "$IOTEMPOWER_ROOT/bin/fix_bin"
+if [[ "$fix_pi_wifi_ap" == 1 ]]; then
+  echo_format "Fix pi wifi ap firmware for more clients."
+  unbreak_ap_limit # TODO: integrate correctly, and check if we are on the pi
+fi # fix wifi raspi
 
-  # activate iot script
-  iot_activate_iot_script
+# fix shebangs for environments like termux
+bash "$IOTEMPOWER_ROOT/bin/fix_bin"
 
-  if [[ "$answer_cache" == 1 ]]; then
-    # populate the cache TODO: potentially integrate with testing
-    update_cache
-  fi # cache
+# activate iot script # TODO: should we expose that as optional?
+iot_activate_iot_script
 
-  # compile man-pages and html-pages of documentation
-  iot_doc make
-  
-  # add permissions to access serial port for current user
+if [[ "$fill_cache" == 1 ]]; then
+  # populate the cache TODO: potentially integrate with testing
+  update_cache
+fi # cache
+
+# compile man-pages and html-pages of documentation
+iot_doc make
+
+# add permissions to access serial port for current user
+if [[ "$fix_serial_permissions" == 1 ]]; then
   iot_add_serial_permissions
+fi
 
-  # Save the state
-  python3 "$IOTEMPOWER_ROOT"/utils/save_arguments_as_json.py --splitter '=' --path "$IOTEMPOWER_LOCAL"/installation_options.json \
-    core="$answer_core" cloud_commander="$answer_commander" \
-    node_red="$answer_node_red" caddy="$answer_caddy" \
-    mosquitto="$answer_mqtt" answer_fix_pi_wifi_ap="$answer_fix_pi_wifi_ap" \
-    convenience="$answer_convenience" templates="$answer_templates" \
-    cache="$answer_cache"
+# Save the state
+python "$IOTEMPOWER_ROOT"/utils/save_arguments_as_json.py --splitter '=' --path "$IOTEMPOWER_LOCAL"/installation_options.json \
+  core="$install_core" cloud_commander="$install_cloudcmd" \
+  node_red="$install_node_red" caddy="$install_caddy" \
+  mosquitto="$install_mqtt" \
+  fix_serial_permissions="$fix_serial_permissions" \
+  fix_pi_wifi_ap="$fix_pi_wifi_ap" \
+  convenience="$install_convenience" \
+  templates="$install_template" \
+  cache="$fill_cache"
 
-  # Testing the installation
-  if ! pytest "$IOTEMPOWER_ROOT"/tests/test_installations.py;
-  then
-    exit 1
-  fi
+# TODO: uninstaller?
+# TODO: make test install specific
+
+# Testing the installation
+if ! pytest "$IOTEMPOWER_ROOT"/tests/test_installations.py;
+then
+  exit 1
 fi
 
 exit 0
