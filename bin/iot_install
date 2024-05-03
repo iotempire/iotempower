@@ -119,21 +119,22 @@ function check_pi() {
 export PATH="$IOTEMPOWER_ROOT/lib/iot_installs:$PATH"
 
 # Parsing options
+# TODO: add quiet or yes option
 help_string="Possible options:
-      --clean: cleans core installation and starts a new virtual environment removing all locally installed packages
-      --default and --quiet: install all dependencies (optional & required)
-      --upgrade: run a system upgrade of all installed system packages before starting
-      --core: install IoTempower core (platformio, deployment and compilation environment)
-      --cloudcmd: install Cloud Commander web file manager into local environment
-      --node-red: install Node-RED IoT integration platform into local environment
-      --caddy: install Caddy web server into system
-      --mqtt: install Mosquitto mqtt broker into system
-      --convenience: install mc, tmux, micro, tilde, elinks (if possible) into system
-      --templates: create iot-systems template
-      --cache: pre-fill cache to accelerate compilations
-      --fix-serial: Fix/add serial port permissions for current user
-      --fix-pi-wifi-ap: Fix Raspberry Pi wireless firmware for access point usage
-      "
+--clean: cleans core installation and starts a new virtual environment removing all locally installed packages
+--default: install all dependencies (optional & required) and tweaks but do not populate the cache
+--upgrade: run a system upgrade of all installed system packages before starting
+--core: install IoTempower core (platformio, deployment and compilation environment)
+--cloudcmd: install Cloud Commander web file manager into local environment
+--node-red: install Node-RED IoT integration platform into local environment
+--caddy: install Caddy web server into system
+--mqtt: install Mosquitto mqtt broker into system
+--convenience: install mc, tmux, micro, tilde, elinks (if possible) into system
+--templates: create iot-systems template
+--cache: pre-fill cache to accelerate compilations
+--fix-serial: Fix/add serial port permissions for current user
+--fix-pi-wifi-ap: Fix Raspberry Pi wireless firmware for access point usage
+"
 if [[ "$@" == *help* ]]; then # overwrite if help was given
   set -- "-h"
 fi
@@ -149,8 +150,6 @@ while getopts ":h-:" opt; do
           exit 0;;
         clean)
           clean=1;;
-        quiet)
-          default=1;;
         default)
           default=1;;
         upgrade)
@@ -190,7 +189,7 @@ if [[ "$clean" == 1 ]]; then
   # TODO: skip this if quiet is set (and don't make quiet the same as default)')
   echo_message_read_answer "Are you sure you want to clean all core installation and start a new virtual environment?" "n"
   if [[ "$?" == 0 ]]; then
-    exit 0
+    exit 1
   fi
   echo_format "Deleting core environment... "
   rm -rf "$IOTEMPOWER_VPYTHON"
@@ -282,11 +281,15 @@ else # not default
   fi # no arguments given, user asked
 fi # not default
 
-# make sure package lists are uptodate
-echo_format "Updating package lists..."
-call_by_system update
-echo_format "Updating package lists done."
-echo
+# make sure package lists are uptodate when system packages are installed
+if [ "$install_caddy" == "1" ] \
+  || [ "$install_mqtt" == "1" ] \
+  || [ "$install_convenience" == "1" ]; then
+  echo_format "Updating package lists..."
+  call_by_system update
+  echo_format "Updating package lists done."
+  echo
+fi
 
 if [[ "$do_upgrade" == 1 ]]; then
   call_by_system upgrade
@@ -326,7 +329,7 @@ if [[ "$install_core" == 1 ]]; then
   init_nodejs
   npm install terminal-kit
 
-  echo "All core packages have been installed. The rest consists of optional packages."
+  echo_format "All core packages have been installed."
 fi # core
 
 if [[ "$install_cloudcmd" == 1 ]]; then
