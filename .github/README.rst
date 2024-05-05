@@ -45,6 +45,7 @@ libraries with permissable licenses).
 
 If you are impatient and want to dive in and get started right away, 
 fast forward to one of the following: 
+
 `Installation </doc/installation.rst>`_ | 
 `First IoT Node </doc/first-node.rst>`_ | 
 `Raspberry Pi Quickstart </doc/quickstart-pi.rst>`_
