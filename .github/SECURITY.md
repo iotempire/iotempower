@@ -8,9 +8,3 @@ If the above email link does not work:
 - Email us at: ulno@ulno.net
   - Subject: IoTempower Security Vulnerability Report
   - Body: Hello, I have found a security vulnerability in IoTempower. Please advise.
-
-## Code of Conduct
-
-We have a Code of Conduct that all contributors are expected to follow. 
-
-Please refer to [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) before participating.
