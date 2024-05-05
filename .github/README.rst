@@ -28,8 +28,7 @@ one of the following:
 Or directly dive into the `full documentation </doc/index-doc.rst>`_.
 
 We love contributions! 
-For guidelines on how to contribute to this project, check out our [Contribution Guidelines](.github/CONTRIBUTING.md).
-[Contribution Guidelines](CONTRIBUTING.md)
+For guidelines on how to contribute to this project, check out our `Contribution Guidelines </.github/CONTRIBUTING.md>`_
 
 The main development takes place here:
 https://github.com/iotempire/iotempower
