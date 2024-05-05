@@ -2,19 +2,17 @@
 IoTempower
 ==========
 
-.. image:: https://img.shields.io/badge/IoTempower-0.9.3-blue.svg
-    :target:
-    :alt: IoTempower
+.. image:: https://img.shields.io/badge/IoTempower-0.9.3-purple.svg
+    :target: https://github.com/iotempire/iotempower
+    :alt: IoTempower version 0.9.3
 .. image:: https://img.shields.io/badge/license-MIT-blue.svg
-    :target:
+    :target: https://opensource.org/licenses/MIT
     :alt: MIT License
-.. image:: https://img.shields.io/badge/Platforms-Linux%20%7C%20Raspberry%20Pi%20%7C%20Android%20%7C%20Windows%20%7C%20Mac-blue.svg
-    :target:
+.. image:: https://img.shields.io/badge/Platforms-Linux%20%7C%20Raspberry%20Pi%20%7C%20Android%20%7C%20Windows%20%7C%20Mac-green.svg
+    :target: https://github.com/iotempire/iotempower#supported-platforms
     :alt: Platforms: Linux | Raspberry Pi | Android | Windows | Mac
 
-
-**Quick Links:** `Homepage <https://github.com/iotempire/iotempower>`_ |
-`Installation <https://github.com/iotempire/iotempower/blob/master/doc/installation.rst>`__ |
+**Quick Links:** `Installation <https://github.com/iotempire/iotempower/blob/master/doc/installation.rst>`__ |
 `First IoT Node <https://github.com/iotempire/iotempower/blob/master/doc/first-node.rst>`__ |
 `Raspberry Pi Quickstart <https://github.com/iotempire/iotempower/blob/master/doc/quickstart-pi.rst>`__ |
 `Examples <https://github.com/iotempire/iotempower/tree/master/examples>`__ |
