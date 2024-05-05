@@ -12,12 +12,6 @@ It directs to installation, setup, quickstart and example usage instructions.
 
 Please also see the official IoTempower YouTube playlist video docs: [`IoT Intro Videos` (link)](https://www.youtube.com/playlist?list=PLlppUpfgGsvkfAGJ38_mzQc1-_Z7bNOgq).
 
-## Code of Conduct
-
-We have a Code of Conduct that all contributors are expected to follow. 
-
-Please refer to [CODE_OF_CONDUCT.md](.github/CODE_OF_CONDUCT.md) before participating.
-
 ## Looking For Assistance
 
 - For immediate assistance, you can join our (active) community chat on:
@@ -66,7 +60,7 @@ If the above email link does not work:
 
 Interested in contributing to IoT Empower? 
 
-Please read our [CONTRIBUTING.md](.github/CONTRIBUTING.md) for guidelines on how to get involved in our project.
+Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to get involved in our project.
 
 Thank you for being part of the IoTempower Community!
 
