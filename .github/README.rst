@@ -2,10 +2,6 @@
 IoTempower
 ==========
 
-The main development is taking place here:
-https://github.com/iotempire/iotempower
-
-
 IoTempower is a framework and environment
 for empowering everyone to explore and develop for the
 Internet of Things (IoT)
@@ -31,3 +27,6 @@ one of the following:
 
 Or directly dive into the `full documentation </doc/index-doc.rst>`_.
 
+
+The main development takes place here:
+https://github.com/iotempire/iotempower

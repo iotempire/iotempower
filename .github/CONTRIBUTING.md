@@ -4,12 +4,6 @@ Thank you for your interest in contributing to IoTempower!
 
 This guide aims to make your contribution process frictionless and fun.
 
-## Code of Conduct
-
-We have a Code of Conduct that all contributors are expected to follow. 
-
-Please refer to [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) before participating.
-
 ## Getting Started
 
 
@@ -152,6 +146,6 @@ Here's how to submit a **`Feature Request`**:
 
 ## Support
 
-If you have any questions, please view our [SUPPORT.md](.github/SUPPORT.md) for ways to find help.
+If you have any questions, please view our [SUPPORT.md](SUPPORT.md) for ways to find help.
 
 We appreciate your contributions to IoT Empower and look forward to your active participation.
