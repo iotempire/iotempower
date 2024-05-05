@@ -8,7 +8,7 @@ IoTempower
 .. |MIT License Badge| image:: https://img.shields.io/badge/license-MIT-blue.svg
     :target: https://opensource.org/licenses/MIT
     :alt: MIT License
-.. |Platforms Badge| image:: https://img.shields.io/badge/Platforms-Linux%20%7C%20Raspberry%20Pi%20%7C%20Android%20%7C%20Windows%20%7C%20Mac-green.svg
+.. |Platforms Badge| image:: https://img.shields.io/badge/Platforms-Linux%20%7C%20Raspberry%20Pi%20%7C%20Android%20%7C%20Windows%20%7C%20Mac-darkgreen.svg
     :target: https://github.com/iotempire/iotempower#supported-platforms
     :alt: Platforms: Linux | Raspberry Pi | Android | Windows | Mac
 
@@ -44,23 +44,23 @@ All with a permissible license (and using only
 libraries with permissable licenses).
 
 If you are impatient and want to dive in and get started right away, 
-fast forward to one of the following: `Installation </doc/installation.rst>`_   |
-   `First IoT Node </doc/first-node.rst>`_   |
-   `Raspberry Pi Quickstart </doc/quickstart-pi.rst>`_
+fast forward to one of the following: 
+`Installation </doc/installation.rst>`_ | 
+`First IoT Node </doc/first-node.rst>`_ | 
+`Raspberry Pi Quickstart </doc/quickstart-pi.rst>`_
 
 .. showcases
 
 
 Or directly dive into the `full documentation here <https://github.com/iotempire/iotempower/blob/master/doc/index-doc.rst>`_.
 
+----------
+
+For support please check out our `Support Page <https://github.com/iotempire/iotempower/blob/master/.github/SUPPORT.md>`_.
 
     We are looking for contributors to help us with the development of this project.
 
-    For guidelines on how to contribute, check out our `Contribution Guidelines <https://github.com/iotempire/iotempower/blob/master/.github/CONTRIBUTING.md>`_
+If you are interested in contributing, please check out our `Contribution Guidelines <https://github.com/iotempire/iotempower/blob/master/.github/CONTRIBUTING.md>`_
 
-    For support please check out our `Support Page <https://github.com/iotempire/iotempower/blob/master/.github/SUPPORT.md>`_.
-
-----------
-
-The main development takes place here:
+The main development takes place here: 
 https://github.com/iotempire/iotempower
