@@ -1,5 +1,5 @@
-Tool support
-------------
+Tool Support
+============
 
 *IoTempower* includes a lot of small scripts to simplify a plethora of tasks
 supporting the deployment of a small IoT system or

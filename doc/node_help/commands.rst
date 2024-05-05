@@ -1,14 +1,13 @@
-command reference
+Command Reference
 =================
 
-The following devices and commands are available for IoTempower nodes:
-
+The following sensor and actuator commands are available for IoTempower nodes.
 
 Alphabetic list
 ---------------
 
 - `adoption <adoption.rst>`_
-- `analog <analog.rst>`_
+- `analog <analog.rst>`_ 
 - `animator <animator.rst>`_
 - `barometer <barometer.rst>`_
 - `bm085 <bm085.rst>`_
