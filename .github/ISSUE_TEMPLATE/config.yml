@@ -1,9 +1,12 @@
 blank_issues_enabled: false  # Disable blank issues to require using a template
 contact_links:
   - name: Support
-    url: https://github.com/iotempire/iotempower/blob/master/SUPPORT.md
+    url: https://github.com/iotempire/iotempower/blob/master/.github/SUPPORT.md
     about: Please check our support guidelines for help.
-  - name: IoTempower Discord Server
+  - name: Contribution Guidelines
+    url: https://github.com/iotempire/iotempower/blob/master/.github/CONTRIBUTING.md
+    about: Please check our support guidelines for help.
+  - name: IoTempire Discord
     url: https://discord.gg/9gq8Q9p6r3
     about: Join our Discord server for questions and discussions.
 
