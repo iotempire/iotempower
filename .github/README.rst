@@ -24,27 +24,51 @@ IoTempower
 `Contribute <https://github.com/iotempire/iotempower/blob/master/.github/CONTRIBUTING.md>`_ 
 
 
-IoTempower is a framework designed to intuitively streamline Internet of Things application development. 
+**Get In Touch:** `IoTempire Discord <https://discord.gg/9gq8Q9p6r3>`_ |
+`Matrix <https://riot.im/app/#/room/#iotempower:matrix.org>`_ |
+`Facebook <https://www.facebook.com/groups/2284490571612435/>`_
 
-Whether a hobbyist, student, artist, or professional, IoTempower has what you need to build your IoT idea.
 
-Key Features:
+**IoTempower** is a framework designed to intuitively streamline your **Internet of Things** application development. 
+
+Whether a hobbyist, student, artist, or professional, **IoTempower** has what you need to build your IoT idea.
+
+*Key Features*:
 
 - **Classroom Friendly**: Ideal for teaching IoT concepts and home automation.
 
+- **Cross-Platform**: Supports Linux, Raspberry Pi, Android, Windows, iOS, and Mac.
+
+- **Easy to Use**: Simplified IoT development. Puts the S back into Internet of Thing(s).
+
+- **Extensible**: Add your own devices and protocols.
+
+- **Secure**: Built-in security features to protect your IoT devices.
+
+- **Open-Source**: Fully permissible MIT License with permissibly licensed dependencies.
+
 - **OTA Updates**: Enhance existing IoT setups with over-the-air update capabilities.
 
-- **Multi-Device Management**: Simplify the deployment across multiple devices with automatic configurations.
+- **Multi-Device Management**: Simplify deployment across multiple devices with automatic configurations.
 
-**Get In Touch:** `IoTempire Discord <https://discord.gg/9gq8Q9p6r3>`_ |
-`Matrix <https://riot.im/app/#/room/#iotempower:matrix.org>`_ |
-`Facebook <https://www.facebook.com/groups/2284490571612435/>`_ |
+
+*The IoTempower System Architecture* enables seamless communication across devices, supporting a robust IoT network.
+
+.. figure:: /doc/images/system-architecture.png
+   :width: 40%
+   :figwidth: 80%
+   :align: center
+   :alt: IoTempower System Architecture
+
+   IoTempower System Architecture
 
 ----------
 
 For support please check out our `Support Page <https://github.com/iotempire/iotempower/blob/master/.github/SUPPORT.md>`_.
 
-If you are interested in contributing, please check out our `Contribution Guidelines <https://github.com/iotempire/iotempower/blob/master/.github/CONTRIBUTING.md>`_. Your contributions help IoTempower grow and improve, and we welcome contributions from all skill levels.
+If you are interested in contributing, please check out our `Contribution Guidelines <https://github.com/iotempire/iotempower/blob/master/.github/CONTRIBUTING.md>`_. 
+
+Your contributions help IoTempower grow and improve, and we welcome contributions from all skill levels.
 
 The main development takes place here: `IoTempower GitHub <https://github.com/iotempire/iotempower>`_
 
