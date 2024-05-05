@@ -19,8 +19,8 @@ Please also see the official IoTempower YouTube playlist video docs: [`IoT Intro
 
 - **GitHub Issues**: For technical issues and bugs, please use [GitHub Issues (link)](https://github.com/iotempire/iotempower/issues)
 - **Discussion Forums**: Join discussions and ask questions on our community forums:
-  - Matrix (inactive): https://riot.im/app/#/room/#iotempower:matrix.org
-  - Facebook Page (inactive): https://www.facebook.com/groups/2284490571612435/
+  - Matrix: https://riot.im/app/#/room/#iotempower:matrix.org
+  - Facebook Page: https://www.facebook.com/groups/2284490571612435/
   - GitHub Discussions (TBA)
 
 > *Please reach out at https://ulno.net/contact/ if you want to use IoTempower at your organization.*
