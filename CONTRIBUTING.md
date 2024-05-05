@@ -152,6 +152,6 @@ Here's how to submit a **`Feature Request`**:
 
 ## Support
 
-If you have any questions, please view our [SUPPORT.md](SUPPORT.md) for ways to find help.
+If you have any questions, please view our [SUPPORT.md](.github/SUPPORT.md) for ways to find help.
 
 We appreciate your contributions to IoT Empower and look forward to your active participation.
