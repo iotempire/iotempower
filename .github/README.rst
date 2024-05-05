@@ -2,22 +2,47 @@
 IoTempower
 ==========
 
+.. image:: https://img.shields.io/badge/IoTempower-0.9.3-blue.svg
+    :target:
+    :alt: IoTempower
+.. image:: https://img.shields.io/badge/license-MIT-blue.svg
+    :target:
+    :alt: MIT License
+.. image:: https://img.shields.io/badge/Platforms-Linux%20%7C%20Raspberry%20Pi%20%7C%20Android%20%7C%20Windows%20%7C%20Mac-blue.svg
+    :target:
+    :alt: Platforms: Linux | Raspberry Pi | Android | Windows | Mac
+
+
+**Quick Links:** `Homepage <https://github.com/iotempire/iotempower>`_ |
+`Installation <https://github.com/iotempire/iotempower/blob/master/doc/installation.rst>`__ |
+`First IoT Node <https://github.com/iotempire/iotempower/blob/master/doc/first-node.rst>`__ |
+`Raspberry Pi Quickstart <https://github.com/iotempire/iotempower/blob/master/doc/quickstart-pi.rst>`__ |
+`Examples <https://github.com/iotempire/iotempower/tree/master/examples>`__ |
+`Docs <https://github.com/iotempire/iotempower/blob/master/doc/index-doc.rst>`_ |
+`Support <https://github.com/iotempire/iotempower/blob/master/.github/SUPPORT.md>`_ |
+`Contributing <https://github.com/iotempire/iotempower/blob/master/.github/CONTRIBUTING.md>`_ 
+
+**Social:** `IoTempire Discord Server <https://discord.gg/9gq8Q9p6r3>`_ |
+`Matrix <https://riot.im/app/#/room/#iotempower:matrix.org>`_ |
+`Facebook Group <https://www.facebook.com/groups/2284490571612435/>`_ |
+
+
 IoTempower is a framework and environment
 for empowering everyone to explore and develop for the
 Internet of Things (IoT)
 -- tinkerers, makers, programmers, hobbyists, students, artists,
 and professionals alike.
 It has a special focus on education and is intended to support classes to teach
-Internet of Things (IoT) and
-home automation.
+Internet of Things (IoT) and home automation.
 
-However, it also supports existing IoT deployments and brings
-mechanisms for over the air (OTA) updates and automatic
-multi-device deployment. All with a permissible license (and using only
+IoTempower supports existing IoT deployments and adds 
+over the air (OTA) updates and automatic multi-device deployment. 
+
+All with a permissible license (and using only
 libraries with permissable licenses).
 
-If you are impatient and want to dive into it right now, fast forward to
-one of the following:
+If you are impatient and want to dive in and get started right away, 
+fast forward to one of the following:
 
 - `Installation </doc/installation.rst>`_
 - `First IoT Node </doc/first-node.rst>`_
@@ -25,10 +50,16 @@ one of the following:
 
 .. showcases
 
+
 Or directly dive into the `full documentation </doc/index-doc.rst>`_.
 
-We love contributions! 
-For guidelines on how to contribute to this project, check out our `Contribution Guidelines </.github/CONTRIBUTING.md>`_
+    We are looking for contributors to help us with the development of this project.
+
+> For guidelines on how to contribute, check out our `Contribution Guidelines <https://github.com/iotempire/iotempower/blob/master/.github/CONTRIBUTING.md>`_
+
+> For support please check out our `Support Page <https://github.com/iotempire/iotempower/blob/master/.github/SUPPORT.md>`_.
+
+----------
 
 The main development takes place here:
 https://github.com/iotempire/iotempower
