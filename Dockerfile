@@ -35,7 +35,7 @@ ENV PATH="$PATH:$HOME/bin"
 WORKDIR $HOME/iot
 
 # Install everything as root
-RUN ./run x bin/iot_install --quiet
+RUN ./run x bin/iot_install --default
 
 # Clean up package lists
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*

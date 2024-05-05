@@ -47,7 +47,7 @@ keyboard shortcuts for select, copy, past, save, and quit.
 
 .. code-block:: bash
 
-   curl -L https://bit.ly/iotempower | bash -s -- --quiet
+   curl -L https://bit.ly/iotempower | bash -s -- --default
 
 After the installation is finished, open a new terminal, and just run ``iot`` from anywhere
 (you can also run ``bash run`` in the iot directory if things go wrong,
