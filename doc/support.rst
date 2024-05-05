@@ -6,7 +6,7 @@ We are here to help you with any questions or issues you may encounter with IoTe
 Documentation
 -------------
 
-Before seeking support, please refer to the :doc:`IoTempower Docs index </doc/index-doc>`. It includes installation, setup, quickstart, and example usage instructions.
+Before seeking support, please refer to the `IoTempower Docs index </doc/index-doc>`_. It includes installation, setup, quickstart, and example usage instructions.
 
 Additionally, you can view our official IoTempower YouTube playlist for video docs: `IoT Intro Videos <https://www.youtube.com/playlist?list=PLlppUpfgGsvkfAGJ38_mzQc1-_Z7bNOgq>`_.
 
@@ -23,8 +23,6 @@ Community Support
   
   - Matrix: `#iotempower:matrix.org <https://riot.im/app/#/room/#iotempower:matrix.org>`_
   - Facebook: `IoTempower Group <https://www.facebook.com/groups/2284490571612435/>`_
-
-  More discussions can also be found on GitHub Discussions (TBA).
 
 Reporting Bugs or Requesting Features
 -------------------------------------
@@ -47,6 +45,12 @@ Security Issues & Vulnerability Reporting
 Please **DO NOT** report security vulnerabilities publicly. Contact us via email:
 
 - `Report Security Vulnerability <mailto:***REMOVED***?subject=IoTempower Security Vulnerability Report&body=Hello, I have found a security vulnerability in IoTempower. Please advise.>`_
+
+If the above email link does not work:
+- Email us at: ***REMOVED***
+  - Subject: IoTempower Security Vulnerability Report
+  - Body: Hello, I have found a security vulnerability in IoTempower. Please advise.
+
 
 Getting Involved
 ----------------
