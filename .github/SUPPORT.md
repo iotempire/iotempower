@@ -16,7 +16,7 @@ Please also see the official IoTempower YouTube playlist video docs: [`IoT Intro
 
 We have a Code of Conduct that all contributors are expected to follow. 
 
-Please refer to [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) before participating.
+Please refer to [CODE_OF_CONDUCT.md](.github/CODE_OF_CONDUCT.md) before participating.
 
 ## Looking For Assistance
 
@@ -66,7 +66,7 @@ If the above email link does not work:
 
 Interested in contributing to IoT Empower? 
 
-Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to get involved in our project.
+Please read our [CONTRIBUTING.md](.github/CONTRIBUTING.md) for guidelines on how to get involved in our project.
 
 Thank you for being part of the IoTempower Community!
 

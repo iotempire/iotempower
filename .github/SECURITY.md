@@ -13,4 +13,4 @@ If the above email link does not work:
 
 We have a Code of Conduct that all contributors are expected to follow. 
 
-Please refer to [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) before participating.
+Please refer to [CODE_OF_CONDUCT.md](./.github/CODE_OF_CONDUCT.md) before participating.
