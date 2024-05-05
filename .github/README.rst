@@ -15,6 +15,15 @@ IoTempower
 |IoTempower Badge| |MIT License Badge| |Platforms Badge|
 
 
+IoTempower is an intuitive framework designed to streamline the development of Internet of Things (IoT) applications. 
+
+Whether you're a hobbyist, student, artist, or professional, IoTempower provides the tools you need to bring your IoT ideas to life.
+
+Key Features:
+- **Classroom Friendly**: Ideal for teaching IoT concepts and home automation.
+- **OTA Updates**: Enhance existing IoT setups with over-the-air update capabilities.
+- **Multi-Device Management**: Simplify the deployment across multiple devices with automatic configurations.
+
 **Quick Links:** `Install <https://github.com/iotempire/iotempower/blob/master/doc/installation.rst>`__ |
 `First IoT Node <https://github.com/iotempire/iotempower/blob/master/doc/first-node.rst>`__ |
 `Raspberry Pi Quickstart <https://github.com/iotempire/iotempower/blob/master/doc/quickstart-pi.rst>`__ |
@@ -27,39 +36,9 @@ IoTempower
 `Matrix <https://riot.im/app/#/room/#iotempower:matrix.org>`_ |
 `Facebook <https://www.facebook.com/groups/2284490571612435/>`_ |
 
-
-IoTempower is a framework and environment 
-empowering you to explore and develop your own 
-Internet of Things (IoT) for
--- tinkerers, makers, programmers, hobbyists, students, artists,
-and professionals alike.
-
-IoTempower focuses on education and supports engaging class curricula for teaching
-Internet of Things (IoT) & home automation.
-
-IoTempower supports existing IoT deployments and adds 
-over the air (OTA) updates and automatic multi-device deployment. 
-
-All with a permissible license (and using only
-libraries with permissable licenses).
-
-If you are impatient and want to dive in and get started right away, 
-fast forward to one of the following: 
-
-`Installation </doc/installation.rst>`_ | 
-`First IoT Node </doc/first-node.rst>`_ | 
-`Raspberry Pi Quickstart </doc/quickstart-pi.rst>`_
-
-.. showcases
-
-
-Or directly dive into the `full documentation here <https://github.com/iotempire/iotempower/blob/master/doc/index-doc.rst>`_.
-
 ----------
 
 For support please check out our `Support Page <https://github.com/iotempire/iotempower/blob/master/.github/SUPPORT.md>`_.
-
-    We are looking for contributors to help us with the development of this project.
 
 If you are interested in contributing, please check out our `Contribution Guidelines <https://github.com/iotempire/iotempower/blob/master/.github/CONTRIBUTING.md>`_
 
