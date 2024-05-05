@@ -1,0 +1,11 @@
+# This is a special file that GitHub uses to populate the "Sponsor" button on your repository.
+github: [github_username]
+patreon: patreon_username
+open_collective: collective_name
+ko_fi: ko_fi_username
+tidelift: package_name
+community_bridge: project_identifier
+liberapay: liberapay_username
+issuehunt: issuehunt_username
+otechie: otechie_username
+custom: ['https://yourcustomfundinglink.com']
