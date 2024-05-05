@@ -2,15 +2,20 @@
 IoTempower
 ==========
 
-.. image:: https://img.shields.io/badge/IoTempower-0.9.3-purple.svg
+
+.. |IoTempower Badge| image:: https://img.shields.io/badge/IoTempower-0.9.3-purple.svg
     :target: https://github.com/iotempire/iotempower
     :alt: IoTempower version 0.9.3
-.. image:: https://img.shields.io/badge/license-MIT-blue.svg
+.. |MIT License Badge| image:: https://img.shields.io/badge/license-MIT-blue.svg
     :target: https://opensource.org/licenses/MIT
     :alt: MIT License
-.. image:: https://img.shields.io/badge/Platforms-Linux%20%7C%20Raspberry%20Pi%20%7C%20Android%20%7C%20Windows%20%7C%20Mac-green.svg
+.. |Platforms Badge| image:: https://img.shields.io/badge/Platforms-Linux%20%7C%20Raspberry%20Pi%20%7C%20Android%20%7C%20Windows%20%7C%20Mac-green.svg
     :target: https://github.com/iotempire/iotempower#supported-platforms
     :alt: Platforms: Linux | Raspberry Pi | Android | Windows | Mac
+
+|IoTempower Badge| |MIT License Badge| |Platforms Badge|
+
+
 
 **Quick Links:** `Installation <https://github.com/iotempire/iotempower/blob/master/doc/installation.rst>`__ |
 `First IoT Node <https://github.com/iotempire/iotempower/blob/master/doc/first-node.rst>`__ |
