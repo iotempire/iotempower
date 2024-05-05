@@ -29,6 +29,13 @@ IoTempower
 `Facebook <https://www.facebook.com/groups/2284490571612435/>`_
 
 
+.. figure:: /doc/images/system-architecture.png
+   :width: 40%
+   :figwidth: 80%
+   :align: center
+   :alt: IoTempower System Architecture
+
+
 **IoTempower** is a framework designed to intuitively streamline your **Internet of Things** application development. 
 
 Whether a hobbyist, student, artist, or professional, **IoTempower** has what you need to build your IoT idea.
@@ -51,16 +58,6 @@ Whether a hobbyist, student, artist, or professional, **IoTempower** has what yo
 
 - **Multi-Device Management**: Simplify deployment across multiple devices with automatic configurations.
 
-
-*The IoTempower System Architecture* enables seamless communication across devices, supporting a robust IoT network.
-
-.. figure:: /doc/images/system-architecture.png
-   :width: 40%
-   :figwidth: 80%
-   :align: center
-   :alt: IoTempower System Architecture
-
-   IoTempower System Architecture
 
 ----------
 
