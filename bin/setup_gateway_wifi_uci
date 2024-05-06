@@ -1,0 +1,160 @@
+#!/bin/bash
+if [[ $# -gt 4 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
+cat << EOF
+
+this must be called from a node directory (or one of its parent system
+directories) and reads it will set the gateway wifi configurartion of that system (SSID, password, gateway IP).
+
+It rebuilds firmwares for the affected nodes and remotely flashes
+the respected nodes.
+
+If credentials are given, it over writes the global wifi configuration.
+Else it the gateway configuration is set to the default global values
+
+If you are running all systems from same gateway, you can also change the credentials by creating an iotempower.conf file in iot/etc/
+Copy the iotempower.conf.example file, (delete the .example extension) and adjust the values.
+
+EOF
+exit 1
+fi
+
+# TODO: add option to specify input file with list of specific nodes to deploy
+
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
+
+#!/bin/bash
+
+source /home/renato/iot/bin/check_router_ip
+echo $ROUTER_IP
+
+# Prompt the user for SSID and password
+read -p "Please choose a SSID for your gateway: " ssid
+read -sp "Please create a password: " password
+echo
+
+# Create a file and write the SSID and password to it
+cat << EOF > /home/renato/iot/etc/wireless_uci
+SSID=$ssid
+Password=$password
+
+
+
+# /etc/config/wireless
+
+config wifi-device 'mt7628'
+        option type 'mt7628'
+        option ht_txstream '2'
+        option ht_rxstream '2'
+        option hwmode '11a'
+        option noscan '0'
+        option txpower '20'
+        option txpower_max '20'
+        option country 'US'
+        option region '0'
+        option band '2G'
+        option mimops '3'
+        option wmm '1'
+        option disabled '1'
+
+config wifi-device 'radio0'
+        option type 'mac80211'
+        option path 'platform/10300000.wmac'
+        option channel '11'
+        option band '2g'
+        option htmode 'HT20'
+        option cell_density '0'
+
+config wifi-iface 'default_radio0'
+        option device 'radio0'
+        option network 'lan'
+        option mode 'ap'
+        option ssid '$ssid'
+        option encryption 'psk2'
+        option key '$password'
+
+EOF
+
+cat << EOF > /home/renato/iot/etc/network
+
+config interface 'loopback'
+        option proto 'static'
+        option ipaddr '127.0.0.1'
+        option netmask '255.0.0.0'
+        option device 'lo'
+
+config globals 'globals'
+        option ula_prefix 'fdff:e123:44fc::/48'
+
+config interface 'lan'
+        option netmask '255.255.255.0'
+        option ip6assign '60'
+        option multicast_to_unicast '0'
+        option hostname 'GL-MT300N-V2-c2f'
+        option ipaddr '192.168.12.1'
+        option proto 'static'
+        option device 'br-lan'
+
+config interface 'wan'
+        option proto 'dhcp'
+        option hostname 'GL-MT300N-V2-c2f'
+        option ipv6 '0'
+        option metric '10'
+        option device 'eth0.2'
+
+config interface 'wan6'
+        option proto 'dhcpv6'
+        option disabled '1'
+        option device 'eth0.2'
+
+config switch
+        option name 'switch0'
+        option reset '1'
+        option enable_vlan '1'
+
+config switch_vlan
+        option device 'switch0'
+        option vlan '1'
+        option ports '1 6t'
+
+config switch_vlan
+        option device 'switch0'
+        option vlan '2'
+        option ports '0 6t'
+
+config interface 'guest'
+        option proto 'static'
+        option ipaddr '192.168.9.1'
+        option netmask '255.255.255.0'
+        option ip6assign '60'
+        option device 'br-guest'
+
+config device 'wan_dev'
+        option name 'eth0.2'
+        option macaddr '94:83:c4:39:4c:2f'
+
+config device 'lan_dev'
+        option name 'eth0.1'
+        option macaddr '94:83:c4:39:4c:30'
+
+config device
+        option name 'br-lan'
+        option type 'bridge'
+        list ports 'eth0.1'
+
+config device
+        option name 'br-guest'
+        option type 'bridge'
+        list ports 'guest'
+
+EOF
+cat /home/renato/iot/etc/wireless_uci | ssh root@$ROUTER_IP "cat > /etc/config/wireless" 
+cat /home/renato/iot/etc/network | ssh root@$ROUTER_IP "cat > /etc/config/network"
+ssh root@$ROUTER_IP 'sleep 5; reboot'
+
+#wireless=$(</home/renato/iot/etc/wireless_uci)
+
+#ssh root@$ROUTER_IP << EOF
+#echo '$wireless's
+EOF
+
+echo "WiFi configuration has been written to uci config file"

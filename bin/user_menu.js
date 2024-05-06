@@ -302,17 +302,6 @@ function adopt() {
     }
 }
 
-function system_configuration(back) {
-    choice([
-    	["Change Wifi-Credentials for your current system (W)", "C", set_wificredentials_systemconf],
-        ["Change Wifi-RouterConfiguration on the Raspberry Pi (P)", "G", wifi_config],
-        ["Back (B,X,ESC)", ["B","X"], back?menu_default:terminate]
-    ], pre_select=-1, pad_last=1);
-}
-function system_configuration_back() {
-    system_configuration(true);
-}
-
 function create_node_template() {
     shell_command_in_path("You are about to create a folder called new-node"
         + " to configure a new node. Do not forget to rename this folder after"
@@ -367,11 +356,27 @@ function wifi_config() {
 }
 
 function set_wificredentials_systemconf() {
-    shell_command("This will open an editor with the project system configuration file where you can assign the gateway credentials for your project."
-        + " Please make corresponding changes. You will have to power off and on"
-        + " the gateway after this edit to activate the new configuration. "
-        + "\nDo you want to continue editing the WiFi-router configuration for your system?",
+    shell_command_in_path("This will open an editor with the project system configuration file where you can assign the wifi credentials for your projects."
+        + " This must be run inside a project folder"
+        + " This is important if your project has different Wifi credentials than the default ones"
+        + "\nDo you want to continue editing your project WiFi configuration for your system?",
         " set_wificredentials_systemconf");
+}
+
+function setup_gateway_wifi() {
+    shell_command("This will a file that preconfigure your gateway credentials."
+        + " Please define the SSID and password for your WiFi-router."
+        + " This Wifi credentials will become your default settings. "
+        + "\nDo you want to continue editing your Gateway's WiFi configuration?",
+        " setup_gateway_wifi");
+}
+
+function setup_gateway_wifi_uci() {
+    shell_command("This will a file that preconfigure your gateway credentials."
+        + " Please define the SSID and password for your external WiFi-router running OpenWRT."
+        + " This Wifi credentials will become your default settings. "
+        + "\nDo you want to continue editing your Gateway's WiFi configuration?",
+        " setup_gateway_wifi_uci");
 }
 
 function advanced(back) {
@@ -390,6 +395,31 @@ function advanced_back() {
     advanced(true);
 }
 
+function system_configuration(back) {
+    choice([
+        ["Set-up Wifi Gateway (G)", "G", internal_external_gateway_back],
+        ["Set Wifi-Credentials for your project (W)", "C", set_wificredentials_systemconf],
+        ["Wifi-Router configuration on the Raspberry Pi (P)", "P", wifi_config],
+        ["Back (B,X,ESC)", ["B","X"], back?menu_default:terminate]
+    ], pre_select=-1, pad_last=1);
+}
+function system_configuration_back() {
+    system_configuration(true);
+}
+
+function internal_external_gateway(back) {
+    choice([
+        ["Set-up Wifi Gateway from internal chip (I)", "I", setup_gateway_wifi],
+        ["Set Wifi Configuration with external OpenWRT router(R)", "R",  setup_gateway_wifi_uci],
+        ["Wifi-Router configuration on the Raspberry Pi (P)", "P", wifi_config],
+        ["Back (B,X,ESC)", ["B","X"], back?menu_default:terminate]
+    ], pre_select=-1, pad_last=1);
+}
+function internal_external_gateway_back() {
+    internal_external_gateway(true);
+}
+
+
 
 function menu_default() {
     //term.clear();
@@ -403,7 +433,7 @@ function menu_default() {
     choice([
         ["Deploy (D)", "D", deploy], 
         ["Adopt (A)", "A", adopt],
-        ["Configuration (C)", "C", system_configuration],
+        ["Configuration (C)", "C", system_configuration_back],
         ["Create New Node Folder (N)", "N", create_node_template],
         ["Advanced (V)", "V", advanced_back],
         ["Exit (X,ESC)", "X", terminate]
