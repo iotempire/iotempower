@@ -1,0 +1,34 @@
+#!/bin/bash
+if [[ $# -gt 4 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
+cat << EOF
+
+this must be called from a node directory (or one of its parent system
+directories) and reads it will set the gateway wifi configurartion of that system (SSID, password, gateway IP).
+
+It rebuilds firmwares for the affected nodes and remotely flashes
+the respected nodes.
+
+If credentials are given, it over writes the global wifi configuration.
+Else it the gateway configuration is set to the default global values
+
+If you are running all systems from same gateway, you can also change the credentials by creating an iotempower.conf file in iot/etc/
+Copy the iotempower.conf.example file, (delete the .example extension) and adjust the values.
+
+EOF
+exit 1
+fi
+
+# TODO: add option to specify input file with list of specific nodes to deploy
+
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
+
+#!/bin/bash
+
+# Detect the router's IP address
+router_ip=$(route -n | grep 'UG[ \t]' | awk '{print $2}')
+
+# Export it as an environment variable
+export ROUTER_IP=$router_ip
+
+# Print it for verification
+echo "Router IP: $ROUTER_IP"
