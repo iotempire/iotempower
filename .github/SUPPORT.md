@@ -21,7 +21,6 @@ Please also see the official IoTempower YouTube playlist video docs: [`IoT Intro
 - **Discussion Forums**: Join discussions and ask questions on our community forums:
   - Matrix: https://riot.im/app/#/room/#iotempower:matrix.org
   - Facebook Page: https://www.facebook.com/groups/2284490571612435/
-  - GitHub Discussions (TBA)
 
 > *Please reach out at https://ulno.net/contact/ if you want to use IoTempower at your organization.*
 
