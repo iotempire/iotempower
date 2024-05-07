@@ -57,6 +57,6 @@ Getting Involved
 
 Interested in contributing to IoTempower? Read our `CONTRIBUTING guidelines <https://github.com/iotempire/iotempower/blob/master/.github/CONTRIBUTING.md>`_ to learn how you can help improve IoTempower.
 
-Top: `ToC <index-doc.rst>`_, Previous: `External Resources <resources.rst>`_, Next: `Further Documentation <further-doc.rst>`_
-
 Thank you for being part of the IoTempower Community!
+
+Top: `ToC <index-doc.rst>`_, Previous: `External Resources <resources.rst>`_, Next: `Further Documentation <further-doc.rst>`_
