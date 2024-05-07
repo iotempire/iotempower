@@ -69,7 +69,7 @@ if ! check_node; then
 fi
 
 # procps allows pkill and ps
-PACKAGE_LIST="build-essential git procps mosquitto-clients virtualenv python3-venv python3-dev make rsync haveged jq"
+PACKAGE_LIST="build-essential git procps mosquitto-clients virtualenv python3-venv python3-dev make rsync openssh-client haveged jq"
 to_install=$(filter_packages debian-query $PACKAGE_LIST)
 
 echo "Installing: $to_install..."

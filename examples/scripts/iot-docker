@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Example script for starting the IoT Empower environment
+# Modify IOTEMPOWER_ROOT accordingly to your setup
+#
+# If you run in termux, apply termux-fix shebang onto this script
+
+# if this should run as root make sure to fix $HOME like this:
+# HOME=/home/pi
+
+export IOTEMPOWER_DOCKER_NAME="iotempower"
+export IOTEMPOWER_DOCKER_SHARE="$HOME/iot-docker"
+export IOTEMPOWER_ROOT="$IOTEMPOWER_DOCKER_SHARE/iot"
+
+if docker ps | grep -q "$IOTEMPOWER_DOCKER_NAME"; then
+    exec docker exec -it "$IOTEMPOWER_DOCKER_NAME" "iot" "$@"
+else
+    docker run --name "$IOTEMPOWER_DOCKER_NAME" \
+        -p 40080:40080 \
+        -p 1883:1883 \
+        -it -v "$IOTEMPOWER_DOCKER_SHARE:/iot/data"  ulno/iotempower
+fi
+
