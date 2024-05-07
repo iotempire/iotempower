@@ -1,0 +1,18 @@
+blank_issues_enabled: false  # Optional: Set to true to allow blank pull requests.
+
+pull_request_template:
+  - name: Default Template
+    about: Use this template for most pull requests or if you're not sure.
+    template: default.md
+
+  - name: Bug Fix
+    about: Specific template for bug fixes.
+    template: bug_fix.md
+
+  - name: Feature Request
+    about: Specific template for proposing new features.
+    template: feature_request.md
+
+  - name: Documentation
+    about: Use this template for documentation improvements.
+    template: documentation.md

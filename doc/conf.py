@@ -128,7 +128,9 @@ html_theme_options = {
     'navbar_links': [
         ("Top", "/", 1),
         # already in main ("ToC", "/index-doc.rst", 1),
+        ("Tools", "/doc/tool-support.rst", 1),
         ("Commands", "/doc/node_help/commands.rst", 1),
+        ("Examples", "/doc/examples_help/examples.rst", 2),
     ],
 
     # Render the next and previous page links in navbar. (Default: true)
