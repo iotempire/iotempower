@@ -30,7 +30,7 @@ IoTempower
 `Facebook <https://www.facebook.com/groups/2284490571612435/>`_
 
 
-.. figure:: /doc/images/IoTempower_Readme_splash.png
+.. figure:: /doc/images/IoTempower_Readme_splash2.png
    :width: 50%
    :figwidth: 100%
    :align: center
