@@ -29,7 +29,9 @@ Table of Contents
 
 - `Further Documentation </doc/further-doc.rst>`_
 
-- `Command reference </doc/node_help/commands.rst>`_
+- `Command Reference </doc/node_help/commands.rst>`_
+
+- `Examples Reference </doc/examples-glossary.rst>`_
 
 
 Obsolete:
