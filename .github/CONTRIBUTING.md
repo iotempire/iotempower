@@ -24,10 +24,10 @@ This guide aims to make your contribution process frictionless and fun.
     - refer to the **manual installation** steps to set a custom install dir location
       - adjust these instructions according to your configuration
   
-  - use the `mv` command to **copy** the contents of `iot` to a new **backup** called `iot.bak`:
+  - use the `mv` command to **move** the contents of `iot` to a new **backup** called `iot.bak`:
   
   ```bash
-    mv iot iot.bak
+    mv iot iot.bak    
   ```
   
 ### 3. **Fork IoTempower**: 
@@ -35,10 +35,10 @@ This guide aims to make your contribution process frictionless and fun.
   - open the IoTempower Repository on GitHub in a browser: https://github.com/iotempire/iotempower
   - find the `Fork` button just below the page header, between `Star` and `Watch` buttons
     - click `Fork` to create a new `Fork` of the `main` branch and follow prompts
-      - please consider `Star`ring the IoTempower Repository to show your support
+      - please consider supporting IoTempower with a `Star`
       - use `Watch` to receive dev updates by email
 
-### 4. **Clone & Sync Your Fork**: 
+#### 3.1 **Sync & Clone Your Fork**: 
   
   - After forking, clone your fork to your local machine:
   
@@ -63,7 +63,7 @@ This guide aims to make your contribution process frictionless and fun.
   - finally, copy the `iot.bak/.local` dir to your newly cloned fork:
   
   ```bash
-    cp -r /iot /iot.bak
+    cp -a iot.bak/.local iot/
   ```
 
   - verify the installation was successful by running the `iot` command in a (new) terminal
@@ -111,7 +111,8 @@ Our project adheres to a modified Google style guide, with specific modification
 
 ### Configure Your Development Environment
 
-- **Visual Studio Code Users**: If you are using Visual Studio Code or VSCodium, you can easily adjust your code formatting settings to match our style. Simply search for `Clang_format_style` in the settings (you can use `Ctrl` + `,` to open settings) and set it to:
+- **Visual Studio Code Users**: If you are using Visual Studio Code or VSCodium, you can easily adjust your code formatting settings to match our style. 
+  - Look for `Clang_format_style` in the settings (you can use `Ctrl` + `,` to open settings) and set it to:
   ```json
    { "BasedOnStyle": "Google", "IndentWidth": 4 }
   ```
