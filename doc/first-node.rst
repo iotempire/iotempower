@@ -2,8 +2,12 @@
 First Node
 ==========
 
+
 If you are using the pi-image, you can find a short walkthrough of this here: 
 https://youtu.be/fTWNYXfet9E
+
+For more video instructions, check the `IoTempower YouTube Video Playlist </https://www.youtube.com/playlist?list=PLlppUpfgGsvkfAGJ38_mzQc1-_Z7bNOgq>`_.
+
 
 For this section, we assume that you have IoTempower successfully set-up in your
 a Linux environment (as described 
