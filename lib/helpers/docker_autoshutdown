@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+# # start also interactive shell
+# (
+#     iot "$@" < /dev/tty
+#     pkill sleep
+# ) &
+
+# Interval in seconds between checks
+CHECK_INTERVAL=10
+
+while true; do
+    # start with sleep to allow interactive process to be started right after
+    # Sleep for the specified interval before checking again
+    sleep $CHECK_INTERVAL
+
+    # Check for any active IoT-related processes
+    # that means, check if there are no /iot/ processes and no bash processes (excluding autoshutdown)
+    if ! ps ax | grep -v grep | egrep '/iot/|bash' | grep -v autoshutdown > /dev/null; then
+        echo
+        echo "No IoT-related processes are running. Shutting down..."
+        echo
+        # Send SIGTERM to PID 1, which is the init process in the container
+        kill 1
+        exit 0
+    fi
+done
