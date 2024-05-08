@@ -11,12 +11,24 @@ export IOTEMPOWER_DOCKER_NAME="iotempower"
 export IOTEMPOWER_DOCKER_SHARE="$HOME/iot-docker"
 export IOTEMPOWER_ROOT="$IOTEMPOWER_DOCKER_SHARE/iot"
 
-if docker ps | grep -q "$IOTEMPOWER_DOCKER_NAME"; then
+function start() {
     exec docker exec -it "$IOTEMPOWER_DOCKER_NAME" "iot" "$@"
+}
+
+if docker ps | grep -q "$IOTEMPOWER_DOCKER_NAME"; then
+    start "$@"
+    # # Check if the container is already running
+    # if docker ps | grep -qw $IOTEMPOWER_DOCKER_NAME; then
+    #     exec docker exec -it "$IOTEMPOWER_DOCKER_NAME" "iot" "$@"
+    # else
+    #     docker start -i "$IOTEMPOWER_DOCKER_NAME"
+    #     # TODO: think how parameter can be forwarded and current directory be found
+    # fi
 else
-    docker run --name "$IOTEMPOWER_DOCKER_NAME" \
+    docker run -d --rm --name "$IOTEMPOWER_DOCKER_NAME" \
         -p 40080:40080 \
         -p 1883:1883 \
-        -it -v "$IOTEMPOWER_DOCKER_SHARE:/iot/data"  ulno/iotempower
+        -v "$IOTEMPOWER_DOCKER_SHARE:/iot/data"  ulno/iotempower
+    start "$@"
 fi
 

@@ -37,6 +37,9 @@ RUN mkdir -p $HOME && \
         apt-utils gnupg ca-certificates && \
     update-ca-certificates
 
+# Add autoshutdown script
+COPY ./lib/helpers/docker_autoshutdown /usr/local/bin/autoshutdown
+
 # Copy the local repository into the image, excluding what's listed in .dockerignore
 COPY . $IOT_REPO
 # can this be done more efficiently as we will have to delete it later
@@ -71,7 +74,9 @@ VOLUME ["$IOT_DATA"]
 
 #ENTRYPOINT ["iot", "x", "docker_web_starter"]
 
-ENTRYPOINT ["iot"]
+#ENTRYPOINT ["iot"]
+
+ENTRYPOINT ["/usr/local/bin/autoshutdown"]
 
 #ENTRYPOINT ["bash"]
 
