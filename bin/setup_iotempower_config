@@ -24,15 +24,14 @@ fi
 
 #!/bin/bash
 
-# Prompt the user for SSID and password
-read -p "Please choose a SSID for your gateway: " ssid
-read -sp "Please create a password: " password
-echo
+source /home/renato/iot/etc/wifi_credentials
+echo $SSID
+echo $Password
+echo $GatewayIP
 
 # Create a file and write the SSID and password to it
 cat << EOF > /home/renato/iot/etc/iotempower.conf
-SSID=$ssid
-Password=$password
+
 
 # Configuration options of iotempower
 # This is specific to this hardware platform and iotempower
@@ -46,14 +45,14 @@ Password=$password
 #IOTEMPOWER_AP_DEVICES="wlan1 wlan0"
 
 # Name of accesspoint to create
-IOTEMPOWER_AP_NAME="$ssid"
+IOTEMPOWER_AP_NAME="$SSID"
 
 # if set to yes, add unique ID from MAC-address as extension to name
 # this is good in classes where you teach iot and have multiple gateways
 IOTEMPOWER_AP_ADDID=no
 
 # Its wifi password to use -> TODO: move to secret file
-IOTEMPOWER_AP_PASSWORD="$password"
+IOTEMPOWER_AP_PASSWORD="$Password"
 
 # Channel to run on (set to actual number)
 # if set to random, will pick one of 2 3 4 5 7 8 9 10
@@ -69,7 +68,7 @@ IOTEMPOWER_AP_HIDDEN=no
 #IOTEMPOWER_AP_BRIDGE=eth0
 
 # IP to pick
-IOTEMPOWER_AP_IP="192.168.12.1"
+IOTEMPOWER_AP_IP="$GatewayIP"
 
 # hostname to export
 # if this is empty, it uses the actual hostname
