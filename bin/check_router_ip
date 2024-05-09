@@ -25,7 +25,7 @@ fi
 #!/bin/bash
 
 # Detect the router's IP address
-router_ip=$(route -n | grep 'UG[ \t]' | awk '{print $2}')
+router_ip=$(route -n | grep 'UG[ \t]' | awk '{print $2}' | grep '^192\.168')
 
 # Export it as an environment variable
 export ROUTER_IP=$router_ip
