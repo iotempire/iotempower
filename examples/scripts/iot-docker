@@ -9,14 +9,42 @@
 
 export IOTEMPOWER_DOCKER_NAME="iotempower"
 export IOTEMPOWER_DOCKER_SHARE="$HOME/iot-docker"
+export IOTEMPOWER_DOCKER_CONTAINER_DIR="/iot/data"
 export IOTEMPOWER_ROOT="$IOTEMPOWER_DOCKER_SHARE/iot"
 
+function start() {
+    # Get the absolute path of the current directory, resolving symlinks
+    CURRENT_DIR=$(realpath $(pwd))
+
+    # Check if the current directory is within the mounted host directory
+    if [[ "$CURRENT_DIR" =~ ^"$IOTEMPOWER_DOCKER_SHARE" ]]; then
+        # Calculate the corresponding directory inside the container
+        CONTAINER_PATH="$IOTEMPOWER_DOCKER_CONTAINER_DIR${CURRENT_DIR#$IOTEMPOWER_DOCKER_SHARE}"
+        # Enter the Docker container at the corresponding directory
+        # Forward all input parameters using "$@"
+        exec docker exec -it "$IOTEMPOWER_DOCKER_NAME" /bin/bash -c "cd \"$CONTAINER_PATH\" && exec iot \"$@\""
+    else
+        echo "Current directory is outside the mounted volume."
+        # Just enter the container without changing the directory but still forward parameters
+        exec docker exec -it "$IOTEMPOWER_DOCKER_NAME" "iot" "$@"
+    fi
+}
+
 if docker ps | grep -q "$IOTEMPOWER_DOCKER_NAME"; then
-    exec docker exec -it "$IOTEMPOWER_DOCKER_NAME" "iot" "$@"
+    start "$@"
+    # # Check if the container is already running
+    # if docker ps | grep -qw $IOTEMPOWER_DOCKER_NAME; then
+    #     exec docker exec -it "$IOTEMPOWER_DOCKER_NAME" "iot" "$@"
+    # else
+    #     docker start -i "$IOTEMPOWER_DOCKER_NAME"
+    #     # TODO: think how parameter can be forwarded and current directory be found
+    # fi
 else
-    docker run --name "$IOTEMPOWER_DOCKER_NAME" \
+    docker run -d --rm --name "$IOTEMPOWER_DOCKER_NAME" \
         -p 40080:40080 \
         -p 1883:1883 \
-        -it -v "$IOTEMPOWER_DOCKER_SHARE:/iot/data"  ulno/iotempower
+        -v "$IOTEMPOWER_DOCKER_SHARE:/iot/data" \
+        ulno/iotempower > /dev/null
+    start "$@"
 fi
 
