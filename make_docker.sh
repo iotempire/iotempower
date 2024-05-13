@@ -15,7 +15,11 @@ fi
 # docker tag ulno/iotempower:$(cat VERSION) ulno/iotempower:latest
 #
 # to run: 
-# docker run -d -p 40080:40080 -p 1883:1883 --platform=amd64 --name iotempower-test ulno/iotempower
+# obsolete: docker run -d -p 40080:40080 -p 1883:1883 --platform=amd64 --name iotempower-test ulno/iotempower
+# now: docker run --name "$IOTEMPOWER_DOCKER_NAME" \
+        # -p 40080:40080 \
+        # -p 1883:1883 \
+        # -it -v "$IOTEMPOWER_DOCKER_SHARE:/iot/data"  ulno/iotempower
 #
 # to push to docker hub:
 # docker push -a ulno/iotempower

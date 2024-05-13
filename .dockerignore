@@ -1,11 +1,10 @@
-.git
-.gitignore
-.dockerignore
-node_modules
+**/.git
+**/.gitignore
+**/.dockerignore
+**/node_modules
 npm-debug.log
-Dockerfile*
-docker-compose*
-.vscode
+**/Dockerfile*
+**/docker-compose*
 *~
 *.bin
 *.pyc
@@ -13,18 +12,18 @@ docker-compose*
 #system.conf
 
 examples/private/
-tmp/
-external/
-.idea/
+**/tmp/
+**/external/
+**/.idea/
 
 etc/iotempower.conf
 etc/yaota8266-keys/
-.local*
+**/.local*
 
-.directory
-.vscode
-build
+**/.directory
+**/.vscode
+**/build
 
-.pio
-.pioenvs
-.piolibdeps
+**/.pio
+**/.pioenvs
+**/.piolibdeps
