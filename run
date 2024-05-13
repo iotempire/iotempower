@@ -160,8 +160,19 @@ if check_root; then
     if [ $installed -eq 0 ] || [ $# -gt 0 ]; then
         run "$@"
     else
-        if install; then # if it failed, try to install first
+        # check if we are in iotempower docker
+        if [[ -d "$HOME/data"  && -e "$HOME/iot-local-docker.tar.xz"  ]]; then
+            echo "Initializing docker container on first run..."
+            cd "$HOME/data"
+            tar xaf "$HOME/iot-local-docker.tar.xz"
+            cd "$current_path" # back to where we have been called
+            echo "... done."
+            echo
             run "$@"
+        else
+            if install; then # if it failed, try to install first
+                run "$@"
+            fi
         fi
     fi
 fi
