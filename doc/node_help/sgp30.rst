@@ -43,7 +43,7 @@ Parameters
 
 
 - ``.with_filter`` 
-    - A filter function can be specified. 
+    - You can specify a filter function.
     - See ``uhelp filter`` for more.
 
 
