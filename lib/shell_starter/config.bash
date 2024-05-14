@@ -94,7 +94,7 @@ export IOTEMPOWER_FIRMWARE="$IOTEMPOWER_EXTERNAL/firmware"
 export PATH="$IOTEMPOWER_FIRMWARE/bin:$PATH"
 export PATH="$IOTEMPOWER_FIRMWARE/esp-open-sdk/xtensa-lx106-elf/bin:$PATH"
 
-IOTEMPOWER_AP_NAME_FULL=$(accesspoint show)
+IOTEMPOWER_AP_NAME_FULL=$(accesspoint show 2>/dev/null)
 export IOTEMPOWER_AP_NAME_FULL
 
 fi ### IOTEMPOWER_ACTIVE
