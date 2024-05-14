@@ -1,6 +1,7 @@
 analog
 ======
 
+
 ..  code-block:: cpp
 
     analog(name)
