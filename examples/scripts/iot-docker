@@ -21,8 +21,19 @@ function start() {
         # Calculate the corresponding directory inside the container
         CONTAINER_PATH="$IOTEMPOWER_DOCKER_CONTAINER_DIR${CURRENT_DIR#$IOTEMPOWER_DOCKER_SHARE}"
         # Enter the Docker container at the corresponding directory
-        # Forward all input parameters using "$@"
-        exec docker exec -it "$IOTEMPOWER_DOCKER_NAME" /bin/bash -c "cd \"$CONTAINER_PATH\" && exec iot \"$@\""
+        # Forward all input parameters from "$@" (this is a bit tricky as it needs to go into docker exec)
+        PARAMS=""
+        for p in "$@"; do
+            # Escape all internal quotes within the parameter
+            p="${p//\"/\\\"}"
+            PARAMS+="\"$p\" "
+        done
+        # Trim the trailing space
+        PARAMS="${PARAMS% }"
+        # if the "bash" is not given, the unpacking of the tar file does not happen
+        # TODO: test why this does not work
+        exec docker exec -it "$IOTEMPOWER_DOCKER_NAME" \
+            /bin/bash -c "cd \"$CONTAINER_PATH\" && exec bash iot $PARAMS"
     else
         echo "Current directory is outside the mounted volume."
         # Just enter the container without changing the directory but still forward parameters

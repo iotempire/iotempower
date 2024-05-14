@@ -387,6 +387,10 @@ users: [{
 }]
 };
 EOF
+    pushd "$HOME/.node-red"
+    npm i node-red/node-red-dashboard  # install dashboard
+    npm i node-red-contrib-influxdb # install influxdb connector
+    popd
     echo_format "Changed $nodered_config."
   fi # node-red config
 
