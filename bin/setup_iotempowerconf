@@ -26,7 +26,6 @@ fi
 
 
 # Prompt the user for SSID and password
-. $IOTEMPOWER_ROOT/bin/setup_wifi_credentials
 source $IOTEMPOWER_ROOT/etc/wifi_credentials
 # Create a file and write the SSID and password to it
 cat << EOF > /home/renato/iot/etc/iotempower.conf
