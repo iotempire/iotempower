@@ -23,42 +23,22 @@ fi
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
 
-source /home/renato/iot/bin/check_router_ip
-source /home/renato/iot/bin/setup_iotempower_config
+source $IOTEMPOWER_ROOT/bin/check_router_ip
 # Print it for verification
 echo "Router IP: $ROUTER_IP"
 
-# Prompt the user for SSID and password
-read -p "Please choose a SSID for your gateway: " ssid
-# Ask for the password until the two inputs match
-while true; do
-    read -sp "Please create a new password: " password
-    echo
-    read -sp "Please confirm your new password: " password_confirm
-    echo
-    if [ "$password" = "$password_confirm" ]; then
-        break
-    else
-        echo "Passwords do not match. Please try again."
-    fi
-done
-# Create a file to store wifi credentials
-cat << EOF > /home/renato/iot/etc/wifi_credentials
-SSID=$ssid
-Password=$password
-GatewayIP='192.168.12.1'
 
+source $IOTEMPOWER_ROOT/etc/wifi_credentials
 
-EOF
 # create iotempower_config file for global wifi configuration under /etc/config/
-. /home/renato/iot/bin/setup_iotempower_config
-
-# /etc/config/wireless
-echo "trying to copy ssh-key..."
-timeout -k 3 2 ssh-copy-id -f root@$ROUTER_IP < /dev/tty # copy ssh-key to router for passwordless login.
+#. /home/renato/iot/bin/setup_iotempower_config
+#ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$ROUTER_IP << EOF # ssh into router and execute the following commands to set the wifi configuration and fix the network ip for the gateway
+echo "trying to copy ssh-key root@"$ROUTER_IP"..."
+timeout -k 6 5 ssh-copy-id -f root@$ROUTER_IP < /dev/tty # copy ssh-key to router for passwordless login.
 #timeout 2 seconds, kills process after 3 seconds if it stalls. /dev/tty redirects input from the terminal to the ssh-copy-id command.
 echo "...done"
 ssh root@$ROUTER_IP << EOF # ssh into router and execute the following commands to set the wifi configuration and fix the network ip for the gateway
+
 
 opkg update
 
@@ -80,11 +60,14 @@ uci set mosquitto.mosquitto.allow_anonymous='1'
 uci set mosquitto.persistence=persistence
 uci set mosquitto.persistence.persistence='0'
 
-# Add a new listener section
-uci add mosquitto listener
-# Set the options in the new listener section
-uci set mosquitto.@listener[0].port='1883'
-uci set mosquitto.@listener[0].protocol='mqtt'
+# Check if a Mosquitto listener already exists
+if ! uci show mosquitto | grep -q '=listener'; then
+    # If no listener exists, add one
+    uci add mosquitto listener
+    # Set the options in the new listener section
+    uci set mosquitto.@listener[0].port='1883'
+    uci set mosquitto.@listener[0].protocol='mqtt'
+fi
 
 # Save the changes
 uci commit mosquitto
@@ -93,18 +76,42 @@ uci commit mosquitto
 /etc/init.d/mosquitto start
 
 uci set wireless.radio0.disabled='0'
-uci set wireless.default_radio0.ssid="$ssid"
+uci set wireless.default_radio0.ssid="$SSID"
 uci set wireless.default_radio0.encryption="psk2"
-uci set wireless.default_radio0.key="$password"
+uci set wireless.default_radio0.key="$Password"
 uci commit wireless
-wifi
+wifi &
 
 echo "Setting wifi credentials"
-uci set network.lan.ipaddr='192.168.12.1'
+uci set network.lan.ipaddr="$GatewayIP"
 uci commit network
 echo "Setting network ip to 192.168.12.1 and restarting..."
 echo "WiFi configuration has been written to uci config file"
 ( sleep 5 ; /etc/init.d/network restart ) &
 
-
 EOF
+
+echo "Wait for the router to restart...Please disconnect Ethernet cable and connect it again"
+#echo "Press enter once you have connected to Wifi $SSID"
+# Set the countdown time in seconds
+
+echo "Waiting for the router to restart...Please disconnect Ethernet and Connect to the new wifi network $SSID once it is up"
+#get routers IP address
+router_ip=$(route -n | grep 'UG[ \t]' | awk '{print $2}' | grep '^192\.168')
+countdown_time=60
+# Start the countdown
+for ((i=$countdown_time; i>0; i--)); do
+    printf "\rCountdown: %2d seconds remaining \n" $i
+    # Check if the user has pressed enter and if the router IP matches the gateway IP
+    if [ "$router_ip" = "$GatewayIP" ]; then
+        echo "You are connected to the Gateway's wifi network $SSID"
+        echo "Gateway's new IP: $router_ip"
+        break
+    fi
+    sleep 1
+done
+
+if [ $i -eq 0 ]; then
+    echo "Timeout, you did not connect to the Gateway's wifi network. Please check your wifi settings and try again"
+fi
+echo "Done"

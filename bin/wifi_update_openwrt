@@ -22,29 +22,5 @@ fi
 
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
-
-source $IOTEMPOWER_ROOT/bin/check_router_ip
-# Print it for verification
-echo "Router IP: $ROUTER_IP"
-
-
-# /etc/config/wireless
-
-source $IOTEMPOWER_ROOT/etc/wifi_credentials
-echo $SSID
-echo $Password
-echo $GatewayIP
-
-#ssh root@$ROUTER_IP << EOF # ssh into router and execute the following commands to set the wifi configuration and fix the network ip for the gateway
-ssh -o StrictHostKeyChecking=no root@$ROUTER_IP << EOF # ssh into router and execute the following commands to set the wifi configuration and fix the network ip for the gateway
-
-
-uci set wireless.radio0.disabled='0'
-uci set wireless.default_radio0.ssid="$SSID"
-uci set wireless.default_radio0.encryption="psk2"
-uci set wireless.default_radio0.key="$Password"
-uci commit wireless
-wifi &
-
-EOF
-
+. $IOTEMPOWER_ROOT/bin/setup_iotempower_network_conf
+. $IOTEMPOWER_ROOT/bin/update_wifi_credentials_uci
