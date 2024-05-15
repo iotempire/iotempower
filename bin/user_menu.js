@@ -1,6 +1,17 @@
 var term = require( 'terminal-kit' ).terminal;
 var child_process = require('child_process');
 
+//test frontend menu for web server
+
+const express = require('express');
+const app = express();
+
+// Your existing code goes here
+
+app.listen(3000, () => {
+  console.log('Server is running on http://localhost:3000');
+});
+
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -356,34 +367,35 @@ function wifi_config() {
 }
 
 function set_wificredentials_systemconf() {
-    shell_command("This will open an editor with the project system configuration file where you can assign the wifi credentials for your projects."
-        + " This must be run inside a project folder"
-        + " This is important if your project has different Wifi credentials than the default ones"
-        + "\nDo you want to continue editing your project WiFi configuration for your system?",
+    shell_command("This will edit system configuration file where you can assign the wifi credentials for specific projects."
+        + "\n!!!This must be run inside a project folder (or its parents) which contains a system.conf file"
+        + "\nThis will overwrite the default credentials. It is useful if your project has different wifi credentials than the default ones"
+        + "\nDo you want to continue editing your project's WiFi configuration (system.conf)?",
         "set_wificredentials_systemconf");
 }
 
-function setup_gateway_wifi() {
-    shell_command("This will a file that pre configure your gateway credentials."
-        + " Please define the SSID and password for your WiFi-router."
-        + " This Wifi credentials will become your default settings. "
-        + "\nDo you want to continue editing your Gateway's WiFi configuration?",
-        " setup_gateway_wifi");
+function setup_iotempower_network_conf() {
+    shell_command("This will create a iotempower.conf file that creates global credentials for your systems."
+        + "\nIf your accesspoint is an internal wifi chip, this will define it's credentials"
+        + "\nThis wull define the SSID and password for wifi by creating a iotempower.conf file."
+        + "\nThis wifi credentials will become your default settings. "
+        + "\nDo you want to continue editing your IoTempower's wiFi configuration?",
+        " setup_iotempower_network_conf");
 }
 
-function setup_gateway_wifi_uci() {
+function wifi_setup_openwrt() {
     shell_command("This will a file that pre configure your gateway credentials."
         + " Please define the SSID and password for your external WiFi-router running OpenWRT."
         + " This Wifi credentials will become your default settings. "
         + "\nDo you want to continue editing your Gateway's WiFi configuration?",
-        " setup_gateway_wifi_uci");
+        " wifi_setup_openwrt");
 }
-function update_gateway_wifi_uci() {
+function wifi_update_openwrt() {
     shell_command("This will a file that pre configure your gateway credentials."
         + " Please define the SSID and password for your external WiFi-router running OpenWRT."
         + " This Wifi credentials will become your default settings. "
         + "\nDo you want to continue editing your Gateway's WiFi configuration?",
-        " update_wifi_credentials_uci");
+        " wifi_update_openwrt");
 }
 
 function advanced(back) {
@@ -404,10 +416,10 @@ function advanced_back() {
 
 function system_configuration(back) {
     choice([
-        ["Change wifi credentials in system config (W)", "W", set_wificredentials_systemconf],
-        ["Set-up wifi gateway from internal wifi chip (I)", "I", setup_gateway_wifi],
-        ["Set-up wifi gateway on external OpenWRT router (R)", "R",  setup_gateway_wifi_uci],
-        ["Update external OpenWRT router credentials (U)", "U",  update_gateway_wifi_uci],
+        ["Change wifi credentials for projects in system config (W)", "W", set_wificredentials_systemconf],
+        ["Set-up global wifi credentials - internal chip (I)", "I", setup_iotempower_network_conf],
+        ["Set-up wifi gateway on external OpenWRT router (R)", "R",  wifi_setup_openwrt],
+        ["Update external OpenWRT router credentials (U)", "U",  wifi_update_openwrt],
         ["Set-up wifi gateway on the Raspberry Pi (P)", "P", wifi_config],
         ["Back (B,X,ESC)", ["B","X"], back?menu_default:terminate]
     ], pre_select=-1, pad_last=1);
