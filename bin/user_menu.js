@@ -1,17 +1,6 @@
 var term = require( 'terminal-kit' ).terminal;
 var child_process = require('child_process');
 
-//test frontend menu for web server
-
-const express = require('express');
-const app = express();
-
-// Your existing code goes here
-
-app.listen(3000, () => {
-  console.log('Server is running on http://localhost:3000');
-});
-
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -102,7 +91,7 @@ async function choice(items, pre_select=0, pad_last=0) {
             itemMaxWidth: 2*(button_padding+1)+longest,
             extraLines: extra_lines,
             style: term.bgBrightWhite.black,
-            selectedStyle: term.bgGreen.black,
+            selectedStyle: term.bgBlue.black,
             submittedStyle: term.bgWhite.black,
             exitOnUnexpectedKey: true, // catch other keys
             continueOnSubmit: false
@@ -366,25 +355,34 @@ function wifi_config() {
         "sudo /usr/bin/mcedit /boot/wifi.txt");
 }
 
-function set_wificredentials_systemconf() {
+function wifi_setup_systemconf() {
+    term("\n\n");
+    term
+    term.bgBrightWhite.black.brightCyan.wrap( '^+!!!This must be run inside a project folder^: (or its parents) which contains a system.conf file' );
+    term("\n");
     shell_command("This will edit system configuration file where you can assign the wifi credentials for specific projects."
-        + "\n!!!This must be run inside a project folder (or its parents) which contains a system.conf file"
         + "\nThis will overwrite the default credentials. It is useful if your project has different wifi credentials than the default ones"
         + "\nDo you want to continue editing your project's WiFi configuration (system.conf)?",
-        "set_wificredentials_systemconf");
+        "wifi_setup_systemconf");
 }
 
-function setup_iotempower_network_conf() {
+function wifi_setup_global() {
+    term("\n\n");
+    term
+    term.bgBrightWhite.black.brightCyan.wrap( '^+!!!Make sure you are connected to your router via Ethernet or Wifi^' );
+    term("\n");
+    term.bgBrightWhite.black.brightCyan.wrap( '^+!!!Make sure your router has internet connection^' );
+    term("\n");
     shell_command("This will create a iotempower.conf file that creates global credentials for your systems."
         + "\nIf your accesspoint is an internal wifi chip, this will define it's credentials"
         + "\nThis wull define the SSID and password for wifi by creating a iotempower.conf file."
         + "\nThis wifi credentials will become your default settings. "
         + "\nDo you want to continue editing your IoTempower's wiFi configuration?",
-        " setup_iotempower_network_conf");
+        " wifi_setup_global");
 }
 
 function wifi_setup_openwrt() {
-    shell_command("This will a file that pre configure your gateway credentials."
+    shell_command("This will create a file that pre configure your gateway credentials."
         + " Please define the SSID and password for your external WiFi-router running OpenWRT."
         + " This Wifi credentials will become your default settings. "
         + "\nDo you want to continue editing your Gateway's WiFi configuration?",
@@ -416,10 +414,10 @@ function advanced_back() {
 
 function system_configuration(back) {
     choice([
-        ["Change wifi credentials for projects in system config (W)", "W", set_wificredentials_systemconf],
-        ["Set-up global wifi credentials - internal chip (I)", "I", setup_iotempower_network_conf],
+        ["Change wifi credentials for projects in system config (W)", "W", wifi_setup_systemconf],
+        ["Set-up global wifi credentials - internal chip (I)", "I", wifi_setup_global],
         ["Set-up wifi gateway on external OpenWRT router (R)", "R",  wifi_setup_openwrt],
-        ["Update external OpenWRT router credentials (U)", "U",  wifi_update_openwrt],
+        ["Update wifi credentials wifi on external OpenWRT router (U)", "U",  wifi_update_openwrt],
         ["Set-up wifi gateway on the Raspberry Pi (P)", "P", wifi_config],
         ["Back (B,X,ESC)", ["B","X"], back?menu_default:terminate]
     ], pre_select=-1, pad_last=1);
