@@ -115,7 +115,7 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
     export PLATFORMIO_LIBDEPS_DIR="$IOTEMPOWER_COMPILE_CACHE/libs"
     export PLATFORMIO_BUILD_CACHE_DIR="$IOTEMPOWER_COMPILE_CACHE/platformio"
 
-    platformio run $pio_upload || { echo "Trouble compiling or flashing new firmware, check errors."; exit 1; }
+    iot_platformio run $pio_upload || { echo "Trouble compiling or flashing new firmware, check errors."; exit 1; }
     
     if [[ "$remote" || "$adopt" ]]; then
         i=1
