@@ -10,7 +10,12 @@ command -v git &>/dev/null || {
 
 mkdir $HOME/iot-docker
 git clone https://github.com/iotempire/iotempower "$HOME/iot-docker/repo"
-ln -s "$HOME/iot-docker/repo" "$HOME/iot"
+if [ ! -d "$HOME/iot" ]; then
+    ln -s "$HOME/iot-docker/repo" "$HOME/iot"
+fi
+if [ ! -d "$HOME/iot-systems" ]; then
+    ln -s "$HOME/iot-docker/iot-systems" "$HOME/iot-systems"
+fi
 cd "$HOME/iot-docker/repo" || exit 1
 git config pull.rebase false
 bin/iot_activate_iot_script "examples/scripts/iot-docker"
