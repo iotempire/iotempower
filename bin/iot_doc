@@ -25,7 +25,7 @@ fi
 # Running in Termux, set correct preloaded lib
 GLIBC_PRELOAD=""
 if [[ -n "$PREFIX" ]] && command -v apt-get &> /dev/null; then
-  GLIBC_PRELOAD="/data/data/com.termux/files/usr/glibc/lib/libtermux-exec.so"
+  GLIBC_PRELOAD=""
 else
   GLIBC_PRELOAD="$LD_PRELOAD"
 fi
