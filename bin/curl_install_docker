@@ -1,34 +1,20 @@
 #!/usr/bin/env bash
+# This can be called as:
+# curl -L https://github.com/iotempire/iotempower/raw/master/bin/curl_install_docker | bash -
 
-# Initialize a flag to track missing tools
-missing_tools=0
+command -v git &>/dev/null || { 
+    echo "git is not installed. Please install it."
+    echo "On Debian systems, you can do this using 'sudo apt update && sudo apt install git'."; 
+    exit 1 
+    }
 
-# Function to check each tool
-check_tool() {
-    if ! command -v "$1" &> /dev/null; then
-        echo "Missing tool: $1"
-        missing_tools=1
-    fi
-}
+mkdir $HOME/iot-docker
+git clone https://github.com/iotempire/iotempower "$HOME/iot-docker/repo"
+ln -s "$HOME/iot-docker/repo" "$HOME/iot"
+cd "$HOME/iot-docker/repo" || exit 1
+git config pull.rebase false
+bin/iot_activate_iot_script "examples/scripts/iot-docker"
+docker pull ulno/iotempower
 
-# Check for each required tool
-check_tool git
-check_tool docker
-check_tool docker-compose
-
-# If any tools are missing, print a message and exit
-if [ "$missing_tools" -ne 0 ]; then
-    echo "Please make sure git, docker, and docker-compose are installed."
-    echo "On Debian-based systems, you can use the following commands:"
-    echo "sudo apt update"
-    echo "sudo apt install git"
-    echo "sudo apt install docker.io"
-    echo "sudo apt install docker-compose"
-    exit 1
-fi
-
-git clone https://github.com/iotempire/iotempower ~/iot
-cd ~/iot || exit 1
-
-docker-compose build
-docker-compose up -d
+# run it
+examples/scripts/iot-docker
