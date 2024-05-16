@@ -10,7 +10,7 @@
 # Running in Termux check
 GRUN=""
 if [[ -n "$PREFIX" ]] && command -v apt-get &> /dev/null; then
-  GRUN="grun -s"
+  GRUN='LD_PRELOAD=""'
 fi
 
 daemon_fifo=/var/tmp/iotempower_dongle
