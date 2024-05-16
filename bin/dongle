@@ -7,11 +7,14 @@
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
 
-# Running in Termux check
-GRUN=""
+# Running in Termux, set correct preloaded lib
+GLIBC_PRELOAD=""
 if [[ -n "$PREFIX" ]] && command -v apt-get &> /dev/null; then
-  GRUN='LD_PRELOAD=""'
+  GLIBC_PRELOAD=""
+else
+  GLIBC_PRELOAD="$LD_PRELOAD"
 fi
+iot_grun() { LD_PRELOAD="$GLIBC_PRELOAD" "$@" }
 
 daemon_fifo=/var/tmp/iotempower_dongle
 daemon_port="$daemon_fifo.port"
@@ -62,7 +65,7 @@ if [[ "$command" = flash ]]; then
         port=/dev/$(find_esp_port "$1" nodongle)
     fi
     echo "Flashing dongle on port $port..."
-    $GRUN python3 "$IOTEMPOWER_ROOT/bin/dongle_display.py" -p "$port" \
+    iot_grun python3 "$IOTEMPOWER_ROOT/bin/dongle_display.py" -p "$port" \
         "Updating\\\\nfirmware...\\\\n\\\\nPlease wait."
     cd "$IOTEMPOWER_ROOT/lib/esp_dongle"
     export PLATFORMIO_UPLOAD_PORT="$port"
@@ -108,9 +111,9 @@ elif [[ "$command" = daemon ]]; then
         echo "$port" > "$daemon_port"
         echo "Starting daemon on $port."
         mkfifo -m 600 "$daemon_fifo"
-    #    $GRUN python3 "$IOTEMPOWER_ROOT/bin/dongle_daemon.py" "$@" <"$daemon_fifo"
+    #    iot_grun python3 "$IOTEMPOWER_ROOT/bin/dongle_daemon.py" "$@" <"$daemon_fifo"
         # not sure why I have to use tail for the fifo and not <$daemon_fifo
-        $GRUN python3 "$IOTEMPOWER_ROOT/bin/dongle_daemon.py" -i "$daemon_fifo" -p "$port" "$@"
+        iot_grun python3 "$IOTEMPOWER_ROOT/bin/dongle_daemon.py" -i "$daemon_fifo" -p "$port" "$@"
         rm -f "$daemon_fifo" "$daemon_port"
     else
         echo "Dongle not found."
@@ -128,9 +131,9 @@ else
     port=""
     port=$(cat "$daemon_port" 2>/dev/null)
     if [[ "$port" ]]; then
-        $GRUN python3 "$IOTEMPOWER_ROOT/bin/dongle_$command.py" -p "$port" "$@"
+        iot_grun python3 "$IOTEMPOWER_ROOT/bin/dongle_$command.py" -p "$port" "$@"
     else
-        $GRUN python3 "$IOTEMPOWER_ROOT/bin/dongle_$command.py" "$@"
+        iot_grun python3 "$IOTEMPOWER_ROOT/bin/dongle_$command.py" "$@"
     fi
     result=$?
     dongle_connect

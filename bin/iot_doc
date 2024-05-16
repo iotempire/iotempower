@@ -22,11 +22,15 @@ fi
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
 
-# Running in Termux check
-GRUN=""
+# Running in Termux, set correct preloaded lib
+GLIBC_PRELOAD=""
 if [[ -n "$PREFIX" ]] && command -v apt-get &> /dev/null; then
-  GRUN='LD_PRELOAD=""'
+  GLIBC_PRELOAD=""
+else
+  GLIBC_PRELOAD="$LD_PRELOAD"
 fi
+iot_grun() { LD_PRELOAD="$GLIBC_PRELOAD" "$@" }
+
 
 cd "$IOTEMPOWER_ROOT/doc"
 
@@ -41,10 +45,10 @@ create_doc() {
 
 EOF
     # make man SPHINXOPTS=-v
-    $GRUN make man
+    iot_grun make man
     echo "Generating web-viewable documentation."
     # make html SPHINXOPTS=-v
-    $GRUN make html
+    iot_grun make html
     # TODO: do eventually a matching specific version here
     ln -s -f "$IOTEMPOWER_LOCAL/doc/html/doc/index-pi.html" \
         "$IOTEMPOWER_LOCAL/doc/html/index.html"
@@ -65,7 +69,7 @@ case "$1" in
         create_doc
         echo "Starting webserver for documentation. ctrl-c to stop."
         cd "$IOTEMPOWER_LOCAL/doc/html"
-        $GRUN exec python "$IOTEMPOWER_ROOT/bin/docserver.py"
+        iot_grun exec python "$IOTEMPOWER_ROOT/bin/docserver.py"
         ;;
     *)
         usage
