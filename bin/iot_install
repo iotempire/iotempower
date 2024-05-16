@@ -213,6 +213,7 @@ if [[ "$clean" == 1 ]]; then
   if [ "$#" -eq 1 ]; then # only clean was given, so set to default install with questions after this deletion
     set --
   fi
+  # TODO: consider also offering to clear $HOME/.npm
 fi
 
 # check if virtualenv is already set up
@@ -458,8 +459,7 @@ iot_grun python3 "$IOTEMPOWER_ROOT"/utils/save_arguments_as_json.py --splitter '
 # TODO: make test install specific
 
 # Testing the installation
-if ! iot_grun pytest "$IOTEMPOWER_ROOT"/tests/test_installations.py;
-then
+if ! iot_grun pytest "$IOTEMPOWER_ROOT"/tests/test_installations.py; then
   exit 1
 fi
 
