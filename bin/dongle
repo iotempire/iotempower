@@ -14,7 +14,9 @@ if [[ -n "$PREFIX" ]] && command -v apt-get &> /dev/null; then
 else
   GLIBC_PRELOAD="$LD_PRELOAD"
 fi
-iot_grun() { LD_PRELOAD="$GLIBC_PRELOAD" "$@" }
+iot_grun() {
+    LD_PRELOAD="$GLIBC_PRELOAD" "$@"
+}
 
 daemon_fifo=/var/tmp/iotempower_dongle
 daemon_port="$daemon_fifo.port"
