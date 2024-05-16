@@ -91,8 +91,8 @@ true # ignore result of this
 
 # add pathes for firmware compilation
 export IOTEMPOWER_FIRMWARE="$IOTEMPOWER_EXTERNAL/firmware"
-export PATH="$IOTEMPOWER_FIRMWARE/bin:$PATH"
-export PATH="$IOTEMPOWER_FIRMWARE/esp-open-sdk/xtensa-lx106-elf/bin:$PATH"
+#export PATH="$IOTEMPOWER_FIRMWARE/bin:$PATH" # TODO: is this needed?
+#export PATH="$IOTEMPOWER_FIRMWARE/esp-open-sdk/xtensa-lx106-elf/bin:$PATH" # TODO: is this needed?
 
 IOTEMPOWER_AP_NAME_FULL=$(accesspoint show 2>/dev/null)
 export IOTEMPOWER_AP_NAME_FULL
