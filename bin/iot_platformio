@@ -8,4 +8,4 @@ if [[ -n "$PREFIX" ]] && command -v apt-get &> /dev/null; then
   GRUN='LD_PRELOAD=""'
 fi
 
-exec $GRUN "$IOTEMPOWER_VPYTHON/bin/pio" "$@"
+$GRUN exec "$IOTEMPOWER_VPYTHON/bin/pio" "$@"
