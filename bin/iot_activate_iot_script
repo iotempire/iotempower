@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
+# if $1 given, install that as script
+
+[ -d "$IOTEMPOWER_ROOT" ] || { echo "IOTEMPOWER_ROOT needs to be set and exist." 1>&2;exit 1; }
 
 # Define potential installation directories
 dirs=("$HOME/bin" "$HOME/.local/bin")
@@ -36,12 +38,18 @@ if [ ! -d "$install_dir" ]; then
     mkdir -p "$install_dir"
 fi
 
-echo "Installing 'iot' to $install_dir"
-cat << EOF > "$install_dir/iot"
+if [[ "$1" ]]; then  # scritp was given
+    echo "Installing '$1' to $install_dir"
+    cp "$1" "$install_dir/iot"
+else
+    echo "Installing 'iot' to $install_dir"
+    cat << EOF > "$install_dir/iot"
 #!/usr/bin/env bash
 export IOTEMPOWER_ROOT="$IOTEMPOWER_ROOT"
 exec bash "\$IOTEMPOWER_ROOT/run" "\$@"
 EOF
+
+fi
 
 chmod +x "$install_dir/iot"
 echo "This is the content of the installed script (cat "\""$install_dir/iot"\""):"
