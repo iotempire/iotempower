@@ -29,7 +29,9 @@ if [[ -n "$PREFIX" ]] && command -v apt-get &> /dev/null; then
 else
   GLIBC_PRELOAD="$LD_PRELOAD"
 fi
-iot_grun() { LD_PRELOAD="$GLIBC_PRELOAD" "$@" }
+iot_grun() {
+    LD_PRELOAD="$GLIBC_PRELOAD" "$@"
+}
 
 
 cd "$IOTEMPOWER_ROOT/doc"

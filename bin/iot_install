@@ -21,7 +21,9 @@ if [[ -n "$PREFIX" ]] && command -v apt-get &> /dev/null; then
 else
   GLIBC_PRELOAD="$LD_PRELOAD"
 fi
-iot_grun() { LD_PRELOAD="$GLIBC_PRELOAD" "$@" }
+iot_grun() { 
+  LD_PRELOAD="$GLIBC_PRELOAD" "$@"
+}
 
 function printf_format() {
   format_command="fold -s -w $(tput cols)"
