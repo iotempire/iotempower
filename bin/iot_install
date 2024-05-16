@@ -458,7 +458,7 @@ iot_grun python3 "$IOTEMPOWER_ROOT"/utils/save_arguments_as_json.py --splitter '
 # TODO: make test install specific
 
 # Testing the installation
-if ! pytest "$IOTEMPOWER_ROOT"/tests/test_installations.py;
+if ! iot_grun pytest "$IOTEMPOWER_ROOT"/tests/test_installations.py;
 then
   exit 1
 fi
