@@ -207,7 +207,7 @@ EOF
     #     "$dest_dir/src/all_devices.txt" > "$fname.new"
     new_dir="$dest_dir/device-selection.tmp"
     mkdir -p "$new_dir/src"
-    commands=$(piot_grun python3 "$IOTEMPOWER_ROOT/bin/command_checker.py" \
+    commands=$(iot_grun python3 "$IOTEMPOWER_ROOT/bin/command_checker.py" \
         "$dest_dir/src/devices.ini" \
         "$dest_dir/src/setup.h" \
         "$new_dir")
