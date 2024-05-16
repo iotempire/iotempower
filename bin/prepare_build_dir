@@ -19,6 +19,17 @@ fi
 # TODO: remove dead links - kind of done below
 # TODO: only do it when no other process is active on that dir
 
+# Running in Termux, set correct preloaded lib
+GLIBC_PRELOAD=""
+if [[ -n "$PREFIX" ]] && command -v apt-get &> /dev/null; then
+  GLIBC_PRELOAD="/data/data/com.termux/files/usr/glibc/lib/libtermux-exec.so"
+else
+  GLIBC_PRELOAD="$LD_PRELOAD"
+fi
+iot_grun() {
+    LD_PRELOAD="$GLIBC_PRELOAD" "$@"
+}
+
 replace_if_new() {
     # only replace if it's new and delete source
     # $1 source
@@ -191,12 +202,12 @@ EOF
     # search devices
     # old command_checker that created only one include file:
     # fname="$dest_dir/src/device-list.h"
-    # python "$IOTEMPOWER_ROOT/bin/command_checker.py" \
+    # python3 "$IOTEMPOWER_ROOT/bin/command_checker.py" \
     #     "$dest_dir/src/setup.h" \
     #     "$dest_dir/src/all_devices.txt" > "$fname.new"
     new_dir="$dest_dir/device-selection.tmp"
     mkdir -p "$new_dir/src"
-    commands=$(python "$IOTEMPOWER_ROOT/bin/command_checker.py" \
+    commands=$(piot_grun python3 "$IOTEMPOWER_ROOT/bin/command_checker.py" \
         "$dest_dir/src/devices.ini" \
         "$dest_dir/src/setup.h" \
         "$new_dir")
