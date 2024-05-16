@@ -14,6 +14,13 @@
 
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
+# Running in Termux check, for python environment
+GRUN=""
+if [[ -n "$PREFIX" ]] && command -v apt-get &> /dev/null; then
+  GRUN="grun -c"
+fi
+
+
 function printf_format() {
   format_command="fold -s -w $(tput cols)"
   if [ $# -gt 0 ]; then
@@ -309,25 +316,12 @@ if [[ "$install_system" == 1 ]]; then
 fi
 
 if [[ "$install_core" == 1 ]]; then
-  # TODO: test if system requirements are available
-  # python2 seems not to be necessary anymore
-  # # TODO: recheck, installation seems to fail first time -> path problems (wrong pip used?)
-  # # install virtualenv for python2 for platformio
-  # mkdir -p "$IOTEMPOWER_VPYTHON2"
-  # virtualenv -p "$(which python2)" "$IOTEMPOWER_VPYTHON2"
-  # source "$IOTEMPOWER_VPYTHON2/bin/activate"
-  # pip install --upgrade pip
-  #    pip install --upgrade platformio
-  # TODO: go back to normal install, but for now we need version4 (development version)
-  # pip install --upgrade https://github.com/platformio/platformio-core/archive/develop.zip
-  # deactivate # disable python 2 environment
-
   # install virtualenv
-  python3 -m venv --system-site-packages "$IOTEMPOWER_VPYTHON"
+  $GRUN python3 -m venv --system-site-packages "$IOTEMPOWER_VPYTHON"
   source "$IOTEMPOWER_VPYTHON/bin/activate"
-  pip install --no-cache-dir --upgrade pip
+  $GRUN pip install --no-cache-dir --upgrade pip
   # dependencies
-  pip install --no-cache-dir -r "$IOTEMPOWER_ROOT/lib/iot_installs/requirements.txt"
+  $GRUN pip install --no-cache-dir -r "$IOTEMPOWER_ROOT/lib/iot_installs/requirements.txt"
 
   # access point - TODO: make this optional
   git clone https://github.com/ulno/create_ap "$IOTEMPOWER_EXTERNAL/create_ap"
@@ -446,7 +440,7 @@ if [[ "$fix_serial_permissions" == 1 ]]; then
 fi
 
 # Save the state
-python "$IOTEMPOWER_ROOT"/utils/save_arguments_as_json.py --splitter '=' --path "$IOTEMPOWER_LOCAL"/installation_options.json \
+$GRUN python "$IOTEMPOWER_ROOT"/utils/save_arguments_as_json.py --splitter '=' --path "$IOTEMPOWER_LOCAL"/installation_options.json \
   core="$install_core" cloud_commander="$install_cloudcmd" \
   node_red="$install_node_red" caddy="$install_caddy" \
   mosquitto="$install_mqtt" \
