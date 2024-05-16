@@ -17,7 +17,7 @@
 # Running in Termux, set correct preloaded lib
 GLIBC_PRELOAD=""
 if [[ -n "$PREFIX" ]] && command -v apt-get &> /dev/null; then
-  GLIBC_PRELOAD=""
+  GLIBC_PRELOAD="/data/data/com.termux/files/usr/glibc/lib/libtermux-exec.so"
 else
   GLIBC_PRELOAD="$LD_PRELOAD"
 fi
@@ -143,6 +143,7 @@ help_string="Possible options:
 --mqtt: install Mosquitto mqtt broker into system
 --convenience: install mc, tmux, micro, tilde, elinks (if possible) into system
 --templates: create iot-systems template
+--platforms: pre-download esp8266 and esp32 platforms
 --cache: pre-fill cache to accelerate compilations
 --fix-serial: Fix/add serial port permissions for current user
 --fix-pi-wifi-ap: Fix Raspberry Pi wireless firmware for access point usage
@@ -182,6 +183,8 @@ while getopts ":h-:" opt; do
           install_convenience=1;;
         templates)
           install_template=1;;
+        platforms)
+          install_platforms=1;;
         cache)
           fill_cache=1;;
         fix-serial)
@@ -236,6 +239,7 @@ if [[ "$default" == 1 ]]; then
   fi
   install_convenience=1
   install_template=1
+  install_platforms=1
   fill_cache=0
   do_upgrade=1
 else # not default
@@ -274,6 +278,9 @@ else # not default
 
       echo_message_read_answer "Do you want to setup the iot-systems template folder"
       install_template=$?
+
+      echo_message_read_answer "Do you want to pre-download the esp8266 and esp32 platforms"
+      install_platforms=$?
 
       echo_message_read_answer "$(printf "%b" \
         "Do you want to pre-populate the compile cache to " \
@@ -430,6 +437,13 @@ bash "$IOTEMPOWER_ROOT/bin/fix_bin"
 
 # activate iot script # TODO: should we expose that as optional?
 iot_activate_iot_script
+
+if [[ "$install_platforms" == 1 ]]; then
+  echo_format "Installing platforms."
+  iot_platformio platform install espressif8266@4.0.1
+  iot_platformio platform install espressif32@6.4.0
+  fix_bin_termux
+fi
 
 if [[ "$fill_cache" == 1 ]]; then
   # populate the cache TODO: potentially integrate with testing

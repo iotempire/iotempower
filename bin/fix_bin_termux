@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
+
+FIX_DIR="$HOME/.platformio/packages"
+
+if [[ -n "$PREFIX" ]] && command -v apt-get &> /dev/null; then
+
+    echo "Fixing glibc problems in termux in :"
+    echo "$FIX_DIR"
+
+    find "$FIX_DIR" -type f -executable -print0 | while IFS= read -r -d $'\0' file; do
+        echo "Fixing glibc problems for $file..."
+        grun -c "$file" || echo "Failed to process $file"
+    done
+    exit 0
+else
+    echo "This script only works for Termux".
+    exit 1
+fi
