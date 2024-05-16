@@ -25,7 +25,7 @@ fi
 # Running in Termux check
 GRUN=""
 if [[ -n "$PREFIX" ]] && command -v apt-get &> /dev/null; then
-  GRUN="grun -s"
+  GRUN='LD_PRELOAD=""'
 fi
 
 cd "$IOTEMPOWER_ROOT/doc"
@@ -65,7 +65,7 @@ case "$1" in
         create_doc
         echo "Starting webserver for documentation. ctrl-c to stop."
         cd "$IOTEMPOWER_LOCAL/doc/html"
-        exec python "$IOTEMPOWER_ROOT/bin/docserver.py"
+        $GRUN exec python "$IOTEMPOWER_ROOT/bin/docserver.py"
         ;;
     *)
         usage

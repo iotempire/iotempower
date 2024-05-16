@@ -17,7 +17,8 @@
 # Running in Termux check, for python environment
 GRUN=""
 if [[ -n "$PREFIX" ]] && command -v apt-get &> /dev/null; then
-  GRUN="grun -s"
+#  GRUN="grun -s" - just removing the pre-load is better
+  GRUN='LD_PRELOAD=""'
 fi
 
 
