@@ -17,7 +17,7 @@
 # Running in Termux check, for python environment
 GRUN=""
 if [[ -n "$PREFIX" ]] && command -v apt-get &> /dev/null; then
-  GRUN="grun -c"
+  GRUN="grun -s"
 fi
 
 
