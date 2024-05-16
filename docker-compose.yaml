@@ -7,3 +7,4 @@ services:
     image: iotempower:latest
     ports:
       - "40080:40080"
+      - "1883:1883"
