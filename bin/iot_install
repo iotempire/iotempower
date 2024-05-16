@@ -14,13 +14,14 @@
 
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
-# Running in Termux check, for python environment
-GRUN=""
+# Running in Termux, set correct preloaded lib
+GLIBC_PRELOAD=""
 if [[ -n "$PREFIX" ]] && command -v apt-get &> /dev/null; then
-#  GRUN="grun -s" - just removing the pre-load is better
-  GRUN='LD_PRELOAD=""'
+  GLIBC_PRELOAD=""
+else
+  GLIBC_PRELOAD="$LD_PRELOAD"
 fi
-
+iot_grun() { LD_PRELOAD="$GLIBC_PRELOAD" "$@" }
 
 function printf_format() {
   format_command="fold -s -w $(tput cols)"
@@ -318,11 +319,11 @@ fi
 
 if [[ "$install_core" == 1 ]]; then
   # install virtualenv
-  $GRUN python3 -m venv --system-site-packages "$IOTEMPOWER_VPYTHON"
+  iot_grun python3 -m venv --system-site-packages "$IOTEMPOWER_VPYTHON"
   source "$IOTEMPOWER_VPYTHON/bin/activate"
-  $GRUN pip install --no-cache-dir --upgrade pip
+  iot_grun pip install --no-cache-dir --upgrade pip
   # dependencies
-  $GRUN pip install --no-cache-dir -r "$IOTEMPOWER_ROOT/lib/iot_installs/requirements.txt"
+  iot_grun pip install --no-cache-dir -r "$IOTEMPOWER_ROOT/lib/iot_installs/requirements.txt"
 
   # access point - TODO: make this optional
   git clone https://github.com/ulno/create_ap "$IOTEMPOWER_EXTERNAL/create_ap"
@@ -441,7 +442,7 @@ if [[ "$fix_serial_permissions" == 1 ]]; then
 fi
 
 # Save the state
-$GRUN python "$IOTEMPOWER_ROOT"/utils/save_arguments_as_json.py --splitter '=' --path "$IOTEMPOWER_LOCAL"/installation_options.json \
+iot_grun python3 "$IOTEMPOWER_ROOT"/utils/save_arguments_as_json.py --splitter '=' --path "$IOTEMPOWER_LOCAL"/installation_options.json \
   core="$install_core" cloud_commander="$install_cloudcmd" \
   node_red="$install_node_red" caddy="$install_caddy" \
   mosquitto="$install_mqtt" \
