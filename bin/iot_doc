@@ -21,6 +21,13 @@ fi
 
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
+
+# Running in Termux check
+GRUN=""
+if [[ -n "$PREFIX" ]] && command -v apt-get &> /dev/null; then
+  GRUN="grun -s"
+fi
+
 cd "$IOTEMPOWER_ROOT/doc"
 
 create_doc() {
@@ -34,10 +41,10 @@ create_doc() {
 
 EOF
     # make man SPHINXOPTS=-v
-    make man
+    $GRUN make man
     echo "Generating web-viewable documentation."
     # make html SPHINXOPTS=-v
-    make html
+    $GRUN make html
     # TODO: do eventually a matching specific version here
     ln -s -f "$IOTEMPOWER_LOCAL/doc/html/doc/index-pi.html" \
         "$IOTEMPOWER_LOCAL/doc/html/index.html"
