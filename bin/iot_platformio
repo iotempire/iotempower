@@ -3,11 +3,8 @@
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
 # Running in Termux, set correct preloaded lib
-GLIBC_PRELOAD=""
 if [[ -n "$PREFIX" ]] && command -v apt-get &> /dev/null; then
-  GLIBC_PRELOAD=""
+  exec grun -t "$IOTEMPOWER_VPYTHON/bin/python" "$IOTEMPOWER_VPYTHON/bin/pio" "$@"
 else
-  GLIBC_PRELOAD="$LD_PRELOAD"
+  exec "$IOTEMPOWER_VPYTHON/bin/pio" "$@"
 fi
-
-LD_PRELOAD="$GLIBC_PRELOAD" exec "$IOTEMPOWER_VPYTHON/bin/pio" "$@"
