@@ -25,7 +25,7 @@ iot_grun() {
   # LD_PRELOAD="$GLIBC_PRELOAD" "$@"
   if [[ -n "$PREFIX" ]] && command -v apt-get &> /dev/null; then
     #LD_PRELOAD="/data/data/com.termux/files/usr/glibc/lib/libtermux-exec.so" \
-    # empty works better for install
+    # empty works better for python install, but not for nodejs
     LD_PRELOAD="" \
     PATH="/data/data/com.termux/files/usr/glibc/bin:$PATH" "$@"
   else
@@ -349,7 +349,7 @@ if [[ "$install_core" == 1 ]]; then
 
   # install node.js related stuff
   init_nodejs
-  npm install terminal-kit
+  iot_grun npm install terminal-kit
 
   echo_format "All core packages have been installed."
 fi # core
@@ -358,8 +358,8 @@ if [[ "$install_cloudcmd" == 1 ]]; then
   init_nodejs
   echo_format "Installing Cloud Commander"
   # apt-get install g++ -y - Obsolete: should be in build-essential or default on arch
-  npm install gritty
-  npm install cloudcmd
+  iot_grun npm install gritty
+  iot_grun npm install cloudcmd
   # copy menu files
   cp -a "$IOTEMPOWER_ROOT/lib/gateway_setup/cloudcmd/cloudcmd.menu.js" "$HOME/.cloudcmd.menu.js"
   cp -a "$IOTEMPOWER_ROOT/lib/gateway_setup/cloudcmd/cloudcmd.json" "$HOME/.cloudcmd.json"
@@ -383,7 +383,7 @@ fi # cloudcmd
 if [[ "$install_node_red" == 1 ]]; then
   init_nodejs
   echo_format "Installing Node Red"
-  npm install --unsafe-perm node-red
+  iot_grun npm install --unsafe-perm node-red
   mkdir -p "$HOME/.node-red"
   cp "$IOTEMPOWER_LOCAL"/nodejs/node_modules/node-red/settings.js "$HOME/.node-red/"
   nodered_config=~/.node-red/settings.js
@@ -402,8 +402,8 @@ users: [{
 };
 EOF
     pushd "$HOME/.node-red"
-    npm i node-red/node-red-dashboard  # install dashboard
-    npm i node-red-contrib-influxdb # install influxdb connector
+    iot_grun npm i node-red/node-red-dashboard  # install dashboard
+    iot_grun npm i node-red-contrib-influxdb # install influxdb connector
     popd
     echo_format "Changed $nodered_config."
   fi # node-red config
