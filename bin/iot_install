@@ -26,8 +26,7 @@ iot_grun() {
   if [[ -n "$PREFIX" ]] && command -v apt-get &> /dev/null; then
     #LD_PRELOAD="/data/data/com.termux/files/usr/glibc/lib/libtermux-exec.so" \
     # empty works better for install
-    #LD_PRELOAD="" \
-    # or only path for install?
+    LD_PRELOAD="" \
     PATH="/data/data/com.termux/files/usr/glibc/bin:$PATH" "$@"
   else
     "$@"
