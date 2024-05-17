@@ -15,14 +15,20 @@
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
 # Running in Termux, set correct preloaded lib
-GLIBC_PRELOAD=""
-if [[ -n "$PREFIX" ]] && command -v apt-get &> /dev/null; then
-  GLIBC_PRELOAD="/data/data/com.termux/files/usr/glibc/lib/libtermux-exec.so"
-else
-  GLIBC_PRELOAD="$LD_PRELOAD"
-fi
+# GLIBC_PRELOAD=""
+# if [[ -n "$PREFIX" ]] && command -v apt-get &> /dev/null; then
+#   GLIBC_PRELOAD="/data/data/com.termux/files/usr/glibc/lib/libtermux-exec.so"
+# else
+#   GLIBC_PRELOAD="$LD_PRELOAD"
+# fi
 iot_grun() { 
-  LD_PRELOAD="$GLIBC_PRELOAD" "$@"
+  # LD_PRELOAD="$GLIBC_PRELOAD" "$@"
+  if [[ -n "$PREFIX" ]] && command -v apt-get &> /dev/null; then
+    LD_PRELOAD="/data/data/com.termux/files/usr/glibc/lib/libtermux-exec.so" \
+    PATH="/data/data/com.termux/files/usr/glibc/bin:$PATH" "$@"
+  else
+    "$@"
+  fi
 }
 
 function printf_format() {
