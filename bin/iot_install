@@ -24,7 +24,9 @@
 iot_grun() { 
   # LD_PRELOAD="$GLIBC_PRELOAD" "$@"
   if [[ -n "$PREFIX" ]] && command -v apt-get &> /dev/null; then
-    LD_PRELOAD="/data/data/com.termux/files/usr/glibc/lib/libtermux-exec.so" \
+    #LD_PRELOAD="/data/data/com.termux/files/usr/glibc/lib/libtermux-exec.so" \
+    # empty works better for install
+    LD_PRELOAD="" \
     PATH="/data/data/com.termux/files/usr/glibc/bin:$PATH" "$@"
   else
     "$@"
