@@ -333,7 +333,7 @@ if [[ "$install_core" == 1 ]]; then
   iot_grun python3 -m venv --system-site-packages "$IOTEMPOWER_VPYTHON"
   source "$IOTEMPOWER_VPYTHON/bin/activate"
   iot_grun pip install --no-cache-dir --upgrade pip
-  # dependencies - TODO: we cannot update pip if running under termux (just throws forbidden error) - fix?
+  # dependencies - TODO: we cannot update pip if running under termux (just throws forbidden error) - fix? - migh tneed to uninstall pip-glibc
   iot_grun pip install --no-cache-dir -r "$IOTEMPOWER_ROOT/lib/iot_installs/requirements.txt"
 
   # access point - TODO: make this optional
