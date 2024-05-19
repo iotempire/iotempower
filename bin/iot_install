@@ -351,7 +351,7 @@ if [[ "$install_cloudcmd" == 1 ]]; then
   init_nodejs
   echo_format "Installing Cloud Commander"
   deactivate # termux can't do the two following in venv - do we need to specialize this?
-  npm install node-gpy
+  npm install node-gyp
   npm install node-pty
   source "$IOTEMPOWER_VPYTHON/bin/activate"
   iot_grun npm install gritty # TODO: fix (node-pty), this needs python and makes trouble on termux
