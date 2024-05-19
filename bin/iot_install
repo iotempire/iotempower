@@ -118,7 +118,7 @@ function init_nodejs() {
     mkdir -p nodejs && cd nodejs || { echo "Can't create nodejs folder, aborting." 1>&2;exit 1; }
     # if package.json does not exist, run nmp init to create it
 
-    npm init -y > /dev/null
+    iot_grun npm init -y > /dev/null
 }
 
 function check_pi() {
@@ -259,7 +259,7 @@ else # not default
     install_system=$?
 
     optional_message="Do you want to install the optional dependency"
-    # as we have already checked that there have ben no otehr arguments given, this is not necessary
+    # as we have already checked that there have ben no other arguments given, this is not necessary
     # if [ -z "$install_cloudcmd" ] && [ -z "$install_node_red" ] &&
     #     [ -z "$install_caddy" ] && [ -z "$install_mqtt" ] && [ -z "$fix_pi_wifi_ap" ]; then
       echo_message_read_answer "${optional_message} CLOUD COMMANDER (Details -> https://cloudcmd.io/)"
@@ -350,8 +350,11 @@ fi # core
 if [[ "$install_cloudcmd" == 1 ]]; then
   init_nodejs
   echo_format "Installing Cloud Commander"
-  # apt-get install g++ -y - Obsolete: should be in build-essential or default on arch
-  iot_grun npm install gritty
+  deactivate # termux can't do the two following in venv - do we need to specialize this?
+  npm install node-gpy
+  npm install node-pty
+  source "$IOTEMPOWER_VPYTHON/bin/activate"
+  iot_grun npm install gritty # TODO: fix (node-pty), this needs python and makes trouble on termux
   iot_grun npm install cloudcmd
   # copy menu files
   cp -a "$IOTEMPOWER_ROOT/lib/gateway_setup/cloudcmd/cloudcmd.menu.js" "$HOME/.cloudcmd.menu.js"
