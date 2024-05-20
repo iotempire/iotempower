@@ -1,7 +1,6 @@
 colorama>=0.4.3
 ipython>=8.12.3
 websocket-client>=1.7.0
-iotknit @ git+https://github.com/iotempire/iotknit
 platformio>=6.1.13
 psutil>=5.5.1
 pyserial>=3.4
