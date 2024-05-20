@@ -128,12 +128,16 @@ function init_nodejs() {
     cd "$IOTEMPOWER_LOCAL" || { echo "$IOTEMPOWER_LOCAL not found, aborting." 1>&2;exit 1; }
     mkdir -p nodejs && cd nodejs || { echo "Can't create nodejs folder, aborting." 1>&2;exit 1; }
     # if package.json does not exist, run nmp init to create it
-    deactivate # termux can't do the two following in venv - do we need to specialize this?
+    deactivate # termux can't do the following in venv - do we need to specialize this?
     #iot_grun npm init -y > /dev/null
-    npm install node-gyp
-    npm install node-pty
-    source "$IOTEMPOWER_VPYTHON/bin/activate"
-
+    npm init -y > /dev/null
+    if [[ ! command -v node-gyp &> /dev/null ]]; then
+      npm install node-gyp
+    fi
+    if ! npm list node-pty >/dev/null 2>&1; then
+      npm install node-pty
+    fi
+    activate
 }
 
 function check_pi() {
@@ -357,16 +361,22 @@ if [[ "$install_core" == 1 ]]; then
 
   # install node.js related stuff
   init_nodejs
+#  iot_grun npm install terminal-kit
+  deactivate
   iot_grun npm install terminal-kit
-
+  activate
   echo_format "All core packages have been installed."
 fi # core
 
 if [[ "$install_cloudcmd" == 1 ]]; then
   init_nodejs
   echo_format "Installing Cloud Commander"
-  iot_grun npm install gritty
-  iot_grun npm install cloudcmd
+  deactivate
+  # iot_grun npm install gritty
+  # iot_grun npm install cloudcmd
+  npm install gritty
+  npm install cloudcmd
+  activate
   # copy menu files
   cp -a "$IOTEMPOWER_ROOT/lib/gateway_setup/cloudcmd/cloudcmd.menu.js" "$HOME/.cloudcmd.menu.js"
   cp -a "$IOTEMPOWER_ROOT/lib/gateway_setup/cloudcmd/cloudcmd.json" "$HOME/.cloudcmd.json"
@@ -389,8 +399,8 @@ fi # cloudcmd
 
 if [[ "$install_node_red" == 1 ]]; then
   init_nodejs
-  echo_format "Installing Node Red"
   deactivate # termux can't do the following in venv - do we need to specialize this?
+  echo_format "Installing Node Red"
   npm install --unsafe-perm node-red
   mkdir -p "$HOME/.node-red"
   cp "$IOTEMPOWER_LOCAL"/nodejs/node_modules/node-red/settings.js "$HOME/.node-red/"
