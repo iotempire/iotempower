@@ -130,7 +130,10 @@ function init_nodejs() {
     # if package.json does not exist, run nmp init to create it
     deactivate # termux can't do the following in venv - do we need to specialize this?
     #iot_grun npm init -y > /dev/null
-    npm init -y > /dev/null
+    # check if pakage.json exists
+    if [ ! -f package.json ]; then
+      npm init -y > /dev/null
+    fi
     if ! command -v node-gyp &> /dev/null; then
       npm install node-gyp
     fi
@@ -361,7 +364,7 @@ if [[ "$install_core" == 1 ]]; then
   pushd "$TMPDIR/iotknit"
   iot_grun python setup.py install
   popd
-  
+
   # access point - TODO: make this optional
   git clone https://github.com/ulno/create_ap "$IOTEMPOWER_EXTERNAL/create_ap"
   #cd "$IOTEMPOWER_EXTERNAL/create_ap"
