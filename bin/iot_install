@@ -313,8 +313,12 @@ else # not default
       fill_cache=$?
 
       # TODO:Don't show for termux
-      echo_message_read_answer "Do you want to add permissions for accessing the serial port for your user?"
-      fix_serial_permissions=$?
+      if [[ -n "$PREFIX" ]] && command -v apt-get &> /dev/null; then
+        echo_format "No serial permission change for termux."
+      then
+        echo_message_read_answer "Do you want to add permissions for accessing the serial port for your user?"
+        fix_serial_permissions=$?
+      fi
 
       if check_pi; then
         # activate minimal firmware
