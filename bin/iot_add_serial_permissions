@@ -1,5 +1,16 @@
 #!/usr/bin/env bash
 
+# Function to check if a group exists
+group_exists() {
+    getent group "$1" >/dev/null 2>&1
+}
+
+# Function to check if the current user is already in the group
+user_in_group() {
+    id -nG "$USER" | grep -qw "$1"
+}
+
+
 echo "Trying to enable serial port access for the currently logged in user $USER."
 
 # Determine OS platform
@@ -21,33 +32,23 @@ if [ "$OS_PLATFORM" = "Darwin" ]; then
     done
 else
     # Define a list of possible groups for serial port access on UNIX/Linux
-    GROUPS=("dialout" "uucp" "modem" "plugdev")
-
-    # Function to check if a group exists
-    group_exists() {
-        getent group "$1" >/dev/null 2>&1
-    }
-
-    # Function to check if the current user is already in the group
-    user_in_group() {
-        id -nG "$USER" | grep -qw "$1"
-    }
+    groups=("dialout" "uucp" "modem" "plugdev")
 
     # Attempt to add the user to one of the groups if not already a member
-    for GROUP in "${GROUPS[@]}"; do
-        if group_exists "$GROUP" && ! user_in_group "$GROUP"; then
-            echo "Adding $USER to the $GROUP group (using sudo - password might be required)."
-            sudo usermod -a -G "$GROUP" "$USER"
+    for g in "${groups[@]}"; do
+        if group_exists "$g" && ! user_in_group "$g"; then
+            echo "Adding $USER to the $g group (using sudo - password might be required)."
+            sudo usermod -a -G "$g" "$USER"
             if [ $? -eq 0 ]; then
-                echo "User $USER successfully added to $GROUP group."
+                echo "User $USER successfully added to $g group."
                 echo "You may need to log out and back in for this to take effect."
                 exit 0
             else
-                echo "Failed to add $USER to $GROUP group."
+                echo "Failed to add $USER to $g group."
                 exit 1
             fi
-        elif user_in_group "$GROUP"; then
-            echo "User $USER is already a member of $GROUP group."
+        elif user_in_group "$g"; then
+            echo "User $USER is already a member of $g group."
         fi
     done
 
