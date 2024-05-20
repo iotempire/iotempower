@@ -37,11 +37,10 @@ function printf_format() {
   format_command="fold -s -w $width"
 
   if [ $# -gt 0 ]; then
-    printf_command="printf '%.*s' \"$@\" | $format_command"
-    eval "$printf_command"
-  else # take stdin directly
+    printf "$@" | $format_command
+  else
     $format_command
-  fi 
+  fi
 }
 
 function echo_format() {
