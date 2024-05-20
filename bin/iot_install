@@ -28,17 +28,19 @@ iot_grun() {
 
 function printf_format() {
   # Check if tput is available.
-  if ! command -v tput &>/dev/null; then
-    width="${COLUMNS:-40}"
+  if command -v tput &>/dev/null; then
+    width="$(tput cols)"
   else
-    width="${COLUMNS:-$(tput cols)}"
+    width="${COLUMNS:-40}"
   fi
   
+  format_command="fold -s -w $width"
+
   if [ $# -gt 0 ]; then
-    printf_command="printf '%.*s' \"$@\" | fold -s -w $width"
+    printf_command="printf '%.*s' \"$@\" | $format_command"
     eval "$printf_command"
   else # take stdin directly
-    printf "%s\n"
+    $format_command
   fi 
 }
 
