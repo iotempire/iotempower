@@ -136,8 +136,8 @@ function init_nodejs() {
     fi
     if ! command -v node-gyp &> /dev/null; then
       npm install node-gyp
-    fi
-    if ! npm list node-pty >/dev/null 2>&1; then
+    # fi
+    # if ! npm list node-pty >/dev/null 2>&1; then - takes too long
       npm install node-pty
     fi
     activate
