@@ -308,6 +308,7 @@ else # not default
         )" n
       fill_cache=$?
 
+      # TODO:Don't show for termux
       echo_message_read_answer "Do you want to add permissions for accessing the serial port for your user?"
       fix_serial_permissions=$?
 
