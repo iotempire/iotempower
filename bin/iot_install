@@ -360,6 +360,7 @@ if [[ "$install_core" == 1 ]]; then
   git clone https://github.com/iotempire/iotknit "$TMPDIR/iotknit"
   pushd "$TMPDIR/iotknit"
   iot_grun python setup.py install
+  popd
   
   # access point - TODO: make this optional
   git clone https://github.com/ulno/create_ap "$IOTEMPOWER_EXTERNAL/create_ap"
@@ -384,6 +385,8 @@ if [[ "$install_cloudcmd" == 1 ]]; then
   # iot_grun npm install cloudcmd
   npm install gritty
   npm install cloudcmd
+
+  cloudcmd --terminal --terminal-path "$(gritty --path)" --save --no-server
   activate
   # copy menu files
   cp -a "$IOTEMPOWER_ROOT/lib/gateway_setup/cloudcmd/cloudcmd.menu.js" "$HOME/.cloudcmd.menu.js"
@@ -402,7 +405,6 @@ if [[ "$install_cloudcmd" == 1 ]]; then
   mv "$cloudcmd_config" "$cloudcmd_config.backup" &>/dev/null
   mv "$cloudcmd_config.new" "$cloudcmd_config"
 
-  cloudcmd --terminal --terminal-path "$(gritty --path)" --save --no-server
 fi # cloudcmd
 
 if [[ "$install_node_red" == 1 ]]; then
@@ -431,10 +433,9 @@ EOF
     npm i node-red/node-red-dashboard  # install dashboard
     npm i node-red-contrib-influxdb # install influxdb connector
     popd
-    activate
     echo_format "Changed $nodered_config."
   fi # node-red config
-
+  activate
 fi # node-red
 
 if [[ "$install_caddy" == 1 ]]; then
