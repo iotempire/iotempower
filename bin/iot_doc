@@ -22,15 +22,16 @@ fi
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
 
-# Running in Termux, set correct preloaded lib
-GLIBC_PRELOAD=""
-if [[ -n "$PREFIX" ]] && command -v apt-get &> /dev/null; then
-  GLIBC_PRELOAD=""
-else
-  GLIBC_PRELOAD="$LD_PRELOAD"
-fi
-iot_grun() {
-    LD_PRELOAD="$GLIBC_PRELOAD" "$@"
+iot_grun() { 
+  # LD_PRELOAD="$GLIBC_PRELOAD" "$@"
+  if [[ -n "$PREFIX" ]] && command -v apt-get &> /dev/null; then
+    #LD_PRELOAD="/data/data/com.termux/files/usr/glibc/lib/libtermux-exec.so" \
+    # empty works better for python install, maybe also for nodejs, TODO: re-test
+    LD_PRELOAD="" \
+    PATH="/data/data/com.termux/files/usr/glibc/bin:$PATH" "$@"
+  else
+    "$@"
+  fi
 }
 
 
