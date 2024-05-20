@@ -73,7 +73,6 @@ And now have fun installing IoTempower and welcome to the IoTempire!
 EOF
 }
 
-
 # Function to echo a message and read the user's answer.
 #
 # Parameters:
@@ -121,12 +120,20 @@ function echo_message_read_answer() {
     esac
 }
 
+function activate() {
+  source "$IOTEMPOWER_VPYTHON/bin/activate"
+}
+
 function init_nodejs() {
     cd "$IOTEMPOWER_LOCAL" || { echo "$IOTEMPOWER_LOCAL not found, aborting." 1>&2;exit 1; }
     mkdir -p nodejs && cd nodejs || { echo "Can't create nodejs folder, aborting." 1>&2;exit 1; }
     # if package.json does not exist, run nmp init to create it
+    deactivate # termux can't do the two following in venv - do we need to specialize this?
+    #iot_grun npm init -y > /dev/null
+    npm install node-gyp
+    npm install node-pty
+    source "$IOTEMPOWER_VPYTHON/bin/activate"
 
-    iot_grun npm init -y > /dev/null
 }
 
 function check_pi() {
@@ -230,7 +237,7 @@ fi
 
 # check if virtualenv is already set up
 if [[ -e "$IOTEMPOWER_VPYTHON/bin/activate" ]]; then # check for existing venv
-    source "$IOTEMPOWER_VPYTHON/bin/activate"
+    activate
 else # no virtualenv exists, so create new one
   install_core=1
 fi
@@ -339,7 +346,7 @@ fi
 if [[ "$install_core" == 1 ]]; then
   # install virtualenv
   iot_grun python3 -m venv --system-site-packages "$IOTEMPOWER_VPYTHON"
-  source "$IOTEMPOWER_VPYTHON/bin/activate"
+  activate
   iot_grun pip install --no-cache-dir --upgrade pip
   # dependencies - TODO: we cannot update pip if running under termux (just throws forbidden error) - fix? - migh tneed to uninstall pip-glibc
   iot_grun pip install --no-cache-dir -r "$IOTEMPOWER_ROOT/lib/iot_installs/requirements.txt"
@@ -358,10 +365,6 @@ fi # core
 if [[ "$install_cloudcmd" == 1 ]]; then
   init_nodejs
   echo_format "Installing Cloud Commander"
-  deactivate # termux can't do the two following in venv - do we need to specialize this?
-  npm install node-gyp
-  npm install node-pty
-  source "$IOTEMPOWER_VPYTHON/bin/activate"
   iot_grun npm install gritty
   iot_grun npm install cloudcmd
   # copy menu files
@@ -387,7 +390,7 @@ fi # cloudcmd
 if [[ "$install_node_red" == 1 ]]; then
   init_nodejs
   echo_format "Installing Node Red"
-  deactivate # termux can't do the two following in venv - do we need to specialize this?
+  deactivate # termux can't do the following in venv - do we need to specialize this?
   npm install --unsafe-perm node-red
   mkdir -p "$HOME/.node-red"
   cp "$IOTEMPOWER_LOCAL"/nodejs/node_modules/node-red/settings.js "$HOME/.node-red/"
@@ -410,7 +413,7 @@ EOF
     npm i node-red/node-red-dashboard  # install dashboard
     npm i node-red-contrib-influxdb # install influxdb connector
     popd
-    source "$IOTEMPOWER_VPYTHON/bin/activate"
+    activate
     echo_format "Changed $nodered_config."
   fi # node-red config
 
