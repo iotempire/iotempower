@@ -362,7 +362,7 @@ if [[ "$install_cloudcmd" == 1 ]]; then
   npm install node-gyp
   npm install node-pty
   source "$IOTEMPOWER_VPYTHON/bin/activate"
-  iot_grun npm install gritty # TODO: fix (node-pty), this needs python and makes trouble on termux
+  iot_grun npm install gritty
   iot_grun npm install cloudcmd
   # copy menu files
   cp -a "$IOTEMPOWER_ROOT/lib/gateway_setup/cloudcmd/cloudcmd.menu.js" "$HOME/.cloudcmd.menu.js"
@@ -387,7 +387,8 @@ fi # cloudcmd
 if [[ "$install_node_red" == 1 ]]; then
   init_nodejs
   echo_format "Installing Node Red"
-  iot_grun npm install --unsafe-perm node-red
+  deactivate # termux can't do the two following in venv - do we need to specialize this?
+  npm install --unsafe-perm node-red
   mkdir -p "$HOME/.node-red"
   cp "$IOTEMPOWER_LOCAL"/nodejs/node_modules/node-red/settings.js "$HOME/.node-red/"
   nodered_config=~/.node-red/settings.js
@@ -406,9 +407,10 @@ users: [{
 };
 EOF
     pushd "$HOME/.node-red"
-    iot_grun npm i node-red/node-red-dashboard  # install dashboard
-    iot_grun npm i node-red-contrib-influxdb # install influxdb connector
+    npm i node-red/node-red-dashboard  # install dashboard
+    npm i node-red-contrib-influxdb # install influxdb connector
     popd
+    source "$IOTEMPOWER_VPYTHON/bin/activate"
     echo_format "Changed $nodered_config."
   fi # node-red config
 
