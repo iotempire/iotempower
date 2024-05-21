@@ -50,6 +50,7 @@ Alphabetic list
 - `rgb_single <rgb_single.rst>`_
 - `rgb_strip <rgb_strip.rst>`_
 - `scale <scale.rst>`_
+- `scd4x <scd4x.rst>`_
 - `servo <servo.rst>`_
 - `servo_switch <servo_switch.rst>`_
 - `setup.cpp <setup.cpp.rst>`_
