@@ -56,7 +56,7 @@ Parameters
 
 - ``.with_address(i2c_address)``
     - ``i2c_address`` is the i2c address of the gas sensor.
-    - The default address for the scd4x sensor is ``0x58``. 
+    - The default address for the scd4x sensor is ``0x62``. 
     - Select a different address if you would like to drive multiple sensors on the same i2c bus.
 
 
