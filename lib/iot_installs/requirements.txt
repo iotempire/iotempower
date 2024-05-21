@@ -1,7 +1,6 @@
 colorama>=0.4.3
 ipython>=8.12.3
 websocket-client>=1.7.0
-iotknit @ git+https://github.com/iotempire/iotknit@0bc4479b104260025372c97b881308fcc1f57243
 platformio>=6.1.13
 psutil>=5.5.1
 pyserial>=3.4
@@ -9,3 +8,4 @@ recommonmark>=0.7.1
 sphinx-bootstrap-theme>=0.8.1
 Sphinx>=7.1.2
 pytest>=8.0.0
+setuptools>=65.6.0

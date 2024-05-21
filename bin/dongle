@@ -6,6 +6,19 @@
 
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
+
+iot_grun() { 
+  # LD_PRELOAD="$GLIBC_PRELOAD" "$@"
+  if [[ -n "$PREFIX" ]] && command -v apt-get &> /dev/null; then
+    #LD_PRELOAD="/data/data/com.termux/files/usr/glibc/lib/libtermux-exec.so" \
+    # empty works better for python install, maybe also for nodejs, TODO: re-test
+    LD_PRELOAD="" \
+    PATH="${PATH%%:*}:/data/data/com.termux/files/usr/glibc/bin:${PATH#*:}" "$@"
+  else
+    "$@"
+  fi
+}
+
 daemon_fifo=/var/tmp/iotempower_dongle
 daemon_port="$daemon_fifo.port"
 
@@ -55,12 +68,11 @@ if [[ "$command" = flash ]]; then
         port=/dev/$(find_esp_port "$1" nodongle)
     fi
     echo "Flashing dongle on port $port..."
-    python3 "$IOTEMPOWER_ROOT/bin/dongle_display.py" -p "$port" \
+    iot_grun python3 "$IOTEMPOWER_ROOT/bin/dongle_display.py" -p "$port" \
         "Updating\\\\nfirmware...\\\\n\\\\nPlease wait."
     cd "$IOTEMPOWER_ROOT/lib/esp_dongle"
     export PLATFORMIO_UPLOAD_PORT="$port"
-    platformio run -t upload
-#    platformio run
+    iot_platformio run -t upload
     result=$?
 #    if [[ "$result" -eq 0 ]]; then
 #        echo "Flashing dongle on $port."
@@ -90,7 +102,7 @@ elif [[ "$command" = daemon ]]; then
         port="/dev/$1"
     else
         port=""
-        ports=$(platformio device list --serial|grep -E '^/dev/tty'|sort) # get available serial ports
+        ports=$(iot_platformio device list --serial|grep -E '^/dev/tty'|sort) # get available serial ports
         for p in $ports; do
             if dongle probe -p "$p"; then
                 port="$p"
@@ -102,9 +114,9 @@ elif [[ "$command" = daemon ]]; then
         echo "$port" > "$daemon_port"
         echo "Starting daemon on $port."
         mkfifo -m 600 "$daemon_fifo"
-    #    python3 "$IOTEMPOWER_ROOT/bin/dongle_daemon.py" "$@" <"$daemon_fifo"
+    #    iot_grun python3 "$IOTEMPOWER_ROOT/bin/dongle_daemon.py" "$@" <"$daemon_fifo"
         # not sure why I have to use tail for the fifo and not <$daemon_fifo
-        python3 "$IOTEMPOWER_ROOT/bin/dongle_daemon.py" -i "$daemon_fifo" -p "$port" "$@"
+        iot_grun python3 "$IOTEMPOWER_ROOT/bin/dongle_daemon.py" -i "$daemon_fifo" -p "$port" "$@"
         rm -f "$daemon_fifo" "$daemon_port"
     else
         echo "Dongle not found."
@@ -122,9 +134,9 @@ else
     port=""
     port=$(cat "$daemon_port" 2>/dev/null)
     if [[ "$port" ]]; then
-        python3 "$IOTEMPOWER_ROOT/bin/dongle_$command.py" -p "$port" "$@"
+        iot_grun python3 "$IOTEMPOWER_ROOT/bin/dongle_$command.py" -p "$port" "$@"
     else
-        python3 "$IOTEMPOWER_ROOT/bin/dongle_$command.py" "$@"
+        iot_grun python3 "$IOTEMPOWER_ROOT/bin/dongle_$command.py" "$@"
     fi
     result=$?
     dongle_connect
