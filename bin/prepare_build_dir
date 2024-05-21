@@ -148,7 +148,7 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
 #define mqtt_topic "$topic"
 EOF
 
-    if [[ "$mqtt_server" ]]; then
+    if [[ "$mqtt_server" && "$mqtt_server" != "_gateway" ]]; then
         cat >> "$fname.new" << EOF
 #define mqtt_server "$mqtt_server"
 EOF
