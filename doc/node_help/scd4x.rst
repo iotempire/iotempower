@@ -15,7 +15,7 @@ Corresponding values are published there as subtopics at a fixed **0.2 Hz** (5s)
 - ``co2``, carbon dioxide - unit: **part per million (ppm)** | range: 0 to 40000 ppm
 
 
-- ``temp``, environment temperature - unit: **celsius (ppm)** | range: -10 to 60 °C
+- ``temp``, environment temperature - unit: **Celsius (°C)** | range: -10 to 60 °C
 
 
 - ``hmdt``, relative humidity - unit: **relative humidity (%RH)** | range: 0 to 100 %RH
