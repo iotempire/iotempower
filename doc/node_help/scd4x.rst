@@ -39,7 +39,7 @@ Specification provided by manufacturer for default conditions (25 °C, 50 %RH, a
 - Low power operation mode down to ``< 0.4 mA avg. @5 V``, 1 meas. / 5 minutes.
 
 
-- Additional ``±(5 ppm + 0.5 %)`` of reading accuracy drift after ``5 years`` with automatic self-calibration enabled. 
+- Additional ``±(5 ppm + 0.5 %)`` of reading accuracy drift after ``5 years`` with automatic self-calibration enabled (default). 
 
 Parameters
 ----------
@@ -74,7 +74,7 @@ Node name: ``room/gas``:
 
     scd4x(gas);
 
-Now CO2 (in ppm), temp (in deg C), hmdt (%RH) are published every 5 seconds as: 
+Now CO2 (in ppm), temperature (in deg C) and humidity (%RH) are published every 5 seconds as: 
 ``room/gas/co2ppm``, ``room/gas/temp``,  ``room/gas/humidity``.
 
 
