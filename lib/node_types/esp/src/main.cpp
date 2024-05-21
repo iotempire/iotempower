@@ -76,6 +76,11 @@ int long_blinks = 0, short_blinks = 0;
 bool wifi_connected = false;
 bool ota_failed = false;
 
+#ifndef mqtt_server
+    // Space for mqtt_server ip (max 16)
+    char* mqtt_server_buffer = "127.0.0.1       ";
+#endif
+
 // TODO: find better solution (add display support?)
 #ifndef ONBOARDLED
     #pragma "No ONBOARDLED is defined for this board, there will be no indicator led" warning
@@ -485,8 +490,9 @@ void init_mqtt() {
         ulog(F("Setting mqtt server ip to: %s"),  mqtt_server);
     #else
         // if not defined, take gateway address
-        mqttClient.setServer(WiFi.gatewayIP().toString().c_str(), 1883);
-        ulog(F("Setting mqtt server ip to: %s"),  WiFi.gatewayIP().toString().c_str());
+        strncpy(mqtt_server_buffer, WiFi.gatewayIP().toString().c_str(), 16);
+        mqttClient.setServer(mqtt_server_buffer, 1883);
+        ulog(F("Setting mqtt server ip to: %s"),  mqtt_server_buffer);
     #endif
     mqttClient.setCallback(onMqttMessage);
 }
