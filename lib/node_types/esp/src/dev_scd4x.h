@@ -4,8 +4,10 @@
 #ifndef _IOTEMPOWER_SCD4X_H_
 #define _IOTEMPOWER_SCD4X_H_
 
-#include <i2c-device.h>  // Include the I2C device library
-#include "DFRobot_SCD4X.h"  // Include the SCD4X library
+#include <i2c-device.h>
+#include "DFRobot_SCD4X.h"
+
+extern DFRobot_SCD4X DFR_SCD4X;
 
 class Scd4x : public I2C_Device {
    private:
