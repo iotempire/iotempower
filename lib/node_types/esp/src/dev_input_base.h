@@ -29,7 +29,8 @@ class Input_Base : public Device {
 
         void buffer_reset();
         int* get_buffer() { return buffer; }
-        int get_buffer_size() {return buffer_fill; }
+        int get_buffer_fill() {return buffer_fill; }
+        int get_buffer_size() {return _precise_reads; }
         bool measure();
         Input_Base& precise_buffer(unsigned long interval_ms, unsigned int reads);
 

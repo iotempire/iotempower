@@ -740,5 +740,31 @@ class Filter_Interval_Map : public Callback {
 };
 #define filter_interval_map(...) with_filter_callback(*new Filter_Interval_Map(__VA_ARGS__))
 
+// This filter works on precise buffer
+#include <TrueRMS.h>
+class Filter_Precise_RMS : public Callback {
+    private:
+        Power *acPower; // reference to TrueRMS object
+    public:
+        Filter_Precise_RMS() : Callback() {
+            // // get size from precise vuffer
+            // size_t buflen = get_buffer_size();
+            // acPower = new Power(buflen);
+        }
+        bool call(Device &dev) {
+            // sum += dev.read_float();
+            // values_count ++;
+            // if(values_count >= _buflen) {
+            //     dev.write_float(sum/values_count);
+            //     values_count = 0;
+            //     sum = 0;
+            //     return true;
+            // }
+            return false;
+        }
+};
+#define filter_precise_rms(count) with_filter_callback(*new Filter_Precise_RMS(count))
+
+
 
 #endif // _IOTEMPOWER_FILTER_H_

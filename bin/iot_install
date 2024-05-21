@@ -14,13 +14,33 @@
 
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
+iot_grun() { 
+  # LD_PRELOAD="$GLIBC_PRELOAD" "$@"
+  if [[ -n "$PREFIX" ]] && command -v apt-get &> /dev/null; then
+    #LD_PRELOAD="/data/data/com.termux/files/usr/glibc/lib/libtermux-exec.so" \
+    # empty works better for python install, maybe also for nodejs, TODO: re-test
+    LD_PRELOAD="" \
+    PATH="/data/data/com.termux/files/usr/glibc/bin:$PATH" "$@"
+  else
+    "$@"
+  fi
+}
+
 function printf_format() {
-  format_command="fold -s -w $(tput cols)"
+  # Check if tput is available.
+  if command -v tput &>/dev/null; then
+    width="$(tput cols)"
+  else
+    width="${COLUMNS:-40}"
+  fi
+  
+  format_command="fold -s -w $width"
+
   if [ $# -gt 0 ]; then
     printf "$@" | $format_command
-  else # take stdiput
+  else
     $format_command
-  fi 
+  fi
 }
 
 function echo_format() {
@@ -52,7 +72,6 @@ And now have fun installing IoTempower and welcome to the IoTempire!
 
 EOF
 }
-
 
 # Function to echo a message and read the user's answer.
 #
@@ -101,12 +120,28 @@ function echo_message_read_answer() {
     esac
 }
 
+function activate() {
+  source "$IOTEMPOWER_VPYTHON/bin/activate"
+}
+
 function init_nodejs() {
     cd "$IOTEMPOWER_LOCAL" || { echo "$IOTEMPOWER_LOCAL not found, aborting." 1>&2;exit 1; }
     mkdir -p nodejs && cd nodejs || { echo "Can't create nodejs folder, aborting." 1>&2;exit 1; }
     # if package.json does not exist, run nmp init to create it
-
-    npm init -y > /dev/null
+    deactivate # termux can't do the following in venv - do we need to specialize this?
+    #iot_grun npm init -y > /dev/null
+    # check if pakage.json exists
+    if [ ! -f package.json ]; then
+      npm init -y > /dev/null
+    fi
+    if ! command -v node-gyp &> /dev/null; then
+      npm install node-gyp
+      npm install node-pre-gyp
+    # fi
+    # if ! npm list node-pty >/dev/null 2>&1; then - takes too long
+      npm install node-pty
+    fi
+    activate
 }
 
 function check_pi() {
@@ -132,6 +167,7 @@ help_string="Possible options:
 --mqtt: install Mosquitto mqtt broker into system
 --convenience: install mc, tmux, micro, tilde, elinks (if possible) into system
 --templates: create iot-systems template
+--platforms: pre-download esp8266 and esp32 platforms
 --cache: pre-fill cache to accelerate compilations
 --fix-serial: Fix/add serial port permissions for current user
 --fix-pi-wifi-ap: Fix Raspberry Pi wireless firmware for access point usage
@@ -171,6 +207,8 @@ while getopts ":h-:" opt; do
           install_convenience=1;;
         templates)
           install_template=1;;
+        platforms)
+          install_platforms=1;;
         cache)
           fill_cache=1;;
         fix-serial)
@@ -202,11 +240,12 @@ if [[ "$clean" == 1 ]]; then
   if [ "$#" -eq 1 ]; then # only clean was given, so set to default install with questions after this deletion
     set --
   fi
+  # TODO: consider also offering to clear $HOME/.npm
 fi
 
 # check if virtualenv is already set up
 if [[ -e "$IOTEMPOWER_VPYTHON/bin/activate" ]]; then # check for existing venv
-    source "$IOTEMPOWER_VPYTHON/bin/activate"
+    activate
 else # no virtualenv exists, so create new one
   install_core=1
 fi
@@ -224,6 +263,7 @@ if [[ "$default" == 1 ]]; then
   fi
   install_convenience=1
   install_template=1
+  install_platforms=1
   fill_cache=0
   do_upgrade=1
 else # not default
@@ -242,7 +282,7 @@ else # not default
     install_system=$?
 
     optional_message="Do you want to install the optional dependency"
-    # as we have already checked that there have ben no otehr arguments given, this is not necessary
+    # as we have already checked that there have ben no other arguments given, this is not necessary
     # if [ -z "$install_cloudcmd" ] && [ -z "$install_node_red" ] &&
     #     [ -z "$install_caddy" ] && [ -z "$install_mqtt" ] && [ -z "$fix_pi_wifi_ap" ]; then
       echo_message_read_answer "${optional_message} CLOUD COMMANDER (Details -> https://cloudcmd.io/)"
@@ -263,14 +303,22 @@ else # not default
       echo_message_read_answer "Do you want to setup the iot-systems template folder"
       install_template=$?
 
+      echo_message_read_answer "Do you want to pre-download the esp8266 and esp32 platforms"
+      install_platforms=$?
+
       echo_message_read_answer "$(printf "%b" \
         "Do you want to pre-populate the compile cache to " \
         "accelerate future compilations (can take a long time)." \
         )" n
       fill_cache=$?
 
-      echo_message_read_answer "Do you want to add permissions for accessing the serial port for your user?"
-      fix_serial_permissions=$?
+      # TODO:Don't show for termux
+      if [[ -n "$PREFIX" ]] && command -v apt-get &> /dev/null; then
+        echo_format "No serial permission change for termux."
+      then
+        echo_message_read_answer "Do you want to add permissions for accessing the serial port for your user?"
+        fix_serial_permissions=$?
+      fi
 
       if check_pi; then
         # activate minimal firmware
@@ -309,43 +357,45 @@ if [[ "$install_system" == 1 ]]; then
 fi
 
 if [[ "$install_core" == 1 ]]; then
-  # TODO: test if system requirements are available
-  # python2 seems not to be necessary anymore
-  # # TODO: recheck, installation seems to fail first time -> path problems (wrong pip used?)
-  # # install virtualenv for python2 for platformio
-  # mkdir -p "$IOTEMPOWER_VPYTHON2"
-  # virtualenv -p "$(which python2)" "$IOTEMPOWER_VPYTHON2"
-  # source "$IOTEMPOWER_VPYTHON2/bin/activate"
-  # pip install --upgrade pip
-  #    pip install --upgrade platformio
-  # TODO: go back to normal install, but for now we need version4 (development version)
-  # pip install --upgrade https://github.com/platformio/platformio-core/archive/develop.zip
-  # deactivate # disable python 2 environment
-
   # install virtualenv
-  python3 -m venv --system-site-packages "$IOTEMPOWER_VPYTHON"
-  source "$IOTEMPOWER_VPYTHON/bin/activate"
-  pip install --no-cache-dir --upgrade pip
-  # dependencies
-  pip install --no-cache-dir -r "$IOTEMPOWER_ROOT/lib/iot_installs/requirements.txt"
+  iot_grun python3 -m venv --system-site-packages "$IOTEMPOWER_VPYTHON"
+  activate
+  iot_grun pip install --no-cache-dir --upgrade pip
+  # git+https://github.com/iotempire/iotknit breaks in requirements when using termux glibc git
+  iot_grun pip install --no-cache-dir -r "$IOTEMPOWER_ROOT/lib/iot_installs/requirements.txt"
+
+  deactivate
+  git clone https://github.com/iotempire/iotknit "$TMPDIR/iotknit"
+  pushd "$TMPDIR/iotknit"
+  iot_grun python setup.py install
+  popd
 
   # access point - TODO: make this optional
   git clone https://github.com/ulno/create_ap "$IOTEMPOWER_EXTERNAL/create_ap"
   #cd "$IOTEMPOWER_EXTERNAL/create_ap"
+  activate
 
   # install node.js related stuff
   init_nodejs
-  npm install terminal-kit
 
+#  iot_grun npm install terminal-kit
+  deactivate
+  npm install terminal-kit
+  activate
   echo_format "All core packages have been installed."
 fi # core
 
 if [[ "$install_cloudcmd" == 1 ]]; then
   init_nodejs
   echo_format "Installing Cloud Commander"
-  # apt-get install g++ -y - Obsolete: should be in build-essential or default on arch
+  deactivate
+  # iot_grun npm install gritty
+  # iot_grun npm install cloudcmd
   npm install gritty
   npm install cloudcmd
+
+  cloudcmd --terminal --terminal-path "$(gritty --path)" --save --no-server
+  activate
   # copy menu files
   cp -a "$IOTEMPOWER_ROOT/lib/gateway_setup/cloudcmd/cloudcmd.menu.js" "$HOME/.cloudcmd.menu.js"
   cp -a "$IOTEMPOWER_ROOT/lib/gateway_setup/cloudcmd/cloudcmd.json" "$HOME/.cloudcmd.json"
@@ -363,11 +413,11 @@ if [[ "$install_cloudcmd" == 1 ]]; then
   mv "$cloudcmd_config" "$cloudcmd_config.backup" &>/dev/null
   mv "$cloudcmd_config.new" "$cloudcmd_config"
 
-  cloudcmd --terminal --terminal-path "$(gritty --path)" --save --no-server
 fi # cloudcmd
 
 if [[ "$install_node_red" == 1 ]]; then
   init_nodejs
+  deactivate # termux can't do the following in venv - do we need to specialize this?
   echo_format "Installing Node Red"
   npm install --unsafe-perm node-red
   mkdir -p "$HOME/.node-red"
@@ -387,9 +437,13 @@ users: [{
 }]
 };
 EOF
+    pushd "$HOME/.node-red"
+    npm i node-red/node-red-dashboard  # install dashboard
+    npm i node-red-contrib-influxdb # install influxdb connector
+    popd
     echo_format "Changed $nodered_config."
   fi # node-red config
-
+  activate
 fi # node-red
 
 if [[ "$install_caddy" == 1 ]]; then
@@ -428,6 +482,13 @@ bash "$IOTEMPOWER_ROOT/bin/fix_bin"
 # activate iot script # TODO: should we expose that as optional?
 iot_activate_iot_script
 
+if [[ "$install_platforms" == 1 ]]; then
+  echo_format "Installing platforms."
+  iot_platformio platform install espressif8266@4.0.1
+  iot_platformio platform install espressif32@6.4.0
+  fix_bin_termux
+fi
+
 if [[ "$fill_cache" == 1 ]]; then
   # populate the cache TODO: potentially integrate with testing
   update_cache
@@ -442,7 +503,7 @@ if [[ "$fix_serial_permissions" == 1 ]]; then
 fi
 
 # Save the state
-python "$IOTEMPOWER_ROOT"/utils/save_arguments_as_json.py --splitter '=' --path "$IOTEMPOWER_LOCAL"/installation_options.json \
+iot_grun python3 "$IOTEMPOWER_ROOT"/utils/save_arguments_as_json.py --splitter '=' --path "$IOTEMPOWER_LOCAL"/installation_options.json \
   core="$install_core" cloud_commander="$install_cloudcmd" \
   node_red="$install_node_red" caddy="$install_caddy" \
   mosquitto="$install_mqtt" \
@@ -456,8 +517,7 @@ python "$IOTEMPOWER_ROOT"/utils/save_arguments_as_json.py --splitter '=' --path 
 # TODO: make test install specific
 
 # Testing the installation
-if ! pytest "$IOTEMPOWER_ROOT"/tests/test_installations.py;
-then
+if ! iot_grun pytest "$IOTEMPOWER_ROOT"/tests/test_installations.py; then
   exit 1
 fi
 

@@ -14,8 +14,8 @@ if [[ "$port" = tty* ]]; then
     echo
     #minicom -D "/dev/$port" -b 115000
     #miniterm.py --raw "/dev/$port" 115000
-    platformio device monitor -p "/dev/$port" -b 115200
+    iot_pio device monitor -p "/dev/$port" -b 115200
 else
     echo "Port not found. The following devices seem to be connected:"
-    platformio device list
+    iot_pio device list
 fi
