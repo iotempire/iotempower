@@ -26,6 +26,7 @@ bool Scd4x::measure() {
             DFR_SCD4X.setAutoCalibMode(true);      // enable auto calibration
             DFR_SCD4X.enablePeriodMeasure(
                 SCD4X_START_PERIODIC_MEASURE);  // start measuring; 500ms delay
+            _in_init_phase = false;
         } else {
             ulog(F("SCD4X: Sensor not found"));
         }
