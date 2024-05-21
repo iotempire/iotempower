@@ -50,6 +50,7 @@ Automatic IP detection for MQTT broker::
     cd /etc/NetworkManager/system-connections
 
 Find your hotspot.nmconnection file and edit it. Under ipv4 section you can define the address1=ip/subnetmask/gateway. It should look something like this::
+
 	[ipv4]
     	method=shared
     	address1=192.168.12.1/24,192.168.12.1
