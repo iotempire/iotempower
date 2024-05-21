@@ -23,6 +23,7 @@ Alphabetic list
 - `do_later <do_later.rst>`_
 - `ds18b20 <ds18b20.rst>`_
 - `edge_counter <edge_counter.rst>`_
+- `ens16x <dev_ens16x.rst>`_
 - `filter <filter.rst>`_
 - `gyro6050 <gyro6050.rst>`_
 - `gyro <gyro.rst>`_
