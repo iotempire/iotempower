@@ -3,9 +3,9 @@ Grove SGP30 gas sensor
 
 ..  code-block:: cpp
 
-    sgp30(name)[.i2c(sda,scl)][.with_address(i2c_address)];
+    sgp30(name)[.i2c(sda,scl)][.with_address(i2c_address)][.with_filter(filter)];
 
-Create a new gas sensor device.
+Create a new sgp30 gas sensor device.
 
 Name will be appended to assigned mqtt topic.
 
@@ -43,7 +43,7 @@ Parameters
 
 
 - ``.with_filter`` 
-    - A filter function can be specified. 
+    - You can specify a filter function.
     - See ``uhelp filter`` for more.
 
 
