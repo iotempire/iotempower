@@ -27,7 +27,7 @@ Here is *more documentation*:
 
 - `Command reference for nodes </doc/node_help/commands.rst>`_
 
-- `IoTempower YouTube Playlist </https://www.youtube.com/playlist?list=PLlppUpfgGsvkfAGJ38_mzQc1-_Z7bNOgq>`_
+- `IoTempower YouTube Playlist <https://www.youtube.com/playlist?list=PLlppUpfgGsvkfAGJ38_mzQc1-_Z7bNOgq>`_
 
 
 Here are some *navigational links* that only work on the raspbery pi installation:
