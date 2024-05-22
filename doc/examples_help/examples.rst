@@ -1,17 +1,12 @@
 Examples Reference
 ==================
 
-The following example projects are available for all supported devices.
-
-
-W.I.P.
+This directory contains example projects. 
 
 Alphabetic list
 ---------------
 
-- M5StickC
+- `m5stickc <m5stickc.rst>`_
 - Wemos D1 mini
 - ESP32 DevKitC
 - ESP32S2
-- `adoption <../node_help/adoption.rst>`_
-
