@@ -1,11 +1,9 @@
 M5StickC
 ========
 
-The M5StickC is a versatile tiny but mighty IoT development device, powered by the ESP32-S2.
+The M5StickC is a portable, easy-to-use, tiny but mighty IoT development device.
 
-It is a portable, easy-to-use, feature packed, open-source easy to use IoT development board. 
-
-Here you will find an example of how to use the M5StickC node in 
+Here you will find an example of how to use the M5StickC node in IoTempower.
 
 Example
 -------
@@ -20,7 +18,7 @@ Configure the ``setup.cpp`` file:
 
 ..  code-block:: cpp
 
-    out(led, ONBOARDLED).inverted().off();
+    out(led, ONBOARDLED).inverted().off(); // initialize the onboard LED
     
     button(home, BUTTON_HOME, "pressed", "released").inverted().debounce(10);
     
@@ -29,10 +27,10 @@ Configure the ``setup.cpp`` file:
     m5stickc_display(console, 1, 270); // initialize LCD display as 'console'
 
     const char* id="01";
-    void start() {
-        do_later(100, [] () {
+    void start() { 
+        do_later(100, [] () { 
                 IN(console).print("This is: stick-")
-                .print(id);});}
+                .print(id);});} // print device id on LCD display (console)
 
 
 **Note**:
@@ -51,8 +49,13 @@ Configure the ``setup.cpp`` file:
   
   - For example:  
    
-    - Send: ``&&bg 000000`` to set the **background** to black.
-    - Send: ``&&fg ffffff`` to set the **foreground** to white.
+    - Send: ``&&bg 000000`` to set the **background** to black: 
+    
+    ``mqtt_send your_m5_node/console &&bg 000000``
+    
+    - Send: ``&&fg ffffff`` to set the **foreground** to white: 
+    
+    ``mqtt_send your_m5_node/console &&fg ffffff``
 
 
 Power switch operation:
@@ -66,7 +69,7 @@ Power switch operation:
 - Charging:
  
   - The ``VBUS_VIN`` and ``VBUS_USB`` have a limited input range between ``4.8-5.5V``.
-  - The internal battery charges through ``AXP192`` power management when VBUS is powered.
+  - The ``AXP192`` power manager charges the battery from a powered ``VBUS``.
 
 **Note:**
 
