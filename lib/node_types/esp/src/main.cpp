@@ -78,7 +78,7 @@ bool ota_failed = false;
 
 #ifndef mqtt_server
     // Space for mqtt_server ip (max 16)
-    char* mqtt_server_buffer = "127.0.0.1       ";
+    Ustring mqtt_server_buffer(F("127.0.0.1"));
 #endif
 
 // TODO: find better solution (add display support?)
@@ -490,9 +490,9 @@ void init_mqtt() {
         ulog(F("Setting mqtt server ip to: %s"),  mqtt_server);
     #else
         // if not defined, take gateway address
-        strncpy(mqtt_server_buffer, WiFi.gatewayIP().toString().c_str(), 16);
-        mqttClient.setServer(mqtt_server_buffer, 1883);
-        ulog(F("Setting mqtt server ip to: %s"),  mqtt_server_buffer);
+        mqtt_server_buffer.from(WiFi.gatewayIP().toString().c_str());
+        mqttClient.setServer(mqtt_server_buffer.as_cstr(), 1883);
+        ulog(F("Setting mqtt server ip to: %s"),  mqtt_server_buffer.as_cstr());
     #endif
     mqttClient.setCallback(onMqttMessage);
 }
