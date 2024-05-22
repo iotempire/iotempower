@@ -1,4 +1,4 @@
-// bmp180.cpp
+// dev_sgp30.cpp
 #include "dev_sgp30.h"
 
 Sgp30::Sgp30(const char *name) : I2C_Device(name) {
