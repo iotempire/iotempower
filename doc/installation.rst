@@ -86,7 +86,9 @@ Manjaro gateway setup
 
 Instead of a Raspberry Pi you can use a laptop as an accesspoint for IoT instead. You can give the gateway internet via phone(tethering)
 or cable connected to the router.
-Here is a guide to do that: `Manjaro gateway setup <manjaro-gateways-setup.rst>`_
+`Manjaro <https://manjaro.org/>`_ was successfully used using this practice in the IoT class of spring 2024 at the University of Tartu and chosen due to its ease of installation and a good base for the KDE plasma desktop that was giving familiarity to the students and still performant on low powered laptops.
+
+Guide for Manjaro gateway setup can be found `here <manjaro-gateways-setup.rst>`_
 
 Top: `ToC <index-doc.rst>`_, Previous: `Tool Support <tool-support.rst>`_,
 Next: `First IoT Node <first-node.rst>`_.
