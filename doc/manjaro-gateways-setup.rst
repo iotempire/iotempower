@@ -1,5 +1,5 @@
 ********************************
-Set up an accesspoint on linux:
+Set up a gateway on linux:
 ********************************
 
 **The following guide is done on Manjaro distribution.**
@@ -63,3 +63,6 @@ Now your gateway IP should be fixed to our default 192.168.12.1 and our mqtt bro
 
     iot
     mqtt_starter
+
+
+Previous: `installation <installation.rst>`_
