@@ -41,6 +41,9 @@ IoTempower
 
 Whether a hobbyist, student, artist, or professional, **IoTempower** has what you need to build your IoT idea.
 
+**IoTempower**: Network, Integration, Device Management, Education, Permissive License, Security, and more.
+
+
 *Key Features*:
 
 - **Classroom Friendly**: Ideal for teaching IoT concepts and home automation.
