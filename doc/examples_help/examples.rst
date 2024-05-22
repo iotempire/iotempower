@@ -3,11 +3,11 @@ Examples Reference
 
 This directory contains example projects. 
 
-Alphabetic list
----------------
+Project list
+------------
 
-- ESP32 DevKitC
-- ESP32S2
-- `m5stickc <m5stickc.rst>`_
-- Wemos D1 mini
+1. ESP32 DevKitC
+2. ESP32S2
+3. `m5stickc <m5stickc.rst>`_
+4. Wemos D1 mini
 
