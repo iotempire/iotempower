@@ -51,6 +51,7 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.mathjax',
     'recommonmark'
+    # "sphinx_new_tab_link"
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -129,8 +130,9 @@ html_theme_options = {
         ("Top", "/", 1),
         # already in main ("ToC", "/index-doc.rst", 1),
         ("Tools", "/doc/tool-support.rst", 1),
+        # ("Node-RED", "/nodered/", 1),
         ("Commands", "/doc/node_help/commands.rst", 1),
-        ("Examples", "/doc/examples_help/examples.rst", 2),
+        ("Projects", "/doc/projects_help/projects.rst", 1),
     ],
 
     # Render the next and previous page links in navbar. (Default: true)
