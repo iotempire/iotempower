@@ -76,9 +76,10 @@ Tutorial video for setting up the sd-card for the pi: https://youtu.be/FrIIXsseZ
 
     Consider changing it immediately entering the command ``passwd``
 
-  - At one point, also make sure to run ``sudo raspi-config`` and
-    chose to resize the
-    hd in the advanced options.
+  - IMPORTANT!!!!Run ``dietpi-drive_manager`` to bring up the main menu.
+    Select the disk containing the root (/) partition and press Enter.
+    Select Resize and press Enter.
+    Reboot your system to expand the root filesystem to use the whole space of the new memory card.
 
 ..  - Check out the `short tmux help </doc/tmux-help.txt>`__,
     pressing the ctrl-key and a-key simultaneously,
