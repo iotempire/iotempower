@@ -91,7 +91,7 @@ async function choice(items, pre_select=0, pad_last=0) {
             itemMaxWidth: 2*(button_padding+1)+longest,
             extraLines: extra_lines,
             style: term.bgBrightWhite.black,
-            selectedStyle: term.bgGreen.black,
+            selectedStyle: term.bgBlue.black,
             submittedStyle: term.bgWhite.black,
             exitOnUnexpectedKey: true, // catch other keys
             continueOnSubmit: false
@@ -302,17 +302,6 @@ function adopt() {
     }
 }
 
-function system_configuration(back) {
-    choice([
-    	["Change Wifi-Credentials for your current system (W)", "C", set_wificredentials_systemconf],
-        ["Change Wifi-RouterConfiguration on the Raspberry Pi (P)", "G", wifi_config],
-        ["Back (B,X,ESC)", ["B","X"], back?menu_default:terminate]
-    ], pre_select=-1, pad_last=1);
-}
-function system_configuration_back() {
-    system_configuration(true);
-}
-
 function create_node_template() {
     shell_command_in_path("You are about to create a folder called new-node"
         + " to configure a new node. Do not forget to rename this folder after"
@@ -366,12 +355,45 @@ function wifi_config() {
         "sudo /usr/bin/mcedit /boot/wifi.txt");
 }
 
-function set_wificredentials_systemconf() {
-    shell_command("This will open an editor with the project system configuration file where you can assign the gateway credentials for your project."
-        + " Please make corresponding changes. You will have to power off and on"
-        + " the gateway after this edit to activate the new configuration. "
-        + "\nDo you want to continue editing the WiFi-router configuration for your system?",
-        " set_wificredentials_systemconf");
+function wifi_setup_systemconf() {
+    term("\n\n");
+    term
+    term.bgBrightWhite.black.brightCyan.wrap( '^+!!!This must be run inside a project folder^: (or its parents) which contains a system.conf file' );
+    term("\n");
+    shell_command("This will edit system configuration file where you can assign the wifi credentials for specific projects."
+        + "\nThis will overwrite the default credentials. It is useful if your project has different wifi credentials than the default ones"
+        + "\nDo you want to continue editing your project's WiFi configuration (system.conf)?",
+        "wifi_setup_systemconf");
+}
+
+function wifi_setup_global() {
+    shell_command("This will create a iotempower.conf file that creates global credentials for your systems."
+        + "\nIf your accesspoint is an internal wifi chip, this will define it's credentials"
+        + "\nThis wull define the SSID and password for wifi by creating a iotempower.conf file."
+        + "\nThis wifi credentials will become your default settings. "
+        + "\nDo you want to continue editing your IoTempower's wiFi configuration?",
+        " wifi_setup_global");
+}
+
+function wifi_setup_openwrt() {
+    term("\n\n");
+    term
+    term.bgBrightWhite.black.brightCyan.wrap( '^+!!!Make sure you are connected to your router via Ethernet or Wifi^' );
+    term("\n");
+    term.bgBrightWhite.black.brightCyan.wrap( '^+!!!Make sure your router has internet connection^' );
+    term("\n");
+    shell_command("This will create a file that pre configure your gateway credentials."
+        + " Please define the SSID and password for your external WiFi-router running OpenWRT."
+        + " This Wifi credentials will become your default settings. "
+        + "\nDo you want to continue editing your Gateway's WiFi configuration?",
+        " wifi_setup_openwrt");
+}
+function wifi_update_openwrt() {
+    shell_command("This will a file that pre configure your gateway credentials."
+        + " Please define the SSID and password for your external WiFi-router running OpenWRT."
+        + " This Wifi credentials will become your default settings. "
+        + "\nDo you want to continue editing your Gateway's WiFi configuration?",
+        " wifi_update_openwrt");
 }
 
 function advanced(back) {
@@ -390,6 +412,19 @@ function advanced_back() {
     advanced(true);
 }
 
+function system_configuration(back) {
+    choice([
+        ["Change wifi credentials for projects in system config (W)", "W", wifi_setup_systemconf],
+        ["Set-up global wifi credentials - internal chip (I)", "I", wifi_setup_global],
+        ["Set-up wifi gateway on external OpenWRT router (R)", "R",  wifi_setup_openwrt],
+        ["Update wifi credentials wifi on external OpenWRT router (U)", "U",  wifi_update_openwrt],
+        ["Set-up wifi gateway on the Raspberry Pi (P)", "P", wifi_config],
+        ["Back (B,X,ESC)", ["B","X"], back?menu_default:terminate]
+    ], pre_select=-1, pad_last=1);
+}
+function system_configuration_back() {
+    system_configuration(true);
+}
 
 function menu_default() {
     //term.clear();
@@ -403,7 +438,7 @@ function menu_default() {
     choice([
         ["Deploy (D)", "D", deploy], 
         ["Adopt (A)", "A", adopt],
-        ["Configuration (C)", "C", system_configuration],
+        ["Wifi Configuration (C)", "C", system_configuration_back],
         ["Create New Node Folder (N)", "N", create_node_template],
         ["Advanced (V)", "V", advanced_back],
         ["Exit (X,ESC)", "X", terminate]
@@ -442,6 +477,9 @@ switch(process.argv[process.argv.length - 1]) {
         break;
     case "shell":
         shell_escape();
+        break;
+    case "set_wificredentials_systemconf":
+        set_wificredentials_systemconf();
         break;
     case "poweroff":
         poweroff();

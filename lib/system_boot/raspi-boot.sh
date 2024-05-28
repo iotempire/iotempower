@@ -28,15 +28,21 @@ else
     IOTEMPOWER_USER=iot
 fi
 
+_WIFI_CONFIG="/boot/wifi.txt"
+_ACESSPOINT_START=""
+_MQTT_SCANIF="scanif"
+if [[ -e "$_WIFI_CONFIG" ]]; then
+    _ACESSPOINT_START="new-window -d -n AP ./run exec accesspoint \;"
+    _MQTT_SCANIF=""
+fi
 if [[ "IOTEMPOWER_AP_PASSWORD" ]]; then # pw was given, so start an accesspoint
     # start accesspoint and mqtt_broker
     (
         sleep 15 # let network devices start
         cd "$IOTEMPOWER_ROOT"
-        tmux new-session -d -n AP -s IoTsvcs \
-                "./run" exec accesspoint \; \
-            new-window -d -n MQTT  \
-                su - $IOTEMPOWER_USER -c 'iot exec mqtt_broker' \; \
+        tmux new-session -d -n MQTT -s IoTsvcs \
+                su - $IOTEMPOWER_USER -c "iot exec mqtt_starter $_MQTT_SCANIF" \; \
+            $_ACESSPOINT_START  \
             new-window -d -n nodered  \
                 su - $IOTEMPOWER_USER -c 'iot exec nodered_starter' \; \
             new-window -d -n cloudcmd  \

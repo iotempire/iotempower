@@ -1,0 +1,52 @@
+#!/bin/bash
+
+# Identify the first WiFi device that supports AP mode
+for dev in $(nmcli device status | grep wifi | awk '{print $1}'); do
+    if [ -z "$dev" ]; then
+  echo "Error: \$dev is not set"
+  exit 1
+fi
+
+if ! which iw > /dev/null; then
+  echo "Error: iw command not found"
+  exit 1
+fi
+
+phy=$(iw dev $dev info | grep wiphy | awk '{print $2}')
+
+if [ -z "$phy" ]; then
+  echo "Error: Could not find phy interface for device $dev"
+  exit 1
+fi
+
+if ! iw phy $phy info | grep -q "* AP"; then
+  echo "Error: Device $dev does not support AP mode"
+  exit 1
+fi
+    # if iw phy `iw dev $dev info | grep wiphy | awk '{print $2}'` info | grep -q "* AP"; then
+    #     WIFI_DEV=$dev
+    #     echo "Using device $WIFI_DEV for hotspot"
+    #     break
+    # fi
+done
+
+# # If no suitable device found, exit
+# if [ -z "$WIFI_DEV" ]; then
+#     echo "No WiFi device supporting AP mode found."
+#     exit 1
+# fi
+
+# # Setup Hotspot
+# SSID="YourHotspotName"
+# PASSWORD="YourPassword"
+# nmcli con add type wifi ifname $WIFI_DEV con-name hotspot autoconnect yes ssid $SSID
+# nmcli con modify hotspot 802-11-wireless.mode ap 802-11-wireless.band bg ipv4.method shared
+# nmcli con modify hotspot wifi-sec.key-mgmt wpa-psk
+# nmcli con modify hotspot wifi-sec.psk $PASSWORD
+# nmcli con modify hotspot ipv4.addresses 192.168.12.1/24
+# nmcli con modify hotspot ipv4.gateway 192.168.12.1
+# nmcli con modify hotspot ipv4.dns 192.168.12.1
+# nmcli con up hotspot
+
+# echo "Hotspot setup complete."
+
