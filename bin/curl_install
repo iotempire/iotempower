@@ -3,7 +3,7 @@
 # curl -L bit.ly/iotempower | bash -
 # If you use -s, you can add parameters to the install script
 # (all the ones that iot_install understand,, --something commands have to be added after --)
-# Example: curl -L bit.ly/iotempower | bash -s -- --quiet
+# Example: curl -L bit.ly/iotempower | bash -s -- --default
 
 command -v git &>/dev/null || { 
     echo "git is not installed. Please install it."

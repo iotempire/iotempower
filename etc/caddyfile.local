@@ -1,9 +1,10 @@
 {
 	skip_install_trust
 	http_port 40080
+	default_bind localhost
 	#	debug
 }
-localhost:40080 {
+:40080 {
 	reverse_proxy /nodered/* localhost:1880
 	reverse_proxy /cloudcmd/* localhost:8000
 
