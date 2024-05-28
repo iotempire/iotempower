@@ -1,0 +1,107 @@
+#!/bin/bash
+if [[ $# -gt 4 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
+cat << EOF
+
+this must be called from a node directory (or one of its parent system
+directories) and reads it will set the gateway wifi configurartion of that system (SSID, password, gateway IP).
+
+It rebuilds firmwares for the affected nodes and remotely flashes
+the respected nodes.
+
+If credentials are given, it over writes the global wifi configuration.
+Else it the gateway configuration is set to the default global values
+
+If you are running all systems from same gateway, you can also change the credentials by creating an iotempower.conf file in iot/etc/
+Copy the iotempower.conf.example file, (delete the .example extension) and adjust the values.
+
+EOF
+exit 1
+fi
+
+# TODO: add option to specify input file with list of specific nodes to deploy
+
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
+
+
+source $IOTEMPOWER_ROOT/bin/check_router_ip
+# Print it for verification
+echo "Router IP: $ROUTER_IP"
+
+
+source $IOTEMPOWER_ROOT/etc/wifi_credentials
+
+ssh_pub_key=$(ls ~/.ssh/*.pub | head -n 1 | xargs cat)+\n
+
+
+hostname="root@$ROUTER_IP"
+
+ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $hostname << EOF 
+echo "cpying your public key to the router authorized.keys for passwordless ssh loging..."
+echo $ssh_pub_key >> /etc/dropbear/authorized_keys
+opkg update
+
+# Install Mosquitto and its SSL libraries
+opkg install mosquitto-ssl mosquitto-client-ssl libmosquitto-ssl luci-app-mosquitto kmod-usb-net-rndis openssh-server openssh-sftp-server
+
+# Replace Dropbear to OpenSSH + SFTP
+uci set dropbear.@dropbear[0].Port=2222
+uci commit dropbear
+/etc/init.d/dropbear restart
+
+sed -i 's/^#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+mkdir /root/.ssh/
+cp /etc/dropbear/authorized_keys /root/.ssh/
+
+/etc/init.d/sshd enable
+/etc/init.d/sshd restart
+
+# Enable Mosquitto to start on boot
+/etc/init.d/mosquitto enable
+
+# Set the options in the 'owrt' section
+uci set mosquitto.owrt=owrt
+uci set mosquitto.owrt.use_uci='1'
+
+# Set the options in the 'mosquitto' section
+uci set mosquitto.mosquitto=mosquitto
+uci set mosquitto.mosquitto.allow_anonymous='1'
+
+# Set the options in the 'persistence' section
+uci set mosquitto.persistence=persistence
+uci set mosquitto.persistence.persistence='0'
+
+# Check if a Mosquitto listener already exists
+if ! uci show mosquitto | grep -q '=listener'; then
+    # If no listener exists, add one
+    uci add mosquitto listener
+    # Set the options in the new listener section
+    uci set mosquitto.@listener[0].port='1883'
+    uci set mosquitto.@listener[0].protocol='mqtt'
+fi
+
+# Save the changes
+uci commit mosquitto
+
+# Start Mosquitto
+/etc/init.d/mosquitto start
+
+uci set wireless.radio0.disabled='0'
+uci set wireless.default_radio0.ssid="$SSID"
+uci set wireless.default_radio0.encryption="psk2"
+uci set wireless.default_radio0.key="$Password"
+uci commit wireless
+wifi &
+
+echo "Setting wifi credentials"
+uci set network.lan.ipaddr="$GatewayIP"
+uci commit network
+echo "Setting network ip to 192.168.12.1 and restarting..."
+echo "WiFi configuration has been written to uci config file"
+( sleep 5 ; /etc/init.d/network restart ) &
+
+EOF
+# TODO deactivate dropbear
+#TODO some mechanism that detacts if the router has internet and only run the install if it does
+echo "Please restart the router to apply the changes and connect to the new wifi network $SSID"
+
+echo "Done"
