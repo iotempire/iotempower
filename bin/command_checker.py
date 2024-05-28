@@ -25,7 +25,7 @@ class TokenChecker:
     def __init__(self, filepath):
         with open(filepath, 'r') as f:
             code = f.read()
-        code = re.sub(re.compile("/\*.*?\*/", re.DOTALL), "", code)
+        code = re.sub(re.compile(r"/\*.*?\*/", re.DOTALL), "", code) # TODO: verify that r=raw works here
         code = re.sub(r"(/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/)|(//.*?$)", "", code, flags=re.MULTILINE)
         self.tokens=set()
         try:

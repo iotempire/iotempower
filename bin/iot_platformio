@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
+
+# Running in Termux, set correct preloaded lib
+if [[ -n "$PREFIX" ]] && command -v apt-get &> /dev/null; then
+  exec grun -t "$IOTEMPOWER_VPYTHON/bin/python" "$IOTEMPOWER_VPYTHON/bin/pio" "$@"
+else
+  exec "$IOTEMPOWER_VPYTHON/bin/pio" "$@"
+fi
