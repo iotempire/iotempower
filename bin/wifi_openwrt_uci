@@ -31,17 +31,29 @@ echo "Router IP: $ROUTER_IP"
 source $IOTEMPOWER_ROOT/etc/wifi_credentials
 
 ssh_pub_key=$(ls ~/.ssh/*.pub | head -n 1 | xargs cat)+\n
-echo $ssh_pub_key
+
 
 hostname="root@$ROUTER_IP"
 
-ssh $hostname << EOF 
-
+ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $hostname << EOF 
+echo "cpying your public key to the router authorized.keys for passwordless ssh loging..."
 echo $ssh_pub_key >> /etc/dropbear/authorized_keys
 opkg update
 
 # Install Mosquitto and its SSL libraries
-opkg install mosquitto-ssl mosquitto-client-ssl libmosquitto-ssl luci-app-mosquitto kmod-usb-net-rndis
+opkg install mosquitto-ssl mosquitto-client-ssl libmosquitto-ssl luci-app-mosquitto kmod-usb-net-rndis openssh-server openssh-sftp-server
+
+# Replace Dropbear to OpenSSH + SFTP
+uci set dropbear.@dropbear[0].Port=2222
+uci commit dropbear
+/etc/init.d/dropbear restart
+
+sed -i 's/^#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+mkdir /root/.ssh/
+cp /etc/dropbear/authorized_keys /root/.ssh/
+
+/etc/init.d/sshd enable
+/etc/init.d/sshd restart
 
 # Enable Mosquitto to start on boot
 /etc/init.d/mosquitto enable
@@ -88,28 +100,8 @@ echo "WiFi configuration has been written to uci config file"
 ( sleep 5 ; /etc/init.d/network restart ) &
 
 EOF
-
+# TODO deactivate dropbear
+#TODO some mechanism that detacts if the router has internet and only run the install if it does
 echo "Please restart the router to apply the changes and connect to the new wifi network $SSID"
-#echo "Press enter once you have connected to Wifi $SSID"
-# Set the countdown time in seconds
 
-# echo "Waiting for the router to restart...Please disconnect Ethernet and Connect to the new wifi network $SSID once it is up"
-# #get routers IP address
-# router_ip=$(route -n | grep 'UG[ \t]' | awk '{print $2}' | grep '^192\.168')
-# countdown_time=60
-# # Start the countdown
-# for ((i=$countdown_time; i>0; i--)); do
-#     printf "\rCountdown: %2d seconds remaining \n" $i
-#     # Check if the user has pressed enter and if the router IP matches the gateway IP
-#     if [ "$router_ip" = "$GatewayIP" ]; then
-#         echo "You are connected to the Gateway's wifi network $SSID"
-#         echo "Gateway's new IP: $router_ip"
-#         break
-#     fi
-#     sleep 1
-# done
-
-# if [ $i -eq 0 ]; then
-#     echo "Timeout, you did not connect to the Gateway's wifi network. Please check your wifi settings and try again"
-# fi
 echo "Done"

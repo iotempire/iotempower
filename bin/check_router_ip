@@ -3,7 +3,7 @@ if [[ $# -gt 4 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF
 
 this must be called from a node directory (or one of its parent system
-directories) and reads it will set the gateway wifi configurartion of that system (SSID, password, gateway IP).
+directories) and reads it will set the gateway wifi configuration of that system (SSID, password, gateway IP).
 
 It rebuilds firmwares for the affected nodes and remotely flashes
 the respected nodes.
@@ -25,7 +25,8 @@ fi
 #!/bin/bash
 
 # Detect the router's IP address
-router_ip=$(route -n | grep 'UG[ \t]' | awk '{print $2}' | grep -E '^192\.168|^1\.1')
+router_ip=$(route -n | grep 'UG[ \t]' | awk '{print $2}' | grep -E '^192\.168')
 
 # Export it as an environment variable
 export ROUTER_IP=$router_ip
+echo " You are connected to Router IP: $ROUTER_IP"

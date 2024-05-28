@@ -367,12 +367,6 @@ function wifi_setup_systemconf() {
 }
 
 function wifi_setup_global() {
-    term("\n\n");
-    term
-    term.bgBrightWhite.black.brightCyan.wrap( '^+!!!Make sure you are connected to your router via Ethernet or Wifi^' );
-    term("\n");
-    term.bgBrightWhite.black.brightCyan.wrap( '^+!!!Make sure your router has internet connection^' );
-    term("\n");
     shell_command("This will create a iotempower.conf file that creates global credentials for your systems."
         + "\nIf your accesspoint is an internal wifi chip, this will define it's credentials"
         + "\nThis wull define the SSID and password for wifi by creating a iotempower.conf file."
@@ -382,6 +376,12 @@ function wifi_setup_global() {
 }
 
 function wifi_setup_openwrt() {
+    term("\n\n");
+    term
+    term.bgBrightWhite.black.brightCyan.wrap( '^+!!!Make sure you are connected to your router via Ethernet or Wifi^' );
+    term("\n");
+    term.bgBrightWhite.black.brightCyan.wrap( '^+!!!Make sure your router has internet connection^' );
+    term("\n");
     shell_command("This will create a file that pre configure your gateway credentials."
         + " Please define the SSID and password for your external WiFi-router running OpenWRT."
         + " This Wifi credentials will become your default settings. "
