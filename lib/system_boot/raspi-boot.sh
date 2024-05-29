@@ -32,7 +32,7 @@ _WIFI_CONFIG="/boot/wifi.txt"
 _ACESSPOINT_START=""
 _MQTT_SCANIF="scanif"
 if [[ -e "$_WIFI_CONFIG" ]]; then
-    _ACESSPOINT_START="new-window -d -n AP ./run exec accesspoint \;"
+    _ACESSPOINT_START='new-window -d -n AP ./run exec accesspoint \;'
     _MQTT_SCANIF=""
 fi
 if [[ "IOTEMPOWER_AP_PASSWORD" ]]; then # pw was given, so start an accesspoint
