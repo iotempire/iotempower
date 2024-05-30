@@ -94,8 +94,7 @@ class RGB_Base : public Device {
             // nothing by default
         }
 
-        virtual bool measure() { return true; }
-
+       virtual bool measure() { show(); return true; } // give control to library on regular basis
 };
 
 #endif // _RGB_BASE_H_
