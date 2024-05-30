@@ -203,7 +203,9 @@ bool Device::poll_measure() {
 
         if (current_micros - last_poll >= _pollrate_us) {
             // Calculate the number of _pollrate_us intervals that have passed
-            unsigned long intervals = (current_micros - last_poll) / _pollrate_us;
+
+            unsigned long intervals = 0;
+            if(_pollrate_us) intervals = (current_micros - last_poll) / _pollrate_us; // only update if not zero - TODO: verify that this cannot be more efficient
 
             // Update last_poll by adding the total amount of passed intervals
             last_poll += intervals * _pollrate_us;
