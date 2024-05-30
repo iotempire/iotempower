@@ -29,12 +29,15 @@ else
 fi
 
 _WIFI_CONFIG="/boot/wifi.txt"
-_ACESSPOINT_START=""
+# true here means to start the command true, which does NOT start the acesspoint
+_ACESSPOINT_START="true"
 _MQTT_SCANIF="scanif"
 if [[ -e "$_WIFI_CONFIG" ]]; then
-    _ACESSPOINT_START='new-window -d -n AP ./run exec accesspoint \;'
+    # actually start accesspoint
+    _ACESSPOINT_START="accesspoint"
     _MQTT_SCANIF=""
 fi
+
 if [[ "IOTEMPOWER_AP_PASSWORD" ]]; then # pw was given, so start an accesspoint
     # start accesspoint and mqtt_broker
     (
@@ -42,7 +45,7 @@ if [[ "IOTEMPOWER_AP_PASSWORD" ]]; then # pw was given, so start an accesspoint
         cd "$IOTEMPOWER_ROOT"
         tmux new-session -d -n MQTT -s IoTsvcs \
                 su - $IOTEMPOWER_USER -c "iot exec mqtt_starter $_MQTT_SCANIF" \; \
-            $_ACESSPOINT_START  \
+                new-window -d -n AP ./run exec $_ACESSPOINT_START  \; \
             new-window -d -n nodered  \
                 su - $IOTEMPOWER_USER -c 'iot exec nodered_starter' \; \
             new-window -d -n cloudcmd  \
