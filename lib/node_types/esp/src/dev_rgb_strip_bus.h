@@ -102,7 +102,6 @@ class RGB_Strip_Bus : public RGB_Base {
             }
             avg_color = CRGB(avg_r/lc, avg_g/lc, avg_b/lc);
         }
-//        virtual bool measure() { show(); } // seems not necessary
 };
 
 #endif // _RGB_STRIP_H_

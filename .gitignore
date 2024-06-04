@@ -27,3 +27,4 @@ __pycache__
 .vscode/c_cpp_properties.json
 .vscode/launch.json
 doc/_links.rst
+etc/wifi_credentials

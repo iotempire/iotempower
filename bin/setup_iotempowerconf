@@ -1,0 +1,101 @@
+#!/bin/bash
+if [[ $# -gt 4 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
+cat << EOF
+
+this must be called from a node directory (or one of its parent system
+directories) and reads it will set the gateway wifi configurartion of that system (SSID, password, gateway IP).
+
+It rebuilds firmwares for the affected nodes and remotely flashes
+the respected nodes.
+
+If credentials are given, it over writes the global wifi configuration.
+Else it the gateway configuration is set to the default global values
+
+If you are running all systems from same gateway, you can also change the credentials by creating an iotempower.conf file in iot/etc/
+Copy the iotempower.conf.example file, (delete the .example extension) and adjust the values.
+
+EOF
+exit 1
+fi
+
+# TODO: add option to specify input file with list of specific nodes to deploy
+
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
+
+#!/bin/bash
+
+
+# Prompt the user for SSID and password
+source $IOTEMPOWER_ROOT/etc/wifi_credentials
+# Create a file and write the SSID and password to it
+cat << EOF > /home/renato/iot/etc/iotempower.conf
+
+# Configuration options of iotempower
+# This is specific to this hardware platform and iotempower
+# gateway installation,
+# it can support several system configurations
+
+
+#### Accesspoint configuration ####
+# potential devices for wifi sharing in order of preference
+# (if not defined, will be all devices starting with wl)
+#IOTEMPOWER_AP_DEVICES="wlan1 wlan0"
+
+# Name of accesspoint to create
+IOTEMPOWER_AP_NAME="$SSID"
+
+# if set to yes, add unique ID from MAC-address as extension to name
+# this is good in classes where you teach iot and have multiple gateways
+IOTEMPOWER_AP_ADDID=no
+
+# Its wifi password to use -> TODO: move to secret file
+IOTEMPOWER_AP_PASSWORD="$Password"
+
+# Channel to run on (set to actual number)
+# if set to random, will pick one of 2 3 4 5 7 8 9 10
+# IOTEMPOWER_AP_CHANNEL=9
+IOTEMPOWER_AP_CHANNEL=random
+
+# Hide the essid when this is yes
+# Attention, this has no effect on lots of chipsets
+# it does works with the built-in wifi of the reaspbeery pi.
+IOTEMPOWER_AP_HIDDEN=no
+
+# An ethernet-interface to bridge the network to, when creating accesspoint
+#IOTEMPOWER_AP_BRIDGE=eth0
+
+# IP to pick
+IOTEMPOWER_AP_IP="$GatewayIP"
+
+# hostname to export
+# if this is empty, it uses the actual hostname
+# this name is associated with the IP given in IOTEMPOWER_AP_IP
+IOTEMPOWER_AP_HOSTNAME="iotgateway"
+
+#### END - Accesspoint configuration ####
+
+
+#### MQTT configuration ####
+# Connect data for local MQTT broker
+# if not defined, the same as IOTEMPOWER_AP_IP
+#IOTEMPOWER_MQTT_HOST="mosquitto-host"
+
+# Username and password for devices to use mqtt
+# If user not defined, do not use user authentication
+# TODO: auto create a user with this credentials
+# TODO: move to secret file
+#IOTEMPOWER_MQTT_USER="homeassistant"
+#IOTEMPOWER_MQTT_PW="secretpw"
+
+# Data to configure an mqtt bridge
+#IOTEMPOWER_MQTT_BRIDGE_HOST="ulno.net"
+#IOTEMPOWER_MQTT_BRIDGE_PORT="8883"
+#IOTEMPOWER_MQTT_BRIDGE_CERTPATH="/etc/ssl/certs"
+#IOTEMPOWER_MQTT_BRIDGE_TOPIC="bridged"
+#IOTEMPOWER_MQTT_BRIDGE_USER="bridgeuser"
+#IOTEMPOWER_MQTT_BRIDGE_PW="secretpw"
+#### END MQTT configuration ####
+
+EOF
+
+echo "WiFi configuration has been written to iotempower.conf"
