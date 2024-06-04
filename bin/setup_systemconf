@@ -22,11 +22,27 @@ fi
 
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
-#export IOTEMPOWER_DEPLOY=active
-
+source $IOTEMPOWER_ROOT/etc/wifi_credentials
 
 if [[ -e "system.conf" ]]; then  # started from system-directory
-   ${EDITOR:-nano} system.conf # TODO how do we make it use the local default editor for all systems?
+   #${EDITOR:-nano} system.conf # TODO how do we make it use the local default editor for all systems?
+          cat << EOF > system.conf
+         # Everything from etc/iotempower.conf can be overwritten here.
+# However, you will usually just overwrite the MQTT-Host and maybe
+# wifi access information
+
+# Name of accesspoint to connect to
+IOTEMPOWER_AP_NAME="$SSID"
+
+# Its wifi password
+IOTEMPOWER_AP_PASSWORD="$Password"
+
+# Connect data for local MQTT broker
+# If not defined, the same as IOTEMPOWERAP_IP from $IOTEMPWOER_ROOT/etc/iotempower.conf default
+#IOTEMPOWER_MQTT_HOST="192.168.12.1"
+EOF
+    echo "Wifi credentials were set"
+    exit 0
 
 else # started from somewhere else, so search for system.conf in subdirs
 
@@ -40,8 +56,22 @@ else # started from somewhere else, so search for system.conf in subdirs
     find -name system.conf |\
         cd "$path"
         cd "$(dirname "$path")"
-         ${EDITOR:-nano} system.conf # TODO how do we make it use the local default editor for all systems?
+         #${EDITOR:-nano} system.conf # TODO how do we make it use the local default editor for all systems?
+        cat << EOF > system.conf
+         # Everything from etc/iotempower.conf can be overwritten here.
+# However, you will usually just overwrite the MQTT-Host and maybe
+# wifi access information
 
+# Name of accesspoint to connect to
+IOTEMPOWER_AP_NAME="$SSID"
+
+# Its wifi password
+IOTEMPOWER_AP_PASSWORD="$Password"
+
+# Connect data for local MQTT broker
+# If not defined, the same as IOTEMPOWERAP_IP from $IOTEMPWOER_ROOT/etc/iotempower.conf default
+#IOTEMPOWER_MQTT_HOST="192.168.12.1"
+EOF
     echo "Wifi credentials were set"
     exit 0
 

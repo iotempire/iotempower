@@ -56,7 +56,6 @@ class RGB_Strip : public RGB_Base {
             }
             avg_color = CRGB(avg_r/lc, avg_g/lc, avg_b/lc);
         }
-        virtual bool measure() { show(); return true; } // give control to library on regular basis - TODO: check if necessary;
 };
 
 #endif // _RGB_STRIP_H_
