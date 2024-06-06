@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# Get all ips of local network adapters
+
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
+
+# Function to get IPs using ifconfig
+get_ips_ifconfig() {
+    ifconfig | awk '/inet / && $2 != "127.0.0.1" {print}' | while read -r line; do
+        ip=$(echo "$line" | awk '{print $2}')
+        iface=$(ifconfig | grep -B1 "inet $ip" | head -n1 | awk '{print $1}')
+        echo "$iface $ip"
+    done
+}
+
+# Function to get IPs using ip
+get_ips_ip() {
+    ip -4 -o addr show | awk '{print $2, $4}' | grep -v '127.0.0.1' | sed 's,/.*,,'
+}
+
+# Check if running on Termux
+if [ -n "$PREFIX" ] && [ -x "$(command -v ifconfig)" ]; then
+    get_ips_ifconfig
+else
+    get_ips_ip
+fi
+
