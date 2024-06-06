@@ -24,4 +24,4 @@ fi
 echo "Setting up external OpenWRT router for IoTempower using wifi_cedentials from /etc/wifi_credentials"
 . $IOTEMPOWER_ROOT/bin/wifi_credentials
 . $IOTEMPOWER_ROOT/bin/wifi_openwrt_uci
-. $IOTEMPOWER_ROOT/bin/setup_iotempowerconf
+. $IOTEMPOWER_ROOT/bin/setup_systemconf
