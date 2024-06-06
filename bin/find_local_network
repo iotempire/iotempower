@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+# Get all ips of local network adapters
+
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
+
+# Define the external IP address to test connectivity
+TEST_IP="8.8.8.8"
+
+# Function to display usage information
+usage() {
+    echo "Usage: $0 [options]"
+    echo
+    echo "Options:"
+    echo "  -h, --help    Show this help message and exit"
+    echo
+    echo "This script finds the first network interface without connectivity by pinging $TEST_IP."
+    echo "The script relies on show_local_ips to retrieve the list of network interfaces and their IP addresses."
+}
+
+# Check for help argument
+if [[ "$1" == "help" || "$1" == "-h" || "$1" == "--help" ]]; then
+    usage
+    exit 0
+fi
+
+# Function to check internet connectivity
+check_internet_connectivity() {
+    local iface=$1
+    # Use ping to check connectivity to the defined IP address
+    if ping -I "$iface" -c 1 -W 1 "$TEST_IP" &> /dev/null; then
+        # Interface $iface has internet connectivity
+        return 0
+    else
+        # Interface $iface does not have internet connectivity
+        return 1
+    fi
+}
+
+# Call the get_ips script and iterate over its output
+show_local_ips | while read -r line; do
+    iface=$(echo "$line" | awk '{print $1}')
+    ip=$(echo "$line" | awk '{print $2}')
+    if ! check_internet_connectivity "$iface"; then
+        echo "$iface $ip"
+        exit 0
+    fi
+done
+
+exit 1

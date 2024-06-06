@@ -31,7 +31,7 @@ Table of Contents
 
 - `Command Reference </doc/node_help/commands.rst>`_
 
-- `Examples Reference </doc/examples-glossary.rst>`_
+- `Project Reference </doc/projects_help/projects.rst>`_
 
 
 Obsolete:
