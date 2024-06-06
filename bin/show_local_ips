@@ -7,8 +7,9 @@
 get_ips_ifconfig() {
     ifconfig 2>/dev/null | awk '/inet / && $2 != "127.0.0.1" {print}' | while read -r line; do
         ip=$(echo "$line" | awk '{print $2}')
+        netmask=$(echo "$line" | awk '{print $4}')
         iface=$(ifconfig | grep -B1 "inet $ip" | head -n1 | awk '{print $1}')
-        echo "$iface $ip"
+        echo "$iface $ip/$netmask"
     done
 }
 
