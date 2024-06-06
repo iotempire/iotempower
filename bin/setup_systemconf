@@ -70,7 +70,7 @@ IOTEMPOWER_AP_PASSWORD="$Password"
 
 # Connect data for local MQTT broker
 # If not defined, the same as IOTEMPOWERAP_IP from $IOTEMPWOER_ROOT/etc/iotempower.conf default
-#IOTEMPOWER_MQTT_HOST="192.168.12.1"
+IOTEMPOWER_MQTT_HOST="$GatewayIP"
 EOF
     echo "Wifi credentials were set"
     exit 0
