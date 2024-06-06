@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# needs ipcalc
+
+IP=$1
+NETWORK=$2
+
+if [ -z "$IP" ] || [ -z "$NETWORK" ]; then
+    echo "Usage: $0 <IP> <NETWORK>"
+    exit 1
+fi
+
+# Extract network address and netmask from the given network
+NETWORK_ADDR=$(ipcalc -n "$NETWORK" | grep "Network:" | awk '{print $2}')
+NETMASK=$(ipcalc -m "$NETWORK" | grep "Netmask:" | awk '{print $2}')
+
+# Calculate network address for the given IP with the same netmask
+IP_NETWORK_ADDR=$(ipcalc -n "$IP/$NETMASK" | grep "Network:" | awk '{print $2}')
+
+# Compare the network addresses
+if [ "$NETWORK_ADDR" == "$IP_NETWORK_ADDR" ]; then
+    # $IP is in $NETWORK
+    exit 0
+else
+    # $IP is NOT in $NETWORK
+    exit 1
+fi
