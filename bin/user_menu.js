@@ -415,7 +415,6 @@ function advanced_back() {
 function system_configuration(back) {
     choice([
         ["Change wifi credentials for projects in system config (W)", "W", wifi_setup_systemconf],
-        ["Set-up global wifi credentials - internal chip (I)", "I", wifi_setup_global],
         ["Set-up wifi gateway on external OpenWRT router (R)", "R",  wifi_setup_openwrt],
         ["Update wifi credentials wifi on external OpenWRT router (U)", "U",  wifi_update_openwrt],
         ["Set-up wifi gateway on the Raspberry Pi (P)", "P", wifi_config],
