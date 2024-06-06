@@ -24,4 +24,4 @@ fi
 
 . $IOTEMPOWER_ROOT/bin/wifi_credentials
 . $IOTEMPOWER_ROOT/bin/wifi_openwrt_change_uci
-. $IOTEMPOWER_ROOT/bin/setup_iotempowerconf
+. $IOTEMPOWER_ROOT/bin/setup_systemconf
