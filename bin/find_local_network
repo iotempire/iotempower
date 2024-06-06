@@ -15,6 +15,7 @@ usage() {
     echo
     echo "This script finds the first network interface without connectivity by pinging $TEST_IP."
     echo "The script relies on show_local_ips to retrieve the list of network interfaces and their IP addresses."
+    echo "If there is only one network interface, it is assumed that this is the local network."
 }
 
 # Check for help argument
@@ -47,17 +48,28 @@ fi
 
 
 # Call the show_local_ips script and iterate over its output
-show_local_ips | while read -r line; do
+LINES_COUNT=0
+FIRST_LINE=""
+while read -r line; do
     if ! [[ "$FIRST_HOP_IP" ]]; then
         echo "$line"
         exit 0
     fi
+    if ! [[ "$FIRST_LINE" ]]; then
+        FIRST_LINE="$line"
+    fi
     iface=$(echo "$line" | awk '{print $1}')
     net=$(echo "$line" | awk '{print $2}')
     if ! check_ip_in_network "$FIRST_HOP_IP" "$net"; then
-        echo "$iface $ip"
+        echo "$line"
         exit 0
     fi
-done
+    LINES_COUNT=$((LINES_COUNT + 1))
+done < <(show_local_ips)
+
+if [[ $LINES_COUNT -eq 1 ]]; then
+    echo "$FIRST_LINE"
+    exit 0
+fi
 
 exit 1
