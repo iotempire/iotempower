@@ -23,30 +23,32 @@ while true; do
         IF="$1"
         if [[ "$IF" = "scanif" ]]; then
             # Get all non-loopback, UP interfaces
-            # TODO: use ifconfig if ip does not exist (broken on Termux on Android >= 13)
-            interfaces=$(ip -o link show | awk '$2 != "lo:" && $9 == "UP" {print $2}' | sed 's/\([a-zA-Z0-9]*\).*/\1/')
+            # interfaces=$(ip -o link show | awk '$2 != "lo:" && $9 == "UP" {print $2}' | sed 's/\([a-zA-Z0-9]*\).*/\1/')
 
-            # Check each interface for a local IP address, prefer the first one found
-            for intf in $interfaces; do
-                if ip -o addr show $intf | grep -q "inet "; then
-                    interface=$intf
-                    break
-                fi
-            done
+            # # Check each interface for a local IP address, prefer the first one found
+            # for intf in $interfaces; do
+            #     if ip -o addr show $intf | grep -q "inet "; then
+            #         interface=$intf
+            #         break
+            #     fi
+            # done
 
-            # If no interface with a local IP is found, use the first UP interface
-            if [ -z "$interface" ]; then
-                interface=$(echo "$interfaces" | head -n 1)
-            fi
+            # # If no interface with a local IP is found, use the first UP interface
+            # if [ -z "$interface" ]; then
+            #     interface=$(echo "$interfaces" | head -n 1)
+            # fi
+            #
+            # IF=$interface
 
-            IF=$interface
+            IF=$(find_local_network)
 
             # Print the interface name
-            echo "Preferred interface: $interface"
-
+            echo "Preferred interface: $IF"
+            export IOTEMPOWER_MQTT_HOST=$(echo "$IF" | cut -d' ' -f2 | cut -d'/' -f1)
+        else
+            # TODO: update for termux case
+            export IOTEMPOWER_MQTT_HOST=$(ip a show "$IF"|grep " inet "|head -n1|cut -dt -f2|cut -d\  -f2|cut -d/ -f1)
         fi
-
-        export IOTEMPOWER_MQTT_HOST=$(ip a show "$IF"|grep " inet "|head -n1|cut -dt -f2|cut -d\  -f2|cut -d/ -f1)
     fi
 
     echo "Listening on $IOTEMPOWER_MQTT_HOST."
