@@ -18,6 +18,8 @@ Configure the ``setup.cpp`` file:
 
 ..  code-block:: cpp
 
+    const char* id="01";
+    
     out(led, ONBOARDLED).inverted().off(); // initialize the onboard LED
     
     button(home, BUTTON_HOME, "pressed", "released").inverted().debounce(10);
@@ -26,7 +28,6 @@ Configure the ``setup.cpp`` file:
     
     m5stickc_display(console, 1, 270); // initialize LCD display as 'console'
 
-    const char* id="01";
     void start() { 
         do_later(100, [] () { 
                 IN(console).print("This is: stick-")
@@ -134,7 +135,23 @@ Features
 Node-RED Flow
 =============
 
-This section includes the Node-RED flow configuration for controlling the M5StickC. The flow allows toggling the internal LED on and off using the side buttons, facilitated by MQTT messages.
+This section includes an example Node-RED flow for controlling the M5StickC. 
+
+The flow toggles the internal LED on and off using the side buttons and MQTT messages.
+
+.. figure:: /doc/images/m5stickc_toggleLED_example_flow.png
+   :width: 50%
+   :figwidth: 100%
+   :align: center
+   :alt: M5StickC Toggle LED Example Flow
+   :name: m5stickc_toggleLED_example_flow
+
+This flow includes the following nodes:
+- MQTT input nodes for the M5StickC buttons and LED.
+- Debug nodes for debugging purposes.
+- Switch nodes for toggling the LED on and off.
+- Change nodes for setting the LED state.
+- MQTT output node for sending the LED state to the M5StickC.
 
 .. code-block:: json
 
@@ -149,8 +166,6 @@ To import this flow into your Node-RED setup:
 3. Click on the menu at the top right corner (three horizontal lines).
 4. Select *Import* from the drop-down menu.
 5. Paste the copied JSON in the text field that appears, and then click *Import*.
-
-This flow integrates with the physical buttons on the M5StickC to control the device's LED through MQTT, illustrating a practical use of IoT concepts with Node-RED and M5StickC.
 
 
 
