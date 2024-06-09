@@ -133,7 +133,7 @@ Features
 
 
 Node-RED Flow
-=============
+-------------
 
 This section includes an example Node-RED flow for controlling the M5StickC. 
 
