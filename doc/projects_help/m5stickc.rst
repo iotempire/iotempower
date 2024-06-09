@@ -31,7 +31,9 @@ Configure the ``setup.cpp`` file:
     void start() { 
         do_later(100, [] () { 
                 IN(console).print("This is: stick-")
-                .print(id);});} // print device id on LCD display (console)
+                .print(id);  // print device id on LCD display (console)
+                }
+                );}
 
 
 **Note**:
