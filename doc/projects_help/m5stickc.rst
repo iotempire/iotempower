@@ -22,7 +22,7 @@ Configure the ``setup.cpp`` file:
     
     button(home, BUTTON_HOME, "pressed", "released").inverted().debounce(10);
     
-    button(buttom, BUTTON_RIGHT, "pressed", "released").inverted().debounce(10);
+    button(button, BUTTON_RIGHT, "pressed", "released").inverted().debounce(10);
     
     m5stickc_display(console, 1, 270); // initialize LCD display as 'console'
 
@@ -129,6 +129,30 @@ Features
    +----------------------+--------------------------------------------------+
    | Case Material        | Plastic (PC)                                     |
    +----------------------+--------------------------------------------------+
+
+
+Node-RED Flow
+=============
+
+This section includes the Node-RED flow configuration for controlling the M5StickC. The flow allows toggling the internal LED on and off using the side buttons, facilitated by MQTT messages.
+
+.. code-block:: json
+
+    [
+      {"id":"6d565a3c.17c584","type":"subflow","name":"Toggle","info":"","category":"","in":[{"x":60,"y":100,"wires":[{"id":"a6449155.3cdd8"}]}],"out":[{"x":440,"y":60,"wires":[{"id":"519f75ef.d3d8cc","port":0}]},{"x":440,"y":140,"wires":[{"id":"d35764b.91d1e98","port":0}]}],"env":[{"name":"option1","type":"bool","value":"true"},{"name":"option2","type":"bool","value":"false"}],"meta":{},"color":"#DDAA99","outputLabels":["Option 1","Option 2",""],"icon":"node-red/switch.svg"},
+      ...
+    ]
+
+To import this flow into your Node-RED setup:
+
+1. Copy the above JSON array.
+2. Go to your Node-RED instance.
+3. Click on the menu at the top right corner (three horizontal lines).
+4. Select *Import* from the drop-down menu.
+5. Paste the copied JSON in the text field that appears, and then click *Import*.
+
+This flow integrates with the physical buttons on the M5StickC to control the device's LED through MQTT, illustrating a practical use of IoT concepts with Node-RED and M5StickC.
+
 
 
 Resources
