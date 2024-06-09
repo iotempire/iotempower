@@ -140,13 +140,15 @@ This section includes an example Node-RED flow for controlling the M5StickC.
 The flow toggles the internal LED on and off using the side buttons and MQTT messages.
 
 .. figure:: /doc/images/m5stickc_toggleLED_example_flow.png
-   :width: 50%
+   :width: 100%
    :figwidth: 100%
    :align: center
    :alt: M5StickC Toggle LED Example Flow
    :name: m5stickc_toggleLED_example_flow
 
+
 This flow includes the following nodes:
+
 - MQTT input nodes for the M5StickC buttons and LED.
 - Debug nodes for debugging purposes.
 - Switch nodes for toggling the LED on and off.
