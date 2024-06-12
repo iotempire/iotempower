@@ -4,7 +4,7 @@
 #ifndef _M5STICKC_DISPLAY_H_
 #define _M5STICKC_DISPLAY_H_
 
-#include <M5StickC.h>
+#include <platform_includes.h>
 #include <device.h>
 #include <text_display_buffer.h>
 
