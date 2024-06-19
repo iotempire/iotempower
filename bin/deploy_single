@@ -97,16 +97,23 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
     fi
 
     if [[ $port ]]; then
-        export PLATFORMIO_UPLOAD_PORT="/dev/$port"
+        # Check if the port starts with /dev/ or is a URL (handling ws, http, https, rfc2217, etc.)
+        if [[ "$port" =~ ^/dev/ || "$port" =~ ^[0-9a-zA-Z]+:// ]]; then
+            export PLATFORMIO_UPLOAD_PORT="$port"
+        else
+            export PLATFORMIO_UPLOAD_PORT="/dev/$port"
+        fi
+
         if [[ ! "$*" == *force ]]; then # usually check dongle
             dongle probe -p "$PLATFORMIO_UPLOAD_PORT" && {
-                echo "There is a IoTempower esp dongle connected at $port."
+                echo "There is a IoTempower esp dongle connected at $PLATFORMIO_UPLOAD_PORT."
                 echo "Refusing to overwrite."
                 echo "If you are sure, specify force as last parameter."
                 exit 1
             }
         fi
     fi
+
 
     prepare_build_dir cache
     #cd "$IOTEMPOWER_COMPILE_CACHE"

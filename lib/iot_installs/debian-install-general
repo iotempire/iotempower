@@ -68,6 +68,16 @@ if ! check_node; then
     fi
 fi
 
+# # on native debian gateway, we want network-manager <- TODO!
+# # connect to network
+# apt update
+# apt upgrade
+# apt install network-manager sudo
+# apt purge ifupdown
+# usermod -aG sudo iot # assuming iot user was created during install
+# # TODO: verify sshd is installed and enbaled
+# should also adjust /etc/systemd/logind.conf to prevent sleeping when lid closed
+
 # procps allows pkill and ps
 PACKAGE_LIST="build-essential git procps mosquitto-clients virtualenv python3-venv python3-dev make rsync openssh-client haveged jq"
 to_install=$(filter_packages debian-query $PACKAGE_LIST)
