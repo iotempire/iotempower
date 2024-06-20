@@ -1,21 +1,19 @@
 // display.cpp
-#include <dev_display_m5stickc.h>
+#include <dev_display_cyd.h>
 
-bool M5StickC_Display::init() {
+bool CYD_Display::init() {
     set_ignore_case(false); // be case sensitive
 
-    M5.begin(true, true, false); // init all but serial
-    // M5.Lcd.begin();
-    // M5.Axp.begin();
-    M5.Lcd.setRotation(_rotation);
+    _display->init();
+    _display->setRotation(_rotation);
+//    _display->setTextSize(_font);
+    _display->setTextSize(1); // this is the scale of the pixels - TODO: make configurable
     set_color_bg(0,0,0);
-    M5.Lcd.fillScreen(_color_bg);
+    _display->fillScreen(_color_bg);
     set_color_fg(255,255,255);
-//    M5.Lcd.setTextSize(_font);
-    M5.Lcd.setTextSize(1);  // this is the scale of the pixels - TODO: make configurable
-    M5.Lcd.setTextWrap(false);
-    char_height = M5.Lcd.fontHeight(_font);
-    char_width = M5.Lcd.textWidth("W", _font);
+    _display->setTextWrap(false);
+    char_height = _display->fontHeight(_font);
+    char_width = _display->textWidth("W", _font); 
     set_fps(10); // can be low for these type of displays and just showing text
     if( !_tdb->init( width_pixels() / char_width, height_pixels() / char_height)) {
         ulog(F("Failed to allocate display buffer."));
@@ -76,7 +74,7 @@ bool M5StickC_Display::init() {
 }
 
 
-bool M5StickC_Display::measure() {
+bool CYD_Display::measure() {
     unsigned long current = millis();
     if(current - last_frame >= frame_len) {
         // only update when changed
@@ -89,18 +87,18 @@ bool M5StickC_Display::measure() {
     return false;
 }
 
-void M5StickC_Display::show() {
+void CYD_Display::show() {
     char charstr[2]=" ";
     int lines = get_lines();
     int columns = get_columns();
     const char* buffer = get_buffer();
 
-    M5.Lcd.fillScreen(_color_bg);
+    _display->fillScreen(_color_bg);
 
     for(int y=0; y<lines; y++) {
         for(int x=0; x<columns; x++) {
             charstr[0] = buffer[y * columns + x];
-            M5.Lcd.drawString(charstr, x*char_width, y*char_height + 1, _font );
+            _display->drawString(charstr, x*char_width, y*char_height + 1, _font );
         }
     }
 }
