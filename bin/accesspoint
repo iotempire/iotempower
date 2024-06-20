@@ -3,11 +3,13 @@ if [[ "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF
 Syntax: accesspoint [show]
 
-accesspoint creates a local accespoint corresponding to parameters set
+accesspoint creates a local accesspoint corresponding to parameters set
 in iotempower/etc/iotempower.conf.
 EOF
 exit 1
 fi
+
+# TODO: add network-manager detection and setup here
 
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
