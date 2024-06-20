@@ -1,0 +1,61 @@
+#!/bin/bash
+
+# Variables for the hotspot configuration
+SSID="iotempire"
+PASSWORD="internetofthings"  # Should be at least 8 characters
+BASE_IP="192.168.12.1"
+NETMASK="/24"  # Netmask for the IP range
+GATEWAY="$BASE_IP"  # Usually the same as BASE_IP
+DNS="$BASE_IP"  # Can be set to something else if required
+
+# Update PATH to include /sbin and /usr/sbin if they are not already included
+PATH="/sbin:/usr/sbin:$PATH"
+
+# Function to check if the hotspot connection already exists
+check_hotspot_exists() {
+    if nmcli con show "$SSID" &> /dev/null; then
+        echo "Hotspot '$SSID' already exists."
+        return 0
+    else
+        echo "No hotspot named '$SSID' exists. Setting up now."
+        return 1
+    fi
+}
+
+# Function to setup hotspot
+setup_hotspot() {
+    # Identify the first WiFi device that supports AP mode
+    for dev in $(nmcli device status | grep wifi | awk '{print $1}'); do
+        if iw phy$(iw dev $dev info | grep wiphy | awk '{print $2}') info | grep -q "* AP"; then
+            WIFI_DEV=$dev
+            echo "Using device $WIFI_DEV for hotspot"
+            break
+        fi
+    done
+
+    # If no suitable device found, exit
+    if [ -z "$WIFI_DEV" ]; then
+        echo "No WiFi device supporting AP mode found."
+        exit 1
+    fi
+
+    # Setup Hotspot
+    nmcli con add type wifi ifname $WIFI_DEV con-name "$SSID" autoconnect yes ssid $SSID
+    nmcli con modify "$SSID" 802-11-wireless.mode ap 802-11-wireless.band bg ipv4.method shared
+    nmcli con modify "$SSID" wifi-sec.key-mgmt wpa-psk
+    nmcli con modify "$SSID" wifi-sec.psk $PASSWORD
+    nmcli con modify "$SSID" ipv4.addresses "$BASE_IP$NETMASK"
+    nmcli con modify "$SSID" ipv4.gateway "$GATEWAY"
+#    nmcli con modify "$SSID" ipv4.dns "$DNS" makes trouble
+    nmcli connection modify "$SSID" connection.autoconnect yes
+
+    # PMF settings, enabled by default as requested
+    # To disable PMF, replace 1 with 0 or 'none' in the following line:
+    nmcli con modify "$SSID" 802-11-wireless-security.pmf 1
+
+    nmcli con up "$SSID"
+    echo "Hotspot setup complete."
+}
+
+# Main execution block
+check_hotspot_exists || setup_hotspot
