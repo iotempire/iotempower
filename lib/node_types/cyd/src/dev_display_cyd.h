@@ -6,6 +6,8 @@
 
 #include <device.h>
 #include <text_display_buffer.h>
+#include <SPI.h>
+#include <XPT2046_Touchscreen.h>
 #include <TFT_eSPI.h>
 
 // using font sizes here 1-7
@@ -25,13 +27,16 @@ class CYD_Display : public Device {
         u_int16_t _color_bg;
         uint8_t _font = 1;
         int _rotation = 0;
+        SPIClass* _ts_spi;
+        XPT2046_Touchscreen* _ts;
+        bool _touchscreen = true;
     protected:
         // allocate text buffer (return true if successful, false otherwise)
         bool init();
         int char_height, char_width;
     public:
         // this only supports the CYD displays so far
-        CYD_Display(const char* name, uint8_t font=1, int rotation=0) : Device(name, 1000) { // small font by default
+        CYD_Display(const char* name, uint8_t font=1, int rotation=0, bool touchscreen=true) : Device(name, 1000) { // small font by default
             _tdb = new Text_Display_Buffer();
             _font = font;
             if(rotation>3) {
@@ -40,6 +45,7 @@ class CYD_Display : public Device {
                 else if(rotation==270) rotation = 3;
                 else rotation = 0;
             }
+            _touchscreen = touchscreen;
             _rotation = rotation;
         }
 

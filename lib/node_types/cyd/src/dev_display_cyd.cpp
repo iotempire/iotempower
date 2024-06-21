@@ -70,6 +70,19 @@ bool CYD_Display::init() {
             return true;
         }
     );
+    if(_touchscreen) {
+        _ts = new XPT2046_Touchscreen(XPT2046_CS, XPT2046_IRQ);
+        _ts_spi = new SPIClass(VSPI);
+        if(_ts && _ts_spi) {
+            add_subdevice(new Subdevice(F("touch"),true));
+            _ts_spi->begin(XPT2046_CLK, XPT2046_MISO, XPT2046_MOSI, XPT2046_CS);
+            _ts->begin(*_ts_spi);
+            _ts->setRotation(_rotation);
+        } else {
+            _touchscreen = false;
+            ulog(F("Failed to initialize touchscreen base objects."));
+        }
+    }
     return true;
 }
 
@@ -83,6 +96,13 @@ bool CYD_Display::measure() {
             _tdb->reset_changed();
         }
         last_frame = current;
+    }
+    // TODO: think about pollrate
+//    if(_touchscreen && _ts->tirqTouched() && _ts->touched()) {
+    if(_touchscreen && _ts->tirqTouched()) {
+        TS_Point p = _ts->getPoint();
+        value(1).printf(F("%d,%d,%d"), p.x, p.y, p.z);
+        return true;
     }
     return false;
 }
