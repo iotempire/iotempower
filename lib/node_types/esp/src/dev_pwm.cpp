@@ -31,6 +31,7 @@ Pwm::Pwm(const char* name, uint8_t pin, int frequency)
 }
 
 Pwm& Pwm::set(int duty, int frequency) {
+    if(frequency<0) frequency = _frequency;
     _frequency = limit(frequency,2,5000);
     _duty = limit(duty,0,1023);
     if(!started()) return *this;
