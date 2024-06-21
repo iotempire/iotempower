@@ -32,7 +32,7 @@ class Pwm : public Device {
             set_frequency(frequency);
             return *this;
         }
-        Pwm& set(int duty, int frequency);
+        Pwm& set(int duty, int frequency=-1);
         void start() {
             _started = true;
             set(_duty, _frequency);
