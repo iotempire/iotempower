@@ -1,61 +1,255 @@
 #!/bin/bash
 
-# Variables for the hotspot configuration
-SSID="iotempire"
-PASSWORD="internetofthings"  # Should be at least 8 characters
-BASE_IP="192.168.12.1"
-NETMASK="/24"  # Netmask for the IP range
-GATEWAY="$BASE_IP"  # Usually the same as BASE_IP
-DNS="$BASE_IP"  # Can be set to something else if required
+# Default values for options
+DEFAULT_SSID_PREFIX="iotempire"
+DEFAULT_PASSWORD="internetofthings"
+DEFAULT_BASE_IP="192.168.12.1"
+DEFAULT_NETMASK="/24"
 
 # Update PATH to include /sbin and /usr/sbin if they are not already included
 PATH="/sbin:/usr/sbin:$PATH"
 
-# Function to check if the hotspot connection already exists
-check_hotspot_exists() {
-    if nmcli con show "$SSID" &> /dev/null; then
-        echo "Hotspot '$SSID' already exists."
-        return 0
-    else
-        echo "No hotspot named '$SSID' exists. Setting up now."
-        return 1
-    fi
+# # Might need to run the following too:
+# cat << EOF  > /etc/polkit-1/rules.d/50-nmcli.rules 
+# polkit.addRule(function(action, subject) {
+#     if (action.id.indexOf("org.freedesktop.NetworkManager.") == 0 && subject.user == "iot") {
+#         return polkit.Result.YES;
+#     }
+# });
+# EOF
+
+
+# Help message function
+function print_help {
+    echo "Usage: $0 command [options]"
+    echo "Commands:"
+    echo "  list             List all hotspots"
+    echo "  create           Create a new hotspot"
+    echo "  change           Modify an existing hotspot"
+    echo "  delete           Delete a hotspot"
+    echo "  start            Start a hotspot"
+    echo "  stop             Stop a hotspot"
+    echo "Options for 'create' and 'change':"
+    echo "  -s, --ssid      Set SSID of the hotspot, defaults to 'iotempire' with the last part of the MAC address of the chosen interface"
+    echo "  -p, --password  Set password of the hotspot, default is '$DEFAULT_PASSWORD'"
+    echo "  -i, --ip        Set base IP address, default is '192.168.12.1'"
+    echo "  -m, --netmask   Set netmask, default is '/24'"
+    echo "  --if             Specify the Wi-Fi interface or autodetect if not specified"
+    echo "Use '$0 command --help' for more information on a specific command."
 }
 
-# Function to setup hotspot
-setup_hotspot() {
-    # Identify the first WiFi device that supports AP mode
-    for dev in $(nmcli device status | grep wifi | awk '{print $1}'); do
-        if iw phy$(iw dev $dev info | grep wiphy | awk '{print $2}') info | grep -q "* AP"; then
-            WIFI_DEV=$dev
-            echo "Using device $WIFI_DEV for hotspot"
-            break
-        fi
-    done
+function print_create_help {
+    echo "Usage: $0 create [--ssid SSID] [--password PASSWORD] [--ip BASE_IP] [--netmask NETMASK] [--if WIFI_INTERFACE]"
+    echo "  -s, --ssid      Set SSID of the hotspot, defaults to 'iotempire' with the last part of the MAC address of the chosen interface"
+    echo "  -p, --password  Set password of the hotspot, default is '$DEFAULT_PASSWORD'"
+    echo "  -i, --ip        Set base IP address, default is '192.168.12.1'"
+    echo "  -m, --netmask   Set netmask, default is '/24'"
+    echo "  --if             Specify the Wi-Fi interface or autodetect if not specified"
+}
+
+function print_change_help {
+    echo "Usage: $0 change --ssid SSID [--password PASSWORD] [--ip BASE_IP] [--netmask NETMASK]"
+    echo "Change the settings of an existing hotspot. SSID is required. Password, IP, and Netmask are optional."
+}
+
+function create_hotspot {
+    # Set defaults if not provided
+    PASSWORD="${PASSWORD:-$DEFAULT_PASSWORD}"
+    BASE_IP="${BASE_IP:-$DEFAULT_BASE_IP}"
+    NETMASK="${NETMASK:-$DEFAULT_NETMASK}"
+
+    # Autodetect Wi-Fi interface if not specified
+    if [ -z "$WIFI_DEV" ]; then
+        for dev in $(nmcli device status | grep wifi | awk '{print $1}'); do
+            if iw phy$(iw dev $dev info | grep wiphy | awk '{print $2}') info | grep -q "* AP"; then
+                WIFI_DEV=$dev
+                echo "Auto-detected Wi-Fi device $WIFI_DEV for hotspot"
+                break
+            fi
+        done
+    fi
 
     # If no suitable device found, exit
     if [ -z "$WIFI_DEV" ]; then
-        echo "No WiFi device supporting AP mode found."
+        echo "No suitable Wi-Fi device supporting AP mode found."
         exit 1
     fi
 
-    # Setup Hotspot
-    nmcli con add type wifi ifname $WIFI_DEV con-name "$SSID" autoconnect yes ssid $SSID
-    nmcli con modify "$SSID" 802-11-wireless.mode ap 802-11-wireless.band bg ipv4.method shared
+    # Get the last part of the MAC address for the SSID if not specified
+    if [ -z "$SSID" ]; then
+        LAST_HEX=$(cat /sys/class/net/$WIFI_DEV/address | awk -F':' '{print $(NF-2) $(NF-1) $NF}')
+        SSID="$DEFAULT_SSID_PREFIX-$LAST_HEX"
+    fi
+
+    if [[ -z "$SSID" || -z "$PASSWORD" ]]; then
+        # this check might never be reached, TODO: verify and remove potentially
+        echo "SSID and password are required for creating a hotspot."
+        print_create_help
+        exit 1
+    fi
+
+    nmcli con add type wifi ifname "$WIFI_DEV" con-name "$SSID" autoconnect yes ssid "$SSID"
     nmcli con modify "$SSID" wifi-sec.key-mgmt wpa-psk
-    nmcli con modify "$SSID" wifi-sec.psk $PASSWORD
-    nmcli con modify "$SSID" ipv4.addresses "$BASE_IP$NETMASK"
-    nmcli con modify "$SSID" ipv4.gateway "$GATEWAY"
-#    nmcli con modify "$SSID" ipv4.dns "$DNS" makes trouble
-    nmcli connection modify "$SSID" connection.autoconnect yes
-
-    # PMF settings, enabled by default as requested
-    # To disable PMF, replace 1 with 0 or 'none' in the following line:
+    nmcli con modify "$SSID" wifi-sec.psk "$PASSWORD"
+    if [[ -n "$BASE_IP" && -n "$NETMASK" ]]; then
+        nmcli con modify "$SSID" ipv4.addresses "$BASE_IP$NETMASK"
+        nmcli con modify "$SSID" ipv4.method manual
+        nmcli con modify "$SSID" ipv4.gateway "$BASE_IP"
+    else
+        nmcli con modify "$SSID" ipv4.method shared
+    fi
     nmcli con modify "$SSID" 802-11-wireless-security.pmf 1
-
     nmcli con up "$SSID"
-    echo "Hotspot setup complete."
+    echo "Hotspot '$SSID' created and activated."
 }
 
-# Main execution block
-check_hotspot_exists || setup_hotspot
+function change_hotspot {
+    CHANGE_OPTIONS=$(getopt -o s:p:i:m:h --long ssid:,password:,ip:,netmask:,help -n 'parse-options' -- "$@")
+    eval set -- "$CHANGE_OPTIONS"
+    # Variables to hold the new values; keeping them unset initially
+    local new_password
+    local new_ip
+    local new_netmask
+
+    while true; do
+        case "$1" in
+            -s | --ssid ) SSID="$2"; shift 2 ;;
+            -p | --password ) new_password="$2"; shift 2 ;;
+            -i | --ip ) new_ip="$2"; shift 2 ;;
+            -m | --netmask ) new_netmask="$2"; shift 2 ;;
+            -h | --help ) print_change_help; exit ;;
+            -- ) shift; break ;;
+            * ) break ;;
+        esac
+    done
+
+    # Check if the SSID was provided and the connection exists
+    if [[ -z "$SSID" ]] || ! nmcli con show "$SSID" &> /dev/null; then
+        echo "Error: SSID not specified or hotspot '$SSID' does not exist."
+        print_change_help
+        exit 1
+    fi
+
+    # Apply changes if options were provided
+    if [[ -n "$new_password" ]]; then
+        nmcli con modify "$SSID" wifi-sec.psk "$new_password"
+        echo "Password updated for '$SSID'."
+    fi
+    if [[ -n "$new_ip" && -n "$new_netmask" ]]; then
+        nmcli con modify "$SSID" ipv4.method manual
+        nmcli con modify "$SSID" ipv4.addresses "$new_ip$new_netmask"
+        nmcli con modify "$SSID" ipv4.gateway "$new_ip"
+        echo "IP and Netmask updated to $new_ip$new_netmask for '$SSID'."
+    elif [[ -n "$new_ip" || -n "$new_netmask" ]]; then
+        echo "Both IP and Netmask need to be specified together to update."
+        print_change_help
+        exit 1
+    fi
+}
+
+# Parse global options and commands
+COMMAND=$1; shift
+
+case $COMMAND in
+    list)
+        nmcli con show | grep wifi
+        ;;
+    create)
+        CREATE_OPTIONS=$(getopt -o s:p:i:m:h --long ssid:,password:,ip:,netmask:,if:,help -n 'parse-options' -- "$@")
+        eval set -- "$CREATE_OPTIONS"
+        while true; do
+            case "$1" in
+                -s | --ssid ) SSID="$2"; shift 2 ;;
+                -p | --password ) PASSWORD="$2"; shift 2 ;;
+                -i | --ip ) BASE_IP="$2"; shift 2 ;;
+                -m | --netmask ) NETMASK="$2"; shift 2 ;;
+                --if ) WIFI_DEV="$2"; shift 2 ;;
+                -h | --help ) print_create_help; exit ;;
+                -- ) shift; break ;;
+                * ) break ;;
+            esac
+        done
+        create_hotspot
+        ;;
+    change)
+        change_hotspot "$@"
+        ;;
+    delete)
+        nmcli con delete "$1"
+        ;;
+    start)
+        nmcli con up "$1"
+        ;;
+    stop)
+        nmcli con down "$1"
+        ;;
+    *)
+        print_help
+        ;;
+esac
+
+
+# ### old script
+# exit 0
+
+# #!/bin/bash
+
+# # Variables for the hotspot configuration
+# SSID="iotempire"
+# PASSWORD="internetofthings"  # Should be at least 8 characters
+# BASE_IP="192.168.12.1"
+# NETMASK="/24"  # Netmask for the IP range
+# GATEWAY="$BASE_IP"  # Usually the same as BASE_IP
+# DNS="$BASE_IP"  # Can be set to something else if required
+
+# # Update PATH to include /sbin and /usr/sbin if they are not already included
+# PATH="/sbin:/usr/sbin:$PATH"
+
+# # Function to check if the hotspot connection already exists
+# check_hotspot_exists() {
+#     if nmcli con show "$SSID" &> /dev/null; then
+#         echo "Hotspot '$SSID' already exists."
+#         return 0
+#     else
+#         echo "No hotspot named '$SSID' exists. Setting up now."
+#         return 1
+#     fi
+# }
+
+# # Function to setup hotspot
+# setup_hotspot() {
+#     # Identify the first WiFi device that supports AP mode
+#     for dev in $(nmcli device status | grep wifi | awk '{print $1}'); do
+#         if iw phy$(iw dev $dev info | grep wiphy | awk '{print $2}') info | grep -q "* AP"; then
+#             WIFI_DEV=$dev
+#             echo "Using device $WIFI_DEV for hotspot"
+#             break
+#         fi
+#     done
+
+#     # If no suitable device found, exit
+#     if [ -z "$WIFI_DEV" ]; then
+#         echo "No WiFi device supporting AP mode found."
+#         exit 1
+#     fi
+
+#     # Setup Hotspot
+#     nmcli con add type wifi ifname $WIFI_DEV con-name "$SSID" autoconnect yes ssid $SSID
+#     nmcli con modify "$SSID" 802-11-wireless.mode ap 802-11-wireless.band bg ipv4.method shared
+#     nmcli con modify "$SSID" wifi-sec.key-mgmt wpa-psk
+#     nmcli con modify "$SSID" wifi-sec.psk $PASSWORD
+#     nmcli con modify "$SSID" ipv4.addresses "$BASE_IP$NETMASK"
+#     nmcli con modify "$SSID" ipv4.gateway "$GATEWAY"
+# #    nmcli con modify "$SSID" ipv4.dns "$DNS" makes trouble
+#     nmcli connection modify "$SSID" connection.autoconnect yes
+
+#     # PMF settings, enabled by default as requested
+#     # To disable PMF, replace 1 with 0 or 'none' in the following line:
+#     nmcli con modify "$SSID" 802-11-wireless-security.pmf 1
+
+#     nmcli con up "$SSID"
+#     echo "Hotspot setup complete."
+# }
+
+# # Main execution block
+# check_hotspot_exists || setup_hotspot
