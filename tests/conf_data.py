@@ -75,7 +75,7 @@ isolated_combinations_to_test += [
 isolated_combinations_to_test += [("wemos_d1_mini", "rgb_single", "rgb_single(r0, D6, D5, D0, true);")]
 
 # Configuration for deployment test & hardware test
-gateway_host = "192.168.8.106"
+gateway_host = "iotgateway"
 default_username = "iot"
 mqtt_listen_period = 15  # in seconds
 local_bind_mqtt_port = 1884
