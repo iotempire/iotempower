@@ -89,17 +89,20 @@ function create_hotspot {
     fi
 
     nmcli con add type wifi ifname "$WIFI_DEV" con-name "$SSID" autoconnect yes ssid "$SSID"
+    nmcli con modify "$SSID" 802-11-wireless.mode ap 802-11-wireless.band bg ipv4.method shared
     nmcli con modify "$SSID" wifi-sec.key-mgmt wpa-psk
     nmcli con modify "$SSID" wifi-sec.psk "$PASSWORD"
     nmcli con modify "$SSID" ipv4.method shared
-    if [[ -n "$BASE_IP" && -n "$NETMASK" ]]; then
-        nmcli con modify "$SSID" ipv4.addresses "$BASE_IP$NETMASK"
-#        nmcli con modify "$SSID" ipv4.method manual
-        nmcli con modify "$SSID" ipv4.gateway "$BASE_IP"
-    fi
+    nmcli con modify "$SSID" ipv4.addresses "$BASE_IP$NETMASK"
+    nmcli con modify "$SSID" ipv4.gateway "$BASE_IP"
+    #    nmcli con modify "$SSID" ipv4.dns "$DNS" # this makes trouble
     nmcli con modify "$SSID" 802-11-wireless-security.pmf 1
-    nmcli con up "$SSID"
-    echo "Hotspot '$SSID' created and activated."
+    if nmcli con up "$SSID"; then 
+        echo "Hotspot '$SSID' created and activated."
+    else
+        echo "Failed to create hotspot '$SSID'."
+        exit 1
+    fi
 }
 
 function change_hotspot {
@@ -135,7 +138,7 @@ function change_hotspot {
         echo "Password updated for '$SSID'."
     fi
     if [[ -n "$new_ip" && -n "$new_netmask" ]]; then
-        nmcli con modify "$SSID" ipv4.method manual
+#        nmcli con modify "$SSID" ipv4.method manual # TODO: is this an error?
         nmcli con modify "$SSID" ipv4.addresses "$new_ip$new_netmask"
         nmcli con modify "$SSID" ipv4.gateway "$new_ip"
         echo "IP and Netmask updated to $new_ip$new_netmask for '$SSID'."
