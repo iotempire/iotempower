@@ -91,12 +91,11 @@ function create_hotspot {
     nmcli con add type wifi ifname "$WIFI_DEV" con-name "$SSID" autoconnect yes ssid "$SSID"
     nmcli con modify "$SSID" wifi-sec.key-mgmt wpa-psk
     nmcli con modify "$SSID" wifi-sec.psk "$PASSWORD"
+    nmcli con modify "$SSID" ipv4.method shared
     if [[ -n "$BASE_IP" && -n "$NETMASK" ]]; then
         nmcli con modify "$SSID" ipv4.addresses "$BASE_IP$NETMASK"
-        nmcli con modify "$SSID" ipv4.method manual
+#        nmcli con modify "$SSID" ipv4.method manual
         nmcli con modify "$SSID" ipv4.gateway "$BASE_IP"
-    else
-        nmcli con modify "$SSID" ipv4.method shared
     fi
     nmcli con modify "$SSID" 802-11-wireless-security.pmf 1
     nmcli con up "$SSID"
