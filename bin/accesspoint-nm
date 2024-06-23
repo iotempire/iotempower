@@ -138,11 +138,10 @@ function change_hotspot {
         echo "Password updated for '$SSID'."
     fi
     if [[ -n "$new_ip" && -n "$new_netmask" ]]; then
-#        nmcli con modify "$SSID" ipv4.method manual # TODO: is this an error?
         nmcli con modify "$SSID" ipv4.addresses "$new_ip$new_netmask"
         nmcli con modify "$SSID" ipv4.gateway "$new_ip"
         echo "IP and Netmask updated to $new_ip$new_netmask for '$SSID'."
-    elif [[ -n "$new_ip" || -n "$new_netmask" ]]; then
+    else
         echo "Both IP and Netmask need to be specified together to update."
         print_change_help
         exit 1
