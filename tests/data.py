@@ -70,7 +70,3 @@ isolated_combinations_to_test += [
     (board, "rfid", "mfrc522(example_name);") for board in ["wemos_d1_mini", "nodemcu", "wroom_02", "esp32", "esp32miniki"]
 ]
 isolated_combinations_to_test += [("wemos_d1_mini", "rgb_single", "rgb_single(r0, D6, D5, D0, true);")]
-
-rooms = ["room1", "room2", "room3"]
-nodes = ["node1", "node2"]
-devices = ["input", "output", "analog", "bmp180"]
