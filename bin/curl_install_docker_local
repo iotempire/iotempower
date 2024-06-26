@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# TODO: this script is obsolete, and should be removed - or could it serve a differnt purpose?
+
 # Initialize a flag to track missing tools
 missing_tools=0
 
