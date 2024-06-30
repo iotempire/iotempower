@@ -156,6 +156,13 @@ case $COMMAND in
         nmcli con show | grep wifi
         ;;
     create)
+        # Check if dnsmasq is installed
+        if ! command -v dnsmasq >/dev/null 2>&1; then
+            echo "dnsmasq is not installed. The network manager hotspot will not"
+            echo "work without it. Please install dnsmasq to continue."
+            exit 1
+        fi
+        # Parse options
         CREATE_OPTIONS=$(getopt -o s:p:i:m:h --long ssid:,password:,ip:,netmask:,if:,help -n 'parse-options' -- "$@")
         eval set -- "$CREATE_OPTIONS"
         while true; do

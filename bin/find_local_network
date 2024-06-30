@@ -38,7 +38,7 @@ check_internet_connectivity() {
 }
 
 
-FIRST_HOP_IP=$(traceroute -n $TEST_IP 2>/dev/null | awk 'NR==2 {print $2}')
+FIRST_HOP_IP=$(traceroute -n $TEST_IP -m 2 2>/dev/null | awk 'NR==2 {print $2}')
 
 # Check if we got a valid IP address
 if ! [[ $FIRST_HOP_IP =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then

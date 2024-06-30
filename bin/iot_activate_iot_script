@@ -38,7 +38,7 @@ if [ ! -d "$install_dir" ]; then
     mkdir -p "$install_dir"
 fi
 
-if [[ "$1" ]]; then  # scritp was given
+if [[ "$1" ]]; then  # script was given
     echo "Installing '$1' to $install_dir"
     cp "$1" "$install_dir/iot"
 else
