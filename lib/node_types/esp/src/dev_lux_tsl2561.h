@@ -22,4 +22,4 @@ class Lux_TSL2561 : public I2C_Device {
         bool measure();
 };
 
-#endif // _IOTEMPOWER_BH1750_H_
+#endif // _IOTEMPOWER_TSL2561_H_
