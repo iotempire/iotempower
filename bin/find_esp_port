@@ -24,7 +24,7 @@ fi
 # Handle direct port inputs, rfc2217 URLs, or device files
 if [[ "$1" =~ ^rfc2217://.+:[0-9]+$ ]]; then
     port="$1"
-elif [[ "$1" =~ ^/dev/tty.+ ]]; then
+elif [[ "$1" =~ ^/.+ ]]; then # starts with /
     port="$1"
 elif [[ "$1" = ws* || "$1" = tty* ]]; then # direct specification, no search necessary
     port="$1" # TDO: verify if this specification is still necessary
