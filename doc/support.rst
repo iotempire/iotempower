@@ -42,14 +42,9 @@ Reporting Bugs or Requesting Features
 Security Issues & Vulnerability Reporting
 -----------------------------------------
 
-Please **DO NOT** report security vulnerabilities publicly. Contact us via email:
-
-- `Report Security Vulnerability <mailto:removed?subject=IoTempower Security Vulnerability Report&body=Hello, I have found a security vulnerability in IoTempower. Please advise.>`_
-
-If the above email link does not work:
-- Email us at: removed
-  - Subject: IoTempower Security Vulnerability Report
-  - Body: Hello, I have found a security vulnerability in IoTempower. Please advise.
+Please **DO NOT** report security vulnerabilities publicly. Contact ulno directly 
+`here <https://ulno.net/contact>`.
+Use "IoTempower Security Vulnerability Report" as subject.
 
 
 Getting Involved

@@ -34,16 +34,11 @@ This Code of Conduct applies both within project spaces and in public spaces whe
 
 ## Enforcement
 
-Report abuse, harassment or unacceptable behavior by **<a href="mailto:removed?&subject=IoTempower Abuse Report&body=Hello,%20I%20want%20to%20report%20abuse.%20Please%20advise.">contacting the IoTempower author (`mailto` link)</a>**. 
+Report abuse, harassment or unacceptable behavior by contacting the IoTempower author ulno [here][<https://ulno.net/contact>]. Use "IoTempower Abuse Report" as subject.
 
 All complaints will be reviewed and investigated and will result in a response that is deemed necessary and appropriate to the circumstances. The project team is obligated to maintain confidentiality with regard to the reporter of an incident.
 
 Further details of specific enforcement policies may be added as needed.
-
-If the above email link does not work:
-- Email us at: removed
-  - Subject: IoTempower Abuse Report
-  - Body: Hello, I want to report abuse. Please advise.
 
 
 ## Attribution
@@ -52,7 +47,6 @@ This Code of Conduct is adapted from the [Contributor Covenant](https://www.cont
 
 Available at [https://www.contributor-covenant.org/version/1/4/code-of-conduct.html](https://www.contributor-covenant.org/version/1/4/code-of-conduct.html).
 
-Date of the last update: May 5, 2024
+Date of the last update: July 27, 2024
 
 Thank you for helping to make this a welcoming, friendly community for all.
-

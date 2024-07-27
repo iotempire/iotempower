@@ -47,17 +47,13 @@ Here's how to submit a **`Feature Request`**:
 
 Please **DO NOT** report security vulnerabilities publicly. 
 
-Instead, contact us by **<a href="mailto:removed?&subject=IoTempower Security Vulnerability Report&body=Hello,%20I%20have%20found%20a%20security%20vulnerability%20in%20IoTempower.%20Please%20advise.">Reporting Security Vulnerability via Email (`mailto` link)</a>** for sensitive reports.
-
-If the above email link does not work:
-- Email us at: removed
-  - Subject: IoTempower Security Vulnerability Report
-  - Body: Hello, I have found a security vulnerability in IoTempower. Please advise.
+Instead, contact ulno directly [here][<https://ulno.net/contact>] for sensitive reports.
+Use "IoTempower Security Vulnerability Report" as subject.
 
 
 ## Getting Involved
 
-Interested in contributing to IoT Empower? 
+Interested in contributing to IoTempower? 
 
 Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to get involved in our project.
 

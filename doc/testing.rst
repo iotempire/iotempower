@@ -1,15 +1,15 @@
-Testing IOT empower
+Testing IoTempower
 ====================
 
 Overview
 --------
 
-The **Testing IOT empower** project focuses on ensuring the robustness and reliability of IOT empower applications. This documentation provides details on the structure and contents of the testing folder, along with instructions on running the tests.
+The **Testing IoTempower** project focuses on ensuring the robustness and reliability of IoTempower applications. This documentation provides details on the structure and contents of the testing folder, along with instructions on running the tests.
 
 Contents
 --------
 
-The testing folder for the IOT empower project is located at `iot/tests`. It consists of four files. The files that start with the `test` prefix are actual test files, and there is one additional file named `data.py` which contains all configurations and test cases for these tests.
+The testing folder for the IoTempower project is located at `iot/tests`. It consists of four files. The files that start with the `test` prefix are actual test files, and there is one additional file named `data.py` which contains all configurations and test cases for these tests.
 
 File Descriptions
 -----------------
@@ -24,7 +24,7 @@ File Descriptions
         - A list of lines for the `setup.cpp` file.
         - A list of tuples, each containing an MQTT topic and the expected payload from that topic.
 
-2. **test_installations.py**: Checks if your installations are complete. This test ensures that all the selected dependencies are correctly installed and configured so that IOT empower works properly. The input file for this test is `installation.json`, which is generated during the installation period and saves your selection of dependencies. Some dependencies are not crucial and are only installed for specific features. If you are using a Docker image or Raspberry Pi image, there is no need to run these tests as they have already been checked.
+2. **test_installations.py**: Checks if your installations are complete. This test ensures that all the selected dependencies are correctly installed and configured so that IoTempower works properly. The input file for this test is `installation.json`, which is generated during the installation period and saves your selection of dependencies. Some dependencies are not crucial and are only installed for specific features. If you are using a Docker image or Raspberry Pi image, there is no need to run these tests as they have already been checked.
 
     - **Purpose**: To verify that all dependencies are installed and configured correctly.
     - **Input**: `installation.json`, generated during installation.
@@ -74,4 +74,4 @@ To run the tests:
 Conclusion
 ----------
 
-The **Testing IOT empower** project ensures thorough testing of the IOT empower application, covering installations, compilation, and deployment. This documentation serves as a guide to understanding the structure, content, and usage of the testing folder.
+The **Testing IoTempower** project ensures thorough testing of the IoTempower application, covering installations, compilation, and deployment. This documentation serves as a guide to understanding the structure, content, and usage of the testing folder.

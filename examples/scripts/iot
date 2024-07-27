@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Example script for starting the IoT Empower environment
+# Example script for starting the IoTempower environment
 # Modify IOTEMPOWER_ROOT accordingly to your setup
 #
 # If you run in termux, apply termux-fix shebang onto this script
