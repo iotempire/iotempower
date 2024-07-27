@@ -747,11 +747,18 @@ class Filter_Precise_RMS : public Callback {
         Power *acPower; // reference to TrueRMS object
     public:
         Filter_Precise_RMS() : Callback() {
+            size_t buflen = get_buffer_size();
+            acPower = new Power(buflen);
             // // get size from precise vuffer
             // size_t buflen = get_buffer_size();
             // acPower = new Power(buflen);
         }
         bool call(Device &dev) {
+            double v = dev.read_float();
+            if(acPower->add(v)) {
+                dev.write_float(acPower->get_rms());
+                return true;
+            }
             // sum += dev.read_float();
             // values_count ++;
             // if(values_count >= _buflen) {
