@@ -17,7 +17,7 @@ class Input_Base : public Device {
         Input_Base& _mux(int num_pins, ...);
     protected:
         int _pin=-1;
-        int _precise_reads = 0; // number of samples to store in buffer
+        int _precise_reads = 0; // number of samples to store in buffer (also buffer size)
         int* buffer; // pointer to buffer
         int buffer_fill = 0; // number of samples currently stored in buffer
     public:
@@ -31,11 +31,12 @@ class Input_Base : public Device {
         int* get_buffer() { return buffer; }
         int get_buffer_fill() {return buffer_fill; }
         int get_buffer_size() {return _precise_reads; }
+        bool has_buffer() { return get_buffer_size() > 0; }
         bool measure();
         Input_Base& precise_buffer(unsigned long interval_ms, unsigned int reads);
 
         int fill_buffer(int val) {
-            if (_precise_reads > 0)
+            if (has_buffer())
             {
                 // only add if still space
                 if (buffer_fill < _precise_reads) {
@@ -61,5 +62,7 @@ class Input_Base : public Device {
 
         virtual void start();
 };
+
+#include "filter.h"
 
 #endif // _INPUT_BASE_H_

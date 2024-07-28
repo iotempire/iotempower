@@ -22,7 +22,7 @@
 
 class Device;
 
-#define IOTEMPOWER_DEVICE_CALLBACK std::function<bool(Device&)>
+#define IOTEMPOWER_DEVICE_CALLBACK std::function<bool(Device &dev)>
 
 // This class implements a callback for IOTEMPOWER
 // It's call function can be overwritten or the internal callback
@@ -30,13 +30,19 @@ class Device;
 class Callback {
     private:
         IOTEMPOWER_DEVICE_CALLBACK _callback = NULL;
+        Device* _dev;
     public:
         Callback(IOTEMPOWER_DEVICE_CALLBACK callback = NULL) {
             _callback = callback;
         }
-        virtual bool call(Device& device) {
-            if(_callback) return _callback(device);
+        void set_device(Device& dev) { _dev = &dev; }
+        Device& get_device() { return *_dev; }
+        virtual bool call(Device &dev) {
+            if(_callback) return _callback(dev);
             return false; // if not overwritten, let this filter forget everything
+        }
+        bool call() { // This is mainly called from Callback Link to make sure that internal device is used
+            return call(*_dev);
         }
 };
 
@@ -52,11 +58,12 @@ class Callback_Link {
     public:
         Callback_Link(Callback& cb) {
             _callback = &cb;
+            // cb.set_device(device); // executed in set_filter_callback
         }
-        bool call(Device &dev) {
-            bool result = _callback->call(dev);
+        bool call() {
+            bool result = _callback->call();
             if(result && next) { // traverse chain down to end
-                result &= next->call(dev);
+                result &= next->call();
             }
             return result;
         }
@@ -284,6 +291,7 @@ class Device {
         //// on_change_callback
         Device& set_on_change_callback(Callback& on_change_cb) {
             bool result;
+            on_change_cb.set_device(*this);
             if(on_change_first) result=on_change_first->chain(on_change_cb);
             else {
                 on_change_first = new Callback_Link(on_change_cb);
@@ -302,7 +310,7 @@ class Device {
         }
         bool call_on_change_callbacks() {
             if(on_change_first) {
-                return on_change_first->call(*this);
+                return on_change_first->call();
             } else {
                 return true; // all ok if there are no on_change callbacks
             }
@@ -311,6 +319,7 @@ class Device {
         // filter_callback
         Device& set_filter_callback(Callback& filter_cb) { 
             bool result;
+            filter_cb.set_device(*this);
             if(filter_first) result=filter_first->chain(filter_cb);
             else {
                 filter_first = new Callback_Link(filter_cb);
@@ -329,7 +338,7 @@ class Device {
         }
         bool call_filter_callbacks() {
             if(filter_first) {
-                return filter_first->call(*this);
+                return filter_first->call();
             } else {
                 return true; // all ok if there are no filters
             }
@@ -424,7 +433,5 @@ class Device {
 
 // helpers for callbacks
 #define on_change(f) with_on_change_callback(*new Callback(f))
-
-#include "filter.h"
 
 #endif // _IOTEMPOWER_DEVICE_H_

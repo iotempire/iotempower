@@ -4,8 +4,8 @@
 void set_precision_interval(long interval_us, long unprecision_interval_us=-1);
 
 Input_Base& Input_Base::precise_buffer(unsigned long interval_ms, unsigned int reads) {
-    pollrate_us(interval_ms*1000L/reads);
-    set_precision_interval(interval_ms*1000L);
+    pollrate_us(interval_ms*1000L/reads); // adjustment here does not seem to help with dropped measuremetns
+    set_precision_interval(interval_ms*(1000L+50L)); // TODO: check - testing adjustment here 50 seems to help, but why - fix later
     _precise_reads = reads;
     demand_precision(); // make sure you end in precision interval
     return *this;
@@ -20,7 +20,7 @@ void Input_Base::start() {
     }
 
     if(_precise_reads > 0) {
-        buffer = new int[_precise_reads];
+        buffer = new int[_precise_reads]; // allocate buffer
         if(buffer == NULL) {
             ulog(F("Could not allocate precise buffer."));
         }
@@ -33,13 +33,18 @@ void Input_Base::start() {
     }
 }
 
-bool Input_Base::measure() {  
-//    if(_num_mux_pins > 0) {
-//            if(i>0) value().add(F(","));
-// }
-    int val = read();
-//    value().add(val);
-    value().from(val);
+bool Input_Base::measure() {
+    //    if(_num_mux_pins > 0) {
+    //            if(i>0) value().add(F(","));
+    // }
+        int val = read(); // This potentially also stores this value directly in the buffer
+    //    value().add(val);
+    if(!has_buffer()) { // only generate a real new value if it was not stored in buffer
+        value().from(val);
+    }
+    // if(has_buffer()) {
+    //     return false; // do not indicate new value when buffer exist
+    // }
     return true;
 }
 

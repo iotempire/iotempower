@@ -653,10 +653,10 @@ class Filter_Binarize : public Callback {
 #define filter_binarize(cutoff, high, low) with_filter_callback(*new Filter_Binarize(cutoff, high, low))
 
 
-/* map set of intervals to single descrite values
+/* map set of intervals to single discrete values
  * always assumed to start at minus infinity and needs is automatically terminated by infinity
  * example parameters: "low", -0.5, NULL, 0.5, "high"
- * NULL means the inerval is skipped
+ * NULL means the interval is skipped
  * */
 class Filter_Interval_Map : public Callback {
     private:
@@ -742,36 +742,44 @@ class Filter_Interval_Map : public Callback {
 
 // This filter works on precise buffer
 #include <TrueRMS.h>
+#include <dev_input_base.h>
 class Filter_Precise_RMS : public Callback {
     private:
-        Power *acPower; // reference to TrueRMS object
+        Rms *rms; // reference to TrueRMS object
     public:
         Filter_Precise_RMS() : Callback() {
-            // size_t buflen = get_buffer_size();
-            // acPower = new Power(buflen);
-            // // // get size from precise vuffer
-            // // size_t buflen = get_buffer_size();
-            // // acPower = new Power(buflen);
+            size_t buflen = ((Input_Base&)get_device()).get_buffer_size();
+            rms = new Rms();
+            /// TODO: check NULL
+
+//            rms->begin(VoltRange, buflen, ADC_12BIT, BLR_ON, CNT_SCAN);
+            float VoltRange = 3.00; // TODO: might have to be adjustable
+            rms->begin(VoltRange, buflen, ADC_12BIT, BLR_ON, SGL_SCAN); // 12 bit on esp32
         }
         bool call(Device &dev) {
-            // double v = dev.read_float();
-            // if(acPower->add(v)) {
-            //     dev.write_float(acPower->get_rms());
-            //     return true;
-            // }
-            // // sum += dev.read_float();
-            // // values_count ++;
-            // // if(values_count >= _buflen) {
-            // //     dev.write_float(sum/values_count);
-            // //     values_count = 0;
-            // //     sum = 0;
-            // //     return true;
-            // // }
+            Input_Base& d = (Input_Base &)dev;
+            int buffer_size = d.get_buffer_size();
+            int buffer_fill = d.get_buffer_fill();
+            int* buffer = d.get_buffer();
+            if(buffer_fill == buffer_size) {
+                // ulog("Debug: RMS buffer fill: %d buffer size: %d", d.get_buffer_fill(), buffer_size ); // TODO: remove debug
+                // compute for whole buffer at once
+                rms->start();
+                for(int i=0; i<buffer_size; i++) {
+                    rms->update(buffer[i]);
+                }
+                rms->publish();
+                dev.value(0).printf("%.4f, %d", rms->rmsVal, rms->dcBias);
+                ulog("Debug: MS values: %.4f, %d", rms->rmsVal, rms->dcBias); // TODO: remove debug
+                rms->stop();
+                // TODO: should buffer be reset here?
+                return true;
+            }
             return false;
         }
 };
-#define filter_precise_rms(count) with_filter_callback(*new Filter_Precise_RMS(count))
-
+#define filter_precise_rms() with_filter_callback(*new Filter_Precise_RMS())
+// TODO: think about other name? like energy?
 
 
 #endif // _IOTEMPOWER_FILTER_H_

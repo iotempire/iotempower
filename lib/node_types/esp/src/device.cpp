@@ -229,7 +229,7 @@ bool Device::poll_measure() {
                     } );
                 }
                 // check if it needs to be filtered - only filter when new value was measured
-                if(filter_first != NULL && ! filter_first->call(*this)) {
+                if(filter_first != NULL && ! filter_first->call()) {
                     // if filter defined but indicates to ignore the current measurement
                     return false; // end here with no update
                 }
