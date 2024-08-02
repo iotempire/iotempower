@@ -13,6 +13,10 @@ from tests.conf_data import (
 )
 
 
+def check_for_presence(all_messages, expected_messages):
+    return set(expected_messages).issubset(set(all_messages))
+
+
 def generate_file(lines):
     return io.BytesIO("\n".join(lines).encode("utf-8"))
 

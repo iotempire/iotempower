@@ -13,11 +13,7 @@ from tests.conf_data import (
     mqtt_listen_period,
     nodes_folder_path,
 )
-from tests.utils import generate_file
-
-
-def check_for_presence(all_messages, expected_messages):
-    return set(expected_messages).issubset(set(all_messages))
+from tests.utils import check_for_presence, generate_file
 
 
 def check_ip_presence(all_messages, node_name):

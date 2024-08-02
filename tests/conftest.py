@@ -1,12 +1,14 @@
 import os
 import socket
 
+import paho.mqtt.client as mqtt
 import paramiko
 import pytest
+import sshtunnel
 from fabric import Connection
 from paramiko.ssh_exception import AuthenticationException
 
-from tests.conf_data import default_username, gateway_host, private_key_file_path
+from tests.conf_data import default_username, gateway_host, local_bind_mqtt_port, private_key_file_path
 
 
 @pytest.fixture(scope="module", autouse=False)
@@ -34,3 +36,17 @@ def sftp_client(ssh_client):
     sftp_client = paramiko.SFTPClient.from_transport(transport)
     yield sftp_client
     sftp_client.close()
+
+
+@pytest.fixture(scope="module", autouse=False)
+def mqtt_client():
+    mqttc = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+    with sshtunnel.open_tunnel(
+        gateway_host,
+        ssh_username=default_username,
+        remote_bind_address=("127.0.0.1", 1883),
+        local_bind_address=("127.0.0.1", local_bind_mqtt_port),
+    ):
+        mqttc.connect("127.0.0.1", local_bind_mqtt_port, 60)
+        yield mqttc
+        mqttc.disconnect()

@@ -112,6 +112,10 @@ cases_for_hardware = [
     #     ),
     #     (
     #         [
+    #             ("mqtt_topic_tested1_name", "mqtt_tested1_initial_state_message"),
+    #             ("mqtt_topic_testedN_name", "mqtt_testedN_initial_state_message"),
+    #         ],
+    #         [
     #             ("mqtt_topic_tester1_name", "mqtt_tester1_command"),
     #             ("mqtt_topic_testerN_name", "mqtt_testerN_command"),
     #         ],
@@ -124,9 +128,13 @@ cases_for_hardware = [
     (
         ("Wemos D1 Mini", "Wemos D1 Mini"),
         (
-            ['output(out_tester, D5, "on", "off");'],
+            ['output(output_tester, D5, "on", "off");'],
             ['input(input_tested, D2, "got input", "no input");'],
         ),
-        ([("out_tester", "on")], [("input_tesed", "got input")]),
+        (
+            [("hardware-testing/tester_node/input_tested", "no input")],
+            [("hardware-testing/tested_node/output_tester/set", "on")],
+            [("hardware-testing/tester_node/input_tested", "got input")],
+        ),
     )
 ]
