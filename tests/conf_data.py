@@ -74,14 +74,24 @@ isolated_combinations_to_test += [
 ]
 isolated_combinations_to_test += [("wemos_d1_mini", "rgb_single", "rgb_single(r0, D6, D5, D0, true);")]
 
-# Deployment test
-gateway_host = "iotgateway"
+# Configuration for deployment test & hardware test
+gateway_host = "192.168.8.106"
 default_username = "iot"
-mqtt_listen_period = 15  # in seconds
+mqtt_listen_period = 25  # in seconds
 local_bind_mqtt_port = 1884
 private_key_file_path = "~/.ssh/id_rsa"
+nodes_folder_path = "/home/iot/iot-systems/demo01"
+tested_node_name = "tested_node"
+tester_node_name = "tester_node"
+# Example:
+# Data for deployment test
 cases_for_deployment: list[tuple[str, list[str], list[tuple[str, str]]]] = [
-    # Example: ("device_name", ['example_syntax'], [("{mqtt_topic_name}", "{default_message}")]),
+    # Example:
+    # (
+    #     "device_name",
+    #     ["example_syntax_line1", "example_syntax_lineN"],
+    #     [("{mqtt_topic_name1}", "{default_message1}"), ("{mqtt_topic_nameN}", "{default_messageN}")],
+    # ),
     ("Wemos D1 Mini", ['led(led, LED_BUILTIN, "off", "on");'], [("testing-node/led", "on")]),
     ("Wemos D1 Mini", ['input(button, D3, "depressed", "pressed");'], [("testing-node/button", "depressed")]),
     (
@@ -89,4 +99,34 @@ cases_for_deployment: list[tuple[str, list[str], list[tuple[str, str]]]] = [
         ['led(led, LED_BUILTIN, "off", "on");', 'input(button, D3, "depressed", "pressed");'],
         [("testing-node/led", "on"), ("testing-node/button", "depressed")],
     ),
+]
+
+# Data for hardware test
+cases_for_hardware = [
+    # Example:
+    # (
+    #     ("tested_device_name", "tester_device_name"),
+    #     (
+    #         ["example_syntax_tested_line1", "example_syntax_tested_lineN"],
+    #         ["example_syntax_tester_line2", "example_syntax_tester_lineN"],
+    #     ),
+    #     (
+    #         [
+    #             ("mqtt_topic_tester1_name", "mqtt_tester1_command"),
+    #             ("mqtt_topic_testerN_name", "mqtt_testerN_command"),
+    #         ],
+    #         [
+    #             ("mqtt_topic_tested1_name", "mqtt_tested1_message"),
+    #             ("mqtt_topic_testedN_name", "mqtt_testedN_message"),
+    #         ],
+    #     ),
+    # ),
+    (
+        ("Wemos D1 Mini", "Wemos D1 Mini"),
+        (
+            ['output(out_tester, D5, "on", "off");'],
+            ['input(input_tested, D2, "got input", "no input");'],
+        ),
+        ([("out_tester", "on")], [("input_tesed", "got input")]),
+    )
 ]

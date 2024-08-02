@@ -1,24 +1,19 @@
-import io
 import ipaddress
-import os
-import socket
 import time
 
 import paho.mqtt.client as mqtt
-import paramiko
 import pytest
 import sshtunnel
-from fabric import Connection
-from paramiko.ssh_exception import AuthenticationException
 
-from tests.data import (
+from tests.conf_data import (
     cases_for_deployment,
     default_username,
     gateway_host,
     local_bind_mqtt_port,
     mqtt_listen_period,
-    private_key_file_path,
+    nodes_folder_path,
 )
+from tests.utils import generate_file
 
 
 def check_for_presence(all_messages, expected_messages):
@@ -33,10 +28,8 @@ def check_ip_presence(all_messages, node_name):
     raise False
 
 
-def generate_file(lines):
-    return io.BytesIO("\n".join(lines).encode("utf-8"))
-
-
+# Tried to export mqtt client as a function however sshtunnel made an exception while creating ssh connection
+# TODO try to refactor this since MQTT client is used for both
 def mqtt_read() -> list[tuple[str, str]]:
     messages: list[tuple[str, str]] = []
 
@@ -70,45 +63,18 @@ def mqtt_read() -> list[tuple[str, str]]:
     return messages
 
 
-@pytest.fixture(scope="module")
-def ssh_client():
-    conn = Connection(host=f"{default_username}@{gateway_host}", connect_timeout=5)
-    try:
-        conn.run("uname -a")
-        yield conn
-        conn.close()
-    except socket.timeout:
-        raise Exception(f"Failed to connect to {gateway_host}")
-    except AuthenticationException:
-        raise Exception(
-            f"Authentication failed for {gateway_host}, "
-            f"please make sure you have right configuration, https://www.ssh.com/academy/ssh/copy-id"
-        )
-
-
-@pytest.fixture(scope="module")
-def sftp_client(ssh_client):
-    transport = paramiko.Transport((gateway_host, 22))
-    private_key_file = os.path.expanduser(private_key_file_path)
-    pkey = paramiko.RSAKey.from_private_key_file(private_key_file)
-    transport.connect(username="iot", pkey=pkey)
-    sftp_client = paramiko.SFTPClient.from_transport(transport)
-    yield sftp_client
-    sftp_client.close()
-
-
 @pytest.fixture
 def new_node(ssh_client):
-    ssh_client.run("rm -rf iot-systems/demo01/testing-node")  # TODO Creating your iot-systems folder for testing
-    ssh_client.run("cd iot-systems/demo01 && iot x create_node_template testing-node")
+    ssh_client.run(f"rm -rf {nodes_folder_path}/testing-node")  # TODO Creating your iot-systems folder for testing
+    ssh_client.run(f"cd {nodes_folder_path} && iot x create_node_template testing-node")
 
 
 @pytest.mark.parametrize("device_name, commands, expected_messages", cases_for_deployment)
 def test_deploy(new_node, ssh_client, sftp_client, device_name, commands, expected_messages):
     # TODO compile stuff in the test machine and the copy them over to rasperry pi and then flash it there.
-    sftp_client.putfo(generate_file(commands), "iot-systems/demo01/testing-node/setup.cpp")
-    ssh_client.run(f"echo 'board=\"{device_name}\"' > iot-systems/demo01/testing-node/node.conf")
-    ssh_client.run("cd iot-systems/demo01/testing-node && iot x deploy serial")
+    sftp_client.putfo(generate_file(lines=commands), f"{nodes_folder_path}/testing-node/setup.cpp")
+    ssh_client.run(f"echo 'board=\"{device_name}\"' > {nodes_folder_path}/testing-node/node.conf")
+    ssh_client.run(f"cd {nodes_folder_path}/testing-node && iot x deploy serial")
     messages = mqtt_read()
     assert check_for_presence(all_messages=messages, expected_messages=expected_messages)
     assert check_ip_presence(all_messages=messages, node_name="testing-node")
