@@ -4,12 +4,11 @@ import pytest
 
 from tests.conf_data import (
     cases_for_hardware,
-    mqtt_listen_period,
     nodes_folder_path,
     tested_node_name,
     tester_node_name,
 )
-from tests.utils import check_for_presence, generate_file
+from tests.utils import check_for_presence, generate_file, mqtt_listen
 
 
 @pytest.fixture
@@ -51,12 +50,8 @@ def test_hardware(mqtt_client, new_nodes, ssh_client, sftp_client, device_names,
     # Subscribe to tested node topic for initial status message
     for topic, message in initial_tested_status:
         mqtt_client.subscribe(topic)
-    # Listen for initial status message of tested node
-    messages = []
-    mqtt_client.on_message = lambda client, userdata, msg: messages.append((msg.topic, msg.payload.decode("utf-8")))
-    mqtt_client.loop_start()
-    time.sleep(mqtt_listen_period)
-    mqtt_client.loop_stop()
+    # Listen for initial status message of tested node and write them to messages list
+    messages = mqtt_listen(mqtt_client)
     assert check_for_presence(all_messages=messages, expected_messages=initial_tested_status)
 
     # Sending command through MQTT
@@ -65,8 +60,5 @@ def test_hardware(mqtt_client, new_nodes, ssh_client, sftp_client, device_names,
 
     # Listening for expected status message of tested node after command
     # Subscription to the topics and on_message functionality was written in upper lines
-    messages = []
-    mqtt_client.loop_start()
-    time.sleep(mqtt_listen_period)
-    mqtt_client.loop_stop()
+    messages = mqtt_listen(mqtt_client)
     assert check_for_presence(all_messages=messages, expected_messages=tested_messages_to_receive)

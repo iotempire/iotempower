@@ -77,7 +77,7 @@ isolated_combinations_to_test += [("wemos_d1_mini", "rgb_single", "rgb_single(r0
 # Configuration for deployment test & hardware test
 gateway_host = "192.168.8.106"
 default_username = "iot"
-mqtt_listen_period = 25  # in seconds
+mqtt_listen_period = 15  # in seconds
 local_bind_mqtt_port = 1884
 private_key_file_path = "~/.ssh/id_rsa"
 nodes_folder_path = "/home/iot/iot-systems/demo01"
