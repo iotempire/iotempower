@@ -4,7 +4,7 @@ import subprocess
 
 import pytest
 
-from tests.data import isolated_combinations_to_test
+from tests.conf_data import isolated_combinations_to_test
 
 local_dir = os.getenv("IOTEMPOWER_LOCAL", "")
 test_dir = os.path.join(local_dir, ".tests", "test_compilation")
@@ -34,4 +34,3 @@ def test_compilation_isolated(board_name: str, device_name: str, example_syntax:
         shutil.rmtree(node_directory, ignore_errors=True)
         if remove_cache_flag.lower() == "true":
             shutil.rmtree(cache_dir, ignore_errors=True)
-
