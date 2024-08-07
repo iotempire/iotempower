@@ -5,7 +5,9 @@ import pytest
 from tests.conf_data import (
     cases_for_hardware,
     nodes_folder_path,
+    tested_device_address,
     tested_node_name,
+    tester_device_address,
     tester_node_name,
 )
 from tests.utils import check_for_presence, generate_file, mqtt_listen
@@ -36,16 +38,10 @@ def test_hardware(mqtt_client, new_nodes, ssh_client, sftp_client, device_names,
     sftp_client.putfo(generate_file(lines=example_syntax_tested), f"{tested_node_path}/setup.cpp")
     sftp_client.putfo(generate_file(lines=example_syntax_tester), f"{tester_node_path}/setup.cpp")
 
-    # Making sure that two devices has been connected
-    command_to_list_devices = "find /dev/serial/by-path/ -type l -exec readlink {} \; | sed 's|.*/||'"
-    devices = ssh_client.run(command_to_list_devices).stdout.strip().split("\n")
-    if len(devices) < 2:
-        raise Exception("At least 2 devices expected to run hardware test")
-
     # Deployment
-    ssh_client.run(f"cd {tested_node_path} && iot x deploy serial {devices[0]}")
+    ssh_client.run(f"cd {tested_node_path} && iot x deploy serial {tested_device_address}")
     time.sleep(3)
-    ssh_client.run(f"cd {tester_node_path} && iot x deploy serial {devices[1]}")
+    ssh_client.run(f"cd {tester_node_path} && iot x deploy serial {tester_device_address}")
 
     # Subscribe to tested node topic for initial status message
     for topic, message in initial_tested_status:

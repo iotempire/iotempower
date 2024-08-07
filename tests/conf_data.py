@@ -83,8 +83,9 @@ private_key_file_path = "~/.ssh/id_rsa"
 nodes_folder_path = "/home/iot/iot-systems/demo01"
 tested_node_name = "tested_node"
 tester_node_name = "tester_node"
-# Example:
 # Data for deployment test
+# Please refer to documentation for getting this address.
+deploy_device_address = "/dev/serial/by-path/platform-fd500000.pcie-pci-0000:01:00.0-usb-0:1.1:1.0-port0"
 cases_for_deployment: list[tuple[str, list[str], list[tuple[str, str]]]] = [
     # Example:
     # (
@@ -93,15 +94,18 @@ cases_for_deployment: list[tuple[str, list[str], list[tuple[str, str]]]] = [
     #     [("{mqtt_topic_name1}", "{default_message1}"), ("{mqtt_topic_nameN}", "{default_messageN}")],
     # ),
     ("Wemos D1 Mini", ['led(led, LED_BUILTIN, "off", "on");'], [("testing-node/led", "on")]),
-    ("Wemos D1 Mini", ['input(button, D3, "depressed", "pressed");'], [("testing-node/button", "depressed")]),
+    ("Wemos D1 Mini", ['input(button, D3, "released", "pressed");'], [("testing-node/button", "released")]),
     (
         "Wemos D1 Mini",
-        ['led(led, LED_BUILTIN, "off", "on");', 'input(button, D3, "depressed", "pressed");'],
-        [("testing-node/led", "on"), ("testing-node/button", "depressed")],
+        ['led(led, LED_BUILTIN, "off", "on");', 'input(button, D3, "released", "pressed");'],
+        [("testing-node/led", "on"), ("testing-node/button", "released")],
     ),
 ]
 
 # Data for hardware test
+# Please refer to documentation for getting this address.
+tester_device_address = "/dev/serial/by-path/platform-fd500000.pcie-pci-0000:01:00.0-usb-0:1.1:1.0-port0"
+tested_device_address = "/dev/serial/by-path/platform-fd500000.pcie-pci-0000:01:00.0-usb-0:1.2:1.0-port0"
 cases_for_hardware = [
     # Example:
     # (
@@ -128,13 +132,13 @@ cases_for_hardware = [
     (
         ("Wemos D1 Mini", "Wemos D1 Mini"),
         (
+            ['input(input_tested, D2, "high input", "low input");'],
             ['output(output_tester, D5, "on", "off");'],
-            ['input(input_tested, D2, "got input", "no input");'],
         ),
         (
-            [("hardware-testing/tester_node/input_tested", "no input")],
-            [("hardware-testing/tested_node/output_tester/set", "on")],
-            [("hardware-testing/tester_node/input_tested", "got input")],
+            [("hardware-testing/tested_node/input_tested", "low input")],
+            [("hardware-testing/tester_node/output_tester/set", "on")],
+            [("hardware-testing/tested_node/input_tested", "high input")],
         ),
     )
 ]

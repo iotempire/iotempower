@@ -15,7 +15,7 @@ from tests.conf_data import default_username, gateway_host, local_bind_mqtt_port
 def ssh_client():
     conn = Connection(host=f"{default_username}@{gateway_host}", connect_timeout=5)
     try:
-        conn.run("uname -a")
+        conn.run("echo Hello IoTempower Testing")
         yield conn
         conn.close()
     except socket.timeout:
