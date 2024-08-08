@@ -38,9 +38,9 @@ File Descriptions
             - Tested node topic and initial status messages emitted by tested node.
             - Set topic and according set commands to trigger the tester node.
             - Tested node topic and the expected status messages after tester trigger.
+    - `deploy_device_address`, `tester_device_address`, `tested_device_address`: Explained in `Hardware configuration`_ part below.
 
 2. **test_installations.py**: Checks if your installations are complete. This test ensures that all the selected dependencies are correctly installed and configured so that IoTempower works properly. The input file for this test is `installation.json`, which is generated during the installation period and saves your selection of dependencies. Some dependencies are not crucial and are only installed for specific features. If you are using a Docker image or Raspberry Pi image, there is no need to run these tests as they have already been checked.
-
     - **Purpose**: To verify that all dependencies are installed and configured correctly.
     - **Input**: `installation.json`, generated during installation.
     - **Note**: Not necessary if using Docker or Raspberry Pi images.
@@ -69,8 +69,7 @@ File Descriptions
 
 5. **test_hardware.py**: The statements for `test_deployment` is also applicable for this test. And you should have at least to dongles connected PI for tester and tested roles.
     - **Purpose**: To verify that after the deployment process the physical changes also takes effect rather than seeing those changes in serial or MQTT channel.
-    - **Details**:
-      - `cases_for_hardware` lists test cases and new tests cases should be added to that list.
+    - **Details**: `cases_for_hardware` lists test cases and new tests cases should be added to that list.
 
 
 Running Tests
@@ -91,6 +90,33 @@ To run the tests:
    .. code-block:: shell
 
        pytest -s -v test_deployment.py
+
+Hardware configuration
+----------
+
+
+To set up deployment and hardware testing you should define address of the node device in conf file.
+
+You can easily list the connected devices by executing command in Raspberry PI::
+
+    ls -l /dev/serial/by-path/
+
+Device Layout
+=============
+
+This is device layout of Raspberry PI:
+
+::
+
+     1.3:1.0    1.2:1.0
+    +-------+  +-------+
+    |  USB  |  |  USB  |  +---------+
+    +-------+  +-------+  |         |
+     1.4:1.0    1.1:1.0   |   LAN   |
+    +-------+  +-------+  |         |
+    |  USB  |  |  USB  |  +---------+
+    +-------+  +-------+
+
 
 Conclusion
 ----------

@@ -2,10 +2,7 @@ import ipaddress
 
 import pytest
 
-from tests.conf_data import (
-    cases_for_deployment,
-    nodes_folder_path,
-)
+from tests.conf_data import cases_for_deployment, deploy_device_address, nodes_folder_path
 from tests.utils import check_for_presence, generate_file, mqtt_listen
 
 
@@ -28,7 +25,7 @@ def test_deploy(new_node, ssh_client, sftp_client, mqtt_client, device_name, com
     # TODO compile stuff in the test machine and the copy them over to rasperry pi and then flash it there.
     sftp_client.putfo(generate_file(lines=commands), f"{nodes_folder_path}/testing-node/setup.cpp")
     ssh_client.run(f"echo 'board=\"{device_name}\"' > {nodes_folder_path}/testing-node/node.conf")
-    ssh_client.run(f"cd {nodes_folder_path}/testing-node && iot x deploy serial")
+    ssh_client.run(f"cd {nodes_folder_path}/testing-node && iot x deploy serial {deploy_device_address}")
 
     # Subscribe to node topics for status messages
     for topic, message in expected_messages:
