@@ -9,6 +9,4 @@ sphinx-bootstrap-theme>=0.8.1
 Sphinx>=7.1.2
 pytest>=8.0.0
 setuptools>=65.6.0
-fabric==3.2.2
 paho-mqtt==2.1.0
-sshtunnel==0.4.0

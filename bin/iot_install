@@ -363,6 +363,8 @@ if [[ "$install_core" == 1 ]]; then
   iot_grun pip install --no-cache-dir --upgrade pip
   # git+https://github.com/iotempire/iotknit breaks in requirements when using termux glibc git
   iot_grun pip install --no-cache-dir -r "$IOTEMPOWER_ROOT/lib/iot_installs/requirements.txt"
+  # will fail on termux
+  iot_grun pip install --no-cache-dir -r "$IOTEMPOWER_ROOT/lib/iot_installs/requirements-ssh.txt"
 
   deactivate
   PIPTEMP="$IOTEMPOWER_LOCAL/tmp"
