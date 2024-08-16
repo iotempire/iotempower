@@ -32,4 +32,4 @@ prepare_build_dir # no cache here as this is the cache
 cd build
 echo
 echo "==== Trying to download and build all ===="
-pio run # build all targets
+iot_pio run # build all targets

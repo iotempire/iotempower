@@ -1,0 +1,8 @@
+#!/data/data/com.termux/files/usr/glibc/bin/bash
+echo "Enabling a working git in termux glibc..."
+cat << EOF > /data/data/com.termux/files/usr/glibc/bin/git
+#!/data/data/com.termux/files/usr/glibc/bin/bash
+export LD_PRELOAD=/data/data/com.termux/files/usr/lib/libtermux-exec.so
+exec /data/data/com.termux/files/usr/bin/git "$@"
+EOF
+echo git should now work.
