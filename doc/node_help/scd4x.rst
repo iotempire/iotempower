@@ -3,7 +3,7 @@ Sensirion SCD4X CO2 sensor
 
 ..  code-block:: cpp
 
-    scd4x(name, temp_comp, altitude)[.i2c(sda,scl)][.with_address(i2c_address)][.with_filter(filter)];
+    scd4x(name[, temp_comp][, altitude])[.i2c(sda,scl)][.with_address(i2c_address)][.with_filter(filter)];
 
 Create a new scd4x co2 sensor device.
 
@@ -49,7 +49,7 @@ Parameters
     - Inside the code it can be addressed via ``IN(name)``.
 
 
-- ``temp_comp``
+- ``temp_comp`` (optional; default = 4.0)
     - 𝑇𝑜𝑓𝑓𝑠𝑒𝑡_𝑎𝑐𝑡𝑢𝑎𝑙 = 𝑇𝑆𝐶𝐷4𝑥 − 𝑇𝑅𝑒𝑓𝑒𝑟𝑒𝑛𝑐𝑒 + 𝑇𝑜𝑓𝑓𝑠𝑒𝑡_ 𝑝𝑟𝑒𝑣𝑖𝑜𝑢𝑠
     - Temperature offset helps optimize Relative Humidity and Temperature measurements.
     - Temperature offset depends on the measurement mode, self-heating of nearby components, ambient temperature and air flow. 
@@ -57,7 +57,7 @@ Parameters
     - Inside the code it can be addressed via ``IN(temp_comp)``.
 
 
-- ``altitude``
+- ``altitude`` (optional; default = 57)
     - Typically, the sensor altitude is set once after device installation. 
     - The default sensor altitude value is set to 0 meters above sea level. 
     - Valid input values are between 0 to 3000 m. 
