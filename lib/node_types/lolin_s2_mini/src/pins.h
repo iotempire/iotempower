@@ -1,4 +1,4 @@
-// Pins on M5StickC
+// Pins on Lolin D1 Mini ESP32
 
 #define SDA 21
 #define SCL 22
