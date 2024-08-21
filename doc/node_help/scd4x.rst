@@ -3,7 +3,7 @@ Sensirion SCD4X CO2 sensor
 
 ..  code-block:: cpp
 
-    scd4x(name[, temp_comp][, altitude])[.i2c(sda,scl)][.with_address(i2c_address)][.with_filter(filter)];
+    scd4x(name[, temp_comp[, altitude]] )[.i2c(sda,scl)][.with_address(i2c_address)][.with_filter(filter)];
 
 Create a new scd4x co2 sensor device.
 
