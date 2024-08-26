@@ -1,59 +1,44 @@
 #!/usr/bin/env bash
 if [[ "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF
-Syntax: mqtt_broker [interface]
+Syntax: mqtt_broker [interface1] [interface2]
 
 mqtt_broker starts a local mosquitto-mqtt-server corresponding to parameters
-set in iotempower/etc/iotempower.conf. If an interface is given it overwrites
-the listener address with this interface. If the option scanif is given it will
-try to guess the interface itself.
+set in iotempower/etc/iotempower.conf. If interface1 is given it overwrites
+the listener address with this interface. If interface2 is also provided, 
+the broker will listen on both interfaces. If the option scanif is given 
+for interface1, it will try to guess the interface itself.
 EOF
 exit 1
 fi
 
-[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
-source <( iot_env ignore_system )
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2; exit 1; }
+source <(iot_env ignore_system)
 
 APTEMP="$IOTEMPOWER_LOCAL/tmp/mosquitto"
 rm -rf "$APTEMP" &> /dev/null
 mkdir -p "$APTEMP"
+
 while true; do
+    IF1="$1"
+    IF2="$2"
 
-    if [[ "$1" ]]; then
-        IF="$1"
-        if [[ "$IF" = "scanif" ]]; then
-            # Get all non-loopback, UP interfaces
-            # interfaces=$(ip -o link show | awk '$2 != "lo:" && $9 == "UP" {print $2}' | sed 's/\([a-zA-Z0-9]*\).*/\1/')
-
-            # # Check each interface for a local IP address, prefer the first one found
-            # for intf in $interfaces; do
-            #     if ip -o addr show $intf | grep -q "inet "; then
-            #         interface=$intf
-            #         break
-            #     fi
-            # done
-
-            # # If no interface with a local IP is found, use the first UP interface
-            # if [ -z "$interface" ]; then
-            #     interface=$(echo "$interfaces" | head -n 1)
-            # fi
-            #
-            # IF=$interface
-
-            IF=$(find_local_network)
-
-            # Print the interface name
-            echo "Preferred interface: $IF"
-            export IOTEMPOWER_MQTT_HOST=$(echo "$IF" | cut -d' ' -f2 | cut -d'/' -f1)
-        else
-            # TODO: update for termux case
-            export IOTEMPOWER_MQTT_HOST=$(ip a show "$IF"|grep " inet "|head -n1|cut -dt -f2|cut -d\  -f2|cut -d/ -f1)
+    if [[ "$IF1" ]]; then
+        if [[ "$IF1" = "scanif" ]]; then
+            IF1=$(find_local_network)
+            echo "Preferred interface: $IF1"
         fi
+        export IOTEMPOWER_MQTT_HOST=$(ip a show "$IF1" | grep " inet " | head -n1 | cut -d\  -f6 | cut -d/ -f1)
+    fi
+
+    if [[ "$IF2" ]]; then
+        export IOTEMPOWER_MQTT_HOST2=$(ip a show "$IF2" | grep " inet " | head -n1 | cut -d\  -f6 | cut -d/ -f1)
     fi
 
     echo "Listening on $IOTEMPOWER_MQTT_HOST."
+    [[ "$IOTEMPOWER_MQTT_HOST2" ]] && echo "Also listening on $IOTEMPOWER_MQTT_HOST2."
 
-    # create mosquitto config - user is needed for root on docker
+    # Create mosquitto config - user is needed for root on docker
     cat << EOF > "$APTEMP/mosquitto.conf"
 pid_file $APTEMP/pid
 user $USER
@@ -64,14 +49,17 @@ log_type error
 log_type warning
 listener 1883 127.0.0.1
 listener 1883 $IOTEMPOWER_MQTT_HOST
-allow_anonymous true
 EOF
 
-    # create bridge
-    if [ "$IOTEMPOWER_MQTT_BRIDGE_HOST" ]; then
+    if [[ "$IOTEMPOWER_MQTT_HOST2" ]]; then
+        cat << EOF >> "$APTEMP/mosquitto.conf"
+listener 1883 $IOTEMPOWER_MQTT_HOST2
+EOF
+    fi
 
-    # bridge config based on example in http://owntracks.org/booklet/guide/bridge/
-    cat << EOF >> "$APTEMP/mosquitto.conf"
+    # Create bridge if needed
+    if [[ "$IOTEMPOWER_MQTT_BRIDGE_HOST" ]]; then
+        cat << EOF >> "$APTEMP/mosquitto.conf"
 connection bridge-to-$IOTEMPOWER_MQTT_BRIDGE_HOST
 bridge_capath $IOTEMPOWER_MQTT_BRIDGE_CERTPATH
 bridge_insecure false
@@ -85,8 +73,7 @@ notifications false
 try_private true
 topic # both 2 ${IOTEMPOWER_MQTT_BRIDGE_TOPIC}/ ${IOTEMPOWER_MQTT_BRIDGE_TOPIC}/
 EOF
-
-    fi # bridge-config
+    fi
 
     echo "Stopping all existing services."
     pkill mosquitto
