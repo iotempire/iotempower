@@ -3,7 +3,7 @@ Sensirion SCD4X CO2 sensor
 
 ..  code-block:: cpp
 
-    scd4x(name)[.i2c(sda,scl)][.with_address(i2c_address)][.with_filter(filter)];
+    scd4x(name[, temp_comp[, altitude]] )[.i2c(sda,scl)][.with_address(i2c_address)][.with_filter(filter)];
 
 Create a new scd4x co2 sensor device.
 
@@ -49,6 +49,21 @@ Parameters
     - Inside the code it can be addressed via ``IN(name)``.
 
 
+- ``temp_comp`` (optional; default = 4.0)
+    - 𝑇𝑜𝑓𝑓𝑠𝑒𝑡_𝑎𝑐𝑡𝑢𝑎𝑙 = 𝑇𝑆𝐶𝐷4𝑥 − 𝑇𝑅𝑒𝑓𝑒𝑟𝑒𝑛𝑐𝑒 + 𝑇𝑜𝑓𝑓𝑠𝑒𝑡_ 𝑝𝑟𝑒𝑣𝑖𝑜𝑢𝑠
+    - Temperature offset helps optimize Relative Humidity and Temperature measurements.
+    - Temperature offset depends on the measurement mode, self-heating of nearby components, ambient temperature and air flow. 
+    - Recommend determining offset when installed and running under typical operational conditions and in thermal equilibrium.
+    - Inside the code it can be addressed via ``IN(temp_comp)``.
+
+
+- ``altitude`` (optional; default = 57)
+    - Typically, the sensor altitude is set once after device installation. 
+    - The default sensor altitude value is set to 0 meters above sea level. 
+    - Valid input values are between 0 to 3000 m. 
+    - Inside the code it can be addressed via ``IN(altitude)``.
+
+
 - ``.i2c(sda,scl)``
     - override i2c default ports - if not specified uses default i2c ports.
     - For the **M5StickC**, please use ``.i2c(32, 33)``.
@@ -72,7 +87,8 @@ Node name: ``room/gas``:
 
 ..  code-block:: cpp
 
-    scd4x(gas);
+    scd4x(gas, 5.0, 60); // name: room/gas, temp_comp: 5.0 [deg C], altitude: 60 [m]
+
 
 Now CO2 (in ppm), temperature (in deg C) and humidity (%RH) are published every 5 seconds as: 
 ``room/gas/co2ppm``, ``room/gas/temp``,  ``room/gas/humidity``.
@@ -82,7 +98,7 @@ Now CO2 (in ppm), temperature (in deg C) and humidity (%RH) are published every 
 
 ..  code-block:: cpp
 
-    scd4x(gas).i2c(32, 33);
+    scd4x(gas, 5.0, 60).i2c(32, 33); //for the M5StickC
 
 
 Wiring

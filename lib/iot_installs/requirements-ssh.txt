@@ -1,0 +1,2 @@
+fabric>=3.2.2
+sshtunnel>=0.4.0

@@ -750,7 +750,7 @@ class Filter_Precise_RMS : public Callback {
         Filter_Precise_RMS() : Callback() {
             size_t buflen = ((Input_Base&)get_device()).get_buffer_size();
             rms = new Rms();
-            /// TODO: check NULL
+            // TODO: check NULL
 
 //            rms->begin(VoltRange, buflen, ADC_12BIT, BLR_ON, CNT_SCAN);
             float VoltRange = 3.00; // TODO: might have to be adjustable
