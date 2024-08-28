@@ -28,3 +28,9 @@ __pycache__
 .vscode/launch.json
 doc/_links.rst
 etc/wifi_credentials
+
+.gradle
+*.lock
+gc.properties
+cache.properties
+buildOutput*/
