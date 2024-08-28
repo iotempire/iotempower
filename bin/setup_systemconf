@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 if [[ $# -gt 4 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF
 

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 BROKER_ADDRESS="192.168.12.1"
 BROKER_PORT=1883

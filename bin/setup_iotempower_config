@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 if [[ $# -gt 4 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF
 
@@ -22,7 +22,7 @@ fi
 
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
-#!/bin/bash
+#!/usr/bin/env bash
 
 source /home/renato/iot/etc/wifi_credentials
 echo $SSID

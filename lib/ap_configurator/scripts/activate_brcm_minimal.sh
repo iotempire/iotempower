@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 minimal_firmware_path="/lib/firmware/cypress/cyfmac43455-sdio-minimal.bin"
 default_firmware_path="/lib/firmware/brcm/brcmfmac43455-sdio.bin"

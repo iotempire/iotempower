@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Identify the first WiFi device that supports AP mode
 for dev in $(nmcli device status | grep wifi | awk '{print $1}'); do

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Default values for options
 DEFAULT_SSID_PREFIX="iotempire"
@@ -200,7 +200,7 @@ esac
 # ### old script
 # exit 0
 
-# #!/bin/bash
+# #!/usr/bin/env bash
 
 # # Variables for the hotspot configuration
 # SSID="iotempire"

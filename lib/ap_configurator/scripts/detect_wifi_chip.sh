@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 
 # An attempt to detect any relevant Wi-Fi chip/driver identifiers 
