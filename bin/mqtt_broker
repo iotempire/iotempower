@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 if [[ "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF
-Syntax: mqtt_broker [interface1] [interface2]
+Syntax: mqtt_broker [interface1 [interface2]]
 
 mqtt_broker starts a local mosquitto-mqtt-server corresponding to parameters
 set in iotempower/etc/iotempower.conf. If interface1 is given it overwrites
