@@ -1,0 +1,42 @@
+#menu {
+    margin: 4 8;
+    background: $panel;
+    color: $text;
+    border: tall $background;
+    padding: 1 2;
+}
+
+.buttons {
+    margin: 2 12;
+}
+
+Input, RadioSet, Log, Markdown {
+    margin: 1 12;
+}
+
+
+QuitScreen, RestartScreen {
+    align: center middle;
+}
+
+#dialog {
+    grid-size: 2;
+    grid-gutter: 1 2;
+    grid-rows: 1fr 3;
+    padding: 0 1;
+    width: 60;
+    height: 11;
+    border: thick $background 80%;
+    background: $surface;
+}
+
+#question {
+    column-span: 2;
+    height: 1fr;
+    width: 1fr;
+    content-align: center middle;
+}
+
+QuitScreen Button, RestartScreen Button {
+    width: 100%;
+}
