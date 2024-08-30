@@ -49,6 +49,7 @@ log_type error
 log_type warning
 listener 1883 127.0.0.1
 listener 1883 $IOTEMPOWER_MQTT_HOST
+allow_anonymous true
 EOF
 
     if [[ "$IOTEMPOWER_MQTT_HOST2" ]]; then
