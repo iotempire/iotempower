@@ -11,7 +11,7 @@ command -v git &>/dev/null || {
     exit 1 
     }
 
-git clone https://github.com/pvastrik/iotempower "$HOME/iot"
+git clone https://github.com/pvastrik/iotempower-test "$HOME/iot"
 cd "$HOME/iot" || exit 1
 git config pull.rebase false
 bash run x bin/iot_install "$@" < /dev/tty
