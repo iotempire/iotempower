@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+[[ $# -eq 0 ]] && exit 0 # exit positive if nothing needs to be installed
+
+exec sudo dnf install -y -q "$@"

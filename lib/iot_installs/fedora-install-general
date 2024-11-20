@@ -3,7 +3,7 @@
 # TODO: potentially also install sudo?
 
 # check if sudo is installed
-if ! debian-query sudo > /dev/null; then
+if ! fedora-query sudo > /dev/null; then
     echo "sudo is not installed, no packages can be installed."
     echo "Either install all dependencies yourself or install sudo"
     echo "and add yourself to the sudo group."
@@ -13,9 +13,9 @@ if ! debian-query sudo > /dev/null; then
 fi
 
 # check if curl is installed
-if ! debian-query curl > /dev/null; then
+if ! fedora-query curl > /dev/null; then
     echo "curl is not installed, installing. Please wait..."
-    debian-install curl
+    fedora-install curl
     # check error and return 1 if not found
     if [[ $? != 0 ]]; then
         echo "curl could not be installed, exiting now."
@@ -49,6 +49,7 @@ else
     [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 fi
 
+
 # Define the minimum required version
 min_version="21"
 
@@ -74,9 +75,10 @@ function check_node() {
     fi
 }
 
+
 if ! check_node; then
-   
-    echo "Trying to install current node version."
+    
+    echo "Trying to install current node version using NVM."
     nvm install $min_version
     if ! check_node; then
         echo "A current node version could not be installed."
@@ -84,30 +86,16 @@ if ! check_node; then
     fi
 fi
 
-# # on native debian gateway, we want network-manager <- TODO!
 # # connect to network
-# apt update
-# apt upgrade
-# apt install network-manager sudo
-# apt purge ifupdown
-# usermod -aG sudo iot # assuming iot user was created during install
-# # TODO: verify sshd is installed and enbaled
-# should also adjust /etc/systemd/logind.conf to prevent sleeping when lid closed
 
 # procps allows pkill and ps
-PACKAGE_LIST="build-essential git procps mosquitto-clients virtualenv python3-venv python3-dev make rsync openssh-client haveged jq"
-to_install=$(filter_packages debian-query $PACKAGE_LIST)
+PACKAGE_LIST="gcc gcc-c++ make git procps virtualenv python3-virtualenv python3-devel make rsync openssh-client haveged jq"
+to_install=$(filter_packages fedora-query $PACKAGE_LIST)
 
 echo "Installing: $to_install..."
-debian-install $to_install
+fedora-install $to_install
 echo "Installation of $to_install complete."
 
 # curl git mosquitto python-virtualenv rsync haveged jq # general
 # ./arch-install iptables bridge-utils hostapd dnsmasq # router and networking
-
-if command -v systemctl > /dev/null; then # docker does not have systemctl
-    sudo systemctl stop mosquitto
-    sudo systemctl disable mosquitto
-fi
-
 exit 0
