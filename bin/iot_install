@@ -133,6 +133,7 @@ function init_nodejs() {
     nvm use 
     source "$HOME/.bashrc"
     # if package.json does not exist, run nmp init to create it
+    deactivate # termux can't do the following in venv - do we need to specialize this?
     #iot_grun npm init -y > /dev/null
     # check if pakage.json exists
     if [ ! -f package.json ]; then
