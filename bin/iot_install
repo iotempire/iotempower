@@ -125,10 +125,14 @@ function activate() {
 }
 
 function init_nodejs() {
+  [[ -s $HOME/.nvm/nvm.sh ]] && source "$HOME/.nvm/nvm.sh"
+  
+
     cd "$IOTEMPOWER_LOCAL" || { echo "$IOTEMPOWER_LOCAL not found, aborting." 1>&2;exit 1; }
     mkdir -p nodejs && cd nodejs || { echo "Can't create nodejs folder, aborting." 1>&2;exit 1; }
+    nvm use 
+    source "$HOME/.bashrc"
     # if package.json does not exist, run nmp init to create it
-    deactivate # termux can't do the following in venv - do we need to specialize this?
     #iot_grun npm init -y > /dev/null
     # check if pakage.json exists
     if [ ! -f package.json ]; then
@@ -143,7 +147,7 @@ function init_nodejs() {
     fi
     activate
 }
-
+ 
 function check_pi() {
   # check if this is a raspberry pi - TODO: seems not to work, verify
   #vcgencmd version &> /dev/null
