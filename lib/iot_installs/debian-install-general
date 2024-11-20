@@ -24,6 +24,31 @@ if ! debian-query curl > /dev/null; then
     echo "curl has been installed successfully"
 fi
 
+nvm_min_version="0.37.2"
+
+NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+
+# Check NVM version
+nvm_installed_version=$(nvm --version)
+
+if [[ -z "$nvm_installed_version" ]]; then
+    nvm_installed_version="0.0.0-notinstalled"
+fi
+
+echo $nvm_installed_versions
+if [[ "$nvm_installed_version" && "$(printf "%s\n%s" "$nvm_min_version" "$nvm_installed_version" | sort -V | head -n1)" = "$nvm_min_version" ]]; then
+    echo "NVM version is higher or equal than the minimum required version $nvm_min_version."
+else
+    echo "NVM version $nvm_installed_version is installed, it does not meet the minimum required version $nvm_min_version."
+    echo "Installing NVM version $nvm_min_version."
+    # Install or update NVM
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+fi
+
 # Define the minimum required version
 min_version="21"
 
@@ -50,18 +75,9 @@ function check_node() {
 }
 
 if ! check_node; then
-    # # the curl install below seems broken on several platforms
-    # # install current node.js - seems to need suddenly sudo # TODO: check other install methods
-    # curl -fsSL "https://deb.nodesource.com/setup_""$min_version"".x" | sudo bash -
-
+   
     echo "Trying to install current node version."
-    sudo apt-get install -y ca-certificates curl gnupg
-    sudo mkdir -p /etc/apt/keyrings # does not exist on old ubuntu versions - TODO: merge into sudo below
-    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | \
-        sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
-    NODE_MAJOR=$min_version
-    echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list
-    sudo apt-get update && sudo apt-get install nodejs -y
+    nvm install $min_version
     if ! check_node; then
         echo "A current node version could not be installed."
         exit 1
