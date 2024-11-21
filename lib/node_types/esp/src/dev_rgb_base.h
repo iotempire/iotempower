@@ -9,7 +9,15 @@
 #define FASTLED_INTERRUPT_RETRY_COUNT 2
 #define FASTLED_INTERNAL // ignore pragma messages in FastLED
 // needs to be included here for color table
+
+// fastled uses an out function, so we need to undefine it first
+#ifdef IOTEMPOWER_COMMAND_OUTPUT
+#undef out
+#endif
 #include <FastLED.h>
+#ifdef IOTEMPOWER_COMMAND_OUTPUT
+#define out(gcc_va_args...) output(gcc_va_args)
+#endif
 
 #include <device.h>
 
