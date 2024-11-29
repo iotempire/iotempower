@@ -8,6 +8,7 @@
 
 #include <Arduino.h>
 #include <device.h>
+#include <filter.h> // TODO: check why this needs to be included explicitely
 
 // only sent out signal every 50ms (when using 40ms there is too much stray)
 #define IOTEMPOWER_HCSR04_INTERVAL 50
