@@ -10,6 +10,9 @@ from paramiko.ssh_exception import AuthenticationException
 
 from tests.conf_data import default_username, gateway_host, local_bind_mqtt_port, private_key_file_path
 
+def pytest_addoption(parser):
+    parser.addoption("--boards", action="store", default=None, help="Specify the board(s) to test")
+    parser.addoption("--devices", action="store", default=None, help="Specify the device(s) to test")
 
 @pytest.fixture(scope="module", autouse=False)
 def ssh_client():

@@ -71,14 +71,13 @@ File Descriptions
     - **Purpose**: To verify that after the deployment process the physical changes also takes effect rather than seeing those changes in serial or MQTT channel.
     - **Details**: `cases_for_hardware` lists test cases and new tests cases should be added to that list.
 
-
 Running Tests
 -------------
 
 To run the tests:
 
 1. Navigate to the `tests` folder.
-2. Activate the IOT environment by typing `iot` (if it hasn't been activated already).
+2. Activate the IoT environment by typing `iot` (if it hasn't been activated already).
 3. Use the `pytest` testing library to run the tests. The command to run all tests is:
 
    .. code-block:: shell
@@ -90,6 +89,30 @@ To run the tests:
    .. code-block:: shell
 
        pytest -s -v test_deployment.py
+
+5. To run a specific test with board and device parameters, use the following command:
+
+   .. code-block:: shell
+
+       pytest -s -v test_deployment.py --boards=<board1>,<board2> --devices=<device1>,<device2>
+
+   - `<board1>`: The name of the first board to test. For example, "wemos_d1_mini".
+   - `<board2>`: The name of the second board to test (optional).
+   - `<device1>`: The name of the first device to test. For example, "rfid".
+   - `<device2>`: The name of the second device to test (optional).
+
+   Note that you can specify as many `<board>` and `<device>` pairs as needed. If neither `<boards>` nor `<devices>` is specified, all combinations will be tested.
+
+6. Example Command
+
+   To run tests for specific boards and devices, you can use:
+
+   .. code-block:: shell
+
+       pytest -s -v --boards=wemos_d1_mini,esp32 --devices=laser_distance test_compilation.py
+
+   This command will execute tests for both specified boards (`wemos_d1_mini` and `esp32`) using the specified device (`laser_distance`).
+
 
 Hardware configuration
 ----------

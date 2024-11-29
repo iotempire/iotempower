@@ -9,7 +9,7 @@ packages = [
     {"name": "mosquitto_pub", "package_manager": "binary", "module": "general"},
     {"name": "node", "package_manager": "binary", "module": "general"},  # TODO: check min version
     #    {"name": "haveged", "package_manager": "binary", "module": "general"}, # not needed on termux, macos
-    #    {"name": "python3-dev", "package_manager": "binary", "module": "general"}, # FIXME: could be quieried with query script
+    #    {"name": "python3-dev", "package_manager": "binary", "module": "general"}, # FIXME: could be queried with query script
     {"name": "terminal-kit", "package_manager": "npm", "module": "general"},
     {"name": "g++", "package_manager": "binary", "module": "cloud_commander"},
     {"name": "gritty", "package_manager": "npm", "module": "cloud_commander"},
@@ -24,18 +24,18 @@ packages = [
 
 # Compilation test
 boards = [
-    "wemos_d1_mini",
-    "sonoff",
-    "nodemcu",
-    "olimex",
-    # "m5stickc_plus",
+    "esp8266", # test generic boards first
+    "esp32", # other generic board
+    "wemos_d1_mini", # our favorite esp8266 board
+    "esp32minikit", # out favorite esp32 board
     "m5stickc",
+    "m5stickc_plus",
     "wroom_02",
+    "nodemcu", # identical to wemos_d1_mini - TODO: do we really need to test it?
+    "sonoff",
+    "olimex",
     "esp-m",
     "sonoff_pow",
-    "esp8266",
-    "esp32",
-    "esp32minikit",
 ]
 devices = [
     {"device_name": "input", "example_syntax": 'input(lower, IOT_TEST_INPUT, "released", "pressed");'},
@@ -61,7 +61,7 @@ devices = [
     {"device_name": "light_sensor_1", "example_syntax": "bh1750(example_name);"},
     {"device_name": "light_sensor_2", "example_syntax": "tsl2561(example_name);"},
     {"device_name": "capacity_touch", "example_syntax": "mpr121(example_name);"},
-    # {"device_name": "rgb_strip", "example_syntax": "rgb_strip(example_name, 7, WS2812B, IOT_TEST_DIGITAL, GRB);"},
+    # {"device_name": "rgb_strip", "example_syntax": "rgb_strip(example_name, 7, WS2812B, IOT_TEST_DIGITAL, GRB);"}, # TODO: Here, we should actually test NeoPixelBus
 ]
 
 isolated_combinations_to_test = [
@@ -70,9 +70,9 @@ isolated_combinations_to_test = [
 # This additional tests are for the devices which are not supported by all devices
 isolated_combinations_to_test += [
     (board, "rfid", "mfrc522(example_name);")
-    for board in ["wemos_d1_mini", "nodemcu", "wroom_02", "esp32", "esp32miniki"]
+    for board in ["wemos_d1_mini", "nodemcu", "wroom_02", "esp32", "esp32minikit"]
 ]
-isolated_combinations_to_test += [("wemos_d1_mini", "rgb_single", "rgb_single(r0, D6, D5, D0, true);")]
+isolated_combinations_to_test += [("wemos_d1_mini", "rgb_single", "rgb_single(r0, D6, D5, D0, true);")] # TODO: this should not be isolated and work on all devices that have at least 3 IOs (or one on board like the cheap yellow display)
 
 # Configuration for deployment test & hardware test
 gateway_host = "iotgateway"
