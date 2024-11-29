@@ -6,6 +6,7 @@
 #include <Arduino.h>
 #include <device.h>
 #include <HX711.h>
+#include <filter.h> // TODO: check why this needs to be included explicitely
 
 
 class Hx711 : public Device {
