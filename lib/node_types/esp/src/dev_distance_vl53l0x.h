@@ -7,7 +7,8 @@
 #include <Arduino.h>
 #include <i2c-device.h>
 
-#include <VL53L0X.h> // here only this in cpp MPU6050_6Axis_MotionApps20.h
+#include <VL53L0X.h>
+#include <filter.h> // TODO: check why this needs to be included explicitely
 
 #define IOTEMPOWER_VL53L0X_MAXDIST 8190
 
