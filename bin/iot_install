@@ -14,6 +14,27 @@
 
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
+# Check for package managers and environment variables to determine the OS/environment
+if command -v pacman &> /dev/null; then
+  platform="arch"
+elif [[ -n "$PREFIX" ]] && command -v apt-get &> /dev/null; then
+  platform="termux"
+elif command -v apt-get &> /dev/null; then
+  platform="debian"
+elif command -v brew &> /dev/null; then
+  # Additional check for macOS using uname
+  if [[ "$(uname)" == "Darwin" ]]; then
+    platform "macos" 
+  else
+    echo "brew found, but not running on macOS. Please check your configuration."
+  fi
+elif command -v dnf &> /dev/null; then
+    platform="fedora"
+else
+  echo "Unsupported OS or environment. Exiting."
+  exit 1
+fi
+
 iot_grun() { 
   # LD_PRELOAD="$GLIBC_PRELOAD" "$@"
   if [[ -n "$PREFIX" ]] && command -v apt-get &> /dev/null; then
@@ -125,11 +146,20 @@ function activate() {
 }
 
 function init_nodejs() {
+
     cd "$IOTEMPOWER_LOCAL" || { echo "$IOTEMPOWER_LOCAL not found, aborting." 1>&2;exit 1; }
     mkdir -p nodejs && cd nodejs || { echo "Can't create nodejs folder, aborting." 1>&2;exit 1; }
+    source "$HOME/.bashrc"
     # if package.json does not exist, run nmp init to create it
     deactivate # termux can't do the following in venv - do we need to specialize this?
     #iot_grun npm init -y > /dev/null
+    
+    # for other platforms than termux, use nvm
+    if [ "$platform" != "termux" ]; then
+      [[ -s $HOME/.nvm/nvm.sh ]] && source "$HOME/.nvm/nvm.sh" # this loads nvm
+      nvm use 
+    fi
+
     # check if pakage.json exists
     if [ ! -f package.json ]; then
       npm init -y > /dev/null
@@ -143,7 +173,7 @@ function init_nodejs() {
     fi
     activate
 }
-
+ 
 function check_pi() {
   # check if this is a raspberry pi - TODO: seems not to work, verify
   #vcgencmd version &> /dev/null
