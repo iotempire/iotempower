@@ -1,43 +1,27 @@
 #!/usr/bin/env bash
 
-# install curl if necessary
-if ! macos-query curl > /dev/null; then
+# TODO: potentially also install sudo?
+
+# check if sudo is installed
+if ! fedora-query sudo > /dev/null; then
+    echo "sudo is not installed, no packages can be installed."
+    echo "Either install all dependencies yourself or install sudo"
+    echo "and add yourself to the sudo group."
+    echo "Lots of error messages will potentially follow."
+    echo
+    exit 1
+fi
+
+# check if curl is installed
+if ! fedora-query curl > /dev/null; then
     echo "curl is not installed, installing. Please wait..."
-    macos-install curl
+    fedora-install curl
     # check error and return 1 if not found
     if [[ $? != 0 ]]; then
         echo "curl could not be installed, exiting now."
         exit 1
     fi
     echo "curl has been installed successfully"
-fi
-
-PACKAGE_LIST="make gcc git mosquitto python python-cryptography rsync jq iproute2mac flock coreutils"
-to_install=$(filter_packages debian-query $PACKAGE_LIST)
-
-echo "Installing: $to_install..."
-macos-install $to_install
-echo "Installation of $to_install complete."
-
-# curl git mosquitto python-virtualenv rsync haveged jq # general
-# ./arch-install iptables bridge-utils hostapd dnsmasq # router and networking
-
-# ./arch-install mc micro # this is optional: mc is nicer file management in cli, micro a nicer editor than nano
-
-# sudo systemctl stop mosquitto
-# sudo systemctl disable mosquitto
-
-
-echo "Implementing a fix for node-gyp." # TODO verify how long that is happening
-mkdir -p "$HOME/.gyp"
-if [ ! -f "$HOME/.gyp/include.gypi" ]; then
-    cat << EOF > "$HOME/.gyp/include.gypi"
-{
- 'variables': {
-  'android_ndk_path': ''
- }
-}
-EOF
 fi
 
 nvm_min_version="0.37.2"
@@ -65,6 +49,7 @@ else
     [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 fi
 
+
 # Define the minimum required version
 min_version="21"
 
@@ -90,9 +75,10 @@ function check_node() {
     fi
 }
 
+
 if ! check_node; then
-   
-    echo "Trying to install current node version."
+    
+    echo "Trying to install current node version using NVM."
     nvm install $min_version
     if ! check_node; then
         echo "A current node version could not be installed."
@@ -100,7 +86,16 @@ if ! check_node; then
     fi
 fi
 
-# # solve small mess up with global and local modules on macos (also on termux the problem)
-# mkdir -p "$HOME/node_modules"
-mkdir -p "$IOTEMPOWER_LOCAL/nodejs"
-# ln -s "$HOME/node_modules" "$IOTEMPOWER_LOCAL/nodejs"
+# # connect to network
+
+# procps allows pkill and ps
+PACKAGE_LIST="gcc gcc-c++ make git procps virtualenv python3-virtualenv python3-devel make rsync openssh-client haveged jq"
+to_install=$(filter_packages fedora-query $PACKAGE_LIST)
+
+echo "Installing: $to_install..."
+fedora-install $to_install
+echo "Installation of $to_install complete."
+
+# curl git mosquitto python-virtualenv rsync haveged jq # general
+# ./arch-install iptables bridge-utils hostapd dnsmasq # router and networking
+exit 0

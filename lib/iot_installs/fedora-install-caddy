@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+PACKAGE_LIST="caddy"
+to_install=$(filter_packages fedora-query $PACKAGE_LIST)
+
+# check caddy version
+installed_version=$(caddy -v | sed 's/v//') # Remove the 'v' prefix from version
+
+if [[ -z "$installed_version" ]]; then
+    installed_version="0.0.0-notinstalled"
+fi
+
+# Define the minimum required version
+min_version="2.5"
+
+# Use sort with version sort flag to compare versions, and check the first line
+if [[ "$installed_version" && "$(printf "%s\n%s" "$min_version" "$installed_version" | sort -V | head -n1)" = "$min_version" ]]; then
+    echo "Caddy version is higher or equal than the minimum required version $min_version."
+    exit 0
+else
+    echo "Caddy version $installed_version is installed, it does not meet the minimum required version $min_version."
+    # install current caddy
+    echo "Installing: $to_install..."
+
+    fedora-install 'dnf-command(copr)' 
+    sudo dnf copr enable @caddy/caddy -y
+    fedora-install caddy
+    sudo dnf config-manager --disable copr:copr.fedorainfracloud.org:group_caddy:caddy 
+    echo "Installation of $to_install complete."
+fi
+
+

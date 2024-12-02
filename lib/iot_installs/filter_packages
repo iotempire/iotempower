@@ -19,3 +19,4 @@ done
 
 # Echo the parameters (packages) that are not installed
 echo "${not_installed_packages[@]}"
+

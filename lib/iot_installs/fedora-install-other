@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+PACKAGE_LIST="$@"
+to_install=$(filter_packages fedora-query $PACKAGE_LIST)
+
+echo "Installing: $to_install..."
+fedora-install $to_install
+echo "Installation of $to_install complete."
+
+
