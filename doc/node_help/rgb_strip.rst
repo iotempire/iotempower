@@ -66,11 +66,14 @@ Example
     // Only runs stable on D4 on esp8266 based boards
     rgb_strip_bus(strip2, 10, F_GRB, NeoEsp8266Uart1800KbpsMethod, D4);
 
-    // Same version for esp32 minikit, you can use otehr pins than D4 on the esp32 any port bellow 34 are supported, however check this link for futher documentation
+    // Same version for esp32 minikit or lolin S2 mini, you can use other pins than D4 on the esp32:
+    // any port bellow 34 are supported, however check this link for further documentation
     https://github.com/Makuna/NeoPixelBus/wiki/ESP32-NeoMethods 
-    rgb_strip_bus(leds, num_leds, F_BRG, NeoEsp32I2s1X8Ws2812xMethod, 26).report_change(false);    
+    rgb_strip_bus(leds, num_leds, F_BRG, NeoEsp32I2s0Ws2812xMethod, 16).report_change(false);    
+    // You can also try NeoEsp32Rmt0Ws2812xMethod if you use big matrixes as
+    // it is supposed to use less buffer space (but more interrupts)
 
-    // old obsolete and probably instabel version, use on your own risk
+    // old obsolete and probably instable version, will be inaccessible soon
     rgb_strip(strip2, 10, WS2811, D6, BRG); // <- do not use!
 
 Now the second RGB LED can be switched to red via sending to the mqtt-broker
