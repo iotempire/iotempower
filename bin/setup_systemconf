@@ -44,6 +44,7 @@ IOTEMPOWER_AP_IP="$IOTEMPOWER_AP_IP"
 # If not defined, the same as IOTEMPOWERAP_IP from $IOTEMPWOER_ROOT/etc/iotempower.conf default
 IOTEMPOWER_MQTT_HOST="$IOTEMPOWER_AP_IP"
 EOF
+echo "Done. Your local wifi configuration is now set up in your system.conf file"
 exit 0
 }
 

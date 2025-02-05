@@ -37,7 +37,8 @@ fi
 
 # Prompt the user to confirm the router IP
 echo "The detected router IP is: $router_ip"
-read -p "Is this correct? (yes/no): " response
+read -p "Is this correct? (yes/no) [yes]: " response
+response=${response:-yes}
 
 
 # Check the result of the ping command
@@ -54,7 +55,7 @@ fi
         echo "Router is connected."
         # Export it as an environment variable
         export ROUTER_IP=$router_ip
-        echo " The Router IP: $ROUTER_IP"
+        #echo " The Router IP: $ROUTER_IP"
         break
     elif [ $i -eq 2 ]; then
         echo "Failed to connect to router, check your router IP and connectivity and try again"

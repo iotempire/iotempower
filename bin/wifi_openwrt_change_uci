@@ -21,38 +21,47 @@ fi
 # TODO: add option to specify input file with list of specific nodes to deploy
 
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
-
-
+#check if current router IP is correct
 source $IOTEMPOWER_ROOT/bin/check_router_ip
 # Print it for verification
-echo "Router IP: $ROUTER_IP"
+#echo "Router IP: $ROUTER_IP"
+if [ -z "$ROUTER_IP" ]; then
+    exit 1
+fi
 
+# Prompt the user for SSID and password
+source $IOTEMPOWER_ROOT/bin/wifi_credentials_temp
+source $IOTEMPOWER_ROOT/etc/wifi_credentials
 
-# /etc/config/wireless
 
 source $IOTEMPOWER_ROOT/etc/wifi_credentials
 # Name of accesspoint to connect to
-echo $IOTEMPOWER_AP_NAME
-
-# Its wifi password
-echo $IOTEMPOWER_AP_PASSWORD
+echo "Your new AP SSID is: $IOTEMPOWER_AP_NAME"
 
 # IP to pick
-echo $IOTEMPOWER_AP_IP
+echo "Your new Gateway IP is: $IOTEMPOWER_AP_IP"
 
 # Connect data for local MQTT broker
 # If not defined, the same as IOTEMPOWERAP_IP from /etc/iotempower.conf default
-echo $IOTEMPOWER_MQTT_HOST
+echo "Your new MQTT IP is: $IOTEMPOWER_MQTT_HOST"
 
-echo $SSID
-echo $Password
-echo $GatewayIP
 
+
+# Check if user has a public SSH key, if not create one
+if ls ~/.ssh/*.pub 1> /dev/null 2>&1 ; then 
+    ssh_pub_key=$(ls ~/.ssh/*.pub | head -n 1 | xargs cat)+\n
+else
+    echo "Public SSH key not found. Genarating a new SSH key"
+    ssh-keygen -o
+    ssh_pub_key=$(ls ~/.ssh/*.pub | head -n 1 | xargs cat)+\n
+fi
+
+#get routers inital ip from check_router_ip
 hostname="root@$ROUTER_IP"
 
-#ssh root@$ROUTER_IP << EOF # ssh into router and execute the following commands to set the wifi configuration and fix the network ip for the gateway
-ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $hostname << EOF # ssh into router and execute the following commands to set the wifi configuration and fix the network ip for the gateway
-
+ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $hostname << EOF 
+#echo "cpying your public key to the router authorized.keys for passwordless ssh loging..."
+echo $ssh_pub_key >> /etc/dropbear/authorized_keys
 
 uci set wireless.radio0.disabled='0'
 uci set wireless.default_radio0.ssid="$IOTEMPOWER_AP_NAME"
@@ -60,6 +69,13 @@ uci set wireless.default_radio0.encryption="psk2"
 uci set wireless.default_radio0.key="$IOTEMPOWER_AP_PASSWORD"
 uci commit wireless
 wifi &
+
+echo "Setting wifi credentials"
+uci set network.lan.ipaddr="$IOTEMPOWER_AP_IP"
+uci commit network
+echo "Setting network ip to 192.168.14.1 and restarting..."
+echo "WiFi configuration has been written to uci config file"
+( sleep 5 ; /etc/init.d/network restart ) &
 
 EOF
 

@@ -23,7 +23,6 @@ fi
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
 if [[ -e "system.conf" ]]; then  # started from system-directory
-    . $IOTEMPOWER_ROOT/bin/wifi_credentials_temp
     . $IOTEMPOWER_ROOT/bin/wifi_openwrt_change_uci
     . $IOTEMPOWER_ROOT/bin/setup_systemconf
 else
