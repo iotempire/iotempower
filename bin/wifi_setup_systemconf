@@ -25,6 +25,4 @@ fi
 . $IOTEMPOWER_ROOT/bin/wifi_credentials_temp
 echo "Setting up the wifi system configuration"
 . $IOTEMPOWER_ROOT/bin/setup_systemconf
-
-
-echo "Done. Your local wifi configuration is now set up in your system.conf file"
+exit 0

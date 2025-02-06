@@ -22,28 +22,12 @@ fi
 
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 #check if current router IP is correct
-#source $IOTEMPOWER_ROOT/bin/check_router_ip
+source $IOTEMPOWER_ROOT/bin/check_router_ip
 # Print it for verification
 #echo "Router IP: $ROUTER_IP"
 if [ -z "$ROUTER_IP" ]; then
     exit 1
 fi
-
-
-# Fetch the wifi credentials from etc/wifi_credentials
-
-source $IOTEMPOWER_ROOT/etc/wifi_credentials
-# Name of accesspoint to connect to
-echo "Your new AP SSID is: $IOTEMPOWER_AP_NAME"
-
-# IP to pick
-echo "Your new Gateway IP is: $IOTEMPOWER_AP_IP"
-
-# Connect data for local MQTT broker
-# If not defined, the same as IOTEMPOWERAP_IP from /etc/iotempower.conf default
-echo "Your new MQTT IP is: $IOTEMPOWER_MQTT_HOST"
-
-
 
 # Check if user has a public SSH key, if not create one
 if ls ~/.ssh/*.pub 1> /dev/null 2>&1 ; then 
@@ -57,26 +41,39 @@ fi
 #get routers inital ip from check_router_ip
 hostname="root@$ROUTER_IP"
 
-ssh -o HostKeyAlgorithms=+ssh-rsa -o PubkeyAcceptedKeyTypes=+ssh-rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $hostname << EOF 
+echo "!!!!! This should only be runned on a Mango router - Gl Inet MT300N -V2 !!!!!"
+echo "!!!! It will install Openwrt 23.05.5 firmware version for this router!!!!"
+echo "!!!! If you run this on any other router, there is a high chance of bricking it!!!!"
+
+ read -p "Would you like to continue with installation? (yes/no) [no]: " response
+    response=${response:-no}
+
+  if [[ "$response" =~ ^[Yy][Ee][Ss]?$ ]]; then
+        ssh -o HostKeyAlgorithms=+ssh-rsa -o PubkeyAcceptedKeyTypes=+ssh-rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $hostname << EOF 
 #echo "cpying your public key to the router authorized.keys for passwordless ssh loging..."
 echo $ssh_pub_key >> /etc/dropbear/authorized_keys
 
-# Verify wireless interface names
-uci show wireless
+ if ping -c 4 8.8.8.8 > /dev/null; then
+    echo "Router is connected to the internet."
+    break
+else
+    echo" The Router must have internet connection to run update"
+    echo "Please connect to the Internet via ETHERNET cable on WAN port"
+    exit 1
+fi
 
-uci set wireless.radio0.disabled='0'
-uci set wireless.default_radio0.ssid="$IOTEMPOWER_AP_NAME"
-uci set wireless.default_radio0.encryption="psk2"
-uci set wireless.default_radio0.key="$IOTEMPOWER_AP_PASSWORD"
-uci commit wireless
-wifi &
+# Installs Openwrt 23.05.5 firmware on a mango
 
-echo "Setting wifi credentials"
-uci set network.lan.ipaddr="$IOTEMPOWER_AP_IP"
-uci commit network
-echo "Setting network ip to $IOTEMPOWER_AP_IP and restarting..."
-echo "WiFi configuration has been written to uci config file"
-( sleep 5 ; /etc/init.d/network restart ) &
+cd /tmp
+wget http://downloads.openwrt.org/releases/23.05.5/targets/ramips/mt76x8/openwrt-23.05.5-ramips-mt76x8-glinet_gl-mt300n-v2-squashfs-sysupgrade.bin
+mtd -r write /tmp/openwrt-23.05.5-ramips-mt76x8-glinet_gl-mt300n-v2-squashfs-sysupgrade.bin firmware
 
 EOF
+
+else
+# If the user does not want to continue with the installation
+echo "Installation aborted"
+exit 1
+fi
+
 

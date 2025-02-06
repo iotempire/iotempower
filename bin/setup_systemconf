@@ -45,9 +45,9 @@ IOTEMPOWER_AP_IP="$IOTEMPOWER_AP_IP"
 IOTEMPOWER_MQTT_HOST="$IOTEMPOWER_AP_IP"
 EOF
 echo "Done. Your local wifi configuration is now set up in your system.conf file"
+echo "PRESS CTRL+D to exit"
 exit 0
 }
-
 if [[ -e "system.conf" ]]; then  # started from system-directory
 user_input_wifi_credentials
 
