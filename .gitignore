@@ -34,3 +34,5 @@ etc/wifi_credentials
 gc.properties
 cache.properties
 buildOutput*/
+
+package.json
