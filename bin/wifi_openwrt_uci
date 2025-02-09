@@ -21,39 +21,59 @@ fi
 # TODO: add option to specify input file with list of specific nodes to deploy
 
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
-
-
-source $IOTEMPOWER_ROOT/bin/check_router_ip
+#check if current router IP is correct
+#source $IOTEMPOWER_ROOT/bin/check_router_ip
 # Print it for verification
-echo "Router IP: $ROUTER_IP"
+#echo "Router IP: $ROUTER_IP"
+if [ -z "$ROUTER_IP" ]; then
+    exit 1
+fi
 
-
+# Prompt the user for SSID and password
+#source $IOTEMPOWER_ROOT/bin/wifi_credentials_temp
 source $IOTEMPOWER_ROOT/etc/wifi_credentials
 
-ssh_pub_key=$(ls ~/.ssh/*.pub | head -n 1 | xargs cat)+\n
+# Check if user has a public SSH key, if not create one
+if ls ~/.ssh/*.pub 1> /dev/null 2>&1 ; then 
+    ssh_pub_key=$(ls ~/.ssh/*.pub | head -n 1 | xargs cat)+\n
+else
+    echo "Public SSH key not found. Genarating a new SSH key"
+    ssh-keygen -o
+    ssh_pub_key=$(ls ~/.ssh/*.pub | head -n 1 | xargs cat)+\n
+fi
 
-
+#get routers inital ip from check_router_ip
 hostname="root@$ROUTER_IP"
 
 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $hostname << EOF 
-echo "cpying your public key to the router authorized.keys for passwordless ssh loging..."
+#echo "cpying your public key to the router authorized.keys for passwordless ssh loging..."
 echo $ssh_pub_key >> /etc/dropbear/authorized_keys
+
+ if ping -c 4 8.8.8.8 > /dev/null; then
+    echo "Router is connected to the internet."
+    break
+else
+    echo" The Router must have internet connection to run update"
+    echo "Please connect to the Internet via ETHERNET cable on WAN port"
+    exit 1
+fi
 opkg update
 
 # Install Mosquitto and its SSL libraries
-opkg install mosquitto-ssl mosquitto-client-ssl libmosquitto-ssl luci-app-mosquitto kmod-usb-net-rndis openssh-server openssh-sftp-server
+opkg install mosquitto-ssl mosquitto-client-ssl libmosquitto-ssl luci-app-mosquitto kmod-usb-net-rndis 
 
-# Replace Dropbear to OpenSSH + SFTP
-uci set dropbear.@dropbear[0].Port=2222
-uci commit dropbear
-/etc/init.d/dropbear restart
-
-sed -i 's/^#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
-mkdir /root/.ssh/
-cp /etc/dropbear/authorized_keys /root/.ssh/
-
-/etc/init.d/sshd enable
-/etc/init.d/sshd restart
+###########################
+# You can potencially Replace Dropbear to OpenSSH + SFTP by uncommenting the lines bellow
+#opkg install openssh-server openssh-sftp-server
+#uci set dropbear.@dropbear[0].Port=2222
+#uci commit dropbear
+#/etc/init.d/dropbear restart
+#sed -i 's/^#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+#mkdir /root/.ssh/
+#cp /etc/dropbear/authorized_keys /root/.ssh/
+#/etc/init.d/sshd enable
+#/etc/init.d/sshd restart
+#########################
 
 # Enable Mosquitto to start on boot
 /etc/init.d/mosquitto enable
@@ -86,22 +106,27 @@ uci commit mosquitto
 /etc/init.d/mosquitto start
 
 uci set wireless.radio0.disabled='0'
-uci set wireless.default_radio0.ssid="$SSID"
+uci set wireless.default_radio0.ssid="$IOTEMPOWER_AP_NAME"
 uci set wireless.default_radio0.encryption="psk2"
-uci set wireless.default_radio0.key="$Password"
+uci set wireless.default_radio0.key="$IOTEMPOWER_AP_PASSWORD"
 uci commit wireless
 wifi &
 
 echo "Setting wifi credentials"
-uci set network.lan.ipaddr="$GatewayIP"
+uci set network.lan.ipaddr="$IOTEMPOWER_AP_IP"
 uci commit network
-echo "Setting network ip to 192.168.14.1 and restarting..."
+echo "Setting network ip to $IOTEMPOWER_AP_IP and restarting..."
 echo "WiFi configuration has been written to uci config file"
 ( sleep 5 ; /etc/init.d/network restart ) &
 
 EOF
-# TODO deactivate dropbear
-#TODO some mechanism that detacts if the router has internet and only run the install if it does
-echo "Please restart the router to apply the changes and connect to the new wifi network $SSID"
 
-echo "Done"
+ if [[ $? -eq 0 ]]; then
+        # Write settings to the system.conf files
+      echo "Please restart the router to apply the changes and connect to the new wifi network $IOTEMPOWER_AP_IP"
+    else
+        echo "wifi_openwrt_uci command failed. Aborting."
+        exit 1
+    fi
+# TODO deactivate dropbear
+

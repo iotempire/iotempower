@@ -414,9 +414,9 @@ function advanced_back() {
 
 function system_configuration(back) {
     choice([
-        ["Change wifi credentials for projects in system config (W)", "W", wifi_setup_systemconf],
-        ["Set-up wifi gateway on external OpenWRT router (R)", "R",  wifi_setup_openwrt],
-        ["Update wifi credentials wifi on external OpenWRT router (U)", "U",  wifi_update_openwrt],
+        ["WiFi system credentials setup - system.conf file (W)", "W", wifi_setup_systemconf],
+        ["Wifi network initial setup - OpenWRT router (R)", "R",  wifi_setup_openwrt],
+        ["Update WiFi Credentials on OpenWRT router (U)", "U",  wifi_update_openwrt],
         ["Set-up wifi gateway on the Raspberry Pi (P)", "P", wifi_config],
         ["Back (B,X,ESC)", ["B","X"], back?menu_default:terminate]
     ], pre_select=-1, pad_last=1);
@@ -437,7 +437,7 @@ function menu_default() {
     choice([
         ["Deploy (D)", "D", deploy], 
         ["Adopt (A)", "A", adopt],
-        ["Wifi Configuration (C)", "C", system_configuration_back],
+        ["WiFi Network Setup (C)", "C", system_configuration_back],
         ["Create New Node Folder (N)", "N", create_node_template],
         ["Advanced (V)", "V", advanced_back],
         ["Exit (X,ESC)", "X", terminate]
