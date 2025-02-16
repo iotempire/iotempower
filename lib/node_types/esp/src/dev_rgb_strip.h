@@ -40,7 +40,7 @@ class RGB_Strip : public RGB_Base {
         }
         virtual void show() {
             if(!started()) return;
-            controller->showLeds(); // TODO: handle brightness of showLeds?
+            controller->showLeds(255); // TODO: handle brightness of showLeds?
             // TODO: consider only computing average every 10ms
             // compute average color
             uint32_t avg_r = 0;
