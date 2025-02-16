@@ -272,7 +272,7 @@ class Device {
             return _report_change;
         }
 
-        //// set if published mqtt messages should be reatined
+        //// set if published mqtt messages should be retained
         Device& set_retained(bool retained) { 
             _retained = retained;
             return *this;
