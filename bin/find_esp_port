@@ -46,7 +46,9 @@ else
     #         break
     #     fi
     # done
-    ports=$(iot_platformio device list --serial|grep -E '^/dev/tty|/dev/cu.usbserial'|\
+    ports=$(iot_platformio device list --serial --json-output|\
+        jq -r '.[] | select(.description != "n/a" or .hwid != "n/a") | .port' |\
+        grep -E '^/dev/tty|/dev/cu.usbserial'|\
         sed s/ttyS/zzttyS/|sed s/ttyAMA/zzttyAMA/|sort|\
         sed s/zzttyS/ttyS/|sed s/zzttyAMA/ttyAMA/) # get available serial ports with ttyS and ttyAMA in end
     port=""
