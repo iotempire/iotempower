@@ -28,6 +28,14 @@ source "$IOTEMPOWER_ROOT/lib/shell_starter/config.bash" \
 #
 #cd
 
+# use nvm if installed
+NVM_DIR="$HOME/.nvm"
+if [[ -s "$NVM_DIR/nvm.sh" ]]; then
+  source "$NVM_DIR/nvm.sh"
+  export NVM_DIR
+  nvm use iotempower-node  &> /dev/null
+fi
+
 fi # ending: if [[ ! "$IOTEMPOWER_ACTIVE" = "yes"]]; then
 
 if [[ "$TERM" ]]; then # only mess with the prompt if there is TERM

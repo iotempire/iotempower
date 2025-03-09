@@ -128,7 +128,7 @@ function run() {
             ;;
         "")
             welcome
-            exec bash --noprofile --norc  # do not read again any of the environments
+            exec bash --noprofile --norc # do not read again any of the environment
             ;;
         exec | x | run | -x | -c | --exec)
             shift
