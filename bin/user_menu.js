@@ -355,6 +355,15 @@ function wifi_config() {
         "sudo /usr/bin/mcedit /boot/wifi.txt");
 }
 
+function iot_system_template(){
+    shell_command_in_path("You are about to create a folder called for a new IoT system"
+        + " Do not forget to rename this folder after"
+        + " this creation. If you are using cloudcmd, you might have to refresh to see the newly"
+        + " created folder after this action. It will be created inside the iot-systems folder",
+        'Are you sure?',
+        "create_system_template");
+}
+
 function wifi_setup_systemconf() {
     term("\n\n");
     term
@@ -402,6 +411,7 @@ function advanced(back) {
         ["Initialize Serial (I)", "I", initialize_serial], 
         // confusing - better through shell ["Compile (C)", "C", compile], 
         ["Upgrade (U)", "U", upgrade],
+        ["Create New System (S)", "S", iot_system_template],
         ["Shell Escape (S)", "S", shell_escape],
         ["Shutdown/Poweroff (O)", "O", poweroff],
         ["Back (B,X,ESC)", ["B","X"], back?menu_default:terminate]
@@ -480,6 +490,8 @@ switch(process.argv[process.argv.length - 1]) {
     case "set_wificredentials_systemconf":
         set_wificredentials_systemconf();
         break;
+    case "iot_system_template":
+        iot_system_template();
     case "poweroff":
         poweroff();
     default:

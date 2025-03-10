@@ -59,8 +59,9 @@ else
 fi
 opkg update
 
-# Install Mosquitto and its SSL libraries
-opkg install mosquitto-ssl mosquitto-client-ssl libmosquitto-ssl luci-app-mosquitto kmod-usb-net-rndis 
+# Install Mosquitto and its SSL libraries, luci-app-mosquitto, and the USB network drivers
+opkg install mosquitto-ssl libmosquitto-ssl luci-app-mosquitto kmod-usb-net-rndis 
+#kmod-usb-net-cdc-ether usbmuxd libimobiledevice usbutils kmod-usb-net
 
 ###########################
 # You can potencially Replace Dropbear to OpenSSH + SFTP by uncommenting the lines bellow
@@ -110,7 +111,18 @@ uci set wireless.default_radio0.ssid="$IOTEMPOWER_AP_NAME"
 uci set wireless.default_radio0.encryption="psk2"
 uci set wireless.default_radio0.key="$IOTEMPOWER_AP_PASSWORD"
 uci commit wireless
-wifi &
+wifi reload
+
+# Configure the new USB tethering interface
+uci set network.usb=interface
+uci set network.usb.proto='dhcp'
+uci set network.usb.ifname='eth1'
+uci commit network
+
+# Assign the firewall zone for the usb interface to wan and wan6
+uci add_list firewall.@zone[1].network='usb'
+uci add_list firewall.@zone[2].network='usb'
+uci commit firewall
 
 echo "Setting wifi credentials"
 uci set network.lan.ipaddr="$IOTEMPOWER_AP_IP"

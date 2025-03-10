@@ -41,12 +41,19 @@ fi
 #get routers inital ip from check_router_ip
 hostname="root@$ROUTER_IP"
 
-echo "!!!!! This should only be runned on a Mango router - Gl Inet MT300N -V2 !!!!!"
-echo "!!!! It will install Openwrt 23.05.5 firmware version for this router!!!!"
-echo "!!!! If you run this on any other router, there is a high chance of bricking it!!!!"
+# Define ANSI escape codes for white background and red font
+RED_BG='\033[41;37m'
+BLUE_BG='\033[44;37m'
+RESET='\033[0m'
 
- read -p "Would you like to continue with installation? (yes/no) [no]: " response
-    response=${response:-no}
+echo -e "${RED_BG}!!! This will install Openwrt 24.10.0 firmware version on the router!!!${RESET}"
+echo -e "${RED_BG}!!! This should only be installed on a Mango router - Gl Inet MT300N -V2!!!${RESET}"
+echo -e "${RED_BG}!!! If you run this on any other router, there is a high chance of bricking it!!!${RESET}"
+
+# Use echo -e to print the prompt with blue background and read to capture input
+echo -e "${BLUE_BG}Would you like to continue with installation? (yes/no) [no]: ${RESET}\c"
+read response
+response=${response:-no}
 
   if [[ "$response" =~ ^[Yy][Ee][Ss]?$ ]]; then
         ssh -o HostKeyAlgorithms=+ssh-rsa -o PubkeyAcceptedKeyTypes=+ssh-rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $hostname << EOF 
@@ -65,8 +72,8 @@ fi
 # Installs Openwrt 23.05.5 firmware on a mango
 
 cd /tmp
-wget http://downloads.openwrt.org/releases/23.05.5/targets/ramips/mt76x8/openwrt-23.05.5-ramips-mt76x8-glinet_gl-mt300n-v2-squashfs-sysupgrade.bin
-mtd -r write /tmp/openwrt-23.05.5-ramips-mt76x8-glinet_gl-mt300n-v2-squashfs-sysupgrade.bin firmware
+wget http://downloads.openwrt.org/releases/24.10.0/targets/ramips/mt76x8/openwrt-24.10.0-ramips-mt76x8-glinet_gl-mt300n-v2-squashfs-sysupgrade.bin
+mtd -r write /tmp/openwrt-24.10.0-ramips-mt76x8-glinet_gl-mt300n-v2-squashfs-sysupgrade.bin firmware
 
 EOF
 
