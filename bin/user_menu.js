@@ -411,7 +411,7 @@ function advanced(back) {
         ["Initialize Serial (I)", "I", initialize_serial], 
         // confusing - better through shell ["Compile (C)", "C", compile], 
         ["Upgrade (U)", "U", upgrade],
-        ["Create New System (S)", "S", iot_system_template],
+        ["Create New System (Y)", "Y", iot_system_template],
         ["Shell Escape (S)", "S", shell_escape],
         ["Shutdown/Poweroff (O)", "O", poweroff],
         ["Back (B,X,ESC)", ["B","X"], back?menu_default:terminate]
