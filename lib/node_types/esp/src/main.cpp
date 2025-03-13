@@ -910,7 +910,7 @@ void loop() {
             // sent out new values if measured (and time isn't too low)
             if (mqttClient.connected()) {
                 // careful, we are not reading any new sensor data during the publishing process
-                // That means, if we have sesnsors that need to monitor data over time
+                // That means, if we have sensors that need to monitor data over time
                 if (current_time - last_published >= MIN_PUBLISH_TIME_MS) {
                     // go through devices and send reports if necessary
                     if (transmission_delta > 0 &&

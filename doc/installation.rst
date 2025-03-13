@@ -34,7 +34,7 @@ After you have **git** and **curl**, Install IoTempower in the terminal with the
  
 .. code-block:: bash
 
-   curl -L https://bit.ly/iotempower | bash -
+   curl -L https://now.iotempower.us | bash -
 
 Hit enter on all questions for default settings, and if you want full features (recommended).
 
@@ -47,7 +47,7 @@ keyboard shortcuts for select, copy, past, save, and quit.
 
 .. code-block:: bash
 
-   curl -L https://bit.ly/iotempower | bash -s -- --default
+   curl -L https://now.iotempower.us | bash -s -- --default
 
 After the installation is finished, open a new terminal, and just run ``iot`` from anywhere
 (you can also run ``bash run`` in the iot directory if things go wrong,

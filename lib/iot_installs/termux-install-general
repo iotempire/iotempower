@@ -39,6 +39,8 @@ echo "Installation of $to_install complete."
 # sudo systemctl stop mosquitto
 # sudo systemctl disable mosquitto
 
+# check how to use nvm on TERMUX -> wrong binaries atm
+
 
 echo "Implementing a fix for node-gyp." # TODO verify how long that is happening
 mkdir -p "$HOME/.gyp"

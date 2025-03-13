@@ -21,12 +21,50 @@ fi
 # TODO: add option to specify input file with list of specific nodes to deploy
 
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
+#check if current router IP is correct
+router_ip=$(ip route | grep default | awk '{print $3}' | grep -E '^192\.168' | head -n 1)
 
-#!/usr/bin/env bash
+# Check if the router's IP address was found
+if [ -z "$router_ip" ]; then
+    echo "Router IP address not found."
+    echo "Please make sure you are connected to the router via ethernet and try again."
+    exit 1
+fi
 
-# Detect the router's IP address
-router_ip=$(route -n | grep 'UG[ \t]' | awk '{print $2}' | grep -E '^192\.168')
+# Prompt the user to confirm the router IP
+echo "The detected router IP is: $router_ip"
+read -p "Is this correct? (yes/no) [yes]: " response
+response=${response:-yes}
 
-# Export it as an environment variable
-export ROUTER_IP=$router_ip
-echo " You are connected to Router IP: $ROUTER_IP"
+
+# Check the result of the ping command
+for i in {1..2}; do
+# If the user says no, ask for the correct IP
+if [[ "$response" =~ ^[Nn][Oo]?$ ]]; then
+    echo "Some common IPs for OpenWRT are 192.168.1.1 or 192.168.14.1"
+    read -p "Please enter the correct router IP: " router_ip
+fi
+    # Ping check the router
+    echo "Trying to ping router to check if it is connected. Please wait a moment"
+    echo "Number of attempts: $i out of 2"
+    if ping -c 2 $router_ip > /dev/null; then
+        echo "Router $router_ip is connected."
+        # Export it as an environment variable
+        export ROUTER_IP=$router_ip
+        #echo " The Router IP: $ROUTER_IP"
+        break
+    elif [ $i -eq 2 ]; then
+        echo "Failed to connect to router, check your router IP and connectivity and try again"
+        export ROUTER_IP=null
+        exit 1
+    else
+        echo "Router is not connected. Please make sure router is connected and you have the correct IP address"
+
+    fi
+done
+
+
+
+  
+
+

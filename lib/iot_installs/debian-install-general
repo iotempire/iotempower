@@ -24,66 +24,6 @@ if ! debian-query curl > /dev/null; then
     echo "curl has been installed successfully"
 fi
 
-nvm_min_version="0.37.2"
-
-NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-
-# Check NVM version
-nvm_installed_version=$(nvm --version)
-
-if [[ -z "$nvm_installed_version" ]]; then
-    nvm_installed_version="0.0.0-notinstalled"
-fi
-
-echo $nvm_installed_versions
-if [[ "$nvm_installed_version" && "$(printf "%s\n%s" "$nvm_min_version" "$nvm_installed_version" | sort -V | head -n1)" = "$nvm_min_version" ]]; then
-    echo "NVM version is higher or equal than the minimum required version $nvm_min_version."
-else
-    echo "NVM version $nvm_installed_version is installed, it does not meet the minimum required version $nvm_min_version."
-    echo "Installing NVM version $nvm_min_version."
-    # Install or update NVM
-    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
-    export NVM_DIR="$HOME/.nvm"
-    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-fi
-
-# Define the minimum required version
-min_version="21"
-
-function check_node() {
-    # check nodejs version
-    if command -v node &> /dev/null; then
-        installed_version=$(node -v 2>/dev/null| sed 's/v//') # Remove the 'v' prefix from version
-    else
-        installed_version="0.0.0-notinstalled"
-    fi
-    # Use sort with version sort flag to compare versions, and check the first line
-    if [[ "$installed_version" && "$(printf "%s\n%s" "$min_version" "$installed_version" | sort -V | head -n1)" = "$min_version" ]]; then
-        if [ "$installed_version" = "$min_version" ] || [ "$(printf "%s\n%s" "$min_version" "$installed_version" | sort -V | head -n2 | tail -n1)" = "$installed_version" ]; then
-            echo "Node.js version $installed_version is installed, meets the minimum required version $min_version."
-        else
-            echo "Node.js version is higher than the minimum required version $min_version."
-        fi
-        return 0 # all good
-    else
-        echo "Node.js version is $installed_version, and "
-        echo "does not meet the minimum required version $min_version."
-        return 1
-    fi
-}
-
-if ! check_node; then
-   
-    echo "Trying to install current node version."
-    nvm install $min_version
-    if ! check_node; then
-        echo "A current node version could not be installed."
-        exit 1
-    fi
-fi
-
 # # on native debian gateway, we want network-manager <- TODO!
 # # connect to network
 # apt update
