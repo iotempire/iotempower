@@ -18,10 +18,12 @@ get_ips_ip() {
     ip -4 -o addr show 2>/dev/null | awk '{print $2, $4}' | grep -v '127.0.0.1'
 }
 
-# Check if running on Termux
-if [ -n "$PREFIX" ] && [ -x "$(command -v ifconfig)" ]; then
-    get_ips_ifconfig
+if [ -x "$(command -v ifconfig)" ]; then
+    if [ -n "$PREFIX" ] || [[ "$(uname)" == "Darwin" ]]; then
+        get_ips_ifconfig
+    else
+        get_ips_ip
+    fi
 else
     get_ips_ip
 fi
-

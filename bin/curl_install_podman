@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # This can be called as:
-# curl -L https://github.com/iotempire/iotempower/raw/master/bin/curl_install_docker | bash -
+# curl -L https://github.com/iotempire/iotempower/raw/master/bin/curl_install_podman | bash -
 
 command -v git &>/dev/null || { 
     echo "git is not installed. Please install it."
@@ -8,15 +8,15 @@ command -v git &>/dev/null || {
     exit 1 
     }
 
-mkdir $HOME/iot-docker
-git clone https://github.com/iotempire/iotempower "$HOME/iot-docker/repo"
+mkdir $HOME/iot-container
+git clone https://github.com/iotempire/iotempower "$HOME/iot-container/repo"
 if [ ! -d "$HOME/iot" ]; then
-    ln -s "$HOME/iot-docker/repo" "$HOME/iot"
+    ln -s "$HOME/iot-container/repo" "$HOME/iot"
 fi
 if [ ! -d "$HOME/iot-systems" ]; then
-    ln -s "$HOME/iot-docker/iot-systems" "$HOME/iot-systems"
+    ln -s "$HOME/iot-container/iot-systems" "$HOME/iot-systems"
 fi
-cd "$HOME/iot-docker/repo" || exit 1
+cd "$HOME/iot-container/repo" || exit 1
 git config pull.rebase false
 bin/iot_activate_iot_script "examples/scripts/iot-podman"
 podman pull docker.io/ulno/iotempower

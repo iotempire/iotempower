@@ -88,4 +88,4 @@ EXPOSE 1883 40080
 
 # TODO:
 # - integrate home directory as volumes nicely - maybe only share iot-systems? <- in process
-#   check examples/script/iot-docker
+#   check examples/script/iot-container

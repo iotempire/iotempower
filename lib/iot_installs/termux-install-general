@@ -24,7 +24,7 @@ termux-install $to_install
 echo "Installation of $to_install complete."
 
 # TODO: need to uninstall python-pip-glibc?
-PACKAGE_LIST="ncurses-utils which glibc-runner git-glibc build-essential binutils binutils-glibc sed-glibc gcc-glibc git git-glibc mosquitto python python-ensurepip-wheels python-pip python-cryptography python-glibc make make-glibc rsync jq nodejs libsodium libsodium-glibc iproute2"
+PACKAGE_LIST="ncurses-utils which glibc-runner git-glibc build-essential binutils binutils-glibc sed-glibc gcc-glibc git git-glibc mosquitto python python-ensurepip-wheels python-pip python-cryptography python-glibc make make-glibc rsync jq nodejs libsodium libsodium-glibc iproute2 ipcalc"
 to_install=$(filter_packages debian-query $PACKAGE_LIST)
 
 echo "Installing: $to_install..."
