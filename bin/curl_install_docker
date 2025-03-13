@@ -18,7 +18,7 @@ if [ ! -d "$HOME/iot-systems" ]; then
 fi
 cd "$HOME/iot-container/repo" || exit 1
 git config pull.rebase false
-bin/iot_activate_iot_script "examples/scripts/iot-container"
+bin/iot_activate_iot_script "examples/scripts/iot-docker"
 docker pull ulno/iotempower
 
 # run it
