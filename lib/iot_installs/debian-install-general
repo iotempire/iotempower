@@ -35,7 +35,7 @@ fi
 # should also adjust /etc/systemd/logind.conf to prevent sleeping when lid closed
 
 # procps allows pkill and ps
-PACKAGE_LIST="build-essential git procps mosquitto-clients virtualenv python3-venv python3-dev make rsync openssh-client haveged jq"
+PACKAGE_LIST="build-essential git procps mosquitto-clients virtualenv python3-venv python3-dev make rsync openssh-client haveged jq man"
 to_install=$(filter_packages debian-query $PACKAGE_LIST)
 
 echo "Installing: $to_install..."

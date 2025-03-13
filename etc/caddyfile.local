@@ -1,7 +1,8 @@
 {
 	skip_install_trust
 	http_port 40080
-	default_bind localhost
+	# listen on all interfaces (important for docker/podman)
+	# default_bind localhost
 	#	debug
 }
 :40080 {
