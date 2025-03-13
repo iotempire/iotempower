@@ -35,4 +35,4 @@ gc.properties
 cache.properties
 buildOutput*/
 
-package.json
+.DS_Store
