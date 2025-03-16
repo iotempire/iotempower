@@ -162,9 +162,10 @@ if check_root; then
     else
         # check if we are in iotempower docker
         if [[ -d "$HOME/data"  && -e "$HOME/iot-local-docker.tar.xz"  ]]; then
-            echo "Initializing docker container on first run..."
+            echo "Initializing container on first run..."
             cd "$HOME/data"
-            tar xaf "$HOME/iot-local-docker.tar.xz"
+            tar xaf "$HOME/iot-local-docker.tar.xz" --no-same-owner --no-same-permissions # permission fix is also for MacOS
+            chmod 755 /iot/data/repo/.local/bin/shebang_run # fix trouble on MacOS
             cd "$current_path" # back to where we have been called
             echo "... done."
             echo
