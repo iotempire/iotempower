@@ -22,4 +22,4 @@ bin/iot_activate_iot_script "examples/scripts/iot-docker"
 docker pull ulno/iotempower
 
 # run it
-examples/scripts/iot-container
+examples/scripts/iot-docker
