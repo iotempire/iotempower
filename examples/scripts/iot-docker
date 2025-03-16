@@ -41,15 +41,8 @@ function start() {
     fi
 }
 
-if docker ps | grep -q "$IOTEMPOWER_CONTAINER_NAME"; then
+if docker ps -a --filter "name=$IOTEMPOWER_CONTAINER_NAME" | grep -q "$IOTEMPOWER_CONTAINER_NAME"; then
     start "$@"
-    # # Check if the container is already running
-    # if docker ps | grep -qw $IOTEMPOWER_CONTAINER_NAME; then
-    #     exec docker exec -it "$IOTEMPOWER_CONTAINER_NAME" "iot" "$@"
-    # else
-    #     docker start -i "$IOTEMPOWER_CONTAINER_NAME"
-    #     # TODO: think how parameter can be forwarded and current directory be found
-    # fi
 else
     docker run -d --rm --name "$IOTEMPOWER_CONTAINER_NAME" \
         -p 40080:40080 \

@@ -41,21 +41,8 @@ function start() {
   fi
 }
 
-if podman ps -q | grep -q "$IOTEMPOWER_CONTAINER_NAME"; then
+if podman ps -a --filter "name=$IOTEMPOWER_CONTAINER_NAME" | grep -q "$IOTEMPOWER_CONTAINER_NAME"; then
   start "$@"
-  # # Check if the container is already running
-  # if podman list --quiet | grep -qw $IOTEMPOWER_CONTAINER_NAME; then
-  #   exec podman exec -it "$IOTEMPOWER_CONTAINER_NAME" "iot" "$@"
-  # else
-  #   # Podman doesn't support starting existing containers, it needs recreating
-  #   echo "Container not found, starting a new one..."
-  #   podman run -d --rm --name "$IOTEMPOWER_CONTAINER_NAME" \
-  #     -p 40080:40080 \
-  #     -p 1883:1883 \
-  #     -v "$IOTEMPOWER_CONTAINER_SHARE:/iot/data" \
-  #     ulno/iotempower > /dev/null
-  #   start "$@"
-  # fi
 else
   podman run -d --rm --name "$IOTEMPOWER_CONTAINER_NAME" \
     -p 40080:40080 \
