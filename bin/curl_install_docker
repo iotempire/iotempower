@@ -18,8 +18,7 @@ if [ ! -d "$HOME/iot-systems" ]; then
 fi
 cd "$HOME/iot-container/repo" || exit 1
 git config pull.rebase false
-export IOTEMPOWER_ROOT="$HOME/iot-container/repo"
-iot_activate_iot_script "$IOTEMPOWER_ROOT/examples/scripts/iot-docker"
+IOTEMPOWER_ROOT="$HOME/iot-container/repo" bin/iot_activate_iot_script "$IOTEMPOWER_ROOT/examples/scripts/iot-docker"
 docker pull ulno/iotempower
 
 # run it (and unpack the environment)
