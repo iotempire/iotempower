@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 # This can be called as:
-# curl -L bit.ly/iotempower | bash -
+# curl -L now.iotempower.us | bash -
+#
 # If you use -s, you can add parameters to the install script
-# (all the ones that iot_install understand,, --something commands have to be added after --)
+# (all the ones that iot_install understands, long commands 
+# like "--something" commands have to be added after --)
 # Example: curl -L bit.ly/iotempower | bash -s -- --default
 
 command -v git &>/dev/null || { 

@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 # This can be called as:
-# curl -L https://github.com/iotempire/iotempower/raw/master/bin/curl_install_docker | bash -
+# curl -L docker.iotempower.us | bash -
+#
+# If you use -s, you can add parameters to the install script
+# (all the ones that iot_install understands, long commands 
+# like "--something" commands have to be added after --)
+# Example: curl -L docker.iotempower.us | bash -s -- x iot_menu
 
 command -v git &>/dev/null || { 
     echo "git is not installed. Please install it."
@@ -22,4 +27,4 @@ IOTEMPOWER_ROOT="$HOME/iot-container/repo" bin/iot_activate_iot_script "$HOME/io
 docker pull ulno/iotempower
 
 # run it (and unpack the environment)
-bash "$IOTEMPOWER_ROOT/examples/scripts/iot-docker"
+bash "$IOTEMPOWER_ROOT/examples/scripts/iot-docker" "$@" < /dev/tty
