@@ -3,9 +3,11 @@
 # curl -L docker.iotempower.us | bash -
 #
 # If you use -s, you can add parameters to the install script
-# (all the ones that iot_install understands, long commands 
+# (for example you can call the tests directly, long commands 
 # like "--something" commands have to be added after --)
 # Example: curl -L docker.iotempower.us | bash -s -- x iot_menu
+#
+# you can overwrite the repo to use with setting IOTEMPOWER_REPO to your repo url
 
 command -v git &>/dev/null || { 
     echo "git is not installed. Please install it."
