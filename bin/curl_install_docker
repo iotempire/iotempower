@@ -14,7 +14,7 @@ command -v git &>/dev/null || {
     }
 
 mkdir $HOME/iot-container
-if[ -z "$IOTEMPOWER_REPO" ]; then
+if [ -z "$IOTEMPOWER_REPO" ]; then
     IOTEMPOWER_REPO="https://github.com/iotempire/iotempower"
 fi
 git clone "$IOTEMPOWER_REPO" "$HOME/iot-container/repo"
