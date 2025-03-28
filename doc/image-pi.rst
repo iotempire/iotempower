@@ -25,7 +25,7 @@ Make sure to resize the image at one point with the DietPi tools
 
 - Write the image to an (at least) 8GB class-10 sd-card with 
   `Etcher <https://www.balena.io/etcher/>`_
-  (works on Windows, MacOS, or Linux).
+  (works on Windows, MacOS, or Linux) and don't forget to expand the filesystem later on.
 
 Top: `ToC <index-doc.rst>`_, Previous: `Installation <installation.rst>`_,
 Next: `First IoT Node <first-node.rst>`_.
