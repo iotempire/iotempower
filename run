@@ -166,6 +166,7 @@ if check_root; then
             cd "$HOME/data"
             tar xaf "$HOME/iot-local-docker.tar.xz" --no-same-owner --no-same-permissions # permission fix is also for MacOS
             chmod 755 /iot/data/repo/.local/bin/shebang_run # fix trouble on MacOS
+            fix_bin # update binaries in local - TODO: check when this breaks
             cd "$current_path" # back to where we have been called
             echo "... done."
             echo
