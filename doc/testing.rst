@@ -57,7 +57,7 @@ The testing folder for the IoTempower project is located at `iot/tests`. The fil
 Software Configuration and File Descriptions
 -----------------
 
-1. **conf_data.py**: Contains configurations and test cases used by the test files. This file includes several variables:
+1.  **conf_data.py**: Contains configurations and test cases used by the test files. This file includes several variables:
     
     - `packages`: A list of dictionaries which hold values for dependency names and nature of the dependency. Important for `test_installations`.
     
@@ -98,15 +98,15 @@ Software Configuration and File Descriptions
     
     - `deploy_device_address`, `tester_device_address`, `tested_device_address`: Explained in `Hardware configuration`_ part below.
 
-2. **test_installations.py**: Checks if your installations are complete. This test ensures that all the selected dependencies are correctly installed and configured so that IoTempower works properly. The input file for this test is `installation.json`, which is generated during the installation period and saves your selection of dependencies. Some dependencies are not crucial and are only installed for specific features. If you are using a Docker image or Raspberry Pi image, there is no need to run these tests as they have already been checked.
+2.  **test_installations.py**: Checks if your installations are complete. This test ensures that all the selected dependencies are correctly installed and configured so that IoTempower works properly. The input file for this test is `installation.json`, which is generated during the installation period and saves your selection of dependencies. Some dependencies are not crucial and are only installed for specific features. If you are using a Docker image or Raspberry Pi image, there is no need to run these tests as they have already been checked.
     - **Purpose**: To verify that all dependencies are installed and configured correctly.
     - **Input**: `installation.json`, generated during installation.
     - **Note**: Not necessary if using Docker or Raspberry Pi images.
 
-3. **test_compile.py**: Tests the compilation process. The compilation is a process where the framework takes node configurations and generates binary files to upload to the actual device. This process can be done in a fully isolated manner. In `data.py`, there is an example where:
-   - `boards` variable lists all devices.
-   - `devices` variable lists sensor names and syntaxes that can be compiled with all boards.
-   - `isolated_combinations_to_test` variable contains combinations of sensors and boards that can only run on specific boards.
+3.  **test_compile.py**: Tests the compilation process. The compilation is a process where the framework takes node configurations and generates binary files to upload to the actual device. This process can be done in a fully isolated manner. In `data.py`, there is an example where:
+    - `boards` variable lists all devices.
+    - `devices` variable lists sensor names and syntaxes that can be compiled with all boards.
+    - `isolated_combinations_to_test` variable contains combinations of sensors and boards that can only run on specific boards.
 
     - **Purpose**: To verify that node configurations can be compiled into binary files for devices.
     - **Details**:
@@ -114,10 +114,10 @@ Software Configuration and File Descriptions
       - `isolated_combinations_to_test` contains specific sensor-board combinations.
     - **Example**: Refer to `data.py` for how devices and sensors are combined.
 
-4. **test_deployment.py**: Requires a Raspberry Pi device to be connected to the network. Normally, the Pi registers itself in the local network under the name `iotgateway`. If this is not the case for you, change the `gateway_host` variable in `conf_data.py`. You should configure SSH connection before running tests (see details at "https://www.ssh.com/academy/ssh/copy-id"). The actual testing parameters are assigned to the `cases_for_deployment` variable, which is a list of tuples. Each tuple represents a separate test and holds three values:
-   - The board name for `node.conf` file.
-   - A list of lines for `setup.cpp` file.
-   - A list of tuples where each tuple contains an MQTT topic and the expected payload from that topic.
+4.  **test_deployment.py**: Requires a Raspberry Pi device to be connected to the network. Normally, the Pi registers itself in the local network under the name `iotgateway`. If this is not the case for you, change the `gateway_host` variable in `conf_data.py`. You should configure SSH connection before running tests (see details at "https://www.ssh.com/academy/ssh/copy-id"). The actual testing parameters are assigned to the `cases_for_deployment` variable, which is a list of tuples. Each tuple represents a separate test and holds three values:
+    - The board name for `node.conf` file.
+    - A list of lines for `setup.cpp` file.
+    - A list of tuples where each tuple contains an MQTT topic and the expected payload from that topic.
 
     - **Purpose**: To verify that the deployment process works correctly on a Raspberry Pi.
     - **Details**:
@@ -125,7 +125,7 @@ Software Configuration and File Descriptions
       - Configure SSH as described at "https://www.ssh.com/academy/ssh/copy-id".
       - `cases_for_deployment` lists test cases, each with a board name, setup lines, and MQTT topic-payload expectations.
 
-5. **test_hardware.py**: The statements for `test_deployment` is also applicable for this test. And you should have at least to dongles connected PI for tester and tested roles.
+5.  **test_hardware.py**: The statements for `test_deployment` is also applicable for this test. And you should have at least to dongles connected PI for tester and tested roles.
     - **Purpose**: To verify that after the deployment process the physical changes also takes effect rather than seeing those changes in serial or MQTT channel.
     - **Details**: `cases_for_hardware` lists test cases and new tests cases should be added to that list.
 
