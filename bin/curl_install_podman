@@ -3,9 +3,9 @@
 # curl -L podman.iotempower.us | bash -
 #
 # If you use -s, you can add parameters to the install script
-# (for example you can call the tests directly, long commands 
-# like "--something" commands have to be added after --)
-# Example: curl -L podman.iotempower.us | bash -s -- x iot_menu
+# (for example you can call the tests directly, 
+# commands have to be added after --)
+# Example: curl -L podman.iotempower.us | bash -s -- test compilation
 #
 # you can overwrite the repo to use with setting IOTEMPOWER_REPO to your repo url
 
