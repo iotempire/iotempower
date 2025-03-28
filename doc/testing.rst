@@ -9,7 +9,16 @@ The **Testing IoTempower** project focuses on ensuring the robustness and reliab
 Running Tests
 -------------
 
-To run the tests:
+The easiest way to run the tests, is to just call ``iot test``, this will run all the tests
+(however careful, you will have to setup something before
+you can run deploy and hardware tests - see below).
+
+To just run all compilation tests, just call ``iot test compile``.
+
+If you want to run only specific tests, you can specify ``--boards`` and/or ``devices``.
+For example: ``iot test compile --boards=wemos_d1_mini,esp32 --devices=laser_distance``
+
+To run the tests the classic pythonic way:
 
 1. Navigate to the `tests` folder.
 2. Activate the IoT environment by typing `iot` (if it hasn't been activated already).
@@ -23,7 +32,7 @@ To run the tests:
 
    .. code-block:: shell
 
-       pytest -s -v test_deployment.py
+       pytest -s -v test_deploy.py
 
 5. To run a specific test with board and device parameters, use the following command:
 
@@ -114,7 +123,7 @@ Software Configuration and File Descriptions
       - `isolated_combinations_to_test` contains specific sensor-board combinations.
     - **Example**: Refer to `data.py` for how devices and sensors are combined.
 
-4.  **test_deployment.py**: Requires a Raspberry Pi device to be connected to the network. Normally, the Pi registers itself in the local network under the name `iotgateway`. If this is not the case for you, change the `gateway_host` variable in `conf_data.py`. You should configure SSH connection before running tests (see details at "https://www.ssh.com/academy/ssh/copy-id"). The actual testing parameters are assigned to the `cases_for_deployment` variable, which is a list of tuples. Each tuple represents a separate test and holds three values:
+4.  **test_deploy.py**: Requires a Raspberry Pi device to be connected to the network. Normally, the Pi registers itself in the local network under the name `iotgateway`. If this is not the case for you, change the `gateway_host` variable in `conf_data.py`. You should configure SSH connection before running tests (see details at "https://www.ssh.com/academy/ssh/copy-id"). The actual testing parameters are assigned to the `cases_for_deployment` variable, which is a list of tuples. Each tuple represents a separate test and holds three values:
     - The board name for `node.conf` file.
     - A list of lines for `setup.cpp` file.
     - A list of tuples where each tuple contains an MQTT topic and the expected payload from that topic.
@@ -125,7 +134,7 @@ Software Configuration and File Descriptions
       - Configure SSH as described at "https://www.ssh.com/academy/ssh/copy-id".
       - `cases_for_deployment` lists test cases, each with a board name, setup lines, and MQTT topic-payload expectations.
 
-5.  **test_hardware.py**: The statements for `test_deployment` is also applicable for this test. And you should have at least to dongles connected PI for tester and tested roles.
+5.  **test_hardware.py**: The statements for `test_deploy.py` is also applicable for this test. And you should have at least to dongles connected PI for tester and tested roles.
     - **Purpose**: To verify that after the deployment process the physical changes also takes effect rather than seeing those changes in serial or MQTT channel.
     - **Details**: `cases_for_hardware` lists test cases and new tests cases should be added to that list.
 
