@@ -156,8 +156,8 @@ if check_root; then
     check_install
     installed=$?
     cd "$current_path" # back to where we have been called
-    # If installed is detected or any argument is given
-    if [ $installed -eq 0 ] || [ $# -gt 0 ]; then
+    # If installed is detected
+    if [ $installed -eq 0 ]; then
         run "$@"
     else
         # check if we are in iotempower docker
@@ -170,9 +170,15 @@ if check_root; then
             echo "... done."
             echo
             run "$@"
-        else
-            if install; then # if it failed, try to install first
+        else # not in docker and not installed
+            # if any argument is given
+            if [ $# -gt 0 ]; then
+                # skip installation
                 run "$@"
+            else # no arguments and not installed
+                if install; then # if it failed, try to install first
+                    run "$@"
+                fi
             fi
         fi
     fi
