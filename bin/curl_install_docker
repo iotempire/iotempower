@@ -7,7 +7,9 @@
 # commands have to be added after --)
 # Example: curl -L docker.iotempower.us | bash -s -- test compilation
 #
-# you can overwrite the repo to use with setting IOTEMPOWER_REPO to your repo url
+# You can overwrite the repo to use with setting IOTEMPOWER_REPO to your repo url
+# to test an IoTempower local repo that is checked out to ~/iot, you can run this:
+# cat iot/bin/curl_install_docker | IOTEMPOWER_REPO=~/iot bash -s -- test compilation
 
 command -v git &>/dev/null || { 
     echo "git is not installed. Please install it."
