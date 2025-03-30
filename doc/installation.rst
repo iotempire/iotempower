@@ -7,8 +7,8 @@ up and running. The easiest is to run our install script like described below.
 
 
 
-Linux, MacOS, Termux and WSL
-----------------------------
+Linux, MacOS, Termux and WSL 2
+------------------------------
 
 For all systems, make sure you have **git** and **curl** installed.
 
@@ -58,6 +58,34 @@ should have changed and started now with IoT),
 start configuring your first IoT node,
 see `First IoT Node <first-node.rst>`_.
 
+Docker/Podman
+-------------
+
+To install IoTempower with docker or podman, enter a Linux environment
+and type or paste the following (this is a bit trickier in Windows than
+on other systems).
+
+.. code-block:: bash
+
+   curl -L docker.iotempower.us | bash -
+
+Respectively for podman:
+
+.. code-block:: bash
+
+   curl -L podman.iotempower.us | bash -
+
+Be aware that this environment does not yet have access to the serial ports
+(and will never have in Windows),
+therefore you will only be able to flash via the network via rfc2217.
+
+The install script tries to install the docker starter script as iot. If this did not
+succeed take a look at examples/scripts/iot-docker or iot-podman and take them as
+an executable template to enter your iot container environment with the correctly mounted
+folder. If you use these scripts, you can use them exactly like the iot script in a 
+native installation.
+
+
 Manual Installation
 -------------------
 
@@ -86,9 +114,21 @@ Manjaro gateway setup
 
 Instead of a Raspberry Pi you can use a laptop as an accesspoint for IoT instead. You can give the gateway internet via phone(tethering)
 or cable connected to the router.
-`Manjaro <https://manjaro.org/>`_ was successfully used using this practice in the IoT class of spring 2024 at the University of Tartu and chosen due to its ease of installation and a good base for the KDE plasma desktop that was giving familiarity to the students and still performant on low powered laptops.
+We successfully used `Manjaro <https://manjaro.org/>`_ in the IoT class of 
+spring 2024 at the University of Tartu. It worked well due to its ease of installation
+and provided a fimiliar base for the students with the KDE plasma desktop.
+It turned out still performant on the used low-powered laptops.
 
-Guide for Manjaro gateway setup can be found `here <manjaro-gateways-setup.rst>`_
+A guide for Manjaro gateway setup can be found `here <manjaro-gateways-setup.rst>`_
+
+Installation, using existing router
+-----------------------------------
+
+Of course, you don't have to activate the gateway function of IoTempwoer and just use it
+locally on your desktop or one of your servers.
+
+In class, we are often using the GL.Inet Mango MT300 v2. We will add some
+more information about this system architecture here soon.
 
 Top: `ToC <index-doc.rst>`_, Previous: `Tool Support <tool-support.rst>`_,
 Next: `First IoT Node <first-node.rst>`_.

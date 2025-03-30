@@ -71,7 +71,7 @@ EOF
 function check_files() {
     for file in "$@"; do
         if [ ! -e "$file" ]; then
-            echo "Can't find $file."
+            echo "Cannot find $file in environment check."
             return 1
         fi
     done
@@ -113,6 +113,11 @@ function install() {
     # run upgrade should not be necessary anymore - TODO: verify
 }
 
+function source_env() {
+    source "$IOTEMPOWER_ROOT/lib/shell_starter/iotempower.bash" \
+        || { echo "Can't read configuration. Aborting."; exit 1; }
+}
+
 function run() {
     case "$1" in
         welcome)
@@ -151,28 +156,36 @@ function run() {
 current_path="$(pwd)" # save to restore later
 if check_root; then
     export IOTEMPOWER_ROOT=$(realpath "$(pwd)")
-    source "$IOTEMPOWER_ROOT/lib/shell_starter/iotempower.bash" \
-        || { echo "Can't read configuration. Aborting."; exit 1; }
+    source_env
     check_install
     installed=$?
     cd "$current_path" # back to where we have been called
-    # If installed is detected or any argument is given
-    if [ $installed -eq 0 ] || [ $# -gt 0 ]; then
+    # If installed is detected
+    if [ $installed -eq 0 ]; then
         run "$@"
     else
-        # check if we are in iotempower docker
+        # check if we are in iotempower container
         if [[ -d "$HOME/data"  && -e "$HOME/iot-local-docker.tar.xz"  ]]; then
-            echo "Initializing container on first run..."
+            echo "Initializing container on first run."
             cd "$HOME/data"
             tar xaf "$HOME/iot-local-docker.tar.xz" --no-same-owner --no-same-permissions # permission fix is also for MacOS
             chmod 755 /iot/data/repo/.local/bin/shebang_run # fix trouble on MacOS
+            echo "Container initialized."
+            fix_bin # update binaries in local - TODO: check when this breaks
             cd "$current_path" # back to where we have been called
-            echo "... done."
             echo
+            source_env # need to source environment again as just installed
             run "$@"
-        else
-            if install; then # if it failed, try to install first
+        else # not in container and not installed
+            # if any argument is given
+            if [ $# -gt 0 ]; then
+                # skip installation
                 run "$@"
+            else # no arguments and not installed
+                if install; then # if it failed, try to install first
+                    source_env # need to source environment again as just installed
+                    run "$@"
+                fi
             fi
         fi
     fi

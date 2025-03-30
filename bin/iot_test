@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+# run different tests
+# check documentation (testing.rst) and 
+#
+# Author: ulno
+# Create date: 2025-03-28
+
+
+if [[ "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
+cat << EOF
+Syntax: iot_test [compile|deploy|hardware|install] [parameters]
+
+Run tests for IoTempower. If no test type is specified, run all tests. 
+Also can take and forward any parameters to pytest.
+EOF
+exit 1
+fi
+
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
+
+cd "$IOTEMPOWER_ROOT/tests"
+
+# check if first parameter is either compile, deploy, hardware, or install
+# and select corresponding python files - else pass through parameters
+test_type=""
+if [[ "$1" == "compile" ]]; then
+  test_type="test_compilation.py"
+elif [[ "$1" == "compilation" ]]; then
+  test_type="test_compilation.py"
+elif [[ "$1" == "deploy" ]]; then
+  test_type="test_deploy.py"
+elif [[ "$1" == "hardware" ]]; then 
+  test_type="test_hardware.py"
+elif [[ "$1" == "install" ]]; then
+  test_type="test_installations.py"
+fi
+
+if [[ "$test_type" != "" ]]; then
+  shift
+  pytest -s -v "$test_type" "$@"
+else
+  pytest -s -v "$@"
+fi
