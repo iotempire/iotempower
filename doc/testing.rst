@@ -24,19 +24,19 @@ To run the tests the classic pythonic way:
 2. Activate the IoT environment by typing `iot` (if it hasn't been activated already).
 3. Use the `pytest` testing library to run the tests. The command to run all tests is:
 
-   .. code-block:: shell
+   .. code-block:: bash
 
        pytest -s -v
 
 4. To run a specific test, append the test file name to the command. For example, to run the deployment tests:
 
-   .. code-block:: shell
+   .. code-block:: bash
 
        pytest -s -v test_deploy.py
 
 5. To run a specific test with board and device parameters, use the following command:
 
-   .. code-block:: shell
+   .. code-block:: bash
 
        pytest -s -v test_compilation.py --boards=<board1>,<board2> --devices=<device1>,<device2>
 
@@ -51,11 +51,22 @@ To run the tests the classic pythonic way:
 
    To run tests for specific boards and devices, you can use:
 
-   .. code-block:: shell
+   .. code-block:: bash
 
        pytest -s -v test_compilation.py --boards=wemos_d1_mini,esp32 --devices=laser_distance
 
    This command will execute tests for both specified boards (`wemos_d1_mini` and `esp32`) using the specified device (`laser_distance`).
+
+Docker
+------
+
+You can also run the tests of yor local repository in docker (or podman).
+You can even do a one line install and test. Assuming your working repository
+is in your home folder under iot, you can test this folder inside docker with:
+
+.. code-block:: bash
+
+   cat iot/bin/curl_install_docker | IOTEMPOWER_REPO=~/iot bash -s -- test compilation
 
 
 Contents
