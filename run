@@ -71,8 +71,7 @@ EOF
 function check_files() {
     for file in "$@"; do
         if [ ! -e "$file" ]; then
-            echo "Cannot find $file"
-            echo "in environment check."
+            echo "Cannot find $file in environment check."
             return 1
         fi
     done
