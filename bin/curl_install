@@ -19,7 +19,7 @@ if [ -z "$IOTEMPOWER_REPO" ]; then
     IOTEMPOWER_REPO="https://github.com/iotempire/iotempower"
 fi
 
-git clone $IOTEMPOWER_ROOT "$HOME/iot"
+git clone "$IOTEMPOWER_REPO" "$HOME/iot"
 cd "$HOME/iot" || exit 1
 git config pull.rebase false
 bash run x bin/iot_install "$@" < /dev/tty
