@@ -6,7 +6,11 @@ For this section, we assume that you have either
 successfully set-up IoTempower on the Raspberry Pi and are able
 to access the websites on it or setup IoTempower in your
 own Linux environment with access to a running mqtt broker and
-a running Node-RED.
+a running Node-RED. On stand-alone systems, not the raspberry pi image, 
+this is usually achieved by running ``iot x web_starter`` and then accessing
+http://gateway-ip:40080 or http://localhost:40080. You can also tunnel port
+40080 to your local computer with ``ssh iot@gateway-ip -L 40080:localhost:40080``
+assuming that your iot user on yout gateway is ``iot``.
 
 We also assume you have completed and running a node and
 system folder from `first node <first-node.rst>`_ 
@@ -61,7 +65,8 @@ New Node
     `command reference </doc/node_help/commands.rst>`_.
     (If you don't have the documentation server running,
     start it in a new terminal with ``iot doc serve`` and
-    access it at http://localhost:8001)
+    access it at http://localhost:8001 - not needed when using
+    ``web_starter``).
     
 
 -   Edit ``setup.cpp``
@@ -98,10 +103,10 @@ Visually Programming the Connections
 
 -   If you use the pi image, you can head to this `Node-RED </nodered/>`_ page
     (only works in the raspberry pi image setup - else this will lead to an undefined page).
-    Here you
-    have to probably enter username (*iot*) and password (*iotempire*) again.
+    Here you have to enter username (*admin*) and password (*iotempire*) again.
 
-    You should see a Node-RED flow with five nodes.
+    You should see a Node-RED flow with five nodes on the raspberry pi.
+    On a new installation, you will see an empty flow.
 
 -   Notable here are the two pink nodes at the sides, one labeled ``node1/b1``
     and one ``node1/blue/set`` (if you don't use the pi image, you have to create this
@@ -140,7 +145,9 @@ Visually Programming the Connections
 Congratulations!! You can remote control your led!
 
 If you still have some time, try using this new button to toggle the led.
-Study for this the filter/rbe and toggle node. (If you don't have the toggle node in Node-RED, you can get it here: https://flows.nodered.org/flow/020546215faf4bb2ca4b1ebcac609154.)
+Study for this the filter/rbe and toggle node. 
+(If you don't have the toggle node in Node-RED, you can get it here: 
+https://flows.nodered.org/flow/020546215faf4bb2ca4b1ebcac609154.)
 What is happening in them?
 
 

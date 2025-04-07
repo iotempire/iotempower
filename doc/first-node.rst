@@ -10,7 +10,7 @@ For more video instructions, check the `IoTempower YouTube Video Playlist </http
 
 
 For this section, we assume that you have IoTempower successfully set-up in your
-a Linux environment (as described 
+Linux environment (as described 
 `here </doc/installation.rst#installation-on-linux-and-wsl>`_) and that you can successfully
 enter the IoTempower environment (prompt changes to IoT).
 
@@ -24,6 +24,7 @@ IoTempower supports, among others, the following microcontroller boards
 - NodeMCU
 - Espresso Lite V2
 - esp32 webkit mini
+- M5StickC and M5StickC Plus (not yet Plus2)
 
 Creating an IoTempower System Folder
 ====================================
@@ -37,7 +38,7 @@ configuration file (we will call it, therefore `system folder`).
 In addition to the ``system.conf`` file the
 folder includes the locations and sub-locations (sub folders) of
 the nodes networked into the IoT system. This allows to model
-hierarchical nodes and connected things architecture for having
+hierarchical nodes and a connected things architecture for having
 something like ``ulnos-home-system/living-room/dining-corner/switches``
 and in there a ``node.conf`` and ``setup.cpp`` file describing a
 sonoff 3 channel switch and potential gestures on it (see also
@@ -48,7 +49,7 @@ of the cloned git repository to the
 outside of the repository. Let's assume the new system is called "demo"
 and our first node should be called "test01". (The pi image has such a folder
 setup in iot-systems. In older versions of the pi-image though there are some
-old variables in the system.conf. Pay attention too its content below.)
+old variables in the ``system.conf``. Pay attention to its content below.)
 
 To create the initial folder via the command-line, do the following:
 
@@ -59,11 +60,11 @@ To create the initial folder via the command-line, do the following:
   cd ~/iot-systems/demo
   mv node_template test01
 
-If you look at ~/iot-systems/demo/system.conf, you should see the following:
+If you look at ``~/iot-systems/demo/system.conf``, you should see the following:
 
 .. code-block:: bash
 
-  # Configuration for a iotempower system
+  # Configuration for a IoTempower system
   # Everything from etc/iotempower.conf can be overwritten here.
   # However, you will usually just overwrite the MQTT-Host and maybe
   # wifi access information
@@ -83,7 +84,7 @@ but if you later want to take this folder to a different PC and deploy from ther
 use the correct variable names to overwrite some settings (so better check
 and eventually update now than being confused later).
 
-If you have the pi-image version or cloudcmd installed, you can alternatively
+If you have the pi-image version or cloudcmd installed or web_starter is running, you can alternatively
 navigate to your `gateway's system folder </cloudcmd/fs/home/iot/iot-systems/test01>`_
 via cloudcmd. Tap F2 there and create a new node via that menu and then rename
 that folder to test01.
@@ -100,9 +101,9 @@ Depending on your network setup, we now need to figure out some ``ipconfig``
 addresses and configure things accordingly to make sure our node can
 connect to the right services.
 
-For WSL 1 in Windows
+For WSL 2 in Windows
 
-- Open the Command Prompt
+- Open a powershell
 - Run ``ipconfig``
 - Look for and note down ``IPv4 Address`` and ``Default Gateway IP`` 
 
@@ -114,7 +115,7 @@ For Linux
 - Run ``ip r``
 - Look for and note down ``default gateway via`` <address of interest>.
 
-If you have an mqtt broker like mosquitto running in your local network,
+If you have an mqtt broker like mosquitto or mqttsuite running in your local network,
 find and note down its IP address and ignore the next indented text block.
 
   If you don't have an mqtt broker running ...
@@ -147,12 +148,16 @@ find and note down its IP address and ignore the next indented text block.
   If the IP address didn't change, you can also start the mqtt broker
   now at any time with ``iot exec mqtt_broker``.
 
+  You can also try just running ``iot exec mqtt_broker scanif`` - 
+  this might guess your local ip-address correctly.
+
 Go to the folder we copied earlier:
    
 ``cd ~/iot-systems/demo``
 
-Edit the system.conf file (``nano system.conf``), uncomment and adjust
-the lines for ``IOTEMPOWER_MQTT_HOST``, (if you use cloudcmd on the pi,
+Edit the system.conf file (``nano system.conf`` - or use your favorite editor),
+uncomment and adjust
+the lines for ``IOTEMPOWER_MQTT_HOST``, (if you use cloudcmd,
 you can use the built-in editor, but if you are actually on cloudcmd on the pi-image,
 you can skip this step as the defaults will be correct):
 
@@ -187,7 +192,7 @@ Add the following line to the end of the setup.cpp file:
   .. code-block:: cpp
 
      # iot doc make  # is included in the next
-     iot doc serve
+     iot doc serve # if your are running web_starter, you can just look at the webpage on port 40080
 
   If both of these commands worked, you should now be able to go to 
   http://localhost:8001 in your browser and see some documentation
@@ -208,27 +213,50 @@ First Deployment
    In Linux (if you run in a virtual machine, pass through your serial USB
    of your microcontroller): ``deploy serial`` (or select from cloudcmd menu)
 
-   In Windows: 
+   In Windows:
+
+   - In Windows using WSL 2 or in docker, you currently can only remote flash.
+     You can just run ``compile`` instead of ``deploy serial`` and then download
+     the firmware from your build folder and flash it manually.
    
-   - Take note of the COM port number that the `Device Manager`
-     shows under `Ports` (for example (COM8) for the connected Wemos D1 Mini
-     (this particular microcontroller usually shows as USB-SERIAL CH340 (COMX)
-     with X: some kind of integer number) as seen in this screenshot.
+   - You can also setup net2ser on your router.
+     Run the following command, but replace the X with the number after COM (in the above example X = 8)
 
-     .. figure:: images/windows-serial-ports.png
-        :width: 70%
-        :figwidth: 100%
-        :align: center
-        :alt: Serial port enumeration in Windows 10 - showing 8 for connected Wemos D1 Mini
+     And, even more exciting, you can now flash devices (i.e. Wemos D1 Mini) 
+     that are connected to your openwrt router with usb port (like the Mango).
+     You need to install ser2net, luci-app-ser2net, kmod-usb-serial-ftdi, 
+     kmod-usb-serial-cp210x,  kmod-usb-serial-ch341,  kmod-usb-serial-pl2303 
+     on the openwrt router. 
+     Then configure ser2net to allow rfc2217 on port 2000 as well as add a 
+     proxy on port 5000 with the right port (for wemos d1 mini /dev/ttyUSB0)
+     and rfc2217 and cts/dts enabled (default port settings 115000 baud 8n1).
 
-   - Run the following command, but replace the X with the number after COM (in the above example X = 8)
-     
-     ``deploy serial ttySX``
+     Then you need to connect the device in force-flash-mode (on d1 mini: connect gnd and d3).
+     Now, you can flash with IoTempower using ``deploy serial rfc2217://192.168.14.1:5000``
+     or from platformio with the follwing entries in your platformio.ini:
+
+     .. code-block:: ini
+
+        [env:your_environment]
+        platform = espressif8266
+        board = nodemcuv2
+        framework = arduino
+
+        monitor_port = rfc2217://192.168.14.1:5000
+        monitor_speed = 115200
+
+        upload_port = rfc2217://192.168.14.1:5000
+        upload_speed = 115200
+
+
+     Assuming your router's local ip address is 192.168.14.1
+     (if you want the serial monitor, you need to remove the force-flash wire of course)
 
 3. Open 2 more Linux terminals (make sure you are in iot environment for all 3 terminals).
    Run a singular command on one terminal, like the following
    
-   Terminal 1: ``console_serial`` (in Linux) or in WSL 1 ``console_serial ttySX`` (like above)
+   Terminal 1: ``console_serial`` (in Linux) or in Windows you can 
+   use the Arduino-IDE serial console
 
    Terminal 2: ``mqtt_listen``
 
@@ -254,7 +282,9 @@ so-called adoption mode. For more look here: `Adoption <adopting.rst>`__
 If your serial flashing works and you don't have lots of devices to manage,
 adoption might be only of marginal interest.
 So only use it when you have gathered some experience with IoTempower.
-
+The dongle usually makes the most sense on raspberry pi IoTempower installations.
+You can probably ignore it if you have a installtion on a dedicated PC or
+in a local environment.
 
 Next deployments
 ================
