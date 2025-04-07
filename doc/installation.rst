@@ -78,6 +78,11 @@ Respectively for podman:
 Be aware that this environment does not yet have access to the serial ports
 (and will never have in Windows),
 therefore you will only be able to flash via the network via rfc2217.
+     
+Good news for our Windows users: The docker container is now also easy to install 
+if you have Docker Desktop installed and WSL 2 Ubuntu integration activated - 
+running the above command should be all you need after setting up docker
+and ubuntu in wsl 2. Then you can start iot in your WSL 2 ubuntu environment.
 
 The install script tries to install the docker starter script as iot. If this did not
 succeed take a look at examples/scripts/iot-docker or iot-podman and take them as
@@ -112,7 +117,8 @@ Please follow the instructions in the following link:
 Manjaro gateway setup
 ---------------------------------------
 
-Instead of a Raspberry Pi you can use a laptop as an accesspoint for IoT instead. You can give the gateway internet via phone(tethering)
+Instead of a Raspberry Pi you can use a laptop as an accesspoint for IoT instead. You can give the 
+gateway internet via phone(tethering)
 or cable connected to the router.
 We successfully used `Manjaro <https://manjaro.org/>`_ in the IoT class of 
 spring 2024 at the University of Tartu. It worked well due to its ease of installation
@@ -120,6 +126,7 @@ and provided a fimiliar base for the students with the KDE plasma desktop.
 It turned out still performant on the used low-powered laptops.
 
 A guide for Manjaro gateway setup can be found `here <manjaro-gateways-setup.rst>`_
+
 
 Installation, using existing router
 -----------------------------------
