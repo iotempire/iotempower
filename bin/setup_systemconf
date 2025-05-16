@@ -24,56 +24,37 @@ fi
 
 source $IOTEMPOWER_ROOT/etc/wifi_credentials
 
-if [[ -e "system.conf" ]]; then  # started from system-directory
-   #${EDITOR:-nano} system.conf # TODO how do we make it use the local default editor for all systems?
-          cat << EOF > system.conf
-         # Everything from etc/iotempower.conf can be overwritten here.
-# However, you will usually just overwrite the MQTT-Host and maybe
-# wifi access information
-
-# Name of accesspoint to connect to
-IOTEMPOWER_AP_NAME="$SSID"
-
-# Its wifi password
-IOTEMPOWER_AP_PASSWORD="$Password"
-
-# Connect data for local MQTT broker
-# If not defined, the same as IOTEMPOWERAP_IP from $IOTEMPWOER_ROOT/etc/iotempower.conf default
-#IOTEMPOWER_MQTT_HOST="192.168.12.1"
-EOF
-    echo "Wifi credentials were set"
-    exit 0
-
-else # started from somewhere else, so search for system.conf in subdirs
-
-    # first search if there is a system.conf, exit if not
-    source "$IOTEMPOWER_ROOT/bin/read_system_config"
-    path="$IOTEMPOWER_SYSTEM_CONFIG"
-    echo "this is not a system directory, searching for system.conf in parent directories"
-    
-
-    # TODO: think about running them all in parallel (or batches)
-    find -name system.conf |\
-        cd "$path"
-        cd "$(dirname "$path")"
-         #${EDITOR:-nano} system.conf # TODO how do we make it use the local default editor for all systems?
+user_input_wifi_credentials(){
+        #Write settings to file
         cat << EOF > system.conf
          # Everything from etc/iotempower.conf can be overwritten here.
 # However, you will usually just overwrite the MQTT-Host and maybe
 # wifi access information
 
 # Name of accesspoint to connect to
-IOTEMPOWER_AP_NAME="$SSID"
+IOTEMPOWER_AP_NAME="$IOTEMPOWER_AP_NAME"
 
 # Its wifi password
-IOTEMPOWER_AP_PASSWORD="$Password"
+IOTEMPOWER_AP_PASSWORD="$IOTEMPOWER_AP_PASSWORD"
+
+# IP to pick
+IOTEMPOWER_AP_IP="$IOTEMPOWER_AP_IP"
 
 # Connect data for local MQTT broker
 # If not defined, the same as IOTEMPOWERAP_IP from $IOTEMPWOER_ROOT/etc/iotempower.conf default
-IOTEMPOWER_MQTT_HOST="$GatewayIP"
+IOTEMPOWER_MQTT_HOST="$IOTEMPOWER_AP_IP"
 EOF
-    echo "Wifi credentials were set"
-    exit 0
+echo "Done. Your local wifi configuration is now set up in your system.conf file"
+echo "PRESS CTRL+D to exit"
+exit 0
+}
+if [[ -e "system.conf" ]]; then  # started from system-directory
+user_input_wifi_credentials
 
-fi # not in  a system-directory
- echo "No system.conf found, aborting."
+else
+    echo "You must be inside a system folder (or it's subfolders) to run this script"
+    echo "It must contain a file named system.conf"
+    echo "Please navigate to a IoT system folder (ussually in iot-system/your project) and try again"
+     echo "No system.conf found, aborting."
+    exit 1
+fi

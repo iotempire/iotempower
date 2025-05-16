@@ -25,7 +25,7 @@ while true; do
 
     if [[ "$IF1" ]]; then
         if [[ "$IF1" = "scanif" ]]; then
-            IF1=$(find_local_network)
+            IF1=$(find_local_network|cut -d\  -f1)
             echo "Preferred interface: $IF1"
         fi
         export IOTEMPOWER_MQTT_HOST=$(ip a show "$IF1" | grep " inet " | head -n1 | cut -d\  -f6 | cut -d/ -f1)

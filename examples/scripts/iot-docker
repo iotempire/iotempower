@@ -7,19 +7,19 @@
 # if this should run as root make sure to fix $HOME like this:
 # HOME=/home/pi
 
-export IOTEMPOWER_DOCKER_NAME="iotempower"
-export IOTEMPOWER_DOCKER_SHARE="$HOME/iot-docker"
-export IOTEMPOWER_DOCKER_CONTAINER_DIR="/iot/data"
-export IOTEMPOWER_ROOT="$IOTEMPOWER_DOCKER_SHARE/iot"
+export IOTEMPOWER_CONTAINER_NAME="iotempower"
+export IOTEMPOWER_CONTAINER_SHARE="$HOME/iot-container"
+export IOTEMPOWER_CONTAINER_DIR="/iot/data"
+export IOTEMPOWER_ROOT="$IOTEMPOWER_CONTAINER_SHARE/iot"
 
 function start() {
     # Get the absolute path of the current directory, resolving symlinks
     CURRENT_DIR=$(realpath $(pwd))
 
     # Check if the current directory is within the mounted host directory
-    if [[ "$CURRENT_DIR" =~ ^"$IOTEMPOWER_DOCKER_SHARE" ]]; then
+    if [[ "$CURRENT_DIR" =~ ^"$IOTEMPOWER_CONTAINER_SHARE" ]]; then
         # Calculate the corresponding directory inside the container
-        CONTAINER_PATH="$IOTEMPOWER_DOCKER_CONTAINER_DIR${CURRENT_DIR#$IOTEMPOWER_DOCKER_SHARE}"
+        CONTAINER_PATH="$IOTEMPOWER_CONTAINER_DIR${CURRENT_DIR#$IOTEMPOWER_CONTAINER_SHARE}"
         # Enter the Docker container at the corresponding directory
         # Forward all input parameters from "$@" (this is a bit tricky as it needs to go into docker exec)
         PARAMS=""
@@ -32,29 +32,22 @@ function start() {
         PARAMS="${PARAMS% }"
         # if the "bash" is not given, the unpacking of the tar file does not happen
         # TODO: test why this does not work
-        exec docker exec -it "$IOTEMPOWER_DOCKER_NAME" \
+        exec docker exec -it "$IOTEMPOWER_CONTAINER_NAME" \
             /bin/bash -c "cd \"$CONTAINER_PATH\" && exec bash iot $PARAMS"
     else
         echo "Current directory is outside the mounted volume."
         # Just enter the container without changing the directory but still forward parameters
-        exec docker exec -it "$IOTEMPOWER_DOCKER_NAME" "iot" "$@"
+        exec docker exec -it "$IOTEMPOWER_CONTAINER_NAME" "iot" "$@"
     fi
 }
 
-if docker ps | grep -q "$IOTEMPOWER_DOCKER_NAME"; then
+if docker ps -a --filter "name=$IOTEMPOWER_CONTAINER_NAME" | grep -q "$IOTEMPOWER_CONTAINER_NAME"; then
     start "$@"
-    # # Check if the container is already running
-    # if docker ps | grep -qw $IOTEMPOWER_DOCKER_NAME; then
-    #     exec docker exec -it "$IOTEMPOWER_DOCKER_NAME" "iot" "$@"
-    # else
-    #     docker start -i "$IOTEMPOWER_DOCKER_NAME"
-    #     # TODO: think how parameter can be forwarded and current directory be found
-    # fi
 else
-    docker run -d --rm --name "$IOTEMPOWER_DOCKER_NAME" \
+    docker run -d --rm --name "$IOTEMPOWER_CONTAINER_NAME" \
         -p 40080:40080 \
         -p 1883:1883 \
-        -v "$IOTEMPOWER_DOCKER_SHARE:/iot/data" \
+        -v "$IOTEMPOWER_CONTAINER_SHARE:/iot/data" \
         ulno/iotempower > /dev/null
     start "$@"
 fi

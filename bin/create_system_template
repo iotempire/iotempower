@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+if [[ $# -gt 1 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
+cat << EOF
+Syntax: create_system_template [name]
+
+Create a new iot system template under iot-systems.
+If name is  not given, it is called system_template else the given name.
+EOF
+exit 1
+fi
+
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
+
+# Check if we are in the iot-systems folder or a subfolder
+while [[ "$(basename "$PWD")" != "iot-systems" ]]; do
+    if [[ "$PWD" == "/" ]]; then
+        echo "Not inside iot-systems folder, aborting." 1>&2
+        exit 1
+    fi
+    cd ..
+    if [[ "$(basename "$PWD")" == "iot-systems" ]]; then
+        break
+    fi
+done
+
+name="system_template"
+if [[ "$1" ]]; then
+    name="$1"
+    echo "Trying to create new iot system with name $name."
+else
+    echo "Trying to create new iot system with name $name. Remember to rename later."
+fi
+
+if [[ -e "$name" ]]; then
+    echo "Folder $name (or a file with that name) already exists, please rename first."
+    exit 1
+else
+    cp -a "$IOTEMPOWER_ROOT/lib/system_template" "$name" && echo "Successfully created."
+fi

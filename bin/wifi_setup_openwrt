@@ -22,6 +22,28 @@ fi
 
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 echo "Setting up external OpenWRT router for IoTempower using wifi_cedentials from /etc/wifi_credentials"
-. $IOTEMPOWER_ROOT/bin/wifi_credentials
-. $IOTEMPOWER_ROOT/bin/wifi_openwrt_uci
-. $IOTEMPOWER_ROOT/bin/setup_systemconf
+if [[ -e "system.conf" ]]; then  # started from system-directory
+       # Check if router is connected
+    . $IOTEMPOWER_ROOT/bin/check_router_ip
+    # Prompt the user for SSID and password
+    . $IOTEMPOWER_ROOT/bin/wifi_credentials_temp
+    # Write settings to the router via uci
+    . $IOTEMPOWER_ROOT/bin/wifi_openwrt_uci
+    
+    # Check if the wifi_openwrt_uci command was successful
+    if [[ $? -eq 0 ]]; then
+        # Write settings to the system.conf files
+        . $IOTEMPOWER_ROOT/bin/setup_systemconf
+    else
+        echo "wifi_openwrt_uci command failed. Aborting."
+        exit 1
+    fi
+
+else
+    echo "You must be inside a system folder (or it's subfolders) to run this script"
+    echo "It must contain a file named system.conf"
+    echo "Please navigate to a IoT system folder (ussually in iot-system/your project) and try again"
+     echo "No system.conf found, aborting."
+    exit 1
+fi
+

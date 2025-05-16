@@ -153,14 +153,14 @@ function init_nodejs() {
     # if package.json does not exist, run nmp init to create it
     deactivate # termux can't do the following in venv - do we need to specialize this?
     #iot_grun npm init -y > /dev/null
-    
-    # for other platforms than termux, use nvm
-    if [ "$platform" != "termux" ]; then
-      [[ -s $HOME/.nvm/nvm.sh ]] && source "$HOME/.nvm/nvm.sh" # this loads nvm
-      nvm use 
+
+    # Try to use nvm  
+    if [[ -s $HOME/.nvm/nvm.sh ]]; then
+      source "$HOME/.nvm/nvm.sh" # this loads nvm
+      nvm use iotempower-node &> /dev/null
     fi
 
-    # check if pakage.json exists
+    # check if package.json exists
     if [ ! -f package.json ]; then
       npm init -y > /dev/null
     fi
@@ -383,8 +383,77 @@ fi
 
 if [[ "$install_system" == 1 ]]; then
   call_by_system install-general
+  
+  # if not TERMUX
+  if [[ -z "$PREFIX" ]] || command -v apt-get &> /dev/null; then
+
+
+    nvm_min_version="0.40.1"
+
+    NVM_DIR="$HOME/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+
+    # Check NVM version
+    nvm_installed_version=$(nvm --version)
+
+    if [[ -z "$nvm_installed_version" ]]; then
+        nvm_installed_version="0.0.0-notinstalled"
+    fi
+
+    echo $nvm_installed_versions
+    if [[ "$nvm_installed_version" && "$(printf "%s\n%s" "$nvm_min_version" "$nvm_installed_version" | sort -V | head -n1)" = "$nvm_min_version" ]]; then
+        echo "NVM version is higher or equal than the minimum required version $nvm_min_version."
+    else
+        echo "NVM version $nvm_installed_version is installed, it does not meet the minimum required version $nvm_min_version."
+        echo "Installing NVM version $nvm_min_version."
+        # Install or update NVM
+        curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/v$nvm_min_version/install.sh" | bash
+        export NVM_DIR="$HOME/.nvm"
+        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+  #      [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+    fi
+
+    nvm use iotempower-node  &> /dev/null
+  fi # not termux
+
+  # Define the minimum and maximum required node versions
+  min_version="20"
+  max_version="22.14.0"
+
+  function check_node() {
+      # Check if Node.js is installed
+      if command -v node &> /dev/null; then
+          installed_version=$(node -v 2>/dev/null | sed 's/v//') # Remove the 'v' prefix from version
+      else
+          installed_version="0.0.0-notinstalled"
+      fi
+
+      # Compare the installed version with the min and max versions
+      if [[ "$(printf "%s\n%s" "$min_version" "$installed_version" | sort -V | head -n1)" != "$min_version" ]]; then
+          echo "Node.js version $installed_version is below the minimum required version $min_version."
+          return 1
+      elif [[ "$(printf "%s\n%s" "$max_version" "$installed_version" | sort -V | tail -n1)" != "$max_version" ]]; then
+          echo "Node.js version $installed_version is above the maximum allowed version $max_version."
+          return 1
+      else
+          echo "Node.js version $installed_version is installed and meets the required version range ($min_version <= version <= $max_version)."
+          nvm alias iotempower-node "$installed_version"
+          return 0
+      fi
+  }
+
+  if ! check_node; then
+      echo "Trying to install the latest compatible Node.js ($max_version) version."
+      nvm install "$max_version"
+      if ! check_node; then
+          echo "Failed to install a compatible Node.js version."
+          exit 1
+      fi
+  fi
+  
   echo
-fi
+
+fi # install system
 
 if [[ "$install_core" == 1 ]]; then
   # install virtualenv

@@ -7,19 +7,19 @@
 # if this should run as root make sure to fix $HOME like this:
 # HOME=/home/pi
 
-export IOTEMPOWER_PODMAN_NAME="iotempower"
-export IOTEMPOWER_PODMAN_SHARE="$HOME/iot-docker"
-export IOTEMPOWER_PODMAN_CONTAINER_DIR="/iot/data"
-export IOTEMPOWER_ROOT="$IOTEMPOWER_PODMAN_SHARE/iot"
+export IOTEMPOWER_CONTAINER_NAME="iotempower"
+export IOTEMPOWER_CONTAINER_SHARE="$HOME/iot-container"
+export IOTEMPOWER_CONTAINER_DIR="/iot/data"
+export IOTEMPOWER_ROOT="$IOTEMPOWER_CONTAINER_SHARE/iot"
 
 function start() {
   # Get the absolute path of the current directory, resolving symlinks
   CURRENT_DIR=$(realpath $(pwd))
 
   # Check if the current directory is within the mounted host directory
-  if [[ "$CURRENT_DIR" =~ ^"$IOTEMPOWER_PODMAN_SHARE" ]]; then
+  if [[ "$CURRENT_DIR" =~ ^"$IOTEMPOWER_CONTAINER_SHARE" ]]; then
     # Calculate the corresponding directory inside the container
-    CONTAINER_PATH="$IOTEMPOWER_PODMAN_CONTAINER_DIR${CURRENT_DIR#$IOTEMPOWER_PODMAN_SHARE}"
+    CONTAINER_PATH="$IOTEMPOWER_CONTAINER_DIR${CURRENT_DIR#$IOTEMPOWER_CONTAINER_SHARE}"
     # Enter the Podman container at the corresponding directory
     # Forward all input parameters from "$@" (this is a bit tricky as it needs to go into podman exec)
     PARAMS=""
@@ -32,35 +32,22 @@ function start() {
     PARAMS="${PARAMS% }"
     # if the "bash" is not given, the unpacking of the tar file does not happen
     # TODO: test why this does not work
-    exec podman exec -it "$IOTEMPOWER_PODMAN_NAME" \
+    exec podman exec -it "$IOTEMPOWER_CONTAINER_NAME" \
       /bin/bash -c "cd \"$CONTAINER_PATH\" && exec bash iot $PARAMS"
   else
     echo "Current directory is outside the mounted volume."
     # Just enter the container without changing the directory but still forward parameters
-    exec podman exec -it "$IOTEMPOWER_PODMAN_NAME" "iot" "$@"
+    exec podman exec -it "$IOTEMPOWER_CONTAINER_NAME" "iot" "$@"
   fi
 }
 
-if podman ps -q | grep -q "$IOTEMPOWER_PODMAN_NAME"; then
+if podman ps -a --filter "name=$IOTEMPOWER_CONTAINER_NAME" | grep -q "$IOTEMPOWER_CONTAINER_NAME"; then
   start "$@"
-  # # Check if the container is already running
-  # if podman list --quiet | grep -qw $IOTEMPOWER_PODMAN_NAME; then
-  #   exec podman exec -it "$IOTEMPOWER_PODMAN_NAME" "iot" "$@"
-  # else
-  #   # Podman doesn't support starting existing containers, it needs recreating
-  #   echo "Container not found, starting a new one..."
-  #   podman run -d --rm --name "$IOTEMPOWER_PODMAN_NAME" \
-  #     -p 40080:40080 \
-  #     -p 1883:1883 \
-  #     -v "$IOTEMPOWER_PODMAN_SHARE:/iot/data" \
-  #     ulno/iotempower > /dev/null
-  #   start "$@"
-  # fi
 else
-  podman run -d --rm --name "$IOTEMPOWER_PODMAN_NAME" \
+  podman run -d --rm --name "$IOTEMPOWER_CONTAINER_NAME" \
     -p 40080:40080 \
     -p 1883:1883 \
-    -v "$IOTEMPOWER_PODMAN_SHARE:/iot/data" \
+    -v "$IOTEMPOWER_CONTAINER_SHARE:/iot/data" \
     ulno/iotempower > /dev/null
   start "$@"
 fi

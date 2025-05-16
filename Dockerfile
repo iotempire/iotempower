@@ -68,7 +68,7 @@ RUN ./run x bin/iot_install --default && \
 # 
 # # Switch to the iot user for running the services
 # USER iot
-ENV USER root
+ENV USER=root
 # 
 # Note: The VOLUME command is used to specify the mount point in the container.
 VOLUME ["$IOT_DATA"]
@@ -88,4 +88,4 @@ EXPOSE 1883 40080
 
 # TODO:
 # - integrate home directory as volumes nicely - maybe only share iot-systems? <- in process
-#   check examples/script/iot-docker
+#   check examples/script/iot-container
