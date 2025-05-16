@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+if [[ "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
+cat << EOF
+Syntax: mqtt_generate_certificates []
+
+mqtt_generate_certificates generates CA and server certificates for the MQTT broker.
+The server certificate is signed by the CA certificate.
+This is needed to enable TLS support for the MQTT broker. The CA certificate is added
+to every client's code and the server certificate has to be configure to be used by the MQTT broker.
+EOF
+exit 1
+fi
+
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
+
+source "$IOTEMPOWER_ROOT/bin/read_system_config" # to get the IOTEMPOWER_MQTT_HOST and system_path
+
+system_name=$(basename "$system_path")
+
+cert_path="$system_path/certs"
+
+mkdir -p "$cert_path"
+cd "$cert_path" || { echo "Can't change to $cert_path. Aborting." 1>&2; exit 1; }
+
+openssl ecparam -genkey -name prime256v1 -out ca.key
+openssl req -x509 -new -nodes -key ca.key -sha256 -days 3650 -out ca.crt -subj "/CN=${system_name}CA"
+
+openssl ecparam -genkey -name prime256v1 -out server.key
+openssl req -new -key server.key -out server.csr -subj "/CN=$IOTEMPOWER_MQTT_HOST"
+
+openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out server.crt -days 3650 -sha256
+
+openssl verify -CAfile ca.crt server.crt
+
