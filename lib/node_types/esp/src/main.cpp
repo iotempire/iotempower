@@ -12,12 +12,26 @@
 #include <ArduinoOTA.h>
 //#include <ESP8266WebServer.h> //Local WebServer used to serve the configuration portal - obsolete due to dongle
 
+
+#include "config-wrapper.h"
+
+#ifdef MQTT_USE_TLS
+    #include <time.h>
+
+#endif
+
 #ifdef ESP32
     // // the flash string helper broke in 6.2 - see https://github.com/espressif/arduino-esp32/issues/8108
     // #define FPSTR(pstr_pointer) (reinterpret_cast<const __FlashStringHelper *>(pstr_pointer))
     // #define F(string_literal) (FPSTR(PSTR(string_literal)))
     #include <WiFi.h>
     #include <ESPmDNS.h>
+
+    #ifdef MQTT_USE_TLS
+        #include <WiFiClientSecure.h>
+    #endif
+
+
     #ifdef BROWNOUT_DETECT_DISABLED
         #include "soc/soc.h"
         #include "soc/rtc_cntl_reg.h"
@@ -25,6 +39,11 @@
 #else
     #include <ESP8266WiFi.h>
     #include <ESP8266mDNS.h>
+
+    #ifdef MQTT_USE_TLS
+        const char mqtt_ca_cert_char[] PROGMEM = mqtt_ca_cert; 
+        BearSSL::X509List *serverTrustedCA = new BearSSL::X509List(mqtt_ca_cert_char);
+    #endif
 #endif
 //#include <FS.h> // no filesystem used
 #include <WiFiUdp.h>
@@ -64,7 +83,6 @@ String mqtt_management_topic;
 
 #include "key.h"
 
-#include "config-wrapper.h"
 
 
 // iotempower functions for user modification in setup.cpp
@@ -438,7 +456,13 @@ void flash_mode_select() {
 
 
 /// WiFi Network
-WiFiClient netClient;
+
+#ifdef MQTT_USE_TLS
+    WiFiClientSecure netClient;
+#else
+    WiFiClient netClient;
+#endif
+
 static char *my_hostname;
 
 ////////////// mqtt
@@ -484,15 +508,20 @@ void init_mqtt() {
     // if (mqtt_user[0]) { // auth given
     //     mqttClient.setCredentials(mqtt_user, mqtt_password);
     // }
+
+    #ifndef mqtt_port // set default mqtt port
+        #define mqtt_port 1883
+    #endif
+
     #ifdef mqtt_server
         // if defined, just set address
-        mqttClient.setServer(mqtt_server, 1883);
-        ulog(F("Setting mqtt server to: %s"),  mqtt_server);
+        mqttClient.setServer(mqtt_server, mqtt_port);
+        ulog(F("Setting mqtt server to: %s:%d"),  mqtt_server, mqtt_port);
     #else
         // if not defined, take gateway address
         mqtt_server_buffer.from(WiFi.gatewayIP().toString().c_str());
-        mqttClient.setServer(mqtt_server_buffer.as_cstr(), 1883);
-        ulog(F("Setting mqtt server ip to: %s"),  mqtt_server_buffer.as_cstr());
+        mqttClient.setServer(mqtt_server_buffer.as_cstr(), mqtt_port);
+        ulog(F("Setting mqtt server ip to: %s:%d"),  mqtt_server_buffer.as_cstr(), mqtt_port);
     #endif
     mqttClient.setCallback(onMqttMessage);
 }
@@ -585,11 +614,51 @@ void connectToWifi() {
         WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
     }
     ulog(F("Wifi begin called."));
+    
+    #ifdef MQTT_USE_TLS
+
+        // load certificate (generated to certificate.h in prepare_build_dir)
+        #ifdef ESP32
+            // TODO: check if there is a need to modify buffer size on esp32
+            // seems not very easy
+            netClient.setCACert(mqtt_ca_cert);
+        #else
+            // decrease the buffer size
+            netClient.setBufferSizes(512, 512); // Smallest safe buffers
+            netClient.setTrustAnchors(serverTrustedCA);
+        #endif
+    #endif
+
+
     if(WiFi.isConnected()) {
         ulog(F("Already connected to Wi-Fi with IP: %s"), WiFi.localIP());
         wifi_connected = true;
         // init_mqtt(); //AsyncMqttClient disabled in favor of PubSubClient
     }
+
+}
+
+void configureTime() {
+    ulog(F("Configuring time..."));
+    configTime(0, 0, "pool.ntp.org", "time.nist.gov", "time.windows.com");
+
+    // Wait for NTP synchronization to complete
+    ulog("Waiting for NTP synchronization...");
+    time_t now = time(nullptr);
+    unsigned int seconds = 0;
+
+    while (now < 10000)
+    { // Wait for time sync
+        delay(1000);
+        seconds++;
+        ulog(F("Waiting for NTP synchronization... %u seconds"), seconds);
+        now = time(nullptr);
+    }
+
+    struct tm timeinfo;
+    gmtime_r(&now, &timeinfo);
+    ulog(F("Current time: %s"), asctime(&timeinfo));
+    ulog(F("Time synchronized after %u seconds."), seconds);
 }
 
 void onWifiDisconnect(
@@ -801,6 +870,11 @@ void setup() {
     // #endif
 
     connectToWifi();
+
+    #ifdef MQTT_USE_TLS 
+        // Needed for certificate expiry validation to work
+        configureTime();
+    #endif
 
     if (!reconfig_mode_active) {
         mqtt_management_topic = String(F(IOTEMPOWER)) + String(F("/_cfg_/")) 
