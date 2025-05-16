@@ -44,6 +44,7 @@ source "system.conf" &> /dev/null || {
     fi
 }
 IOTEMPOWER_SYSTEM_CONFIG="$(pwd)/system.conf"
+system_path="$(pwd)"
 
 if [[ "$IOTEMPOWER_AP_NAME" != "__IOTEMPOWER_TEST__" ]]; then # was overwritten
     IOTEMPOWER_AP_NAME_FULL="$IOTEMPOWER_AP_NAME"
