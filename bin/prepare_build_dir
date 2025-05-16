@@ -154,6 +154,12 @@ EOF
 EOF
     fi
 
+    if [[ "$mqtt_port" ]]; then
+        cat >> "$fname.new" << EOF
+#define mqtt_port $mqtt_port
+EOF
+    fi
+
     cat >> "$fname.new" << EOF
 #define mqtt_user "$mqtt_user"
 #define mqtt_password "$mqtt_password"
@@ -162,6 +168,25 @@ EOF
     if [[ "$IOTEMPOWER_MQTT_DISCOVERY_PREFIX" ]]; then
         echo '#define mqtt_discovery_prefix "'$IOTEMPOWER_MQTT_DISCOVERY_PREFIX'"' >> "$fname.new"
     fi
+
+    if [[ "$IOTEMPOWER_MQTT_USE_TLS" == 1 ]]; then
+        echo '#define MQTT_USE_TLS' >> "$fname.new"
+
+        # Add CA certificate to config.h
+        cert_file="$system_path/certs/ca.crt"
+        if [[ -e "$cert_file" ]]; then
+            {
+                echo -n "#define mqtt_ca_cert \""
+                sed 's/\\/\\\\/g; s/"/\\"/g; s/$/\\n/' "$cert_file" | tr -d '\n'
+                echo "\""
+            } >> "$fname.new"
+        else
+            echo "CA certificate not found at $cert_file. TLS will not work." 1>&2;
+            exit 1;
+        fi
+
+    fi
+
     replace_if_new "$fname.new" "$fname"
     ## end: create node-specific config file.
 
