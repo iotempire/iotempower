@@ -49,7 +49,9 @@ IOTEMPOWER_AP_HOSTNAME="iotgateway"
 #IOTEMPOWER_MQTT_HOST="mosquitto-host"
 
 # Port for the MQTT broker
-# if not defined, uses 1883
+# if not defined, defaults to
+# 1883 without TLS
+# 8883 when TLS is enabled
 #IOTEMPOWER_MQTT_PORT=1883
 
 # Enable TLS for MQTT 

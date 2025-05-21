@@ -509,8 +509,12 @@ void init_mqtt() {
     //     mqttClient.setCredentials(mqtt_user, mqtt_password);
     // }
 
-    #ifndef mqtt_port // set default mqtt port
-        #define mqtt_port 1883
+    #ifndef mqtt_port // set default mqtt port depending on TLS
+        #ifdef MQTT_USE_TLS
+            #define mqtt_port 8883
+        #else
+            #define mqtt_port 1883
+        #endif
     #endif
 
     #ifdef mqtt_server
