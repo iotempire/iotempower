@@ -3,7 +3,7 @@ Installation
 ============
 
 There are several ways to get the IoTempower configuration management software
-up and running. The easiest is to run our install script like described below.
+up and running. The easiest way is to run our install script like described below.
 
 
 
@@ -14,7 +14,7 @@ For all systems, make sure you have **git** and **curl** installed.
 
 * Arch-based system (like vanilla Arch or Manjaro)
 
-  ``sudo pacman -S git curl`` 
+  ``sudo pacman -S git curl``
 
 * Debian-based system (like Ubuntu or Mint). WSL is probably similar to this.
   We highly recommend **against** using WSL 2 as the networking is currently
@@ -23,15 +23,15 @@ For all systems, make sure you have **git** and **curl** installed.
   ``sudo apt-get install git curl``
 
 * Termux-based system (https://termux.dev) can be used on Android
-  
+
   ``apt-get install git curl``
- 
-* MacOS install homebrew (https://brew.sh/) and then run 
-   
+
+* MacOS install homebrew (https://brew.sh/) and then run
+
   ``brew install git curl``
 
 After you have **git** and **curl**, Install IoTempower in the terminal with the following:
- 
+
 .. code-block:: bash
 
    curl -L https://now.iotempower.us | bash -
@@ -78,16 +78,16 @@ Respectively for podman:
 Be aware that this environment does not yet have access to the serial ports
 (and will never have in Windows),
 therefore you will only be able to flash via the network via rfc2217.
-     
-Good news for our Windows users: The docker container is now also easy to install 
-if you have Docker Desktop installed and WSL 2 Ubuntu integration activated - 
+
+Good news for our Windows users: The docker container is now also easy to install
+if you have Docker Desktop installed and WSL 2 Ubuntu integration activated -
 running the above command should be all you need after setting up docker
 and ubuntu in wsl 2. Then you can start iot in your WSL 2 ubuntu environment.
 
 The install script tries to install the docker starter script as iot. If this did not
 succeed take a look at examples/scripts/iot-docker or iot-podman and take them as
 an executable template to enter your iot container environment with the correctly mounted
-folder. If you use these scripts, you can use them exactly like the iot script in a 
+folder. If you use these scripts, you can use them exactly like the iot script in a
 native installation.
 
 
@@ -113,14 +113,14 @@ You can download and flash a pre-prepared Raspberry Pi image to an sd card
 and run the IoTempower (gateway and configuration management software) on a Raspberry Pi.
 Please follow the instructions in the following link:
 `Installation on Raspberry Pi <installation-raspberry-pi.rst>`_
-   
+
 Manjaro gateway setup
 ---------------------------------------
 
-Instead of a Raspberry Pi you can use a laptop as an accesspoint for IoT instead. You can give the 
+Instead of a Raspberry Pi you can use a laptop as an accesspoint for IoT instead. You can give the
 gateway internet via phone(tethering)
 or cable connected to the router.
-We successfully used `Manjaro <https://manjaro.org/>`_ in the IoT class of 
+We successfully used `Manjaro <https://manjaro.org/>`_ in the IoT class of
 spring 2024 at the University of Tartu. It worked well due to its ease of installation
 and provided a fimiliar base for the students with the KDE plasma desktop.
 It turned out still performant on the used low-powered laptops.
