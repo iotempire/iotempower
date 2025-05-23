@@ -154,11 +154,6 @@ EOF
 EOF
     fi
 
-    if [[ "$mqtt_port" ]]; then
-        cat >> "$fname.new" << EOF
-#define mqtt_port $mqtt_port
-EOF
-    fi
 
     cat >> "$fname.new" << EOF
 #define mqtt_user "$mqtt_user"
@@ -173,18 +168,22 @@ EOF
         echo '#define MQTT_USE_TLS' >> "$fname.new"
 
         # Add CA certificate to config.h
-        cert_file="$system_path/certs/ca.crt"
-        if [[ -e "$cert_file" ]]; then
-            {
-                echo -n "#define mqtt_ca_cert \""
-                sed 's/\\/\\\\/g; s/"/\\"/g; s/$/\\n/' "$cert_file" | tr -d '\n'
-                echo "\""
-            } >> "$fname.new"
+        if [[ "$IOTEMPOWER_MQTT_CERT_FOLDER"]]; then
+            cert_file="$IOTEMPOWER_MQTT_CERT_FOLDER/ca.crt"
+            if [[ -e "$cert_file" ]]; then
+                {
+                    echo -n "#define mqtt_ca_cert \""
+                    sed 's/\\/\\\\/g; s/"/\\"/g; s/$/\\n/' "$cert_file" | tr -d '\n'
+                    echo "\""
+                } >> "$fname.new"
+            else
+                echo "CA certificate not found at $cert_file. TLS will not work." 1>&2;
+                exit 1;
+            fi
         else
-            echo "CA certificate not found at $cert_file. TLS will not work." 1>&2;
+            echo "IOTEMPOWER_MQTT_CERT_FOLDER not defined. Please define to use TLS with MQTT." 1>&2;
             exit 1;
         fi
-
     fi
 
     replace_if_new "$fname.new" "$fname"
