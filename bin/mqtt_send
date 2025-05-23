@@ -37,5 +37,10 @@ fi
 
 shift
 
+ca_file_option=""
+if [[ "$IOTEMPOWER_MQTT_USE_TLS" == 1 ]]; then
+    ca_file_option=(--cafile "$IOTEMPOWER_MQTT_CERT_FOLDER/ca.crt")
+fi
+
 echo "Trying to send $@ to mqtt://$IOTEMPOWER_MQTT_HOST/$topic." >&2
-exec mosquitto_pub -h "$IOTEMPOWER_MQTT_HOST" -t "$topic" -m "$*"
+exec mosquitto_pub -h "$IOTEMPOWER_MQTT_HOST" "${ca_file_option[@]}" -t "$topic" -m "$*"
