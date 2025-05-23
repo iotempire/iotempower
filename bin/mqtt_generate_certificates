@@ -5,6 +5,7 @@ cat << EOF
 Syntax: mqtt_generate_certificates []
 
 mqtt_generate_certificates generates CA and server certificates for the MQTT broker.
+The files are saved to folder marked in $IOTEMPOWER_MQTT_CERT_FOLDER or if not specified, into {current_system_root}/certs folder.
 The server certificate is signed by the CA certificate.
 This is needed to enable TLS support for the MQTT broker. The CA certificate is added
 to every client's code and the server certificate has to be configure to be used by the MQTT broker.
@@ -16,9 +17,10 @@ fi
 
 source "$IOTEMPOWER_ROOT/bin/read_system_config" # to get the IOTEMPOWER_MQTT_HOST and system_path
 
-system_name=$(basename "$system_path")
 
-cert_path="$system_path/certs"
+cert_path="$IOTEMPOWER_MQTT_CERT_FOLDER"
+
+echo "$system_name"
 
 mkdir -p "$cert_path"
 cd "$cert_path" || { echo "Can't change to $cert_path. Aborting." 1>&2; exit 1; }
