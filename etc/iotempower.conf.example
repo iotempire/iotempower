@@ -48,16 +48,14 @@ IOTEMPOWER_AP_HOSTNAME="iotgateway"
 # if not defined, the same as IOTEMPOWER_AP_IP
 #IOTEMPOWER_MQTT_HOST="mosquitto-host"
 
-# Port for the MQTT broker
-# if not defined, defaults to
-# 1883 without TLS
-# 8883 when TLS is enabled
-#IOTEMPOWER_MQTT_PORT=1883
-
 # Enable TLS for MQTT 
 # requires certificates to be configured for the broker
 # and CA certificate in PEM format should be in the system_root/certs folder as ca.crt
 #IOTEMPOWER_MQTT_USE_TLS=1
+
+# Set the MQTT server and CA certificate folder
+# if not defined, defaults to {current_system_root}/certs
+#IOTEMPOWER_MQTT_CERT_FOLDER=""
 
 # Username and password for devices to use mqtt
 # If user not defined, do not use user authentication
