@@ -23,6 +23,8 @@ Table of Contents
 
 - `First IoT Node </doc/first-node.rst>`_
 
+- `MQTT via TLS </doc/mqtt-with-tls.rst>`_
+
 - `External Resources </doc/resources.rst>`_
 
 - `Support </doc/support.rst>`_

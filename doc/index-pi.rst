@@ -27,6 +27,8 @@ Here is *more documentation*:
 
 - `Command reference for nodes </doc/node_help/commands.rst>`_
 
+- `Using MQTT via TLS </doc/mqtt-with-tls.rst>`_
+
 - `IoTempower YouTube Playlist <https://www.youtube.com/playlist?list=PLlppUpfgGsvkfAGJ38_mzQc1-_Z7bNOgq>`_
 
 
