@@ -42,5 +42,14 @@ else
     topic="#"
 fi
 
+ca_file_option=""
+if [[ "$IOTEMPOWER_MQTT_USE_TLS" == 1 ]]; then
+    if [[ ! "$IOTEMPOWER_MQTT_CERT_FOLDER" ]]; then
+        echo "MQTT TLS enabled, but no certificate folder set. Aborting." 1>&2
+        exit 1
+    fi
+    ca_file_option=(--cafile "$IOTEMPOWER_MQTT_CERT_FOLDER/ca.crt")
+fi
+
 echo "Subscribing and listening to mqtt://$IOTEMPOWER_MQTT_HOST/$topic." >&2
-mosquitto_sub -v -h "$IOTEMPOWER_MQTT_HOST" -t "$topic"
+mosquitto_sub -v -h "$IOTEMPOWER_MQTT_HOST""${ca_file_option[@]}"  -t "$topic"

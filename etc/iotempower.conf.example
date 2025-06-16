@@ -48,6 +48,12 @@ IOTEMPOWER_AP_HOSTNAME="iotgateway"
 # if not defined, the same as IOTEMPOWER_AP_IP
 #IOTEMPOWER_MQTT_HOST="mosquitto-host"
 
+# Enable TLS for MQTT 
+#IOTEMPOWER_MQTT_USE_TLS=1
+
+# Set the MQTT server and CA certificate folder
+#IOTEMPOWER_MQTT_CERT_FOLDER=""
+
 # Username and password for devices to use mqtt
 # If user not defined, do not use user authentication
 # TODO: auto create a user with this credentials

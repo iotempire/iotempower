@@ -58,6 +58,23 @@ listener 1883 $IOTEMPOWER_MQTT_HOST2
 EOF
     fi
 
+    if [[ "$IOTEMPOWER_MQTT_USE_TLS" == 1 ]]; then
+        if [[ ! "$IOTEMPOWER_MQTT_CERT_FOLDER" ]]; then
+            echo "MQTT TLS enabled, but no certificate folder set. Aborting." 1>&2
+            exit 1
+        fi
+    # IOTEMPOWER_MQTT_CERT_FOLDER's default is set in read_system_config
+        cat << EOF >> "$APTEMP/mosquitto.conf"
+# TLS
+listener 8883 $IOTEMPOWER_MQTT_HOST
+cafile $IOTEMPOWER_MQTT_CERT_FOLDER/ca.crt
+certfile $IOTEMPOWER_MQTT_CERT_FOLDER/server.crt
+keyfile $IOTEMPOWER_MQTT_CERT_FOLDER/server.key
+require_certificate false  
+allow_anonymous true
+EOF
+    fi
+
     # Create bridge if needed
     if [[ "$IOTEMPOWER_MQTT_BRIDGE_HOST" ]]; then
         cat << EOF >> "$APTEMP/mosquitto.conf"
