@@ -4,11 +4,11 @@ if [[ "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF
 Syntax: mqtt_generate_certificates []
 
-mqtt_generate_certificates generates CA and server certificates for the MQTT broker.
-The files are saved to folder marked in $IOTEMPOWER_MQTT_CERT_FOLDER or if not specified, into {current_system_root}/certs folder.
+mqtt_generate_certificates generates CA and server certificates and the server key for the MQTT broker.
+The files are saved to folder marked in $IOTEMPOWER_MQTT_CERT_FOLDER or if not specified, into the current folder.
 The server certificate is signed by the CA certificate.
 This is needed to enable TLS support for the MQTT broker. The CA certificate is added
-to every client's code and the server certificate has to be configure to be used by the MQTT broker.
+to every client's code and the server certificate has to be configured to be used by the MQTT broker.
 EOF
 exit 1
 fi

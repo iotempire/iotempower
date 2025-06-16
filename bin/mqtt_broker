@@ -59,6 +59,10 @@ EOF
     fi
 
     if [[ "$IOTEMPOWER_MQTT_USE_TLS" == 1 ]]; then
+        if [[ ! "$IOTEMPOWER_MQTT_CERT_FOLDER" ]]; then
+            echo "MQTT TLS enabled, but no certificate folder set. Aborting." 1>&2
+            exit 1
+        fi
     # IOTEMPOWER_MQTT_CERT_FOLDER's default is set in read_system_config
         cat << EOF >> "$APTEMP/mosquitto.conf"
 # TLS
