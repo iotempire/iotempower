@@ -23,7 +23,7 @@ Generating Certificates
 
 To enable MQTT with TLS, you need to generate a CA certificate and a server certificate.
 You can do this using the ``mqtt_generate_certificates`` script provided by IoTempower.
-This generates the necessary certifiFcates and keys in the folder specified by the
+This generates the necessary certificates and keys in the folder specified by the
 ``IOTEMPOWER_MQTT_CERT_FOLDER`` environment variable or, if not set, in the current active folder.
 
 
@@ -35,4 +35,4 @@ To do this, define the ``IOTEMPOWER_MQTT_CERT_FOLDER`` environment variable to p
 where your certificates are stored. The folder should definitely store a ``ca.crt`` file, which is the CA certificate.
 You also need to ensure that the CA certificate, server certificate and key are correctly configured in your MQTT broker.
 If using the IoTempower MQTT broker, it will automatically use the certificates from the specified folder.
-In this case the certificate folder should also contain ``server.crt`` and ``server.key`` files, which are the server certificate and key respectively.
+In this case, the certificate folder should also contain ``server.crt`` and ``server.key`` files, which are the server certificate and key, respectively.
