@@ -168,7 +168,7 @@ EOF
         echo '#define MQTT_USE_TLS' >> "$fname.new"
 
         # Add CA certificate to config.h
-        if [[ "$IOTEMPOWER_MQTT_CERT_FOLDER"]]; then
+        if [[ "$IOTEMPOWER_MQTT_CERT_FOLDER" ]]; then
             cert_file="$IOTEMPOWER_MQTT_CERT_FOLDER/ca.crt"
             if [[ -e "$cert_file" ]]; then
                 {
