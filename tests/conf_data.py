@@ -27,7 +27,9 @@ boards = [
     "esp8266", # test generic boards first
     "esp32", # other generic board
     "wemos_d1_mini", # our favorite esp8266 board
-    "esp32minikit", # out favorite esp32 board
+    "esp32minikit", # our favorite esp32 board
+    "lolin_s2_mini",
+    "esp32_c3_devkitm_1",
     "m5stickc",
     "m5stickc_plus",
     "wroom_02",
