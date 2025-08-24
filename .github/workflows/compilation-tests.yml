@@ -1,0 +1,83 @@
+---
+name: Compilation Tests
+
+'on':
+  pull_request:
+    branches: [master, main]
+    paths:
+      - 'lib/**'
+      - 'tests/**'
+      - 'bin/**'
+      - 'examples/**'
+      - '.github/workflows/compilation-tests.yml'
+  workflow_dispatch:
+    inputs:
+      boards:
+        description: >-
+          Comma-separated list of boards to test
+          (default: wemos_d1_mini,esp32minikit)
+        required: false
+        default: 'wemos_d1_mini,esp32minikit'
+      devices:
+        description: >-
+          Comma-separated list of devices to test
+          (default: input,output,analog)
+        required: false
+        default: 'input,output,analog'
+
+jobs:
+  compilation-test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # Test key boards separately for parallel execution
+        board: [wemos_d1_mini, esp32minikit]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Prepare test environment
+        run: |
+          mkdir -p /tmp/iot-container
+          cp -r . /tmp/iot-container/repo
+
+      - name: Pull IoTempower Docker image
+        run: |
+          docker pull ulno/iotempower
+
+      - name: Run compilation tests
+        run: |
+          # Determine which boards and devices to test
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            BOARDS="${{ github.event.inputs.boards }}"
+            DEVICES="${{ github.event.inputs.devices }}"
+          else
+            # Default subset for PR tests
+            BOARDS="${{ matrix.board }}"
+            DEVICES="input,output,analog"
+          fi
+
+          echo "Testing boards: $BOARDS"
+          echo "Testing devices: $DEVICES"
+
+          # Run tests using the pre-built IoTempower image
+          docker run --rm \
+            -v /tmp/iot-container:/iot/data \
+            ulno/iotempower \
+            bash -c "
+              cd /iot/data/repo &&
+              iot test compile --boards=$BOARDS --devices=$DEVICES
+            "
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: compilation-test-results-${{ matrix.board }}
+          path: /tmp/iot-container/
+          retention-days: 7

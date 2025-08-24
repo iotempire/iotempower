@@ -1,0 +1,76 @@
+---
+name: Quick Smoke Tests
+
+'on':
+  push:
+    branches: [master, main]
+    paths:
+      - 'lib/**'
+      - 'tests/**'
+      - 'bin/**'
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Prepare test environment
+        run: |
+          mkdir -p /tmp/iot-container
+          cp -r . /tmp/iot-container/repo
+
+      - name: Pull IoTempower Docker image
+        run: |
+          docker pull ulno/iotempower
+
+      - name: Run quick smoke tests
+        run: |
+          # Test basic functionality with minimal boards and devices
+          BOARDS="wemos_d1_mini"
+          DEVICES="input,output"
+
+          echo "Running smoke tests..."
+          echo "Testing boards: $BOARDS"
+          echo "Testing devices: $DEVICES"
+
+          # Run smoke tests using the pre-built IoTempower image
+          docker run --rm \
+            -v /tmp/iot-container:/iot/data \
+            ulno/iotempower \
+            bash -c "
+              cd /iot/data/repo &&
+              echo 'Starting IoTempower smoke tests...' &&
+              iot test compile --boards=$BOARDS --devices=$DEVICES -v &&
+              echo 'Smoke tests completed successfully!'
+            "
+
+      - name: Verify Docker image
+        run: |
+          # Additional verification that the Docker image works correctly
+          docker run --rm \
+            -v /tmp/iot-container:/iot/data \
+            ulno/iotempower \
+            bash -c "
+              echo 'Verifying IoTempower installation...' &&
+              ls -la /iot/data/repo/bin/ &&
+              ls -la /iot/data/repo/tests/ &&
+              echo 'Docker image verification completed!'
+            "
+
+      - name: Test summary
+        if: always()
+        run: |
+          echo "## Smoke Test Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- **Trigger**: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Boards**: wemos_d1_mini" >> $GITHUB_STEP_SUMMARY
+          echo "- **Devices**: input,output" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status**: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
