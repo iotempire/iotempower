@@ -97,7 +97,8 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: extended-compilation-test-results-${{ github.event.inputs.test_scope }}
+          name: >-
+            extended-compilation-test-results-{{ test_scope }}
           path: /tmp/iot-container/
           retention-days: 7
 

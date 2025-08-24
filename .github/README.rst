@@ -62,6 +62,8 @@ Whether a hobbyist, student, artist, or professional, **IoTempower** has what yo
 
 - **Multi-Device Management**: Simplify deployment across multiple devices with automatic configurations.
 
+- **Continuous Integration**: Automated testing via GitHub Actions ensures code quality and compatibility across supported hardware platforms.
+
 
 ----------
 
