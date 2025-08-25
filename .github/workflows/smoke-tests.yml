@@ -25,8 +25,12 @@ jobs:
 
       - name: Setup IoTempower environment
         run: |
-          # Copy repository to ~/iot for testing
-          cp -r . ~/iot
+          # Create the directory structure as expected by curl_install_docker
+          mkdir -p ~/iot-container
+          # Copy current repository (branch being tested) to the expected location
+          cp -r . ~/iot-container/repo
+          # Create symlink as expected by the installer
+          ln -s ~/iot-container/repo ~/iot
 
       - name: Run quick smoke tests
         run: |
@@ -38,7 +42,7 @@ jobs:
           echo "Testing boards: $BOARDS"
           echo "Testing devices: $DEVICES"
 
-          # Run smoke tests using the recommended approach
+          # Run smoke tests using the recommended approach - this will skip repo clone since ~/iot exists
           IOTEMPOWER_REPO=~/iot bash ~/iot/bin/curl_install_docker test compilation --boards=$BOARDS --devices=$DEVICES -v
 
       - name: Verify Docker image

@@ -29,12 +29,6 @@ jobs:
   compilation-test:
     runs-on: ubuntu-latest
 
-    strategy:
-      fail-fast: false
-      matrix:
-        # Test key boards separately for parallel execution
-        board: [wemos_d1_mini, esp32minikit]
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -43,8 +37,12 @@ jobs:
 
       - name: Setup IoTempower environment
         run: |
-          # Copy repository to ~/iot for testing
-          cp -r . ~/iot
+          # Create the directory structure as expected by curl_install_docker
+          mkdir -p ~/iot-container
+          # Copy current repository (branch being tested) to the expected location
+          cp -r . ~/iot-container/repo
+          # Create symlink as expected by the installer
+          ln -s ~/iot-container/repo ~/iot
 
       - name: Run compilation tests
         run: |
@@ -53,21 +51,21 @@ jobs:
             BOARDS="${{ github.event.inputs.boards }}"
             DEVICES="${{ github.event.inputs.devices }}"
           else
-            # Default subset for PR tests
-            BOARDS="${{ matrix.board }}"
+            # Default for PR tests - test both boards at once with all devices
+            BOARDS="wemos_d1_mini,esp32minikit"
             DEVICES="input,output,analog"
           fi
 
           echo "Testing boards: $BOARDS"
           echo "Testing devices: $DEVICES"
 
-          # Run tests using the recommended approach
+          # Run tests using the recommended approach - this will skip repo clone since ~/iot exists
           IOTEMPOWER_REPO=~/iot bash ~/iot/bin/curl_install_docker test compilation --boards=$BOARDS --devices=$DEVICES
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: compilation-test-results-${{ matrix.board }}
+          name: compilation-test-results
           path: ~/iot-container/
           retention-days: 7
