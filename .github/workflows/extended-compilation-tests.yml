@@ -66,14 +66,10 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Prepare test environment
+      - name: Setup IoTempower environment
         run: |
-          mkdir -p /tmp/iot-container
-          cp -r . /tmp/iot-container/repo
-
-      - name: Pull IoTempower Docker image
-        run: |
-          docker pull ulno/iotempower
+          # Copy repository to ~/iot for testing
+          cp -r . ~/iot
 
       - name: Run extended compilation tests
         run: |
@@ -83,23 +79,16 @@ jobs:
           echo "Testing boards: $BOARDS"
           echo "Testing devices: $DEVICES"
 
-          # Run tests using the pre-built IoTempower image
-          docker run --rm \
-            -v /tmp/iot-container:/iot/data \
-            ulno/iotempower \
-            bash -c "
-              cd /iot/data/repo &&
-              echo 'Starting IoTempower compilation tests...' &&
-              iot test compile --boards=$BOARDS --devices=$DEVICES -v
-            "
+          # Run tests using the recommended approach
+          cat ~/iot/bin/curl_install_docker | IOTEMPOWER_REPO=~/iot bash -s -- test compilation --boards=$BOARDS --devices=$DEVICES -v
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: >-
-            extended-compilation-test-results-{{ test_scope }}
-          path: /tmp/iot-container/
+            extended-compilation-test-results-${{ github.event.inputs.test_scope }}
+          path: ~/iot-container/
           retention-days: 7
 
       - name: Test summary
