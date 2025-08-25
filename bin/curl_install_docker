@@ -36,4 +36,11 @@ IOTEMPOWER_ROOT="$iot_root_tmp" bin/iot_activate_iot_script "$iot_root_tmp/examp
 docker pull ulno/iotempower
 
 # run it (and unpack the environment)
-bash "$iot_root_tmp/examples/scripts/iot-docker" "$@" < /dev/tty
+# Check if running in interactive mode (tty available)
+if [ -t 0 ]; then
+    # Interactive mode - use tty redirection
+    bash "$iot_root_tmp/examples/scripts/iot-docker" "$@" < /dev/tty
+else
+    # Non-interactive mode (e.g., GitHub Actions) - skip tty redirection
+    bash "$iot_root_tmp/examples/scripts/iot-docker" "$@"
+fi
