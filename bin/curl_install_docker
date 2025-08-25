@@ -36,4 +36,8 @@ IOTEMPOWER_ROOT="$iot_root_tmp" bin/iot_activate_iot_script "$iot_root_tmp/examp
 docker pull ulno/iotempower
 
 # run it (and unpack the environment)
-bash "$iot_root_tmp/examples/scripts/iot-docker" "$@" < /dev/tty
+if ([ -t 0 ] || [ -t 1 ]) && [ -e /dev/tty ] && [ -r /dev/tty ] && [ -w /dev/tty ]; then
+    bash "$iot_root_tmp/examples/scripts/iot-docker" "$@" < /dev/tty
+else
+    bash "$iot_root_tmp/examples/scripts/iot-docker" "$@"
+fi

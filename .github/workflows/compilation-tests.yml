@@ -1,0 +1,71 @@
+---
+name: Compilation Tests
+
+'on':
+  pull_request:
+    branches: [master, main]
+    paths:
+      - 'lib/**'
+      - 'tests/**'
+      - 'bin/**'
+      - 'examples/**'
+      - '.github/workflows/compilation-tests.yml'
+  workflow_dispatch:
+    inputs:
+      boards:
+        description: >-
+          Comma-separated list of boards to test
+          (default: wemos_d1_mini,esp32minikit)
+        required: false
+        default: 'wemos_d1_mini,esp32minikit'
+      devices:
+        description: >-
+          Comma-separated list of devices to test
+          (default: input,output,analog)
+        required: false
+        default: 'input,output,analog'
+
+jobs:
+  compilation-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup IoTempower environment
+        run: |
+          # Create the directory structure as expected by curl_install_docker
+          mkdir -p ~/iot-container
+          # Copy current repository (branch being tested) to the expected location
+          cp -r . ~/iot-container/repo
+          # Create symlink as expected by the installer
+          ln -s ~/iot-container/repo ~/iot
+
+      - name: Run compilation tests
+        run: |
+          # Determine which boards and devices to test
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            BOARDS="${{ github.event.inputs.boards }}"
+            DEVICES="${{ github.event.inputs.devices }}"
+          else
+            # Default for PR tests - test both boards at once with all devices
+            BOARDS="wemos_d1_mini,esp32minikit"
+            DEVICES="input,output,analog"
+          fi
+
+          echo "Testing boards: $BOARDS"
+          echo "Testing devices: $DEVICES"
+
+          # Run tests using the recommended approach - this will skip repo clone since ~/iot exists
+          IOTEMPOWER_REPO=~/iot bash ~/iot/bin/curl_install_docker test compilation --boards=$BOARDS --devices=$DEVICES
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: compilation-test-results
+          path: ~/iot-container/
+          retention-days: 7

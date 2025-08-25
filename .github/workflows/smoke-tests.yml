@@ -1,0 +1,63 @@
+---
+name: Quick Smoke Tests
+
+'on':
+  push:
+    branches: [master, main]
+    paths:
+      - 'lib/**'
+      - 'tests/**'
+      - 'bin/**'
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup IoTempower environment
+        run: |
+          # Create the directory structure as expected by curl_install_docker
+          mkdir -p ~/iot-container
+          # Copy current repository (branch being tested) to the expected location
+          cp -r . ~/iot-container/repo
+          # Create symlink as expected by the installer
+          ln -s ~/iot-container/repo ~/iot
+
+      - name: Run quick smoke tests
+        run: |
+          # Test basic functionality with minimal boards and devices
+          BOARDS="wemos_d1_mini"
+          DEVICES="input,output"
+
+          echo "Running smoke tests..."
+          echo "Testing boards: $BOARDS"
+          echo "Testing devices: $DEVICES"
+
+          # Run smoke tests using the recommended approach - this will skip repo clone since ~/iot exists
+          IOTEMPOWER_REPO=~/iot bash ~/iot/bin/curl_install_docker test compilation --boards=$BOARDS --devices=$DEVICES -v
+
+      - name: Verify Docker image
+        run: |
+          # Additional verification that the Docker image works correctly
+          echo "Verifying IoTempower installation in repository..."
+          ls -la ~/iot/bin/
+          ls -la ~/iot/tests/
+          echo "Repository verification completed!"
+
+      - name: Test summary
+        if: always()
+        run: |
+          echo "## Smoke Test Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- **Trigger**: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Boards**: wemos_d1_mini" >> $GITHUB_STEP_SUMMARY
+          echo "- **Devices**: input,output" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status**: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,108 @@
+---
+name: Extended Compilation Tests
+
+'on':
+  workflow_dispatch:
+    inputs:
+      test_scope:
+        description: 'Test scope'
+        required: true
+        default: 'basic'
+        type: choice
+        options:
+          - basic
+          - extended
+          - full
+      custom_boards:
+        description: 'Custom boards (comma-separated, optional)'
+        required: false
+        default: ''
+      custom_devices:
+        description: 'Custom devices (comma-separated, optional)'
+        required: false
+        default: ''
+
+jobs:
+  compilation-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set test parameters
+        id: set-params
+        run: |
+          # Set defaults based on test scope
+          case "${{ github.event.inputs.test_scope }}" in
+            "basic")
+              BOARDS="wemos_d1_mini,esp32minikit"
+              DEVICES="input,output,analog"
+              ;;
+            "extended")
+              BOARDS="wemos_d1_mini,esp32minikit,esp8266,esp32"
+              DEVICES="input,output,analog,bmp180,dht,dallas"
+              ;;
+            "full")
+              BOARDS="wemos_d1_mini,esp32minikit,esp8266,esp32,lolin_s2_mini"
+              DEVICES="input,output,analog,bmp180,dht,dallas,gyro6050,acoustic_distance,laser_distance"
+              ;;
+          esac
+
+          # Override with custom values if provided
+          if [ -n "${{ github.event.inputs.custom_boards }}" ]; then
+            BOARDS="${{ github.event.inputs.custom_boards }}"
+          fi
+
+          if [ -n "${{ github.event.inputs.custom_devices }}" ]; then
+            DEVICES="${{ github.event.inputs.custom_devices }}"
+          fi
+
+          echo "boards=$BOARDS" >> $GITHUB_OUTPUT
+          echo "devices=$DEVICES" >> $GITHUB_OUTPUT
+
+          echo "Selected boards: $BOARDS"
+          echo "Selected devices: $DEVICES"
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup IoTempower environment
+        run: |
+          # Create the directory structure as expected by curl_install_docker
+          mkdir -p ~/iot-container
+          # Copy current repository (branch being tested) to the expected location
+          cp -r . ~/iot-container/repo
+          # Create symlink as expected by the installer
+          ln -s ~/iot-container/repo ~/iot
+
+      - name: Run extended compilation tests
+        run: |
+          BOARDS="${{ steps.set-params.outputs.boards }}"
+          DEVICES="${{ steps.set-params.outputs.devices }}"
+
+          echo "Testing boards: $BOARDS"
+          echo "Testing devices: $DEVICES"
+
+          # Run tests using the recommended approach - this will skip repo clone since ~/iot exists
+          IOTEMPOWER_REPO=~/iot bash ~/iot/bin/curl_install_docker test compilation --boards=$BOARDS --devices=$DEVICES -v
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: >-
+            extended-compilation-test-results-${{ github.event.inputs.test_scope }}
+          path: ~/iot-container/
+          retention-days: 7
+
+      - name: Test summary
+        if: always()
+        run: |
+          echo "## Extended Compilation Test Summary" >> $GITHUB_STEP_SUMMARY
+          TEST_SCOPE="${{ github.event.inputs.test_scope }}"
+          BOARDS="${{ steps.set-params.outputs.boards }}"
+          DEVICES="${{ steps.set-params.outputs.devices }}"
+          echo "- **Test Scope**: $TEST_SCOPE" >> $GITHUB_STEP_SUMMARY
+          echo "- **Boards Tested**: $BOARDS" >> $GITHUB_STEP_SUMMARY
+          echo "- **Devices Tested**: $DEVICES" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status**: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY

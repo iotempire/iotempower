@@ -6,8 +6,18 @@ Overview
 
 The **Testing IoTempower** project focuses on ensuring the robustness and reliability of IoTempower applications. This documentation provides details on the structure and contents of the testing folder, along with instructions on running the tests.
 
-Running Tests
--------------
+GitHub Actions CI/CD
+---------------------
+
+IoTempower includes automated testing via GitHub Actions workflows that run compilation tests automatically on pull requests and provide manual testing options. See `github-actions.rst <github-actions.rst>`_ for detailed information about:
+
+- Automatic compilation tests on pull requests
+- Scheduled smoke tests
+- Manual extended testing workflows
+- Docker-based testing for consistency
+
+Running Tests Locally
+----------------------
 
 The easiest way to run the tests, is to just call ``iot test``, this will run all the tests
 (however careful, you will have to setup something before
