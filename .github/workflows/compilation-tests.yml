@@ -40,7 +40,7 @@ jobs:
           # Create the directory structure as expected by curl_install_docker
           mkdir -p ~/iot-container
           # Copy current repository (branch being tested) to the expected location
-          cp -r . ~/iot-container/repo
+          cp -r $GITHUB_WORKSPACE ~/iot-container/repo
           # Create symlink as expected by the installer
           ln -s ~/iot-container/repo ~/iot
 
@@ -59,8 +59,8 @@ jobs:
           echo "Testing boards: $BOARDS"
           echo "Testing devices: $DEVICES"
 
-          # Run tests - since ~/iot-container/repo already exists, script will skip cloning
-          bash ~/iot/bin/curl_install_docker test compilation --boards=$BOARDS --devices=$DEVICES
+          # Run tests using the recommended approach - this will skip repo clone since ~/iot exists
+          IOTEMPOWER_REPO=~/iot bash ~/iot/bin/curl_install_docker test compilation --boards=$BOARDS --devices=$DEVICES
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
