@@ -80,7 +80,7 @@ jobs:
           echo "Testing devices: $DEVICES"
 
           # Run tests using the recommended approach
-          cat ~/iot/bin/curl_install_docker | IOTEMPOWER_REPO=~/iot bash -s -- test compilation --boards=$BOARDS --devices=$DEVICES -v
+          IOTEMPOWER_REPO=~/iot bash ~/iot/bin/curl_install_docker test compilation --boards=$BOARDS --devices=$DEVICES -v
 
       - name: Upload test results
         uses: actions/upload-artifact@v4

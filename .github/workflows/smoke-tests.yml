@@ -39,7 +39,7 @@ jobs:
           echo "Testing devices: $DEVICES"
 
           # Run smoke tests using the recommended approach
-          cat ~/iot/bin/curl_install_docker | IOTEMPOWER_REPO=~/iot bash -s -- test compilation --boards=$BOARDS --devices=$DEVICES -v
+          IOTEMPOWER_REPO=~/iot bash ~/iot/bin/curl_install_docker test compilation --boards=$BOARDS --devices=$DEVICES -v
 
       - name: Verify Docker image
         run: |
