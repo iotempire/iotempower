@@ -59,8 +59,8 @@ jobs:
           echo "Testing boards: $BOARDS"
           echo "Testing devices: $DEVICES"
 
-          # Run tests using the recommended approach - this will skip repo clone since ~/iot exists
-          IOTEMPOWER_REPO=~/iot bash ~/iot/bin/curl_install_docker test compilation --boards=$BOARDS --devices=$DEVICES
+          # Run tests - since ~/iot-container/repo already exists, script will skip cloning
+          bash ~/iot/bin/curl_install_docker test compilation --boards=$BOARDS --devices=$DEVICES
 
       - name: Upload test results
         uses: actions/upload-artifact@v4

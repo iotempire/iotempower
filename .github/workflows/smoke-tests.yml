@@ -42,8 +42,8 @@ jobs:
           echo "Testing boards: $BOARDS"
           echo "Testing devices: $DEVICES"
 
-          # Run smoke tests using the recommended approach - this will skip repo clone since ~/iot exists
-          IOTEMPOWER_REPO=~/iot bash ~/iot/bin/curl_install_docker test compilation --boards=$BOARDS --devices=$DEVICES -v
+          # Run smoke tests - since ~/iot-container/repo already exists, script will skip cloning
+          bash ~/iot/bin/curl_install_docker test compilation --boards=$BOARDS --devices=$DEVICES -v
 
       - name: Verify Docker image
         run: |

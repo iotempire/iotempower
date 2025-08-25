@@ -17,11 +17,14 @@ command -v git &>/dev/null || {
     exit 1 
     }
 
-mkdir "$HOME/iot-container"
+mkdir -p "$HOME/iot-container"
 if [ -z "$IOTEMPOWER_REPO" ]; then
     IOTEMPOWER_REPO="https://github.com/iotempire/iotempower"
 fi
-git clone "$IOTEMPOWER_REPO" "$HOME/iot-container/repo"
+# Only clone if the repository directory doesn't exist
+if [ ! -d "$HOME/iot-container/repo" ]; then
+    git clone "$IOTEMPOWER_REPO" "$HOME/iot-container/repo"
+fi
 
 if [ ! -d "$HOME/iot" ]; then
     ln -s "$HOME/iot-container/repo" "$HOME/iot"
