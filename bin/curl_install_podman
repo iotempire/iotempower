@@ -36,4 +36,10 @@ IOTEMPOWER_ROOT="$iot_root_tmp" bin/iot_activate_iot_script "$iot_root_tmp/examp
 podman pull docker.io/ulno/iotempower
 
 # run it
-bash "$iot_root_tmp/examples/scripts/iot-podman" "$@" < /dev/tty
+if [ -t 0 ]; then
+    # TTY is available, use TTY input redirection
+    bash "$iot_root_tmp/examples/scripts/iot-podman" "$@" < /dev/tty
+else
+    # No TTY available, run without input redirection (for non-interactive usage)
+    bash "$iot_root_tmp/examples/scripts/iot-podman" "$@"
+fi

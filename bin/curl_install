@@ -22,5 +22,11 @@ fi
 git clone "$IOTEMPOWER_REPO" "$HOME/iot"
 cd "$HOME/iot" || exit 1
 git config pull.rebase false
-bash run x bin/iot_install "$@" < /dev/tty
+if [ -t 0 ]; then
+    # TTY is available, use TTY input redirection
+    bash run x bin/iot_install "$@" < /dev/tty
+else
+    # No TTY available, run without input redirection (for non-interactive usage)
+    bash run x bin/iot_install "$@"
+fi
 
