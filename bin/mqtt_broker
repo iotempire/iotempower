@@ -25,14 +25,17 @@ while true; do
 
     if [[ "$IF1" ]]; then
         if [[ "$IF1" = "scanif" ]]; then
-            IF1=$(find_local_network|cut -d\  -f1)
+            if_search=$(find_local_network)
+            IF1=$(echo $if_search|cut -d\  -f1)
             echo "Preferred interface: $IF1"
         fi
-        export IOTEMPOWER_MQTT_HOST=$(ip a show "$IF1" | grep " inet " | head -n1 | cut -d\  -f6 | cut -d/ -f1)
+            IF1_ADDRESS=$(echo $if_search|cut -d\  -f2|cut -d\  -f1)
+
+        export IOTEMPOWER_MQTT_HOST=$(show_local_ips | grep "$IF1" | cut -d\  -f2|cut -d/ -f1)
     fi
 
     if [[ "$IF2" ]]; then
-        export IOTEMPOWER_MQTT_HOST2=$(ip a show "$IF2" | grep " inet " | head -n1 | cut -d\  -f6 | cut -d/ -f1)
+        export IOTEMPOWER_MQTT_HOST2=$(show_local_ips | grep "$IF2" | cut -d\  -f2|cut -d/ -f1)
     fi
 
     echo "Listening on $IOTEMPOWER_MQTT_HOST."
