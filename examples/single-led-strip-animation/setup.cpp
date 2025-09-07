@@ -18,9 +18,9 @@ rgb_matrix(matrix, IN(leds));
 animator(anim)
     .with_fps(30)
     .with_frame_builder( [] {
-        CRGB eye1=CRGB::Black, eye2 = CRGB::Black;
-        CRGB new_color;
-        CHSV hsv;
+        ICRGB eye1=ICRGB::Black, eye2 = ICRGB::Black;
+        ICRGB new_color;
+        ICHSV hsv;
         
         // strip animation
         switch(strip_atype) {
@@ -35,7 +35,7 @@ animator(anim)
                         if (strip_frames > 0) strip_frames --;
                         else {
                                 strip_atype = strip_none;
-                                // keep content IN(matrix).gradient_row(CRGB::Black, CRGB::Black, 2, 0); // off
+                                // keep content IN(matrix).gradient_row(ICRGB::Black, ICRGB::Black, 2, 0); // off
                         }
                 }
     } )
@@ -50,12 +50,12 @@ animator(anim)
     } )
     .with_command_handler( "blue_red", [] (Ustring& command) {
         strip_atype = strip_none;
-        IN(matrix).gradient_row(CRGB::Blue, CRGB::Red, 0, 0);
+        IN(matrix).gradient_row(ICRGB::Blue, ICRGB::Red, 0, 0);
         IN(matrix).show();
     } )
     .with_command_handler( "green_blue", [] (Ustring& command) {
         strip_atype = strip_none;
-        IN(matrix).gradient_row(CRGB::Green, CRGB::Blue, 0, 0);
+        IN(matrix).gradient_row(ICRGB::Green, ICRGB::Blue, 0, 0);
         IN(matrix).show();
     } )
     .with_command_handler( "scroll", [] (Ustring& command) {

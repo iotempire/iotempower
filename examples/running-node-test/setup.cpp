@@ -132,10 +132,10 @@ input(button1, D3, "released", "pressed");
 //             IN(matrix).rainbow(0, line, len, 1);
 //             break;
 //         case 2:
-//             IN(matrix).gradient_row(CRGB::Green, CRGB::Blue, 0, line, len, 1);
+//             IN(matrix).gradient_row(ICRGB::Green, ICRGB::Blue, 0, line, len, 1);
 //             break;
 //         case 3:
-//             IN(matrix).gradient_row(CRGB::Blue, CRGB::Red, 0, line, len, 1);
+//             IN(matrix).gradient_row(ICRGB::Blue, ICRGB::Red, 0, line, len, 1);
 //             break;
 //         default:
 //             break;
@@ -165,7 +165,7 @@ input(button1, D3, "released", "pressed");
 //                         IN(matrix).scroll_right(false,i);
 //                         break;
 //                     case fade_to:
-//                         IN(matrix).fade_to(CRGB::Red, 16, 0, i, -1, 1);
+//                         IN(matrix).fade_to(ICRGB::Red, 16, 0, i, -1, 1);
 //                     default:
 //                         break; 
 //                 }

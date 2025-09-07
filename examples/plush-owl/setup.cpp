@@ -1,5 +1,5 @@
 enum anim_type {none, wink, color_animation};
-CRGB dest_color;
+ICRGB dest_color;
 int frame_counter=0;
 int frames=0;
 int current_eye=0;
@@ -10,15 +10,15 @@ rgb_strip(eyes, 2, WS2812, D2, GRB);
 animator(anim)
     .with_fps(30)
     .with_frame_builder( [] {
-        CRGB eye1=CRGB::Black, eye2 = CRGB::Black;
-        CRGB new_color;
-        CHSV hsv;
+        ICRGB eye1=ICRGB::Black, eye2 = ICRGB::Black;
+        ICRGB new_color;
+        ICHSV hsv;
         switch(atype) {
             case wink:
                 if(frame_counter<frames/2) { // increase brightness
-                    new_color = blend( CRGB::Black, dest_color, frame_counter * 255 / (frames/2-1));
+                    new_color = blend( ICRGB::Black, dest_color, frame_counter * 255 / (frames/2-1));
                 } else {
-                    new_color = blend( CRGB::Black, dest_color, (frames-1-frame_counter) * 255 / (frames/2-1));
+                    new_color = blend( ICRGB::Black, dest_color, (frames-1-frame_counter) * 255 / (frames/2-1));
                 }
                 if(current_eye == 0) {
                     eye1 = new_color;
@@ -56,15 +56,15 @@ void start_wink() {
         current_eye = random(0,2);
         atype = wink;
         switch(random(0,6)) {
-            case 0: dest_color = CRGB::Blue;
+            case 0: dest_color = ICRGB::Blue;
                 break;
-            case 1: dest_color = CRGB::Red;
+            case 1: dest_color = ICRGB::Red;
                 break;
-            case 2: dest_color = CRGB::Purple;
+            case 2: dest_color = ICRGB::Purple;
                 break;
-            case 3: dest_color = CRGB::Green;
+            case 3: dest_color = ICRGB::Green;
                 break;
-            default: dest_color = CRGB::White;
+            default: dest_color = ICRGB::White;
             break;
         }
         frame_counter = 0;
