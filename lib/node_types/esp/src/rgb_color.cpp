@@ -1,24 +1,24 @@
 // rgb_color.cpp
-// Definitions for static color constants in RGB_Color
+// Definitions for static color constants in ICRGB
 #include "rgb_color.h"
 
-const RGB_Color RGB_Color::Black    = RGB_COLOR_BLACK;
-const RGB_Color RGB_Color::White    = RGB_COLOR_WHITE;
-const RGB_Color RGB_Color::Red      = RGB_COLOR_RED;
-const RGB_Color RGB_Color::Green    = RGB_COLOR_GREEN;
-const RGB_Color RGB_Color::Blue     = RGB_COLOR_BLUE;
-const RGB_Color RGB_Color::Yellow   = RGB_COLOR_YELLOW;
-const RGB_Color RGB_Color::Cyan     = RGB_COLOR_CYAN;
-const RGB_Color RGB_Color::Magenta  = RGB_COLOR_MAGENTA;
-const RGB_Color RGB_Color::Purple   = RGB_COLOR_PURPLE;
-const RGB_Color RGB_Color::Orange   = RGB_COLOR_ORANGE;
-const RGB_Color RGB_Color::Pink     = RGB_COLOR_PINK;
-const RGB_Color RGB_Color::DeepPink = RGB_COLOR_DEEPPINK;
-const RGB_Color RGB_Color::Brown    = RGB_COLOR_BROWN;
-const RGB_Color RGB_Color::Gold     = RGB_COLOR_GOLD;
-const RGB_Color RGB_Color::Grey     = RGB_COLOR_GREY;
-const RGB_Color RGB_Color::Gray     = RGB_COLOR_GRAY;
-const RGB_Color RGB_Color::LightGrey = RGB_COLOR_LIGHTGREY;
-const RGB_Color RGB_Color::LightGray = RGB_COLOR_LIGHTGRAY;
-const RGB_Color RGB_Color::LightBlue = RGB_COLOR_LIGHTBLUE;
-const RGB_Color RGB_Color::LightGreen = RGB_COLOR_LIGHTGREEN;
+const ICRGB ICRGB::Black    = ICRGB_BLACK;
+const ICRGB ICRGB::White    = ICRGB_WHITE;
+const ICRGB ICRGB::Red      = ICRGB_RED;
+const ICRGB ICRGB::Green    = ICRGB_GREEN;
+const ICRGB ICRGB::Blue     = ICRGB_BLUE;
+const ICRGB ICRGB::Yellow   = ICRGB_YELLOW;
+const ICRGB ICRGB::Cyan     = ICRGB_CYAN;
+const ICRGB ICRGB::Magenta  = ICRGB_MAGENTA;
+const ICRGB ICRGB::Purple   = ICRGB_PURPLE;
+const ICRGB ICRGB::Orange   = ICRGB_ORANGE;
+const ICRGB ICRGB::Pink     = ICRGB_PINK;
+const ICRGB ICRGB::DeepPink = ICRGB_DEEPPINK;
+const ICRGB ICRGB::Brown    = ICRGB_BROWN;
+const ICRGB ICRGB::Gold     = ICRGB_GOLD;
+const ICRGB ICRGB::Grey     = ICRGB_GREY;
+const ICRGB ICRGB::Gray     = ICRGB_GRAY;
+const ICRGB ICRGB::LightGrey = ICRGB_LIGHTGREY;
+const ICRGB ICRGB::LightGray = ICRGB_LIGHTGRAY;
+const ICRGB ICRGB::LightBlue = ICRGB_LIGHTBLUE;
+const ICRGB ICRGB::LightGreen = ICRGB_LIGHTGREEN;

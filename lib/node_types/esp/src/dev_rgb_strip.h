@@ -28,25 +28,26 @@ class RGB_Strip : public RGB_Base {
             _started = true;
             controller->init(); // re-init, might be important if using onboard-led
             delay(50); // let things settle
-            set_color(ALL_LEDS, RGB_Color::Black);
+            set_color(ALL_LEDS, ICRGB::Black);
             delay(100); // let things settle (total 100 is too small)
-            set_color(ALL_LEDS, RGB_Color::Black);
+            set_color(ALL_LEDS, ICRGB::Black);
         }
         
-        // Conversion between RGB_Color and CRGB
-        static CRGB toCRGB(const RGB_Color& c) {
+        // TODO: evaluate if the two following can also be get_color?
+        // Conversion between ICRGB and CRGB
+        static CRGB toCRGB(const ICRGB& c) { // TODO: refactor to none-CamelCase: to_CRRGB
             return CRGB(c.r, c.g, c.b);
         }
-        static RGB_Color fromCRGB(const CRGB& c) {
-            return RGB_Color(c.r, c.g, c.b);
+        static ICRGB fromCRGB(const CRGB& c) { // TODO: refactor to none-CamelCase: from_CRRGB
+            return ICRGB(c.r, c.g, c.b);
         }
 
-        virtual void process_color(int lednr, RGB_Color color, bool _show=true) {
+        virtual void process_color(int lednr, ICRGB color, bool _show=true) {
             leds[lednr] = toCRGB(color);
             if(_show) show();
         }
         
-        virtual RGB_Color get_color(int lednr) {
+        virtual ICRGB get_color(int lednr) {
             if(lednr < 0) lednr=0;
             else if(lednr >= led_count()) lednr = led_count()-1;
             return fromCRGB(leds[lednr]);
@@ -66,7 +67,7 @@ class RGB_Strip : public RGB_Base {
                 avg_g += leds[i].g;
                 avg_b += leds[i].b;
             }
-            avg_color = RGB_Color(avg_r/lc, avg_g/lc, avg_b/lc);
+            avg_color = ICRGB(avg_r/lc, avg_g/lc, avg_b/lc);
         }
 
         virtual bool measure() { show(); return true; } // give control to library on regular basis

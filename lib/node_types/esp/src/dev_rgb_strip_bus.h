@@ -12,20 +12,20 @@ class RGB_Strip_Bus_Base {
         bool _initialized=false;
     public:
 
-        // Conversion between RGB_Color and RgbColor
-        static RgbColor toRgbColor(const RGB_Color& c) {
+        // Conversion between ICRGB and RgbColor
+        static RgbColor toRgbColor(const ICRGB& c) {
             return RgbColor(c.r, c.g, c.b);
         }
-        static RGB_Color fromRgbColor(const RgbColor& c) {
-            return RGB_Color(c.R, c.G, c.B);
+        static ICRGB fromRgbColor(const RgbColor& c) {
+            return ICRGB(c.R, c.G, c.B);
         }
 
-        virtual void set_pixel(uint16_t indexPixel, RGB_Color color) {
+        virtual void set_pixel(uint16_t indexPixel, ICRGB color) {
             // Convert to RgbColor for NeoPixelBus
         }
-        virtual RGB_Color get_pixel(uint16_t indexPixel) {
+        virtual ICRGB get_pixel(uint16_t indexPixel) {
             // Convert from RgbColor for NeoPixelBus
-            return RGB_Color::Black;
+            return ICRGB::Black;
         }
         virtual void show() {
         }
@@ -45,10 +45,10 @@ template<typename T_COLOR_FEATURE, typename T_METHOD> class RGB_Strip_Bus_Templa
             controller = new NeoPixelBus<T_COLOR_FEATURE, T_METHOD> (countPixels, pin);
             if(controller) _initialized = true;
         }
-        virtual void set_pixel(uint16_t indexPixel, RGB_Color color) {
+        virtual void set_pixel(uint16_t indexPixel, ICRGB color) {
             controller->SetPixelColor(indexPixel, toRgbColor(color));
         }
-        virtual RGB_Color get_pixel(uint16_t indexPixel) {
+        virtual ICRGB get_pixel(uint16_t indexPixel) {
             return fromRgbColor(controller->GetPixelColor(indexPixel));
         }
         virtual void show() {
@@ -76,18 +76,18 @@ class RGB_Strip_Bus : public RGB_Base {
                 //controller->init(); // re-init, might be important if using onboard-led
                 controller->begin();
                 delay(50); // let things settle
-                set_color(ALL_LEDS, RGB_Color::Black);
+                set_color(ALL_LEDS, ICRGB::Black);
                 delay(100); // let things settle (total 100 is too small)
-                set_color(ALL_LEDS, RGB_Color::Black);
+                set_color(ALL_LEDS, ICRGB::Black);
             } else {
                 ulog("rgb strip not initialized."); // TODO: show device name
             }
         }
-        virtual void process_color(int lednr, RGB_Color color, bool _show=true) {
+        virtual void process_color(int lednr, ICRGB color, bool _show=true) {
             controller->set_pixel(lednr, color);
             if(_show) show();
         }
-        virtual RGB_Color get_color(int lednr) {
+        virtual ICRGB get_color(int lednr) {
             if(lednr < 0) lednr=0;
             else if(lednr >= led_count()) lednr = led_count()-1;
             return controller->get_pixel(lednr);
@@ -102,12 +102,12 @@ class RGB_Strip_Bus : public RGB_Base {
             uint32_t avg_b = 0;
             int lc = led_count();
             for(int i=lc-1; i>=0; i--) {
-                RGB_Color c = controller->get_pixel(i);
+                ICRGB c = controller->get_pixel(i);
                 avg_r += c.r;
                 avg_g += c.g;
                 avg_b += c.b;
             }
-            avg_color = RGB_Color(avg_r/lc, avg_g/lc, avg_b/lc);
+            avg_color = ICRGB(avg_r/lc, avg_g/lc, avg_b/lc);
         }
 };
 
