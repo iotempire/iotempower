@@ -21,9 +21,9 @@ name: Compilation Tests
       devices:
         description: >-
           Comma-separated list of devices to test
-          (default: input,output,analog)
+          (default: input,output,analog,rgb_strip_bus)
         required: false
-        default: 'input,output,analog'
+        default: 'input,output,analog,rgb_strip_bus'
 
 jobs:
   compilation-test:
@@ -53,7 +53,7 @@ jobs:
           else
             # Default for PR tests - test both boards at once with all devices
             BOARDS="wemos_d1_mini,esp32minikit"
-            DEVICES="input,output,analog"
+            DEVICES="input,output,analog,rgb_strip_bus"
           fi
 
           echo "Testing boards: $BOARDS"

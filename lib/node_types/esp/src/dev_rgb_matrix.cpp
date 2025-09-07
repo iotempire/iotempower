@@ -94,7 +94,7 @@ RGB_Matrix& RGB_Matrix::add(RGB_Base& strip, int posx, int posy,
 }
 
 void RGB_Matrix::scroll_up(bool cycle, int startx, int starty, int w, int h) {
-    CRGB old;
+    ICRGB old;
     if(w<0) w=width;
     if(h<0) h=height;
     if(startx+w >= width) w=width-startx;
@@ -104,7 +104,7 @@ void RGB_Matrix::scroll_up(bool cycle, int startx, int starty, int w, int h) {
         if(cycle)
             old = get_pixel(x,starty);
         else
-            old = CRGB::Black;
+            old = ICRGB::Black;
         for(int y=starty+h-1; y>=starty; y--) {
             old = set_pixel(x,y,old);
         }
@@ -112,7 +112,7 @@ void RGB_Matrix::scroll_up(bool cycle, int startx, int starty, int w, int h) {
 }
 
 void RGB_Matrix::scroll_down(bool cycle, int startx, int starty, int w, int h) {
-    CRGB old;
+    ICRGB old;
     if(w<0) w=width;
     if(h<0) h=height;
     if(startx+w >= width) w=width-startx;
@@ -122,7 +122,7 @@ void RGB_Matrix::scroll_down(bool cycle, int startx, int starty, int w, int h) {
         if(cycle)
             old = get_pixel(x,starty+h-1);
         else
-            old = CRGB::Black;
+            old = ICRGB::Black;
         for(int y=starty; y<starty+h; y++) {
             old = set_pixel(x,y,old);
         }
@@ -130,7 +130,7 @@ void RGB_Matrix::scroll_down(bool cycle, int startx, int starty, int w, int h) {
 }
 
 void RGB_Matrix::scroll_right(bool cycle, int startx, int starty, int w, int h) {
-    CRGB old;
+    ICRGB old;
     if(w<0) w=width;
     if(h<0) h=height;
     if(startx+w >= width) w=width-startx;
@@ -140,7 +140,7 @@ void RGB_Matrix::scroll_right(bool cycle, int startx, int starty, int w, int h) 
         if(cycle)
             old = get_pixel(startx+w-1,y);
         else
-            old = CRGB::Black;
+            old = ICRGB::Black;
         for(int x=startx; x<startx+w; x++) {
             old = set_pixel(x,y,old);
         }
@@ -148,7 +148,7 @@ void RGB_Matrix::scroll_right(bool cycle, int startx, int starty, int w, int h) 
 }
 
 void RGB_Matrix::scroll_left(bool cycle, int startx, int starty, int w, int h) {
-    CRGB old;
+    ICRGB old;
     if(w<0) w=width;
     if(h<0) h=height;
     if(startx+w >= width) w=width-startx;
@@ -158,7 +158,7 @@ void RGB_Matrix::scroll_left(bool cycle, int startx, int starty, int w, int h) {
         if(cycle)
             old = get_pixel(0,y);
         else
-            old = CRGB::Black;
+            old = ICRGB::Black;
         for(int x=startx+w-1; x>=0; x--) {
             old = set_pixel(x,y,old);
         }
@@ -172,7 +172,7 @@ void RGB_Matrix::rainbow( int startx, int starty, int w, int h,
     if(startx+w >= width) w=width-startx;
     if(starty+h >= height) h=height-starty;
 
-    CHSV hsv_rowstart, hsv;
+    ICHSV hsv_rowstart, hsv;
     hsv_rowstart.hue = initialhue;
     hsv_rowstart.val = 255;
     hsv_rowstart.sat = 240;
@@ -197,7 +197,7 @@ void RGB_Matrix::rainbow_row( int startx, int starty,
     if(startx+w >= width) w=width-startx;
     if(starty+h >= height) h=height-starty;
 
-    CHSV hsv;
+    ICHSV hsv;
     hsv.hue = initialhue;
     hsv.val = 255;
     hsv.sat = 240;
@@ -219,7 +219,7 @@ void RGB_Matrix::rainbow_column( int startx, int starty,
     if(startx+w >= width) w=width-startx;
     if(starty+h >= height) h=height-starty;
 
-    CHSV hsv;
+    ICHSV hsv;
     hsv.hue = initialhue;
     hsv.val = 255;
     hsv.sat = 240;
@@ -232,7 +232,7 @@ void RGB_Matrix::rainbow_column( int startx, int starty,
     }
 }
 
-void RGB_Matrix::gradient_row( CRGB startcolor, CRGB endcolor,
+void RGB_Matrix::gradient_row( ICRGB startcolor, ICRGB endcolor,
                    int startx, int starty,
                    int w, int h )
 {
@@ -241,9 +241,9 @@ void RGB_Matrix::gradient_row( CRGB startcolor, CRGB endcolor,
     if(startx+w >= width) w=width-startx;
     if(starty+h >= height) h=height-starty;
 
-    saccum87 rdistance87;
-    saccum87 gdistance87;
-    saccum87 bdistance87;
+    rgbcolor_saccum87 rdistance87;
+    rgbcolor_saccum87 gdistance87;
+    rgbcolor_saccum87 bdistance87;
 
     rdistance87 = (endcolor.r - startcolor.r) << 7;
     gdistance87 = (endcolor.g - startcolor.g) << 7;
@@ -252,19 +252,19 @@ void RGB_Matrix::gradient_row( CRGB startcolor, CRGB endcolor,
     uint16_t pixeldistance = w;
     int16_t divisor = pixeldistance ? pixeldistance : 1;
 
-    saccum87 rdelta87 = rdistance87 / divisor;
-    saccum87 gdelta87 = gdistance87 / divisor;
-    saccum87 bdelta87 = bdistance87 / divisor;
+    rgbcolor_saccum87 rdelta87 = rdistance87 / divisor;
+    rgbcolor_saccum87 gdelta87 = gdistance87 / divisor;
+    rgbcolor_saccum87 bdelta87 = bdistance87 / divisor;
 
     rdelta87 *= 2;
     gdelta87 *= 2;
     bdelta87 *= 2;
 
-    accum88 r88 = startcolor.r << 8;
-    accum88 g88 = startcolor.g << 8;
-    accum88 b88 = startcolor.b << 8;
+    rgbcolor_accum88 r88 = startcolor.r << 8;
+    rgbcolor_accum88 g88 = startcolor.g << 8;
+    rgbcolor_accum88 b88 = startcolor.b << 8;
     for( int x = startx; x < startx + w; x++) {
-        CRGB color( r88 >> 8, g88 >> 8, b88 >> 8);
+        ICRGB color( r88 >> 8, g88 >> 8, b88 >> 8);
         for( int y = starty; y < starty + h; y++) { 
             set_pixel(x, y, color, false);
         }
@@ -274,7 +274,7 @@ void RGB_Matrix::gradient_row( CRGB startcolor, CRGB endcolor,
     }
 }
 
-void RGB_Matrix::gradient_column( CRGB startcolor, CRGB endcolor,
+void RGB_Matrix::gradient_column( ICRGB startcolor, ICRGB endcolor,
                    int startx, int starty,
                    int w, int h )
 {
@@ -283,9 +283,9 @@ void RGB_Matrix::gradient_column( CRGB startcolor, CRGB endcolor,
     if(startx+w >= width) w=width-startx;
     if(starty+h >= height) h=height-starty;
 
-    saccum87 rdistance87;
-    saccum87 gdistance87;
-    saccum87 bdistance87;
+    rgbcolor_saccum87 rdistance87;
+    rgbcolor_saccum87 gdistance87;
+    rgbcolor_saccum87 bdistance87;
 
     rdistance87 = (endcolor.r - startcolor.r) << 7;
     gdistance87 = (endcolor.g - startcolor.g) << 7;
@@ -294,19 +294,19 @@ void RGB_Matrix::gradient_column( CRGB startcolor, CRGB endcolor,
     uint16_t pixeldistance = w;
     int16_t divisor = pixeldistance ? pixeldistance : 1;
 
-    saccum87 rdelta87 = rdistance87 / divisor;
-    saccum87 gdelta87 = gdistance87 / divisor;
-    saccum87 bdelta87 = bdistance87 / divisor;
+    rgbcolor_saccum87 rdelta87 = rdistance87 / divisor;
+    rgbcolor_saccum87 gdelta87 = gdistance87 / divisor;
+    rgbcolor_saccum87 bdelta87 = bdistance87 / divisor;
 
     rdelta87 *= 2;
     gdelta87 *= 2;
     bdelta87 *= 2;
 
-    accum88 r88 = startcolor.r << 8;
-    accum88 g88 = startcolor.g << 8;
-    accum88 b88 = startcolor.b << 8;
+    rgbcolor_accum88 r88 = startcolor.r << 8;
+    rgbcolor_accum88 g88 = startcolor.g << 8;
+    rgbcolor_accum88 b88 = startcolor.b << 8;
     for( int y = starty; y < starty + h; y++) {
-        CRGB color( r88 >> 8, g88 >> 8, b88 >> 8);
+        ICRGB color( r88 >> 8, g88 >> 8, b88 >> 8);
         for( int x = startx; x < startx + w; x++) { 
             set_pixel(x, y, color, false);
         }
@@ -316,10 +316,10 @@ void RGB_Matrix::gradient_column( CRGB startcolor, CRGB endcolor,
     }
 }
 
-void RGB_Matrix::fade_to(CRGB new_color, uint8_t scale,
+void RGB_Matrix::fade_to(ICRGB new_color, uint8_t scale,
         int startx, int starty,
         int w, int h) {
-    CRGB color;
+    ICRGB color;
     if(w<0) w=width;
     if(h<0) h=height;
     if(startx+w >= width) w=width-startx;
@@ -336,7 +336,7 @@ void RGB_Matrix::fade_to(CRGB new_color, uint8_t scale,
 void RGB_Matrix::fade( uint8_t scale,
         int startx, int starty,
         int w, int h) {
-    CRGB color;
+    ICRGB color;
     scale = 255 - scale;
     if(w<0) w=width;
     if(h<0) h=height;

@@ -6,42 +6,42 @@
 
 typedef struct {
     const char* key;
-    CRGB color;
+    ICRGB color;
 } String_Color;
 
 static const String_Color color_map[] = {
-    { "black", CRGB::Black },
-    { "red", CRGB::Red },
-    { "pink", CRGB::DeepPink },
-    { "blue", CRGB::Blue },
-    { "lightblue", CRGB::LightBlue },
-    { "green", 0x00ff00 }, // broken in current fastled
-    { "lightgreen", CRGB::LightGreen },
-    { "yellow", CRGB::Yellow },
-    { "magenta", CRGB::Magenta },
-    { "cyan", CRGB::Cyan },
-    { "purple", CRGB::Purple },
-    { "orange", CRGB::Orange },
-    { "brown", CRGB::Brown },
-    { "gold", CRGB::Gold },
-    { "grey", CRGB::Grey },
-    { "lightgrey", CRGB::Grey },
-    { "gray", CRGB::Grey },
-    { "lightgray", CRGB::LightGrey },
-    { "white", CRGB::White },
+    { "black", ICRGB::Black },
+    { "red", ICRGB::Red },
+    { "pink", ICRGB::DeepPink },
+    { "blue", ICRGB::Blue },
+    { "lightblue", ICRGB::LightBlue },
+    { "green", ICRGB(0, 255, 0) }, // fixed green
+    { "lightgreen", ICRGB::LightGreen },
+    { "yellow", ICRGB::Yellow },
+    { "magenta", ICRGB::Magenta },
+    { "cyan", ICRGB::Cyan },
+    { "purple", ICRGB::Purple },
+    { "orange", ICRGB::Orange },
+    { "brown", ICRGB::Brown },
+    { "gold", ICRGB::Gold },
+    { "grey", ICRGB::Grey },
+    { "lightgrey", ICRGB::Grey },
+    { "gray", ICRGB::Grey },
+    { "lightgray", ICRGB::LightGrey },
+    { "white", ICRGB::White },
 };
 static const unsigned int color_map_count = sizeof(color_map)/sizeof(String_Color); 
 
 
 
-void RGB_Base::push_front(CRGB color, bool _show) {
+void RGB_Base::push_front(ICRGB color, bool _show) {
     for(int i=led_count()-1; i>0; i--) {
         set_color(i, get_color(i-1), false); // move colors up
     }
     set_color(0, color, _show);    
 }
 
-void RGB_Base::push_back(CRGB color, bool _show) {
+void RGB_Base::push_back(ICRGB color, bool _show) {
     for(int i=0; i<led_count()-1; i++) {
         set_color(i, get_color(i+1), false); // move colors down
     }
@@ -68,7 +68,7 @@ RGB_Base::RGB_Base(const char* name, int led_count) :
             int brightness=payload.as_int();
             if(brightness<0) brightness=0;
             else if(brightness>255) brightness=255;
-            set_color(CRGB(brightness,brightness,brightness));
+            set_color(ICRGB(brightness,brightness,brightness));
             return true;
         }
     );
@@ -81,7 +81,7 @@ RGB_Base::RGB_Base(const char* name, int led_count) :
     );
 }
 
-bool RGB_Base::read_color(const Ustring& colorstr, CRGB& color) {
+bool RGB_Base::read_color(const Ustring& colorstr, ICRGB& color) {
     // Check if this is a predefined color, allow colorstr to have other values after color
     unsigned int i;
     for(i=0; i<color_map_count; i++) {
@@ -97,21 +97,21 @@ bool RGB_Base::read_color(const Ustring& colorstr, CRGB& color) {
         char *endptr;
         long colorval = strtol(colorstr.as_cstr(), &endptr, 16);
         if(endptr - colorstr.as_cstr() == 6) {
-            color = CRGB(colorval);
+            color = ICRGB((colorval >> 16) & 0xFF, (colorval >> 8) & 0xFF, colorval & 0xFF);
             return true;
         } 
     }
     // Last chance: see, if we can extract 3 comma seperated integers
     int r,g,b;
     if(sscanf(colorstr.as_cstr(),"%d,%d,%d",&r,&g,&b) == 3) {
-        color = CRGB(r,g,b);
+        color = ICRGB(r,g,b);
         return true;
     }
     return false; // could not convert
 }
 
 RGB_Base& RGB_Base::set_colorstr(int lednr, const Ustring& color, bool _show) {
-    CRGB c;
+    ICRGB c;
     if(read_color(color, c)) {
         set_color(lednr, c, _show);
     } // TODO: should error be reported if no color found

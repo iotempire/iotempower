@@ -38,11 +38,11 @@ jobs:
               ;;
             "extended")
               BOARDS="wemos_d1_mini,esp32minikit,esp8266,esp32"
-              DEVICES="input,output,analog,bmp180,dht,dallas"
+              DEVICES="input,output,analog,bmp180,dht,dallas,rgb_strip"
               ;;
             "full")
               BOARDS="wemos_d1_mini,esp32minikit,esp8266,esp32,lolin_s2_mini"
-              DEVICES="input,output,analog,bmp180,dht,dallas,gyro6050,acoustic_distance,laser_distance"
+              DEVICES="input,output,analog,bmp180,dht,dallas,gyro6050,acoustic_distance,laser_distance,rgb_strip"
               ;;
           esac
 

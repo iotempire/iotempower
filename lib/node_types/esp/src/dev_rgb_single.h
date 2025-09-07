@@ -32,10 +32,10 @@ class RGB_Single : public RGB_Base {
             pinMode(p_g, OUTPUT);
             pinMode(p_b, OUTPUT);
             _started = true;
-            set_color(ALL_LEDS, CRGB::Black);
+            set_color(ALL_LEDS, ICRGB::Black);
         }
-        virtual void process_color(int lednr, CRGB color, bool show=false);
-        virtual CRGB get_color(int lednr) {
+        virtual void process_color(int lednr, ICRGB color, bool show=false);
+        virtual ICRGB get_color(int lednr) {
             return avg_color;
         }
         virtual void show() {
