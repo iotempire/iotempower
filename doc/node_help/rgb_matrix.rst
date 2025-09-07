@@ -72,11 +72,12 @@ This example creates a 25×4 matrix from four separate RGB strips:
 
     /* setup.cpp */
 
-    // RGB strips
-    rgb_strip(strip1, 50, WS2811, D3, BRG);
-    rgb_strip(strip2, 50, WS2811, D5, BRG);
-    rgb_strip(strip3, 50, WS2811, D4, BRG);
-    rgb_strip(strip4, 50, WS2811, D1, BRG);
+    // RGB strips using NeoPixelBus (interrupt-resistant)
+    rgb_strip_bus(strip1, 50, F_BRG, NeoEsp32I2s0Ws2812xMethod, 16);
+    rgb_strip_bus(strip2, 50, F_BRG, NeoEsp32I2s0Ws2812xMethod, 17);
+    rgb_strip_bus(strip3, 50, F_BRG, NeoEsp32I2s0Ws2812xMethod, 21);
+    rgb_strip_bus(strip4, 50, F_BRG, NeoEsp32I2s0Ws2812xMethod, 22);
+
 
     // A matrix consisting of several strips
     rgb_matrix(matrix_name, 25, 4)
@@ -158,7 +159,6 @@ RGB matrices automatically respond to MQTT commands:
 See Also
 --------
 
-- :doc:`rgb_strip` - Individual RGB strip control
-- :doc:`animator` - Animation framework for matrices  
-- :doc:`rgb_strip_bus` - High-performance RGB strips
+- :doc:`rgb_strip_bus` - High-performance RGB strips (recommended)
+- :doc:`animator` - Animation framework for matrices
 

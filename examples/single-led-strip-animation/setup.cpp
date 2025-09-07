@@ -11,7 +11,7 @@ int strip_frames = 0;
 
 
 
-//rgb_strip(leds, 13, WS2812, D3, GRB);
+//rgb_strip_bus(leds, 13, F_GRB, NeoEsp8266Uart1800KbpsMethod, D4);
 rgb_strip_bus(leds, num_leds, F_BRG, NeoEsp8266Uart1800KbpsMethod, D4).report_change(false);
 rgb_matrix(matrix, IN(leds));
 

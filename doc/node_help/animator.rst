@@ -85,7 +85,7 @@ This example shows a basic winking eye animation:
     int current_eye = 0;
     anim_type atype = none;
 
-    rgb_strip(eyes, 2, WS2812, D2, GRB);
+    rgb_strip_bus(eyes, 2, F_GRB, NeoEsp8266Uart1800KbpsMethod, D4);
 
     animator(anim)
         .with_fps(30)
@@ -221,11 +221,11 @@ Advanced example with multiple animation states:
     enum anim_type {none, fade, fade_to, scroll};
     anim_type anim_types[4] = {none, none, none, none};
 
-    // RGB strips and matrix
-    rgb_strip(strip1, 50, WS2811, D3, BRG);
-    rgb_strip(strip2, 50, WS2811, D5, BRG);
-    rgb_strip(strip3, 50, WS2811, D4, BRG);
-    rgb_strip(strip4, 50, WS2811, D1, BRG);
+    // RGB strips using NeoPixelBus (interrupt-resistant)
+    rgb_strip_bus(strip1, 50, F_BRG, NeoEsp32I2s0Ws2812xMethod, 16);
+    rgb_strip_bus(strip2, 50, F_BRG, NeoEsp32I2s0Ws2812xMethod, 17);
+    rgb_strip_bus(strip3, 50, F_BRG, NeoEsp32I2s0Ws2812xMethod, 21);
+    rgb_strip_bus(strip4, 50, F_BRG, NeoEsp32I2s0Ws2812xMethod, 22);
 
     rgb_matrix(matrix, 25, 4)
         .with(IN(strip1), 0, 0, Right_Down, 25)
@@ -360,5 +360,4 @@ See Also
 --------
 
 - :doc:`rgb_matrix` - Matrix control functions
-- :doc:`rgb_strip` - Individual strip control  
-- :doc:`rgb_strip_bus` - High-performance strips
+- :doc:`rgb_strip_bus` - High-performance strips (recommended)

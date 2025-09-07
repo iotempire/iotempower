@@ -1,2 +1,2 @@
 led(blue, ONBOARDLED,"off","on").set("off");
-rgb_strip(rgb, 1, WS2812B, D2, BRG);
+rgb_strip_bus(rgb, 1, F_BRG, NeoEsp8266Uart1800KbpsMethod, D4);

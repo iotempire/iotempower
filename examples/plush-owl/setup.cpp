@@ -6,7 +6,7 @@ int current_eye=0;
 
 anim_type atype;
 
-rgb_strip(eyes, 2, WS2812, D2, GRB);
+rgb_strip_bus(eyes, 2, F_GRB, NeoEsp8266Uart1800KbpsMethod, D4);
 animator(anim)
     .with_fps(30)
     .with_frame_builder( [] {

@@ -101,14 +101,17 @@ input(button1, D3, "released", "pressed");
 
 
 //// RGB strips
+// // Example for a single strip on an esp8266 (wemos d1 min or nodemcu)
+// rgb_strip_bus(strip1, 7, F_GRB, NeoEsp8266Uart1800KbpsMethod, D4);
 
-// small wemos 7-leds shield (careful, on D4=ONBOARDLED)
-// rgb_strip(strip1, 7, WS2812B, D4, GRB);
+// This does not work for the esp8266 as it only supports one pin for NeoPixelBus
+// multi-strip example for esp32
+// // RGB strips using NeoPixelBus (interrupt-resistant)
+// rgb_strip_bus(strip1, 50, F_BRG, NeoEsp32I2s0Ws2812xMethod, 16);
+// rgb_strip_bus(strip2, 50, F_BRG, NeoEsp32I2s0Ws2812xMethod, 17);
+// rgb_strip_bus(strip3, 50, F_BRG, NeoEsp32I2s0Ws2812xMethod, 21);
+// rgb_strip_bus(strip4, 50, F_BRG, NeoEsp32I2s0Ws2812xMethod, 22);
 
-//rgb_strip(strip1, 90, WS2811, D2, BRG);
-// // rgb_strip_(strip2, "strip2", 50, WS2811, D5, BRG);
-// // rgb_strip_(strip3, "strip3", 50, WS2811, D4, BRG);
-// // rgb_strip_(strip4, "strip4", 50, WS2811, D1, BRG);
 
 // A matrix consiting of several strips
 // rgb_matrix(matrix, 25, 2)
