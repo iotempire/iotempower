@@ -4,24 +4,24 @@
 #include "dev_rgb_single.h"
 #include <_PWM.h> // analog write seems to be finally completely broken on the esp8266, so use our own
 
-void RGB_Single::process_color(int lednr, CRGB color, bool show) {
+void RGB_Single::process_color(int lednr, RgbColor color, bool show) {
     if(!started()) return;
     // ignore show
     // this is a controller for single led, so we ignore lednr
     if(invert) {
-        // analogWrite(p_r, (255-color.red)*1023/255);
-        // analogWrite(p_g, (255-color.green)*1023/255);
-        // analogWrite(p_b, (255-color.blue)*1023/255);
-        analogWrite(p_r, 255-color.red);
-        analogWrite(p_g, 255-color.green);
-        analogWrite(p_b, 255-color.blue);
+        // analogWrite(p_r, (255-color.R)*1023/255);
+        // analogWrite(p_g, (255-color.G)*1023/255);
+        // analogWrite(p_b, (255-color.B)*1023/255);
+        analogWrite(p_r, 255-color.R);
+        analogWrite(p_g, 255-color.G);
+        analogWrite(p_b, 255-color.B);
     } else {
-        // analogWrite(p_r, color.red*1023/255);
-        // analogWrite(p_g, color.green*1023/255);
-        // analogWrite(p_b, color.blue*1023/255);
-        analogWrite(p_r, color.red);
-        analogWrite(p_g, color.green);
-        analogWrite(p_b, color.blue);
+        // analogWrite(p_r, color.R*1023/255);
+        // analogWrite(p_g, color.G*1023/255);
+        // analogWrite(p_b, color.B*1023/255);
+        analogWrite(p_r, color.R);
+        analogWrite(p_g, color.G);
+        analogWrite(p_b, color.B);
     }
     avg_color = color;
 }

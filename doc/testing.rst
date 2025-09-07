@@ -155,7 +155,7 @@ Software Configuration and File Descriptions
       - Configure SSH as described at "https://www.ssh.com/academy/ssh/copy-id".
       - `cases_for_deployment` lists test cases, each with a board name, setup lines, and MQTT topic-payload expectations.
 
-5.  **test_hardware.py**: The statements for `test_deploy.py` is also applicable for this test. And you should have at least to dongles connected PI for tester and tested roles.
+5.  **test_hardware.py**: The statements for `test_deploy.py` is also applicable for this test. And you should have at least two devices connected to the PI for tester and tested roles.
     - **Purpose**: To verify that after the deployment process the physical changes also takes effect rather than seeing those changes in serial or MQTT channel.
     - **Details**: `cases_for_hardware` lists test cases and new tests cases should be added to that list.
 

@@ -63,7 +63,8 @@ devices = [
     {"device_name": "light_sensor_1", "example_syntax": "bh1750(example_name);"},
     {"device_name": "light_sensor_2", "example_syntax": "tsl2561(example_name);"},
     {"device_name": "capacity_touch", "example_syntax": "mpr121(example_name);"},
-    # {"device_name": "rgb_strip", "example_syntax": "rgb_strip(example_name, 7, WS2812B, IOT_TEST_DIGITAL, GRB);"}, # TODO: Here, we should actually test NeoPixelBus
+    {"device_name": "rgb_strip", "example_syntax": "rgb_strip(example_name, 7, WS2812B, IOT_TEST_DIGITAL, GRB);"},
+    {"device_name": "rgb_strip_bus", "example_syntax": "rgb_strip_bus(example_name, 7, F_GRB, IOT_TEST_NEOPIXEL_CONTROL_METHOD, IOT_TEST_NEOPIXEL_TESTPIN);"},
 ]
 
 isolated_combinations_to_test = [

@@ -4,22 +4,25 @@ rgb_strip
 ..  code-block:: cpp
 
 
-    // new version
+    // Recommended: NeoPixelBus-based version (FastLED-free)
     rgb_strip_bus(name, num_leds, color_feature, control_method, data_pin);
 
-    // Obsolete version
+    // Legacy: FastLED-based version (DEPRECATED)
     rgb_strip(name, num_leds, Striptype, data_pin, 
         ...other FastLed parameters...);
 
 Create a new rgb strip device object for an rgb-led strip connected to the
 given ``data_pin`` (or ``data`` and ``clock_pin``) with ``num_leds`` rgb leds.
-All led chips supported by FastLED (https://github.com/FastLED/FastLED) are
-supported. Attention: FastLED seems to be broken since beginning of 2020 and
-does not work using WiFi on esp8266 anymore. Short led strips might still work,
-but long strips will show flickering wrong colors, and other synchronization issues.
-Please use the new rgb_strip_bus that uses precise timing but can only be wired to
-specific datapins (like only D4 on the Wemos D1 Mini or NodeMCU).
-Check https://github.com/Makuna/NeoPixelBus for this advanced version.
+
+**rgb_strip_bus** is the recommended approach using NeoPixelBus library 
+with precise timing and no dependency on FastLED. It supports all the same
+color operations and effects but with better performance and reliability.
+
+The legacy **rgb_strip** uses FastLED but is deprecated due to issues with
+WiFi synchronization on ESP8266. FastLED dependency has been removed from
+the core rgb_base classes.
+
+Check https://github.com/Makuna/NeoPixelBus for advanced NeoPixelBus features.
 
 
 Topics

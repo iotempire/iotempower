@@ -4,57 +4,44 @@
 #ifndef _RGB_BASE_H_
 #define _RGB_BASE_H_
 
-#define FASTLED_ESP8266_RAW_PIN_ORDER // solve issues with D4
-//#define FASTLED_INTERRUPT_RETRY_COUNT 0 or better 1 or 2? - both seem to cause random flashes
-#define FASTLED_INTERRUPT_RETRY_COUNT 2
-#define FASTLED_INTERNAL // ignore pragma messages in FastLED
-// needs to be included here for color table
-
-// fastled uses an out function, so we need to undefine it first
-#ifdef IOTEMPOWER_COMMAND_OUTPUT
-#undef out
-#endif
-#include <FastLED.h>
-#ifdef IOTEMPOWER_COMMAND_OUTPUT
-#define out(gcc_va_args...) output(gcc_va_args)
-#endif
 
 #include <device.h>
+#include "rgb_color.h"
 
 #define ALL_LEDS -16
 
 class RGB_Base : public Device {
     protected:
         int _led_count=0;
-        CRGB avg_color;
+    RGB_Color avg_color;
     public:
         RGB_Base(const char* name, int led_count);
         RGB_Base& high() {
             if((uint16_t)avg_color.r+avg_color.g+avg_color.b>0) {
                 return *this; // if something is on, do nothing
             }
-            return set_color(CRGB::White); // else switch to white TODO: make on-brightness configurable
+            return set_color(RGB_Color::White); // else switch to white TODO: make on-brightness configurable
         }
         RGB_Base& on() { return high(); }
         RGB_Base& low() {
-            return set_color(CRGB::Black);
+            return set_color(RGB_Color::Black);
         }
         RGB_Base& off() { return low(); }
-        RGB_Base& set_color(CRGB color) {
+        RGB_Base& set_color(RGB_Color color) {
             return set_color(ALL_LEDS, color, true);
         }
-        RGB_Base& set_color_noshow(CRGB color) {
+        RGB_Base& set_color_noshow(RGB_Color color) {
             return set_color(ALL_LEDS, color, false);
         }
 
-        bool read_color(const Ustring& colorstr, CRGB& color); // TODO: make static
+    bool read_color(const Ustring& colorstr, RGB_Color& color); // TODO: make static
 
-        RGB_Base& set_colorstr(int lednr, const Ustring& color, bool _show=true);
-        RGB_Base& set_colorstr(const Ustring& color, bool _show=true);
+    RGB_Base& set_colorstr(int lednr, const Ustring& color, bool _show=true);
+    RGB_Base& set_colorstr(const Ustring& color, bool _show=true);
 
 // TODO: implement setting a bar (percentage or number of leds at once)
 
-        RGB_Base& set_color( int lednr, CRGB color, bool _show=true) {
+    RGB_Base& set_color( int lednr, RGB_Color color, bool _show=true) {
             if(!started()) return *this;
             if(lednr<0) {
                 if(lednr==ALL_LEDS) {
@@ -81,20 +68,20 @@ class RGB_Base : public Device {
         int led_count() {
             return _led_count;
         }
-        void push_front(CRGB color, bool _show=true);
-        void push_back(CRGB color, bool _show=true);
+    void push_front(RGB_Color color, bool _show=true);
+    void push_back(RGB_Color color, bool _show=true);
 
         // these 4 need be re-implemented
         virtual void start() {
             // keep _started at false
         }
 
-        virtual void process_color(int lednr, CRGB color, bool _show=true) {
+        virtual void process_color(int lednr, RGB_Color color, bool _show=true) {
             avg_color = color; // in strip, real average is computed
             // show not evaluated in single led case (but in rgb_strip)
         }
 
-        virtual CRGB get_color(int lednr) {
+        virtual RGB_Color get_color(int lednr) {
             return avg_color;
         }
 

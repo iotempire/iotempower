@@ -34,8 +34,8 @@ class RGB_Single : public RGB_Base {
             _started = true;
             set_color(ALL_LEDS, CRGB::Black);
         }
-        virtual void process_color(int lednr, CRGB color, bool show=false);
-        virtual CRGB get_color(int lednr) {
+        virtual void process_color(int lednr, RgbColor color, bool show=false);
+        virtual RgbColor get_color(int lednr) {
             return avg_color;
         }
         virtual void show() {
