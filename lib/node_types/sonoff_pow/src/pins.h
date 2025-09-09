@@ -24,9 +24,3 @@
 #define RELAIS1 12
 #define RELAIS 12
 #define REDLED1 12
-
-// test pins for IoTempower
-#define IOT_TEST_INPUT BUTTON1
-#define IOT_TEST_OUTPUT ONBOARDLED
-#define IOT_TEST_DIGITAL 14
-#define IOT_TEST_DIGITAL_2 4
