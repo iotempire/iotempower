@@ -95,5 +95,3 @@
 // #define D9 9
 #define SD2 D9
 #define SDD2 D9
-
-// test pins for IoTempower 

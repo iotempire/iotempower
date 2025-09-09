@@ -28,5 +28,3 @@
     #define A0 35
 #endif
 
-// test pins for IoTempower
-

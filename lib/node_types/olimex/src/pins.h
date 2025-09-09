@@ -6,5 +6,3 @@
 // #define ONBOARDLED 2
 
 #define RELAIS 5
-
-// test pins for IoTempower

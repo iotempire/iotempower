@@ -45,5 +45,3 @@
 #define D10 10
 #define BUTTON3 D10
 
-// test pins for IoTempower
-

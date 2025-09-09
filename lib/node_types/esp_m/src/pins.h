@@ -4,5 +4,3 @@
 // TODO: check, if there is really none
 //#define ONBOARDLED 2
 
-// test pins for IoTempower
-

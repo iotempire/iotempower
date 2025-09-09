@@ -24,5 +24,3 @@
 #define RELAIS1 12
 #define RELAIS 12
 #define REDLED1 12
-
-// test pins for IoTempower

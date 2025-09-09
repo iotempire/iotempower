@@ -12,5 +12,3 @@
 #ifndef A0
     #define A0 36
 #endif
-
-// test pins for IoTempower
