@@ -11,6 +11,3 @@
 #endif
 
 // test pins for IoTempower
-#define IOT_TEST_INPUT FLASHBUTTON
-#define IOT_TEST_OUTPUT ONBOARDLED
-#define IOT_TEST_DIGITAL 26

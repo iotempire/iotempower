@@ -33,7 +33,3 @@
 #define SDD2 D9
 
 // test pins for IoTempower
-#define IOT_TEST_INPUT FLASHBUTTON
-#define IOT_TEST_OUTPUT ONBOARDLED
-#define IOT_TEST_DIGITAL D1
-#define IOT_TEST_DIGITAL_2 D2

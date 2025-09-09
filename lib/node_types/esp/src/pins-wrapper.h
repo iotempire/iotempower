@@ -4,6 +4,7 @@
 #define _IOTEMPOWER_PINS_H_
 
 #include <pins.h>
+#include <testdefs.h>
 
 #ifdef ONBOARDLED
 
