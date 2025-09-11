@@ -52,4 +52,4 @@ if [[ "$IOTEMPOWER_MQTT_USE_TLS" == 1 ]]; then
 fi
 
 echo "Subscribing and listening to mqtt://$IOTEMPOWER_MQTT_HOST/$topic." >&2
-mosquitto_sub -v -h "$IOTEMPOWER_MQTT_HOST""${ca_file_option[@]}"  -t "$topic"
+mosquitto_sub -v -h "$IOTEMPOWER_MQTT_HOST" ${ca_file_option[@]}  -t "$topic"
