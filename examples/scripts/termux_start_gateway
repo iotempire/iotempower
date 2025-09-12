@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+termux-wake-lock
+sshd
+iot x start_in_tmux IoTempower mqtt_broker scanif -- web_starter
