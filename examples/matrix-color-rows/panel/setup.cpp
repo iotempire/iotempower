@@ -7,7 +7,7 @@ const int panels=3;
 // Global animation variables
 unsigned long frames[rows] = {0, 0, 0, 0, 0, 0, 0};
 ICRGB dest_colors[rows];
-enum anim_type {none, fade_to, scroll};
+enum anim_type {none, fade_to, scroll, rainbow};
 anim_type anim_types[rows] = {none, none, none, none, none, none, none, none};
 
 // RGB strips using NeoPixelBus (interrupt-resistant)
@@ -63,4 +63,13 @@ animator(anim)
             anim_types[row] = scroll;
             frames[row] = 150;
         }
+    })
+    .with_command_handler("rainbow", [] (Ustring& command) {
+        IN(matrix).rainbow(0, 0, -1, -1, 25, 1, 64);
+        int row = command.as_int() - 1;
+        if(row >= 0 && row < rows) {
+            anim_types[row] = scroll;
+            frames[row] = 150;
+        }
     });
+;

@@ -123,25 +123,26 @@ class RGB_Matrix : public RGB_Base {
         }
         void off() { black(); }
 
-        void rainbow(int startx=0, int starty=0,
-                int w=-1, int h=-1,
-                uint8_t initialhue=16, uint8_t deltahue=16 );
 
-        void rainbow_row(int startx=0, int starty=0,
-                int w=-1, int h=-1,
-                uint8_t initialhue=16, uint8_t deltahue=16 );
+    void rainbow(int startx=0, int starty=0,
+        int w=-1, int h=-1,
+        uint8_t initialhue=16, uint8_t deltahue=16, uint8_t brightness=255 );
 
-        void rainbow_column(int startx=0, int starty=0,
-                int w=-1, int h=-1,
-                uint8_t initialhue=16, uint8_t deltahue=16 );
+    void rainbow_row(int startx=0, int starty=0,
+        int w=-1, int h=-1,
+        uint8_t initialhue=16, uint8_t deltahue=16, uint8_t brightness=255 );
 
-        void gradient_row(ICRGB startcolor, ICRGB endcolor,
-                   int startx=0, int starty=0,
-                   int w=-1, int h=-1 );
+    void rainbow_column(int startx=0, int starty=0,
+        int w=-1, int h=-1,
+        uint8_t initialhue=16, uint8_t deltahue=16, uint8_t brightness=255 );
 
-        void gradient_column(ICRGB startcolor, ICRGB endcolor,
-                   int startx=0, int starty=0,
-                   int w=-1, int h=-1 );
+    void gradient_row(ICRGB startcolor, ICRGB endcolor,
+           int startx=0, int starty=0,
+           int w=-1, int h=-1, uint8_t brightness=255 );
+
+    void gradient_column(ICRGB startcolor, ICRGB endcolor,
+           int startx=0, int starty=0,
+           int w=-1, int h=-1, uint8_t brightness=255 );
 
         void fade_to(ICRGB new_color, uint8_t scale=4,
                 int startx=0, int starty=0,
