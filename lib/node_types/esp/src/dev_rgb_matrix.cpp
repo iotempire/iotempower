@@ -78,7 +78,7 @@ RGB_Matrix& RGB_Matrix::add(RGB_Base& strip, int posx, int posy,
     }
     for(int i=0; i<strip.led_count(); i++) {
         matrix_set(posx, posy, strip_nr, i);
-        ulog(F("Setting strip reference at %d,%d to %d,%d"),posx,posy,strip_nr,i);
+        // TODO: might crash? ulog(F("Setting strip reference at %d,%d to %d,%d"),posx,posy,strip_nr,i);
         if((i+1)%linelen == 0) { // at lineend
             posx += xline;
             posy += yline;
@@ -166,7 +166,7 @@ void RGB_Matrix::scroll_left(bool cycle, int startx, int starty, int w, int h) {
 }
 
 void RGB_Matrix::rainbow( int startx, int starty, int w, int h,
-            uint8_t initialhue, uint8_t deltahue ) {
+            uint8_t initialhue, uint8_t deltahue, uint8_t brightness ) {
     if(w<0) w=width;
     if(h<0) h=height;
     if(startx+w >= width) w=width-startx;
@@ -179,7 +179,11 @@ void RGB_Matrix::rainbow( int startx, int starty, int w, int h,
     for( int x = startx; x < startx + w; x++) {
         hsv = hsv_rowstart;
         for( int y = starty; y < starty + h; y++) { 
-            set_pixel(x, y, hsv, false);
+            ICRGB color = hsv;
+            color.r = (color.r * brightness) / 255;
+            color.g = (color.g * brightness) / 255;
+            color.b = (color.b * brightness) / 255;
+            set_pixel(x, y, color, false);
             hsv.hue += deltahue;
         }
         hsv_rowstart.hue += deltahue;
@@ -190,7 +194,8 @@ void RGB_Matrix::rainbow( int startx, int starty, int w, int h,
 void RGB_Matrix::rainbow_row( int startx, int starty,
             int w, int h,
             uint8_t initialhue,
-            uint8_t deltahue )
+            uint8_t deltahue,
+            uint8_t brightness )
 {
     if(w<0) w=width;
     if(h<0) h=height;
@@ -203,7 +208,11 @@ void RGB_Matrix::rainbow_row( int startx, int starty,
     hsv.sat = 240;
     for( int x = startx; x < startx + w; x++) {
         for( int y = starty; y < starty + h; y++) { 
-            set_pixel(x, y, hsv, false);
+            ICRGB color = hsv;
+            color.r = (color.r * brightness) / 255;
+            color.g = (color.g * brightness) / 255;
+            color.b = (color.b * brightness) / 255;
+            set_pixel(x, y, color, false);
         }
         hsv.hue += deltahue;
     }
@@ -212,7 +221,8 @@ void RGB_Matrix::rainbow_row( int startx, int starty,
 void RGB_Matrix::rainbow_column( int startx, int starty,
             int w, int h,
             uint8_t initialhue,
-            uint8_t deltahue )
+            uint8_t deltahue,
+            uint8_t brightness )
 {
     if(w<0) w=width;
     if(h<0) h=height;
@@ -226,7 +236,11 @@ void RGB_Matrix::rainbow_column( int startx, int starty,
 
     for( int y = starty; y < starty + h; y++) {
         for( int x = startx; x < startx + w; x++) {
-            set_pixel(x, y, hsv, false);
+            ICRGB color = hsv;
+            color.r = (color.r * brightness) / 255;
+            color.g = (color.g * brightness) / 255;
+            color.b = (color.b * brightness) / 255;
+            set_pixel(x, y, color, false);
         }
         hsv.hue += deltahue;
     }
@@ -234,7 +248,8 @@ void RGB_Matrix::rainbow_column( int startx, int starty,
 
 void RGB_Matrix::gradient_row( ICRGB startcolor, ICRGB endcolor,
                    int startx, int starty,
-                   int w, int h )
+                   int w, int h,
+                   uint8_t brightness )
 {
     if(w<0) w=width;
     if(h<0) h=height;
@@ -265,6 +280,9 @@ void RGB_Matrix::gradient_row( ICRGB startcolor, ICRGB endcolor,
     rgbcolor_accum88 b88 = startcolor.b << 8;
     for( int x = startx; x < startx + w; x++) {
         ICRGB color( r88 >> 8, g88 >> 8, b88 >> 8);
+        color.r = (color.r * brightness) / 255;
+        color.g = (color.g * brightness) / 255;
+        color.b = (color.b * brightness) / 255;
         for( int y = starty; y < starty + h; y++) { 
             set_pixel(x, y, color, false);
         }
@@ -276,7 +294,8 @@ void RGB_Matrix::gradient_row( ICRGB startcolor, ICRGB endcolor,
 
 void RGB_Matrix::gradient_column( ICRGB startcolor, ICRGB endcolor,
                    int startx, int starty,
-                   int w, int h )
+                   int w, int h,
+                   uint8_t brightness )
 {
     if(w<0) w=width;
     if(h<0) h=height;
@@ -307,6 +326,9 @@ void RGB_Matrix::gradient_column( ICRGB startcolor, ICRGB endcolor,
     rgbcolor_accum88 b88 = startcolor.b << 8;
     for( int y = starty; y < starty + h; y++) {
         ICRGB color( r88 >> 8, g88 >> 8, b88 >> 8);
+        color.r = (color.r * brightness) / 255;
+        color.g = (color.g * brightness) / 255;
+        color.b = (color.b * brightness) / 255;
         for( int x = startx; x < startx + w; x++) { 
             set_pixel(x, y, color, false);
         }
@@ -320,6 +342,7 @@ void RGB_Matrix::fade_to(ICRGB new_color, uint8_t scale,
         int startx, int starty,
         int w, int h) {
     ICRGB color;
+    ulog(F("Fading to color: %d %d %d"), new_color.r, new_color.g, new_color.b);
     if(w<0) w=width;
     if(h<0) h=height;
     if(startx+w >= width) w=width-startx;

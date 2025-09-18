@@ -25,7 +25,8 @@ class CYD_Display : public Device {
         unsigned long last_frame=millis();
         u_int16_t _color_fg;
         u_int16_t _color_bg;
-        uint8_t _font = 1;
+        int _font = 1;
+        int _text_size = 1;
         int _rotation = 0;
         SPIClass* _ts_spi;
         XPT2046_Touchscreen* _ts;
@@ -36,9 +37,10 @@ class CYD_Display : public Device {
         int char_height, char_width;
     public:
         // this only supports the CYD displays so far
-        CYD_Display(const char* name, uint8_t font=1, int rotation=0, bool touchscreen=true) : Device(name, 1000) { // small font by default
+        CYD_Display(const char* name, int font=1, int rotation=0, bool touchscreen=true, int text_size=1 ) : Device(name, 1000) { // small font by default
             _tdb = new Text_Display_Buffer();
             _font = font;
+            _text_size = text_size;
             if(rotation>3) {
                 if(rotation==90) rotation = 1;
                 else if(rotation==180) rotation = 2;
