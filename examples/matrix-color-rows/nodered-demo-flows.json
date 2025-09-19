@@ -164,136 +164,6 @@
         "sessionExpiry": ""
     },
     {
-        "id": "20599f80329286f0",
-        "type": "ui_spacer",
-        "z": "585a956aeead605c",
-        "name": "spacer",
-        "group": "212c677090a3568a",
-        "order": 1,
-        "width": 1,
-        "height": 1
-    },
-    {
-        "id": "156d291005370c57",
-        "type": "ui_spacer",
-        "z": "585a956aeead605c",
-        "name": "spacer",
-        "group": "212c677090a3568a",
-        "order": 3,
-        "width": 5,
-        "height": 1
-    },
-    {
-        "id": "57d228a3f7ff3f87",
-        "type": "ui_spacer",
-        "z": "585a956aeead605c",
-        "name": "spacer",
-        "group": "212c677090a3568a",
-        "order": 4,
-        "width": 2,
-        "height": 1
-    },
-    {
-        "id": "fda74d6b9db76dbc",
-        "type": "ui_spacer",
-        "z": "585a956aeead605c",
-        "name": "spacer",
-        "group": "212c677090a3568a",
-        "order": 6,
-        "width": 3,
-        "height": 1
-    },
-    {
-        "id": "2ad0955cfbba4f9c",
-        "type": "ui_spacer",
-        "z": "585a956aeead605c",
-        "name": "spacer",
-        "group": "212c677090a3568a",
-        "order": 9,
-        "width": 1,
-        "height": 1
-    },
-    {
-        "id": "7989cb5028e0f9cc",
-        "type": "ui_spacer",
-        "z": "585a956aeead605c",
-        "name": "spacer",
-        "group": "212c677090a3568a",
-        "order": 12,
-        "width": 1,
-        "height": 1
-    },
-    {
-        "id": "f2527f93857c035c",
-        "type": "ui_spacer",
-        "z": "585a956aeead605c",
-        "name": "spacer",
-        "group": "212c677090a3568a",
-        "order": 15,
-        "width": 1,
-        "height": 1
-    },
-    {
-        "id": "246280f4e40f16c3",
-        "type": "ui_spacer",
-        "z": "585a956aeead605c",
-        "name": "spacer",
-        "group": "212c677090a3568a",
-        "order": 18,
-        "width": 1,
-        "height": 1
-    },
-    {
-        "id": "b1d0e6a7ea08592a",
-        "type": "ui_spacer",
-        "z": "585a956aeead605c",
-        "name": "spacer",
-        "group": "212c677090a3568a",
-        "order": 21,
-        "width": 1,
-        "height": 1
-    },
-    {
-        "id": "57e1a24fea335502",
-        "type": "ui_spacer",
-        "z": "585a956aeead605c",
-        "name": "spacer",
-        "group": "212c677090a3568a",
-        "order": 24,
-        "width": 1,
-        "height": 1
-    },
-    {
-        "id": "e946a78f76aca89b",
-        "type": "ui_spacer",
-        "z": "585a956aeead605c",
-        "name": "spacer",
-        "group": "212c677090a3568a",
-        "order": 27,
-        "width": 1,
-        "height": 1
-    },
-    {
-        "id": "eff920cb32b2c1c7",
-        "type": "ui_spacer",
-        "z": "585a956aeead605c",
-        "name": "spacer",
-        "group": "212c677090a3568a",
-        "order": 30,
-        "width": 1,
-        "height": 1
-    },
-    {
-        "id": "a2741d67d4d572e6",
-        "type": "ui_spacer",
-        "z": "585a956aeead605c",
-        "name": "spacer",
-        "group": "212c677090a3568a",
-        "order": 33,
-        "width": 1,
-        "height": 1
-    },
-    {
         "id": "3ec284bfd4f81f2d",
         "type": "ui_tab",
         "name": "Folk control dashboard",
@@ -308,15 +178,156 @@
         "tab": "3ec284bfd4f81f2d",
         "order": 2,
         "disp": true,
+        "width": 8,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "c3914b2425e51101",
+        "type": "ui_spacer",
+        "z": "585a956aeead605c",
+        "name": "spacer",
+        "group": "212c677090a3568a",
+        "order": 3,
+        "width": 1,
+        "height": 1
+    },
+    {
+        "id": "c4cfeffdea2f32a0",
+        "type": "ui_spacer",
+        "z": "585a956aeead605c",
+        "name": "spacer",
+        "group": "212c677090a3568a",
+        "order": 4,
+        "width": 3,
+        "height": 1
+    },
+    {
+        "id": "aab1f8c150595c30",
+        "type": "ui_spacer",
+        "z": "585a956aeead605c",
+        "name": "spacer",
+        "group": "212c677090a3568a",
+        "order": 5,
+        "width": 1,
+        "height": 1
+    },
+    {
+        "id": "a008e8312356892e",
+        "type": "ui_spacer",
+        "z": "585a956aeead605c",
+        "name": "spacer",
+        "group": "212c677090a3568a",
+        "order": 6,
+        "width": 1,
+        "height": 1
+    },
+    {
+        "id": "0235ab15f4bb1a01",
+        "type": "ui_spacer",
+        "z": "585a956aeead605c",
+        "name": "spacer",
+        "group": "212c677090a3568a",
+        "order": 9,
+        "width": 1,
+        "height": 1
+    },
+    {
+        "id": "3a6250f1b3d32beb",
+        "type": "ui_spacer",
+        "z": "585a956aeead605c",
+        "name": "spacer",
+        "group": "212c677090a3568a",
+        "order": 12,
+        "width": 1,
+        "height": 1
+    },
+    {
+        "id": "e183a679e18d22b3",
+        "type": "ui_spacer",
+        "z": "585a956aeead605c",
+        "name": "spacer",
+        "group": "212c677090a3568a",
+        "order": 15,
+        "width": 1,
+        "height": 1
+    },
+    {
+        "id": "19bd0a09545d39cf",
+        "type": "ui_spacer",
+        "z": "585a956aeead605c",
+        "name": "spacer",
+        "group": "212c677090a3568a",
+        "order": 18,
+        "width": 1,
+        "height": 1
+    },
+    {
+        "id": "d49c292ed143207c",
+        "type": "ui_spacer",
+        "z": "585a956aeead605c",
+        "name": "spacer",
+        "group": "212c677090a3568a",
+        "order": 21,
+        "width": 1,
+        "height": 1
+    },
+    {
+        "id": "8d3299517ec67c28",
+        "type": "ui_spacer",
+        "z": "585a956aeead605c",
+        "name": "spacer",
+        "group": "212c677090a3568a",
+        "order": 24,
+        "width": 1,
+        "height": 1
+    },
+    {
+        "id": "cebe349b046b1cba",
+        "type": "ui_spacer",
+        "z": "585a956aeead605c",
+        "name": "spacer",
+        "group": "212c677090a3568a",
+        "order": 27,
+        "width": 1,
+        "height": 1
+    },
+    {
+        "id": "921df6395383fc94",
+        "type": "ui_spacer",
+        "z": "585a956aeead605c",
+        "name": "spacer",
+        "group": "212c677090a3568a",
+        "order": 30,
+        "width": 1,
+        "height": 1
+    },
+    {
+        "id": "3916f7d45cb59c36",
+        "type": "ui_group",
+        "name": "Presets",
+        "tab": "3ec284bfd4f81f2d",
+        "order": 2,
+        "disp": true,
         "width": 6,
         "collapse": false,
         "className": ""
     },
     {
+        "id": "e23a6d71bffc2d7f",
+        "type": "ui_spacer",
+        "z": "585a956aeead605c",
+        "name": "spacer",
+        "group": "209003e430797b1a",
+        "order": 4,
+        "width": 8,
+        "height": 1
+    },
+    {
         "id": "75910a5b1b16c099",
         "type": "ui_button",
         "z": "585a956aeead605c",
-        "name": "",
+        "name": "red button",
         "group": "212c677090a3568a",
         "order": 7,
         "width": 3,
@@ -332,11 +343,11 @@
         "payloadType": "str",
         "topic": "topic",
         "topicType": "msg",
-        "x": 570,
-        "y": 940,
+        "x": 860,
+        "y": 920,
         "wires": [
             [
-                "9d1a4ef39aa045e5"
+                "91da7e6dc6dc5ec5"
             ]
         ]
     },
@@ -344,7 +355,7 @@
         "id": "e02de89423b30087",
         "type": "ui_button",
         "z": "585a956aeead605c",
-        "name": "",
+        "name": "green button",
         "group": "212c677090a3568a",
         "order": 10,
         "width": 3,
@@ -360,11 +371,11 @@
         "payloadType": "str",
         "topic": "topic",
         "topicType": "msg",
-        "x": 570,
-        "y": 1020,
+        "x": 870,
+        "y": 1040,
         "wires": [
             [
-                "d2b90f6422cd12cf"
+                "be7697ddd7b91890"
             ]
         ]
     },
@@ -372,7 +383,7 @@
         "id": "1523e97851ced2e1",
         "type": "ui_button",
         "z": "585a956aeead605c",
-        "name": "",
+        "name": "blue button",
         "group": "212c677090a3568a",
         "order": 13,
         "width": 3,
@@ -388,11 +399,11 @@
         "payloadType": "str",
         "topic": "topic",
         "topicType": "msg",
-        "x": 570,
-        "y": 1100,
+        "x": 870,
+        "y": 1120,
         "wires": [
             [
-                "b6a8c28c7b3420c5"
+                "95d1055e31ee75a5"
             ]
         ]
     },
@@ -400,7 +411,7 @@
         "id": "cb4e37d145648a4a",
         "type": "ui_chart",
         "z": "585a956aeead605c",
-        "name": "",
+        "name": "red bar",
         "group": "212c677090a3568a",
         "order": 8,
         "width": 5,
@@ -410,7 +421,7 @@
         "legend": "false",
         "xformat": "HH:mm:ss",
         "interpolate": "linear",
-        "nodata": "0",
+        "nodata": "",
         "dot": false,
         "ymin": "0",
         "ymax": "30",
@@ -433,9 +444,9 @@
         ],
         "outputs": 1,
         "useDifferentColor": false,
-        "className": "my-custom-chart",
-        "x": 1730,
-        "y": 980,
+        "className": "",
+        "x": 860,
+        "y": 960,
         "wires": [
             []
         ]
@@ -445,11 +456,11 @@
         "type": "ui_text",
         "z": "585a956aeead605c",
         "group": "212c677090a3568a",
-        "order": 5,
-        "width": 4,
-        "height": 1,
+        "order": 2,
+        "width": 5,
+        "height": 2,
         "name": "",
-        "label": "Countdown",
+        "label": "Timer",
         "format": "{{msg.payload}}",
         "layout": "col-center",
         "className": "",
@@ -457,8 +468,8 @@
         "font": "Gill Sans,Geneva,sans-serif",
         "fontSize": "24",
         "color": "#ff0000",
-        "x": 610,
-        "y": 660,
+        "x": 950,
+        "y": 720,
         "wires": []
     },
     {
@@ -488,243 +499,12 @@
         ]
     },
     {
-        "id": "847474708a94eaef",
-        "type": "ui_chart",
-        "z": "585a956aeead605c",
-        "name": "",
-        "group": "212c677090a3568a",
-        "order": 11,
-        "width": 5,
-        "height": 1,
-        "label": "",
-        "chartType": "horizontalBar",
-        "legend": "false",
-        "xformat": "HH:mm:ss",
-        "interpolate": "linear",
-        "nodata": "0",
-        "dot": false,
-        "ymin": "0",
-        "ymax": "30",
-        "removeOlder": 1,
-        "removeOlderPoints": "",
-        "removeOlderUnit": "3600",
-        "cutout": 0,
-        "useOneColor": true,
-        "useUTC": false,
-        "colors": [
-            "#2ca02c",
-            "#aec7e8",
-            "#ff7f0e",
-            "#2ca02c",
-            "#98df8a",
-            "#d62728",
-            "#ff9896",
-            "#9467bd",
-            "#c5b0d5"
-        ],
-        "outputs": 1,
-        "useDifferentColor": false,
-        "className": "",
-        "x": 1730,
-        "y": 1020,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "26c51ba345757e97",
-        "type": "ui_chart",
-        "z": "585a956aeead605c",
-        "name": "",
-        "group": "212c677090a3568a",
-        "order": 14,
-        "width": 5,
-        "height": 1,
-        "label": "",
-        "chartType": "horizontalBar",
-        "legend": "false",
-        "xformat": "HH:mm:ss",
-        "interpolate": "linear",
-        "nodata": "0",
-        "dot": false,
-        "ymin": "0",
-        "ymax": "30",
-        "removeOlder": 1,
-        "removeOlderPoints": "",
-        "removeOlderUnit": "3600",
-        "cutout": 0,
-        "useOneColor": true,
-        "useUTC": false,
-        "colors": [
-            "#1f77b4",
-            "#aec7e8",
-            "#ff7f0e",
-            "#2ca02c",
-            "#98df8a",
-            "#d62728",
-            "#ff9896",
-            "#9467bd",
-            "#c5b0d5"
-        ],
-        "outputs": 1,
-        "useDifferentColor": false,
-        "className": "",
-        "x": 1730,
-        "y": 1060,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "33a94342988041c6",
-        "type": "change",
-        "z": "585a956aeead605c",
-        "name": "set red",
-        "rules": [
-            {
-                "t": "set",
-                "p": "redCount",
-                "pt": "flow",
-                "to": "payload",
-                "tot": "msg"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 1110,
-        "y": 960,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "d6c38748bb50efbf",
-        "type": "change",
-        "z": "585a956aeead605c",
-        "name": "set green",
-        "rules": [
-            {
-                "t": "set",
-                "p": "greenCount",
-                "pt": "flow",
-                "to": "payload",
-                "tot": "msg"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 1120,
-        "y": 1000,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "eee083953b78d6d1",
-        "type": "change",
-        "z": "585a956aeead605c",
-        "name": "set blue",
-        "rules": [
-            {
-                "t": "set",
-                "p": "blueCount",
-                "pt": "flow",
-                "to": "payload",
-                "tot": "msg"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 1120,
-        "y": 1040,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "bcc75cc39a7a0547",
-        "type": "inject",
-        "z": "585a956aeead605c",
-        "name": "reset",
-        "props": [
-            {
-                "p": "reset",
-                "v": "true",
-                "vt": "bool"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": true,
-        "onceDelay": 0.1,
-        "topic": "",
-        "x": 270,
-        "y": 1260,
-        "wires": [
-            [
-                "9d1a4ef39aa045e5",
-                "d2b90f6422cd12cf",
-                "b6a8c28c7b3420c5",
-                "fb81bafe0ad1568b",
-                "d7e3362e77781e09",
-                "91165d2cfdfb824c",
-                "ed26716e120b0780",
-                "11cdff9a9f6cd24b",
-                "d45a6fe0189c7e30"
-            ]
-        ]
-    },
-    {
-        "id": "224643699c3cf90e",
-        "type": "change",
-        "z": "585a956aeead605c",
-        "name": "",
-        "rules": [
-            {
-                "t": "set",
-                "p": "reset",
-                "pt": "msg",
-                "to": "true",
-                "tot": "bool"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 180,
-        "y": 1080,
-        "wires": [
-            [
-                "9d1a4ef39aa045e5",
-                "d2b90f6422cd12cf",
-                "b6a8c28c7b3420c5",
-                "fb81bafe0ad1568b",
-                "d7e3362e77781e09",
-                "91165d2cfdfb824c",
-                "ed26716e120b0780",
-                "11cdff9a9f6cd24b",
-                "d45a6fe0189c7e30"
-            ]
-        ]
-    },
-    {
         "id": "175408e81fd63946",
         "type": "ui_button",
         "z": "585a956aeead605c",
-        "name": "",
+        "name": "cyan button",
         "group": "212c677090a3568a",
-        "order": 16,
+        "order": 31,
         "width": 3,
         "height": 1,
         "passthru": false,
@@ -738,11 +518,11 @@
         "payloadType": "str",
         "topic": "topic",
         "topicType": "msg",
-        "x": 570,
-        "y": 1220,
+        "x": 870,
+        "y": 1260,
         "wires": [
             [
-                "fb81bafe0ad1568b"
+                "489adef8f9585840"
             ]
         ]
     },
@@ -750,7 +530,7 @@
         "id": "94293052babef955",
         "type": "ui_button",
         "z": "585a956aeead605c",
-        "name": "",
+        "name": "magenta button",
         "group": "212c677090a3568a",
         "order": 19,
         "width": 3,
@@ -766,11 +546,11 @@
         "payloadType": "str",
         "topic": "topic",
         "topicType": "msg",
-        "x": 570,
-        "y": 1280,
+        "x": 880,
+        "y": 1340,
         "wires": [
             [
-                "d7e3362e77781e09"
+                "6cb0e573f86e5931"
             ]
         ]
     },
@@ -778,7 +558,7 @@
         "id": "8247905367a6af86",
         "type": "ui_button",
         "z": "585a956aeead605c",
-        "name": "",
+        "name": "yellow button",
         "group": "212c677090a3568a",
         "order": 22,
         "width": 3,
@@ -794,87 +574,12 @@
         "payloadType": "str",
         "topic": "topic",
         "topicType": "msg",
-        "x": 570,
-        "y": 1360,
+        "x": 870,
+        "y": 1420,
         "wires": [
             [
-                "91165d2cfdfb824c"
+                "e94e1de419667cb6"
             ]
-        ]
-    },
-    {
-        "id": "20a6236b095ab89b",
-        "type": "change",
-        "z": "585a956aeead605c",
-        "name": "set cyan",
-        "rules": [
-            {
-                "t": "set",
-                "p": "cyanCount",
-                "pt": "flow",
-                "to": "payload",
-                "tot": "msg"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 1120,
-        "y": 1220,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "2bc540adbcedbda3",
-        "type": "change",
-        "z": "585a956aeead605c",
-        "name": "set magenta",
-        "rules": [
-            {
-                "t": "set",
-                "p": "magentaCount",
-                "pt": "flow",
-                "to": "payload",
-                "tot": "msg"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 1130,
-        "y": 1260,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "9d32bec97f1e2b68",
-        "type": "change",
-        "z": "585a956aeead605c",
-        "name": "set yellow",
-        "rules": [
-            {
-                "t": "set",
-                "p": "yellowCount",
-                "pt": "flow",
-                "to": "payload",
-                "tot": "msg"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 1120,
-        "y": 1300,
-        "wires": [
-            []
         ]
     },
     {
@@ -895,7 +600,7 @@
         "payload": "false",
         "payloadType": "bool",
         "x": 110,
-        "y": 620,
+        "y": 640,
         "wires": [
             [
                 "5fc447b70d6b302f"
@@ -924,7 +629,7 @@
         "topic": "",
         "payload": "true",
         "payloadType": "bool",
-        "x": 530,
+        "x": 170,
         "y": 340,
         "wires": [
             [
@@ -1033,9 +738,9 @@
         "id": "c5bfd2a2c266eb2d",
         "type": "ui_button",
         "z": "585a956aeead605c",
-        "name": "",
+        "name": "orange button",
         "group": "212c677090a3568a",
-        "order": 25,
+        "order": 16,
         "width": 3,
         "height": 1,
         "passthru": false,
@@ -1049,11 +754,11 @@
         "payloadType": "str",
         "topic": "topic",
         "topicType": "msg",
-        "x": 570,
-        "y": 1500,
+        "x": 880,
+        "y": 1540,
         "wires": [
             [
-                "ed26716e120b0780"
+                "697680e59e2df93f"
             ]
         ]
     },
@@ -1061,9 +766,9 @@
         "id": "0d457f552296a88e",
         "type": "ui_button",
         "z": "585a956aeead605c",
-        "name": "",
+        "name": "purple button",
         "group": "212c677090a3568a",
-        "order": 31,
+        "order": 25,
         "width": 3,
         "height": 1,
         "passthru": false,
@@ -1077,11 +782,11 @@
         "payloadType": "str",
         "topic": "topic",
         "topicType": "msg",
-        "x": 570,
-        "y": 1560,
+        "x": 870,
+        "y": 1620,
         "wires": [
             [
-                "11cdff9a9f6cd24b"
+                "833d2e9fb3923ea2"
             ]
         ]
     },
@@ -1089,7 +794,7 @@
         "id": "109c8ce9a422efd6",
         "type": "ui_button",
         "z": "585a956aeead605c",
-        "name": "",
+        "name": "aqua button",
         "group": "212c677090a3568a",
         "order": 28,
         "width": 3,
@@ -1105,540 +810,12 @@
         "payloadType": "str",
         "topic": "topic",
         "topicType": "msg",
-        "x": 570,
-        "y": 1620,
+        "x": 870,
+        "y": 1700,
         "wires": [
             [
-                "d45a6fe0189c7e30"
+                "cedc8b3ad575b2d7"
             ]
-        ]
-    },
-    {
-        "id": "92971db23930423d",
-        "type": "change",
-        "z": "585a956aeead605c",
-        "name": "set orange",
-        "rules": [
-            {
-                "t": "set",
-                "p": "orangeCount",
-                "pt": "flow",
-                "to": "payload",
-                "tot": "msg"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 1130,
-        "y": 1500,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "491f470106fcde23",
-        "type": "change",
-        "z": "585a956aeead605c",
-        "name": "set purple",
-        "rules": [
-            {
-                "t": "set",
-                "p": "purpleCount",
-                "pt": "flow",
-                "to": "payload",
-                "tot": "msg"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 1120,
-        "y": 1540,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "baded031a9126429",
-        "type": "change",
-        "z": "585a956aeead605c",
-        "name": "set aqua",
-        "rules": [
-            {
-                "t": "set",
-                "p": "aquaCount",
-                "pt": "flow",
-                "to": "payload",
-                "tot": "msg"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 1120,
-        "y": 1580,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "ae3966c951f75cbc",
-        "type": "ui_chart",
-        "z": "585a956aeead605c",
-        "name": "",
-        "group": "212c677090a3568a",
-        "order": 17,
-        "width": 5,
-        "height": 1,
-        "label": "",
-        "chartType": "horizontalBar",
-        "legend": "false",
-        "xformat": "HH:mm:ss",
-        "interpolate": "linear",
-        "nodata": "0",
-        "dot": false,
-        "ymin": "0",
-        "ymax": "30",
-        "removeOlder": 1,
-        "removeOlderPoints": "",
-        "removeOlderUnit": "3600",
-        "cutout": 0,
-        "useOneColor": true,
-        "useUTC": false,
-        "colors": [
-            "#2cc0dd",
-            "#aec7e8",
-            "#ff7f0e",
-            "#2ca02c",
-            "#98df8a",
-            "#d62728",
-            "#ff9896",
-            "#9467bd",
-            "#c5b0d5"
-        ],
-        "outputs": 1,
-        "useDifferentColor": false,
-        "className": "",
-        "x": 1710,
-        "y": 1220,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "c7afbf1a3df29247",
-        "type": "ui_chart",
-        "z": "585a956aeead605c",
-        "name": "",
-        "group": "212c677090a3568a",
-        "order": 20,
-        "width": 5,
-        "height": 1,
-        "label": "",
-        "chartType": "horizontalBar",
-        "legend": "false",
-        "xformat": "HH:mm:ss",
-        "interpolate": "linear",
-        "nodata": "0",
-        "dot": false,
-        "ymin": "0",
-        "ymax": "30",
-        "removeOlder": 1,
-        "removeOlderPoints": "",
-        "removeOlderUnit": "3600",
-        "cutout": 0,
-        "useOneColor": true,
-        "useUTC": false,
-        "colors": [
-            "#e41fa7",
-            "#aec7e8",
-            "#ff7f0e",
-            "#2ca02c",
-            "#98df8a",
-            "#d62728",
-            "#ff9896",
-            "#9467bd",
-            "#c5b0d5"
-        ],
-        "outputs": 1,
-        "useDifferentColor": false,
-        "className": "",
-        "x": 1710,
-        "y": 1260,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "e80407f2b9e143e5",
-        "type": "ui_chart",
-        "z": "585a956aeead605c",
-        "name": "",
-        "group": "212c677090a3568a",
-        "order": 23,
-        "width": 5,
-        "height": 1,
-        "label": "",
-        "chartType": "horizontalBar",
-        "legend": "false",
-        "xformat": "HH:mm:ss",
-        "interpolate": "linear",
-        "nodata": "0",
-        "dot": false,
-        "ymin": "0",
-        "ymax": "30",
-        "removeOlder": 1,
-        "removeOlderPoints": "",
-        "removeOlderUnit": "3600",
-        "cutout": 0,
-        "useOneColor": true,
-        "useUTC": false,
-        "colors": [
-            "#f6d32d",
-            "#aec7e8",
-            "#ff7f0e",
-            "#2ca02c",
-            "#98df8a",
-            "#d62728",
-            "#ff9896",
-            "#9467bd",
-            "#c5b0d5"
-        ],
-        "outputs": 1,
-        "useDifferentColor": false,
-        "className": "",
-        "x": 1710,
-        "y": 1300,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "dda483be7cf660f7",
-        "type": "ui_chart",
-        "z": "585a956aeead605c",
-        "name": "",
-        "group": "212c677090a3568a",
-        "order": 26,
-        "width": 5,
-        "height": 1,
-        "label": "",
-        "chartType": "horizontalBar",
-        "legend": "false",
-        "xformat": "HH:mm:ss",
-        "interpolate": "linear",
-        "nodata": "0",
-        "dot": false,
-        "ymin": "0",
-        "ymax": "30",
-        "removeOlder": 1,
-        "removeOlderPoints": "",
-        "removeOlderUnit": "3600",
-        "cutout": 0,
-        "useOneColor": true,
-        "useUTC": false,
-        "colors": [
-            "#ff7800",
-            "#aec7e8",
-            "#ff7f0e",
-            "#2ca02c",
-            "#98df8a",
-            "#d62728",
-            "#ff9896",
-            "#9467bd",
-            "#c5b0d5"
-        ],
-        "outputs": 1,
-        "useDifferentColor": false,
-        "className": "",
-        "x": 1710,
-        "y": 1500,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "1eee80ec3b1264ca",
-        "type": "ui_chart",
-        "z": "585a956aeead605c",
-        "name": "",
-        "group": "212c677090a3568a",
-        "order": 32,
-        "width": 5,
-        "height": 1,
-        "label": "",
-        "chartType": "horizontalBar",
-        "legend": "false",
-        "xformat": "HH:mm:ss",
-        "interpolate": "linear",
-        "nodata": "0",
-        "dot": false,
-        "ymin": "0",
-        "ymax": "30",
-        "removeOlder": 1,
-        "removeOlderPoints": "",
-        "removeOlderUnit": "3600",
-        "cutout": 0,
-        "useOneColor": true,
-        "useUTC": false,
-        "colors": [
-            "#c061cb",
-            "#aec7e8",
-            "#ff7f0e",
-            "#2ca02c",
-            "#98df8a",
-            "#d62728",
-            "#ff9896",
-            "#9467bd",
-            "#c5b0d5"
-        ],
-        "outputs": 1,
-        "useDifferentColor": false,
-        "className": "",
-        "x": 1710,
-        "y": 1540,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "becaa7e81de9d1a2",
-        "type": "ui_chart",
-        "z": "585a956aeead605c",
-        "name": "",
-        "group": "212c677090a3568a",
-        "order": 29,
-        "width": 5,
-        "height": 1,
-        "label": "",
-        "chartType": "horizontalBar",
-        "legend": "false",
-        "xformat": "HH:mm:ss",
-        "interpolate": "linear",
-        "nodata": "0",
-        "dot": false,
-        "ymin": "0",
-        "ymax": "30",
-        "removeOlder": 1,
-        "removeOlderPoints": "",
-        "removeOlderUnit": "3600",
-        "cutout": 0,
-        "useOneColor": true,
-        "useUTC": false,
-        "colors": [
-            "#2be1cb",
-            "#aec7e8",
-            "#ff7f0e",
-            "#2ca02c",
-            "#98df8a",
-            "#d62728",
-            "#ff9896",
-            "#9467bd",
-            "#c5b0d5"
-        ],
-        "outputs": 1,
-        "useDifferentColor": false,
-        "className": "",
-        "x": 1710,
-        "y": 1580,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "9d1a4ef39aa045e5",
-        "type": "counter",
-        "z": "585a956aeead605c",
-        "name": "red counter",
-        "init": "0",
-        "step": "1",
-        "lower": "",
-        "upper": "",
-        "mode": "increment",
-        "outputs": 2,
-        "x": 750,
-        "y": 940,
-        "wires": [
-            [
-                "33a94342988041c6",
-                "75910a5b1b16c099"
-            ],
-            []
-        ]
-    },
-    {
-        "id": "d2b90f6422cd12cf",
-        "type": "counter",
-        "z": "585a956aeead605c",
-        "name": "green counter",
-        "init": "0",
-        "step": "1",
-        "lower": "",
-        "upper": "",
-        "mode": "increment",
-        "outputs": 2,
-        "x": 760,
-        "y": 1020,
-        "wires": [
-            [
-                "d6c38748bb50efbf",
-                "e02de89423b30087"
-            ],
-            []
-        ]
-    },
-    {
-        "id": "b6a8c28c7b3420c5",
-        "type": "counter",
-        "z": "585a956aeead605c",
-        "name": "blue pressed",
-        "init": "0",
-        "step": "1",
-        "lower": "",
-        "upper": "",
-        "mode": "increment",
-        "outputs": 2,
-        "x": 770,
-        "y": 1100,
-        "wires": [
-            [
-                "eee083953b78d6d1",
-                "1523e97851ced2e1"
-            ],
-            []
-        ]
-    },
-    {
-        "id": "fb81bafe0ad1568b",
-        "type": "counter",
-        "z": "585a956aeead605c",
-        "name": "cyan counter",
-        "init": "0",
-        "step": "1",
-        "lower": null,
-        "upper": null,
-        "mode": "increment",
-        "outputs": 2,
-        "x": 770,
-        "y": 1220,
-        "wires": [
-            [
-                "175408e81fd63946",
-                "20a6236b095ab89b"
-            ],
-            []
-        ]
-    },
-    {
-        "id": "d7e3362e77781e09",
-        "type": "counter",
-        "z": "585a956aeead605c",
-        "name": "magenta counter",
-        "init": "0",
-        "step": "1",
-        "lower": "",
-        "upper": "",
-        "mode": "increment",
-        "outputs": 2,
-        "x": 790,
-        "y": 1280,
-        "wires": [
-            [
-                "94293052babef955",
-                "2bc540adbcedbda3"
-            ],
-            []
-        ]
-    },
-    {
-        "id": "91165d2cfdfb824c",
-        "type": "counter",
-        "z": "585a956aeead605c",
-        "name": "yellow pressed",
-        "init": "0",
-        "step": "1",
-        "lower": "",
-        "upper": "",
-        "mode": "increment",
-        "outputs": 2,
-        "x": 800,
-        "y": 1360,
-        "wires": [
-            [
-                "9d32bec97f1e2b68",
-                "8247905367a6af86"
-            ],
-            []
-        ]
-    },
-    {
-        "id": "ed26716e120b0780",
-        "type": "counter",
-        "z": "585a956aeead605c",
-        "name": "orange counter",
-        "init": "0",
-        "step": "1",
-        "lower": null,
-        "upper": null,
-        "mode": "increment",
-        "outputs": 2,
-        "x": 780,
-        "y": 1500,
-        "wires": [
-            [
-                "92971db23930423d",
-                "c5bfd2a2c266eb2d"
-            ],
-            []
-        ]
-    },
-    {
-        "id": "11cdff9a9f6cd24b",
-        "type": "counter",
-        "z": "585a956aeead605c",
-        "name": "purple counter",
-        "init": "0",
-        "step": "1",
-        "lower": null,
-        "upper": null,
-        "mode": "increment",
-        "outputs": 2,
-        "x": 780,
-        "y": 1560,
-        "wires": [
-            [
-                "491f470106fcde23",
-                "0d457f552296a88e"
-            ],
-            []
-        ]
-    },
-    {
-        "id": "d45a6fe0189c7e30",
-        "type": "counter",
-        "z": "585a956aeead605c",
-        "name": "aqua pressed",
-        "init": "0",
-        "step": "1",
-        "lower": "",
-        "upper": "",
-        "mode": "increment",
-        "outputs": 2,
-        "x": 780,
-        "y": 1620,
-        "wires": [
-            [
-                "baded031a9126429",
-                "109c8ce9a422efd6"
-            ],
-            []
         ]
     },
     {
@@ -1651,16 +828,17 @@
         "payloadTimerStartType": "nul",
         "payloadTimerStop": "true",
         "payloadTimerStopType": "bool",
-        "timer": "5",
+        "timer": "6",
         "resetWhileRunning": false,
-        "outputOnReset": false,
+        "outputOnReset": true,
         "setTimeToNewWhileRunning": false,
         "startCountdownOnControlMessage": false,
         "x": 610,
         "y": 560,
         "wires": [
             [
-                "b1971d503832b51f"
+                "b1971d503832b51f",
+                "93e072861585ca82"
             ],
             [
                 "30ee892b13dc39d9"
@@ -1672,7 +850,7 @@
         "type": "function",
         "z": "585a956aeead605c",
         "name": "rounds++",
-        "func": "let rounds = flow.get(\"rounds\");\nrounds++;\nflow.set(\"rounds\",rounds);\nmsg.payload = rounds;\nreturn msg;",
+        "func": "let rounds = flow.get(\"rounds\");\nrounds++;\nmsg.payload = rounds;\nflow.set(\"rounds\",rounds);\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -1692,7 +870,7 @@
         "type": "debug",
         "z": "585a956aeead605c",
         "name": "debug 2",
-        "active": false,
+        "active": true,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -1700,7 +878,7 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1420,
+        "x": 1400,
         "y": 460,
         "wires": []
     },
@@ -1709,7 +887,7 @@
         "type": "function",
         "z": "585a956aeead605c",
         "name": "compute mqtt",
-        "func": "let round = msg.payload;\nlet panel = Math.ceil(round/8);\nlet row = ((round-1)%8)+1;\n\n// compute the winning color\nlet red = flow.get(\"redCount\") || 0;\nlet green = flow.get(\"greenCount\") || 0;\nlet blue = flow.get(\"blueCount\") || 0;\nlet cyan = flow.get(\"cyanCount\") || 0;\nlet magenta = flow.get(\"magentaCount\") || 0;\nlet yellow = flow.get(\"yellowCount\") || 0;\nlet orange = flow.get(\"orangeCount\") || 0;\nlet purple = flow.get(\"purpleCount\") || 0;\nlet aqua = flow.get(\"aquaCount\") || 0;\n\nlet maxCount = Math.max(red, green, blue,cyan,magenta,yellow,orange,purple,aqua);\nlet winner = \"\";\nif (maxCount === 0) {\n    winner = \"000000\";\n} else {\n    if (red === maxCount) winner = \"500000\";\n    else if (green === maxCount) winner = \"005000\";\n    else if (blue === maxCount) winner = \"00035A\";\n    else if (cyan === maxCount) winner = \"00505A\";\n    else if (magenta === maxCount) winner = \"500050\";\n    else if (yellow === maxCount) winner = \"5A5000\";\n    else if (orange === maxCount) winner = \"5A2D00\";\n    else if (purple === maxCount) winner = \"280078\";\n    else if (aqua === maxCount) winner = \"006E3C\";\n}\n\n//debub\n\nmsg.panel = panel;\nmsg.row = row;\nmsg.topic = \"panel\" + panel + \"/anim\";\n// panels are inverted so map 1-8 to 8-1\nmsg.payload = \"fade_to \" + (9-row) + \" \" + winner;\nreturn msg;\n",
+        "func": "let round = msg.payload;\n//let panel = Math.ceil(round/8);\nlet panel = flow.get(\"panelnum\");\nlet row = ((round-1)%8)+1;\n\n// compute the winning color\nlet red = flow.get(\"redCount\") || 0;\nlet green = flow.get(\"greenCount\") || 0;\nlet blue = flow.get(\"blueCount\") || 0;\nlet cyan = flow.get(\"cyanCount\") || 0;\nlet magenta = flow.get(\"magentaCount\") || 0;\nlet yellow = flow.get(\"yellowCount\") || 0;\nlet orange = flow.get(\"orangeCount\") || 0;\nlet purple = flow.get(\"purpleCount\") || 0;\nlet aqua = flow.get(\"aquaCount\") || 0;\n\nlet maxCount = Math.max(red, green, blue,cyan,magenta,yellow,orange,purple,aqua);\nlet winner = \"\";\nif (maxCount === 0) {\n    winner = \"000000\";\n} else {\n    if (red === maxCount) winner = \"500000\";\n    else if (green === maxCount) winner = \"005000\";\n    else if (blue === maxCount) winner = \"00035A\";\n    else if (cyan === maxCount) winner = \"00505A\";\n    else if (magenta === maxCount) winner = \"500050\";\n    else if (yellow === maxCount) winner = \"5A5000\";\n    else if (orange === maxCount) winner = \"5A2D00\";\n    else if (purple === maxCount) winner = \"280078\";\n    else if (aqua === maxCount) winner = \"006E3C\";\n}\n\n//debub\n\nmsg.panel = panel;\nmsg.row = row;\nmsg.topic = \"panel\" + panel + \"/anim\";\n// panels are inverted so map 1-8 to 8-1\nmsg.payload = \"fade_to \" + (9-row) + \" \" + winner;\nreturn msg;\n",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -1720,9 +898,9 @@
         "y": 560,
         "wires": [
             [
-                "ea916c29246d3d48",
                 "c377db8091606cbd",
-                "93e072861585ca82"
+                "ea916c29246d3d48",
+                "498bfca274a7d397"
             ]
         ]
     },
@@ -1736,11 +914,13 @@
         "rules": [
             {
                 "t": "lte",
-                "v": "32",
+                "v": "8",
                 "vt": "str"
             },
             {
-                "t": "else"
+                "t": "eq",
+                "v": "8",
+                "vt": "str"
             }
         ],
         "checkall": "true",
@@ -1781,7 +961,8 @@
         "y": 460,
         "wires": [
             [
-                "5fc447b70d6b302f"
+                "5fc447b70d6b302f",
+                "db851b09d188c9a9"
             ]
         ]
     },
@@ -1802,51 +983,6 @@
         "x": 1670,
         "y": 560,
         "wires": []
-    },
-    {
-        "id": "ea916c29246d3d48",
-        "type": "function",
-        "z": "585a956aeead605c",
-        "name": "reset counts",
-        "func": "// Reset counts if needed\nflow.set(\"redCount\", 0);\nflow.set(\"greenCount\", 0);\nflow.set(\"blueCount\", 0);\nflow.set(\"cyanCount\", 0);\nflow.set(\"magentaCount\", 0);\nflow.set(\"yellowCount\", 0);\nflow.set(\"orangeCount\", 0);\nflow.set(\"purpleCount\", 0);\nflow.set(\"aquaCount\", 0);\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 310,
-        "y": 860,
-        "wires": [
-            [
-                "224643699c3cf90e"
-            ]
-        ]
-    },
-    {
-        "id": "abbae6390191b23d",
-        "type": "inject",
-        "z": "585a956aeead605c",
-        "name": "",
-        "props": [
-            {
-                "p": "payload"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "payload": "true",
-        "payloadType": "bool",
-        "x": 270,
-        "y": 1300,
-        "wires": [
-            [
-                "9d1a4ef39aa045e5"
-            ]
-        ]
     },
     {
         "id": "eac991d188970146",
@@ -1967,7 +1103,7 @@
         "id": "faf543e00dfe6f02",
         "type": "inject",
         "z": "585a956aeead605c",
-        "name": "every 0.7s",
+        "name": "every 0.25s",
         "props": [
             {
                 "p": "payload"
@@ -1977,26 +1113,18 @@
                 "vt": "str"
             }
         ],
-        "repeat": "0.7",
+        "repeat": "0.25",
         "crontab": "",
         "once": true,
         "onceDelay": 0.1,
         "topic": "",
         "payload": "ping",
         "payloadType": "str",
-        "x": 1190,
-        "y": 1120,
+        "x": 130,
+        "y": 1080,
         "wires": [
             [
-                "5c4a00ef88c1d4ee",
-                "a485d4fda9b51b41",
-                "127643eb87e21113",
-                "1e7cb374c77520ad",
-                "961911a1838fbc9b",
-                "647a441b94800a98",
-                "fcf3f6f3df537c18",
-                "cc673bfc1a9396e7",
-                "9e67c875e339d0f4"
+                "d5d6f4b39ca72a47"
             ]
         ]
     },
@@ -2012,6 +1140,13 @@
                 "pt": "msg",
                 "to": "redCount",
                 "tot": "flow"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "false",
+                "tot": "bool"
             }
         ],
         "action": "",
@@ -2019,11 +1154,13 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1540,
-        "y": 980,
+        "x": 660,
+        "y": 940,
         "wires": [
             [
-                "cb4e37d145648a4a"
+                "cb4e37d145648a4a",
+                "75910a5b1b16c099",
+                "ca8185904f741dde"
             ]
         ]
     },
@@ -2039,6 +1176,13 @@
                 "pt": "msg",
                 "to": "greenCount",
                 "tot": "flow"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "false",
+                "tot": "bool"
             }
         ],
         "action": "",
@@ -2046,11 +1190,12 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1540,
-        "y": 1020,
+        "x": 660,
+        "y": 1060,
         "wires": [
             [
-                "847474708a94eaef"
+                "e02de89423b30087",
+                "ffe94153a88c199f"
             ]
         ]
     },
@@ -2066,6 +1211,13 @@
                 "pt": "msg",
                 "to": "blueCount",
                 "tot": "flow"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "false",
+                "tot": "bool"
             }
         ],
         "action": "",
@@ -2073,11 +1225,12 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1540,
-        "y": 1060,
+        "x": 660,
+        "y": 1140,
         "wires": [
             [
-                "26c51ba345757e97"
+                "1523e97851ced2e1",
+                "2b2fd9ef94313425"
             ]
         ]
     },
@@ -2093,6 +1246,13 @@
                 "pt": "msg",
                 "to": "cyanCount",
                 "tot": "flow"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "false",
+                "tot": "bool"
             }
         ],
         "action": "",
@@ -2100,11 +1260,12 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1540,
-        "y": 1220,
+        "x": 660,
+        "y": 1280,
         "wires": [
             [
-                "ae3966c951f75cbc"
+                "175408e81fd63946",
+                "c30594cc495c4222"
             ]
         ]
     },
@@ -2120,6 +1281,13 @@
                 "pt": "msg",
                 "to": "magentaCount",
                 "tot": "flow"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "false",
+                "tot": "bool"
             }
         ],
         "action": "",
@@ -2127,11 +1295,12 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1550,
-        "y": 1260,
+        "x": 670,
+        "y": 1360,
         "wires": [
             [
-                "c7afbf1a3df29247"
+                "94293052babef955",
+                "5bb8bf39b1b4da02"
             ]
         ]
     },
@@ -2139,7 +1308,7 @@
         "id": "647a441b94800a98",
         "type": "change",
         "z": "585a956aeead605c",
-        "name": "get blue",
+        "name": "get yellow",
         "rules": [
             {
                 "t": "set",
@@ -2147,6 +1316,13 @@
                 "pt": "msg",
                 "to": "yellowCount",
                 "tot": "flow"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "false",
+                "tot": "bool"
             }
         ],
         "action": "",
@@ -2154,11 +1330,12 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1540,
-        "y": 1300,
+        "x": 660,
+        "y": 1440,
         "wires": [
             [
-                "e80407f2b9e143e5"
+                "8247905367a6af86",
+                "ce79a216314e631e"
             ]
         ]
     },
@@ -2174,6 +1351,13 @@
                 "pt": "msg",
                 "to": "orangeCount",
                 "tot": "flow"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "false",
+                "tot": "bool"
             }
         ],
         "action": "",
@@ -2181,11 +1365,12 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1550,
-        "y": 1500,
+        "x": 670,
+        "y": 1560,
         "wires": [
             [
-                "dda483be7cf660f7"
+                "c5bfd2a2c266eb2d",
+                "135acaaefc3bdb8c"
             ]
         ]
     },
@@ -2201,6 +1386,13 @@
                 "pt": "msg",
                 "to": "purpleCount",
                 "tot": "flow"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "false",
+                "tot": "bool"
             }
         ],
         "action": "",
@@ -2208,11 +1400,12 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1540,
-        "y": 1540,
+        "x": 660,
+        "y": 1640,
         "wires": [
             [
-                "1eee80ec3b1264ca"
+                "0d457f552296a88e",
+                "ffbb13fbe08a7204"
             ]
         ]
     },
@@ -2228,6 +1421,13 @@
                 "pt": "msg",
                 "to": "aquaCount",
                 "tot": "flow"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "false",
+                "tot": "bool"
             }
         ],
         "action": "",
@@ -2235,11 +1435,842 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1540,
-        "y": 1580,
+        "x": 660,
+        "y": 1720,
         "wires": [
             [
-                "becaa7e81de9d1a2"
+                "109c8ce9a422efd6",
+                "bbdaf125e5fe6fff"
+            ]
+        ]
+    },
+    {
+        "id": "b6cc2da2899a5936",
+        "type": "inject",
+        "z": "585a956aeead605c",
+        "name": "test green",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 880,
+        "y": 1000,
+        "wires": [
+            [
+                "be7697ddd7b91890"
+            ]
+        ]
+    },
+    {
+        "id": "9b6c07429c54096b",
+        "type": "inject",
+        "z": "585a956aeead605c",
+        "name": "test red",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 870,
+        "y": 880,
+        "wires": [
+            [
+                "91da7e6dc6dc5ec5"
+            ]
+        ]
+    },
+    {
+        "id": "8c0132d205373750",
+        "type": "link in",
+        "z": "585a956aeead605c",
+        "name": "show votes",
+        "links": [
+            "498bfca274a7d397",
+            "d5d6f4b39ca72a47"
+        ],
+        "x": 205,
+        "y": 1180,
+        "wires": [
+            [
+                "a485d4fda9b51b41",
+                "127643eb87e21113",
+                "1e7cb374c77520ad",
+                "961911a1838fbc9b",
+                "647a441b94800a98",
+                "cc673bfc1a9396e7",
+                "9e67c875e339d0f4",
+                "fcf3f6f3df537c18",
+                "5c4a00ef88c1d4ee"
+            ]
+        ]
+    },
+    {
+        "id": "d5d6f4b39ca72a47",
+        "type": "link out",
+        "z": "585a956aeead605c",
+        "name": "link out 1",
+        "mode": "link",
+        "links": [
+            "8c0132d205373750"
+        ],
+        "x": 245,
+        "y": 1060,
+        "wires": []
+    },
+    {
+        "id": "498bfca274a7d397",
+        "type": "link out",
+        "z": "585a956aeead605c",
+        "name": "link out 2",
+        "mode": "link",
+        "links": [
+            "8c0132d205373750"
+        ],
+        "x": 1475,
+        "y": 700,
+        "wires": []
+    },
+    {
+        "id": "ea916c29246d3d48",
+        "type": "function",
+        "z": "585a956aeead605c",
+        "name": "reset counts",
+        "func": "// Reset counts if needed\nflow.set(\"redCount\", 0);\nflow.set(\"greenCount\", 0);\nflow.set(\"blueCount\", 0);\nflow.set(\"cyanCount\", 0);\nflow.set(\"magentaCount\", 0);\nflow.set(\"yellowCount\", 0);\nflow.set(\"orangeCount\", 0);\nflow.set(\"purpleCount\", 0);\nflow.set(\"aquaCount\", 0);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 330,
+        "y": 760,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "be7697ddd7b91890",
+        "type": "function",
+        "z": "585a956aeead605c",
+        "name": "increase green",
+        "func": "let cs=\"greenCount\"\nlet count = flow.get(cs) || 0;\ncount++;\nflow.set(cs, count);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1060,
+        "y": 1040,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "91da7e6dc6dc5ec5",
+        "type": "function",
+        "z": "585a956aeead605c",
+        "name": "increase green",
+        "func": "let cs=\"redCount\"\nlet count = flow.get(cs) || 0;\ncount++;\nflow.set(cs, count);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1060,
+        "y": 920,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "95d1055e31ee75a5",
+        "type": "function",
+        "z": "585a956aeead605c",
+        "name": "increase blue",
+        "func": "let cs=\"blueCount\"\nlet count = flow.get(cs) || 0;\ncount++;\nflow.set(cs, count);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1050,
+        "y": 1120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "489adef8f9585840",
+        "type": "function",
+        "z": "585a956aeead605c",
+        "name": "increase cyan",
+        "func": "let cs=\"cyanCount\"\nlet count = flow.get(cs) || 0;\ncount++;\nflow.set(cs, count);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1060,
+        "y": 1260,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "6cb0e573f86e5931",
+        "type": "function",
+        "z": "585a956aeead605c",
+        "name": "increase magenta",
+        "func": "let cs=\"magentaCount\"\nlet count = flow.get(cs) || 0;\ncount++;\nflow.set(cs, count);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1070,
+        "y": 1340,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e94e1de419667cb6",
+        "type": "function",
+        "z": "585a956aeead605c",
+        "name": "increase blue",
+        "func": "let cs=\"yellowCount\"\nlet count = flow.get(cs) || 0;\ncount++;\nflow.set(cs, count);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1050,
+        "y": 1420,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "697680e59e2df93f",
+        "type": "function",
+        "z": "585a956aeead605c",
+        "name": "increase orange",
+        "func": "let cs=\"orangeCount\"\nlet count = flow.get(cs) || 0;\ncount++;\nflow.set(cs, count);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1060,
+        "y": 1540,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "833d2e9fb3923ea2",
+        "type": "function",
+        "z": "585a956aeead605c",
+        "name": "increase purple",
+        "func": "let cs=\"purpleCount\"\nlet count = flow.get(cs) || 0;\ncount++;\nflow.set(cs, count);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1060,
+        "y": 1620,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "cedc8b3ad575b2d7",
+        "type": "function",
+        "z": "585a956aeead605c",
+        "name": "increase aqua",
+        "func": "let cs=\"aquaCount\"\nlet count = flow.get(cs) || 0;\ncount++;\nflow.set(cs, count);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1060,
+        "y": 1700,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ffe94153a88c199f",
+        "type": "ui_chart",
+        "z": "585a956aeead605c",
+        "name": "green bar",
+        "group": "212c677090a3568a",
+        "order": 11,
+        "width": 5,
+        "height": 1,
+        "label": "",
+        "chartType": "horizontalBar",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "0",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "30",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": true,
+        "useUTC": false,
+        "colors": [
+            "#2ca02c",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 860,
+        "y": 1080,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "2b2fd9ef94313425",
+        "type": "ui_chart",
+        "z": "585a956aeead605c",
+        "name": "blue bar",
+        "group": "212c677090a3568a",
+        "order": 14,
+        "width": 5,
+        "height": 1,
+        "label": "",
+        "chartType": "horizontalBar",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "0",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "30",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": true,
+        "useUTC": false,
+        "colors": [
+            "#1c71d8",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 860,
+        "y": 1160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "c30594cc495c4222",
+        "type": "ui_chart",
+        "z": "585a956aeead605c",
+        "name": "cyan bar",
+        "group": "212c677090a3568a",
+        "order": 32,
+        "width": 5,
+        "height": 1,
+        "label": "",
+        "chartType": "horizontalBar",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "0",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "30",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": true,
+        "useUTC": false,
+        "colors": [
+            "#2cc0dd",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 880,
+        "y": 1300,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "5bb8bf39b1b4da02",
+        "type": "ui_chart",
+        "z": "585a956aeead605c",
+        "name": "magenta bar",
+        "group": "212c677090a3568a",
+        "order": 20,
+        "width": 5,
+        "height": 1,
+        "label": "",
+        "chartType": "horizontalBar",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "0",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "30",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": true,
+        "useUTC": false,
+        "colors": [
+            "#e41fa7",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 870,
+        "y": 1380,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ce79a216314e631e",
+        "type": "ui_chart",
+        "z": "585a956aeead605c",
+        "name": "yellow bar",
+        "group": "212c677090a3568a",
+        "order": 23,
+        "width": 5,
+        "height": 1,
+        "label": "",
+        "chartType": "horizontalBar",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "0",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "30",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": true,
+        "useUTC": false,
+        "colors": [
+            "#f6d32d",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 860,
+        "y": 1460,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "135acaaefc3bdb8c",
+        "type": "ui_chart",
+        "z": "585a956aeead605c",
+        "name": "orange bar",
+        "group": "212c677090a3568a",
+        "order": 17,
+        "width": 5,
+        "height": 1,
+        "label": "",
+        "chartType": "horizontalBar",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "0",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "30",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": true,
+        "useUTC": false,
+        "colors": [
+            "#ff7800",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 870,
+        "y": 1580,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ffbb13fbe08a7204",
+        "type": "ui_chart",
+        "z": "585a956aeead605c",
+        "name": "purple bar",
+        "group": "212c677090a3568a",
+        "order": 26,
+        "width": 5,
+        "height": 1,
+        "label": "",
+        "chartType": "horizontalBar",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "0",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "30",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": true,
+        "useUTC": false,
+        "colors": [
+            "#c061cb",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 860,
+        "y": 1660,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "bbdaf125e5fe6fff",
+        "type": "ui_chart",
+        "z": "585a956aeead605c",
+        "name": "aqua bar",
+        "group": "212c677090a3568a",
+        "order": 29,
+        "width": 5,
+        "height": 1,
+        "label": "",
+        "chartType": "horizontalBar",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "0",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "30",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": true,
+        "useUTC": false,
+        "colors": [
+            "#2be1cb",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 860,
+        "y": 1740,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "646ce638c4723b4f",
+        "type": "link in",
+        "z": "585a956aeead605c",
+        "name": "panelnum button",
+        "links": [
+            "0b11cff9c459de86"
+        ],
+        "x": 65,
+        "y": 420,
+        "wires": [
+            [
+                "80f1d59e6b33446c",
+                "03a446f68a5f297a"
+            ]
+        ]
+    },
+    {
+        "id": "03a446f68a5f297a",
+        "type": "change",
+        "z": "585a956aeead605c",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "panelnum",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 310,
+        "y": 460,
+        "wires": [
+            [
+                "8c33c17c51df92b5"
+            ]
+        ]
+    },
+    {
+        "id": "db851b09d188c9a9",
+        "type": "change",
+        "z": "585a956aeead605c",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "Game Over",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 460,
+        "y": 640,
+        "wires": [
+            [
+                "30ee892b13dc39d9",
+                "c80e3a8d62aa53a4"
+            ]
+        ]
+    },
+    {
+        "id": "1f44cc8ffabc9e1e",
+        "type": "ui_text",
+        "z": "585a956aeead605c",
+        "group": "212c677090a3568a",
+        "order": 1,
+        "width": 3,
+        "height": 1,
+        "name": "",
+        "label": "PART",
+        "format": "{{msg.payload}}",
+        "layout": "row-center",
+        "className": "",
+        "style": true,
+        "font": "Gill Sans,Geneva,sans-serif",
+        "fontSize": "27",
+        "color": "#000000",
+        "x": 650,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "ca8185904f741dde",
+        "type": "debug",
+        "z": "585a956aeead605c",
+        "name": "debug 1",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 800,
+        "y": 820,
+        "wires": []
+    },
+    {
+        "id": "8c33c17c51df92b5",
+        "type": "change",
+        "z": "585a956aeead605c",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "panelnum",
+                "tot": "flow"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 500,
+        "y": 460,
+        "wires": [
+            [
+                "1f44cc8ffabc9e1e"
+            ]
+        ]
+    },
+    {
+        "id": "c80e3a8d62aa53a4",
+        "type": "delay",
+        "z": "585a956aeead605c",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 600,
+        "y": 720,
+        "wires": [
+            [
+                "c8ef35a7ca130ae0"
+            ]
+        ]
+    },
+    {
+        "id": "c8ef35a7ca130ae0",
+        "type": "change",
+        "z": "585a956aeead605c",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "Get Ready",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 780,
+        "y": 720,
+        "wires": [
+            [
+                "30ee892b13dc39d9"
             ]
         ]
     },
@@ -2262,14 +2293,14 @@
         "z": "89b7424beca3476c",
         "name": "",
         "group": "209003e430797b1a",
-        "order": 0,
+        "order": 3,
         "width": 0,
         "height": 0,
         "passthru": false,
-        "label": "Rest all panels",
+        "label": "Reset all panels",
         "tooltip": "",
-        "color": "",
-        "bgcolor": "",
+        "color": "white",
+        "bgcolor": "black",
         "className": "",
         "icon": "",
         "payload": "",
@@ -2285,40 +2316,6 @@
         ]
     },
     {
-        "id": "df306c25c99da698",
-        "type": "ui_switch",
-        "z": "89b7424beca3476c",
-        "name": "",
-        "label": "START/STOP",
-        "tooltip": "",
-        "group": "209003e430797b1a",
-        "order": 2,
-        "width": 3,
-        "height": 1,
-        "passthru": true,
-        "decouple": "false",
-        "topic": "reset",
-        "topicType": "msg",
-        "style": "",
-        "onvalue": "true",
-        "onvalueType": "bool",
-        "onicon": "",
-        "oncolor": "",
-        "offvalue": "false",
-        "offvalueType": "bool",
-        "officon": "",
-        "offcolor": "",
-        "animate": true,
-        "className": "",
-        "x": 440,
-        "y": 280,
-        "wires": [
-            [
-                "559e5f9813a8ed65"
-            ]
-        ]
-    },
-    {
         "id": "559e5f9813a8ed65",
         "type": "link out",
         "z": "89b7424beca3476c",
@@ -2327,8 +2324,8 @@
         "links": [
             "64fc38627f55dad3"
         ],
-        "x": 615,
-        "y": 280,
+        "x": 625,
+        "y": 240,
         "wires": []
     },
     {
@@ -2349,7 +2346,7 @@
         "type": "function",
         "z": "89b7424beca3476c",
         "name": "Emmaste panels",
-        "func": "// This is just to paint the panels to orderly colors\n// to test if they are all working\n\n// Colors\nlet red = \"500000\";\nlet green = \"005000\";\nlet blue = \"00035A\";\nlet cyan = \"00505A\";\nlet magenta = \"500050\";\nlet yellow = \"5A5000\";\nlet orange = \"5A2D00\";\nlet purple = \"280078\";\nlet aqua = \"006E3C\";\nlet black = \"000000\";\n\nlet round = msg.payload;\nlet panel = Math.ceil(round/8);\nlet row = (round%8);\nlet winner = \"0\";\nif (row === 0) {\n row = 8;\n};\n\n    if (round === 1) winner = red;\n    else if (round === 2) winner = blue;\n    else if (round === 3) winner = green;\n    else if (round === 4) winner = orange;\n    else if (round === 5) winner = yellow;\n    else if (round === 6) winner = orange;\n    else if (round === 7) winner = green;\n    else if (round === 8) winner = blue;\n    \n    else if (round === 9) winner = red;\n    else if (round === 10) winner = purple;\n    else if (round === 11) winner = black;\n    else if (round === 12) winner = black;\n    else if (round === 13) winner = magenta;\n    else if (round === 14) winner = green;\n    else if (round === 15) winner = purple;\n    else if (round === 16) winner = red;\n\n    else if (round === 17) winner = red;\n    else if (round === 18) winner = purple;\n    else if (round === 19) winner = blue;\n    else if (round === 20) winner = purple;\n    else if (round === 21) winner = red;\n    else if (round === 22) winner = red;\n    else if (round === 23) winner = blue;\n    else if (round === 24) winner = green;\n\n    else if (round === 25) winner = orange;\n    else if (round === 26) winner = yellow;\n    else if (round === 27) winner = orange;\n    else if (round === 28) winner = green;\n    else if (round === 29) winner = blue;\n    else if (round === 9) winner = red;\n    else if (round === 10) winner = red;\n    else if (round === 11) winner = purple;\n    else if (round === 12) winner = black;\n\n\nmsg.panel = panel;\nmsg.row = row;\nmsg.topic = \"panel\" + panel + \"/anim\";\nmsg.payload = \"fade_to \" + row + \" \" + winner;\nreturn msg;\n",
+        "func": "// This is just to paint the panels to orderly colors\n// to test if they are all working\n\n// Colors\nlet red = \"500000\";\nlet green = \"005000\";\nlet blue = \"00035A\";\nlet cyan = \"00505A\";\nlet magenta = \"500050\";\nlet yellow = \"5A5000\";\nlet orange = \"5A2D00\";\nlet purple = \"280078\";\nlet aqua = \"006E3C\";\nlet black = \"000000\";\n\nlet round = msg.payload;\nlet panel = Math.ceil(round/8);\nlet row = ((round-1)%8)+1;\nlet winner = \"0\";\n\n\n    if (round === 1) winner = red;\n    else if (round === 2) winner = blue;\n    else if (round === 3) winner = green;\n    else if (round === 4) winner = orange;\n    else if (round === 5) winner = yellow;\n    else if (round === 6) winner = orange;\n    else if (round === 7) winner = green;\n    else if (round === 8) winner = blue;\n    \n    else if (round === 9) winner = red;\n    else if (round === 10) winner = purple;\n    else if (round === 11) winner = black;\n    else if (round === 12) winner = black;\n    else if (round === 13) winner = magenta;\n    else if (round === 14) winner = green;\n    else if (round === 15) winner = purple;\n    else if (round === 16) winner = red;\n\n    else if (round === 17) winner = red;\n    else if (round === 18) winner = purple;\n    else if (round === 19) winner = blue;\n    else if (round === 20) winner = purple;\n    else if (round === 21) winner = red;\n    else if (round === 22) winner = red;\n    else if (round === 23) winner = blue;\n    else if (round === 24) winner = green;\n\n    else if (round === 25) winner = orange;\n    else if (round === 26) winner = yellow;\n    else if (round === 27) winner = orange;\n    else if (round === 28) winner = green;\n    else if (round === 29) winner = blue;\n    else if (round === 9) winner = red;\n    else if (round === 10) winner = red;\n    else if (round === 11) winner = purple;\n    else if (round === 12) winner = black;\n\n\nmsg.panel = panel;\nmsg.row = row;\nmsg.topic = \"panel\" + panel + \"/anim\";\nmsg.payload = \"fade_to \" + (9-row) + \" \" + winner;\nreturn msg;\n",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -2542,10 +2539,10 @@
         "type": "ui_button",
         "z": "89b7424beca3476c",
         "name": "",
-        "group": "209003e430797b1a",
-        "order": 2,
-        "width": 0,
-        "height": 0,
+        "group": "3916f7d45cb59c36",
+        "order": 1,
+        "width": 3,
+        "height": 1,
         "passthru": false,
         "label": "Emmaste colors",
         "tooltip": "",
@@ -2600,7 +2597,7 @@
         "type": "function",
         "z": "89b7424beca3476c",
         "name": "Emmaste panels",
-        "func": "// This is just to paint the panels to orderly colors\n// to test if they are all working\n\n// Colors\nlet red = \"500000\";\nlet green = \"005000\";\nlet blue = \"00035A\";\nlet cyan = \"00505A\";\nlet magenta = \"500050\";\nlet yellow = \"5A5000\";\nlet orange = \"5A2D00\";\nlet purple = \"280078\";\nlet aqua = \"006E3C\";\nlet black = \"000000\";\nlet white = \"505050\";\n\nlet round = msg.payload;\nlet panel = Math.ceil(round/8);\nlet row = (round%8);\nlet winner = \"0\";\nif (row === 0) {\n row = 8;\n};\n\n    if (round === 1) winner = blue;\n    else if (round === 2) winner = blue;\n    else if (round === 3) winner = cyan;\n    else if (round === 4) winner = white;\n    else if (round === 5) winner = red;\n    else if (round === 6) winner = orange;\n    else if (round === 7) winner = red;\n    else if (round === 8) winner = red;\n    \n    else if (round === 9) winner = white;\n    else if (round === 10) winner = cyan;\n    else if (round === 11) winner = blue;\n    else if (round === 12) winner = blue;\n    else if (round === 13) winner = orange;\n    else if (round === 14) winner = black;\n    else if (round === 15) winner = red;\n    else if (round === 16) winner = orange;\n\n    else if (round === 17) winner = blue;\n    else if (round === 18) winner = blue;\n    else if (round === 19) winner = cyan;\n    else if (round === 20) winner = white;\n    else if (round === 21) winner = red;\n    else if (round === 22) winner = orange;\n    else if (round === 23) winner = red;\n    else if (round === 24) winner = red;\n\n    else if (round === 25) winner = white;\n    else if (round === 26) winner = yellow;\n    else if (round === 27) winner = orange;\n    else if (round === 28) winner = green;\n    else if (round === 29) winner = blue;\n    else if (round === 30) winner = red;\n    else if (round === 31) winner = red;\n    else if (round === 32) winner = purple;\n\n\n\nmsg.panel = panel;\nmsg.row = row;\nmsg.topic = \"panel\" + panel + \"/anim\";\nmsg.payload = \"fade_to \" + row + \" \" + winner;\nreturn msg;\n",
+        "func": "// This is just to paint the panels to orderly colors\n// to test if they are all working\n\n// Colors\nlet red = \"500000\";\nlet green = \"005000\";\nlet blue = \"00035A\";\nlet cyan = \"00505A\";\nlet magenta = \"500050\";\nlet yellow = \"5A5000\";\nlet orange = \"5A2D00\";\nlet purple = \"280078\";\nlet aqua = \"006E3C\";\nlet black = \"000000\";\nlet white = \"505050\";\n\nlet round = msg.payload;\nlet panel = Math.ceil(round/8);\nlet row = ((round-1)%8)+1;\nlet winner = \"0\";\n\n    if (round === 1) winner = blue;\n    else if (round === 2) winner = blue;\n    else if (round === 3) winner = cyan;\n    else if (round === 4) winner = white;\n    else if (round === 5) winner = red;\n    else if (round === 6) winner = orange;\n    else if (round === 7) winner = red;\n    else if (round === 8) winner = red;\n    \n    else if (round === 9) winner = white;\n    else if (round === 10) winner = cyan;\n    else if (round === 11) winner = blue;\n    else if (round === 12) winner = blue;\n    else if (round === 13) winner = orange;\n    else if (round === 14) winner = black;\n    else if (round === 15) winner = red;\n    else if (round === 16) winner = orange;\n\n    else if (round === 17) winner = blue;\n    else if (round === 18) winner = blue;\n    else if (round === 19) winner = cyan;\n    else if (round === 20) winner = white;\n    else if (round === 21) winner = red;\n    else if (round === 22) winner = orange;\n    else if (round === 23) winner = red;\n    else if (round === 24) winner = red;\n\n    else if (round === 25) winner = white;\n    else if (round === 26) winner = yellow;\n    else if (round === 27) winner = orange;\n    else if (round === 28) winner = green;\n    else if (round === 29) winner = blue;\n    else if (round === 30) winner = red;\n    else if (round === 31) winner = red;\n    else if (round === 32) winner = purple;\n\n\n\nmsg.panel = panel;\nmsg.row = row;\nmsg.topic = \"panel\" + panel + \"/anim\";\nmsg.payload = \"fade_to \" + (9-row) + \" \" + winner;\nreturn msg;\n",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -2793,10 +2790,10 @@
         "type": "ui_button",
         "z": "89b7424beca3476c",
         "name": "",
-        "group": "209003e430797b1a",
+        "group": "3916f7d45cb59c36",
         "order": 2,
-        "width": 0,
-        "height": 0,
+        "width": 3,
+        "height": 1,
         "passthru": false,
         "label": "Võnnu colors",
         "tooltip": "",
@@ -2817,12 +2814,221 @@
         ]
     },
     {
-        "id": "85eb32ece20d5e0b",
+        "id": "c6dd6fb3fb3bca95",
+        "type": "ui_button",
+        "z": "89b7424beca3476c",
+        "name": "panel 1",
+        "group": "209003e430797b1a",
+        "order": 5,
+        "width": 4,
+        "height": 1,
+        "passthru": false,
+        "label": "Panel 1",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "1",
+        "payloadType": "num",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 60,
+        "y": 260,
+        "wires": [
+            [
+                "5bb7f6fe694e43cf",
+                "0b11cff9c459de86"
+            ]
+        ]
+    },
+    {
+        "id": "0b11cff9c459de86",
+        "type": "link out",
+        "z": "89b7424beca3476c",
+        "name": "panel number",
+        "mode": "link",
+        "links": [
+            "646ce638c4723b4f"
+        ],
+        "x": 625,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "5339b08e8ec7b32e",
+        "type": "ui_button",
+        "z": "89b7424beca3476c",
+        "name": "panel 2",
+        "group": "209003e430797b1a",
+        "order": 6,
+        "width": 4,
+        "height": 1,
+        "passthru": false,
+        "label": "Panel 2",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "2",
+        "payloadType": "num",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 60,
+        "y": 300,
+        "wires": [
+            [
+                "5bb7f6fe694e43cf",
+                "0b11cff9c459de86"
+            ]
+        ]
+    },
+    {
+        "id": "f499ca10809d0d39",
+        "type": "ui_button",
+        "z": "89b7424beca3476c",
+        "name": "panel 3",
+        "group": "209003e430797b1a",
+        "order": 7,
+        "width": 4,
+        "height": 1,
+        "passthru": false,
+        "label": "Panel 3",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "3",
+        "payloadType": "num",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 60,
+        "y": 340,
+        "wires": [
+            [
+                "5bb7f6fe694e43cf",
+                "0b11cff9c459de86"
+            ]
+        ]
+    },
+    {
+        "id": "7326d5971656749a",
+        "type": "ui_button",
+        "z": "89b7424beca3476c",
+        "name": "panel 4",
+        "group": "209003e430797b1a",
+        "order": 8,
+        "width": 4,
+        "height": 1,
+        "passthru": false,
+        "label": "Panel 4",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "4",
+        "payloadType": "num",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 60,
+        "y": 380,
+        "wires": [
+            [
+                "5bb7f6fe694e43cf",
+                "0b11cff9c459de86"
+            ]
+        ]
+    },
+    {
+        "id": "5bb7f6fe694e43cf",
+        "type": "delay",
+        "z": "89b7424beca3476c",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "500",
+        "timeoutUnits": "milliseconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 230,
+        "y": 200,
+        "wires": [
+            [
+                "559e5f9813a8ed65"
+            ]
+        ]
+    },
+    {
+        "id": "f076142f5f55b66f",
+        "type": "ui_button",
+        "z": "89b7424beca3476c",
+        "name": "",
+        "group": "209003e430797b1a",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Sart",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "green",
+        "className": "",
+        "icon": "",
+        "payload": "true",
+        "payloadType": "bool",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 390,
+        "y": 240,
+        "wires": [
+            [
+                "559e5f9813a8ed65"
+            ]
+        ]
+    },
+    {
+        "id": "781c3d7b55acc86c",
+        "type": "ui_button",
+        "z": "89b7424beca3476c",
+        "name": "",
+        "group": "209003e430797b1a",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Stop",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "red",
+        "className": "",
+        "icon": "",
+        "payload": "false",
+        "payloadType": "bool",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 390,
+        "y": 280,
+        "wires": [
+            [
+                "559e5f9813a8ed65"
+            ]
+        ]
+    },
+    {
+        "id": "e8c48a253920be17",
         "type": "global-config",
         "env": [],
         "modules": {
             "node-red-dashboard": "3.6.6",
-            "node-red-contrib-counter": "0.1.6",
             "node-red-contrib-countdown": "1.3.2"
         }
     }
