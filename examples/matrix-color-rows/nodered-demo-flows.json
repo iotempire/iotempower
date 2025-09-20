@@ -1056,8 +1056,8 @@
         "links": [
             "2b830db53f394432"
         ],
-        "x": 515,
-        "y": 280,
+        "x": 445,
+        "y": 300,
         "wires": [
             [
                 "e5b4319e8462ba0f",
@@ -2275,6 +2275,25 @@
         ]
     },
     {
+        "id": "bfe6846b22963234",
+        "type": "link in",
+        "z": "585a956aeead605c",
+        "name": "link in 4",
+        "links": [
+            "aa64836abff0fecd"
+        ],
+        "x": 1155,
+        "y": 220,
+        "wires": [
+            [
+                "7b7dc8a0d58e0686",
+                "eac991d188970146",
+                "64e4089bff6849fc",
+                "883da126d90e9b63"
+            ]
+        ]
+    },
+    {
         "id": "2b830db53f394432",
         "type": "link out",
         "z": "89b7424beca3476c",
@@ -2283,8 +2302,8 @@
         "links": [
             "e199c8588b88ea7d"
         ],
-        "x": 615,
-        "y": 180,
+        "x": 1055,
+        "y": 200,
         "wires": []
     },
     {
@@ -2307,8 +2326,8 @@
         "payloadType": "str",
         "topic": "topic",
         "topicType": "msg",
-        "x": 440,
-        "y": 180,
+        "x": 880,
+        "y": 200,
         "wires": [
             [
                 "2b830db53f394432"
@@ -2584,8 +2603,8 @@
         "topic": "",
         "payload": "true",
         "payloadType": "bool",
-        "x": 430,
-        "y": 120,
+        "x": 870,
+        "y": 140,
         "wires": [
             [
                 "2b830db53f394432"
@@ -3024,7 +3043,48 @@
         ]
     },
     {
-        "id": "e8c48a253920be17",
+        "id": "b729c8aa95da0d33",
+        "type": "ui_button",
+        "z": "89b7424beca3476c",
+        "name": "",
+        "group": "3916f7d45cb59c36",
+        "order": 2,
+        "width": 3,
+        "height": 1,
+        "passthru": false,
+        "label": "Rainbow",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "rainbow",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 840,
+        "y": 280,
+        "wires": [
+            [
+                "aa64836abff0fecd"
+            ]
+        ]
+    },
+    {
+        "id": "aa64836abff0fecd",
+        "type": "link out",
+        "z": "89b7424beca3476c",
+        "name": "rainbow",
+        "mode": "link",
+        "links": [
+            "bfe6846b22963234"
+        ],
+        "x": 1025,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "e23c1448b4142445",
         "type": "global-config",
         "env": [],
         "modules": {
