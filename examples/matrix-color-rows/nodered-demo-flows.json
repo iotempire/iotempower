@@ -314,13 +314,93 @@
         "className": ""
     },
     {
-        "id": "e23a6d71bffc2d7f",
+        "id": "a07ceecdc20430da",
         "type": "ui_spacer",
-        "z": "585a956aeead605c",
+        "z": "89b7424beca3476c",
         "name": "spacer",
         "group": "209003e430797b1a",
         "order": 4,
         "width": 8,
+        "height": 1
+    },
+    {
+        "id": "3d21aa010d94fd0c",
+        "type": "ui_spacer",
+        "z": "89b7424beca3476c",
+        "name": "spacer",
+        "group": "209003e430797b1a",
+        "order": 5,
+        "width": 1,
+        "height": 1
+    },
+    {
+        "id": "a2ef109e109d8479",
+        "type": "ui_spacer",
+        "z": "89b7424beca3476c",
+        "name": "spacer",
+        "group": "209003e430797b1a",
+        "order": 7,
+        "width": 1,
+        "height": 1
+    },
+    {
+        "id": "f392e05a8e1e4e69",
+        "type": "ui_spacer",
+        "z": "89b7424beca3476c",
+        "name": "spacer",
+        "group": "209003e430797b1a",
+        "order": 8,
+        "width": 1,
+        "height": 1
+    },
+    {
+        "id": "83659f43e2746c64",
+        "type": "ui_spacer",
+        "z": "89b7424beca3476c",
+        "name": "spacer",
+        "group": "209003e430797b1a",
+        "order": 10,
+        "width": 1,
+        "height": 1
+    },
+    {
+        "id": "8c8fa258d250e91b",
+        "type": "ui_spacer",
+        "z": "89b7424beca3476c",
+        "name": "spacer",
+        "group": "209003e430797b1a",
+        "order": 11,
+        "width": 1,
+        "height": 1
+    },
+    {
+        "id": "4f593848d65dd8c8",
+        "type": "ui_spacer",
+        "z": "89b7424beca3476c",
+        "name": "spacer",
+        "group": "209003e430797b1a",
+        "order": 13,
+        "width": 1,
+        "height": 1
+    },
+    {
+        "id": "24f4c8b533852a51",
+        "type": "ui_spacer",
+        "z": "89b7424beca3476c",
+        "name": "spacer",
+        "group": "209003e430797b1a",
+        "order": 14,
+        "width": 1,
+        "height": 1
+    },
+    {
+        "id": "db6e87448ac54c18",
+        "type": "ui_spacer",
+        "z": "89b7424beca3476c",
+        "name": "spacer",
+        "group": "209003e430797b1a",
+        "order": 16,
+        "width": 1,
         "height": 1
     },
     {
@@ -490,7 +570,7 @@
         "payload": "true",
         "payloadType": "bool",
         "x": 110,
-        "y": 560,
+        "y": 580,
         "wires": [
             [
                 "80f1d59e6b33446c",
@@ -703,8 +783,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 760,
-        "y": 340,
+        "x": 940,
+        "y": 240,
         "wires": [
             [
                 "7b7dc8a0d58e0686",
@@ -837,8 +917,7 @@
         "y": 560,
         "wires": [
             [
-                "b1971d503832b51f",
-                "93e072861585ca82"
+                "b1971d503832b51f"
             ],
             [
                 "30ee892b13dc39d9"
@@ -878,8 +957,8 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1400,
-        "y": 460,
+        "x": 1520,
+        "y": 480,
         "wires": []
     },
     {
@@ -887,7 +966,7 @@
         "type": "function",
         "z": "585a956aeead605c",
         "name": "compute mqtt",
-        "func": "let round = msg.payload;\n//let panel = Math.ceil(round/8);\nlet panel = flow.get(\"panelnum\");\nlet row = ((round-1)%8)+1;\n\n// compute the winning color\nlet red = flow.get(\"redCount\") || 0;\nlet green = flow.get(\"greenCount\") || 0;\nlet blue = flow.get(\"blueCount\") || 0;\nlet cyan = flow.get(\"cyanCount\") || 0;\nlet magenta = flow.get(\"magentaCount\") || 0;\nlet yellow = flow.get(\"yellowCount\") || 0;\nlet orange = flow.get(\"orangeCount\") || 0;\nlet purple = flow.get(\"purpleCount\") || 0;\nlet aqua = flow.get(\"aquaCount\") || 0;\n\nlet maxCount = Math.max(red, green, blue,cyan,magenta,yellow,orange,purple,aqua);\nlet winner = \"\";\nif (maxCount === 0) {\n    winner = \"000000\";\n} else {\n    if (red === maxCount) winner = \"500000\";\n    else if (green === maxCount) winner = \"005000\";\n    else if (blue === maxCount) winner = \"00035A\";\n    else if (cyan === maxCount) winner = \"00505A\";\n    else if (magenta === maxCount) winner = \"500050\";\n    else if (yellow === maxCount) winner = \"5A5000\";\n    else if (orange === maxCount) winner = \"5A2D00\";\n    else if (purple === maxCount) winner = \"280078\";\n    else if (aqua === maxCount) winner = \"006E3C\";\n}\n\n//debub\n\nmsg.panel = panel;\nmsg.row = row;\nmsg.topic = \"panel\" + panel + \"/anim\";\n// panels are inverted so map 1-8 to 8-1\nmsg.payload = \"fade_to \" + (9-row) + \" \" + winner;\nreturn msg;\n",
+        "func": "let round = msg.payload;\n//let panel = Math.ceil(round/8);\nlet panel = flow.get(\"panelnum\");\nlet row = ((round-1)%8)+1;\n\n// compute the winning color\nlet red = flow.get(\"redCount\") || 0;\nlet green = flow.get(\"greenCount\") || 0;\nlet blue = flow.get(\"blueCount\") || 0;\nlet cyan = flow.get(\"cyanCount\") || 0;\nlet magenta = flow.get(\"magentaCount\") || 0;\nlet yellow = flow.get(\"yellowCount\") || 0;\nlet orange = flow.get(\"orangeCount\") || 0;\nlet purple = flow.get(\"purpleCount\") || 0;\nlet aqua = flow.get(\"aquaCount\") || 0;\n\nlet maxCount = Math.max(red, green, blue,cyan,magenta,yellow,orange,purple,aqua);\nlet winner = \"\";\nif (maxCount === 0) {\n    winner = \"000000\";\n} else {\n    if (red === maxCount) winner = \"500000\";\n    else if (green === maxCount) winner = \"005000\";\n    else if (blue === maxCount) winner = \"000050\";\n    else if (cyan === maxCount) winner = \"00505A\";\n    else if (magenta === maxCount) winner = \"500050\";\n    else if (yellow === maxCount) winner = \"5A5000\";\n    else if (orange === maxCount) winner = \"5A2D00\";\n    else if (purple === maxCount) winner = \"280078\";\n    else if (aqua === maxCount) winner = \"006E3C\";\n}\n\n//debub\n\nmsg.panel = panel;\nmsg.row = row;\nmsg.topic = \"panel\" + panel + \"/anim\";\n// panels are inverted so map 1-8 to 8-1\nmsg.payload = \"fade_to \" + (9-row) + \" \" + winner;\nreturn msg;\n\n",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -898,9 +977,10 @@
         "y": 560,
         "wires": [
             [
-                "c377db8091606cbd",
                 "ea916c29246d3d48",
-                "498bfca274a7d397"
+                "93e072861585ca82",
+                "498bfca274a7d397",
+                "c377db8091606cbd"
             ]
         ]
     },
@@ -2093,12 +2173,13 @@
         "links": [
             "0b11cff9c459de86"
         ],
-        "x": 65,
-        "y": 420,
+        "x": 155,
+        "y": 260,
         "wires": [
             [
                 "80f1d59e6b33446c",
-                "03a446f68a5f297a"
+                "03a446f68a5f297a",
+                "1ecbc324b94227e2"
             ]
         ]
     },
@@ -2294,6 +2375,163 @@
         ]
     },
     {
+        "id": "1ecbc324b94227e2",
+        "type": "switch",
+        "z": "585a956aeead605c",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "1",
+                "vt": "num"
+            },
+            {
+                "t": "eq",
+                "v": "2",
+                "vt": "num"
+            },
+            {
+                "t": "eq",
+                "v": "3",
+                "vt": "num"
+            },
+            {
+                "t": "eq",
+                "v": "4",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 4,
+        "x": 350,
+        "y": 260,
+        "wires": [
+            [
+                "c4bda31c9d2405ea"
+            ],
+            [
+                "87ebcf3a0d0fe6a9"
+            ],
+            [
+                "5dac403c7dcc86cf"
+            ],
+            [
+                "a78c0c22038d2dae"
+            ]
+        ]
+    },
+    {
+        "id": "c4bda31c9d2405ea",
+        "type": "change",
+        "z": "585a956aeead605c",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "fade_to_black",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 940,
+        "y": 280,
+        "wires": [
+            [
+                "7b7dc8a0d58e0686"
+            ]
+        ]
+    },
+    {
+        "id": "87ebcf3a0d0fe6a9",
+        "type": "change",
+        "z": "585a956aeead605c",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "fade_to_black",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 940,
+        "y": 320,
+        "wires": [
+            [
+                "eac991d188970146"
+            ]
+        ]
+    },
+    {
+        "id": "5dac403c7dcc86cf",
+        "type": "change",
+        "z": "585a956aeead605c",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "fade_to_black",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 940,
+        "y": 360,
+        "wires": [
+            [
+                "64e4089bff6849fc"
+            ]
+        ]
+    },
+    {
+        "id": "a78c0c22038d2dae",
+        "type": "change",
+        "z": "585a956aeead605c",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "fade_to_black",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 940,
+        "y": 400,
+        "wires": [
+            [
+                "883da126d90e9b63"
+            ]
+        ]
+    },
+    {
         "id": "2b830db53f394432",
         "type": "link out",
         "z": "89b7424beca3476c",
@@ -2364,15 +2602,15 @@
         "id": "7cd896d075903442",
         "type": "function",
         "z": "89b7424beca3476c",
-        "name": "Emmaste panels",
-        "func": "// This is just to paint the panels to orderly colors\n// to test if they are all working\n\n// Colors\nlet red = \"500000\";\nlet green = \"005000\";\nlet blue = \"00035A\";\nlet cyan = \"00505A\";\nlet magenta = \"500050\";\nlet yellow = \"5A5000\";\nlet orange = \"5A2D00\";\nlet purple = \"280078\";\nlet aqua = \"006E3C\";\nlet black = \"000000\";\n\nlet round = msg.payload;\nlet panel = Math.ceil(round/8);\nlet row = ((round-1)%8)+1;\nlet winner = \"0\";\n\n\n    if (round === 1) winner = red;\n    else if (round === 2) winner = blue;\n    else if (round === 3) winner = green;\n    else if (round === 4) winner = orange;\n    else if (round === 5) winner = yellow;\n    else if (round === 6) winner = orange;\n    else if (round === 7) winner = green;\n    else if (round === 8) winner = blue;\n    \n    else if (round === 9) winner = red;\n    else if (round === 10) winner = purple;\n    else if (round === 11) winner = black;\n    else if (round === 12) winner = black;\n    else if (round === 13) winner = magenta;\n    else if (round === 14) winner = green;\n    else if (round === 15) winner = purple;\n    else if (round === 16) winner = red;\n\n    else if (round === 17) winner = red;\n    else if (round === 18) winner = purple;\n    else if (round === 19) winner = blue;\n    else if (round === 20) winner = purple;\n    else if (round === 21) winner = red;\n    else if (round === 22) winner = red;\n    else if (round === 23) winner = blue;\n    else if (round === 24) winner = green;\n\n    else if (round === 25) winner = orange;\n    else if (round === 26) winner = yellow;\n    else if (round === 27) winner = orange;\n    else if (round === 28) winner = green;\n    else if (round === 29) winner = blue;\n    else if (round === 9) winner = red;\n    else if (round === 10) winner = red;\n    else if (round === 11) winner = purple;\n    else if (round === 12) winner = black;\n\n\nmsg.panel = panel;\nmsg.row = row;\nmsg.topic = \"panel\" + panel + \"/anim\";\nmsg.payload = \"fade_to \" + (9-row) + \" \" + winner;\nreturn msg;\n",
+        "name": "light inspired patterns",
+        "func": "// This is just to paint the panels to orderly colors\n// to test if they are all working\n\n// Colors\nlet red = \"A00000\";\nlet darkred = \"320000\";\nlet green = \"003000\";\nlet blue = \"00005A\";\nlet cyan = \"00505A\";\nlet magenta = \"500050\";\nlet yellow = \"404000\";\nlet orange = \"5B2D00\";\nlet purple = \"280078\";\nlet aqua = \"006E35\";\nlet black = \"000000\";\nlet white = \"505050\";\n\nlet round = msg.payload;\nlet panel = Math.ceil(round/8);\nlet row = ((round-1)%8)+1;\nlet winner = \"0\";\n\n\n    if (round === 1) winner = cyan;\n    else if (round === 2) winner = orange;\n    else if (round === 3) winner = yellow;\n    else if (round === 4) winner = red;\n    else if (round === 5) winner = red;\n    else if (round === 6) winner = yellow;\n    else if (round === 7) winner = orange;\n    else if (round === 8) winner = cyan;\n    \n    else if (round === 9) winner = aqua;\n    else if (round === 10) winner = red;\n    else if (round === 11) winner = darkred;\n    else if (round === 12) winner = orange;\n    else if (round === 13) winner = orange;\n    else if (round === 14) winner = red;\n    else if (round === 15) winner = darkred;\n    else if (round === 16) winner = aqua;\n\n    else if (round === 17) winner = aqua;\n    else if (round === 18) winner = red;\n    else if (round === 19) winner = darkred;\n    else if (round === 20) winner = orange;\n    else if (round === 21) winner = orange;\n    else if (round === 22) winner = red;\n    else if (round === 23) winner = darkred;\n    else if (round === 24) winner = aqua;\n\n    else if (round === 25) winner = white;\n    else if (round === 26) winner = orange;\n    else if (round === 27) winner = yellow;\n    else if (round === 28) winner = red;\n    else if (round === 29) winner = red;\n    else if (round === 30) winner = yellow;\n    else if (round === 31) winner = orange;\n    else if (round === 32) winner = white;\n\n\nmsg.panel = panel;\nmsg.row = row;\nmsg.topic = \"panel\" + panel + \"/anim\";\nmsg.payload = \"fade_to \" + (9-row) + \" \" + winner;\nreturn msg;\n",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1390,
+        "x": 1400,
         "y": 540,
         "wires": [
             [
@@ -2563,17 +2801,17 @@
         "width": 3,
         "height": 1,
         "passthru": false,
-        "label": "Emmaste colors",
+        "label": "warmer color pattern",
         "tooltip": "",
         "color": "",
-        "bgcolor": "",
+        "bgcolor": "orange",
         "className": "",
         "icon": "",
         "payload": "true",
         "payloadType": "bool",
         "topic": "topic",
         "topicType": "msg",
-        "x": 200,
+        "x": 220,
         "y": 540,
         "wires": [
             [
@@ -2608,26 +2846,6 @@
         "wires": [
             [
                 "2b830db53f394432"
-            ]
-        ]
-    },
-    {
-        "id": "b09bbe01a713b4b6",
-        "type": "function",
-        "z": "89b7424beca3476c",
-        "name": "Emmaste panels",
-        "func": "// This is just to paint the panels to orderly colors\n// to test if they are all working\n\n// Colors\nlet red = \"500000\";\nlet green = \"005000\";\nlet blue = \"00035A\";\nlet cyan = \"00505A\";\nlet magenta = \"500050\";\nlet yellow = \"5A5000\";\nlet orange = \"5A2D00\";\nlet purple = \"280078\";\nlet aqua = \"006E3C\";\nlet black = \"000000\";\nlet white = \"505050\";\n\nlet round = msg.payload;\nlet panel = Math.ceil(round/8);\nlet row = ((round-1)%8)+1;\nlet winner = \"0\";\n\n    if (round === 1) winner = blue;\n    else if (round === 2) winner = blue;\n    else if (round === 3) winner = cyan;\n    else if (round === 4) winner = white;\n    else if (round === 5) winner = red;\n    else if (round === 6) winner = orange;\n    else if (round === 7) winner = red;\n    else if (round === 8) winner = red;\n    \n    else if (round === 9) winner = white;\n    else if (round === 10) winner = cyan;\n    else if (round === 11) winner = blue;\n    else if (round === 12) winner = blue;\n    else if (round === 13) winner = orange;\n    else if (round === 14) winner = black;\n    else if (round === 15) winner = red;\n    else if (round === 16) winner = orange;\n\n    else if (round === 17) winner = blue;\n    else if (round === 18) winner = blue;\n    else if (round === 19) winner = cyan;\n    else if (round === 20) winner = white;\n    else if (round === 21) winner = red;\n    else if (round === 22) winner = orange;\n    else if (round === 23) winner = red;\n    else if (round === 24) winner = red;\n\n    else if (round === 25) winner = white;\n    else if (round === 26) winner = yellow;\n    else if (round === 27) winner = orange;\n    else if (round === 28) winner = green;\n    else if (round === 29) winner = blue;\n    else if (round === 30) winner = red;\n    else if (round === 31) winner = red;\n    else if (round === 32) winner = purple;\n\n\n\nmsg.panel = panel;\nmsg.row = row;\nmsg.topic = \"panel\" + panel + \"/anim\";\nmsg.payload = \"fade_to \" + (9-row) + \" \" + winner;\nreturn msg;\n",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 1390,
-        "y": 760,
-        "wires": [
-            [
-                "1646ca7518f082e2"
             ]
         ]
     },
@@ -2742,8 +2960,8 @@
         "y": 720,
         "wires": [
             [
-                "b09bbe01a713b4b6",
-                "ed93035e469c9c54"
+                "ed93035e469c9c54",
+                "5e923e759eaf7229"
             ],
             [
                 "d70c7eea031bd0e5"
@@ -2814,17 +3032,17 @@
         "width": 3,
         "height": 1,
         "passthru": false,
-        "label": "Võnnu colors",
+        "label": "Colder color pattern",
         "tooltip": "",
         "color": "",
-        "bgcolor": "",
+        "bgcolor": "indigo",
         "className": "",
         "icon": "",
         "payload": "true",
         "payloadType": "bool",
         "topic": "topic",
         "topicType": "msg",
-        "x": 190,
+        "x": 210,
         "y": 760,
         "wires": [
             [
@@ -2838,8 +3056,8 @@
         "z": "89b7424beca3476c",
         "name": "panel 1",
         "group": "209003e430797b1a",
-        "order": 5,
-        "width": 4,
+        "order": 6,
+        "width": 6,
         "height": 1,
         "passthru": false,
         "label": "Panel 1",
@@ -2880,8 +3098,8 @@
         "z": "89b7424beca3476c",
         "name": "panel 2",
         "group": "209003e430797b1a",
-        "order": 6,
-        "width": 4,
+        "order": 9,
+        "width": 6,
         "height": 1,
         "passthru": false,
         "label": "Panel 2",
@@ -2909,8 +3127,8 @@
         "z": "89b7424beca3476c",
         "name": "panel 3",
         "group": "209003e430797b1a",
-        "order": 7,
-        "width": 4,
+        "order": 12,
+        "width": 6,
         "height": 1,
         "passthru": false,
         "label": "Panel 3",
@@ -2938,8 +3156,8 @@
         "z": "89b7424beca3476c",
         "name": "panel 4",
         "group": "209003e430797b1a",
-        "order": 8,
-        "width": 4,
+        "order": 15,
+        "width": 6,
         "height": 1,
         "passthru": false,
         "label": "Panel 4",
@@ -3048,14 +3266,14 @@
         "z": "89b7424beca3476c",
         "name": "",
         "group": "3916f7d45cb59c36",
-        "order": 2,
+        "order": 3,
         "width": 3,
         "height": 1,
         "passthru": false,
         "label": "Rainbow",
         "tooltip": "",
-        "color": "",
-        "bgcolor": "",
+        "color": "black",
+        "bgcolor": "Yellow",
         "className": "",
         "icon": "",
         "payload": "rainbow",
@@ -3084,7 +3302,248 @@
         "wires": []
     },
     {
-        "id": "e23c1448b4142445",
+        "id": "5e923e759eaf7229",
+        "type": "function",
+        "z": "89b7424beca3476c",
+        "name": "dark lines inspired patterns",
+        "func": "// This is just to paint the panels to orderly colors\n// to test if they are all working\n\n// Colors\nlet red = \"500000\";\nlet darkred = \"320000\";\nlet green = \"005000\";\nlet blue = \"00005A\";\nlet cyan = \"00505A\";\nlet magenta = \"500050\";\nlet yellow = \"5A5000\";\nlet orange = \"5A2D00\";\nlet purple = \"280078\";\nlet aqua = \"006E3C\";\nlet black = \"000000\";\nlet white = \"505050\";\n\nlet round = msg.payload;\nlet panel = Math.ceil(round/8);\nlet row = ((round-1)%8)+1;\nlet winner = \"0\";\n\n    if (round === 1) winner = cyan;\n    else if (round === 2) winner = aqua;\n    else if (round === 3) winner = blue;\n    else if (round === 4) winner = magenta;\n    else if (round === 5) winner = magenta;\n    else if (round === 6) winner = blue;\n    else if (round === 7) winner = aqua;\n    else if (round === 8) winner = cyan;\n    \n    else if (round === 9) winner = blue;\n    else if (round === 10) winner = blue;\n    else if (round === 11) winner = cyan;\n    else if (round === 12) winner = white;\n    else if (round === 13) winner = red;\n    else if (round === 14) winner = orange;\n    else if (round === 15) winner = red;\n    else if (round === 16) winner = darkred;\n\n    else if (round === 17) winner = cyan;\n    else if (round === 18) winner = aqua;\n    else if (round === 19) winner = blue;\n    else if (round === 20) winner = magenta;\n    else if (round === 21) winner = magenta;\n    else if (round === 22) winner = blue;\n    else if (round === 23) winner = aqua;\n    else if (round === 24) winner = cyan;\n\n    else if (round === 25) winner = blue;\n    else if (round === 26) winner = blue;\n    else if (round === 27) winner = cyan;\n    else if (round === 28) winner = white;\n    else if (round === 29) winner = red;\n    else if (round === 30) winner = orange;\n    else if (round === 31) winner = red;\n    else if (round === 32) winner = darkred;\n\n\nmsg.panel = panel;\nmsg.row = row;\nmsg.topic = \"panel\" + panel + \"/anim\";\nmsg.payload = \"fade_to \" + (9-row) + \" \" + winner;\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1420,
+        "y": 740,
+        "wires": [
+            [
+                "1646ca7518f082e2"
+            ]
+        ]
+    },
+    {
+        "id": "8a2f68c073c54cab",
+        "type": "trigger",
+        "z": "89b7424beca3476c",
+        "name": "",
+        "op1": "true",
+        "op2": "0",
+        "op1type": "bool",
+        "op2type": "str",
+        "duration": "-300",
+        "extend": false,
+        "overrideDelay": false,
+        "units": "ms",
+        "reset": "",
+        "bytopic": "all",
+        "topic": "topic",
+        "outputs": 1,
+        "x": 520,
+        "y": 920,
+        "wires": [
+            [
+                "8ca76763a1506e39"
+            ]
+        ]
+    },
+    {
+        "id": "8ca76763a1506e39",
+        "type": "function",
+        "z": "89b7424beca3476c",
+        "name": "increse counter",
+        "func": "let counter = flow.get(\"rounds\");\ncounter++;\nflow.set(\"rounds\",counter);\nmsg.payload = counter;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 760,
+        "y": 920,
+        "wires": [
+            [
+                "ef0de3a9ac1e58e3"
+            ]
+        ]
+    },
+    {
+        "id": "842f4ab96cb3c693",
+        "type": "inject",
+        "z": "89b7424beca3476c",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "true",
+        "payloadType": "bool",
+        "x": 70,
+        "y": 920,
+        "wires": [
+            [
+                "153c0b688c0d884b"
+            ]
+        ]
+    },
+    {
+        "id": "c26a230bd728d57c",
+        "type": "debug",
+        "z": "89b7424beca3476c",
+        "name": "debug 5",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1260,
+        "y": 900,
+        "wires": []
+    },
+    {
+        "id": "ef0de3a9ac1e58e3",
+        "type": "switch",
+        "z": "89b7424beca3476c",
+        "name": "counter <32",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "lte",
+                "v": "32",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 1010,
+        "y": 960,
+        "wires": [
+            [
+                "c26a230bd728d57c",
+                "a626aa5577e37b07"
+            ],
+            [
+                "fcb3f08c6c80a066"
+            ]
+        ]
+    },
+    {
+        "id": "fcb3f08c6c80a066",
+        "type": "change",
+        "z": "89b7424beca3476c",
+        "name": "false",
+        "rules": [
+            {
+                "t": "set",
+                "p": "reset",
+                "pt": "msg",
+                "to": "reset",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1010,
+        "y": 1060,
+        "wires": [
+            [
+                "8a2f68c073c54cab"
+            ]
+        ]
+    },
+    {
+        "id": "153c0b688c0d884b",
+        "type": "change",
+        "z": "89b7424beca3476c",
+        "name": "reset flow.rounds",
+        "rules": [
+            {
+                "t": "set",
+                "p": "rounds",
+                "pt": "flow",
+                "to": "0",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 270,
+        "y": 920,
+        "wires": [
+            [
+                "8a2f68c073c54cab"
+            ]
+        ]
+    },
+    {
+        "id": "3ee1a00184d7c09e",
+        "type": "ui_button",
+        "z": "89b7424beca3476c",
+        "name": "",
+        "group": "3916f7d45cb59c36",
+        "order": 4,
+        "width": 3,
+        "height": 1,
+        "passthru": false,
+        "label": "Kevin inspired patterns",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "blue",
+        "className": "",
+        "icon": "",
+        "payload": "true",
+        "payloadType": "bool",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 100,
+        "y": 1000,
+        "wires": [
+            [
+                "153c0b688c0d884b"
+            ]
+        ]
+    },
+    {
+        "id": "a626aa5577e37b07",
+        "type": "function",
+        "z": "89b7424beca3476c",
+        "name": "Kevin inspired pattern",
+        "func": "// This is just to paint the panels to orderly colors\n// to test if they are all working\n\n// Colors\nlet red = \"500000\";\nlet green = \"003000\";\nlet blue = \"00005A\";\nlet cyan = \"00505A\";\nlet magenta = \"500050\";\nlet yellow = \"505500\";\nlet orange = \"5B2D00\";\nlet purple = \"280078\";\nlet aqua = \"006E3C\";\nlet black = \"000000\";\nlet white = \"505050\";\n\nlet round = msg.payload;\nlet panel = Math.ceil(round/8);\nlet row = ((round-1)%8)+1;\nlet winner = \"0\";\n\n\n    if (round === 1) winner = orange;\n    else if (round === 2) winner = yellow;\n    else if (round === 3) winner = magenta;\n    else if (round === 4) winner = red;\n    else if (round === 5) winner = red;\n    else if (round === 6) winner = magenta;\n    else if (round === 7) winner = yellow;\n    else if (round === 8) winner = orange;\n    \n    else if (round === 9) winner = blue;\n    else if (round === 10) winner = green;\n    else if (round === 11) winner = green;\n    else if (round === 12) winner = orange;\n    else if (round === 13) winner = orange;\n    else if (round === 14) winner = green;\n    else if (round === 15) winner = green;\n    else if (round === 16) winner = blue;\n\n    else if  (round === 17) winner = orange;\n    else if (round === 18) winner = yellow;\n    else if (round === 19) winner = magenta;\n    else if (round === 20) winner = red;\n    else if (round === 21) winner = red;\n    else if (round === 22) winner = magenta;\n    else if (round === 23) winner = yellow;\n    else if (round === 24) winner = orange;\n\n    else if (round === 25) winner = blue;\n    else if (round === 26) winner = green;\n    else if (round === 27) winner = green;\n    else if (round === 28) winner = orange;\n    else if (round === 29) winner = orange;\n    else if (round === 30) winner = green;\n    else if (round === 31) winner = green;\n    else if (round === 32) winner = blue;\n\n\nmsg.panel = panel;\nmsg.row = row;\nmsg.topic = \"panel\" + panel + \"/anim\";\nmsg.payload = \"fade_to \" + (9-row) + \" \" + winner;\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1480,
+        "y": 980,
+        "wires": [
+            [
+                "1646ca7518f082e2"
+            ]
+        ]
+    },
+    {
+        "id": "2111632fe0fb4d96",
         "type": "global-config",
         "env": [],
         "modules": {
