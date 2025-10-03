@@ -15,6 +15,8 @@ Table of Contents
 
 - `Architecture </doc/architecture.rst>`_
 
+  - `Architecture Quick Reference </doc/architecture-quick-reference.rst>`_
+
   - `Device Architecture </doc/device-architecture.rst>`_
   
   - `Deployment Process </doc/deployment-process.rst>`_

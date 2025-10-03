@@ -643,6 +643,10 @@ The IoTempower deployment process:
 This automation allows you to focus on defining what devices you want, not how to program them.
 
 
-Next: See `Device Architecture <device-architecture.rst>`_ for details on device implementation.
+Related Documentation
+---------------------
 
-See: `Command Reference <node_help/commands.rst>`_ for available device types.
+- `Architecture Overview <architecture.rst>`_ - Complete system architecture
+- `Device Architecture <device-architecture.rst>`_ - Details on device implementation
+- `Architecture Quick Reference <architecture-quick-reference.rst>`_ - Quick reference guide
+- `Command Reference <node_help/commands.rst>`_ - Available device types
