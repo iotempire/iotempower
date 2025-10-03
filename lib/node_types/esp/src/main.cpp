@@ -1249,7 +1249,7 @@ double performance_total_execution_time = 0; // Total execution time in microsec
  * This is where IoTempower's cooperative multitasking happens. The loop manages:
  * 
  * 1. PRECISION vs REGULAR INTERVALS
- *    - Precision interval: Very tight timing for sensitive devices (e.g., LED strips)
+ *    - Precision interval: Very tight timing for sensitive devices (e.g., power meters)
  *    - Regular interval: Normal operation with yields for network/system tasks
  *    - Only precision devices update during precision intervals
  *    - Everything else happens during regular intervals

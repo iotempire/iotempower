@@ -357,7 +357,7 @@ class Device {
 #endif
     private:
         // PRECISION CONTROL
-        // Some devices (like LED strips) need very precise timing
+        // Some devices (like power meters measuring AC voltage curves) need very precise timing
         bool requires_precision = false;  // If true, only update in precision intervals
         
         // IDENTIFICATION
@@ -419,7 +419,7 @@ class Device {
          * Example:
          *   button.on_change([](Device& dev) {
          *       if (dev.value().equals("on")) {
-         *           light.value().from("on");
+         *           IN(mylight).on();
          *       }
          *       return true;
          *   });
