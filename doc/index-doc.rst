@@ -15,6 +15,10 @@ Table of Contents
 
 - `Architecture </doc/architecture.rst>`_
 
+  - `Device Architecture </doc/device-architecture.rst>`_
+  
+  - `Deployment Process </doc/deployment-process.rst>`_
+
 - `Supported Hardware </doc/hardware.rst>`_
 
 - `Tool Support </doc/tool-support.rst>`_
