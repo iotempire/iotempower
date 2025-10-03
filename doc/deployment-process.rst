@@ -107,17 +107,17 @@ The user-written file that defines which devices are connected:
 
    // Example setup.cpp
    
-   // LED on pin D1
-   led("onboard_led", D1);
+   // LED on pin D1 (note: name without quotes)
+   led(onboard_led, D1);
    
    // Button on pin D2 with pull-up
-   button("door_button", D2).with_pull_up();
+   button(door_button, D2).with_pull_up();
    
    // Temperature sensor on pin D4
-   dht22("room_temp", D4);
+   dht22(room_temp, D4);
    
    // I2C display on default pins
-   display("status_display", 0x3c);
+   display(status_display, 0x3c);
 
 
 Stage 1: Command Detection
@@ -170,8 +170,8 @@ Given this setup.cpp:
 
 .. code-block:: cpp
 
-   led("status", D1);
-   dht22("temp", D4);
+   led(status, D1);
+   dht22(temp, D4);
 
 The script determines:
 
@@ -221,9 +221,9 @@ Device Macro System
 
 The macro system provides clean syntax while handling device registration:
 
-1. **User writes**: ``led("status", D1);``
+1. **User writes**: ``led(status, D1);`` (note: name without quotes)
 
-2. **Expands to**: ``output("status", D1);``
+2. **Expands to**: ``output(status, D1);`` (alias resolution)
 
 3. **Expands to**: ``IOTEMPOWER_DEVICE(status, output_, D1);``
 
@@ -239,6 +239,7 @@ This creates:
 - A global device instance (``iotempower_dev_status``)
 - With low initialization priority (runs last)
 - And a reference (``status``) for easy access in code
+- Use ``IN(status)`` macro to get the internal name when needed
 
 platformio-libs.ini
 ~~~~~~~~~~~~~~~~~~~
@@ -479,21 +480,21 @@ Edit ``setup.cpp``:
 
    // Living room devices
    
-   // Temperature and humidity sensor
-   dht22("climate", D4);
+   // Temperature and humidity sensor (note: names without quotes)
+   dht22(climate, D4);
    
    // Motion sensor
-   input("motion", D5).with_pull_up();
+   input(motion, D5).with_pull_up();
    
    // LED strip
-   rgb_strip("ambiance", D6, 30);
+   rgb_strip(ambiance, D6, 30);
    
-   // Setup reactions
-   motion.with_on_change_callback(*new Callback([](Device& dev) {
+   // Setup reactions - use IN() macro to access device references
+   IN(motion).with_on_change_callback(*new Callback([](Device& dev) {
        if (dev.is("on")) {
-           ambiance.color(255, 255, 255);  // White on motion
+           IN(ambiance).color(255, 255, 255);  // White on motion
        } else {
-           ambiance.color(0, 0, 255);      // Blue when idle
+           IN(ambiance).color(0, 0, 255);      // Blue when idle
        }
        return true;
    }));

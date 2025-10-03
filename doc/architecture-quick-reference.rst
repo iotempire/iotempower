@@ -36,10 +36,11 @@ Device Class Hierarchy
 
    Device (base class)
    ├── Input_Base → Input, Analog
-   ├── Output
+   ├── Output → PWM, RGB_Single, RGB_Strip_Bus
    ├── I2C_Device → BMP180, BH1750, etc.
-   ├── Dht11, Dht22, Ds18b20
-   └── RGB_Base → RGB_Single
+   ├── Dht11, Dht22, Ds18b20 (OneWire devices)
+   ├── Hcsr04 (acoustic distance sensor)
+   └── RGB_Base → RGB_Single, RGB_Strip_Bus
 
 Each level adds functionality:
 
@@ -70,24 +71,24 @@ node.conf (Node Level)
 
 .. code-block:: bash
 
-   # Board type
+   # Board type - any board listed in lib/node_types/ can be used
    board="wemos_d1_mini"
-   # or: board="esp32dev"
+   # or: board="esp32dev", "nodemcu", "esp32", "lolin_s2_mini", etc.
 
 setup.cpp (Device Level)
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: cpp
 
-   // Define your devices
-   led("status", D1);
-   button("door", D2).with_pull_up();
-   dht22("climate", D4);
+   // Define your devices (note: name is not quoted)
+   led(status, D1);
+   button(door, D2).with_pull_up();
+   dht22(climate, D4);
    
-   // Add interactions
-   door.with_on_change_callback(*new Callback([](Device& dev) {
+   // Add interactions using IN() macro to access device reference
+   IN(door).with_on_change_callback(*new Callback([](Device& dev) {
        if (dev.is("on")) {
-           status.on();
+           IN(status).on();
        }
        return true;
    }));
@@ -141,24 +142,26 @@ Topic Structure
 
 .. code-block::
 
-   <system>/<node>/<device>/[subdevice]/[command]
+   <node>/<device>/[subdevice]/[command]
+
+Note: System name is not used in MQTT topics. Topics start at node level (often a room name).
 
 Publishing (Sensor → MQTT)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block::
 
-   my-home/living-room/climate/temperature    → 23.5
-   my-home/living-room/climate/humidity       → 45
-   my-home/living-room/door                   → on
+   living-room/climate/temperature    → 23.5
+   living-room/climate/humidity       → 45
+   living-room/door                   → on
 
 Subscribing (MQTT → Actuator)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block::
 
-   my-home/living-room/status/set             ← on
-   my-home/living-room/rgb/color/set          ← 255,0,0
+   living-room/status/set             ← on
+   living-room/rgb/color/set          ← 255,0,0
 
 
 Common Commands
@@ -170,39 +173,42 @@ System Management
 .. code-block:: bash
 
    # Create new system
-   system_create my-home
+   create_system_template my-home
    
-   # Create new node
+   # Create new node (or use mkdir for a room folder)
    cd my-home
-   node_create living-room
+   create_node_template living-room
 
 Node Development
 ~~~~~~~~~~~~~~~~
 
 .. code-block:: bash
 
-   # Edit device configuration
+   # Edit device configuration (use micro, mcedit, or graphical editor)
    cd living-room
-   vim setup.cpp
+   micro setup.cpp
+   # or: mcedit setup.cpp
+   # or: code setup.cpp (VS Code)
    
    # Compile firmware
    compile
    
    # Deploy to node
-   deploy              # All nodes
-   deploy 192.168.1.50 # Specific IP
-   deploy serial       # Via USB
+   deploy                              # All nodes in current folder
+   deploy 192.168.1.50                 # Specific IP
+   deploy serial                       # Via local USB
+   deploy rfc2217://IP-addr.local:port # Via remote serial over network
 
 Monitoring
 ~~~~~~~~~~
 
 .. code-block:: bash
 
-   # Monitor MQTT messages
-   console
+   # Monitor MQTT messages (run in system folder or node folder)
+   mqtt_listen
    
    # Serial console
-   serial_monitor
+   serial_console
 
 
 Code Generation Flow
@@ -233,28 +239,46 @@ User Code
 
 .. code-block:: cpp
 
-   led("status", D1);
+   led(status, D1);  // Note: name without quotes!
 
 Macro Expansion
 ~~~~~~~~~~~~~~~
 
 .. code-block:: cpp
 
-   // Step 1: Alias resolution
-   output("status", D1);
+   // Step 1: Alias resolution (led → output)
+   output(status, D1);
    
-   // Step 2: Device macro
+   // Step 2: Device macro (creates internal name)
    IOTEMPOWER_DEVICE(status, output_, D1);
    
-   // Step 3: Device creation macro
-   IOTEMPOWER_DEVICE_(Output, status, D1);
+   // Step 3: Expands to IOTEMPOWER_DEVICE_(Output, iotempower_dev_status, "status", D1)
    
    // Step 4: Final code
    Output iotempower_dev_status __attribute__((init_priority(65535))) 
        = Output("status", D1);
    Output& status = (Output&) iotempower_dev_status;
 
-Result: Global device instance with reference for easy access
+Result: 
+- Global device instance named ``iotempower_dev_status``
+- Reference ``status`` for code access
+- Use ``IN(status)`` macro to get the internal name: ``iotempower_dev_status``
+
+The IN() Macro
+~~~~~~~~~~~~~~
+
+The ``IN()`` macro (Internal Name) is used to reference devices in code:
+
+.. code-block:: cpp
+
+   // Device definition
+   led(status, D1);
+   
+   // Later in code, use IN() to access the device
+   IN(status).on();
+   IN(status).toggle();
+   
+   // IN(status) expands to: iotempower_dev_status
 
 
 Creating New Device Types
@@ -330,7 +354,7 @@ Creating New Device Types
 
 .. code-block:: cpp
 
-   mydevice("sensor1", D1);
+   mydevice(sensor1, D1);  // Note: name without quotes!
 
 
 Common Patterns
@@ -341,10 +365,10 @@ Callbacks
 
 .. code-block:: cpp
 
-   // On value change
-   button.with_on_change_callback(*new Callback([](Device& dev) {
+   // On value change - use IN() to access device references
+   IN(button).with_on_change_callback(*new Callback([](Device& dev) {
        if (dev.is("on")) {
-           led.on();
+           IN(led).on();
        }
        return true;
    }));
@@ -366,9 +390,9 @@ Scheduled Actions
 
 .. code-block:: cpp
 
-   // Do something later
+   // Do something later - use IN() to access devices
    do_later(5000, []() {
-       led.off();
+       IN(led).off();
    });
 
 
