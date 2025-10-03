@@ -1,5 +1,95 @@
-// main.cpp
-// main program for iotempower esp8266/esp32 firmware
+/**
+ * @file main.cpp
+ * @brief Main program for IoTempower ESP8266/ESP32 firmware
+ * @author ulno
+ * 
+ * OVERVIEW
+ * ========
+ * This is the main entry point for IoTempower nodes running on ESP8266 and ESP32 microcontrollers.
+ * It orchestrates the entire lifecycle of an IoT node from boot to operation.
+ * 
+ * WHAT IOTEMPOWER ADDS TO STANDARD ARDUINO/MQTT PROJECTS
+ * =======================================================
+ * IoTempower transforms standard Arduino projects into a comprehensive, production-ready IoT framework:
+ * 
+ * 1. AUTOMATIC DEVICE MANAGEMENT
+ *    - Devices register themselves automatically during construction
+ *    - The DeviceManager singleton tracks all devices and manages their lifecycle
+ *    - No manual device tracking or initialization code needed
+ * 
+ * 2. SIMPLIFIED MQTT INTEGRATION
+ *    - Automatic MQTT topic generation based on device names
+ *    - Built-in reconnection logic with configurable retry intervals
+ *    - Automatic publishing when device values change
+ *    - Home Assistant MQTT discovery support out of the box
+ * 
+ * 3. OVER-THE-AIR (OTA) UPDATE SYSTEM
+ *    - Password-protected OTA updates for secure remote firmware deployment
+ *    - Special "adoption mode" for initial configuration of unconfigured nodes
+ *    - Visual feedback via LED blink patterns for node identification
+ *    - Display support for adoption progress (if I2C display present)
+ * 
+ * 4. ROBUST WIFI MANAGEMENT
+ *    - Automatic WiFi connection with retry logic
+ *    - Hostname registration and mDNS support
+ *    - Configurable for both production and adoption modes
+ *    - TLS/SSL support for secure MQTT connections
+ * 
+ * 5. DEVICE POLLING AND MEASUREMENT SYSTEM
+ *    - Each device can have its own poll rate in microseconds
+ *    - Automatic scheduling ensures devices are read at the right time
+ *    - Support for "precision" devices that need exact timing
+ *    - Built-in change detection to minimize unnecessary MQTT traffic
+ * 
+ * 6. CALLBACK AND FILTER SYSTEM
+ *    - Devices can have filter callbacks to validate/modify measurements
+ *    - Change callbacks trigger when values change
+ *    - Flexible callback chaining for complex logic
+ * 
+ * 7. SCHEDULER (do_later)
+ *    - Schedule callbacks to execute after a delay
+ *    - Useful for debouncing, delayed actions, deep sleep scheduling
+ *    - Automatic management of scheduled tasks
+ * 
+ * 8. USER-FRIENDLY CONFIGURATION
+ *    - Users write simple setup.cpp with high-level device declarations
+ *    - Automatic code generation and build process
+ *    - No need to understand MQTT, WiFi, or complex Arduino code
+ * 
+ * MAIN PROGRAM FLOW
+ * =================
+ * 
+ * STARTUP SEQUENCE:
+ * 1. Hardware initialization (brownout detection, serial, LED)
+ * 2. Flash button check for entering adoption/reconfig mode
+ * 3. WiFi connection establishment
+ * 4. OTA system initialization
+ * 5. User init() function call (from setup.cpp)
+ * 6. Device manager starts all registered devices
+ * 7. User start() function call (from setup.cpp)
+ * 8. MQTT connection establishment
+ * 
+ * MAIN LOOP:
+ * 1. Handle WiFi connection status
+ * 2. Maintain MQTT connection
+ * 3. Execute do_later scheduled callbacks
+ * 4. Update devices in precision interval (exact timing for sensitive devices)
+ * 5. Update regular devices
+ * 6. Publish changed device values via MQTT
+ * 7. Handle OTA updates
+ * 8. Run user loop() function (if defined)
+ * 
+ * ADOPTION MODE
+ * =============
+ * When a node is unconfigured or the flash button is pressed 2+ times during boot:
+ * - Node creates its own WiFi access point with a unique name
+ * - LED blinks in a unique pattern for visual identification
+ * - OTA server runs for 10 minutes allowing firmware upload
+ * - Display (if present) shows adoption status
+ * - After timeout or successful adoption, node reboots
+ * 
+ * See docs for more information on the IoTempower architecture.
+ */
 
 // TODO: enable when PJON works 
 // // for randomness, we need crypto library first
@@ -8,12 +98,18 @@
 // TODO: check when this is actually not harmful
 #define BROWNOUT_DETECT_DISABLED
 
+/**
+ * LIBRARY INCLUDES
+ * ================
+ * These are the key libraries that provide the foundation for IoTempower functionality.
+ */
+
 ////// Standard libraries
-#include <ArduinoOTA.h>
+#include <ArduinoOTA.h>  // Over-the-air firmware update support
 //#include <ESP8266WebServer.h> //Local WebServer used to serve the configuration portal - obsolete due to dongle
 
 
-#include "config-wrapper.h"
+#include "config-wrapper.h"  // Wraps user configuration from node config files
 
 #ifdef MQTT_USE_TLS
     #include <time.h>
@@ -85,14 +181,33 @@ String mqtt_management_topic;
 
 
 
-// iotempower functions for user modification in setup.cpp
+/**
+ * USER CALLBACK FUNCTIONS
+ * ========================
+ * These weak functions can be defined by users in setup.cpp to customize node behavior.
+ * 
+ * iotempower_init() - Called during setup before devices are started
+ *                     Use this to create device objects and configure them
+ * 
+ * iotempower_start() - Called after devices have been started
+ *                      Use this for any post-initialization setup
+ */
 void (iotempower_init)() __attribute__((weak));
 void (iotempower_start)() __attribute__((weak));
 
+/**
+ * GLOBAL STATE VARIABLES
+ * ======================
+ * These variables track the node's operational state throughout its lifecycle.
+ */
+
+// LED blink pattern for node identification during adoption
+// Randomly generated pattern (1-5 long blinks, 1-6 short blinks) makes each node visually unique
 int long_blinks = 0, short_blinks = 0;
 
-bool wifi_connected = false;
-bool ota_failed = false;
+// Network connection status flags
+bool wifi_connected = false;  // True when connected to WiFi network
+bool ota_failed = false;      // Set when an OTA update attempt fails
 
 #ifndef mqtt_server
     // Space for mqtt_server ip (max 16 chars)
@@ -105,14 +220,26 @@ bool ota_failed = false;
 #else
     #define ID_LED ONBOARDLED
 #endif
-#define BLINK_OFF_START 2000
-#define BLINK_LONG 800
-#define BLINK_OFF_MID 800
-#define BLINK_SHORT 200
-#define BLINK_OFF 500
+/**
+ * LED BLINK PATTERN TIMING (in milliseconds)
+ * ===========================================
+ * These constants define the visual identification pattern during adoption mode.
+ * Each node gets a unique combination of long and short blinks for easy identification.
+ */
+#define BLINK_OFF_START 2000  // Initial pause before pattern starts
+#define BLINK_LONG 800        // Duration of a long blink
+#define BLINK_OFF_MID 800     // Pause between long and short blinks
+#define BLINK_SHORT 200       // Duration of a short blink
+#define BLINK_OFF 500         // Pause between individual blinks
 
-#define IOTEMPOWER_OTA_PORT 8266  // needs to be fixed as it also should work for esp32
+#define IOTEMPOWER_OTA_PORT 8266  // OTA port (works for both ESP8266 and ESP32)
 
+/**
+ * @brief Turn on the onboard LED
+ * 
+ * Handles both regular GPIO LEDs and special onboard LEDs that may be inverted.
+ * Used during adoption mode blink patterns and OTA progress indication.
+ */
 void onboard_led_on() {
     #ifdef ID_LED
         #ifdef ONBOARDLED_FULL_GPIO
@@ -134,6 +261,19 @@ void onboard_led_off() {
     #endif
 }
 
+/**
+ * @brief Generate unique LED blink pattern for node identification
+ * 
+ * Creates a repeating pattern of long and short blinks unique to this node.
+ * Called continuously during adoption mode to help users identify which physical
+ * node they are working with.
+ * 
+ * The pattern is: [2s pause] [N long blinks] [0.8s pause] [M short blinks]
+ * Where N = 1-5 and M = 1-6, giving 30 possible unique patterns.
+ * 
+ * This is crucial in environments with multiple nodes, as it allows visual
+ * identification without needing to read serial output or check MAC addresses.
+ */
 void id_blinker() {
     static bool init_just_done = false;
     static int total, global_pos;
@@ -203,6 +343,20 @@ void id_blinker() {
 Display* ota_display=NULL;
 bool ota_display_present = false;
 
+/**
+ * @brief Initialize the Over-The-Air (OTA) update system
+ * 
+ * Sets up the Arduino OTA library with progress callbacks for:
+ * - Visual feedback via LED during update
+ * - Display updates (if I2C display is present)
+ * - Error handling and reporting
+ * 
+ * This is a key IoTempower feature that allows firmware updates without
+ * physical access to the device. The system is:
+ * - Password protected for security
+ * - Progress-aware with visual feedback
+ * - Error-resilient with automatic retry capability
+ */
 void setup_ota() {
     ArduinoOTA.setPort(IOTEMPOWER_OTA_PORT);
 
@@ -285,8 +439,32 @@ uint32_t getChipId32() {
     #endif
 }
 
+/**
+ * @brief Enter adoption/reconfiguration mode
+ * 
+ * ADOPTION MODE - A KEY IOTEMPOWER FEATURE
+ * =========================================
+ * This mode allows unconfigured nodes to be "adopted" into an IoTempower system:
+ * 
+ * 1. Node creates its own WiFi access point with a unique name
+ *    - SSID format: "uiot-node-XX-NL-MS" where:
+ *      XX = last 2 hex digits of chip ID
+ *      N = number of long blinks
+ *      M = number of short blinks
+ * 
+ * 2. Node blinks LED in unique pattern for visual identification
+ * 
+ * 3. OTA server runs for 10 minutes waiting for firmware upload
+ * 
+ * 4. If display is present, shows adoption status and countdown
+ * 
+ * 5. After timeout or successful adoption, node reboots
+ * 
+ * This eliminates the need for serial connection during initial setup,
+ * making deployment much easier in production environments.
+ */
 void reconfigMode() {
-    // go to access-point and reconfiguration mode to allow a new
+    // Go to access-point and reconfiguration mode to allow a new
     // firmware to be uploaded
 
     Ustring ssid;
@@ -394,6 +572,21 @@ void reconfigMode() {
 static bool reconfig_mode_active=false;
 static bool adopt_flash_toggle = false;
 
+/**
+ * @brief Check if user wants to enter adoption/reconfig mode
+ * 
+ * During the first 5 seconds after boot, this function:
+ * 1. Blinks LED to show the node is ready for mode selection
+ * 2. Monitors the flash button (if present)
+ * 3. Counts button press/release cycles (toggles)
+ * 4. Enters adoption mode if button pressed 2+ times
+ * 
+ * This provides a simple physical interface for triggering adoption mode
+ * without needing to modify configuration files or use serial commands.
+ * 
+ * The 5-second window is long enough to press the button but short enough
+ * not to significantly delay normal operation.
+ */
 void flash_mode_select() {
     // Check specific GPIO port if pressed and unpressed 2-4 times
     // to enter reconfiguration mode (allow generic reflash in AP
@@ -435,7 +628,14 @@ void flash_mode_select() {
     ArduinoOTA.setPasswordHash(keyhash);
 }
 
-////////////// mqtt
+/**
+ * MQTT CLIENT SETUP
+ * =================
+ * IoTempower uses PubSubClient for MQTT communication.
+ * 
+ * Note: AsyncMqttClient was disabled due to conflicts with other interrupt-based
+ * libraries. PubSubClient is more reliable but requires manual loop() calls.
+ */
 
 ////AsyncMqttClient disabled in favor of PubSubClient
 //AsyncMqttClient mqttClient;
@@ -455,7 +655,7 @@ void flash_mode_select() {
 //
 
 
-/// WiFi Network
+/// WiFi Network setup
 
 #ifdef MQTT_USE_TLS
     WiFiClientSecure netClient;
@@ -465,14 +665,39 @@ void flash_mode_select() {
 
 static char *my_hostname;
 
+/**
+ * MQTT CLIENT AND STATE
+ * =====================
+ * The MQTT client handles all communication with the broker.
+ * IoTempower adds automatic connection management and message routing.
+ */
 ////////////// mqtt
-PubSubClient mqttClient(netClient) ;
-Ustring node_topic(mqtt_topic);
-bool mqtt_connected = false; // mqtt in process of connecting
+PubSubClient mqttClient(netClient);  // MQTT client instance
+Ustring node_topic(mqtt_topic);      // Base topic for this node (from config)
+bool mqtt_connected = false;         // Connection state flag
 // char mqtt_id[33]="01234567890123456789012";
-#define MQTT_RETRY_INTERVAL 5000
+#define MQTT_RETRY_INTERVAL 5000     // Retry MQTT connection every 5 seconds
 unsigned long mqtt_last_attempt = millis() - MQTT_RETRY_INTERVAL;
 
+/**
+ * @brief Handle incoming MQTT messages
+ * 
+ * AUTOMATIC MESSAGE ROUTING
+ * =========================
+ * IoTempower automatically routes MQTT messages to the correct device:
+ * 
+ * 1. Strips the node topic prefix from the full topic
+ * 2. Parses remaining topic to identify target device/subdevice
+ * 3. Calls device_manager.receive() which dispatches to the correct device
+ * 4. Device's receive callback handles the actual command
+ * 
+ * This means users don't need to write message parsing code - they just
+ * define what should happen when a device receives a command.
+ * 
+ * @param topic Full MQTT topic that received a message
+ * @param payload Message payload bytes
+ * @param len Length of payload
+ */
 void onMqttMessage(char *topic, byte *payload, unsigned int len) {
     Ustring log_buffer;
 //    log_buffer.printf(F("Publish received.  topic: %s  len:  %u"), // TODO: allow use of flash-string
@@ -491,6 +716,14 @@ void onMqttMessage(char *topic, byte *payload, unsigned int len) {
 }
 
 
+/**
+ * @brief Initialize MQTT client connection parameters
+ * 
+ * Sets up the MQTT client with server address and callback.
+ * If mqtt_server is not defined in config, uses WiFi gateway address as server.
+ * This auto-detection feature means users don't need to configure MQTT broker
+ * address if it's running on their gateway.
+ */
 void init_mqtt() {
     if (reconfig_mode_active)
         return;
@@ -530,6 +763,21 @@ void init_mqtt() {
 }
 
 
+/**
+ * @brief Handle MQTT connection established event
+ * 
+ * AUTOMATIC MQTT SETUP
+ * ====================
+ * When MQTT connects, IoTempower automatically:
+ * 1. Publishes node's IP address to management topic
+ * 2. Publishes Home Assistant discovery messages for all devices
+ * 3. Subscribes to command topics for all devices
+ * 
+ * This automation means users get:
+ * - Automatic Home Assistant integration
+ * - No manual topic subscription code
+ * - Network visibility for debugging
+ */
 void onMqttConnect() {
     ulog(F("Connected to MQTT."));
 
@@ -541,6 +789,20 @@ void onMqttConnect() {
 }
 
 
+/**
+ * @brief Maintain MQTT connection and handle reconnection
+ * 
+ * ROBUST CONNECTION MANAGEMENT
+ * ============================
+ * Called every loop iteration to:
+ * 1. Process incoming MQTT messages (via mqttClient.loop())
+ * 2. Detect disconnections and log the reason
+ * 3. Attempt reconnection every 5 seconds if disconnected
+ * 4. Re-establish subscriptions after reconnection
+ * 
+ * This automatic reconnection is crucial for IoT reliability - nodes
+ * can recover from temporary network outages without manual intervention.
+ */
 void maintain_mqtt() {
     if(reconfig_mode_active)
         return;
@@ -581,6 +843,24 @@ void maintain_mqtt() {
 }
 
 
+/**
+ * @brief Initialize WiFi connection
+ * 
+ * NETWORK SETUP
+ * =============
+ * Handles complete WiFi setup:
+ * 1. Sets hostname for network identification
+ * 2. Initializes mDNS for name resolution
+ * 3. Starts OTA service
+ * 4. Connects to WiFi (credentials from config or adoption mode)
+ * 5. Configures TLS/SSL if enabled
+ * 
+ * The hostname-based identification is important for:
+ * - Easy device discovery on the network
+ * - OTA updates (connect to hostname.local)
+ * - MQTT client identification
+ * - Debugging and monitoring
+ */
 void connectToWifi() {
     // Start WiFi connection and register hostname
     ulog(F("Trying to connect to Wi-Fi with name " WIFI_SSID));
@@ -827,8 +1107,33 @@ void onWifiConnect(
 //     ulog();
 // }
 
+/**
+ * @brief Arduino setup function - runs once at boot
+ * 
+ * STARTUP SEQUENCE
+ * ================
+ * Important: Device objects are constructed BEFORE setup() runs due to C++ 
+ * static initialization. This is why devices can register themselves with
+ * the DeviceManager during construction.
+ * 
+ * Setup sequence:
+ * 1. Disable brownout detector (ESP32) - prevents spurious resets
+ * 2. Initialize serial communication for logging
+ * 3. Configure onboard LED
+ * 4. Initialize random number generator
+ * 5. Check for adoption mode request (flash button)
+ * 6. Configure WiFi sleep mode
+ * 7. Setup OTA system
+ * 8. Connect to WiFi
+ * 9. Configure NTP time (if TLS enabled)
+ * 10. Call user iotempower_init() function
+ * 11. Start all registered devices (calls device.start() on each)
+ * 12. Call user iotempower_start() function
+ * 
+ * This sequence ensures everything is ready before devices start operating.
+ */
 void setup() {
-    // careful - devices are initialized before this due to class constructors
+    // Careful - devices are initialized before this due to class constructors
     // TODO: setup (another, the internal one seems quite ok) watchdog
     // TODO: consider not using serial at all and freeing it for other
     // connections, and offering other debug channels
@@ -936,7 +1241,53 @@ const unsigned long performance_interval = 5000; // Interval of 5 seconds in mil
 unsigned long performance_iteration_count = 0;
 double performance_total_execution_time = 0; // Total execution time in microseconds
 
-// main loop managing the cooperative multitasking
+/**
+ * @brief Arduino main loop - runs continuously
+ * 
+ * MAIN LOOP OPERATION
+ * ===================
+ * This is where IoTempower's cooperative multitasking happens. The loop manages:
+ * 
+ * 1. PRECISION vs REGULAR INTERVALS
+ *    - Precision interval: Very tight timing for sensitive devices (e.g., LED strips)
+ *    - Regular interval: Normal operation with yields for network/system tasks
+ *    - Only precision devices update during precision intervals
+ *    - Everything else happens during regular intervals
+ * 
+ * 2. DEVICE UPDATES
+ *    - device_manager.update() polls all devices based on their poll rates
+ *    - Each device checks if it's time to measure
+ *    - Measurements trigger change detection
+ *    - Changes mark devices for publishing
+ * 
+ * 3. NETWORK MANAGEMENT
+ *    - WiFi connection monitoring with automatic recovery
+ *    - MQTT connection maintenance and reconnection
+ *    - OTA update handling
+ * 
+ * 4. PUBLISHING
+ *    - Changed values published as soon as possible
+ *    - Full state reports on configurable interval (transmission_delta)
+ *    - Rate limiting to prevent network buffer overflow (MIN_PUBLISH_TIME_MS)
+ * 
+ * 5. SCHEDULER
+ *    - do_later_check() executes scheduled callbacks
+ *    - Supports delayed actions, debouncing, deep sleep scheduling
+ * 
+ * KEY IOTEMPOWER FEATURES IN THE LOOP:
+ * - Automatic device polling and measurement
+ * - Automatic change detection and publishing
+ * - Robust network connection management
+ * - No blocking operations (cooperative multitasking)
+ * - Minimal user code needed (most logic is automatic)
+ * 
+ * Compare this to a standard Arduino MQTT project where you would need to:
+ * - Manually call every sensor's read function at the right time
+ * - Manually check for value changes
+ * - Manually build and send MQTT messages
+ * - Manually handle reconnections
+ * - Write all the timing and scheduling logic yourself
+ */
 void loop() {
     //yield(); // do necessary things for  maintaining WiFi and other system tasks
     // yield at start of loop doesn't make sense by its definition
