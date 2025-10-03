@@ -183,12 +183,13 @@ Each device publishes and subscribes to specific topics:
 
 .. code-block::
 
-   <node>/[<room>/[<subroom>/]]<device>/[subdevice]/[command]
+   <node>/[<room>/[<subroom>/]]<device>/[subdevice/][command]
    
    Examples:
-   living-room/temp/temperature        → 23.5 (published)
-   living-room/temp/humidity           → 45 (published)
-   living-room/status/set              ← on (subscribed)
+   bedroom/reading-lamp-left/relay        → on (published)
+   bedroom/environment-reader/climate/temperature → 23.5 (published)
+   bedroom/environment-reader/climate/humidity    → 45 (published)
+   bedroom/reading-lamp-left/relay/set    ← on (subscribed)
 
 
 Configuration Management
@@ -201,16 +202,17 @@ System Hierarchy
 
    IoT System (e.g., "my-home")
    ├── system.conf                    # Network and MQTT config
-   ├── Node 1 (e.g., "living-room")
-   │   ├── node.conf                  # Board type
-   │   ├── setup.cpp                  # Device configuration
-   │   └── build/                     # Generated files
-   │       ├── src/
-   │       │   ├── main.cpp           # Main firmware
-   │       │   ├── devices_generated.h # Device includes
-   │       │   └── setup.cpp          # Your config
-   │       └── platformio.ini         # Build config
-   └── Node 2 (e.g., "bedroom")
+   ├── Room/Collection (e.g., "living-room")
+   │   ├── Node (e.g., "sofa-light")
+   │   │   ├── node.conf              # Board type
+   │   │   ├── setup.cpp              # Device configuration
+   │   │   └── build/                 # Generated files
+   │   └── Node (e.g., "climate")
+   │       └── ...
+   └── Room/Collection (e.g., "bedroom")
+       ├── reading-lamp-left/
+       ├── reading-lamp-right/
+       ├── bed-leds/
        └── ...
 
 Configuration Flow

@@ -65,10 +65,14 @@ system.conf (System Level)
    IOTEMPOWER_AP_NAME="my-iot-network"
    IOTEMPOWER_AP_PASSWORD="secret123"
    
-   # MQTT broker
+   # MQTT broker (can be IP address or "_gateway" if broker is on gateway)
+   # "_gateway" is useful when gateway IP changes often (e.g., Android hotspot)
    MQTT_HOST="192.168.1.100"
-   MQTT_USER="mqtt"
-   MQTT_PASSWORD="mqttpass"
+   # or: MQTT_HOST="_gateway"
+   
+   # MQTT authentication (usually undefined in most home setups)
+   # MQTT_USER="mqtt"
+   # MQTT_PASSWORD="mqttpass"
 
 node.conf (Node Level)
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -179,7 +183,7 @@ Subscribing (MQTT → Actuator)
 Common Commands
 ---------------
 
-Note: Most of these commands can also be triggered via ``iot menu`` in a TUI way.
+Note: Most of these commands can also be triggered via ``iot menu`` in an easy to use terminal user interface (TUI).
 
 System Management
 ~~~~~~~~~~~~~~~~~

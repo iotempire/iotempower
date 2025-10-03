@@ -316,11 +316,10 @@ This bash script:
       ; Include generated libraries
       [include:platformio-libs.ini]
       
-      ; System configuration
-      build_flags = 
-          -DIOTEMPOWER_AP_NAME="my-network"
-          -DMQTT_HOST="192.168.1.100"
-          ; ... (other config values)
+      ; Common build flags example
+      build_flags =
+          -DCORE_DEBUG_LEVEL=5
+          -DLOG_LOCAL_LEVEL=5
 
 
 Stage 4: PlatformIO Compilation
@@ -395,9 +394,10 @@ Deployment Methods:
    
    .. code-block:: bash
    
-      $ deploy                    # Deploy all nodes in system
-      $ deploy 192.168.1.50       # Deploy to specific IP
-      $ deploy node1              # Deploy specific node by name
+      $ deploy                              # Deploy all nodes in system
+      $ deploy 192.168.1.50                 # Deploy to specific IP
+      $ deploy node1                        # Deploy specific node by name
+      $ deploy rfc2217://IP-addr.local:port # Via remote serial over network
 
 2. **Serial Upload**
    
