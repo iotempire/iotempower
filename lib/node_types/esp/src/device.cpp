@@ -3,51 +3,6 @@
  * @brief Implementation of Device and Subdevice classes
  * @author ulno
  * @created 2018-07-16
- * 
- * IMPLEMENTATION OVERVIEW
- * =======================
- * This file implements the core device functionality including:
- * - Device lifecycle management (construction, start, measure, publish)
- * - Subdevice value management
- * - MQTT publishing logic
- * - Change detection
- * - Home Assistant discovery
- * 
- * KEY IMPLEMENTATION DETAILS
- * ==========================
- * 
- * 1. AUTOMATIC REGISTRATION
- *    When a Device is constructed, it automatically registers itself with
- *    the DeviceManager singleton. This happens before setup() runs due to
- *    C++ static initialization order.
- * 
- * 2. POLLING MECHANISM
- *    poll_measure() is called from the main loop for each device.
- *    It checks if enough time has passed based on pollrate_us, then:
- *    - Calls measure_init() for any pre-measurement setup
- *    - Calls measure() which derived classes override
- *    - Calls measure_exit() for any post-measurement cleanup
- *    - Runs filter callbacks to validate the measurement
- *    - Only updates values if filters return true
- * 
- * 3. CHANGE DETECTION
- *    check_changes() compares measured_value to last_confirmed_value
- *    for each subdevice. If any changed:
- *    - Calls on_change callbacks
- *    - Marks device for publishing
- *    - Copies measured_value to last_confirmed_value
- * 
- * 4. MQTT PUBLISHING
- *    publish() iterates through all subdevices and:
- *    - Constructs full MQTT topic
- *    - Publishes last_confirmed_value
- *    - Handles retained flag
- *    - Provides detailed logging
- * 
- * 5. HOME ASSISTANT DISCOVERY
- *    create_discovery_info() builds JSON payloads for Home Assistant MQTT discovery.
- *    This allows devices to appear in Home Assistant automatically without
- *    manual configuration.
  */
 
 #include <Arduino.h>
@@ -88,37 +43,7 @@ bool Subdevice::call_receive_cb(Ustring& payload) {
 #include "device-manager.h"
 
 /**
- * @brief Device constructor - automatically registers device with DeviceManager
- * 
- * AUTOMATIC REGISTRATION - A KEY IOTEMPOWER FEATURE
- * ==================================================
- * This constructor demonstrates one of IoTempower's most powerful features:
- * automatic device registration.
- * 
- * In a standard Arduino project, you would need to:
- * 1. Declare device objects
- * 2. Manually keep track of all devices in an array or list
- * 3. Manually initialize each device in setup()
- * 4. Manually poll each device in loop()
- * 5. Manually publish each device's values
- * 
- * With IoTempower:
- * 1. Just create the device object
- * 2. Everything else is automatic!
- * 
- * HOW IT WORKS
- * ============
- * During construction:
- * 1. Device name is stored (used for MQTT topic)
- * 2. Poll rate is set (how often to read sensor)
- * 3. Device registers itself with DeviceManager
- * 4. DeviceManager will call start(), measure(), and publish() automatically
- * 
- * This happens during C++ static initialization, before setup() runs.
- * That's why you can declare devices globally and they "just work".
- * 
- * @param _name Device name (becomes part of MQTT topic)
- * @param __pollrate_us How often to poll this device in microseconds
+ * @brief Constructor - registers device with DeviceManager automatically
  */
 Device::Device(const char* _name, unsigned long __pollrate_us) {
     name.from(_name);
@@ -178,52 +103,14 @@ void Device::create_discovery_info(const String& type,
 }
 #endif
 
+/**
+ * @brief Publish device values to MQTT - constructs topics and sends values
+ */
 ////AsyncMqttClient disabled in favor of PubSubClient
 //bool Device::publish(AsyncMqttClient& mqtt_client, Ustring& node_topic) {
 // As we cannot use AsyncMqttClient (too many conflicts with other libraries that use interrupts)
-// and being archived, we need to assuem for this publish process that no new sensor data will
+// and being archived, we need to assume for this publish process that no new sensor data will
 // be acquired while publishing.
-/**
- * @brief Publish device values to MQTT
- * 
- * AUTOMATIC MQTT TOPIC CONSTRUCTION
- * ==================================
- * One of IoTempower's key features is automatic MQTT topic generation.
- * 
- * Topic structure:
- * - Device with no subdevices: <node_topic>/<device_name>
- * - Device with subdevices: <node_topic>/<device_name>/<subdevice_name>
- * 
- * Example:
- * - Node topic: "living_room"
- * - Device name: "temperature"
- * - Subdevice name: "celsius"
- * - Full topic: "living_room/temperature/celsius"
- * 
- * In a standard MQTT project, you would need to:
- * 1. Manually construct topic strings
- * 2. Format payload data
- * 3. Call MQTT publish
- * 4. Handle errors and retries
- * 5. Manage retained flags
- * 
- * With IoTempower, all of this is automatic. Just set device values and
- * publishing happens automatically when values change.
- * 
- * PUBLISHING STRATEGY
- * ===================
- * - Iterates through all subdevices
- * - Publishes only non-empty values
- * - Constructs full topic path
- * - Logs all published values
- * - Yields to network stack between publishes
- * - Clears needs_publishing flag on success
- * 
- * @param mqtt_client PubSubClient instance
- * @param node_topic Base topic for this node
- * @param log_buffer Buffer for logging published values
- * @return true if any values were published
- */
 bool Device::publish(PubSubClient& mqtt_client, Ustring& node_topic, Ustring& log_buffer) {
     bool published = false;
     Ustring topic;
@@ -231,12 +118,12 @@ bool Device::publish(PubSubClient& mqtt_client, Ustring& node_topic, Ustring& lo
     subdevices_for_each( [&] (Subdevice& sd) {
         const Ustring& val = sd.get_last_confirmed_value();
         if(!val.empty()) {
-            // Construct full MQTT topic
+            // construct full topic
             topic.copy(node_topic);
             topic.add(F("/"));
             topic.add(get_name());
             const Ustring& sd_name = sd.get_name();
-            if(!sd_name.empty()) { // Only add subdevice name if it exists
+            if(!sd_name.empty()) { // only add, if name given
                 topic.add(F("/"));
                 topic.add(sd.get_name());
             }
@@ -252,8 +139,7 @@ bool Device::publish(PubSubClient& mqtt_client, Ustring& node_topic, Ustring& lo
 
             ////AsyncMqttClient disabled in favor of PubSubClient
             // if(!mqtt_client.publish(topic.as_cstr(), 0, false, val.as_cstr())) {
-            
-            // Get buffers a bit emptier before we try to publish
+            // get buffers a bit emptier before we try to publish
             yield();
             mqtt_client.loop();
             yield();
@@ -262,13 +148,13 @@ bool Device::publish(PubSubClient& mqtt_client, Ustring& node_topic, Ustring& lo
                 // TODO: signal error and trigger reconnect - necessary?
                 return false;
             }
-            // Give room for publish to be sent out TODO: implement sync send
+            // give room for publish to be sent out TODO: implement sync send
             yield();
             mqtt_client.loop();
             yield();
             published = true;
         }
-        return true; // Continue loop
+        return true; // continue loop
     } ); // end for_each - iterate over subdevices
     if(published) _needs_publishing = false;
     return published;
@@ -321,66 +207,17 @@ bool Device::publish_discovery_info(PubSubClient& mqtt_client) {
 
 
 /**
- * @brief Poll and measure device if enough time has passed
- * 
- * THE POLLING AND MEASUREMENT SYSTEM
- * ===================================
- * This is a core part of IoTempower's automatic device management.
- * 
- * HOW POLLING WORKS
- * =================
- * 1. Check if device is started
- * 2. Check if pollrate_us has elapsed since last_poll
- * 3. Calculate how many intervals passed (handles missed intervals)
- * 4. Call measure_init() for any pre-measurement setup (e.g., I2C bus setup)
- * 5. Call measure() to read sensor or update actuator
- * 6. Call measure_exit() for any post-measurement cleanup
- * 7. Run filter callbacks to validate measurement
- * 8. If filters pass, accept the new value
- * 9. If filters fail, revert to last confirmed value
- * 
- * COMPARISON TO STANDARD ARDUINO
- * ==============================
- * Standard Arduino:
- *   void loop() {
- *     if (millis() - lastRead > 1000) {
- *       temp = readTemperature();
- *       if (temp != lastTemp) {
- *         mqtt.publish("temp", String(temp));
- *         lastTemp = temp;
- *       }
- *       lastRead = millis();
- *     }
- *     // Repeat for every sensor...
- *   }
- * 
- * With IoTempower:
- *   // Just implement measure() in your device class
- *   bool measure() {
- *     value().from(readTemperature());
- *     return true;
- *   }
- *   // Everything else is automatic!
- * 
- * PRECISE TIMING
- * ==============
- * The timing is microsecond-accurate and handles:
- * - Missed intervals (if processing took too long)
- * - Drift compensation (uses intervals, not absolute time)
- * - Very fast polling (1000us = 1ms for LED strips)
- * - Very slow polling (1000000us = 1s for temperature)
- * 
- * @return true if measurement was taken and accepted
+ * @brief Poll device if poll interval elapsed - calls measure() and runs filters
  */
 bool Device::poll_measure() {
-    if(started()) { // Only if device active
+    if(started()) { // only if device active
         unsigned long current_micros = micros();
 
         if (current_micros - last_poll >= _pollrate_us) {
             // Calculate the number of _pollrate_us intervals that have passed
 
             unsigned long intervals = 0;
-            if(_pollrate_us) intervals = (current_micros - last_poll) / _pollrate_us; // Only update if not zero - TODO: verify that this cannot be more efficient
+            if(_pollrate_us) intervals = (current_micros - last_poll) / _pollrate_us; // only update if not zero - TODO: verify that this cannot be more efficient
 
             // Update last_poll by adding the total amount of passed intervals
             last_poll += intervals * _pollrate_us;
@@ -424,56 +261,19 @@ bool Device::poll_measure() {
 }
 
 /**
- * @brief Check if values changed and trigger callbacks
- * 
- * AUTOMATIC CHANGE DETECTION
- * ===========================
- * This is another key IoTempower feature that eliminates boilerplate code.
- * 
- * In a standard Arduino project:
- *   float newTemp = readTemperature();
- *   if (newTemp != lastTemp) {
- *     mqtt.publish("temp", String(newTemp));
- *     lastTemp = newTemp;
- *   }
- *   // Repeat for every sensor...
- * 
- * With IoTempower:
- *   // Just write the value
- *   value().from(readTemperature());
- *   // Change detection, callbacks, and publishing are automatic!
- * 
- * HOW IT WORKS
- * ============
- * 1. Compare measured_value to last_confirmed_value for each subdevice
- * 2. If any changed, call on_change callbacks
- * 3. If callbacks accept the change (return true):
- *    - Mark device as needs_publishing
- *    - Log the change
- *    - Copy measured_value to last_confirmed_value
- * 4. If callbacks reject the change (return false):
- *    - Keep old value
- *    - Don't publish
- * 
- * This allows for:
- * - Automatic MQTT traffic reduction (only publish changes)
- * - Callback-based automation (trigger actions on changes)
- * - Change validation (reject suspicious changes)
- * - Detailed logging of what changed
- * 
- * @return true if any values changed and were accepted
+ * @brief Check if values changed, call on_change callbacks, mark for publishing
  */
 bool Device::check_changes() {
-    // Check if value has changed/is updated and call on_change_callback if it did
+    // check if value has changed/is updated and call on_change_callback if it did
     
     // Check if there was a change in any subdevice
     bool changed = false;
     subdevices.for_each( [&] (Subdevice& sd) {
         if(!sd.measured_value.equals(sd.last_confirmed_value)) {
             changed = true;
-            return false; // Stop loop after one change found
+            return false; // stop loop after one change found
         }
-        return true; // Continue loop
+        return true; // continue loop
     } ); // end for each subdevices
 
     // Call on_change callback if change happened
@@ -497,7 +297,7 @@ bool Device::check_changes() {
                     }
                     sd.last_confirmed_value.copy(sd.measured_value);
                 }
-                return true; // Continue whole loop to copy confirmed values
+                return true; // continue whole loop to copy confirmed values
             } ); // end for each subdevices
         }
     } // changed?

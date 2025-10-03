@@ -1,46 +1,8 @@
 /**
  * @file device-manager.cpp
- * @brief Implementation of DeviceManager and do_later scheduler
+ * @brief Implementation of DeviceManager singleton and do_later scheduler
  * @author ulno
  * @created 2018-07-16
- * 
- * IMPLEMENTATION OVERVIEW
- * =======================
- * This file implements:
- * 1. The do_later scheduler for delayed callback execution
- * 2. The DeviceManager singleton for managing all devices
- * 3. Device lifecycle operations (start, update, publish)
- * 4. MQTT integration for all devices
- * 
- * DO_LATER SCHEDULER IMPLEMENTATION
- * ==================================
- * The scheduler maintains a sorted array of callbacks to execute at specific times.
- * 
- * Data structure:
- * - Array of {time, id, callback} entries
- * - Sorted by execution time (earliest first)
- * - Fixed maximum size (IOTEMPOWER_DO_LATER_MAP_SIZE = 64)
- * 
- * Key operations:
- * - Insert: Binary search for correct position, shift array
- * - Delete: Shift array to fill gap
- * - Check: Execute callbacks whose time has come
- * 
- * Time handling:
- * - Uses millis() which overflows every ~49 days
- * - Handles overflow with delta calculations
- * - Maximum delay: 24 hours (prevents overflow issues)
- * 
- * ID-based callbacks:
- * - If id != -1, replaces any existing callback with same id
- * - Useful for debouncing (new action cancels old one)
- * - Example: Button press schedules action, repeated presses update timing
- * 
- * DEVICEMANAGER IMPLEMENTATION
- * ============================
- * Singleton pattern ensures single device registry.
- * Uses Fixed_Map for efficient device lookup by name.
- * All operations iterate through device list using lambda callbacks.
  */
 
 #include <Arduino.h>
@@ -50,24 +12,17 @@
 #include <toolbox.h>
 #include <device-manager.h>
 
-/**
- * DO_LATER SCHEDULER DATA STRUCTURES
- * ===================================
- */
-
-/// Callback wrapper that can be stored (std::function supports lambdas)
+// Structure and list for scheduler
 typedef std::function<void()> Do_Later_Callback;
 
-/// Scheduled callback entry
 typedef struct {
-    unsigned long time;         ///< millis() when callback should execute
-    int16_t id;                ///< ID for replaceable callbacks (-1 for one-shot)
-    Do_Later_Callback callback; ///< Function to call
+    unsigned long time;
+    int16_t id;
+    Do_Later_Callback callback;
 } do_later_map_t;
 
-/// Scheduler storage (sorted array, earliest callback first)
 static do_later_map_t do_later_map[IOTEMPOWER_DO_LATER_MAP_SIZE];
-static int do_later_map_count=0;  ///< Number of scheduled callbacks
+static int do_later_map_count=0;
 
 bool do_later_is_full() {
     return do_later_map_count >= IOTEMPOWER_DO_LATER_MAP_SIZE;
@@ -82,81 +37,39 @@ static void do_later_delete(int pos) {
 }
 
 /**
- * @brief Add a callback to the scheduler (internal function)
- * 
- * SCHEDULER INSERTION ALGORITHM
- * ==============================
- * This function implements a sorted insertion algorithm:
- * 
- * 1. If callback has an ID, check if one with same ID exists:
- *    - If found, delete old callback (replacement)
- *    - This implements debouncing/replacement logic
- * 
- * 2. If scheduler is full:
- *    - Delete oldest callback (at position 0)
- *    - This ensures newer callbacks have priority
- * 
- * 3. Find insertion position:
- *    - Linear search through sorted array
- *    - Uses delta calculation to handle millis() overflow
- *    - Insert before first callback scheduled for later
- * 
- * 4. Insert callback:
- *    - Shift existing callbacks to make room
- *    - Insert new callback at correct position
- *    - Increment counter
- * 
- * OVERFLOW HANDLING
- * =================
- * millis() overflows every ~49 days. This is handled by:
- * - Using delta (difference) calculations
- * - Checking if delta is within valid range
- * - Maximum delay prevents wraparound issues
- * 
- * Example with overflow:
- *   current = 4294967290 (5ms before overflow)
- *   in_ms = 10ms from now
- *   time = 4294967300 (would overflow to 5)
- *   When checking: delta = 5 - 4294967290 = large negative (wraps to large positive)
- *   If delta > IOTEMPOWER_MAX_DO_LATER_INTERVAL, it's invalid
- * 
- * @param in_ms Delay in milliseconds
- * @param id Callback ID (-1 for one-shot, >=0 for replaceable)
- * @param cbu Callback function to execute
- * @return true if added successfully, false if had to forget oldest callback
+ * @brief Add callback to scheduler - maintains sorted order, handles ID replacement
  */
 static bool do_later_add(unsigned long in_ms, int16_t id, Do_Later_Callback cbu) {
     bool forgot_one = false;
-    // Insert sorted into list
+    // insert sorted into list
     unsigned long current = millis();
-    in_ms += current;  // Convert relative time to absolute time
-    int pos; // Position variable for finding things
-    
-    // If valid id (!=-1) is given, a potential existing position needs 
-    // to be deleted (replacement logic)
+    in_ms += current;
+    int pos; // position variable for finding things
+    // if valid id (!=-1) is given, a potential existing position needs 
+    // to be deleted
     if(id!=-1) {
-        // Check if already in there
+        // check if already in there
         for(pos=0; pos<do_later_map_count; pos++) {
-            if(do_later_map[pos].id == id) break; // Found it
+            if(do_later_map[pos].id == id) break; // found it
         }
-        if(pos < do_later_map_count) { // Loop didn't run out and found
-            do_later_delete(pos); // Make space for replacement
+        if(pos < do_later_map_count) { // loop didn't run out and found
+            do_later_delete(pos); // make space for replacement
         }
     }
-    if(do_later_is_full()) { // No space, forget oldest (at beginning)
-        // Forget oldest
+    if(do_later_is_full()) { // no space, forget oldest (in beginning)
+        // forget oldest
         do_later_delete(0);
         forgot_one = true;
     }
-    // Find position to insert (maintain sorted order)
+    // find position to insert
     for(pos=0; pos<do_later_map_count; pos++) {
         unsigned long delta = do_later_map[pos].time-current;
-        // Be aware of overflow - only valid if delta is reasonable
-        if(delta >= in_ms && delta <= IOTEMPOWER_MAX_DO_LATER_INTERVAL) break; // Found something scheduled later
+        // be aware of overrun
+        if(delta >= in_ms && delta <= IOTEMPOWER_MAX_DO_LATER_INTERVAL) break; // found something scheduled later
     }
-    // Do actual insert at pos
+    // do actual insert at pos
     if(pos<do_later_map_count) {
-        // Move existing elements up to make room
+        // move existing elements up
         memmove(do_later_map+pos+1, do_later_map+pos, sizeof(do_later_map_t)*(do_later_map_count-pos-1));
     }
     do_later_map[pos].time = in_ms;
@@ -197,64 +110,25 @@ bool do_later(unsigned long in_ms, DO_LATER_CB_NO_ID callback) {
 }
 
 /**
- * @brief Check and execute ready callbacks (called from main loop)
- * 
- * SCHEDULER EXECUTION
- * ===================
- * This function is called in every iteration of the main loop.
- * It checks if any scheduled callbacks are ready to execute.
- * 
- * Algorithm:
- * 1. Check if scheduler is empty - if so, return immediately
- * 2. Get next callback (always at position 0 due to sorting)
- * 3. Calculate delta between current time and scheduled time
- * 4. If delta indicates time has come (considering overflow):
- *    - Extract callback from scheduler
- *    - Delete it from the queue (before executing!)
- *    - Execute the callback
- * 5. Repeat until no more ready callbacks
- * 
- * WHY DELETE BEFORE EXECUTING?
- * ============================
- * The callback is deleted from the queue before execution because:
- * - Callback might call do_later() itself
- * - This could modify the queue
- * - Deleting first ensures queue consistency
- * - Callback execution might take significant time
- * 
- * OVERFLOW HANDLING
- * =================
- * Uses same delta calculation as insertion:
- * - If current time >= scheduled time (considering overflow)
- * - And delta is within valid range
- * - Then callback is ready to execute
- * 
- * Example timeline:
- *   T=0: Schedule callback for T=1000
- *   T=500: Check - delta = 500-1000 = large negative (not ready)
- *   T=1000: Check - delta = 1000-1000 = 0 (ready!)
- *   T=1100: Check - delta = 1100-1000 = 100 (ready, late but still valid)
- * 
- * This is called from the main loop outside precision intervals
- * to avoid interfering with precise timing requirements.
+ * @brief Execute ready callbacks - called from main loop
  */
 void do_later_check() {
     unsigned long next;
     unsigned long current=millis();
     unsigned long delta;
     while(true) {
-        if(do_later_map_count<=0) break;  // No more callbacks
-        next = do_later_map[0].time;      // Next callback time
-        delta = current - next;           // Time difference
-        // Pay attention to overflow
+        if(do_later_map_count<=0) break;
+        next = do_later_map[0].time;
+        delta = current - next;
+        // pay attention to overrun
         if(delta>=0 && delta <= IOTEMPOWER_MAX_DO_LATER_INTERVAL) {
-            //int16_t id = do_later_map[0].id; // ID is hardcoded in callback lambda
+            //int16_t id = do_later_map[0].id; hardcoded in callback lambda
             Do_Later_Callback cb = do_later_map[0].callback;
-            // Release entry BEFORE execution as callback might schedule new ones
+            // release entry as there might be a new one created
             do_later_delete(0);
-            cb();  // Execute the callback
+            cb();
         } else {
-            break; // Next callback not ready yet, we are done
+            break; // we are done
         }
     }
 }
@@ -303,87 +177,16 @@ bool DeviceManager::start() {
 }
 
 /**
- * @brief Update all devices (poll sensors, check for changes)
- * 
- * THE HEART OF IOTEMPOWER'S AUTOMATIC DEVICE MANAGEMENT
- * ======================================================
- * This method is called from the main loop and implements the core
- * device polling logic that makes IoTempower so easy to use.
- * 
- * DUAL TIMING MODE
- * ================
- * IoTempower operates in two timing modes:
- * 
- * 1. PRECISION INTERVAL (in_precision_interval = true)
- *    - Very tight timing, no yields
- *    - Only devices that need precision update
- *    - Used for LED strips, audio, etc.
- *    - Fast and uninterrupted
- * 
- * 2. REGULAR INTERVAL (in_precision_interval = false)
- *    - Normal operation with yields
- *    - All devices update
- *    - Allows network/system tasks to run
- *    - More forgiving timing
- * 
- * WHAT HAPPENS FOR EACH DEVICE
- * =============================
- * 1. Check if device needs precision matches current interval
- * 2. Call dev.poll_measure():
- *    - Checks if poll rate has elapsed
- *    - Calls measure() to read sensor
- *    - Runs filter callbacks
- *    - Returns true if new value
- * 3. If new value, call dev.check_changes():
- *    - Compares to last confirmed value
- *    - Runs on_change callbacks
- *    - Marks for publishing if changed
- * 4. Yield (if not in precision mode) to let network run
- * 
- * COMPARISON TO STANDARD ARDUINO
- * ==============================
- * Standard Arduino would require:
- *   void loop() {
- *     // Poll temperature sensor
- *     if (millis() - tempLastPoll >= 1000) {
- *       float temp = readTemp();
- *       if (temp != lastTemp) {
- *         mqtt.publish("temp", String(temp));
- *         lastTemp = temp;
- *       }
- *       tempLastPoll = millis();
- *     }
- *     
- *     // Poll button
- *     if (millis() - buttonLastPoll >= 50) {
- *       bool pressed = digitalRead(BUTTON);
- *       if (pressed != lastPressed) {
- *         mqtt.publish("button", pressed ? "on" : "off");
- *         lastPressed = pressed;
- *       }
- *       buttonLastPoll = millis();
- *     }
- *     
- *     // ...repeat for every device...
- *     yield(); // Don't forget this!
- *   }
- * 
- * With IoTempower:
- *   // Just define devices in setup
- *   // This one line replaces all the code above:
- *   device_manager.update(in_precision_interval);
- * 
- * @param in_precision_interval true for precision mode, false for regular
- * @return true if any device values changed
+ * @brief Update all devices - polls and checks for changes
  */
 bool DeviceManager::update(bool in_precision_interval) {
     bool changed = false;
     device_list.for_each( [&] (Device& dev) {
-        if(dev.needs_precision() == in_precision_interval) { // Execute precision devices according to what interval is selected
+        if(dev.needs_precision() == in_precision_interval) { // execute precision devices according to what interval is selected
             if(dev.poll_measure()) {
                 changed |= dev.check_changes();
             }
-            if (!in_precision_interval) yield(); // Give time if not in precision mode
+            if (!in_precision_interval) yield(); // give time if not in precision mode
         }
         return true; // Continue loop
     } );
@@ -399,79 +202,6 @@ void DeviceManager::reset_buffers() {
 
 /**
  * @brief Publish changed device values to MQTT
- * 
- * AUTOMATIC MQTT PUBLISHING
- * =========================
- * This method demonstrates another key IoTempower feature: automatic publishing
- * of changed values without any user code needed.
- * 
- * PUBLISHING LOGIC
- * ================
- * For each device:
- * 1. Check if device is started
- * 2. Check if device should report changes
- * 3. Check if publish_all OR device needs publishing:
- *    - publish_all: Periodic full state report
- *    - needs_publishing: Value changed since last publish
- * 4. Call device.publish() to send to MQTT
- * 5. Call mqtt_client.loop() to ensure message is sent
- * 
- * TWO PUBLISHING MODES
- * ====================
- * 
- * 1. CHANGE-BASED (publish_all = false)
- *    - Only publish devices that have changed
- *    - Reduces MQTT traffic significantly
- *    - Most common mode (called in every loop)
- *    - Example: Button pressed -> publish immediately
- * 
- * 2. FULL STATE (publish_all = true)
- *    - Publish all devices regardless of changes
- *    - Ensures external systems have current state
- *    - Called periodically (e.g., every 5 minutes)
- *    - Recovers from broker restarts or lost messages
- * 
- * DETAILED LOGGING
- * ================
- * Builds a log message showing all published values:
- *   "Publishing topic1:value1 | topic2:value2 | topic3:value3"
- * 
- * This helps with debugging and monitoring:
- * - See what's being published
- * - Verify values are correct
- * - Track publishing frequency
- * 
- * COMPARISON TO STANDARD ARDUINO
- * ==============================
- * 
- * Standard Arduino:
- *   void publishDevices() {
- *     if (tempChanged) {
- *       mqtt.publish("node/temp", String(temp));
- *       tempChanged = false;
- *     }
- *     if (humidityChanged) {
- *       mqtt.publish("node/humidity", String(humidity));
- *       humidityChanged = false;
- *     }
- *     // ...repeat for every device...
- *   }
- * 
- * With IoTempower:
- *   device_manager.publish(mqtt_client, node_topic, false);
- *   // Handles all devices automatically!
- * 
- * NETWORK CONSIDERATIONS
- * ======================
- * - Calls mqtt_client.loop() after each publish
- * - Ensures messages are sent out promptly
- * - Prevents buffer overflow
- * - Allows network stack to process packets
- * 
- * @param mqtt_client PubSubClient instance
- * @param node_topic Base MQTT topic for this node
- * @param publish_all If true, publish all values; if false, only changed
- * @return true if any values were published
  */
 bool DeviceManager::publish(PubSubClient& mqtt_client, Ustring& node_topic, bool publish_all) {
     ////AsyncMqttClient disabled in favor of PubSubClient
@@ -486,7 +216,7 @@ bool DeviceManager::publish(PubSubClient& mqtt_client, Ustring& node_topic, bool
                     if(!first) log_buffer.add(F("; "));
                     published = true;
                 }
-                mqtt_client.loop(); // Give time to send things out -> seems necessary
+                mqtt_client.loop(); // give time to send things out -> seems necessary
                 if(first) {
                     first = false;
                 }
@@ -498,7 +228,7 @@ bool DeviceManager::publish(PubSubClient& mqtt_client, Ustring& node_topic, bool
         log_buffer.add(F(" nothing"));
         published = true; // If you did send nothing at all, say this publish was successful
     } else {
-        if(log_buffer.length() > 10) { // More than "Publishing."
+        if(log_buffer.length() > 10) { // more than "Publishing."
             ulog(log_buffer.as_cstr());
         }
     }
