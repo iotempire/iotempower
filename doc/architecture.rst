@@ -91,7 +91,8 @@ IoTempower's architecture consists of several layers:
 
    ┌─────────────────────────────────────────────┐
    │  Integration Layer                          │
-   │  (Node-RED, Home Assistant, Custom Apps)    │
+   │  (Node-RED, Home Assistant, IoTknit,        │
+   │   Custom Apps)                               │
    └─────────────────────────────────────────────┘
                       ↕ MQTT
    ┌─────────────────────────────────────────────┐
@@ -165,13 +166,13 @@ Each device in your ``setup.cpp`` becomes a global object:
 
 .. code-block:: cpp
 
-   // In setup.cpp
-   led("status", D1);
-   dht22("temp", D4);
+   // In setup.cpp (note: names without quotes)
+   led(status, D1);
+   dht22(temp, D4);
    
    // Generates (simplified)
-   Output status_device("status", D1);
-   Dht22 temp_device("temp", D4);
+   Output iotempower_dev_status("status", D1);
+   Dht22 iotempower_dev_temp("temp", D4);
    
    // Registered in DeviceManager automatically
 
@@ -182,12 +183,12 @@ Each device publishes and subscribes to specific topics:
 
 .. code-block::
 
-   <system>/<node>/<device>/[subdevice]/[command]
+   <node>/[<room>/[<subroom>/]]<device>/[subdevice]/[command]
    
    Examples:
-   my-home/living-room/temp/temperature        → 23.5 (published)
-   my-home/living-room/temp/humidity           → 45 (published)
-   my-home/living-room/status/set              ← on (subscribed)
+   living-room/temp/temperature        → 23.5 (published)
+   living-room/temp/humidity           → 45 (published)
+   living-room/status/set              ← on (subscribed)
 
 
 Configuration Management

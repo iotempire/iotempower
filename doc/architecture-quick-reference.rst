@@ -19,14 +19,17 @@ Systems, Nodes, and Devices
 .. code-block::
 
    IoT System (e.g., "my-home")
-   └── Nodes (e.g., "living-room", "bedroom")
-       └── Devices (e.g., "temperature", "motion", "led")
+   └── Room/Collection (e.g., "bedroom") - folder with multiple nodes
+       └── Node (e.g., "reading-lamp-left") - microcontroller
+           └── Devices (e.g., "relay", "button", "status_led")
 
 **System**: A complete IoT installation (one WiFi network, one MQTT broker)
 
-**Node**: A microcontroller (ESP8266/ESP32) with connected devices
+**Room/Collection**: A folder containing multiple related nodes (e.g., bedroom with reading-lamp-left, reading-lamp-right, bed-leds, overhead-light, environment-reader)
 
-**Device**: A sensor or actuator (temperature sensor, LED, button, etc.)
+**Node**: A microcontroller (ESP8266/ESP32) with connected devices, stored in a folder with node.conf and setup.cpp
+
+**Device**: A sensor or actuator (temperature sensor, LED, button, relay, etc.)
 
 
 Device Class Hierarchy
@@ -36,7 +39,8 @@ Device Class Hierarchy
 
    Device (base class)
    ├── Input_Base → Input, Analog
-   ├── Output → PWM, RGB_Single, RGB_Strip_Bus
+   ├── Output (digital output, LED, relay)
+   ├── PWM (pulse width modulation)
    ├── I2C_Device → BMP180, BH1750, etc.
    ├── Dht11, Dht22, Ds18b20 (OneWire devices)
    ├── Hcsr04 (acoustic distance sensor)
@@ -73,16 +77,19 @@ node.conf (Node Level)
 
    # Board type - any board listed in lib/node_types/ can be used
    board="wemos_d1_mini"
-   # or: board="esp32dev", "nodemcu", "esp32", "lolin_s2_mini", etc.
+   # or: board="esp32dev", "nodemcu", "esp32", "esp32minikit", 
+   #     "m5stickc", "m5stickcplus", "sonoff", "lolin_s2_mini"
 
 setup.cpp (Device Level)
 ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Located in: my-home/living-room/door-climate/setup.cpp
 
 .. code-block:: cpp
 
    // Define your devices (note: name is not quoted)
    led(status, D1);
-   button(door, D2).with_pull_up();
+   button(door, D2);  // with_pull_up is default
    dht22(climate, D4);
    
    // Add interactions using IN() macro to access device reference
@@ -127,7 +134,8 @@ Each device goes through these stages:
 
 5. **Publish**
    
-   Changed values automatically published via MQTT
+   Changed values automatically published via MQTT (can be overridden in on_change 
+   closure by returning false to prevent value registration)
 
 6. **Receive**
    
@@ -142,30 +150,36 @@ Topic Structure
 
 .. code-block::
 
-   <node>/<device>/[subdevice]/[command]
+   <node>/[<room>/[<subroom>/]]<device>/[subdevice]/[command or subsensor value]
 
 Note: System name is not used in MQTT topics. Topics start at node level (often a room name).
 
 Publishing (Sensor → MQTT)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Examples from bedroom with multiple nodes:
+
 .. code-block::
 
-   living-room/climate/temperature    → 23.5
-   living-room/climate/humidity       → 45
-   living-room/door                   → on
+   bedroom/reading-lamp-left/relay             → on
+   bedroom/environment-reader/climate/temperature → 23.5
+   bedroom/environment-reader/climate/humidity    → 45
+   bedroom/bed-leds/strip                      → #ff0000
 
 Subscribing (MQTT → Actuator)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block::
 
-   living-room/status/set             ← on
-   living-room/rgb/color/set          ← 255,0,0
+   bedroom/reading-lamp-left/relay/set         ← on
+   bedroom/bed-leds/strip/set                  ← blue
+   bedroom/overhead-light/dimmer/set           ← 75
 
 
 Common Commands
 ---------------
+
+Note: Most of these commands can also be triggered via ``iot menu`` in a TUI way.
 
 System Management
 ~~~~~~~~~~~~~~~~~
@@ -190,13 +204,16 @@ Node Development
    # or: mcedit setup.cpp
    # or: code setup.cpp (VS Code)
    
-   # Compile firmware
+   # Compile firmware (for testing setup.cpp without deploying)
    compile
    
-   # Deploy to node
+   # Deploy to node (runs compile first)
+   # First time: use deploy serial to flash via USB
+   deploy serial                       # Via local USB (first time)
+   
+   # Subsequent deploys (OTA - over the air, finds IP automatically)
    deploy                              # All nodes in current folder
    deploy 192.168.1.50                 # Specific IP
-   deploy serial                       # Via local USB
    deploy rfc2217://IP-addr.local:port # Via remote serial over network
 
 Monitoring
@@ -267,18 +284,27 @@ Result:
 The IN() Macro
 ~~~~~~~~~~~~~~
 
-The ``IN()`` macro (Internal Name) is used to reference devices in code:
+The ``IN()`` macro (Internal Name) is used to reference devices in code.
+
+Example from Sonoff Basic (see examples/sonoff/basic):
 
 .. code-block:: cpp
 
-   // Device definition
-   led(status, D1);
+   // Device definitions
+   led(green, GREENLED).inverted().report_change(false);
+   output(relais1, RELAIS1).off();
+   input(button1, BUTTON1, "released", "pressed")
+       .debounce(3)
+       .on_change([] (Device& dev) {
+            if(dev.is("pressed")) {
+                IN(relais1).toggle();  // Use IN() to access relais1
+                IN(green).toggle();    // Use IN() to access green LED
+            }
+            return true;
+        });
    
-   // Later in code, use IN() to access the device
-   IN(status).on();
-   IN(status).toggle();
-   
-   // IN(status) expands to: iotempower_dev_status
+   // IN(relais1) expands to: iotempower_dev_relais1
+   // IN(green) expands to: iotempower_dev_green
 
 
 Creating New Device Types

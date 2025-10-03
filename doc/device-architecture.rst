@@ -20,6 +20,7 @@ The device system is built on several key base classes that form an inheritance 
    │   ├── Input (digital input, button, contact)
    │   └── Analog (analog input)
    ├── Output (digital output, LED, relay)
+   ├── PWM (pulse width modulation)
    ├── I2C_Device
    │   ├── Barometer_BMP180
    │   ├── Barometer_BMP280
@@ -30,8 +31,10 @@ The device system is built on several key base classes that form an inheritance 
    ├── Dht11 (temperature/humidity)
    ├── Dht22 (temperature/humidity)
    ├── Ds18b20 (temperature)
+   ├── Hcsr04 (acoustic distance sensor)
    ├── RGB_Base
-   │   └── RGB_Single
+   │   ├── RGB_Single
+   │   └── RGB_Strip_Bus
    └── ... (other device types)
 
 
