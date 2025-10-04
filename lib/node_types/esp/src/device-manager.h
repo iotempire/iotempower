@@ -43,9 +43,8 @@
  * 
  * With IoTempower's DeviceManager:
  *   // Just create devices - that's it!
- *   Temperature temp_sensor("temperature");
- *   Humidity humidity_sensor("humidity");
- *   Output led("led");
+ *   dht11(temp_hum, D4);  // creates device for topic temp_hum with subdevices
+ *   output(led, D5);
  *   // Everything else is automatic!
  * 
  * THE DO_LATER SCHEDULER
@@ -135,9 +134,9 @@
  *   }
  * 
  * With IoTempower do_later:
- *   if (button.is("pressed")) {
+ *   if (IN(button).is("pressed")) {
  *     do_later(5000, [] {
- *       led.value().from("off");
+ *       IN(led).on();
  *     });
  *   }
  * 

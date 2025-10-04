@@ -154,8 +154,8 @@ class Callback {
  * 
  * 2. Trigger Chain:
  *    - First callback: Check if temperature above threshold
- *    - Second callback: Send alert if not already sent
- *    - Third callback: Turn on cooling system
+ *    - Second callback: Turn on signalling LED
+ *    - Third callback: Turn on cooling system relay
  * 
  * HOW IT WORKS
  * ============
@@ -203,7 +203,7 @@ class Callback_Link {
  * Many physical devices produce multiple values. For example:
  * - DHT sensor: temperature AND humidity
  * - RGB LED: red, green, blue channels
- * - GPS: latitude, longitude, altitude
+ * - IMU (MPU6050): yaw/pitch/roll on ypr topic, accelerations on acc topic
  * 
  * Each of these values is a Subdevice with:
  * - Its own name (appended to device name for MQTT topic)
