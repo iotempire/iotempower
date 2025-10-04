@@ -213,13 +213,17 @@ class Callback_Link {
  * 
  * MQTT TOPIC STRUCTURE
  * ====================
- * If device name is "temp_sensor" and subdevice name is "celsius":
- * - Full topic: <node_topic>/temp_sensor/celsius
- * - Command topic: <node_topic>/temp_sensor/celsius/set
+ * Example: RGB LED created with rgb_single(rgb1, D3, D4, D2);
+ * Device name: rgb1
  * 
- * If subdevice has no name (empty string):
- * - Full topic: <node_topic>/temp_sensor
- * - Command topic: <node_topic>/temp_sensor/set
+ * Subdevices and topics:
+ * - set: <node_topic>/rgb1/set (command topic for on/off)
+ * - brightness/status: <node_topic>/rgb1/brightness/status (reports brightness 0-255)
+ * - brightness/set: <node_topic>/rgb1/brightness/set (command to set brightness)
+ * - rgb/status: <node_topic>/rgb1/rgb/status (reports color as name, hex rrggbb, or r,g,b)
+ * - rgb/set: <node_topic>/rgb1/rgb/set (command to set color)
+ * 
+ * The "set" topics are command topics - the device sends info on the "status" topics
  * 
  * VALUE LIFECYCLE
  * ===============
@@ -365,7 +369,8 @@ class Device {
         
         // PUBLISHING CONTROL
         bool _ignore_case = true;        // Convert values to lowercase before comparison
-        bool _report_change = true;      // Should changes be published?
+        bool _report_change = true;      // Should changes be published? Can be changed with .report_change(false)
+                                         // (useful for LED strips to not report every LED change)
         bool _needs_publishing = false;  // Does this device have unpublished changes?
         bool _retained = false;          // Should MQTT messages be retained?
 
