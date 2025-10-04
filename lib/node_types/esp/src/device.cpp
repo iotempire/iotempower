@@ -132,7 +132,6 @@ bool Device::publish(PubSubClient& mqtt_client, Ustring& node_topic, Ustring& lo
                 first = false;
             }
             else log_buffer.add(F("|"));
-// TODO: seems wrong, check if fixed correctly            Serial.print(topic.as_cstr()+node_topic.length()+1);
             log_buffer.add(topic);
             log_buffer.add(F(":"));
             log_buffer.add(val);
