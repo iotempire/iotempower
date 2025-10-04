@@ -1,6 +1,9 @@
-// device.cpp
-// author: ulno
-// created: 2018-07-16
+/**
+ * @file device.cpp
+ * @brief Implementation of Device and Subdevice classes
+ * @author ulno
+ * @created 2018-07-16
+ */
 
 #include <Arduino.h>
 #include "device.h"
@@ -39,6 +42,9 @@ bool Subdevice::call_receive_cb(Ustring& payload) {
 
 #include "device-manager.h"
 
+/**
+ * @brief Constructor - registers device with DeviceManager automatically
+ */
 Device::Device(const char* _name, unsigned long __pollrate_us) {
     name.from(_name);
     pollrate_us(__pollrate_us);
@@ -97,10 +103,13 @@ void Device::create_discovery_info(const String& type,
 }
 #endif
 
+/**
+ * @brief Publish device values to MQTT - constructs topics and sends values
+ */
 ////AsyncMqttClient disabled in favor of PubSubClient
 //bool Device::publish(AsyncMqttClient& mqtt_client, Ustring& node_topic) {
 // As we cannot use AsyncMqttClient (too many conflicts with other libraries that use interrupts)
-// and being archived, we need to assuem for this publish process that no new sensor data will
+// and being archived, we need to assume for this publish process that no new sensor data will
 // be acquired while publishing.
 bool Device::publish(PubSubClient& mqtt_client, Ustring& node_topic, Ustring& log_buffer) {
     bool published = false;
@@ -197,6 +206,9 @@ bool Device::publish_discovery_info(PubSubClient& mqtt_client) {
 
 
 
+/**
+ * @brief Poll device if poll interval elapsed - calls measure() and runs filters
+ */
 bool Device::poll_measure() {
     if(started()) { // only if device active
         unsigned long current_micros = micros();
@@ -248,6 +260,9 @@ bool Device::poll_measure() {
     return false;
 }
 
+/**
+ * @brief Check if values changed, call on_change callbacks, mark for publishing
+ */
 bool Device::check_changes() {
     // check if value has changed/is updated and call on_change_callback if it did
     

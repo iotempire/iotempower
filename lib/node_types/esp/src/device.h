@@ -1,12 +1,76 @@
-// device.h
-// author: ulno
-// created: 2018-07-16
-//
-// One iotempower device (actor or sensor connected to node)
+/**
+ * @file device.h
+ * @brief Base Device class for IoTempower - the foundation of the device system
+ * @author ulno
+ * @created 2018-07-16
+ * 
+ * WHAT IS A DEVICE IN IOTEMPOWER?
+ * ================================
+ * A Device represents any sensor or actuator connected to an IoT node. This could be:
+ * - Sensors: temperature, humidity, light, motion, buttons, distance sensors, etc.
+ * - Actuators: LEDs, relays, motors, servos, displays, etc.
+ * 
+ * CORE DESIGN PRINCIPLES
+ * ======================
+ * 
+ * 1. STRING-BASED VALUES
+ *    All device values are passed as strings (Ustring) for simplicity and consistency.
+ *    This means:
+ *    - Easy MQTT publishing (MQTT payloads are strings)
+ *    - Simple debugging (can print any value)
+ *    - Type conversion handled by helper methods (read_int, read_float, etc.)
+ *    - No complex type marshalling needed
+ * 
+ * 2. AUTOMATIC REGISTRATION
+ *    Devices register themselves with DeviceManager during construction.
+ *    Users just create a device object and it's automatically:
+ *    - Added to the device list
+ *    - Given an MQTT topic
+ *    - Set up for polling
+ *    - Ready to publish and receive
+ * 
+ * 3. SUBDEVICE ARCHITECTURE
+ *    A single Device can have multiple subdevices (e.g., DHT sensor has temp & humidity).
+ *    Each subdevice:
+ *    - Has its own name and MQTT subtopic
+ *    - Can have its own value and callbacks
+ *    - Can be subscribed to receive commands
+ * 
+ * 4. CALLBACK CHAINS
+ *    Devices support two callback chains:
+ *    - Filter callbacks: Process/validate measurements before they're accepted
+ *    - Change callbacks: Trigger when a value changes
+ *    Callbacks can be chained for complex processing pipelines
+ * 
+ * 5. LIFECYCLE MANAGEMENT
+ *    Every device goes through a clear lifecycle:
+ *    - Construction: Device created, registers with DeviceManager
+ *    - start(): Initialize hardware, called by DeviceManager
+ *    - measure(): Poll sensor/update actuator, called based on pollrate
+ *    - publish(): Send values to MQTT when they change
+ *    - receive(): Handle incoming MQTT commands
+ * 
+ * HOW THIS DIFFERS FROM STANDARD ARDUINO
+ * =======================================
+ * In a standard Arduino MQTT project, you would need:
+ * - Manual sensor reading in loop() with timing logic
+ * - Manual MQTT topic construction and message formatting
+ * - Manual change detection (store old value, compare to new)
+ * - Manual subscription and message routing
+ * - Manual callback registration and management
+ * 
+ * With IoTempower Device class:
+ * - Just inherit from Device and implement measure()
+ * - Automatic polling based on pollrate
+ * - Automatic MQTT topic generation
+ * - Automatic change detection and publishing
+ * - Automatic message routing to your device
+ * - Built-in callback chains for filtering and triggering
+ */
 
-// General note, in iotempower, we pass as convenience all values as strings.
-// So other types have to be converted into a string or from one.
-// We are actually using Ustring as defined in toolbox.h.
+// General note: In IoTempower, we pass all values as strings (Ustring) for convenience.
+// Other types must be converted to/from strings using the provided helper methods.
+// We are actually using Ustring as defined in toolbox.h for memory efficiency.
 
 #ifndef _IOTEMPOWER_DEVICE_H_
 #define _IOTEMPOWER_DEVICE_H_
@@ -22,11 +86,36 @@
 
 class Device;
 
+/**
+ * Type definition for device callbacks
+ * Callbacks receive a reference to the device and return bool:
+ * - true: Accept/process the value
+ * - false: Reject/ignore the value
+ */
 #define IOTEMPOWER_DEVICE_CALLBACK std::function<bool(Device &dev)>
 
-// This class implements a callback for IOTEMPOWER
-// It's call function can be overwritten or the internal callback
-// can be intialized by another function
+/**
+ * @class Callback
+ * @brief Wrapper for device callback functions
+ * 
+ * PURPOSE
+ * =======
+ * Provides a flexible callback mechanism that can:
+ * - Store a function to be called later
+ * - Be overridden by subclasses for custom behavior
+ * - Access the device it's associated with
+ * 
+ * USAGE
+ * =====
+ * Callbacks are used for:
+ * - Filter callbacks: Validate/modify measurements
+ * - Change callbacks: React to value changes
+ * - Command callbacks: Handle MQTT commands
+ * 
+ * The callback can either:
+ * 1. Be initialized with a lambda/function
+ * 2. Be subclassed and override the call() method
+ */
 class Callback {
     private:
         IOTEMPOWER_DEVICE_CALLBACK _callback = NULL;
@@ -47,10 +136,38 @@ class Callback {
 };
 
 
-// This is a chained list of callbacks working on a device
-// If called it traverses the chain and all it's subchain elements and
-// returns only true if all subcalls returned true - else it will return false
-// the call back operates on a device as parameter
+/**
+ * @class Callback_Link
+ * @brief Linked list of callbacks for processing pipelines
+ * 
+ * PURPOSE
+ * =======
+ * Allows multiple callbacks to be chained together in a processing pipeline.
+ * All callbacks in the chain must return true for the chain to succeed.
+ * 
+ * EXAMPLE USE CASES
+ * =================
+ * 1. Filter Chain:
+ *    - First callback: Validate sensor reading is in valid range
+ *    - Second callback: Apply calibration correction
+ *    - Third callback: Average with previous readings
+ * 
+ * 2. Trigger Chain:
+ *    - First callback: Check if temperature above threshold
+ *    - Second callback: Turn on signalling LED
+ *    - Third callback: Turn on cooling system relay
+ * 
+ * HOW IT WORKS
+ * ============
+ * - Each Callback_Link holds one Callback and a pointer to the next link
+ * - Calling the chain calls each callback in sequence
+ * - If any callback returns false, the chain stops and returns false
+ * - Only if all callbacks return true does the chain return true
+ * 
+ * This is a key feature that makes IoTempower more powerful than standard
+ * Arduino code - you can build complex processing logic by chaining simple
+ * callbacks without writing explicit control flow.
+ */
 class Callback_Link {
     private:
         Callback* _callback;
@@ -77,19 +194,64 @@ class Callback_Link {
         }
 };
 
+/**
+ * @class Subdevice
+ * @brief Represents one value/channel of a Device
+ * 
+ * PURPOSE
+ * =======
+ * Many physical devices produce multiple values. For example:
+ * - DHT sensor: temperature AND humidity
+ * - RGB LED: red, green, blue channels
+ * - IMU (MPU6050): yaw/pitch/roll on ypr topic, accelerations on acc topic
+ * 
+ * Each of these values is a Subdevice with:
+ * - Its own name (appended to device name for MQTT topic)
+ * - Its own measured and confirmed values
+ * - Its own subscription capability for receiving commands
+ * - Its own receive callback
+ * 
+ * MQTT TOPIC STRUCTURE
+ * ====================
+ * Example: RGB LED created with rgb_single(rgb1, D3, D4, D2);
+ * Device name: rgb1
+ * 
+ * Subdevices and topics:
+ * - set: <node_topic>/rgb1/set (command topic for on/off)
+ * - brightness/status: <node_topic>/rgb1/brightness/status (reports brightness 0-255)
+ * - brightness/set: <node_topic>/rgb1/brightness/set (command to set brightness)
+ * - rgb/status: <node_topic>/rgb1/rgb/status (reports color as name, hex rrggbb, or r,g,b)
+ * - rgb/set: <node_topic>/rgb1/rgb/set (command to set color)
+ * 
+ * The "set" topics are command topics - the device sends info on the "status" topics
+ * 
+ * VALUE LIFECYCLE
+ * ===============
+ * - measured_value: Latest reading from sensor (may not be published yet)
+ * - last_confirmed_value: Last value that was published to MQTT
+ * - Values are compared to detect changes
+ * - Only changed values are published (reduces MQTT traffic)
+ * 
+ * SUBSCRIPTION
+ * ============
+ * If subscribed = true:
+ * - Device will subscribe to <topic>/set on MQTT
+ * - Incoming messages trigger the receive_cb callback
+ * - Callback can update device state based on command
+ */
 class Subdevice {
     private:
-        Ustring name; // subdevice name (added to the device name)
-        bool _subscribed = false;
+        Ustring name;  // Subdevice name (appended to device name for MQTT topic)
+        bool _subscribed = false;  // Should this subdevice subscribe to commands?
         void init_log();
         void init(bool subscribed);
         void init(const char* subname, bool subscribed);
         void init(const __FlashStringHelper* subname, bool subscribed);
         #define IOTEMPOWER_ON_RECEIVE_CALLBACK std::function<bool(const Ustring&)>
-        IOTEMPOWER_ON_RECEIVE_CALLBACK receive_cb = NULL;
+        IOTEMPOWER_ON_RECEIVE_CALLBACK receive_cb = NULL;  // Called when MQTT command received
     public:
-        Ustring measured_value; // the just measured value (after calling measure)
-        Ustring last_confirmed_value;
+        Ustring measured_value;         // The just measured value (after calling measure())
+        Ustring last_confirmed_value;   // Last value published to MQTT
         Ustring& get_last_confirmed_value() { return last_confirmed_value; }
         Ustring& get() { return measured_value; }
         Subdevice& with_receive_cb(IOTEMPOWER_ON_RECEIVE_CALLBACK cb) {
@@ -120,51 +282,158 @@ class Subdevice {
         }
 };
 
+/**
+ * @class Device
+ * @brief Base class for all IoTempower devices (sensors and actuators)
+ * 
+ * ARCHITECTURE OVERVIEW
+ * =====================
+ * This is the foundation of IoTempower's device system. All sensors and actuators
+ * inherit from this class and gain automatic:
+ * - Registration with DeviceManager
+ * - MQTT topic generation
+ * - Polling and measurement scheduling
+ * - Change detection and publishing
+ * - Command reception and routing
+ * - Home Assistant integration
+ * 
+ * KEY FEATURES
+ * ============
+ * 
+ * 1. MULTIPLE SUBDEVICES
+ *    A single Device can have multiple subdevices for multi-value sensors.
+ *    Example: DHT sensor has "temperature" and "humidity" subdevices.
+ * 
+ * 2. HOME ASSISTANT DISCOVERY
+ *    If mqtt_discovery_prefix is defined, devices automatically:
+ *    - Publish discovery messages to Home Assistant
+ *    - Appear in Home Assistant without manual configuration
+ *    - Include proper device metadata and capabilities
+ * 
+ * 3. FLEXIBLE POLLING
+ *    Each device has its own poll rate (in microseconds):
+ *    - Fast polling (1000us): For precise timing needs
+ *    - Normal polling (100000us = 0.1s): For most sensors
+ *    - Slow polling (1000000us = 1s): For slow-changing sensors
+ * 
+ * 4. CALLBACK SYSTEM
+ *    Two types of callbacks:
+ *    - Filter callbacks: Process measurements before acceptance
+ *    - Change callbacks: Trigger when values change
+ * 
+ * 5. AUTOMATIC MQTT INTEGRATION
+ *    No manual MQTT code needed:
+ *    - Topics auto-generated from device and subdevice names
+ *    - Publishing happens automatically when values change
+ *    - Subscriptions set up automatically
+ *    - Message routing handled by DeviceManager
+ * 
+ * DEVICE LIFECYCLE
+ * ================
+ * 1. Construction: Device object created, registers with DeviceManager
+ * 2. start(): Initialize hardware (override this in derived classes)
+ * 3. measure(): Read sensor/update actuator (called at pollrate)
+ * 4. publish(): Send to MQTT (automatic when values change)
+ * 5. receive(): Handle commands (automatic routing from MQTT)
+ * 
+ * CREATING A NEW DEVICE TYPE
+ * ==========================
+ * To create a new device type:
+ * 1. Inherit from Device (or a specialized base like I2C_Device)
+ * 2. Call Device constructor with name and pollrate
+ * 3. Override start() to initialize hardware
+ * 4. Override measure() to read sensor or update actuator
+ * 5. Use value() to get/set subdevice values
+ * 6. Optionally add callbacks for filtering or change detection
+ */
 class Device {
     protected:
-        Fixed_Map<Subdevice, IOTEMPOWER_MAX_SUBDEVICES> subdevices;
+        Fixed_Map<Subdevice, IOTEMPOWER_MAX_SUBDEVICES> subdevices;  // List of subdevices
 #ifdef mqtt_discovery_prefix
+        // Home Assistant MQTT Discovery support
         // TODO: might have to move this to subdevice (if there are two values measured)
-        String discovery_config_topic;
-        String discovery_info;
+        String discovery_config_topic;  // Topic for discovery config
+        String discovery_info;          // JSON discovery payload
         void create_discovery_info(const String& type,
             bool state_topic=true, const char* state_on=NULL, const char* state_off=NULL,
             bool command_topic=false, const char* payload_on=NULL, const char* payload_off=NULL,
             const String& extra_json=String());
 #endif
     private:
-        bool requires_precision = false; // usually precision not needed (only for buffers)
-        Ustring name; // device name and mqtt-topic extension
-        bool _ignore_case = true;
-        bool _report_change = true;
-        bool _needs_publishing = false;
-        bool _retained = false; // allow setting retained for publishing
+        // PRECISION CONTROL
+        // Some devices (like power meters measuring AC voltage curves) need very precise timing
+        bool requires_precision = false;  // If true, only update in precision intervals
+        
+        // IDENTIFICATION
+        Ustring name;  // Device name, used as MQTT topic component
+        
+        // PUBLISHING CONTROL
+        bool _ignore_case = true;        // Convert values to lowercase before comparison
+        bool _report_change = true;      // Should changes be published? Can be changed with .report_change(false)
+                                         // (useful for LED strips to not report every LED change)
+        bool _needs_publishing = false;  // Does this device have unpublished changes?
+        bool _retained = false;          // Should MQTT messages be retained?
 
-
-        // This is a chain of callbacks called for every measuring iteration of the
-        // device.
-        // It gets passed the triggering device. 
-        // the last measured value will be in .value() or
-        // .value(n) with n denoting the subdevice.
-        // .measured_value can be modified.
-        // Returning false means that the value should not be considered.
-        // Returning true means that the (new) value in .measured_value is correct.
-        // TODO: commented example
+        /**
+         * FILTER CALLBACK CHAIN
+         * =====================
+         * Called for every measurement to validate/modify the value.
+         * 
+         * The chain receives the device with measured_value filled in.
+         * Each callback can:
+         * - Modify measured_value
+         * - Return true to accept the value
+         * - Return false to reject the value
+         * 
+         * Common uses:
+         * - Range validation (reject out-of-range values)
+         * - Calibration (adjust readings)
+         * - Noise filtering (average multiple readings)
+         * - Unit conversion
+         * 
+         * Example:
+         *   device.add_filter([](Device& dev) {
+         *       float temp = dev.value().as_float();
+         *       if (temp < -40 || temp > 85) return false;  // Out of range
+         *       temp = temp * 1.02 - 0.5;  // Calibration
+         *       dev.value().from(temp);
+         *       return true;
+         *   });
+         */
         Callback_Link *filter_first;
 
-
-        // This is a chain of callbacks which are called based on
-        // a value change of the or one of any of the values of the subdevices.
-        // It gets passed the triggering device. 
-        // the last measured value will be in .value() or
-        // .value(n) with n denoting the subdevice.
-        // Returning false also allows here to discard the value.
-        // Returning true menas that value was considered.
-        // TODO: commented example
+        /**
+         * CHANGE CALLBACK CHAIN
+         * =====================
+         * Called when a value changes (after filter chain accepts it).
+         * 
+         * The chain receives the device with new measured_value.
+         * Each callback can:
+         * - Read the old value (last_confirmed_value)
+         * - Read the new value (measured_value)
+         * - Perform actions based on the change
+         * - Return true to accept the change
+         * - Return false to reject the change
+         * 
+         * Common uses:
+         * - Trigger actions (turn on light when motion detected)
+         * - Send alerts (notify when temperature too high)
+         * - Log changes
+         * - Update related devices
+         * 
+         * Example:
+         *   button.on_change([](Device& dev) {
+         *       if (dev.value().equals("on")) {
+         *           IN(mylight).on();
+         *       }
+         *       return true;
+         *   });
+         */
         Callback_Link *on_change_first;
 
-        unsigned long _pollrate_us = 0; // poll as often as possible
-        unsigned long last_poll = micros(); // when was last polled
+        // POLLING CONTROL
+        unsigned long _pollrate_us = 0;    // Microseconds between polls (0 = as fast as possible)
+        unsigned long last_poll = micros(); // Last time device was polled
 
     protected:
         bool _started = false;

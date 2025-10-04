@@ -1,6 +1,9 @@
-// device-manager.cpp
-// author: ulno
-// created: 2018-07-16
+/**
+ * @file device-manager.cpp
+ * @brief Implementation of DeviceManager singleton and do_later scheduler
+ * @author ulno
+ * @created 2018-07-16
+ */
 
 #include <Arduino.h>
 ////AsyncMqttClient disabled in favor of PubSubClient
@@ -9,7 +12,7 @@
 #include <toolbox.h>
 #include <device-manager.h>
 
-////// structure and list for scheduler
+// Structure and list for scheduler
 typedef std::function<void()> Do_Later_Callback;
 
 typedef struct {
@@ -33,6 +36,9 @@ static void do_later_delete(int pos) {
     do_later_map_count --;
 }
 
+/**
+ * @brief Add callback to scheduler - maintains sorted order, handles ID replacement
+ */
 static bool do_later_add(unsigned long in_ms, int16_t id, Do_Later_Callback cbu) {
     bool forgot_one = false;
     // insert sorted into list
@@ -103,6 +109,9 @@ bool do_later(unsigned long in_ms, DO_LATER_CB_NO_ID callback) {
     return do_later_add(in_ms, -1, callback);
 }
 
+/**
+ * @brief Execute ready callbacks - called from main loop
+ */
 void do_later_check() {
     unsigned long next;
     unsigned long current=millis();
@@ -167,6 +176,9 @@ bool DeviceManager::start() {
     return all_success;
 }
 
+/**
+ * @brief Update all devices - polls and checks for changes
+ */
 bool DeviceManager::update(bool in_precision_interval) {
     bool changed = false;
     device_list.for_each( [&] (Device& dev) {
@@ -188,6 +200,9 @@ void DeviceManager::reset_buffers() {
     } );
 }
 
+/**
+ * @brief Publish changed device values to MQTT
+ */
 bool DeviceManager::publish(PubSubClient& mqtt_client, Ustring& node_topic, bool publish_all) {
     ////AsyncMqttClient disabled in favor of PubSubClient
     //bool devices_publish(AsyncMqttClient& mqtt_client, Ustring& node_topic, bool publish_all) {
