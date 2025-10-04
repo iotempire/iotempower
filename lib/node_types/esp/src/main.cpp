@@ -1189,9 +1189,7 @@ void setup() {
                                 + String(F(HOSTNAME)) + String(F("/"));
 
         if(iotempower_init) iotempower_init(); // call user init from setup.cpp
-        ulog("Debug: before dev start"); // TODO: remove
         device_manager.start(); // call start of all devices
-        ulog("Debug: after dev start"); // TODO: remove
         if(iotempower_start) iotempower_start(); // call user start from setup.cpp
         // init_mqtt(); //AsyncMqttClient disabled in favor of PubSubClient
     } else {  // do something to show that we are in adopt mode
