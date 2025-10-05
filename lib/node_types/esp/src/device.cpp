@@ -132,6 +132,7 @@ bool Device::publish(PubSubClient& mqtt_client, Ustring& node_topic, Ustring& lo
                 first = false;
             }
             else log_buffer.add(F("|"));
+// TODO: seems wrong, check if fixed correctly            Serial.print(topic.as_cstr()+node_topic.length()+1);
             log_buffer.add(topic);
             log_buffer.add(F(":"));
             log_buffer.add(val);
@@ -229,6 +230,7 @@ bool Device::poll_measure() {
 
             measure_init(); // something might have to be executed here to init each time, for example i2c-setup
             bool measure_result = measure(); // measure new value or trigger physical update
+//            ulog("poll measure val: %s, %lu", name.as_cstr(), _pollrate_us); // TODO: enable based on debug level
 //            yield(); // measure might have taken long, give some time to system TODO: do we have to take care of mqtt here too? - only yield in unprecision interval
             measure_exit(); // something might have to be executed here to exit each time, for example i2c-exit
             if(measure_result) { // new value generated
