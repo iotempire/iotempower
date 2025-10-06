@@ -233,7 +233,7 @@ EOF
     new_dir="$dest_dir/device-selection.tmp"
     mkdir -p "$new_dir/src"
     commands=$(iot_grun python3 "$IOTEMPOWER_ROOT/bin/command_checker.py" \
-        "$dest_dir/src/devices.ini" \
+        "$dest_dir/devices.ini" \
         "$dest_dir/src/setup.h" \
         "$new_dir")
     commands=$(echo $commands) # remove newlines
