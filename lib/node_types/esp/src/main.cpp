@@ -127,11 +127,12 @@
         #include <WiFiClientSecure.h>
     #endif
 
-
-    #ifdef BROWNOUT_DETECT_DISABLED
-        #include "soc/soc.h"
-        #include "soc/rtc_cntl_reg.h"
-    #endif
+    #ifdef BROWNOUT_DETECT_DISABLED    
+        #ifndef CONFIG_IDF_TARGET_ESP32C6
+            #include "soc/soc.h"
+            #include "soc/rtc_cntl_reg.h"
+        #endif // CONFIG_IDF_TARGET_ESP32C6
+    #endif // BROWNOUT_DETECT_DISABLED
 #else
     #include <ESP8266WiFi.h>
     #include <ESP8266mDNS.h>
@@ -1139,8 +1140,10 @@ void setup() {
     // connections, and offering other debug channels
     #ifdef ESP32
         #ifdef BROWNOUT_DETECT_DISABLED
-        WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0); //disable brownout detector TODO: verify that this reduces crashes
-        #endif
+            #ifndef CONFIG_IDF_TARGET_ESP32C6
+                WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0); //disable brownout detector TODO: verify that this reduces crashes
+            #endif // CONFIG_IDF_TARGET_ESP32C6
+        #endif // BROWNOUT_DETECT_DISABLED
     #endif
 
     initialize_serial();
