@@ -22,60 +22,89 @@ packages = [
     {"name": "mosquitto", "package_manager": "binary", "module": "mosquitto"},
 ]
 
-# Compilation test
-boards = [
-    "esp8266", # test generic boards first
-    "esp32", # other generic board
-    "wemos_d1_mini", # our favorite esp8266 board
-    "esp32minikit", # our favorite esp32 board
-    "lolin_s2_mini",
-    "esp32_c3_devkitm_1",
-    "m5stickc",
-    "m5stickc_plus",
-    "wroom_02",
-    "nodemcu", # identical to wemos_d1_mini - TODO: do we really need to test it?
-    "sonoff",
-    "olimex",
-    "esp-m",
-    "sonoff_pow",
-]
-devices = [
-    {"device_name": "input", "example_syntax": 'input(lower, IOT_TEST_INPUT, "released", "pressed");'},
-    {"device_name": "output", "example_syntax": 'led(yellow, IOT_TEST_OUTPUT, "turn on", "turn off");'},
-    {"device_name": "analog", "example_syntax": "analog(example_name);"},
-    {"device_name": "bmp180", "example_syntax": "bmp180(example_name);"},
-    {"device_name": "bmp280", "example_syntax": "bmp280(example_name);"},
-    {"device_name": "dallas", "example_syntax": "dallas(example_name, IOT_TEST_DIGITAL);"},
-    {"device_name": "gyro6050", "example_syntax": "gyro6050(example_name);"},
-    {"device_name": "gyro9250", "example_syntax": "gyro9250(example_name);"},
-    {"device_name": "gesture_apds9960", "example_syntax": "gesture_apds9960(example_name);"},
-    {"device_name": "sgp30", "example_syntax": "sgp30(example_name);"},
-    {"device_name": "edge_counter", "example_syntax": "edge_counter(example_name, IOT_TEST_DIGITAL);"},
-    {"device_name": "dht", "example_syntax": "dht(example_name, IOT_TEST_DIGITAL);"},
-    {"device_name": "ds18b20", "example_syntax": "ds18b20(example_name, IOT_TEST_DIGITAL);"},
-    {"device_name": "servo", "example_syntax": "servo(example_name, IOT_TEST_DIGITAL, 800);"},
-    {"device_name": "acoustic_distance", "example_syntax": "hcsr04(distance, IOT_TEST_DIGITAL, IOT_TEST_DIGITAL_2);"},
-    {"device_name": "laser_distance", "example_syntax": "vl53l0x(example_name);"},
-    {
-        "device_name": "weight_sensor",
-        "example_syntax": "hx711(example_name, IOT_TEST_DIGITAL, IOT_TEST_DIGITAL_2, 419.0, true);",
-    },
-    {"device_name": "light_sensor_1", "example_syntax": "bh1750(example_name);"},
-    {"device_name": "light_sensor_2", "example_syntax": "tsl2561(example_name);"},
-    {"device_name": "capacity_touch", "example_syntax": "mpr121(example_name);"},
-    {"device_name": "rgb_strip", "example_syntax": "rgb_strip(example_name, 7, WS2812B, IOT_TEST_DIGITAL, GRB);"},
-    {"device_name": "rgb_strip_bus", "example_syntax": "rgb_strip_bus(example_name, 7, F_GRB, IOT_TEST_NEOPIXEL_CONTROL_METHOD, IOT_TEST_NEOPIXEL_TESTPIN);"},
-]
+# Import auto-discovery functionality
+import os
+try:
+    from tests.auto_discovery import generate_auto_combinations
+    
+    # Get IoTempower root directory
+    iotempower_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    
+    # Generate automatic combinations
+    auto_combinations = generate_auto_combinations(iotempower_root)
+    print(f"Auto-discovered {len(auto_combinations)} board/device combinations")
+    
+    # Use auto-generated combinations
+    isolated_combinations_to_test = auto_combinations
+    
+except ImportError as e:
+    print(f"Warning: Could not import auto_discovery, falling back to manual configuration: {e}")
+    
+    # Fallback to original manual configuration if auto-discovery fails
+    # Compilation test
+    boards = [
+        "esp8266", # test generic boards first
+        "esp32", # other generic board
+        "wemos_d1_mini", # our favorite esp8266 board
+        "esp32minikit", # our favorite esp32 board
+        "lolin_s2_mini",
+        "esp32_c3_devkitm_1",
+        "m5stickc",
+        "m5stickc_plus",
+        "wroom_02",
+        "nodemcu", # identical to wemos_d1_mini - TODO: do we really need to test it?
+        "sonoff",
+        "olimex",
+        "esp-m",
+        "sonoff_pow",
+    ]
+    devices = [
+        {"device_name": "input", "example_syntax": 'input(lower, IOT_TEST_INPUT, "released", "pressed");'},
+        {"device_name": "output", "example_syntax": 'led(yellow, IOT_TEST_OUTPUT, "turn on", "turn off");'},
+        {"device_name": "analog", "example_syntax": "analog(example_name);"},
+        {"device_name": "bmp180", "example_syntax": "bmp180(example_name);"},
+        {"device_name": "bmp280", "example_syntax": "bmp280(example_name);"},
+        {"device_name": "dallas", "example_syntax": "dallas(example_name, IOT_TEST_DIGITAL);"},
+        {"device_name": "gyro6050", "example_syntax": "gyro6050(example_name);"},
+        {"device_name": "gyro9250", "example_syntax": "gyro9250(example_name);"},
+        {"device_name": "gesture_apds9960", "example_syntax": "gesture_apds9960(example_name);"},
+        {"device_name": "sgp30", "example_syntax": "sgp30(example_name);"},
+        {"device_name": "edge_counter", "example_syntax": "edge_counter(example_name, IOT_TEST_DIGITAL);"},
+        {"device_name": "dht", "example_syntax": "dht(example_name, IOT_TEST_DIGITAL);"},
+        {"device_name": "ds18b20", "example_syntax": "ds18b20(example_name, IOT_TEST_DIGITAL);"},
+        {"device_name": "servo", "example_syntax": "servo(example_name, IOT_TEST_DIGITAL, 800);"},
+        {"device_name": "acoustic_distance", "example_syntax": "hcsr04(distance, IOT_TEST_DIGITAL, IOT_TEST_DIGITAL_2);"},
+        {"device_name": "laser_distance", "example_syntax": "vl53l0x(example_name);"},
+        {
+            "device_name": "weight_sensor",
+            "example_syntax": "hx711(example_name, IOT_TEST_DIGITAL, IOT_TEST_DIGITAL_2, 419.0, true);",
+        },
+        {"device_name": "light_sensor_1", "example_syntax": "bh1750(example_name);"},
+        {"device_name": "light_sensor_2", "example_syntax": "tsl2561(example_name);"},
+        {"device_name": "capacity_touch", "example_syntax": "mpr121(example_name);"},
+        {"device_name": "rgb_strip", "example_syntax": "rgb_strip(example_name, 7, WS2812B, IOT_TEST_DIGITAL, GRB);"},
+        {"device_name": "rgb_strip_bus", "example_syntax": "rgb_strip_bus(example_name, 7, F_GRB, IOT_TEST_NEOPIXEL_CONTROL_METHOD, IOT_TEST_NEOPIXEL_TESTPIN);"},
+    ]
 
-isolated_combinations_to_test = [
-    (board, device["device_name"], device["example_syntax"]) for device in devices for board in boards
-]
-# This additional tests are for the devices which are not supported by all devices
-isolated_combinations_to_test += [
+    isolated_combinations_to_test = [
+        (board, device["device_name"], device["example_syntax"]) for device in devices for board in boards
+    ]
+
+# Additional manual test cases that are not auto-discoverable or have special requirements
+# These will be added to the auto-generated combinations
+manual_additional_combinations = [
+    # RFID device - only supported on specific boards
     (board, "rfid", "mfrc522(example_name);")
     for board in ["wemos_d1_mini", "nodemcu", "wroom_02", "esp32", "esp32minikit"]
 ]
-isolated_combinations_to_test += [("wemos_d1_mini", "rgb_single", "rgb_single(r0, D6, D5, D0, true);")] # TODO: this should not be isolated and work on all devices that have at least 3 IOs (or one on board like the cheap yellow display)
+
+# RGB single LED - needs specific pin configuration
+manual_additional_combinations += [
+    ("wemos_d1_mini", "rgb_single", "rgb_single(r0, D6, D5, D0, true);")
+]
+
+# Add manual combinations to the auto-generated ones
+isolated_combinations_to_test.extend(manual_additional_combinations)
 
 # Configuration for deployment test & hardware test
 gateway_host = "iotgateway"
