@@ -12,7 +12,7 @@ This guide aims to make your contribution process frictionless and fun.
   - follow the [IoTempower installation instructions](https://github.com/iotempire/iotempower/blob/master/doc/installation.rst), for example, using the default `curl` command:
     
   ```bash
-    curl -L https://bit.ly/iotempower | bash -s -- --default
+    curl -L https://now.iotempower.us | bash -s -- --default
   ```
   - verify the installation was successful by running the `iot` command in a (new) terminal
     - use `bash run` inside the `/iot` dir to fix any install issues
