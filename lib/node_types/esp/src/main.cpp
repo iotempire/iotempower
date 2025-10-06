@@ -487,9 +487,9 @@ void reconfigMode() {
         ota_display = new Display("testdisplay", u8g2);
         if(ota_display) {
             ota_display_present = true;
-            ota_display->clear_bus(); // debug test TODO: remove
+            ota_display->clear_bus();
             Wire.begin(); // check default i2c TODO: replace with i2c switch in i2c_device
-            ota_display->measure_init(); // debug test TODO: remove
+            ota_display->measure_init();
             ota_display->i2c_start();
         }
     }
@@ -1189,9 +1189,9 @@ void setup() {
                                 + String(F(HOSTNAME)) + String(F("/"));
 
         if(iotempower_init) iotempower_init(); // call user init from setup.cpp
-        ulog("Debug: before dev start"); // TODO: remove
+//        ulog("Debug: before dev start"); // TODO: enable based on debug level
         device_manager.start(); // call start of all devices
-        ulog("Debug: after dev start"); // TODO: remove
+//        ulog("Debug: after dev start"); // TODO: enable based on debug level
         if(iotempower_start) iotempower_start(); // call user start from setup.cpp
         // init_mqtt(); //AsyncMqttClient disabled in favor of PubSubClient
     } else {  // do something to show that we are in adopt mode

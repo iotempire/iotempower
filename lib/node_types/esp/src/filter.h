@@ -762,7 +762,6 @@ class Filter_Precise_RMS : public Callback {
             int buffer_fill = d.get_buffer_fill();
             int* buffer = d.get_buffer();
             if(buffer_fill == buffer_size) {
-                // ulog("Debug: RMS buffer fill: %d buffer size: %d", d.get_buffer_fill(), buffer_size ); // TODO: remove debug
                 // compute for whole buffer at once
                 rms->start();
                 for(int i=0; i<buffer_size; i++) {
@@ -770,7 +769,6 @@ class Filter_Precise_RMS : public Callback {
                 }
                 rms->publish();
                 dev.value(0).printf("%.4f, %d", rms->rmsVal, rms->dcBias);
-                ulog("Debug: MS values: %.4f, %d", rms->rmsVal, rms->dcBias); // TODO: remove debug
                 rms->stop();
                 // TODO: should buffer be reset here?
                 return true;
