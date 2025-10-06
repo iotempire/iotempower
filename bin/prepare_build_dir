@@ -130,6 +130,7 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
     link_type_through_base "$src_dir" src "$dest_dir/src"
     link_type_through_base "$src_dir" lib "$dest_dir/lib"
     link_type_through_base "$src_dir" platformio.ini "$dest_dir"
+    link_type_through_base "$src_dir" devices.ini "$dest_dir"
     link_type_through_base "$src_dir" pre_extra_script.py "$dest_dir"
 
     ln -s -f "$(realpath setup.cpp)" "$dest_dir/src/setup.h"
@@ -233,7 +234,7 @@ EOF
     new_dir="$dest_dir/device-selection.tmp"
     mkdir -p "$new_dir/src"
     commands=$(iot_grun python3 "$IOTEMPOWER_ROOT/bin/command_checker.py" \
-        "$dest_dir/src/devices.ini" \
+        "$dest_dir/devices.ini" \
         "$dest_dir/src/setup.h" \
         "$new_dir")
     commands=$(echo $commands) # remove newlines
