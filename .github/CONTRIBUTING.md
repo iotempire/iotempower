@@ -24,7 +24,7 @@ This guide aims to make your contribution process frictionless and fun.
     - refer to the **manual installation** steps to set a custom install dir location
       - adjust these instructions according to your configuration
   
-  - use the `mv` command to **move** the contents of `iot` to a new **backup** called `iot.bak`:
+  - potentially use the `mv` command to **move** the contents of `iot` to a new **backup** called `iot.bak`:
   
   ```bash
     mv iot iot.bak    
@@ -119,7 +119,7 @@ Our project adheres to a modified Google style guide, with specific modification
   - Use the formatting shortcut **`Ctrl+Shift+I`** on *Linux* to automatically *format* your code.
   - Learn more about configuring this feature here: https://code.visualstudio.com/docs/cpp/cpp-ide
 
-- **Other Environments**: If you use a different IDE or text editor, please configure it to use the Google C++ style guide as a base but set the indentation width to 4 spaces.
+- **Other Environments**: If you use a different IDE or text editor, please configure it to use the Google C++ style guide as a base, but set the indentation width to 4 spaces.
 
 - **Before Submitting a Pull Request**:
   - Ensure your contributions are properly formatted according to these guidelines. 
@@ -139,13 +139,7 @@ Testing is an important part of ensuring your contributions work correctly. IoTe
 
 ### Running Tests Locally
 
-The easiest way to run tests is using the `iot test` command:
-
-```bash
-iot test
-```
-
-To run only compilation tests:
+The easiest way to run tests is using the `iot test` command. To run compilation tests:
 
 ```bash
 iot test compile
@@ -157,26 +151,8 @@ To test specific boards and devices:
 iot test compile --boards=wemos_d1_mini,esp32 --devices=laser_distance
 ```
 
-### Alternative: Using pytest Directly
 
-If you prefer to use pytest directly:
-
-1. Navigate to the `tests` folder
-2. Activate the IoT environment by typing `iot` (if not already activated)
-3. Run tests:
-
-```bash
-# Run all tests
-pytest -s -v
-
-# Run a specific test file
-pytest -s -v test_compilation.py
-
-# Run with specific parameters
-pytest -s -v test_compilation.py --boards=wemos_d1_mini,esp32 --devices=laser_distance
-```
-
-### Testing with Docker/Podman
+### Testing with Docker
 
 You can test your local repository changes inside a Docker or Podman container. This is particularly useful for ensuring consistency across different environments.
 
@@ -188,16 +164,8 @@ Assuming your working repository is in your home folder under `iot`, test inside
 cat iot/bin/curl_install_docker | IOTEMPOWER_REPO=~/iot bash -s -- test compilation
 ```
 
-**Podman Testing:**
-
-Similarly, for Podman:
-
-```bash
-cat iot/bin/curl_install_podman | IOTEMPOWER_REPO=~/iot bash -s -- test compilation
-```
-
 This one-line command will:
-- Install IoTempower in a container
+- Install IoTempower based on your local development repository into a container in /iot-container
 - Use your local repository as the source
 - Run the compilation tests
 
