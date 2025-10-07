@@ -24,7 +24,7 @@ This guide aims to make your contribution process frictionless and fun.
     - refer to the **manual installation** steps to set a custom install dir location
       - adjust these instructions according to your configuration
   
-  - use the `mv` command to **move** the contents of `iot` to a new **backup** called `iot.bak`:
+  - potentially use the `mv` command to **move** the contents of `iot` to a new **backup** called `iot.bak`:
   
   ```bash
     mv iot iot.bak    
@@ -100,7 +100,7 @@ This guide aims to make your contribution process frictionless and fun.
 ### Additional Notes:
   - **Follow the Style Guides**: Please adhere to the code style guidelines outlined below.
   - **Write Meaningful Commit Messages**: Describe what your changes do and why.
-  - **Test**: Please test new features to ensure they work as expected.
+  - **Test**: Please test new features to ensure they work as expected (see Testing section below).
   - **Update the Docs**: If you're changing anything that requires a change in documentation, please update it.
 
 ## Code Style Guidelines
@@ -119,12 +119,84 @@ Our project adheres to a modified Google style guide, with specific modification
   - Use the formatting shortcut **`Ctrl+Shift+I`** on *Linux* to automatically *format* your code.
   - Learn more about configuring this feature here: https://code.visualstudio.com/docs/cpp/cpp-ide
 
-- **Other Environments**: If you use a different IDE or text editor, please configure it to use the Google C++ style guide as a base but set the indentation width to 4 spaces.
+- **Other Environments**: If you use a different IDE or text editor, please configure it to use the Google C++ style guide as a base, but set the indentation width to 4 spaces.
 
 - **Before Submitting a Pull Request**:
   - Ensure your contributions are properly formatted according to these guidelines. 
   - Please review your changes for any unintended formatting alterations before committing. 
     - This helps maintain the quality and consistency of the codebase.
+
+
+## Testing Your Changes
+
+Testing is an important part of ensuring your contributions work correctly. IoTempower includes comprehensive testing capabilities.
+
+### General Testing Recommendations
+
+- **Test Compilation**: Run compilation tests to verify your changes don't break device configurations
+- **Test Before Submitting**: Always test your changes before submitting a pull request
+- **Run Relevant Tests**: Focus on tests that are related to your changes
+
+### Running Tests Locally
+
+The easiest way to run tests is using the `iot test` command. To run compilation tests:
+
+```bash
+iot test compile
+```
+
+To test specific boards and devices:
+
+```bash
+iot test compile --boards=wemos_d1_mini,esp32 --devices=laser_distance
+```
+
+
+### Testing with Docker
+
+You can test your local repository changes inside a Docker or Podman container. This is particularly useful for ensuring consistency across different environments.
+
+**Docker Testing:**
+
+Assuming your working repository is in your home folder under `iot`, test inside Docker with:
+
+```bash
+cat iot/bin/curl_install_docker | IOTEMPOWER_REPO=~/iot bash -s -- test compilation
+```
+
+This one-line command will:
+- Install IoTempower based on your local development repository into a container in /iot-container
+- Use your local repository as the source
+- Run the compilation tests
+
+For more detailed information about testing, including deployment and hardware tests, see the [testing documentation](https://github.com/iotempire/iotempower/blob/master/doc/testing.rst).
+
+
+## Alternative Installation Methods
+
+### Docker/Podman Installation
+
+If you prefer to work in a containerized environment, IoTempower supports both Docker and Podman installations:
+
+**Docker Installation:**
+
+```bash
+curl -L docker.iotempower.us | bash -
+```
+
+**Podman Installation:**
+
+```bash
+curl -L podman.iotempower.us | bash -
+```
+
+**Important Notes:**
+- Container environments don't have direct access to serial ports (especially on Windows)
+- You can only flash via network using rfc2217
+- On Windows with Docker Desktop and WSL 2 Ubuntu integration, run the command in your WSL 2 Ubuntu environment
+- The install script creates an `iot` starter script; if it doesn't work, check `examples/scripts/iot-docker` or `iot-podman` for manual setup
+
+After installation, use the container environment just like a native installation by running the `iot` command.
 
 
 ## Reporting Bugs or Requesting Features
