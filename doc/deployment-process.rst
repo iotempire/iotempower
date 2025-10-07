@@ -603,7 +603,7 @@ Common Issues
 
 .. code-block::
 
-   Error: Unknown device type 'dht11'
+   Error: Unknown device type 'dth11'
 
 Solution: Check spelling, check if device exists in devices.ini
 
