@@ -407,7 +407,7 @@ Deployment Methods:
    
       $ deploy serial             # Auto-detect USB port
       $ deploy serial usb0        # Specific port
-      $ deploy serial usb0 force  # Erase all first
+      $ deploy serial usb0 force  # Skip dongle detection and overwrite potetially a dongle connected here
 
 3. **Adoption Mode**
    
