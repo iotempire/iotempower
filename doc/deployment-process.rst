@@ -541,13 +541,15 @@ Subsequent updates (OTA):
 
 .. code-block:: bash
 
-   $ console
+   $ mqtt_listen
    
    # Shows MQTT messages:
    # living-room/climate/temperature 23.5
    # living-room/climate/humidity 45
    # living-room/motion on
    # living-room/ambiance/color 255,255,255
+
+   $ console_serial # show serial debug of locally connected node/MCU
 
 
 Advanced Topics
