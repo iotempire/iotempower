@@ -120,4 +120,17 @@ class SleepManager : public Device {
         Ustring get_sleep_status();
 };
 
+/**
+ * @brief Schedule device to enter deep sleep mode
+ * 
+ * Deep sleep is a power-saving mode where the ESP goes into hibernation
+ * and wakes up after a specified duration or when reset.
+ * 
+ * @param time_from_now_ms Delay before entering deep sleep (in milliseconds)
+ * @param duration_ms How long to sleep (0 = wake only via RST line)
+ */
+//void deep_sleep(unsigned long time_from_now_ms, unsigned long duration_ms=0);
+#define deep_sleep(time_from_now_ms, duration_ms) IN(sleep_mgr).sleep_in(time_from_now_ms, duration_ms)
+
+
 #endif // _SLEEP_MGR_H_

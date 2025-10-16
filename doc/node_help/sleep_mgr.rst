@@ -188,9 +188,9 @@ sleep management. The automatic global instance is immediately available:
 ..  code-block:: cpp
 
     // No need to declare sleep_mgr - it's automatically available
-    button(sleep_button, D1)..with_on_change([&] (Device& device) {
+    button(sleep_button, D1).with_on_change([&] (Device& device) {
             if (sleep_button.get_last_confirmed_value().equals("on")) {
-                IN(sleep_mgr).sleep_now(60000); // Sleep for 60 seconds
+                IN(sleep_mgr).sleep(60000); // Sleep for 60 seconds
             }
             return true;
         });
@@ -205,7 +205,7 @@ The automatic sleep manager can be accessed in several ways:
 ..  code-block:: cpp
 
     // Via the global variable name
-    IN(sleep_mgr).sleep_now(30000);
+    IN(sleep_mgr).sleep(30000);
     
     // Via MQTT (external control)
     // mosquitto_pub -t "node1/sleep_mgr/set" -m "sleep 30s"
@@ -239,19 +239,13 @@ Battery-Optimized Example
     sleep_mgr(sleep_control);
     dht22(temperature, D4);
 
-    void iotempower_start() {
-        // Take sensor reading, then sleep for 10 minutes
-        do_later(1000, "sensor_cycle", [] {
-            // Reading is automatically published by IoTempower
-            temperature.measure();
-            
-            // Sleep in 5 seconds to allow publishing
-            sleep_control.sleep_in(5000, 10 * 60 * 1000); // 10 minutes
-        });
+    void start() {
+      // Sleep in 5 seconds to allow publishing
+      IN.sleep_in(5000, 10 * 60 * 1000); // 10 minutes
     }
 
 This pattern achieves:
-- Wake up and connect to WiFi (~3 seconds)
+- Wake up and connect to WiFi (~6 seconds)
 - Take sensor reading (~0.1 seconds)
 - Publish to MQTT (~0.5 seconds)
 - Enter deep sleep for 10 minutes (~20μA power consumption)
@@ -273,7 +267,7 @@ as a switch device. You can create automations:
         action:
           service: mqtt.publish
           data:
-            topic: "bedroom/sensor1/sleep_control/set"
+            topic: "bedroom/sensor1/sleep_mgr/set"
             payload: "sleep 28800000"  # 8 hours
 
 Safety Features
@@ -295,23 +289,12 @@ Common Issues
 3. **Rapid wake/sleep cycles**: Check minimum sleep duration (1000ms)
 4. **Status not published**: Ensure MQTT broker is accessible
 
-Debug Information
-~~~~~~~~~~~~~~~~~
-
-Enable debug logging to see power management operations:
-
-..  code-block:: cpp
-
-    void iotempower_start() {
-        ulog_level = DEBUG;  // Enable debug logging
-    }
-
 Methods
 -------
 
 The sleep management device provides these methods for programmatic control:
 
-- ``sleep_now(duration_ms)`` - Sleep immediately (0 = indefinite)
+- ``sleep(duration_ms)`` - Sleep immediately (0 = indefinite)
 - ``sleep_in(delay_ms, duration_ms)`` - Schedule sleep after delay
 - ``get_sleep_status()`` - Get current sleep state
 
@@ -322,18 +305,18 @@ The automatic sleep manager instance is immediately available for use:
 
 ..  code-block:: cpp
 
-    void iotempower_start() {
+    void start() {
         // Sleep immediately for 5 minutes using automatic instance
-        auto_sleep_mgr.sleep_now(5 * 60 * 1000);
+        IN(sleep_mgr).sleep_now(5 * 60 * 1000);
         
         // Schedule sleep in 30 seconds for 10 minutes
-        auto_sleep_mgr.sleep_in(30000, 10 * 60 * 1000);
+        IN(sleep_mgr).sleep_in(30000, 10 * 60 * 1000);
         
         // Power off immediately (indefinite sleep)
-        auto_sleep_mgr.sleep_now(0);
+        IN(sleep_mgr).sleep_now(0);
         
         // Schedule power off in 1 minute
-        auto_sleep_mgr.sleep_in(60000, 0);
+        IN(sleep_mgr).sleep_in(60000, 0);
     }
 
 **Simple Sleep Example** (no setup.cpp code needed):

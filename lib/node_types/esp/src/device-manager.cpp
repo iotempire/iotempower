@@ -90,19 +90,19 @@ bool do_later(unsigned long in_ms, int16_t id, DO_LATER_CB_ID callback) {
     return true;
 }
 
-void deep_sleep(unsigned long time_from_now_ms, unsigned long duration_ms) {
-    static unsigned long duration_ms_backup;
+// void deep_sleep(unsigned long time_from_now_ms, unsigned long duration_ms) {
+//     static unsigned long duration_ms_backup;
 
-    duration_ms_backup = duration_ms; // static to save for lambda
-    do_later(time_from_now_ms, [&] {
-        ulog(F("About to fall into deepsleep for %lu s"), duration_ms_backup/1000);
-        delay(100);
-        delay(100);
-        delay(100);
-        ESP.deepSleep(duration_ms_backup*1000); 
-    });
-    // TODO: make sure, that at wake-up time the 5s reset is not triggered
-}
+//     duration_ms_backup = duration_ms; // static to save for lambda
+//     do_later(time_from_now_ms, [&] {
+//         ulog(F("About to fall into deepsleep for %lu s"), duration_ms_backup/1000);
+//         delay(100);
+//         delay(100);
+//         delay(100);
+//         ESP.deepSleep(duration_ms_backup*1000); 
+//     });
+//     TODO: make sure, that at wake-up time the 5s reset is not triggered
+// }
 
 
 bool do_later(unsigned long in_ms, DO_LATER_CB_NO_ID callback) {
