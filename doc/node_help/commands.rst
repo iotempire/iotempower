@@ -41,6 +41,7 @@ Alphabetic list
 - `mfrc522 <mfrc522.rst>`_
 - `output <output.rst>`_
 - `out <out.rst>`_
+- `power <power.rst>`_
 - `pwm <pwm.rst>`_
 - `rcwl-1601 <rcwl-1601.rst>`_
 - `reconfiguration <reconfiguration.rst>`_

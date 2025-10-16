@@ -92,6 +92,20 @@ if __name__ == "__main__":
 
         check_dependency(aliases_main[command])
 
+    # Auto-include certain devices for all ESP platforms
+    # Sleep manager should always be available for power management
+    auto_include_esp = ['sleep_mgr']
+    for auto_device in auto_include_esp:
+        if auto_device in devices:
+            trimmed_commands.add(auto_device)
+            # Also check dependencies for auto-included devices
+            def check_auto_dependency(dev_name):
+                depends = devices[dev_name].get('depends', '').split()
+                for dep in depends:
+                    if not dep in trimmed_commands:
+                        trimmed_commands.add(dep)
+                        check_auto_dependency(dep)
+            check_auto_dependency(auto_device)
 
     # now generate files
     libs = set()
