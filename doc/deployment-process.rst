@@ -407,7 +407,7 @@ Deployment Methods:
    
       $ deploy serial             # Auto-detect USB port
       $ deploy serial usb0        # Specific port
-      $ deploy serial usb0 force  # Erase all first
+      $ deploy serial usb0 force  # Skip dongle detection and overwrite potetially a dongle connected here
 
 3. **Adoption Mode**
    
@@ -541,13 +541,15 @@ Subsequent updates (OTA):
 
 .. code-block:: bash
 
-   $ console
+   $ mqtt_listen
    
    # Shows MQTT messages:
    # living-room/climate/temperature 23.5
    # living-room/climate/humidity 45
    # living-room/motion on
    # living-room/ambiance/color 255,255,255
+
+   $ console_serial # show serial debug of locally connected node/MCU
 
 
 Advanced Topics
@@ -601,7 +603,7 @@ Common Issues
 
 .. code-block::
 
-   Error: Unknown device type 'dht11'
+   Error: Unknown device type 'dth11'
 
 Solution: Check spelling, check if device exists in devices.ini
 
