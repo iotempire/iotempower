@@ -467,6 +467,9 @@ if [[ "$install_core" == 1 ]]; then
   # will fail on termux
   iot_grun pip install --no-cache-dir -r "$IOTEMPOWER_ROOT/lib/iot_installs/requirements-ssh.txt"
 
+  # Force install pytest in virtual environment to override system version
+  iot_grun pip install --force-reinstall --no-deps pytest # TODO: check if still works in termux
+  
   deactivate
   PIPTEMP="$IOTEMPOWER_LOCAL/tmp"
   mkdir -p "$PIPTEMP"

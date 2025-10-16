@@ -159,17 +159,6 @@ typedef std::function<void()> DO_LATER_CB_NO_ID;
 bool do_later(unsigned long in_ms, DO_LATER_CB_NO_ID callback);
 void do_later_check(); // Internal - called by main loop, not by user code
 
-/**
- * @brief Schedule device to enter deep sleep mode
- * 
- * Deep sleep is a power-saving mode where the ESP goes into hibernation
- * and wakes up after a specified duration or when reset.
- * 
- * @param time_from_now_ms Delay before entering deep sleep (in milliseconds)
- * @param duration_ms How long to sleep (0 = wake only via RST line)
- */
-void deep_sleep(unsigned long time_from_now_ms, unsigned long duration_ms=0);
-
 
 /**
  * @class DeviceManager
