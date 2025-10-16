@@ -240,6 +240,7 @@ bool ota_failed = false;      // Set when an OTA update attempt fails
  * 
  * Handles both regular GPIO LEDs and special onboard LEDs that may be inverted.
  * Used during adoption mode blink patterns and OTA progress indication.
+ * ONBOARDLED_FULL_GPIO 0 or undefined also means that led will be used in floating mode tu turn off
  */
 void onboard_led_on() {
     #ifdef ID_LED
