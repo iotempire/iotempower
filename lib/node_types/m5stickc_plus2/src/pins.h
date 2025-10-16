@@ -4,7 +4,6 @@
 #define BUTTON_HOME 37
 #define SDA 21
 #define SCL 22
-#define IR 9
 #define IRQ  35
 #define FLASHBUTTON BUTTON_HOME
 #define ONBOARDLED 19
