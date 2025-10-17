@@ -1,17 +1,12 @@
 // dev_sleep_mgr.cpp
-// Implementation of sleep management device
+// Implementation of sleep management device for M5StickC Plus2
 
 #include "dev_sleep_mgr.h"
 #include "device-manager.h"
+#include "platform_includes.h"
 
-// Include platform-specific power management
-#ifdef ESP8266
-    extern "C" {
-        #include "user_interface.h"
-    }
-#elif defined(ESP32)
-    #include <esp_sleep.h>
-#endif
+// Include ESP32-specific power management
+#include <esp_sleep.h>
 
 SleepManager::SleepManager(const char* name) : Device(name, 1000000) { // Poll every 1 second for status updates
     // Add main status subdevice (publishes power state)
@@ -24,10 +19,21 @@ SleepManager::SleepManager(const char* name) : Device(name, 1000000) { // Poll e
             
             unsigned long duration_ms = 0; // 0 = indefinite by default
             unsigned long delay_ms = 0;    // 0 = immediate by default
+            bool shutdown = false;         // shutdown command flag
+            
             
             // Parse the sleep command with all its variations
-            if (parse_sleep_command(payload, duration_ms, delay_ms)) {
-                if (delay_ms == 0) {
+            if (parse_sleep_command(payload, duration_ms, delay_ms, shutdown)) {
+                if (shutdown) {
+                    // M5StickC Plus2 shutdown
+                    if (delay_ms == 0) {
+                        ulog(F("Sleep: Shutting down M5StickC Plus2"));
+                        return this->shutdown();
+                    } else {
+                        ulog(F("Sleep: Scheduling shutdown in %lu ms"), delay_ms);
+                        return shutdown_in(delay_ms);
+                    }
+                } else if (delay_ms == 0) {
                     // Immediate sleep
                     if (duration_ms == 0) {
                         ulog(F("Sleep: Entering indefinite deep sleep"));
@@ -47,7 +53,7 @@ SleepManager::SleepManager(const char* name) : Device(name, 1000000) { // Poll e
             }
             
             // Invalid command
-            ulog(F("Sleep: Invalid command '%s'. Use 'sleep [<duration>] [later <delay>]'"), payload.as_cstr());
+            ulog(F("Sleep: Invalid command '%s'. Use 'sleep [<duration>] [later <delay>]' or 'shutdown [later <delay>]'"), payload.as_cstr());
             value().from(F("invalid_command"));
             return false;
         }
@@ -74,10 +80,13 @@ void SleepManager::start() {
     
     // Report that device is ready
     value().from(F("ready"));
-    ulog(F("Sleep management device started"));
+    ulog(F("M5StickC Plus2 Sleep management device started"));
 }
 
 bool SleepManager::measure() {
+    // Update M5StickC Plus2 power management
+    StickCP2.update();
+    
     // Update status to show countdown if sleep is pending
     if (_sleep_pending) {
         unsigned long current_time = millis();
@@ -88,10 +97,15 @@ bool SleepManager::measure() {
             unsigned long remaining = _sleep_delay_ms - elapsed;
             value().copy(get_sleep_status());
         } else {
-            // Time to sleep - this shouldn't happen as do_later should handle it
+            // Time to sleep/shutdown - this shouldn't happen as do_later should handle it
             // But include as failsafe
             _sleep_pending = false;
-            enter_deep_sleep(_sleep_duration_ms);
+            if (_shutdown_pending) {
+                _shutdown_pending = false;
+                enter_shutdown();
+            } else {
+                enter_deep_sleep(_sleep_duration_ms);
+            }
         }
     } else {
         // Update status normally
@@ -137,6 +151,7 @@ bool SleepManager::sleep_in(unsigned long delay_ms, unsigned long duration_ms) {
     
     // Set up pending sleep state
     _sleep_pending = true;
+    _shutdown_pending = false;
     _sleep_duration_ms = duration_ms;
     _sleep_delay_ms = delay_ms;
     _sleep_scheduled_time = millis();
@@ -151,52 +166,76 @@ bool SleepManager::sleep_in(unsigned long delay_ms, unsigned long duration_ms) {
     return true;
 }
 
+bool SleepManager::shutdown() {
+    value().from(F("shutting_down"));
+    
+    // Give a brief moment for status to be published
+    do_later(100, [this]() {
+        enter_shutdown();
+    });
+    
+    return true;
+}
+
+bool SleepManager::shutdown_in(unsigned long delay_ms) {
+    // Set up pending shutdown state
+    _sleep_pending = true;
+    _shutdown_pending = true;
+    _sleep_duration_ms = 0; // Not used for shutdown
+    _sleep_delay_ms = delay_ms;
+    _sleep_scheduled_time = millis();
+    
+    // Schedule the actual shutdown
+    do_later(delay_ms, [this]() {
+        _sleep_pending = false;
+        _shutdown_pending = false;
+        enter_shutdown();
+    });
+    
+    ulog(F("Sleep: Shutdown scheduled in %lu ms"), delay_ms);
+    return true;
+}
+
 void SleepManager::enter_deep_sleep(unsigned long duration_ms) {
     if (duration_ms == 0) {
-        ulog(F("Sleep: Entering indefinite deep sleep"));
+        ulog(F("Sleep: M5StickC Plus2 entering indefinite deep sleep"));
         
-        // Platform-specific indefinite deep sleep
-        #ifdef ESP8266
-            ulog(F("Sleep: ESP8266 entering indefinite deep sleep"));
-            ESP.deepSleep(0); // 0 = indefinite sleep
-        #elif defined(ESP32)
-            ulog(F("Sleep: ESP32 entering indefinite deep sleep"));
-            // ESP32 doesn't support indefinite sleep, use maximum value (~136 years)
-            esp_sleep_enable_timer_wakeup(0x7FFFFFFFFFFFFFFFLL);
-            esp_deep_sleep_start();
-        #else
-            ulog(F("Sleep: Indefinite deep sleep not supported on this platform"));
-            while(true) {
-                delay(1000); // Fallback infinite loop
-            }
-        #endif
+        // M5StickC Plus2 doesn't support indefinite sleep, use maximum value (~136 years)
+        esp_sleep_enable_timer_wakeup(0x7FFFFFFFFFFFFFFFLL);
+        
+        // Use M5StickC Plus2 specific sleep preparation
+        StickCP2.Power.deepSleep();
     } else {
-        ulog(F("Sleep: Entering deep sleep for %lu ms"), duration_ms);
+        ulog(F("Sleep: M5StickC Plus2 entering deep sleep for %lu ms"), duration_ms);
         
-        // Platform-specific timed deep sleep
-        #ifdef ESP8266
-            ulog(F("Sleep: ESP8266 entering deep sleep"));
-            ESP.deepSleep(duration_ms * 1000); // deepSleep expects microseconds
-        #elif defined(ESP32)
-            ulog(F("Sleep: ESP32 entering deep sleep"));
-            esp_sleep_enable_timer_wakeup(duration_ms * 1000); // expects microseconds
-            esp_deep_sleep_start();
-        #else
-            ulog(F("Sleep: Deep sleep not supported on this platform"));
-            delay(duration_ms); // Fallback for unsupported platforms
-        #endif
+        // ESP32 timed deep sleep with M5StickC Plus2 power management
+        esp_sleep_enable_timer_wakeup(duration_ms * 1000); // expects microseconds
+        
+        // Use M5StickC Plus2 specific sleep preparation
+        StickCP2.Power.timerSleep(duration_ms/1000); // expects seconds
     }
 }
 
-bool SleepManager::parse_sleep_command(const Ustring& payload, unsigned long& duration_ms, unsigned long& delay_ms) {
-    Ustring command(payload); // Make a copy to manipulate
+void SleepManager::enter_shutdown() {
+    ulog(F("Sleep: M5StickC Plus2 shutting down"));
+    
+    // Use M5StickC Plus2 specific shutdown
+    StickCP2.Power.powerOff();
+}
 
-    // Check if command starts with "sleep" (IoTempower handles case automatically)
-    if (!command.starts_with(F("sleep"))) {
+bool SleepManager::parse_sleep_command(const Ustring& payload, unsigned long& duration_ms, unsigned long& delay_ms, bool& shutdown) {
+    Ustring command(payload); // Make a mutable copy of the command
+
+    // Check for shutdown command first
+    shutdown = false;
+    if (command.starts_with(F("shutdown"))) {
+        shutdown = true;
+    }
+    if (!shutdown and !command.starts_with(F("sleep"))) {
         return false;
     }
     
-    // Strip the "sleep" command to get parameters
+    // Strip the "shutdown/sleep" command to get parameters
     command.strip_param(); // This removes "sleep" and the following space
 
     // Initialize defaults
@@ -251,7 +290,11 @@ Ustring SleepManager::get_sleep_status() {
             unsigned long remaining_seconds = (remaining_delay + 999) / 1000; // Round up
             
             Ustring status;
-            if (_sleep_duration_ms == 0) {
+            if (_shutdown_pending) {
+                status.from(F("shutting_down_in_"));
+                status.add(remaining_seconds);
+                status.add(F("s"));
+            } else if (_sleep_duration_ms == 0) {
                 status.from(F("powering_off_in_"));
                 status.add(remaining_seconds);
                 status.add(F("s"));
