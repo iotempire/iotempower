@@ -7,14 +7,17 @@
 
 #include <iotempower.h>
 
-void (iotempower_init)() __attribute__((weak));
 void (iotempower_start)() __attribute__((weak));
+void (iotempower_platform_early_init)() __attribute__((weak));
 
 #define init() \
      iotempower_init()
 
 #define start() \
     iotempower_start()
+
+
+
 
 /**
  * AUTOMATIC SLEEP MANAGER

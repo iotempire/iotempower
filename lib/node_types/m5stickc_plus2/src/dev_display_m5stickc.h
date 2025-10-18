@@ -4,8 +4,7 @@
 #ifndef _M5STICKC_DISPLAY_H_
 #define _M5STICKC_DISPLAY_H_
 
-#include <platform_includes.h>
-#include <device.h>
+#include <iotempower.h>
 #include <text_display_buffer.h>
 
 // using font sizes here 1-7

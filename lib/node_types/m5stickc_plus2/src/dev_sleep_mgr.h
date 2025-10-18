@@ -4,7 +4,7 @@
 #ifndef _SLEEP_MGR_H_
 #define _SLEEP_MGR_H_
 
-#include <device.h>
+#include <iotempower.h>
 
 /**
  * @class SleepManager
@@ -21,7 +21,8 @@
  * MQTT INTERFACE
  * ==============
  * Topics:
- * - <node>/sleep_mgr/status       → Reports current sleep state and operations
+ * - <node>/sleep_mgr       → Reports current sleep state and operations
+ * - <node>/sleep_mgr/battery      → Reports battery status (voltage,level,charging)
  * - <node>/sleep_mgr/set          ← Receives sleep commands
  * 
  * Commands:
@@ -38,9 +39,16 @@
  * - mosquitto_pub -t "bedroom/sensor1/sleep_mgr/set" -m "sleep 60000 later 5000"  # Sleep 60s in 5s
  * - mosquitto_pub -t "bedroom/sensor1/sleep_mgr/set" -m "shutdown"           # Power off device
  * 
+ * Battery Status Format:
+ * - Format: "voltage,level,charging" (e.g., "3.85,75,1")
+ * - voltage: Battery voltage in volts (float with 2 decimal places)
+ * - level: Battery level percentage (0-100)
+ * - charging: 1 if charging, 0 if not charging
+ * 
  * M5StickC Plus2 SPECIFIC FEATURES
  * ================================
  * - Uses StickCP2.Power for advanced power management
+ * - Battery status monitoring via StickCP2.Power
  * - Supports proper shutdown via power management IC
  * - Maintains RTC functionality during sleep
  * - Optimized power consumption for battery operation

@@ -2,8 +2,6 @@
 // Implementation of sleep management device for M5StickC Plus2
 
 #include "dev_sleep_mgr.h"
-#include "device-manager.h"
-#include "platform_includes.h"
 
 // Include ESP32-specific power management
 #include <esp_sleep.h>
@@ -11,6 +9,9 @@
 SleepManager::SleepManager(const char* name) : Device(name, 1000000) { // Poll every 1 second for status updates
     // Add main status subdevice (publishes power state)
     add_subdevice(new Subdevice());
+    
+    // Add battery status subdevice (publishes battery information)
+    add_subdevice(new Subdevice(F("battery")));
     
     // Add command subdevice that subscribes to power commands
     add_subdevice(new Subdevice(str_set, true))->with_receive_cb(
@@ -64,6 +65,9 @@ SleepManager::SleepManager(const char* name) : Device(name, 1000000) { // Poll e
 }
 
 void SleepManager::start() {
+    auto cfg = M5.config();
+    StickCP2.begin(cfg);
+
     #ifdef mqtt_discovery_prefix
         // Create Home Assistant discovery info
         // Register as a switch that can be used to trigger sleep
@@ -85,8 +89,21 @@ void SleepManager::start() {
 
 bool SleepManager::measure() {
     // Update M5StickC Plus2 power management
-    StickCP2.update();
+    //StickCP2.update(); // seems to wrack havock on the wakeup process
     
+    // Read battery status and update battery subdevice (index 1)
+    // Get battery information from M5StickCPlus2 power management
+    // float battery_voltage = StickCP2.Power.getBatteryVoltage(); // fluctuates a lot
+    int battery_level = StickCP2.Power.getBatteryLevel();
+    // bool is_charging = StickCP2.Power.isCharging(); // seems not to work
+ 
+    // Format battery status as "voltage,level,charging" (e.g., "3.85,75,1")
+    // Ustring battery_status;
+    // battery_status.printf("%.1f,%d,%d", ((long)(battery_voltage/100))/10.0, battery_level, is_charging ? 1 : 0);
+    // value(1).copy(battery_status);
+    
+    value(1).from(battery_level/2*2); // only battery level seems reliable
+
     // Update status to show countdown if sleep is pending
     if (_sleep_pending) {
         unsigned long current_time = millis();
@@ -169,10 +186,8 @@ bool SleepManager::sleep_in(unsigned long delay_ms, unsigned long duration_ms) {
 bool SleepManager::shutdown() {
     value().from(F("shutting_down"));
     
-    // Give a brief moment for status to be published
-    do_later(100, [this]() {
-        enter_shutdown();
-    });
+    delay(100); // Brief delay to allow status to be published
+    enter_shutdown();
     
     return true;
 }
@@ -218,6 +233,12 @@ void SleepManager::enter_deep_sleep(unsigned long duration_ms) {
 
 void SleepManager::enter_shutdown() {
     ulog(F("Sleep: M5StickC Plus2 shutting down"));
+    delay(100); // Brief delay to allow log to flush
+    
+    // // Release hold pin to allow proper shutdown
+    // // This allows the power management IC to cut power completely
+    // digitalWrite(4, LOW);
+    // pinMode(4, INPUT); // Set to input to save power
     
     // Use M5StickC Plus2 specific shutdown
     StickCP2.Power.powerOff();
@@ -291,17 +312,17 @@ Ustring SleepManager::get_sleep_status() {
             
             Ustring status;
             if (_shutdown_pending) {
-                status.from(F("shutting_down_in_"));
+                status.from(F("shutting down in "));
                 status.add(remaining_seconds);
                 status.add(F("s"));
             } else if (_sleep_duration_ms == 0) {
-                status.from(F("powering_off_in_"));
+                status.from(F("powering off in "));
                 status.add(remaining_seconds);
                 status.add(F("s"));
             } else {
-                status.from(F("sleeping_in_"));
+                status.from(F("sleeping in "));
                 status.add(remaining_seconds);
-                status.add(F("s_for_"));
+                status.add(F("s for "));
                 status.add(_sleep_duration_ms);
                 status.add(F("ms"));
             }
