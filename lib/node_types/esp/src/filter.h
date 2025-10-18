@@ -13,8 +13,113 @@
 #include <device.h>
 */
 
+// Include auto-generated markers (if they exist)
+#if __has_include("markers_generated.h")
+    #include "markers_generated.h"
+#endif
+
+// Macro to access markers
+#define MARKED(marker_name) iotempower_marker_##marker_name
+
 // general helper
 #define filter(f) with_filter_callback(*new Callback(f))
+
+// Marker support classes
+class Filter_CSV_Mark : public Callback {
+    private:
+        Ustring* _target;
+        int _value_index;
+        int _csv_field_index;
+        
+    public:
+        Filter_CSV_Mark(Ustring* target, int field_index, int value_index = 0) : Callback() {
+            _target = target;
+            _value_index = value_index;
+            _csv_field_index = field_index;
+        }
+        
+        bool call(Device &dev) {
+            // Parse CSV field using Ustring class
+            Ustring csv_data;
+            csv_data.from(dev.value(_value_index).as_cstr());
+            
+            // Extract field using simple parsing
+            int current_field = 0;
+            int field_start = 0;
+            int pos = 0;
+            
+            while(pos < csv_data.length() && current_field < _csv_field_index) {
+                if(csv_data.as_cstr()[pos] == ',') {
+                    current_field++;
+                    field_start = pos + 1;
+                }
+                pos++;
+            }
+            
+            if(current_field == _csv_field_index) {
+                // Find end of field
+                int field_end = field_start;
+                while(field_end < csv_data.length() && csv_data.as_cstr()[field_end] != ',') {
+                    field_end++;
+                }
+                
+                // Extract field value directly into target Ustring
+                _target->clear();
+                _target->copy(csv_data, field_start, field_end - field_start);
+            }
+            return true; // Forward the now marked and copied value in the filter chain
+        }
+};
+
+///// Marker macros
+// Mark a CSV field from value_index into marker
+#define mark_csv_field(marker_name, field_index, value_index) \
+    with_filter_callback(*new Filter_CSV_Mark(&iotempower_marker_##marker_name, field_index, value_index))
+
+// Mark current value into marker
+#define mark_field(marker_name, value_index) \
+    with_filter_callback(*new Callback([](Device& dev) { \
+        MARKED(marker_name).copy(dev.value(value_index)); \
+        return true; \
+    }))
+
+/**
+ * Generic helper macro to dispatch function-like macros based on argument count.
+ * This macro examines the number of arguments passed and selects the appropriate
+ * implementation macro to call. It's used to create overloaded macro behavior
+ * similar to function overloading in C++.
+ * 
+ * The macro works by:
+ * 1. Adding dummy arguments to fill positions
+ * 2. Using argument position to select the correct implementation
+ * 3. The NAME parameter ends up being the selected macro to call
+ * 4. This allows 1-argument vs 2-argument macro dispatch
+ */
+#define IOTEMPOWER_DISPATCH_2(_1, _2, NAME, ...) NAME
+#define IOTEMPOWER_DISPATCH_3(_1, _2, _3, NAME, ...) NAME
+#define IOTEMPOWER_DISPATCH_4(_1, _2, _3, _4, NAME, ...) NAME
+
+// Commit marker macro with optional clear flag
+#define commit_mark(...) \
+    IOTEMPOWER_DISPATCH_3(__VA_ARGS__, \
+                     commit_mark_with_clear_, \
+                     commit_mark_no_clear_, \
+                     commit_mark_no_clear_)(__VA_ARGS__)
+
+// Implementation without third parameter (no clear flag)
+#define commit_mark_no_clear_(marker_name, value_index, ...) \
+    with_filter_callback(*new Callback([](Device& dev) { \
+        dev.value(value_index).copy(MARKED(marker_name)); \
+        return true; \
+    }))
+
+// Implementation with third parameter (boolean clear flag)
+#define commit_mark_with_clear_(marker_name, value_index, clear_flag) \
+    with_filter_callback(*new Callback([](Device& dev) { \
+        if (clear_flag) dev.clear_all_values(); \
+        dev.value(value_index).copy(MARKED(marker_name)); \
+        return true; \
+    }))
 
 // simple averaging filter
 // average over buflen samples
@@ -23,15 +128,19 @@ class Filter_Average : public Callback {
         double sum=0;
         size_t values_count = 0;
         size_t _buflen;
+        Ustring& _target;
     public:
-        Filter_Average(size_t buflen) : Callback() {
+        Filter_Average(size_t buflen) : Callback(), _target(get_device().value()) {
+            _buflen = buflen;
+        }
+        Filter_Average(Ustring& target, size_t buflen) : Callback(), _target(target) {
             _buflen = buflen;
         }
         bool call(Device &dev) {
-            sum += dev.read_float();
+            sum += _target.as_float();
             values_count ++;
             if(values_count >= _buflen) {
-                dev.write_float(sum/values_count);
+                _target.from(sum/values_count);
                 values_count = 0;
                 sum = 0;
                 return true;
@@ -39,7 +148,20 @@ class Filter_Average : public Callback {
             return false;
         }
 };
-#define filter_average(count) with_filter_callback(*new Filter_Average(count))
+// Filter average macro with automatic marker expansion
+#define filter_average(...) \
+    IOTEMPOWER_DISPATCH_2(__VA_ARGS__, \
+                     filter_average_with_marker_, \
+                     filter_average_simple_)(__VA_ARGS__)
+
+// Implementation with one parameter (just buffer size)
+#define filter_average_simple_(buflen) \
+    with_filter_callback(*new Filter_Average(buflen))
+
+// Implementation with two parameters (marker name + buffer size)
+#define filter_average_with_marker_(marker_name, buflen) \
+    with_filter_callback(*new Filter_Average(MARKED(marker_name), buflen))
+
 
 // simple sliding averaging filter
 // average over last buflen samples
@@ -50,8 +172,16 @@ class Filter_Sliding_Average : public Callback {
         size_t buffer_filled = 0;
         size_t buffer_position = 0;
         double *samples;
+        Ustring& _target;
     public:
-        Filter_Sliding_Average(size_t buflen) : Callback() {
+        Filter_Sliding_Average(size_t buflen) : Callback(), _target(get_device().value()) {
+            _buflen = buflen;
+            samples = new double[_buflen];
+            if(!samples) {
+                ulog(F("Not enough memory for sliding average filter buffer."));
+            }
+        }
+        Filter_Sliding_Average(Ustring& target, size_t buflen) : Callback(), _target(target) {
             _buflen = buflen;
             samples = new double[_buflen];
             if(!samples) {
@@ -61,14 +191,14 @@ class Filter_Sliding_Average : public Callback {
         bool call(Device &dev) {
             bool retval = false;
             if(samples) {
-                double v = dev.read_float();
+                double v = _target.as_float();
                 sum += v; // add to overall sum
                 buffer_filled ++;
                 if(buffer_filled >= _buflen) { // only active when buffer filled
                     buffer_filled = _buflen; // keep at that size
                     // forget old value (that is on that new position) before overwriting
                     sum -= samples[buffer_position];
-                    dev.write_float(sum/buffer_filled);
+                    _target.from(sum/buffer_filled);
                     retval = true; // only return results when buffer filled
                 }
                 samples[buffer_position] = v; // store (overwrite when full) new value
@@ -77,7 +207,19 @@ class Filter_Sliding_Average : public Callback {
             return retval; 
         }
 };
-#define filter_sliding_average(count) with_filter_callback(*new Filter_Sliding_Average(count))
+// Filter sliding average macro with automatic marker expansion
+#define filter_sliding_average(...) \
+    IOTEMPOWER_DISPATCH_2(__VA_ARGS__, \
+                     filter_sliding_average_with_marker_, \
+                     filter_sliding_average_simple_)(__VA_ARGS__)
+
+// Implementation with one parameter (just buffer size)
+#define filter_sliding_average_simple_(buflen) \
+    with_filter_callback(*new Filter_Sliding_Average(buflen))
+
+// Implementation with two parameters (marker name + buffer size)
+#define filter_sliding_average_with_marker_(marker_name, buflen) \
+    with_filter_callback(*new Filter_Sliding_Average(MARKED(marker_name), buflen))
 
 
 // sliding minimum, maximum average filter
@@ -89,8 +231,16 @@ class Filter_Sliding_Min_Max_Avg : public Callback {
         size_t buffer_filled = 0;
         size_t buffer_position = 0;
         double *samples;
+        Ustring& _target;
     public:
-        Filter_Sliding_Min_Max_Avg(size_t buflen) : Callback() {
+        Filter_Sliding_Min_Max_Avg(size_t buflen) : Callback(), _target(get_device().value()) {
+            _buflen = buflen;
+            samples = new double[_buflen];
+            if(!samples) {
+                ulog(F("Not enough memory for sliding average filter buffer."));
+            }
+        }
+        Filter_Sliding_Min_Max_Avg(Ustring& target, size_t buflen) : Callback(), _target(target) {
             _buflen = buflen;
             samples = new double[_buflen];
             if(!samples) {
@@ -100,7 +250,7 @@ class Filter_Sliding_Min_Max_Avg : public Callback {
         bool call(Device &dev) {
             bool retval = false;
             if(samples) {
-                double v = dev.read_float();
+                double v = _target.as_float();
                 sum += v; // add to overall sum
                 buffer_filled ++;
                 if(buffer_filled >= _buflen) { // only active when buffer filled
@@ -117,14 +267,26 @@ class Filter_Sliding_Min_Max_Avg : public Callback {
                         if(s < _min) _min=s;
                         if(s > _max) _max=s;
                     }
-                    dev.write_float((_min + _max) / 2);
+                    _target.from((_min + _max) / 2);
                     retval = true; // only return results when buffer filled
                 }
             } // else not enough space, discard
             return retval; 
         }
 };
-#define filter_sliding_min_max_avg(count) with_filter_callback(*new Filter_Sliding_Min_Max_Avg(count))
+// Filter sliding min max avg macro with automatic marker expansion
+#define filter_sliding_min_max_avg(...) \
+    IOTEMPOWER_DISPATCH_2(__VA_ARGS__, \
+                     filter_sliding_min_max_avg_with_marker_, \
+                     filter_sliding_min_max_avg_simple_)(__VA_ARGS__)
+
+// Implementation with one parameter (just buffer size)
+#define filter_sliding_min_max_avg_simple_(buflen) \
+    with_filter_callback(*new Filter_Sliding_Min_Max_Avg(buflen))
+
+// Implementation with two parameters (marker name + buffer size)
+#define filter_sliding_min_max_avg_with_marker_(marker_name, buflen) \
+    with_filter_callback(*new Filter_Sliding_Min_Max_Avg(MARKED(marker_name), buflen))
 
 
 // sliding maximum filter
@@ -136,8 +298,16 @@ class Filter_Sliding_Max : public Callback {
         size_t buffer_filled = 0;
         size_t buffer_position = 0;
         double *samples;
+        Ustring& _target;
     public:
-        Filter_Sliding_Max(size_t buflen) : Callback() {
+        Filter_Sliding_Max(size_t buflen) : Callback(), _target(get_device().value()) {
+            _buflen = buflen;
+            samples = new double[_buflen];
+            if(!samples) {
+                ulog(F("Not enough memory for sliding average filter buffer."));
+            }
+        }
+        Filter_Sliding_Max(Ustring& target, size_t buflen) : Callback(), _target(target) {
             _buflen = buflen;
             samples = new double[_buflen];
             if(!samples) {
@@ -147,7 +317,7 @@ class Filter_Sliding_Max : public Callback {
         bool call(Device &dev) {
             bool retval = false;
             if(samples) {
-                double v = dev.read_float();
+                double v = _target.as_float();
                 sum += v; // add to overall sum
                 buffer_filled ++;
                 if(buffer_filled >= _buflen) { // only active when buffer filled
@@ -163,16 +333,28 @@ class Filter_Sliding_Max : public Callback {
                         double s = samples[i];
                         if(s > _max) _max=s;
                     }
-                    dev.write_float(_max);
+                    _target.from(_max);
                     retval = true; // only return results when buffer filled
                 }
             } // else not enough space, discard
             return retval; 
         }
 };
-#define filter_sliding_max(count) with_filter_callback(*new Filter_Sliding_Max(count))
+// Filter sliding max macro with automatic marker expansion
+#define filter_sliding_max(...) \
+    IOTEMPOWER_DISPATCH_2(__VA_ARGS__, \
+                     filter_sliding_max_with_marker_, \
+                     filter_sliding_max_simple_)(__VA_ARGS__)
 
-// sliding maximum filter
+// Implementation with one parameter (just buffer size)
+#define filter_sliding_max_simple_(buflen) \
+    with_filter_callback(*new Filter_Sliding_Max(buflen))
+
+// Implementation with two parameters (marker name + buffer size)
+#define filter_sliding_max_with_marker_(marker_name, buflen) \
+    with_filter_callback(*new Filter_Sliding_Max(MARKED(marker_name), buflen))
+
+// sliding minimum filter
 // average over last buflen samples
 class Filter_Sliding_Min : public Callback {
     private:
@@ -181,8 +363,16 @@ class Filter_Sliding_Min : public Callback {
         size_t buffer_filled = 0;
         size_t buffer_position = 0;
         double *samples;
+        Ustring& _target;
     public:
-        Filter_Sliding_Min(size_t buflen) : Callback() {
+        Filter_Sliding_Min(size_t buflen) : Callback(), _target(get_device().value()) {
+            _buflen = buflen;
+            samples = new double[_buflen];
+            if(!samples) {
+                ulog(F("Not enough memory for sliding average filter buffer."));
+            }
+        }
+        Filter_Sliding_Min(Ustring& target, size_t buflen) : Callback(), _target(target) {
             _buflen = buflen;
             samples = new double[_buflen];
             if(!samples) {
@@ -192,7 +382,7 @@ class Filter_Sliding_Min : public Callback {
         bool call(Device &dev) {
             bool retval = false;
             if(samples) {
-                double v = dev.read_float();
+                double v = _target.as_float();
                 sum += v; // add to overall sum
                 buffer_filled ++;
                 if(buffer_filled >= _buflen) { // only active when buffer filled
@@ -208,14 +398,26 @@ class Filter_Sliding_Min : public Callback {
                         double s = samples[i];
                         if(s < _min) _min=s;
                     }
-                    dev.write_float(_min);
+                    _target.from(_min);
                     retval = true; // only return results when buffer filled
                 }
             } // else not enough space, discard
             return retval; 
         }
 };
-#define filter_sliding_min(count) with_filter_callback(*new Filter_Sliding_Min(count))
+// Filter sliding min macro with automatic marker expansion
+#define filter_sliding_min(...) \
+    IOTEMPOWER_DISPATCH_2(__VA_ARGS__, \
+                     filter_sliding_min_with_marker_, \
+                     filter_sliding_min_simple_)(__VA_ARGS__)
+
+// Implementation with one parameter (just buffer size)
+#define filter_sliding_min_simple_(buflen) \
+    with_filter_callback(*new Filter_Sliding_Min(buflen))
+
+// Implementation with two parameters (marker name + buffer size)
+#define filter_sliding_min_with_marker_(marker_name, buflen) \
+    with_filter_callback(*new Filter_Sliding_Min(MARKED(marker_name), buflen))
 
 
 // build an average over all samples arriving in a specific time window
@@ -226,12 +428,16 @@ class Filter_Time_Average : public Callback {
         uint32_t last_measured = millis();
         uint32_t _delta;
         double last_val = NAN;
+        Ustring& _target;
     public:
-        Filter_Time_Average(uint32_t delta) : Callback() {
+        Filter_Time_Average(uint32_t delta) : Callback(), _target(get_device().value()) {
+            _delta=delta;
+        }
+        Filter_Time_Average(Ustring& target, uint32_t delta) : Callback(), _target(target) {
             _delta=delta;
         }
         bool call(Device &dev) {
-            sum += dev.read_float();
+            sum += _target.as_float();
             values_count ++;
             if(millis()-last_measured >= _delta) {
                 last_measured = millis();
@@ -244,7 +450,7 @@ class Filter_Time_Average : public Callback {
                     result = sum/values_count;
                 }
                 last_val = result;
-                dev.write_float(result);
+                _target.from(result);
                 values_count = 0;
                 sum = 0;
                 return true;
@@ -252,7 +458,19 @@ class Filter_Time_Average : public Callback {
             return false;
         }
 };
-#define filter_time_average(delta_ms) with_filter_callback(*new Filter_Time_Average(delta_ms))
+// Filter time average macro with automatic marker expansion
+#define filter_time_average(...) \
+    IOTEMPOWER_DISPATCH_2(__VA_ARGS__, \
+                     filter_time_average_with_marker_, \
+                     filter_time_average_simple_)(__VA_ARGS__)
+
+// Implementation with one parameter (just delta)
+#define filter_time_average_simple_(delta_ms) \
+    with_filter_callback(*new Filter_Time_Average(delta_ms))
+
+// Implementation with two parameters (marker name + delta)
+#define filter_time_average_with_marker_(marker_name, delta_ms) \
+    with_filter_callback(*new Filter_Time_Average(MARKED(marker_name), delta_ms))
 
 
 // moving median filter over last buflen samples
@@ -263,8 +481,18 @@ class Filter_Moving_Median : public Callback {
         size_t samples_filled = 0;
         size_t samples_position = 0;
         double *sorted;
+        Ustring& _target;
     public:
-        Filter_Moving_Median(size_t buflen) : Callback() {
+        Filter_Moving_Median(size_t buflen) : Callback(), _target(get_device().value()) {
+            _buflen = buflen;
+            samples = new double[_buflen];
+            sorted = new double[_buflen];
+            if(!samples || !sorted) {
+                samples = NULL;
+                ulog(F("Not enough memory for moving median filter buffers."));
+            }
+        }
+        Filter_Moving_Median(Ustring& target, size_t buflen) : Callback(), _target(target) {
             _buflen = buflen;
             samples = new double[_buflen];
             sorted = new double[_buflen];
@@ -276,7 +504,7 @@ class Filter_Moving_Median : public Callback {
         bool call(Device &dev) {
             bool retval = false;
             if(samples) {
-                double v = dev.read_float();
+                double v = _target.as_float();
                 double oldv;
                 samples_filled ++;
                 if(samples_filled >= _buflen) { // only active when buffer filled
@@ -310,7 +538,7 @@ class Filter_Moving_Median : public Callback {
                     if(!inserted_new) { // if it hasn't been stored already
                         sorted[samples_filled-1] = v;
                     }
-                    dev.write_float(sorted[samples_filled/2]);
+                    _target.from(sorted[samples_filled/2]);
                     retval = true; // only return results when buffer filled
                 } else { // just add to buffers
                     samples[samples_position] = v; // store new value
@@ -337,7 +565,19 @@ class Filter_Moving_Median : public Callback {
             return retval; 
         }
 };
-#define filter_moving_median(count) with_filter_callback(*new Filter_Moving_Median(count))
+// Filter moving median macro with automatic marker expansion
+#define filter_moving_median(...) \
+    IOTEMPOWER_DISPATCH_2(__VA_ARGS__, \
+                     filter_moving_median_with_marker_, \
+                     filter_moving_median_simple_)(__VA_ARGS__)
+
+// Implementation with one parameter (just buffer size)
+#define filter_moving_median_simple_(buflen) \
+    with_filter_callback(*new Filter_Moving_Median(buflen))
+
+// Implementation with two parameters (marker name + buffer size)
+#define filter_moving_median_with_marker_(marker_name, buflen) \
+    with_filter_callback(*new Filter_Moving_Median(MARKED(marker_name), buflen))
 
 
 
@@ -371,26 +611,42 @@ class Filter_Minchange : public Callback {
     private:
         TYPE old_val = 0;
         TYPE _min_change;
+        Ustring& _target;
     public:
-        Filter_Minchange(uint32_t min_change) : Callback() {
+        Filter_Minchange(uint32_t min_change) : Callback(), _target(get_device().value()) {
+            _min_change=min_change;
+        }
+        Filter_Minchange(Ustring& target, uint32_t min_change) : Callback(), _target(target) {
             _min_change=min_change;
         }
         bool call(Device &dev) {
             TYPE v;
             if(std::is_same<TYPE, double>::value) {
-                v = dev.read_float();
+                v = _target.as_float();
             } else {
-                v = dev.read_int();
+                v = _target.as_int();
             }
             if(abs(old_val - v) >= _min_change) {
-                dev.value().from(v);
+                _target.from(v);
                 old_val = v;
                 return true;
             }
             return false;
         }
 };
-#define filter_minchange(minchange) with_filter_callback(*new Filter_Minchange<double>(minchange))
+// Filter minchange macro with automatic marker expansion
+#define filter_minchange(...) \
+    IOTEMPOWER_DISPATCH_2(__VA_ARGS__, \
+                     filter_minchange_with_marker_, \
+                     filter_minchange_simple_)(__VA_ARGS__)
+
+// Implementation with one parameter (just min change)
+#define filter_minchange_simple_(minchange) \
+    with_filter_callback(*new Filter_Minchange<double>(minchange))
+
+// Implementation with two parameters (marker name + min change)
+#define filter_minchange_with_marker_(marker_name, minchange) \
+    with_filter_callback(*new Filter_Minchange<double>(MARKED(marker_name), minchange))
 
 
 /* The Jeff McClintock running median estimate. 
@@ -400,16 +656,33 @@ class Filter_JMC_Median : public Callback {
     private:
         double median = 0.0;
         double average = 0.0;
+        Ustring& _target;
     public:
+        Filter_JMC_Median() : Callback(), _target(get_device().value()) {
+        }
+        Filter_JMC_Median(Ustring& target) : Callback(), _target(target) {
+        }
         bool call(Device &dev) {
-            double sample = dev.read_float();
+            double sample = _target.as_float();
             average += (sample - average) * 0.1;
             median += copysign(average * 0.01, sample - median);
-            dev.write_float(average);
+            _target.from(average);
             return true;
         }
 };
-#define filter_jmc_median() with_filter_callback(*new Filter_JMC_Median())
+// Filter JMC median macro with automatic marker expansion
+#define filter_jmc_median(...) \
+    IOTEMPOWER_DISPATCH_2(__VA_ARGS__, \
+                     filter_jmc_median_with_marker_, \
+                     filter_jmc_median_simple_)(__VA_ARGS__)
+
+// Implementation with no parameters
+#define filter_jmc_median_simple_() \
+    with_filter_callback(*new Filter_JMC_Median())
+
+// Implementation with one parameter (marker name)
+#define filter_jmc_median_with_marker_(marker_name) \
+    with_filter_callback(*new Filter_JMC_Median(MARKED(marker_name)))
 
 /* Jmc median over small time intervals with reset after time runs out*/
 // TODO rewrite as class to avoid local closure issues
@@ -443,18 +716,36 @@ class Filter_Restrict : public Callback {
     private:
         double _from = 0.0;
         double _to = 0.0;
+        Ustring& _target;
     public:
-        Filter_Restrict(double from, double to) : Callback() {
+        Filter_Restrict(double from, double to) : Callback(), _target(get_device().value()) {
+            _from = from;
+            _to = to;
+        }
+        Filter_Restrict(Ustring& target, double from, double to) : Callback(), _target(target) {
             _from = from;
             _to = to;
         }
         bool call(Device &dev) {
-            double sample = dev.read_float();
+            double sample = _target.as_float();
             if(sample < _from || sample > _to) return false;
             return true;
         }
 };
-#define filter_restrict(from, to) with_filter_callback(*new Filter_Restrict(from, to))
+// Filter restrict macro with automatic marker expansion
+#define filter_restrict(...) \
+    IOTEMPOWER_DISPATCH_3(__VA_ARGS__, \
+                     filter_restrict_with_marker_, \
+                     filter_restrict_simple_, \
+                     filter_restrict_simple_)(__VA_ARGS__)
+
+// Implementation with two parameters (from, to)
+#define filter_restrict_simple_(from, to) \
+    with_filter_callback(*new Filter_Restrict(from, to))
+
+// Implementation with three parameters (marker name, from, to)
+#define filter_restrict_with_marker_(marker_name, from, to) \
+    with_filter_callback(*new Filter_Restrict(MARKED(marker_name), from, to))
 
 
 /* round to the next multiple of base */
@@ -632,25 +923,45 @@ class Filter_Binarize : public Callback {
         double _cutoff;
         const char* _high;
         const char* _low;
+        Ustring& _target;
     public:
-        Filter_Binarize(double cutoff, const char* high, const char* low) : Callback() {
+        Filter_Binarize(double cutoff, const char* high, const char* low) : Callback(), _target(get_device().value()) {
+            _cutoff = cutoff;
+            _high = high;
+            _low = low;
+        }
+        Filter_Binarize(Ustring& target, double cutoff, const char* high, const char* low) : Callback(), _target(target) {
             _cutoff = cutoff;
             _high = high;
             _low = low;
         }
         bool call(Device &dev) {
-            if(dev.value().equals(_low)) return false;
-            if(dev.value().equals(_high)) return false;
-            double sample = dev.value().as_float();
+            if(_target.equals(_low)) return false;
+            if(_target.equals(_high)) return false;
+            double sample = _target.as_float();
             if(sample >= _cutoff) {
-                dev.value().from(_high);
+                _target.from(_high);
             } else {
-                dev.value().from(_low);
+                _target.from(_low);
             }
             return true;
         }
 };
-#define filter_binarize(cutoff, high, low) with_filter_callback(*new Filter_Binarize(cutoff, high, low))
+// Filter binarize macro with automatic marker expansion
+#define filter_binarize(...) \
+    IOTEMPOWER_DISPATCH_4(__VA_ARGS__, \
+                     filter_binarize_with_marker_, \
+                     filter_binarize_simple_, \
+                     filter_binarize_simple_, \
+                     filter_binarize_simple_)(__VA_ARGS__)
+
+// Implementation with three parameters (cutoff, high, low)
+#define filter_binarize_simple_(cutoff, high, low) \
+    with_filter_callback(*new Filter_Binarize(cutoff, high, low))
+
+// Implementation with four parameters (marker name, cutoff, high, low)
+#define filter_binarize_with_marker_(marker_name, cutoff, high, low) \
+    with_filter_callback(*new Filter_Binarize(MARKED(marker_name), cutoff, high, low))
 
 
 /* map set of intervals to single discrete values
@@ -663,6 +974,8 @@ class Filter_Interval_Map : public Callback {
         double *borders;
         const char* *values;
         int count = 0;
+        Ustring& _target;
+        
         bool _allocate(int c) {
             borders =  new double[c];
             values = new const char*[c];
@@ -678,13 +991,14 @@ class Filter_Interval_Map : public Callback {
             count ++;
         }
     public:
-        Filter_Interval_Map(const char* v0) : Callback() {
+        // Original constructors for device values
+        Filter_Interval_Map(const char* v0) : Callback(), _target(get_device().value()) {
             if(_allocate(1)) {
                 _add(v0, INFINITY);            
             }
         }
         Filter_Interval_Map(const char* v0, double b0, 
-                            const char* v1) : Callback() {
+                            const char* v1) : Callback(), _target(get_device().value()) {
             if(_allocate(2)) {
                 _add(v0, b0);            
                 _add(v1, INFINITY);            
@@ -692,7 +1006,7 @@ class Filter_Interval_Map : public Callback {
         }
         Filter_Interval_Map(const char* v0, double b0, 
                             const char* v1, double b1,
-                            const char* v2) : Callback() {
+                            const char* v2) : Callback(), _target(get_device().value()) {
             if(_allocate(3)) {
                 _add(v0, b0);            
                 _add(v1, b1);            
@@ -702,7 +1016,7 @@ class Filter_Interval_Map : public Callback {
         Filter_Interval_Map(const char* v0, double b0, 
                             const char* v1, double b1,
                             const char* v2, double b2,
-                            const char* v3) : Callback() {
+                            const char* v3) : Callback(), _target(get_device().value()) {
             if(_allocate(4)) {
                 _add(v0, b0);
                 _add(v1, b1);
@@ -714,7 +1028,54 @@ class Filter_Interval_Map : public Callback {
                             const char* v1, double b1,
                             const char* v2, double b2,
                             const char* v3, double b3,
-                            const char* v4) : Callback() {
+                            const char* v4) : Callback(), _target(get_device().value()) {
+            if(_allocate(5)) {
+                _add(v0, b0);
+                _add(v1, b1);
+                _add(v2, b2);
+                _add(v3, b3);
+                _add(v4, INFINITY);
+            }
+        }
+        
+        // New constructors for marker values
+        Filter_Interval_Map(Ustring& target, const char* v0) : Callback(), _target(target) {
+            if(_allocate(1)) {
+                _add(v0, INFINITY);            
+            }
+        }
+        Filter_Interval_Map(Ustring& target, const char* v0, double b0, 
+                            const char* v1) : Callback(), _target(target) {
+            if(_allocate(2)) {
+                _add(v0, b0);            
+                _add(v1, INFINITY);            
+            }
+        }
+        Filter_Interval_Map(Ustring& target, const char* v0, double b0, 
+                            const char* v1, double b1,
+                            const char* v2) : Callback(), _target(target) {
+            if(_allocate(3)) {
+                _add(v0, b0);            
+                _add(v1, b1);            
+                _add(v2, INFINITY);            
+            }
+        }
+        Filter_Interval_Map(Ustring& target, const char* v0, double b0, 
+                            const char* v1, double b1,
+                            const char* v2, double b2,
+                            const char* v3) : Callback(), _target(target) {
+            if(_allocate(4)) {
+                _add(v0, b0);
+                _add(v1, b1);
+                _add(v2, b2);
+                _add(v3, INFINITY);
+            }
+        }
+        Filter_Interval_Map(Ustring& target, const char* v0, double b0, 
+                            const char* v1, double b1,
+                            const char* v2, double b2,
+                            const char* v3, double b3,
+                            const char* v4) : Callback(), _target(target) {
             if(_allocate(5)) {
                 _add(v0, b0);
                 _add(v1, b1);
@@ -726,11 +1087,11 @@ class Filter_Interval_Map : public Callback {
         // TODO allow more values
 
         bool call(Device &dev) {
-            double v = dev.read_float();
+            double v = _target.as_float();
             for(int i=0; i<=count; i++) { // make infinity as values included
                 if(v<borders[i]) {
                     if(values[i]) {
-                        dev.write(values[i]);
+                        _target.from(values[i]);
                         return true;
                     } else return false; // when NULL discard value
                 }
@@ -739,6 +1100,7 @@ class Filter_Interval_Map : public Callback {
         }
 };
 #define filter_interval_map(...) with_filter_callback(*new Filter_Interval_Map(__VA_ARGS__))
+#define filter_interval_map_m(marker_name, ...) with_filter_callback(*new Filter_Interval_Map(MARKED(marker_name), ##__VA_ARGS__))
 
 // This filter works on precise buffer
 #include <TrueRMS.h>
