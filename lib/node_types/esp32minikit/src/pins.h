@@ -26,7 +26,7 @@
 #define SCL D1
 #define D2 21
 #define SDA D2
-#define D3 0
+#define D3 17
 #define FLASHBUTTON D3
 #define D4 16
 #define ONBOARDLED 2
