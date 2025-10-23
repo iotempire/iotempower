@@ -327,3 +327,9 @@ Ustring& Device::value(unsigned long index) {
     }
     return sd->measured_value;
 }
+
+void Device::clear_all_values() {
+    for(unsigned int i = 0; i < subdevices_count(); i++) {
+        value(i).clear();
+    }
+}

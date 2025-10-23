@@ -588,7 +588,7 @@ class Device {
         // filter_callback
         Device& set_filter_callback(Callback& filter_cb) { 
             bool result;
-            filter_cb.set_device(*this);
+            filter_cb.set_device(*this); // save device reference in callback
             if(filter_first) result=filter_first->chain(filter_cb);
             else {
                 filter_first = new Callback_Link(filter_cb);
@@ -698,6 +698,12 @@ class Device {
          * Does nothing by default.
          */
         virtual void buffer_reset() {};
+
+        /* clear_all_values
+         * Clears all measured values for all subdevices.
+         * Iterates through all subdevices and calls clear() on each value.
+         */
+        void clear_all_values();
 };
 
 // helpers for callbacks

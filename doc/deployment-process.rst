@@ -159,7 +159,11 @@ This Python script:
    
    Follows dependency chains (e.g., ``dht22`` depends on ``ds18b20``)
 
-5. **Determines Required Files**
+5. **Extracts Markers**
+   
+   Detects markers used in ``.mark_field()`` and ``.mark_csv_field()`` calls
+
+6. **Determines Required Files**
    
    Creates a list of ``dev_*.h`` files needed
 

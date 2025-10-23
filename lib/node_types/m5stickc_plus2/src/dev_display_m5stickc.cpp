@@ -1,11 +1,13 @@
 // display.cpp
+
 #include <dev_display_m5stickc.h>
 
 bool M5StickC_Display::init() {
     set_ignore_case(false); // be case sensitive
 
-    auto cfg = M5.config(); // move to header
-    StickCP2.begin(cfg);
+    // should be done in sleep_mgr
+    // auto cfg = M5.config(); // move to header
+    // StickCP2.begin(cfg);
     // StickCP2.begin(true, true, false); // init all but serial
     // StickCP2.Lcd.begin();
     // StickCP2.Axp.begin();

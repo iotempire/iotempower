@@ -4,8 +4,7 @@
 #ifndef _IOTEMPOWER_M5STICKC_IMU_H_
 #define _IOTEMPOWER_M5STICKC_IMU_H_
 
-#include <platform_includes.h>
-#include <device.h>
+#include <iotempower.h>
 
 class M5StickC_IMU : public Device {
     private:

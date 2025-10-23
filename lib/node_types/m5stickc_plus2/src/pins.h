@@ -1,5 +1,7 @@
 // Pins on M5StickC PLus2
 
+#define BUTTON_LEFT 35
+#define BUTTON_POWER BUTTON_LEFT
 #define BUTTON_RIGHT 39
 #define BUTTON_HOME 37
 #define SDA 21

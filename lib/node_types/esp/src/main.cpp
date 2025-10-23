@@ -187,6 +187,9 @@ String mqtt_management_topic;
  * ========================
  * These weak functions can be defined by users in setup.cpp to customize node behavior.
  * 
+ * iotempower_platform_early_init() - Called at very start of setup() for platform-specific early initialization
+ *                                     Use this for critical hardware setup that must happen before everything else
+ * 
  * iotempower_init() - Called during setup before devices are started
  *                     Use this to create device objects and configure them
  * 
@@ -195,6 +198,7 @@ String mqtt_management_topic;
  */
 void (iotempower_init)() __attribute__((weak));
 void (iotempower_start)() __attribute__((weak));
+void (iotempower_platform_early_init)() __attribute__((weak));
 
 /**
  * GLOBAL STATE VARIABLES
@@ -928,7 +932,7 @@ void configureTime() {
     configTime(0, 0, "pool.ntp.org", "time.nist.gov", "time.windows.com");
 
     // Wait for NTP synchronization to complete
-    ulog("Waiting for NTP synchronization...");
+    ulog(F("Waiting for NTP synchronization..."));
     time_t now = time(nullptr);
     unsigned int seconds = 0;
 
@@ -1134,7 +1138,13 @@ void onWifiConnect(
  * 
  * This sequence ensures everything is ready before devices start operating.
  */
+#include "platform_extras.h"
 void setup() {
+    // CRITICAL: Platform-specific early initialization must happen first
+    // This is called before everything else to handle platform-specific requirements
+    // like M5StickC Plus2's hold pin that must be set high immediately to maintain power
+   if (iotempower_platform_early_init) iotempower_platform_early_init();
+    
     // Careful - devices are initialized before this due to class constructors
     // TODO: setup (another, the internal one seems quite ok) watchdog
     // TODO: consider not using serial at all and freeing it for other

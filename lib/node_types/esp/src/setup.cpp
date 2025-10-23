@@ -7,14 +7,21 @@
 
 #include <iotempower.h>
 
-void (iotempower_init)() __attribute__((weak));
 void (iotempower_start)() __attribute__((weak));
+void (iotempower_platform_early_init)() __attribute__((weak));
 
 #define init() \
      iotempower_init()
 
 #define start() \
     iotempower_start()
+
+
+// Include auto-generated markers (if they exist)
+#if __has_include("markers_generated.h")
+    #include "markers_generated.h"
+#endif
+
 
 /**
  * AUTOMATIC SLEEP MANAGER
@@ -24,8 +31,8 @@ void (iotempower_start)() __attribute__((weak));
  */
 sleep_mgr(sleep_mgr);
 
-// That's the user file (called in folder setup.cpp, but linked as setup.h
-// here)
+
+// That's the user file (called in folder setup.cpp, but linked as setup.h here)
 #include "setup.h"
 
 #undef start
