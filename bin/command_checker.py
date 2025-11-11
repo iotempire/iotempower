@@ -27,6 +27,16 @@ class TokenChecker:
             code = f.read()
         code = re.sub(re.compile(r"/\*.*?\*/", re.DOTALL), "", code) # TODO: verify that r=raw works here
         code = re.sub(r"(/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/)|(//.*?$)", "", code, flags=re.MULTILINE)
+        # Convert leading tabs to 4 spaces to avoid tab/space mixing errors
+        lines = code.split('\n')
+        normalized_lines = []
+        for line in lines:
+            # Count leading tabs and convert them to spaces
+            leading_tabs = len(line) - len(line.lstrip('\t'))
+            if leading_tabs > 0:
+                line = '    ' * leading_tabs + line.lstrip('\t')
+            normalized_lines.append(line)
+        code = '\n'.join(normalized_lines)
         self.tokens=set()
         try:
             for token in tokenize.tokenize(io.BytesIO(code.encode('utf-8')).readline):
