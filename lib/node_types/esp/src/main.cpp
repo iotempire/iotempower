@@ -734,6 +734,16 @@ void init_mqtt() {
     if (reconfig_mode_active)
         return;
     ulog(F("Initializing MQTT..."));
+    
+    // Set MQTT buffer size based on big buffer allocations
+    // This is done before connecting to ensure the buffer is large enough
+    // for streaming audio or other large payloads
+    extern size_t iotempower_mqtt_buffer_size;
+    if (iotempower_mqtt_buffer_size > 256) {
+        mqttClient.setBufferSize(iotempower_mqtt_buffer_size);
+        ulog(F("MQTT client buffer set to %d bytes"), iotempower_mqtt_buffer_size);
+    }
+    
     // mqttClient.connect();
     ////AsyncMqttClient disabled in favor of PubSubClient
     // mqttClient.onConnect(onMqttConnect);
@@ -1251,7 +1261,7 @@ void set_precision_interval(long interval_us, long unprecision_interval_us=-1) {
 
 // Variables for performance metrics
 unsigned long performance_last_reset_time = 0;
-const unsigned long performance_interval = 5000; // Interval of 5 seconds in milliseconds
+const unsigned long performance_interval = 30000; // Interval of 30 seconds in milliseconds
 unsigned long performance_iteration_count = 0;
 double performance_total_execution_time = 0; // Total execution time in microseconds
 
@@ -1359,7 +1369,6 @@ void loop() {
                         current_time - last_transmission >=
                             transmission_delta) {
                         if (device_manager.publish(mqttClient, node_topic, true)) {
-                            ulog(F("Free memory: %ld"),ESP.getFreeHeap());
                             last_transmission = current_time;
                             last_published = current_time;
                         }
@@ -1408,19 +1417,19 @@ void loop() {
     performance_total_execution_time += performance_execution_time;
     performance_iteration_count++;
 
-    // Check if 5 seconds for performace have passed
-    if (millis() - performance_last_reset_time >= performance_interval) {
+    // Check if 30 seconds for performance have passed
+    if (current_time - performance_last_reset_time >= performance_interval) {
         double performance_average_execution_time = performance_total_execution_time / performance_iteration_count;
-        double performance_average_calls_per_second = performance_iteration_count / 5.0; // Dividing by 5 seconds directly
+        double performance_average_calls_per_second = performance_iteration_count / 30.0; // Dividing by 30 seconds
 
-        // Display the results
-        Serial.print("Average Execution Time (us): ");
-        Serial.println(performance_average_execution_time);
-        Serial.print("Average Calls Per Second: ");
-        Serial.println(performance_average_calls_per_second);
+        // Display the results including free memory
+        ulog("Performance: avg exec time %.2f us, %.2f calls/sec, free mem %ld bytes", 
+             performance_average_execution_time, 
+             performance_average_calls_per_second,
+             ESP.getFreeHeap());
 
         // Reset for the next interval
-        performance_last_reset_time = millis();
+        performance_last_reset_time = current_time;
         performance_iteration_count = 0;
         performance_total_execution_time = 0;
     }

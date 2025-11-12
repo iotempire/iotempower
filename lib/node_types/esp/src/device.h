@@ -87,6 +87,16 @@
 class Device;
 
 /**
+ * MQTT buffer size management for big buffers
+ * ============================================
+ * Tracks the largest big buffer allocated and ensures MQTT client
+ * buffer is large enough to send the data in a single packet.
+ * This is crucial for low-latency streaming applications like audio.
+ */
+extern size_t iotempower_mqtt_buffer_size;
+void iotempower_ensure_mqtt_buffer_size(size_t required_size);
+
+/**
  * Type definition for device callbacks
  * Callbacks receive a reference to the device and return bool:
  * - true: Accept/process the value
@@ -243,10 +253,14 @@ class Subdevice {
     private:
         Ustring name;  // Subdevice name (appended to device name for MQTT topic)
         bool _subscribed = false;  // Should this subdevice subscribe to commands?
+        uint8_t* _big_buffer = NULL;  // Pointer to large buffer for binary data (e.g., audio)
+        size_t _big_buffer_size = 0;  // Size of the large buffer
+        size_t _big_buffer_filled = 0;  // How much of the buffer is currently filled with data
         void init_log();
-        void init(bool subscribed);
-        void init(const char* subname, bool subscribed);
-        void init(const __FlashStringHelper* subname, bool subscribed);
+        void init_common(bool subscribed, size_t big_buffer_size);  // Common initialization logic
+        void init(bool subscribed, size_t big_buffer_size);
+        void init(const char* subname, bool subscribed, size_t big_buffer_size);
+        void init(const __FlashStringHelper* subname, bool subscribed, size_t big_buffer_size);
         #define IOTEMPOWER_ON_RECEIVE_CALLBACK std::function<bool(const Ustring&)>
         IOTEMPOWER_ON_RECEIVE_CALLBACK receive_cb = NULL;  // Called when MQTT command received
     public:
@@ -262,23 +276,39 @@ class Subdevice {
         const Ustring& get_name() const { return name; }
         const Ustring& key() const { return name; }
         bool subscribed() { return _subscribed; }
-        Subdevice(bool subscribed) {
-            init(subscribed);
+        
+        // Big buffer methods
+        bool has_big_buffer() { return _big_buffer != NULL; }
+        uint8_t* get_big_buffer() { return _big_buffer; }
+        size_t get_big_buffer_size() { return _big_buffer_size; }
+        size_t get_big_buffer_filled() { return _big_buffer_filled; }
+        void big_buffer_clear() { _big_buffer_filled = 0; }
+        void big_buffer_from(const uint8_t* buffer, size_t buffer_size=-1) {
+            if (_big_buffer != NULL && buffer != NULL) {
+                size_t copy_size = buffer_size;
+                // If buffer_size is -1 (or negative), use full internal buffer size
+                if ((int)buffer_size < 0) {
+                    copy_size = _big_buffer_size;
+                }
+                // If buffer_size is bigger than internal buffer, limit and log error
+                if (copy_size > _big_buffer_size) {
+                    ulog(F("Error: big_buffer_from requested size %d exceeds buffer size %d"), 
+                         copy_size, _big_buffer_size);
+                    copy_size = _big_buffer_size;
+                }
+                memcpy(_big_buffer, buffer, copy_size);
+                _big_buffer_filled = copy_size;
+            }
         }
-        Subdevice() { 
-            init(false);
+        
+        Subdevice(bool subscribed=false, size_t big_buffer_size=0) {
+            init(subscribed, big_buffer_size);
         }
-        Subdevice(const char* subname, bool subscribed) {
-            init(subname, subscribed);
+        Subdevice(const char* subname, bool subscribed=false, size_t big_buffer_size=0) {
+            init(subname, subscribed, big_buffer_size);
         }
-        Subdevice(const char* subname) { 
-            init(subname, false);
-        }
-        Subdevice(const __FlashStringHelper* subname, bool subscribed) {
-            init(subname, subscribed);
-        }
-        Subdevice(const __FlashStringHelper* subname) { 
-            init(subname, false);
+        Subdevice(const __FlashStringHelper* subname, bool subscribed=false, size_t big_buffer_size=0) {
+            init(subname, subscribed, big_buffer_size);
         }
 };
 
@@ -487,6 +517,36 @@ class Device {
         void write_int(long v, unsigned long index=0) { value(index).from(v); }
         void write(const char* s, unsigned long index=0) { value(index).from(s); }
         bool is(const char* s, unsigned long index=0) { return value(index).equals(s); }
+
+        // Big buffer access methods
+        bool has_big_buffer(unsigned long index=0) {
+            Subdevice* sd = subdevice(index);
+            return sd != NULL && sd->has_big_buffer();
+        }
+        uint8_t* get_big_buffer(unsigned long index=0) {
+            Subdevice* sd = subdevice(index);
+            return sd != NULL ? sd->get_big_buffer() : NULL;
+        }
+        size_t get_big_buffer_size(unsigned long index=0) {
+            Subdevice* sd = subdevice(index);
+            return sd != NULL ? sd->get_big_buffer_size() : 0;
+        }
+        size_t get_big_buffer_filled(unsigned long index=0) {
+            Subdevice* sd = subdevice(index);
+            return sd != NULL ? sd->get_big_buffer_filled() : 0;
+        }
+        void big_buffer_clear(unsigned long index=0) {
+            Subdevice* sd = subdevice(index);
+            if (sd != NULL) {
+                sd->big_buffer_clear();
+            }
+        }
+        void big_buffer_from(unsigned long subdevice_index=0, const uint8_t* buffer=NULL, size_t buffer_size=-1) {
+            Subdevice* sd = subdevice(subdevice_index);
+            if (sd != NULL) {
+                sd->big_buffer_from(buffer, buffer_size);
+            }
+        }
 
         const Ustring& get_name() const { return name; }
         //const char* get_name() const { return name.as_cstr(); }
