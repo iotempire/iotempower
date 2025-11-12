@@ -121,6 +121,52 @@ class Filter_CSV_Mark : public Callback {
         return true; \
     }))
 
+// Commit CSV marks - writes multiple markers as comma-separated values
+// Usage: commit_csv_marks(value_index, mark1, mark2, mark3, ...)
+
+// Helper macro to apply MARKED() to each argument - needs indirection for proper expansion
+#define IOTEMPOWER_APPLY_MARKED(x) &MARKED(x)
+#define IOTEMPOWER_MAP_1(f, x) f(x)
+#define IOTEMPOWER_MAP_2(f, x, ...) f(x), IOTEMPOWER_MAP_1(f, __VA_ARGS__)
+#define IOTEMPOWER_MAP_3(f, x, ...) f(x), IOTEMPOWER_MAP_2(f, __VA_ARGS__)
+#define IOTEMPOWER_MAP_4(f, x, ...) f(x), IOTEMPOWER_MAP_3(f, __VA_ARGS__)
+#define IOTEMPOWER_MAP_5(f, x, ...) f(x), IOTEMPOWER_MAP_4(f, __VA_ARGS__)
+#define IOTEMPOWER_MAP_6(f, x, ...) f(x), IOTEMPOWER_MAP_5(f, __VA_ARGS__)
+#define IOTEMPOWER_MAP_7(f, x, ...) f(x), IOTEMPOWER_MAP_6(f, __VA_ARGS__)
+#define IOTEMPOWER_MAP_8(f, x, ...) f(x), IOTEMPOWER_MAP_7(f, __VA_ARGS__)
+#define IOTEMPOWER_MAP_9(f, x, ...) f(x), IOTEMPOWER_MAP_8(f, __VA_ARGS__)
+#define IOTEMPOWER_MAP_10(f, x, ...) f(x), IOTEMPOWER_MAP_9(f, __VA_ARGS__)
+
+// Count and dispatch macros - need extra indirection for proper expansion
+#define IOTEMPOWER_NARG_HELPER_(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, N, ...) N
+#define IOTEMPOWER_NARG_(...) IOTEMPOWER_NARG_HELPER_(__VA_ARGS__, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
+#define IOTEMPOWER_NARG(...) IOTEMPOWER_NARG_(__VA_ARGS__)
+#define IOTEMPOWER_MAP__(N, f, ...) IOTEMPOWER_MAP_##N(f, __VA_ARGS__)
+#define IOTEMPOWER_MAP_(N, f, ...) IOTEMPOWER_MAP__(N, f, __VA_ARGS__)
+#define IOTEMPOWER_MAP(f, ...) IOTEMPOWER_MAP_(IOTEMPOWER_NARG(__VA_ARGS__), f, __VA_ARGS__)
+
+// Main macro - simpler approach using direct lambda
+#define commit_csv_marks(value_index, ...) \
+    with_filter_callback(*new Callback([](Device& dev) { \
+        Ustring* markers[] = {IOTEMPOWER_MAP(IOTEMPOWER_APPLY_MARKED, __VA_ARGS__)}; \
+        int count = sizeof(markers) / sizeof(markers[0]); \
+        if (count > 0) { \
+            dev.value(value_index).copy(*markers[0]); \
+            for (int i = 1; i < count; i++) { \
+                dev.value(value_index).add(","); \
+                dev.value(value_index).add(*markers[i]); \
+            } \
+        } \
+        return true; \
+    }))
+
+// Clear value helper - clears a specific value index
+#define clear_value(value_index) \
+    with_filter_callback(*new Callback([](Device& dev) { \
+        dev.value(value_index).clear(); \
+        return true; \
+    }))
+
 // simple averaging filter
 // average over buflen samples
 class Filter_Average : public Callback {
