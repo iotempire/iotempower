@@ -712,6 +712,32 @@ void onMqttMessage(const espMqttClientTypes::MessageProperties& properties, cons
 
 
 /**
+ * @brief Handle MQTT connection established event
+ * 
+ * AUTOMATIC MQTT SETUP
+ * ====================
+ * When MQTT connects, IoTempower automatically:
+ * 1. Publishes node's IP address to management topic
+ * 2. Publishes Home Assistant discovery messages for all devices
+ * 3. Subscribes to command topics for all devices
+ * 
+ * This automation means users get:
+ * - Automatic Home Assistant integration
+ * - No manual topic subscription code
+ * - Network visibility for debugging
+ */
+void onMqttConnect() {
+    ulog(F("Connected to MQTT."));
+
+    // publish IP on mqtt
+    mqttClient.publish((mqtt_management_topic+String("ip")).c_str(), 0, true,
+        WiFi.localIP().toString().c_str());
+    device_manager.publish_discovery_info(mqttClient);
+    device_manager.subscribe(mqttClient, node_topic);
+}
+
+
+/**
  * @brief Initialize MQTT client connection parameters
  * 
  * Sets up the MQTT client with server address and callbacks.
@@ -771,32 +797,6 @@ void init_mqtt() {
         mqttClient.setServer(mqtt_server_buffer.as_cstr(), mqtt_port);
         ulog(F("Setting mqtt server ip to: %s:%d"),  mqtt_server_buffer.as_cstr(), mqtt_port);
     #endif
-}
-
-
-/**
- * @brief Handle MQTT connection established event
- * 
- * AUTOMATIC MQTT SETUP
- * ====================
- * When MQTT connects, IoTempower automatically:
- * 1. Publishes node's IP address to management topic
- * 2. Publishes Home Assistant discovery messages for all devices
- * 3. Subscribes to command topics for all devices
- * 
- * This automation means users get:
- * - Automatic Home Assistant integration
- * - No manual topic subscription code
- * - Network visibility for debugging
- */
-void onMqttConnect() {
-    ulog(F("Connected to MQTT."));
-
-    // publish IP on mqtt
-    mqttClient.publish((mqtt_management_topic+String("ip")).c_str(), 0, true,
-        WiFi.localIP().toString().c_str());
-    device_manager.publish_discovery_info(mqttClient);
-    device_manager.subscribe(mqttClient, node_topic);
 }
 
 
