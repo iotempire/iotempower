@@ -383,13 +383,13 @@ void ulog_output(const char *header, const char *message) {
     ulog_last_output_time = current_time;
 }
 
-void ulog_internal(unsigned long timestamp_ms, const char* file, int line, const char* function, const char *fmt, ...) {
+void ulog_internal(const char* file, int line, const char* function, const char *fmt, ...) {
     char header[128];
     char message[LOG_LINE_MAX_LEN];
     
     // Format the header with source location
     snprintf(header, sizeof(header), "[%6lu][%s:%u] %s(): ", 
-             timestamp_ms, file, line, function);
+             millis(), file, line, function);
     
     // Format the message
     va_list ap;
@@ -400,13 +400,13 @@ void ulog_internal(unsigned long timestamp_ms, const char* file, int line, const
     ulog_output(header, message);
 }
 
-void ulog_internal(unsigned long timestamp_ms, const char* file, int line, const char* function, const __FlashStringHelper *fmt, ...) {
+void ulog_internal(const char* file, int line, const char* function, const __FlashStringHelper *fmt, ...) {
     char header[128];
     char message[LOG_LINE_MAX_LEN];
     
     // Format the header with source location
     snprintf(header, sizeof(header), "[%6lu][%s:%u] %s(): ", 
-             timestamp_ms, file, line, function);
+             millis(), file, line, function);
     
     // Format the message
     va_list ap;

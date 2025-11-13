@@ -34,11 +34,11 @@ extern const PROGMEM char* str_set;
 // Logging
 void ulog_serial_disable();
 void ulog_serial_enable();
-void ulog_internal(unsigned long timestamp_ms, const char* file, int line, const char* function, const char *fmt, ...);
-void ulog_internal(unsigned long timestamp_ms, const char* file, int line, const char* function, const __FlashStringHelper *fmt, ...);
+void ulog_internal(const char* file, int line, const char* function, const char *fmt, ...);
+void ulog_internal(const char* file, int line, const char* function, const __FlashStringHelper *fmt, ...);
 void ulog_reset_repeat_filter(); // Reset the repeat filter (useful for testing)
 // TODO: work on making logging more configurable
-#define ulog(fmt, ...) ulog_internal((unsigned long)(esp_timer_get_time() / 1000ULL), pathToFileName(__FILE__), __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__)
+#define ulog(fmt, ...) ulog_internal(pathToFileName(__FILE__), __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__)
 
 // a simple class for handling fixed-length strings.
 // Ustring stands for UlnoIoT (old framework name) - String
