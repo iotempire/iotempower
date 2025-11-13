@@ -62,7 +62,8 @@ Add MQTT command handlers for interactive control:
 .. code-block:: cpp
 
     .with_command_handler("command_name", [] (Ustring& command) {
-        // Handle MQTT command
+        // Handle MQTT command ("command_name" will already be stripped from the string command)
+        // however command might hold further parameters that were sent after the command "command_name"
         // Parse parameters from command string
     })
 
@@ -334,19 +335,19 @@ Command handlers receive MQTT messages:
 MQTT Commands
 -------------
 
-Send commands to control animations:
+Send commands to control animations (this assume you are inside the node folder where you have defined the animator <animator_name>):
 
 .. code-block:: bash
 
     # Start color animation
-    mqtt_send <node>/<animator>/colors
+    mqtt_send <animator_name> colors [param1 [param2 [...]]]
 
     # Start scroll animation  
-    mqtt_send <node>/<animator>/scroll
+    mqtt_send <animator_name> scroll [param1 [param2 [...]]]
 
     # Set specific patterns
-    mqtt_send <node>/<animator>/blue_red
-    mqtt_send <node>/<animator>/rainbow
+    mqtt_send <animator_name> blue_red [param1 [param2 [...]]]
+    mqtt_send <animator_name> rainbow [param1 [param2 [...]]]
 
 Performance Tips
 ----------------
