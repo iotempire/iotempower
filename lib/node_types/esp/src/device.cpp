@@ -203,11 +203,14 @@ bool Device::publish(espMqttClient& mqtt_client, Ustring& node_topic, Ustring& l
                 log_buffer.add(sd.get_last_confirmed_value());
             }
 
+            // // DEBUG: check how long mqtt publish takes
+            // unsigned long publish_start = micros();
+ 
             // Publish with espMqttClient
-            // API: uint16_t publish(const char* topic, uint8_t qos, bool retain, const uint8_t* payload, size_t length)
             yield();
             
             uint16_t packet_id = mqtt_client.publish(topic.as_cstr(), 0, _retained, data_ptr, data_len);
+ 
             if(packet_id == 0) {
                 ulog(F("DEBUG: publish error!"));
                 log_buffer.add(F("!publish error!"));
@@ -222,6 +225,11 @@ bool Device::publish(espMqttClient& mqtt_client, Ustring& node_topic, Ustring& l
             if (sd.has_big_buffer()) {
                 sd.big_buffer_clear();
             }
+ 
+            // unsigned long publish_end = micros();
+            // unsigned long publish_duration = publish_end - publish_start;
+            // ulog(F("Published to topic %s, packet_id: %d, duration: %lu us"), topic.as_cstr(), packet_id, publish_duration);
+ 
         }
         return true; // continue loop
     } ); // end for_each - iterate over subdevices
