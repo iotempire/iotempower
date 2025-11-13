@@ -76,9 +76,7 @@
 #define _IOTEMPOWER_DEVICE_H_
 
 #include <functional>
-////AsyncMqttClient disabled in favor of PubSubClient
-//#include <AsyncMqttClient.h>
-#include <PubSubClient.h>
+#include <espMqttClient.h>
 #include <iotempower-default.h>
 #include <toolbox.h>
 
@@ -498,14 +496,10 @@ class Device {
         }
 
         // publish current value(s) and resets needs_publishing state
-        ////AsyncMqttClient disabled in favor of PubSubClient
-        //bool publish(AsyncMqttClient& mqtt_client, Ustring& node_topic);
-        bool publish(PubSubClient& mqtt_client, Ustring& node_topic, Ustring& log_buffer);
+        bool publish(espMqttClient& mqtt_client, Ustring& node_topic, Ustring& log_buffer);
 
 #ifdef mqtt_discovery_prefix
-        ////AsyncMqttClient disabled in favor of PubSubClient
-        // bool publish_discovery_info(AsyncMqttClient& mqtt_client);
-        bool publish_discovery_info(PubSubClient& mqtt_client);
+        bool publish_discovery_info(espMqttClient& mqtt_client);
 #endif
 
         Ustring& get_last_confirmed_value(unsigned long index=0);

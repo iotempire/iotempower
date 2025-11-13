@@ -13,9 +13,10 @@
  * ==========================
  * Global variable to track the current MQTT buffer size.
  * Updated whenever a bigger big buffer is allocated.
- * The MQTT client buffer size will be set to this value + overhead for topic/headers.
+ * Note: espMqttClient handles large payloads automatically, so this is mainly
+ * for tracking and logging purposes.
  */
-size_t iotempower_mqtt_buffer_size = 256;  // Default PubSubClient buffer size
+size_t iotempower_mqtt_buffer_size = 256;  // Default buffer size
 
 /**
  * @brief Ensure MQTT buffer is large enough for the required size
@@ -149,12 +150,7 @@ void Device::create_discovery_info(const String& type,
 /**
  * @brief Publish device values to MQTT - constructs topics and sends values
  */
-////AsyncMqttClient disabled in favor of PubSubClient
-//bool Device::publish(AsyncMqttClient& mqtt_client, Ustring& node_topic) {
-// As we cannot use AsyncMqttClient (too many conflicts with other libraries that use interrupts)
-// and being archived, we need to assume for this publish process that no new sensor data will
-// be acquired while publishing.
-bool Device::publish(PubSubClient& mqtt_client, Ustring& node_topic, Ustring& log_buffer) {
+bool Device::publish(espMqttClient& mqtt_client, Ustring& node_topic, Ustring& log_buffer) {
     bool published = false;
     Ustring topic;
     bool first = true;
@@ -162,7 +158,7 @@ bool Device::publish(PubSubClient& mqtt_client, Ustring& node_topic, Ustring& lo
         // Check if there's a big buffer to publish
         bool has_data = false;
         const uint8_t* data_ptr = NULL;
-        unsigned int data_len = 0;
+        size_t data_len = 0;
         
         if (sd.has_big_buffer()) {
             // Publish big buffer data only if filled > 0
@@ -197,7 +193,6 @@ bool Device::publish(PubSubClient& mqtt_client, Ustring& node_topic, Ustring& lo
                 first = false;
             }
             else log_buffer.add(F("|"));
-// TODO: seems wrong, check if fixed correctly            Serial.print(topic.as_cstr()+node_topic.length()+1);
             log_buffer.add(topic);
             log_buffer.add(F(":"));
             if (sd.has_big_buffer()) {
@@ -208,28 +203,18 @@ bool Device::publish(PubSubClient& mqtt_client, Ustring& node_topic, Ustring& lo
                 log_buffer.add(sd.get_last_confirmed_value());
             }
 
-            ////AsyncMqttClient disabled in favor of PubSubClient
-            // if(!mqtt_client.publish(topic.as_cstr(), 0, false, val.as_cstr())) {
-            // get buffers a bit emptier before we try to publish
+            // Publish with espMqttClient
+            // API: uint16_t publish(const char* topic, uint8_t qos, bool retain, const uint8_t* payload, size_t length)
             yield();
-            mqtt_client.loop();
-            yield();
-            // // DEBUG: measure time that it takes to publish data
-            // unsigned long start_time = millis();
             
-            if(!mqtt_client.publish(topic.as_cstr(), data_ptr, data_len, _retained)) {
-                ulog(F("DEBUG: publish error!")); // TODO: remove debug
+            uint16_t packet_id = mqtt_client.publish(topic.as_cstr(), 0, _retained, data_ptr, data_len);
+            if(packet_id == 0) {
+                ulog(F("DEBUG: publish error!"));
                 log_buffer.add(F("!publish error!"));
                 // TODO: signal error and trigger reconnect - necessary?
                 return false;
             }
             
-            // unsigned long publish_time = millis() - start_time;
-            // ulog(F("DEBUG: publish took %lu ms"), publish_time);
-            
-            // give room for publish to be sent out TODO: implement sync send
-            yield();
-            mqtt_client.loop();
             yield();
             published = true;
             
@@ -245,42 +230,16 @@ bool Device::publish(PubSubClient& mqtt_client, Ustring& node_topic, Ustring& lo
 }
 
 #ifdef mqtt_discovery_prefix
-////AsyncMqttClient disabled in favor of PubSubClient
-//bool Device::publish_discovery_info(AsyncMqttClient& mqtt_client) {
-bool Device::publish_discovery_info(PubSubClient& mqtt_client) {
+bool Device::publish_discovery_info(espMqttClient& mqtt_client) {
     if(discovery_config_topic.length()>0) { // only if exists
         ulog(F("Publishing discovery info for %s."), name.as_cstr());
-        // TODO: check if retained and/or some cleanup necessary
-        ////AsyncMqttClient disabled in favor of PubSubClient
-        // if(!mqtt_client.publish(discovery_config_topic.c_str(), 0, true, discovery_info.c_str(), discovery_info.length())) {
-        //     ulog(F("!discovery publish error!"));
-        //     // TODO: signal error and trigger reconnect - necessary?
-        //     return false;
-        // } else {
-        //     // make sure it gets sent
-        //     delay(10);  // This delay is important to prevent overflow of network buffer TODO: implement sync publish mechanism
-        // }
-        unsigned int left = discovery_info.length();
-        if(!mqtt_client.beginPublish(discovery_config_topic.c_str(), left, true)) {
-            ulog(F("!discovery publish init error!"));
-        }
-        const uint8_t* start = (uint8_t*) discovery_info.c_str();
-        while(true) {
-            if(left>128) {
-                if(!mqtt_client.write(start, 128)) break;
-                start += 128;
-                left -= 128;
-            } else {
-                if(!mqtt_client.write(start, left)) break;
-                left = 0;
-                break;
-            }
-        }
-        if(left>0) {
-            ulog(F("!discovery publish write error!"));
-        }
-        if(!mqtt_client.endPublish()) {
-            ulog(F("!discovery publish end error!"));
+        // espMqttClient handles larger payloads automatically
+        // API: uint16_t publish(const char* topic, uint8_t qos, bool retain, const uint8_t* payload, size_t length)
+        uint16_t packet_id = mqtt_client.publish(discovery_config_topic.c_str(), 0, true, 
+                                                  (const uint8_t*)discovery_info.c_str(), 
+                                                  discovery_info.length());
+        if(packet_id == 0) {
+            ulog(F("!discovery publish error!"));
             return false;
         }
     }
