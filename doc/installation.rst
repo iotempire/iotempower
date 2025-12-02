@@ -101,6 +101,17 @@ After installation, plug in your device and run:
 Your device will now appear under ``/dev/ttyUSB0`` or similar in WSL2.
 Use IoTempower as normal from your WSL2 Linux shell.
 
+For easier USB device management with a graphical interface, you can also 
+install the WSL USB Manager:
+
+.. code-block:: powershell
+
+   winget install nickbeth.wsl-usb-manager
+
+After installation, press ``Win+R`` and type ``wsl-usb-gui`` to launch the 
+application. You can then pin it to the system tray for convenient access 
+when attaching or detaching USB devices.
+
 Alternatively, you can flash via the network using the rfc2217 method with 
 a device like the GL.Inet Mango MT300 v2—see the section on using an 
 existing router below.
