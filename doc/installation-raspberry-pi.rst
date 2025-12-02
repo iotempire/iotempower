@@ -1,9 +1,18 @@
+.. warning::
+   **This installation method is deprecated.**
+
+   The pre-prepared Raspberry Pi images are no longer actively maintained 
+   and are not recommended for new deployments. Please consider using 
+   `Raspberry Pi OS Lite <https://www.raspberrypi.com/software/operating-systems/>`_ 
+   or `DietPi <https://dietpi.com/>`_ with a standard Linux installation instead.
+   See `Installation <installation.rst>`_ for recommended methods.
+
 Please also check out the tutorial videos for this setup on ulno's teaching youtube
 channel(s): https://www.youtube.com/@ut-teaching-ulno/search?query=gateway
 
 
-Installation on Raspberry Pi from Pre-Prepared Image
-++++++++++++++++++++++++++++++++++++++++++++++++++++
+Installation on Raspberry Pi from Pre-Prepared Image (Deprecated)
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 Tutorial video for setting up the sd-card for the pi: https://youtu.be/FrIIXsseZys
 

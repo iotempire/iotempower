@@ -7,16 +7,13 @@ up and running. **A native (classic) Linux installation is always preferred**
 and offers the best experience, maintainability, and full device access.
 
 .. note::
-   **Transition Notice:** For Windows users, we now offer WSL2 with USB device
-   support via ``usbipd-win`` (installed using ``winget``) as a new recommended 
-   option. This provides a much better experience than Docker on Windows.
-   Docker and Raspberry Pi installations are being deprecated—see notes below.
+   **Transition Notice:** Docker and Raspberry Pi image installations are 
+   being deprecated—see notes below. Podman is now the recommended container
+   option if containers are needed.
 
 
-Linux, MacOS, and Termux (Preferred)
-------------------------------------
-
-**A native Linux installation is the most robust and recommended approach.**
+Linux, MacOS, Termux, and WSL2
+------------------------------
 
 For all systems, make sure you have **git** and **curl** installed.
 
@@ -36,6 +33,21 @@ For all systems, make sure you have **git** and **curl** installed.
 
   ``brew install git curl``
 
+* Windows with WSL2 (Windows 10 version 2004+ or Windows 11):
+
+  In a Windows PowerShell (run as Administrator):
+
+  .. code-block:: powershell
+
+     wsl --install
+
+  Restart as instructed. Then open Ubuntu from the Start menu and run:
+
+  .. code-block:: bash
+
+     sudo apt-get update
+     sudo apt-get install git curl
+
 After you have **git** and **curl**, install IoTempower in the terminal with the following:
 
 .. code-block:: bash
@@ -44,7 +56,7 @@ After you have **git** and **curl**, install IoTempower in the terminal with the
 
 Hit enter on all questions to use default settings and enable full features (recommended).
 
-Convenience tools are optional but we recommend them because Midnight Commander is nicer file
+Convenience tools are optional but we recommend them because Midnight Commander is a nicer file
 manager in the command line interface and integrates nicely with IoTempower.
 Micro, and tilde are nicer/easier editors than nano or vim as they support Windows-like
 keyboard shortcuts for select, copy, paste, save, and quit.
@@ -65,37 +77,13 @@ start configuring your first IoT node,
 see `First IoT Node <first-node.rst>`_.
 
 
-Windows Host with WSL2 + usbipd-win
------------------------------------
+USB Flashing in WSL2 with usbipd-win
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. note::
-   **New Option:** For Windows 10 (2004+) and Windows 11 users, WSL2 combined
-   with ``usbipd-win`` provides a viable alternative to a full Linux installation.
-   This setup allows USB serial device access (for ESP32, ESP8266, etc.) from 
-   within WSL2, enabling full flashing and device communication.
-
-**Step 1: Install WSL2 and Ubuntu (or Debian)**
-
-In a Windows PowerShell (run as Administrator):
-
-.. code-block:: powershell
-
-   wsl --install
-
-Restart as instructed. Then open Ubuntu from the Start menu and run:
-
-.. code-block:: bash
-
-   sudo apt-get update
-   sudo apt-get install git curl
-   curl -L https://now.iotempower.us | bash -
-
-**Step 2: Enable USB serial device access**
-
-To access USB devices (like ESP32/ESP8266) from WSL2, install ``usbipd-win``
-on the Windows host using ``winget``. ``winget`` is pre-installed on Windows 11
-and Windows 10 version 2004 and later. If unavailable, update "App Installer"
-from the Microsoft Store.
+To access USB devices (like ESP32/ESP8266) from WSL2 for direct flashing, 
+install ``usbipd-win`` on the Windows host using ``winget``. ``winget`` is 
+pre-installed on Windows 11 and Windows 10 version 2004 and later. 
+If unavailable, update "App Installer" from the Microsoft Store.
 
 In a Windows command prompt or PowerShell (**not** WSL):
 
@@ -113,9 +101,13 @@ After installation, plug in your device and run:
 Your device will now appear under ``/dev/ttyUSB0`` or similar in WSL2.
 Use IoTempower as normal from your WSL2 Linux shell.
 
+Alternatively, you can flash via the network using the rfc2217 method with 
+a device like the GL.Inet Mango MT300 v2—see the section on using an 
+existing router below.
 
-Docker/Podman (Deprecated)
---------------------------
+
+Docker (Deprecated) / Podman (Recommended for Containers)
+----------------------------------------------------------
 
 .. warning::
    **Docker Desktop is deprecated as a recommended installation method.**
@@ -127,29 +119,26 @@ Docker/Podman (Deprecated)
    the community.
 
    Additionally, Docker on Windows via WSL2 often introduces technical issues,
-   and hardware (serial/USB) support is severely limited. Podman shares 
-   similar limitations.
+   and hardware (serial/USB) support is severely limited.
 
-   **We recommend using a native Linux installation or WSL2 with usbipd-win
-   instead of Docker.**
-
-If you *must* use containers, in a Linux environment:
-
-.. code-block:: bash
-
-   curl -L docker.iotempower.us | bash -
-
-Respectively for podman:
+If you need to use containers, **Podman is the recommended option** and works
+on Linux, Windows, and MacOS:
 
 .. code-block:: bash
 
    curl -L podman.iotempower.us | bash -
 
-Be aware that this environment does not have access to the serial ports
+If you must use Docker (deprecated), in a Linux environment:
+
+.. code-block:: bash
+
+   curl -L docker.iotempower.us | bash -
+
+Be aware that container environments do not have access to the serial ports
 (and will never have in Windows),
 therefore you will only be able to flash via the network via rfc2217.
 
-The install script tries to install the docker starter script as iot. If this did not
+The install script tries to install the container starter script as iot. If this did not
 succeed take a look at examples/scripts/iot-docker or iot-podman and take them as
 an executable template to enter your iot container environment with the correctly mounted
 folder. If you use these scripts, you can use them exactly like the iot script in a
@@ -184,9 +173,13 @@ Installation on Raspberry Pi (Deprecated)
    For gateway and infrastructure setups, consider using Manjaro (see below)
    or another mainstream Linux distribution on standard hardware.
 
-If you still wish to use a Raspberry Pi, you can download and flash a 
-pre-prepared Raspberry Pi image to an SD card and run IoTempower on it.
-Please follow the instructions in the following link:
+If you still wish to use a Raspberry Pi, we recommend installing 
+`Raspberry Pi OS Lite <https://www.raspberrypi.com/software/operating-systems/>`_ 
+or `DietPi <https://dietpi.com/>`_ and then performing a standard Linux 
+installation as described above.
+
+For the legacy pre-prepared image method (deprecated), please follow the 
+instructions in the following link:
 `Installation on Raspberry Pi <installation-raspberry-pi.rst>`_
 
 
