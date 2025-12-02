@@ -101,20 +101,50 @@ After installation, plug in your device and run:
 Your device will now appear under ``/dev/ttyUSB0`` or similar in WSL2.
 Use IoTempower as normal from your WSL2 Linux shell.
 
-For easier USB device management with a graphical interface, you can also 
-install the WSL USB Manager:
+For easier USB device management with a graphical interface, install 
+**WSL USB GUI** by downloading the latest MSI installer from the GitLab releases:
 
-.. code-block:: powershell
+https://gitlab.com/alelec/wsl-usb-gui/-/releases
 
-   winget install nickbeth.wsl-usb-manager
+.. note::
+   Do **not** use ``winget install nickbeth.wsl-usb-manager`` as this installs 
+   a completely outdated version.
 
-After installation, press ``Win+R`` and type ``wsl-usb-manager`` to launch the 
-application. You can then pin it to the system tray for convenient access 
-when attaching or detaching USB devices.
+After installing WSL USB GUI:
+
+1. Launch the application from the Start menu.
+2. Go to **File → udev: allow all** to ensure USB devices are created with the 
+   correct system group (``dialout`` on Debian/Ubuntu) for proper device access 
+   with IoTempower.
+3. You can now graphically attach and detach connected MCU devices (like 
+   ESP32/ESP8266) as needed.
 
 Alternatively, you can flash via the network using the rfc2217 method with 
 a device like the GL.Inet Mango MT300 v2—see the section on using an 
 existing router below.
+
+
+WSL2 User Setup
+~~~~~~~~~~~~~~~
+
+When you first install WSL2, you will be prompted to create a user account. 
+This user should have sudo privileges and be able to access USB devices.
+
+If you need to set or reset your WSL user password (for example, after a 
+fresh installation or if you've forgotten it), open the WSL terminal and run:
+
+.. code-block:: bash
+
+   sudo passwd $USER
+
+.. note::
+   **For educational environments:** In classroom settings where convenience 
+   is prioritized, some instructors use ``iotempire`` as a standard password. 
+   
+   **Security Warning:** Using a shared, well-known password like this is a 
+   significant security tradeoff. Only use this approach in isolated, 
+   controlled educational environments where security risks are acceptable 
+   and understood by all participants.
 
 
 Docker (Deprecated) / Podman (Recommended for Containers)
