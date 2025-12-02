@@ -8,7 +8,7 @@ IoTempower
 .. |MIT License Badge| image:: https://img.shields.io/badge/license-MIT-blue.svg
     :target: https://opensource.org/licenses/MIT
     :alt: MIT License
-.. |Platforms Badge| image:: https://img.shields.io/badge/Platforms-Linux%20%7C%20Raspberry%20Pi%20%7C%20Android%20%7C%20Windows%20%7C%20%7C%20Mac-darkgreen.svg
+.. |Platforms Badge| image:: https://img.shields.io/badge/Platforms-Linux%20%7C%20Raspberry%20Pi%20%7C%20Android%20%7C%20Windows%20%7C%20Mac-darkgreen.svg
     :target: https://github.com/iotempire/iotempower#supported-platforms
     :alt: Platforms: Linux | Raspberry Pi | Android | Windows | iOS | Mac
 
