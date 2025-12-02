@@ -2,7 +2,7 @@
 IoTempower
 ==========
 
-.. |IoTempower Badge| image:: https://img.shields.io/badge/IoTempower-0.9.3-purple.svg
+.. |IoTempower Badge| image:: https://img.shields.io/badge/IoTempower-0.9.4-purple.svg
     :target: https://github.com/iotempire/iotempower
     :alt: IoTempower version 0.9.4
 .. |MIT License Badge| image:: https://img.shields.io/badge/license-MIT-blue.svg
