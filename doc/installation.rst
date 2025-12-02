@@ -36,13 +36,13 @@ For all systems, make sure you have **git** and **curl** installed.
 
   ``brew install git curl``
 
-After you have **git** and **curl**, Install IoTempower in the terminal with the following:
+After you have **git** and **curl**, install IoTempower in the terminal with the following:
 
 .. code-block:: bash
 
    curl -L https://now.iotempower.us | bash -
 
-Hit enter on all questions for default settings, and if you want full features (recommended).
+Hit enter on all questions to use default settings and enable full features (recommended).
 
 Convenience tools are optional but we recommend them because Midnight Commander is nicer file
 manager in the command line interface and integrates nicely with IoTempower.
@@ -193,8 +193,8 @@ Please follow the instructions in the following link:
 Manjaro gateway setup
 ---------------------
 
-Instead of a Raspberry Pi you can use a laptop as an accesspoint for IoT instead. You can give the
-gateway internet via phone (tethering)
+Instead of a Raspberry Pi, you can use a laptop as an access point for IoT. You can provide the
+gateway internet access via phone (tethering)
 or cable connected to the router.
 We successfully used `Manjaro <https://manjaro.org/>`_ in the IoT class of
 spring 2024 at the University of Tartu. It worked well due to its ease of installation
