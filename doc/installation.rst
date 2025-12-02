@@ -1,14 +1,10 @@
-============
 Installation
 ============
 
-There are several ways to get the IoTempower configuration management software
-up and running. The easiest way is to run our install script like described below.
+There are several ways to get the IoTempower configuration management software up and running. **A native (classic) Linux installation is preferred and offers the best experience, maintainability, and full device access.** For Windows, we now recommend WSL2 with USB device support via `usbipd-win` (installed with winget). **Docker and Raspberry Pi installations are deprecated** due to technical and licensing issues.
 
-
-
-Linux, MacOS, Termux and WSL 2
-------------------------------
+Linux, MacOS, Termux and WSL2 (Preferred)
+------------------------------------------
 
 For all systems, make sure you have **git** and **curl** installed.
 
@@ -16,126 +12,118 @@ For all systems, make sure you have **git** and **curl** installed.
 
   ``sudo pacman -S git curl``
 
-* Debian-based system (like Ubuntu or Mint). WSL is probably similar to this.
-  We highly recommend **against** using WSL 2 as the networking is currently
-  a total mess and serial ports are nearly unsupported.
-
+* Debian-based system (like Ubuntu or Mint) – WSL2 with Ubuntu/Debian also follows this flow:
   ``sudo apt-get install git curl``
 
 * Termux-based system (https://termux.dev) can be used on Android
-
   ``apt-get install git curl``
 
-* MacOS install homebrew (https://brew.sh/) and then run
-
+* macOS: install homebrew (https://brew.sh/) and then run
   ``brew install git curl``
 
-After you have **git** and **curl**, Install IoTempower in the terminal with the following:
+After you have **git** and **curl**, install IoTempower in the terminal with:
 
 .. code-block:: bash
 
    curl -L https://now.iotempower.us | bash -
 
-Hit enter on all questions for default settings, and if you want full features (recommended).
+Hit enter on all questions for default settings and full features (recommended).
 
-Convenience tools are optional but we recommend them because Midnight Commander is nicer file
-managemer in the command line interface and integrates nicely with IoTempower.
-Micro, and tilde are nicer/easier editors than nano or vim as they support Windows-like
-keyboard shortcuts for select, copy, past, save, and quit.
+Convenience tools (like Midnight Commander, micro, tilde) provide easier file and text editing on the command line.
 
-*Alternatively, you can install everything directly without the prompt questions by running:*
+*Alternatively, install directly with default prompts:*
 
 .. code-block:: bash
 
    curl -L https://now.iotempower.us | bash -s -- --default
 
-After the installation is finished, open a new terminal, and just run ``iot`` from anywhere
-(you can also run ``bash run`` in the iot directory if things go wrong,
-but only for debugging purposes).
+After installation, open a new terminal and run ``iot`` from anywhere. (Or, for debugging, run ``bash run`` in the iot directory.)
 
-After successfully entering IoTempower (the prompt
-should have changed and started now with IoT),
-start configuring your first IoT node,
-see `First IoT Node <first-node.rst>`_.
+After entering IoTempower for the first time (prompt should now indicate IoT), start configuring your first IoT node (see `First IoT Node <first-node.rst>`_).
 
-Docker/Podman
--------------
+Windows Host via WSL2 + usbipd-win (Recommended)
+------------------------------------------------
 
-To install IoTempower with docker or podman, enter a Linux environment
-and type or paste the following (this is a bit trickier in Windows than
-on other systems).
+*For Windows 11 and recent Windows 10, this is now the most robust and least-friction method.*
+
+1. Install WSL2 and Ubuntu (or Debian):
+   
+.. code-block:: powershell
+   
+   wsl --install
+
+   # Restart as instructed, then in Ubuntu:
+   sudo apt-get update
+   sudo apt-get install git curl
+   curl -L https://now.iotempower.us | bash -
+
+2. Enable USB serial device access (ESP32/ESP8266 etc):
+   - Ensure you have Windows "App Installer" (winget) available (pre-installed on Windows 11, Win10 2004+).
+   - In a Windows command prompt or PowerShell (not WSL):
+
+.. code-block:: powershell
+
+   winget install --interactive --exact dorssel.usbipd-win
+
+   # Plug in your device, then:
+   usbipd list
+   usbipd attach --busid <BUSID_FROM_LIST>
+
+   # Your device will now appear under /dev/ttyUSB0 or similar in WSL2
+
+   - Use as normal from WSL2 Linux shell. Full flashing and device access is now supported.
+   - If winget is not available, update "App Installer" from Microsoft Store.
+
+Docker/Podman (Deprecated)
+--------------------------
+
+.. warning::
+   **Docker Desktop is deprecated as a recommended install.**
+
+   Docker Desktop's license terms for education and academia changed significantly in 2024, leading to uncertainty about eligibility ([reference](https://forum.csdms.io/t/docker-licensing-change/75)).
+   In practice, many organizations and individuals are not eligible for free use. Docker on Windows via WSL2 also frequently introduces technical issues, and hardware (serial/USB) support is severely limited. Podman is slightly lighter but shares the same fundamental limitations.
+
+If you *must* use containers, in an Ubuntu/Debian WSL2 environment:
 
 .. code-block:: bash
 
    curl -L docker.iotempower.us | bash -
-
-Respectively for podman:
-
-.. code-block:: bash
-
+   # or for podman
    curl -L podman.iotempower.us | bash -
 
-Be aware that this environment does not yet have access to the serial ports
-(and will never have in Windows),
-therefore you will only be able to flash via the network via rfc2217.
-
-Good news for our Windows users: The docker container is now also easy to install
-if you have Docker Desktop installed and WSL 2 Ubuntu integration activated -
-running the above command should be all you need after setting up docker
-and ubuntu in wsl 2. Then you can start iot in your WSL 2 ubuntu environment.
-
-The install script tries to install the docker starter script as iot. If this did not
-succeed take a look at examples/scripts/iot-docker or iot-podman and take them as
-an executable template to enter your iot container environment with the correctly mounted
-folder. If you use these scripts, you can use them exactly like the iot script in a
-native installation.
-
+Be aware: **Serial device access is not possible under Windows containers.** Only network flashing (RFC2217) is available. For hardware device support, always use classic Linux or WSL2-native methods above.
 
 Manual Installation
 -------------------
 
-If you do not trust the install via curl, execute the following (and verify after
-cloning the content of bin/iot_install) to do a manual install:
+If you do not trust the curl script, clone and manually inspect/run:
 
 .. code-block:: bash
 
    cd # go to home directory
-   my_iot_folder=iot
-   git clone https://github.com/iotempire/iotempower "$my_iot_folder"
-   cd "$my_iot_folder"
+   git clone https://github.com/iotempire/iotempower iot
+   cd iot
    bash run
 
+Raspberry Pi (Deprecated)
+-------------------------
 
-Installation on Raspberry Pi with Image
----------------------------------------
+.. warning::
+   **Raspberry Pi images and installation are deprecated.**
 
-You can download and flash a pre-prepared Raspberry Pi image to an sd card
-and run the IoTempower (gateway and configuration management software) on a Raspberry Pi.
-Please follow the instructions in the following link:
-`Installation on Raspberry Pi <installation-raspberry-pi.rst>`_
+   The preferred, best-supported method for IoTempower is a maintained, standard Linux PC or VM. Raspberry Pi images will no longer be maintained and are not recommended for new deployments.
+   Gateway/infrastructure setups: see Manjaro below or use another mainstream Linux distribution.
 
 Manjaro gateway setup
----------------------------------------
+---------------------
 
-Instead of a Raspberry Pi you can use a laptop as an accesspoint for IoT instead. You can give the
-gateway internet via phone(tethering)
-or cable connected to the router.
-We successfully used `Manjaro <https://manjaro.org/>`_ in the IoT class of
-spring 2024 at the University of Tartu. It worked well due to its ease of installation
-and provided a fimiliar base for the students with the KDE plasma desktop.
-It turned out still performant on the used low-powered laptops.
-
-A guide for Manjaro gateway setup can be found `here <manjaro-gateways-setup.rst>`_
-
+Manjaro (KDE Plasma Desktop) continues to be a good option for classroom gateway devices and older/low-powered laptops. Successfully used in University of Tartu IoT courses, Spring 2024. See further instructions in this repository.
 
 Installation, using existing router
 -----------------------------------
 
-Of course, you don't have to activate the gateway function of IoTempwoer and just use it
-locally on your desktop or one of your servers.
-
-In class, we are often using the GL.Inet Mango MT300 v2. We will add some
-more information about this system architecture here soon.
+You do not have to activate the gateway function—IoTempower is fully usable locally on desktops or servers.
+Frequently, the GL.Inet Mango MT300 v2 is used as a class router.
 
 Top: `ToC <index-doc.rst>`_, Previous: `Tool Support <tool-support.rst>`_,
 Next: `First IoT Node <first-node.rst>`_.
