@@ -108,7 +108,7 @@ install the WSL USB Manager:
 
    winget install nickbeth.wsl-usb-manager
 
-After installation, press ``Win+R`` and type ``wsl-usb-gui`` to launch the 
+After installation, press ``Win+R`` and type ``wsl-usb-manager`` to launch the 
 application. You can then pin it to the system tray for convenient access 
 when attaching or detaching USB devices.
 
