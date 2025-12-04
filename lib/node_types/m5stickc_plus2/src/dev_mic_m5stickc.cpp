@@ -1,12 +1,21 @@
 // dev_mic_m5stickc.cpp
 #include "dev_mic_m5stickc.h"
 
-M5StickC_Mic::M5StickC_Mic(const char* name) : Device(name, 20000) { 
+M5StickC_Mic::M5StickC_Mic(const char* name) : Device(name, 4000) { 
     add_subdevice(new Subdevice(F("audio"), false, IOTEMPOWER_MIC_BUFFER_SIZE * sizeof(int16_t))); // subdevice_index=0, with big buffer
 }
 
 bool M5StickC_Mic::init() {
     StickCP2.Speaker.end(); // Disable speaker (shares I2S)
+       // Get current mic configuration
+    auto mic_cfg = StickCP2.Mic.config();
+    
+    // Set sample rate
+    mic_cfg.sample_rate = 16000; // TODO: merge with 16000 defined below into one constant
+    
+    // Apply the configuration
+    StickCP2.Mic.config(mic_cfg);
+
     StickCP2.Mic.begin();
     return true;
 }
