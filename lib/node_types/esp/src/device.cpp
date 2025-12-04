@@ -8,26 +8,70 @@
 #include <Arduino.h>
 #include "device.h"
 
+/**
+ * MQTT buffer size tracking
+ * ==========================
+ * Global variable to track the current MQTT buffer size.
+ * Updated whenever a bigger big buffer is allocated.
+ * Note: espMqttClient handles large payloads automatically, so this is mainly
+ * for tracking and logging purposes.
+ */
+size_t iotempower_mqtt_buffer_size = 256;  // Default buffer size
+
+/**
+ * @brief Ensure MQTT buffer is large enough for the required size
+ * 
+ * This function is called when a big buffer is allocated to ensure the MQTT
+ * client can send the data in a single packet. It adds overhead for MQTT
+ * topic length and protocol headers.
+ * 
+ * @param required_size The size of data that needs to be sent via MQTT
+ */
+void iotempower_ensure_mqtt_buffer_size(size_t required_size) {
+    // Add overhead for MQTT packet: topic (up to 128 bytes) + protocol overhead (~10 bytes)
+    const size_t mqtt_overhead = 256;
+    size_t needed_size = required_size + mqtt_overhead;
+    
+    if (needed_size > iotempower_mqtt_buffer_size) {
+        iotempower_mqtt_buffer_size = needed_size;
+        ulog(F("MQTT buffer size increased to %d bytes for big buffer support"), iotempower_mqtt_buffer_size);
+    }
+}
+
 void Subdevice::init_log() {
     ulog(F("subdevice init: subname: >%s<"), name.as_cstr()); 
 }
 
-void Subdevice::init(bool subscribed) {
+void Subdevice::init_common(bool subscribed, size_t big_buffer_size) {
+    _subscribed = subscribed;
+    _big_buffer_size = big_buffer_size;
+    _big_buffer_filled = 0;
+    if (_big_buffer_size > 0) {
+        _big_buffer = (uint8_t*) malloc(_big_buffer_size);
+        if (_big_buffer == NULL) {
+            ulog(F("Failed to allocate big buffer of size %d"), _big_buffer_size);
+            _big_buffer_size = 0;
+        } else {
+            // Successfully allocated big buffer - ensure MQTT can handle it
+            iotempower_ensure_mqtt_buffer_size(_big_buffer_size);
+        }
+    }
+    init_log();
+}
+
+void Subdevice::init(bool subscribed, size_t big_buffer_size) {
     name.clear();
-    _subscribed = subscribed;
-    init_log();
+    init_common(subscribed, big_buffer_size);
 }
 
-void Subdevice::init(const char* subname, bool subscribed) {
+void Subdevice::init(const char* subname, bool subscribed, size_t big_buffer_size) {
     name.from(subname);
-    _subscribed = subscribed;
-    init_log();
+    init_common(subscribed, big_buffer_size);
 }
 
-void Subdevice::init(const __FlashStringHelper* subname, bool subscribed) {
+void Subdevice::init(const __FlashStringHelper* subname, bool subscribed, size_t big_buffer_size) {
     name.from(subname);
-    _subscribed = subscribed;
-    init_log();
+    init_common(subscribed, big_buffer_size);
 }
 
 bool Subdevice::call_receive_cb(Ustring& payload) {
@@ -106,18 +150,35 @@ void Device::create_discovery_info(const String& type,
 /**
  * @brief Publish device values to MQTT - constructs topics and sends values
  */
-////AsyncMqttClient disabled in favor of PubSubClient
-//bool Device::publish(AsyncMqttClient& mqtt_client, Ustring& node_topic) {
-// As we cannot use AsyncMqttClient (too many conflicts with other libraries that use interrupts)
-// and being archived, we need to assume for this publish process that no new sensor data will
-// be acquired while publishing.
-bool Device::publish(PubSubClient& mqtt_client, Ustring& node_topic, Ustring& log_buffer) {
+bool Device::publish(espMqttClient& mqtt_client, Ustring& node_topic, Ustring& log_buffer) {
     bool published = false;
     Ustring topic;
     bool first = true;
     subdevices_for_each( [&] (Subdevice& sd) {
-        const Ustring& val = sd.get_last_confirmed_value();
-        if(!val.empty()) {
+        // Check if there's a big buffer to publish
+        bool has_data = false;
+        const uint8_t* data_ptr = NULL;
+        size_t data_len = 0;
+        
+        if (sd.has_big_buffer()) {
+            // Publish big buffer data only if filled > 0
+            size_t filled = sd.get_big_buffer_filled();
+            if (filled > 0) {
+                data_ptr = sd.get_big_buffer();
+                data_len = filled;  // Only publish filled portion
+                has_data = true;
+            }
+        } else {
+            // Publish string value
+            const Ustring& val = sd.get_last_confirmed_value();
+            if (!val.empty()) {
+                data_ptr = (const uint8_t*) val.as_cstr();
+                data_len = val.length();
+                has_data = true;
+            }
+        }
+        
+        if (has_data) {
             // construct full topic
             topic.copy(node_topic);
             topic.add(F("/"));
@@ -132,27 +193,43 @@ bool Device::publish(PubSubClient& mqtt_client, Ustring& node_topic, Ustring& lo
                 first = false;
             }
             else log_buffer.add(F("|"));
-// TODO: seems wrong, check if fixed correctly            Serial.print(topic.as_cstr()+node_topic.length()+1);
             log_buffer.add(topic);
             log_buffer.add(F(":"));
-            log_buffer.add(val);
+            if (sd.has_big_buffer()) {
+                log_buffer.add(F("binary<"));
+                log_buffer.add(data_len);
+                log_buffer.add(F(">"));
+            } else {
+                log_buffer.add(sd.get_last_confirmed_value());
+            }
 
-            ////AsyncMqttClient disabled in favor of PubSubClient
-            // if(!mqtt_client.publish(topic.as_cstr(), 0, false, val.as_cstr())) {
-            // get buffers a bit emptier before we try to publish
+            // // DEBUG: check how long mqtt publish takes
+            // unsigned long publish_start = micros();
+ 
+            // Publish with espMqttClient
             yield();
-            mqtt_client.loop();
-            yield();
-            if(!mqtt_client.publish(topic.as_cstr(), (uint8_t*) val.as_cstr(), (unsigned int)val.length(), _retained)) {
+            
+            uint16_t packet_id = mqtt_client.publish(topic.as_cstr(), 0, _retained, data_ptr, data_len);
+ 
+            if(packet_id == 0) {
+                ulog(F("DEBUG: publish error!"));
                 log_buffer.add(F("!publish error!"));
                 // TODO: signal error and trigger reconnect - necessary?
                 return false;
             }
-            // give room for publish to be sent out TODO: implement sync send
-            yield();
-            mqtt_client.loop();
+            
             yield();
             published = true;
+            
+            // After successful publish, clear big buffer for next recording
+            if (sd.has_big_buffer()) {
+                sd.big_buffer_clear();
+            }
+ 
+            // unsigned long publish_end = micros();
+            // unsigned long publish_duration = publish_end - publish_start;
+            // ulog(F("Published to topic %s, packet_id: %d, duration: %lu us"), topic.as_cstr(), packet_id, publish_duration);
+ 
         }
         return true; // continue loop
     } ); // end for_each - iterate over subdevices
@@ -161,42 +238,16 @@ bool Device::publish(PubSubClient& mqtt_client, Ustring& node_topic, Ustring& lo
 }
 
 #ifdef mqtt_discovery_prefix
-////AsyncMqttClient disabled in favor of PubSubClient
-//bool Device::publish_discovery_info(AsyncMqttClient& mqtt_client) {
-bool Device::publish_discovery_info(PubSubClient& mqtt_client) {
+bool Device::publish_discovery_info(espMqttClient& mqtt_client) {
     if(discovery_config_topic.length()>0) { // only if exists
         ulog(F("Publishing discovery info for %s."), name.as_cstr());
-        // TODO: check if retained and/or some cleanup necessary
-        ////AsyncMqttClient disabled in favor of PubSubClient
-        // if(!mqtt_client.publish(discovery_config_topic.c_str(), 0, true, discovery_info.c_str(), discovery_info.length())) {
-        //     ulog(F("!discovery publish error!"));
-        //     // TODO: signal error and trigger reconnect - necessary?
-        //     return false;
-        // } else {
-        //     // make sure it gets sent
-        //     delay(10);  // This delay is important to prevent overflow of network buffer TODO: implement sync publish mechanism
-        // }
-        unsigned int left = discovery_info.length();
-        if(!mqtt_client.beginPublish(discovery_config_topic.c_str(), left, true)) {
-            ulog(F("!discovery publish init error!"));
-        }
-        const uint8_t* start = (uint8_t*) discovery_info.c_str();
-        while(true) {
-            if(left>128) {
-                if(!mqtt_client.write(start, 128)) break;
-                start += 128;
-                left -= 128;
-            } else {
-                if(!mqtt_client.write(start, left)) break;
-                left = 0;
-                break;
-            }
-        }
-        if(left>0) {
-            ulog(F("!discovery publish write error!"));
-        }
-        if(!mqtt_client.endPublish()) {
-            ulog(F("!discovery publish end error!"));
+        // espMqttClient handles larger payloads automatically
+        // API: uint16_t publish(const char* topic, uint8_t qos, bool retain, const uint8_t* payload, size_t length)
+        uint16_t packet_id = mqtt_client.publish(discovery_config_topic.c_str(), 0, true, 
+                                                  (const uint8_t*)discovery_info.c_str(), 
+                                                  discovery_info.length());
+        if(packet_id == 0) {
+            ulog(F("!discovery publish error!"));
             return false;
         }
     }
@@ -269,6 +320,13 @@ bool Device::check_changes() {
     // Check if there was a change in any subdevice
     bool changed = false;
     subdevices.for_each( [&] (Subdevice& sd) {
+        // For big buffers, check if filled > 0 (has new data)
+        if (sd.has_big_buffer()) {
+            if (sd.get_big_buffer_filled() > 0) {
+                changed = true;
+                return false; // stop loop after one change found
+            }
+        }
         if(!sd.measured_value.equals(sd.last_confirmed_value)) {
             changed = true;
             return false; // stop loop after one change found
@@ -281,7 +339,11 @@ bool Device::check_changes() {
     if(changed) {
         if(call_on_change_callbacks()) {
             subdevices.for_each( [&] (Subdevice& sd) {
-                if(!sd.measured_value.equals(sd.last_confirmed_value)) {
+                // For big buffers, check if filled > 0 (has new data to publish)
+                bool needs_update = (sd.has_big_buffer() && sd.get_big_buffer_filled() > 0) 
+                                    || !sd.measured_value.equals(sd.last_confirmed_value);
+                
+                if(needs_update) {
                     if(_report_change) {
                         updated = true;
                         _needs_publishing = true;
@@ -292,10 +354,19 @@ bool Device::check_changes() {
                             log_buffer.add(sd.get_name());
                         }
                         log_buffer.add(F(":"));
-                        log_buffer.add(sd.measured_value);
+                        if (sd.has_big_buffer()) {
+                            log_buffer.add(F("binary<"));
+                            log_buffer.add(sd.get_big_buffer_filled());
+                            log_buffer.add(F(">"));
+                        } else {
+                            log_buffer.add(sd.measured_value);
+                        }
                         ulog(log_buffer.as_cstr());
                     }
-                    sd.last_confirmed_value.copy(sd.measured_value);
+                    // Only copy string values, not big buffers (they're managed separately)
+                    if (!sd.has_big_buffer()) {
+                        sd.last_confirmed_value.copy(sd.measured_value);
+                    }
                 }
                 return true; // continue whole loop to copy confirmed values
             } ); // end for each subdevices

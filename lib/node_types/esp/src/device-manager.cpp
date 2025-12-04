@@ -6,9 +6,7 @@
  */
 
 #include <Arduino.h>
-////AsyncMqttClient disabled in favor of PubSubClient
-//#include <AsyncMqttClient.h>
-#include <PubSubClient.h>
+#include <espMqttClient.h>
 #include <toolbox.h>
 #include <device-manager.h>
 
@@ -203,9 +201,7 @@ void DeviceManager::reset_buffers() {
 /**
  * @brief Publish changed device values to MQTT
  */
-bool DeviceManager::publish(PubSubClient& mqtt_client, Ustring& node_topic, bool publish_all) {
-    ////AsyncMqttClient disabled in favor of PubSubClient
-    //bool devices_publish(AsyncMqttClient& mqtt_client, Ustring& node_topic, bool publish_all) {
+bool DeviceManager::publish(espMqttClient& mqtt_client, Ustring& node_topic, bool publish_all) {
     bool published = false;
     bool first = true;
     Ustring log_buffer(F("Publishing"));
@@ -216,7 +212,7 @@ bool DeviceManager::publish(PubSubClient& mqtt_client, Ustring& node_topic, bool
                     if(!first) log_buffer.add(F("; "));
                     published = true;
                 }
-                mqtt_client.loop(); // give time to send things out -> seems necessary
+                // espMqttClient handles internal buffering, no need for manual loop() calls here
                 if(first) {
                     first = false;
                 }
@@ -235,16 +231,13 @@ bool DeviceManager::publish(PubSubClient& mqtt_client, Ustring& node_topic, bool
     return published;
 }
 
-bool DeviceManager::subscribe(PubSubClient& mqtt_client, Ustring& node_topic) {
-    ////AsyncMqttClient disabled in favor of PubSubClient
-    //bool devices_subscribe(AsyncMqttClient& mqtt_client, Ustring& node_topic) {
+bool DeviceManager::subscribe(espMqttClient& mqtt_client, Ustring& node_topic) {
     // subscribe to all devices that accept input
     Ustring topic;
 
     device_list.for_each( [&] (Device& dev) {
         if( dev.started() ) {
             dev.subdevices_for_each( [&] (Subdevice& sd) {
-//                ulog("device: %s subdevice: %s", node_topic.as_cstr(),  sd.get_name().as_cstr()); // TODO: enable based on debug level
                 if(sd.subscribed()) {
                     // construct full topic
                     topic.copy(node_topic);
@@ -266,9 +259,7 @@ bool DeviceManager::subscribe(PubSubClient& mqtt_client, Ustring& node_topic) {
     return true; // TODO: decide if error occurred
 }
 
-bool DeviceManager::publish_discovery_info(PubSubClient& mqtt_client) {
-    ////AsyncMqttClient disabled in favor of PubSubClient
-    //bool devices_publish_discovery_info(AsyncMqttClient& mqtt_client) {
+bool DeviceManager::publish_discovery_info(espMqttClient& mqtt_client) {
 
     #ifdef mqtt_discovery_prefix
 

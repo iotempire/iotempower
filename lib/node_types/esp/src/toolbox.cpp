@@ -272,6 +272,15 @@ void initialize_serial() {
 
 static bool ulog_serial_enabled = true;
 
+// Smart logging state to prevent flooding with repeated messages
+#define ULOG_MESSAGE_BUFFER_SIZE 128
+static char ulog_last_message[ULOG_MESSAGE_BUFFER_SIZE] = {0};
+static char ulog_prev_message[ULOG_MESSAGE_BUFFER_SIZE] = {0};
+static unsigned long ulog_last_repeat_count = 0;
+static unsigned long ulog_prev_repeat_count = 0;
+static unsigned long ulog_last_output_time = 0;
+static const unsigned long ULOG_MIN_INTERVAL_MS = 1; // Minimum time between log outputs (1ms)
+
 void ulog_serial_disable() {
     ulog_serial_enabled = false;
 }
@@ -281,41 +290,131 @@ void ulog_serial_enable() {
     ulog_serial_enabled = true;
 }
 
-void ulog_output(const char *buf) {
-     if(ulog_serial_enabled) {
+void ulog_reset_repeat_filter() {
+    ulog_last_message[0] = 0;
+    ulog_prev_message[0] = 0;
+    ulog_last_repeat_count = 0;
+    ulog_prev_repeat_count = 0;
+    ulog_last_output_time = 0;
+}
+
+void ulog_output(const char *header, const char *message) {
+    if(!ulog_serial_enabled) {
+        return;
+    }
+    
+    unsigned long current_time = millis();
+    
+    // Check if this message matches either of our tracked messages
+    bool is_last_repeat = (ulog_last_message[0] != 0) && 
+                         (strncmp(message, ulog_last_message, ULOG_MESSAGE_BUFFER_SIZE - 1) == 0);
+    bool is_prev_repeat = (ulog_prev_message[0] != 0) && 
+                         (strncmp(message, ulog_prev_message, ULOG_MESSAGE_BUFFER_SIZE - 1) == 0);
+    
+    // If it matches the most recent message, just increment counter and return
+    if (is_last_repeat) {
+        ulog_last_repeat_count++;
+        return;
+    }
+    
+    // If it matches the previous message (alternating pattern), increment that counter
+    if (is_prev_repeat) {
+        ulog_prev_repeat_count++;
+        return;
+    }
+    
+    // New unique message - first output any pending repeat counts if significant
+    bool has_significant_repeats = (ulog_last_repeat_count > 2) || (ulog_prev_repeat_count > 2);
+    
+    if (has_significant_repeats) {
+        char repeat_buf[128];
+        int pos = 0;
+        
+        pos += snprintf(repeat_buf + pos, sizeof(repeat_buf) - pos, "[repeated");
+        
+        if (ulog_last_repeat_count > 2) {
+            pos += snprintf(repeat_buf + pos, sizeof(repeat_buf) - pos, " -1x%lu", ulog_last_repeat_count);
+        }
+        
+        if (ulog_prev_repeat_count > 2) {
+            pos += snprintf(repeat_buf + pos, sizeof(repeat_buf) - pos, " -2x%lu", ulog_prev_repeat_count);
+        }
+        
+        snprintf(repeat_buf + pos, sizeof(repeat_buf) - pos, "]");
+        
         #ifdef ESP32
-            if(is_serial_initialized) {
-                Serial.println(buf);
+            if(is_serial_initialized()) {
+                Serial.println(repeat_buf);
             } else {
-                log_i("%s", buf); 
+                log_printf("%s", repeat_buf); log_printf("\n");
             }
         #else
             initialize_serial();
-	        Serial.println(buf);
+            Serial.println(repeat_buf);
         #endif
     }
+    
+    // Output the new message with header
+    char full_buf[LOG_LINE_MAX_LEN];
+    snprintf(full_buf, LOG_LINE_MAX_LEN, "%s%s", header, message);
+    
+    #ifdef ESP32
+        if(is_serial_initialized()) {
+            Serial.println(full_buf);
+        } else {
+            log_printf("%s", full_buf); log_printf("\n");
+        }
+    #else
+        initialize_serial();
+        Serial.println(full_buf);
+    #endif
+    
+    // Store new message and reset counters
+    // Move current last to prev
+    strncpy(ulog_prev_message, ulog_last_message, ULOG_MESSAGE_BUFFER_SIZE - 1);
+    ulog_prev_message[ULOG_MESSAGE_BUFFER_SIZE - 1] = 0;
+    ulog_prev_repeat_count = 1; // Reset prev counter
+    
+    // Store new message as last
+    strncpy(ulog_last_message, message, ULOG_MESSAGE_BUFFER_SIZE - 1);
+    ulog_last_message[ULOG_MESSAGE_BUFFER_SIZE - 1] = 0;
+    ulog_last_repeat_count = 1; // This is the first occurrence
+    
+    ulog_last_output_time = current_time;
 }
 
-void ulog_internal() {
-    ulog_output(str_empty);
-}
-
-void ulog_internal(const char *fmt, ...) {
-	char buf[LOG_LINE_MAX_LEN];
+void ulog_internal(const char* file, int line, const char* function, const char *fmt, ...) {
+    char header[128];
+    char message[LOG_LINE_MAX_LEN];
+    
+    // Format the header with source location
+    snprintf(header, sizeof(header), "[%6lu][%s:%u] %s(): ", 
+             millis(), file, line, function);
+    
+    // Format the message
     va_list ap;
-	va_start(ap, fmt);
-    vsnprintf(buf, LOG_LINE_MAX_LEN, fmt, ap);
+    va_start(ap, fmt);
+    vsnprintf(message, LOG_LINE_MAX_LEN, fmt, ap);
     va_end(ap);
-    ulog_output(buf);
+    
+    ulog_output(header, message);
 }
 
-void ulog_internal(const __FlashStringHelper *fmt, ...) {
-    char buf[LOG_LINE_MAX_LEN];
+void ulog_internal(const char* file, int line, const char* function, const __FlashStringHelper *fmt, ...) {
+    char header[128];
+    char message[LOG_LINE_MAX_LEN];
+    
+    // Format the header with source location
+    snprintf(header, sizeof(header), "[%6lu][%s:%u] %s(): ", 
+             millis(), file, line, function);
+    
+    // Format the message
     va_list ap;
     va_start(ap, (const char*)fmt);
-    vsnprintf(buf, LOG_LINE_MAX_LEN, (const char*)fmt, ap);
+    vsnprintf(message, LOG_LINE_MAX_LEN, (const char*)fmt, ap);
     va_end(ap);
-    ulog_output(buf);
+    
+    ulog_output(header, message);
 }
 
 long urandom(long from, long upto_exclusive) {

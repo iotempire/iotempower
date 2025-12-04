@@ -81,9 +81,7 @@
 #ifndef _IOTEMPOWER_DEVICE_MANAGER_H_
 #define _IOTEMPOWER_DEVICE_MANAGER_H_
 
-////AsyncMqttClient disabled in favor of PubSubClient
-//#include <AsyncMqttClient.h>
-#include <PubSubClient.h>
+#include <espMqttClient.h>
 #include <toolbox.h>
 #include <device.h>
 
@@ -236,27 +234,27 @@ public:
      * 
      * Iterates through all devices and publishes changed values.
      * 
-     * @param mqtt_client PubSubClient instance
+     * @param mqtt_client espMqttClient instance
      * @param node_topic Base MQTT topic for this node
      * @param publish_all If true, publish all values; if false, only changed values
      * @return true if any values were published
      */
-    bool publish(PubSubClient& mqtt_client, Ustring& node_topic, bool publish_all);
+    bool publish(espMqttClient& mqtt_client, Ustring& node_topic, bool publish_all);
     
     /**
      * @brief Subscribe to MQTT command topics for all devices
-     * @param mqtt_client PubSubClient instance
+     * @param mqtt_client espMqttClient instance
      * @param node_topic Base MQTT topic for this node
      * @return true if subscriptions successful
      */
-    bool subscribe(PubSubClient& mqtt_client, Ustring& node_topic);
+    bool subscribe(espMqttClient& mqtt_client, Ustring& node_topic);
     
     /**
      * @brief Publish Home Assistant discovery messages for all devices
-     * @param mqtt_client PubSubClient instance
+     * @param mqtt_client espMqttClient instance
      * @return true if discovery info published successfully
      */
-    bool publish_discovery_info(PubSubClient& mqtt_client);
+    bool publish_discovery_info(espMqttClient& mqtt_client);
     
     /**
      * @brief Route incoming MQTT message to correct device
@@ -292,17 +290,6 @@ public:
      * are defined at compile time, not dynamically at runtime.
      * This decision was made during the transition from MicroPython to C++.
      */
-    //bool remove_device(const char* name);
-
-    /**
-     * AsyncMqttClient vs PubSubClient:
-     * Originally used AsyncMqttClient but switched to PubSubClient due to
-     * conflicts with other interrupt-based libraries. PubSubClient is more
-     * compatible but requires manual loop() calls.
-     */
-    ////AsyncMqttClient disabled in favor of PubSubClient
-    //bool devices_publish(AsyncMqttClient& mqtt_client, Ustring& node_topic, bool publish_all = false);
-    //bool devices_publish_discovery_info(AsyncMqttClient& mqtt_client);
 
 private:
     /**
