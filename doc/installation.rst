@@ -180,16 +180,16 @@ Be aware that container environments do not have access to the serial ports
 therefore you will only be able to flash via the network via rfc2217.
 
 .. note::
-   **Network Conflict Warning:** Docker and Podman by default use the 
-   172.17.0.0/16 network range for containers, which may conflict with some 
+   **Network Conflict Warning:** Docker and Podman by default use the
+   172.17.0.0/16 network range for containers, which may conflict with some
    university or corporate LANs (e.g., University of Tartu uses 172.17.x.x).
-   
+
    If you experience network conflicts:
-   
+
    **For Docker:** Create or edit ``/etc/docker/daemon.json`` and add:
-   
+
    .. code-block:: json
-   
+
       {
         "default-address-pools": [
           {
@@ -198,21 +198,21 @@ therefore you will only be able to flash via the network via rfc2217.
           }
         ]
       }
-   
+
    Then restart Docker: ``sudo systemctl restart docker``
-   
-   **For Podman:** Edit ``~/.config/containers/containers.conf`` (or 
+
+   **For Podman:** Edit ``~/.config/containers/containers.conf`` (or
    ``/etc/containers/containers.conf`` for system-wide) and add:
-   
+
    .. code-block:: toml
-   
+
       [network]
       default_subnet = "10.10.0.0/16"
-      
+
       [[network.default_subnet_pools]]
       base = "10.10.0.0/16"
       size = 24
-   
+
    Then restart any existing containers.
 
 The install script tries to install the container starter script as iot. If this did not
