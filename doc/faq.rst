@@ -226,13 +226,14 @@ Then restart Docker: ``sudo systemctl restart docker``
 
 **For Podman:** Edit ``~/.config/containers/containers.conf`` (or ``/etc/containers/containers.conf`` for system-wide) and add:
 
-.. code-block:: ini
+.. code-block:: toml
 
    [network]
    default_subnet = "10.10.0.0/16"
-   default_subnet_pools = [
-     {"base" = "10.10.0.0/16", "size" = 24}
-   ]
+   
+   [[network.default_subnet_pools]]
+   base = "10.10.0.0/16"
+   size = 24
 
 Then restart any existing containers.
 
