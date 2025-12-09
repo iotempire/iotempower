@@ -3,7 +3,7 @@ Transmission
 
 ..  code-block:: cpp
 
-    transmission_interval(/* transmission_interval */ 5)
+    transmission_interval(transmission_interval = 5)
 
 Set the status report transmission interval (must be placed into the
 start method, see running-node-test example).

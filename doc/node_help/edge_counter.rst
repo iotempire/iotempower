@@ -3,7 +3,7 @@ edge counter
 
 ..  code-block:: cpp
 
-    edge_counter(name, pin, /* rising */ true, /* falling */ true);
+    edge_counter(name, pin, rising = true, falling = true);
 
 Create a new input port for an edge_counter,
 measuring either a falling or rising edge on the

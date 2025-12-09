@@ -3,7 +3,7 @@ rgb_single
 
 ..  code-block:: cpp
 
-    rgb_single(name, pin_r, pin_g, pin_b, /* invert */ false);
+    rgb_single(name, pin_r, pin_g, pin_b, invert = false);
 
 Create a new rgb device object for an rgb-led connected to the pins
 ``pin_r`` (red pin), ``pin_g`` (green pin), and ``pin_b`` (blue pin).

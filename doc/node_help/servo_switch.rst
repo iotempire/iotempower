@@ -5,9 +5,9 @@ servo_switch
 
     servo_switch(name, pin, 
         on_angle, off_angle, return_angle,
-        /* on_command */ "on", /* off_command */ "off",
-        /* turn_time_ms */ 700,
-        /* min_us */ 600, /* max_us */ 2400);
+        on_command=NULL /* default "on" */, off_command=NULL /* default "off" */,
+        turn_time_ms = 700,
+        min_us = 600, max_us = 2400);
 
 Create a new servo motor controller acting as a switch.
 name will be appended to the mqtt topic and a set appended to

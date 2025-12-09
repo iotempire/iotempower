@@ -3,7 +3,7 @@ vl53l0x
 
 ..  code-block:: cpp
 
-    vl53l0x(name, /* long_range */ false, /* high_accuracy_slow */ false);
+    vl53l0x(name, long_range = false, high_accuracy_slow = false);
 
 Create a new VL53L0X laser time-of-flight distance measuring device.
 It reads the distance in mm using laser technology with high precision.
