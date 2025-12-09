@@ -175,8 +175,8 @@ Common issues:
 
 1. **USB connection**: Ensure the USB cable supports data (not just power)
 2. **Drivers**: Install CH340 or CP2102 USB-to-serial drivers if needed
-3. **Permissions**: Add your user to the ``dialout`` group on Linux: ``sudo usermod -a -G dialout $USER``. You can also use ``iot install --fix-serial`` for that (even works on macOS).
-4. **Boot mode**: Some boards need a button pressed during flashing or pin connected to ground
+3. **Permissions**: Use ``iot install --fix-serial`` for that (even works on macOS). (on Ubuntu or Debian, this is basically just adding your user to the ``dialout`` group on Linux: ``sudo usermod -a -G dialout $USER``. Arch and macOS are slightly different.)
+4. **Boot mode**: Some boards need a button pressed during flashing or a pin connected to ground
 5. **Port selection**: You can select the port in different ways. Usually, if only one device is connected, IoTempower detects the port automatically when doing ``deploy serial``. Sometimes you might have to specify ``usb1``, ``acm2``, or even ``/dev/ttyUSB0``. Do NOT use sudo - check serial permissions rather.
 
 For network flashing issues, verify your node is connected to the correct WiFi network.
