@@ -3,7 +3,7 @@ pulse width modulation (pwm)
 
 ..  code-block:: cpp
 
-    pwm(name, pin/*, frequency is by default 1000*/); /* replace the full comment with , 1000 if you want to change the default. */
+    pwm(name, pin/*, frequency is by default 1000*/); /* replace the full comment with , 511 if you want to change the default. */
 
 Control the given pin with pulse width modulation (PWM).
 A different frequency can be chosen for each port and even changed at runtime.
