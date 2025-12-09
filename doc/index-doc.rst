@@ -37,6 +37,8 @@ Table of Contents
 
 - `FAQ </doc/faq.rst>`_
 
+- `Detailed Development Setup Guide </doc/detailed-dev-setup-guide.rst>`_
+
 - `Further Documentation </doc/further-doc.rst>`_
 
 - `Command Reference </doc/node_help/commands.rst>`_

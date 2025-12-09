@@ -19,6 +19,12 @@ IoTempower is a framework for easily creating, deploying, and managing Internet 
 See our `introduction <introduction.rst>`_ for more details.
 
 
+What is the difference between IoTempire and IoTempower?
+---------------------------------------------------------
+
+IoTempire is the open organization in which IoTempower is the most prominent product. Learn more at https://iotempire.net
+
+
 What hardware do I need?
 -------------------------
 
@@ -63,7 +69,7 @@ For detailed instructions and alternative methods, see our `installation guide <
 Where is IoTempower installed by default?
 ------------------------------------------
 
-The default installation directory is ``/iot``. You can customize this during installation if needed.
+The default installation directory is ``/iot`` if you follow the manual clone and bash run installation. You can customize this during installation if needed.
 
 
 How do I update IoTempower?
@@ -92,7 +98,7 @@ To add a device to a node:
 4. Run ``iot compile`` to verify your configuration
 5. Run ``iot deploy`` to flash the updated firmware
 
-For device-specific examples, check our `device source code <../lib/node_types/esp/src>`_ and `architecture guide <device-architecture.rst>`_.
+For device-specific examples, check our `device source code <../lib/node_types/esp/src>`_ and `architecture guide <device-architecture.rst>`_. For generic devices, you can usually work in the ``lib/node_types/esp`` folder. After compile, you can use the created build directory as a PlatformIO project and debug and edit your files there as they are "just" symbolic links. Make use of ``ulog`` for debugging!
 
 
 What devices/sensors are supported?
@@ -110,7 +116,7 @@ IoTempower supports a wide range of devices including:
 - **RGB LEDs**: WS2812B, NeoPixels
 - And many more...
 
-Browse the `lib/node_types/esp/src/` directory or check our documentation for a complete list.
+Browse the `lib/node_types/esp/src/` directory or check our documentation for a complete list. You can also explore the running node test examples to see devices in action.
 
 
 How do I create support for a new device type?
@@ -156,6 +162,8 @@ Can I use IoTempower without an MQTT broker?
 
 No, MQTT is central to IoTempower's architecture. However, IoTempower can automatically set up and manage an MQTT broker for you, so you don't need to configure one separately.
 
+**Note:** We are open to extend to BLE, LoRa, and ESPNow bridges. If you are interested in doing that, please contact us or fork and hack along - we will be excited to see your PR!
+
 
 Troubleshooting
 ===============
@@ -166,10 +174,10 @@ My node won't flash/connect - what should I check?
 Common issues:
 
 1. **USB connection**: Ensure the USB cable supports data (not just power)
-2. **Drivers**: Install CH340 or CP2102 USB-to-serial drivers if needed
+2. **Drivers**: Install CH340 or CP2102 USB-to-serial drivers if needed. You can also use ``iot install --fix-serial`` for that (even works on macOS).
 3. **Permissions**: Add your user to the ``dialout`` group on Linux: ``sudo usermod -a -G dialout $USER``
-4. **Boot mode**: Some boards need a button pressed during flashing
-5. **Port selection**: Use ``iot`` command to select the correct serial port
+4. **Boot mode**: Some boards need a button pressed during flashing or pin connected to ground
+5. **Port selection**: You can select the port in different ways. Usually, if only one device is connected, IoTempower detects the port automatically when doing ``deploy serial``. Sometimes you might have to specify ``usb1``, ``acm2``, or even ``/dev/ttyUSB0``. Do NOT use sudo - check serial permissions rather.
 
 For network flashing issues, verify your node is connected to the correct WiFi network.
 
@@ -177,11 +185,7 @@ For network flashing issues, verify your node is connected to the correct WiFi n
 How do I see debug output from my node?
 ----------------------------------------
 
-Use the serial monitor:
-
-.. code-block:: bash
-
-   iot console
+Either enter the IoT environment and then run ``console_serial`` or use ``iot x console_serial [optional usb port]``.
 
 This will show serial output from your node, including startup messages, connection status, and debug information.
 
@@ -215,6 +219,12 @@ Can I use Node-RED with IoTempower?
 ------------------------------------
 
 Yes! Node-RED works great with IoTempower. Use MQTT nodes in Node-RED to subscribe to sensor topics and publish commands to your actuators.
+
+
+What is the Node-RED password after starting web_starter?
+----------------------------------------------------------
+
+Many default passwords in IoTempower are set to ``iotempire`` for simplicity in classroom environments. Yes, this is a security concern, but we opt for that for ease of use in educational settings. Feel free to enhance security of IoTempower on different levels without compromising usability.
 
 
 How do I run custom code on my nodes?
@@ -283,7 +293,6 @@ If your question isn't answered here:
 
 - Check our `documentation index <index-doc.rst>`_
 - Join our `Discord community <https://discord.gg/9gq8Q9p6r3>`_
-- Ask on `GitHub Discussions <https://github.com/iotempire/iotempower/discussions>`_
 - Open an `issue <https://github.com/iotempire/iotempower/issues>`_ if you found a bug or have a feature request
 
 See our `support page <support.rst>`_ for all contact options.
