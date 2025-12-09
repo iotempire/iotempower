@@ -8,4 +8,4 @@ Further Documentation
 - or check `IoTempower related videos on youtube <https://www.youtube.com/playlist?index=1&list=PL67eyjlXSDutIVdJG2GzzdiF_a2o1q4eR&playnext=1>`__
 
 
-Top: `ToC <index-doc.rst>`_, Previous: `Support <support.rst>`__
+Top: `ToC <index-doc.rst>`_, Previous: `FAQ <faq.rst>`__
