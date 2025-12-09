@@ -228,9 +228,6 @@ Then restart Docker: ``sudo systemctl restart docker``
 
 .. code-block:: toml
 
-   [network]
-   default_subnet = "10.10.0.0/16"
-
    [[network.default_subnet_pools]]
    base = "10.10.0.0/16"
    size = 24

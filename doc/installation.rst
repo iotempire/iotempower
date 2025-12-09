@@ -206,9 +206,6 @@ therefore you will only be able to flash via the network via rfc2217.
 
    .. code-block:: toml
 
-      [network]
-      default_subnet = "10.10.0.0/16"
-
       [[network.default_subnet_pools]]
       base = "10.10.0.0/16"
       size = 24
