@@ -92,7 +92,7 @@ To add a device to a node:
 4. Run ``iot compile`` to verify your configuration
 5. Run ``iot deploy`` to flash the updated firmware
 
-For device-specific examples, check our `device source code <https://github.com/iotempire/iotempower/tree/master/lib/node_types/esp/src>`_ and `architecture guide <device-architecture.rst>`_.
+For device-specific examples, check our `device source code <../lib/node_types/esp/src>`_ and `architecture guide <device-architecture.rst>`_.
 
 
 What devices/sensors are supported?

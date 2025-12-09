@@ -56,4 +56,4 @@ Interested in contributing to IoTempower? Read our `CONTRIBUTING guidelines <htt
 
 Thank you for being part of the IoTempower Community!
 
-Top: `ToC <index-doc.rst>`_, Previous: `Support <support.rst>`_, Next: `FAQ <faq.rst>`_
+Top: `ToC <index-doc.rst>`_, Previous: `External Resources <resources.rst>`_, Next: `FAQ <faq.rst>`_
