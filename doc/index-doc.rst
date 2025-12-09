@@ -35,6 +35,8 @@ Table of Contents
 
 - `Support </doc/support.rst>`_
 
+- `FAQ </doc/faq.rst>`_
+
 - `Further Documentation </doc/further-doc.rst>`_
 
 - `Command Reference </doc/node_help/commands.rst>`_
