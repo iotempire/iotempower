@@ -3,7 +3,7 @@ hx711
 
 ..  code-block:: cpp
 
-    hx711(name, scx_pin, dout_pin, calfactor = 450, calibration = false);
+    hx711(name, scx_pin, dout_pin/*, calfactor is by default 450*/ /*, calibration is by default false*/); /* replace one full comment with , 450 or , false if you want to change the defaults. */
 
 Create a new load cell driver for a scale.
 

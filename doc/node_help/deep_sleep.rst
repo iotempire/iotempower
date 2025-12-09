@@ -3,7 +3,7 @@ Deep Sleep
 
 ..  code-block:: cpp
 
-    deep_sleep(time_from_now_ms, duration_ms = 0);
+    deep_sleep(time_from_now_ms/*, duration_ms is by default 0*/); /* replace the full comment with , 0 if you want to change the default. */
 
 
 Fall in ``time_from_now_ms`` ms into deep sleep mode for ``duration_ms`` ms.
