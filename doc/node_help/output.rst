@@ -3,7 +3,7 @@ output
 
 ..  code-block:: cpp
 
-    output(name, pin, high_command="on", low_command="off");
+    output(name, pin, /* high_command */ "on", /* low_command */ "off");
 
 **other names:** ``led``, ``out``, ``relais``, ``relay``
 
