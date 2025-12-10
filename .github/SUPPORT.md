@@ -43,7 +43,7 @@ Here's how to submit a **`Feature Request`**:
 
 Please **DO NOT** report security vulnerabilities publicly. 
 
-Instead, contact ulno directly [here][<https://ulno.net/contact>] for sensitive reports.
+Instead, contact ulno directly [here](https://ulno.net/contact) for sensitive reports.
 Use "IoTempower Security Vulnerability Report" as subject.
 
 
