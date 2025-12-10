@@ -24,9 +24,7 @@ IoTempower
 
 
 **Get In Touch:** `IoTempire Discord <https://discord.gg/9gq8Q9p6r3>`_ |
-`YouTube Playlist <https://www.youtube.com/playlist?list=PLlppUpfgGsvkfAGJ38_mzQc1-_Z7bNOgq>`_ |
-`Matrix <https://riot.im/app/#/room/#iotempower:matrix.org>`_ |
-`Facebook <https://www.facebook.com/groups/2284490571612435/>`_
+`YouTube Playlist <https://www.youtube.com/playlist?list=PLlppUpfgGsvkfAGJ38_mzQc1-_Z7bNOgq>`_
 
 
 .. figure:: /doc/images/system-architecture.png
