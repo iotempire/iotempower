@@ -94,6 +94,84 @@ The workflow is:
 3. **commit_mark(name, threshold, absolute)** - Finalize the mark with change detection
 
 
+Committing Multiple Marked Fields as CSV
+-----------------------------------------
+
+**filter:** ``commit_csv_marks(value_index, marker1, marker2, ...)``
+
+**description:** Combines multiple marked values into a single CSV string and writes 
+it to the specified value index. This is useful when you want to process several 
+fields independently with filters and then recombine them into a CSV output.
+
+The macro accepts:
+
+- **value_index**: The subdevice value index to write the CSV result to
+- **marker1, marker2, ...**: Names of previously marked fields (up to 10 markers)
+
+**example:**
+
+..  code-block:: cpp
+
+    const int gyro_value_index = 0;
+    m5stickc_imu(imu, true, true, false, false)
+        .mark_csv_field(xgyro, 0, gyro_value_index)  // up and down is X
+        .mark_csv_field(zgyro, 2, gyro_value_index)  // left and right is Z
+        .mark_csv_field(yacc, 1, 1)                  // push is Y
+        
+        .filter_moving_median(xgyro, 20)
+        .filter_interval_map_m(xgyro, "d", -180, "x", 180, "u")  // up down
+        .filter_moving_median(yacc, 20)
+        .filter_interval_map_m(yacc, "b", -1.2, "x", 1.2, "f")   // forward back
+        .filter_moving_median(zgyro, 20)
+        .filter_interval_map_m(zgyro, "r", -180, "x", 180, "l")  // left right
+        
+        .commit_csv_marks(gyro_value_index, xgyro, yacc, zgyro)
+        .clear_value(1);  // clear reported accelerations
+
+This example:
+
+1. Marks three fields: x and z gyroscope values, and y acceleration
+2. Applies median filtering and interval mapping to each
+3. Combines the three filtered values into a CSV string (e.g., "u,f,l")
+4. Writes the result to value index 0
+5. Clears value index 1 (raw acceleration data)
+
+
+Clearing Values
+---------------
+
+**filter:** ``clear_value(value_index)``
+
+**description:** Clears the value at the specified subdevice index. This is useful 
+when you want to suppress certain subdevice outputs while keeping others, typically 
+after processing data with `commit_csv_marks` or other filters.
+
+This is similar to the boolean flag in `commit_mark`. When that flag is omitted or 
+set to false (keeping other values), `clear_value` can be used to explicitly clear 
+specific other values that should not be published.
+
+**parameters:**
+
+- **value_index**: The subdevice value index to clear (0-based)
+
+**example:**
+
+..  code-block:: cpp
+
+    m5stickc_imu(imu, true, true, false, false)
+        .mark_csv_field(xgyro, 0, 0)
+        .filter_average(xgyro, 10)
+        .commit_mark(xgyro, 0)    // Commit without clearing others
+        .clear_value(1);          // Explicitly clear acceleration data
+
+This clears the value at index 1 (acceleration subdevice), leaving only the 
+filtered gyroscope data at index 0.
+
+**note:** The `clear_value` filter is often used in combination with 
+`commit_csv_marks` to clean up intermediate values that were used during 
+processing but shouldn't be published.
+
+
 Pre-defined Filters
 -------------------
 

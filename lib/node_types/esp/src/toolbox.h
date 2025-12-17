@@ -34,19 +34,14 @@ extern const PROGMEM char* str_set;
 // Logging
 void ulog_serial_disable();
 void ulog_serial_enable();
-void ulog_internal();
-void ulog_internal(const char *fmt, ...);
-void ulog_internal(const __FlashStringHelper *fmt, ...);
+void ulog_internal(const char* file, int line, const char* function, const char *fmt, ...);
+void ulog_internal(const char* file, int line, const char* function, const __FlashStringHelper *fmt, ...);
+void ulog_reset_repeat_filter(); // Reset the repeat filter (useful for testing)
 // TODO: work on making logging more configurable
-#define ULOG_FORMAT  F("[%6u][%s:%u] %s(): "), (unsigned long) (esp_timer_get_time() / 1000ULL), pathToFileName(__FILE__), __LINE__, __FUNCTION__
 #ifdef ESP32
-//    #define ulog(fmt, ...) log_i(__VA_OPT__(fmt) "%s" __VA_OPT__(, __VA_ARGS__))
-//    #define ulog(fmt, ...) log_i(__VA_OPT__(fmt) __VA_OPT__(, __VA_ARGS__));
-//    #define ulog(fmt, ...) ESP_LOGI("IoT", fmt, ##__VA_ARGS__);
-    #define ulog(fmt, ...) log_printf(ULOG_FORMAT); log_printf(fmt, ##__VA_ARGS__); log_printf("\n")
+    #define ulog(fmt, ...) ulog_internal(pathToFileName(__FILE__), __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__)
 #else
-//    #define ulog(fmt, ...) log_printf(ULOG_FORMAT); log_printf(fmt, ##__VA_ARGS__); log_printf("\n")
-    #define ulog(fmt, ...) ulog_internal(fmt, ##__VA_ARGS__)
+    #define ulog(fmt, ...) ulog_internal(__FILE__, __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__)
 #endif
 
 // a simple class for handling fixed-length strings.

@@ -3,7 +3,7 @@ hcsr04/rcwl-1601
 
 ..  code-block:: cpp
 
-    hcsr04(name, trigger_pin, echo_pin, timeout_us=30000);
+    hcsr04(name, trigger_pin, echo_pin/*, timeout_us is by default 30000*/); /* replace the full comment with , 60000 if you want to change to 60ms. */
 
 Create a new HC-SR04 (or RCWL-1601) ultrasonic distance measuring device.
 It reads the distance in mm.

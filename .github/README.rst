@@ -17,7 +17,6 @@ IoTempower
 
 **Quick Links:** `Install <https://github.com/iotempire/iotempower/blob/master/doc/installation.rst>`__ |
 `First IoT Node <https://github.com/iotempire/iotempower/blob/master/doc/first-node.rst>`__ |
-`Raspberry Pi Quickstart <https://github.com/iotempire/iotempower/blob/master/doc/quickstart-pi.rst>`__ |
 `Examples <https://github.com/iotempire/iotempower/tree/master/examples>`__ |
 `Docs <https://github.com/iotempire/iotempower/blob/master/doc/index-doc.rst>`_ |
 `Support <https://github.com/iotempire/iotempower/blob/master/.github/SUPPORT.md>`_ |
@@ -25,9 +24,7 @@ IoTempower
 
 
 **Get In Touch:** `IoTempire Discord <https://discord.gg/9gq8Q9p6r3>`_ |
-`YouTube Playlist <https://www.youtube.com/playlist?list=PLlppUpfgGsvkfAGJ38_mzQc1-_Z7bNOgq>`_ |
-`Matrix <https://riot.im/app/#/room/#iotempower:matrix.org>`_ |
-`Facebook <https://www.facebook.com/groups/2284490571612435/>`_
+`YouTube Playlist <https://www.youtube.com/playlist?list=PLlppUpfgGsvkfAGJ38_mzQc1-_Z7bNOgq>`_
 
 
 .. figure:: /doc/images/system-architecture.png

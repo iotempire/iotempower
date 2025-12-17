@@ -27,6 +27,8 @@ Table of Contents
 
 - `Installation </doc/installation.rst>`_
 
+- `Quickstart </doc/quickstart.rst>`_
+
 - `First IoT Node </doc/first-node.rst>`_
 
 - `MQTT via TLS </doc/mqtt-with-tls.rst>`_
@@ -34,6 +36,10 @@ Table of Contents
 - `External Resources </doc/resources.rst>`_
 
 - `Support </doc/support.rst>`_
+
+- `FAQ </doc/faq.rst>`_
+
+- `Detailed Development Setup Guide </doc/detailed-dev-setup-guide.rst>`_
 
 - `Further Documentation </doc/further-doc.rst>`_
 

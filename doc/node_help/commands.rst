@@ -60,4 +60,5 @@ Alphabetic list
 - `temperature <temperature.rst>`_
 - `transmission <transmission.rst>`_
 - `ultra_sonic_distance <ultra_sonic_distance.rst>`_
+- `vl53l0x.rst`_
 - `wifi <wifi.rst>`_
