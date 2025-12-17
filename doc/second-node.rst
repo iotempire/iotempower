@@ -17,7 +17,7 @@ with ``ssh user@gateway-ip -L 40080:localhost:40080``).
 
 We also assume you have completed and running a node and
 system folder from the `first node tutorial <first-node.rst>`_ 
-and can control its onboard led via the Node-RED web GUI.
+(or from the quickstart manual) and can control its onboard led via the Node-RED web GUI.
 
 The goal of this tutorial is to show you how to flash (or adopt)
 a second node and then connect them together 
@@ -69,9 +69,8 @@ New Node
     enter the respective new board.
 
 -   For reference documentation on available commands and device types,
-    see the `Command Reference <node_help/commands.rst>`_.
-    You can also start the documentation server with ``iot doc serve`` and
-    access it at http://localhost:8001 (or use ``web_starter`` which includes it).
+    see the `Command Reference <node_help/commands.rst>`_ or use 
+    ``iot x web_starter`` which includes the documentation server.
     
 -   Edit ``setup.cpp`` using your preferred editor (nano, micro, etc.):
 
@@ -79,7 +78,7 @@ New Node
     completely remove it to have an empty configuration file.
 
 -   In the command reference, look up the button configuration and copy an
-    example like: ``input(lower, D2, "depressed", "pressed");``
+    example like: ``input(lower, D2, "released", "pressed");``
 
     Paste this into the setup.cpp editor.
 
@@ -94,14 +93,13 @@ New Node
     
     .. code-block:: bash
 
-       deploy serial /dev/ttyUSB1  # or whatever your port is
+       deploy serial /dev/ttyUSB1  # or use the shortcut: deploy serial usb1
 
 
 Visually Programming the Connections
 ------------------------------------
 
--   Open your Node-RED server page in the browser (http://localhost:40080/nodered 
-    or http://gateway-ip:40080/nodered).
+-   Open your Node-RED server page in the browser at http://localhost:40080/nodered.
 
     .. note::
        **Optional: Using the Raspberry Pi Image**

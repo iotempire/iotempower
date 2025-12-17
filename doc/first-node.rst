@@ -6,8 +6,10 @@ First Node (Advanced)
    **New to IoTempower?** Start with the `Quickstart Guide <quickstart.rst>`_ instead!
    This guide covers everything you need to get your first node running quickly.
    
-   This advanced tutorial is for users who want detailed explanations of the underlying
-   system and are comfortable with manual configuration steps.
+   This advanced tutorial is getting outdated and still relies heavily on the 
+   Raspberry Pi based installation. Reading and following the quickstart is 
+   currently preferred. This tutorial is for users who want detailed explanations 
+   of the underlying system and are comfortable with manual configuration steps.
 
 For video instructions, check the `IoTempower YouTube Video Playlist <https://www.youtube.com/playlist?list=PLlppUpfgGsvkfAGJ38_mzQc1-_Z7bNOgq>`_.
 
@@ -98,9 +100,9 @@ use the correct variable names to overwrite some settings (so better check
 and eventually update now than being confused later).
 
 .. note::
-   You can also use the ``iot menu`` command (press F2) to create a new node via 
+   You can also use the ``iot menu`` command to create a new node via 
    the interactive menu system. This works on all platforms and is generally easier 
-   than manual folder creation.
+   than manual folder creation. (If using CloudCmd, you can press F2 to access the menu.)
 
 You can, of course, use another system name than "demo" (and even move
 or rename this folder later). Renaming nodes at a later point
@@ -234,14 +236,15 @@ First Deployment
    
    If you have an OpenWRT router with USB ports and ser2net configured,
    you can flash over the network:
+   
    .. code-block:: bash
 
       deploy serial rfc2217://192.168.14.1:5000
 
    (Replace with your router's IP and configured port)
 
-   For detailed ser2net setup instructions on OpenWRT routers, see the 
-   `Quickstart Guide <quickstart.rst>`_.
+   For detailed ser2net setup instructions, see the 
+   `Serial to Network Setup Guide <ser2net-setup.rst>`_.
 
 3. Open 2 more terminals (make sure you are in iot environment for all terminals).
    Run these commands in separate terminals:
