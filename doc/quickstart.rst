@@ -51,7 +51,7 @@ Network Setup
 You have two main options for network setup:
 
 Option 1: Home Router or Generic WiFi Router
----------------------------------------------
+--------------------------------------------
 
 If you're using your home router or any standard WiFi router:
 
@@ -60,7 +60,7 @@ If you're using your home router or any standard WiFi router:
 3. You'll need to run an MQTT broker on your computer (we'll show you how below)
 
 Option 2: OpenWRT Router (e.g., GL.iNet Mango)
------------------------------------------------
+----------------------------------------------
 
 If you're using an OpenWRT router like the GL.iNet Mango MT300N v2:
 
@@ -103,7 +103,7 @@ Keep this terminal running. You can stop the services with Ctrl+C.
    ``iot menu`` command instead.
 
 MQTT Broker (if not on router)
--------------------------------
+------------------------------
 
 If you're **NOT** running mosquitto on your router, you need to start the MQTT broker
 on your computer:
@@ -121,7 +121,7 @@ Keep this terminal running.
 If you **ARE** running mosquitto on your OpenWRT router, you can skip this step.
 
 Creating Your First IoT System
-===============================
+==============================
 
 System Folder Structure
 -----------------------
@@ -144,7 +144,7 @@ Let's create a new system called "my-home":
 This creates the system folder with a template configuration.
 
 Configuring System Settings
-----------------------------
+---------------------------
 
 Edit the ``system.conf`` file using your favorite editor:
 
@@ -185,7 +185,7 @@ Update the following settings:
 Save and close the file.
 
 Creating Your First Node
-=========================
+========================
 
 Create a new node in your system:
 
@@ -220,7 +220,7 @@ The default is usually ``wemos_d1_mini``. Change it if you're using a different 
    # or: board="esp32minikit"
 
 Defining Devices in setup.cpp
-------------------------------
+-----------------------------
 
 Edit the ``setup.cpp`` file to define your devices:
 
@@ -241,12 +241,12 @@ For a simple example with a button and LED, add:
 Save and close the file.
 
 Flashing Your First Node
-=========================
+========================
 
 Connect your microcontroller to your computer via USB.
 
 Platform-Specific Serial Flashing
-----------------------------------
+---------------------------------
 
 **On Linux:**
 
@@ -367,7 +367,7 @@ After the initial serial flash, you can update your node over WiFi.
 No USB cable needed! The node will update itself over WiFi.
 
 Controlling Devices via Node-RED
-=================================
+================================
 
 Open Node-RED in your browser:
 
@@ -417,7 +417,7 @@ For example, a button on one node could control an LED on another node!
 For more details, see the `Second Node Tutorial <second-node.rst>`_.
 
 Tips and Best Practices
-========================
+=======================
 
 Using iot menu
 --------------
