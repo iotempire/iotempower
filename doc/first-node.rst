@@ -175,7 +175,7 @@ Go to the folder we copied earlier:
    
 ``cd ~/iot-systems/demo``
 
-Edit the system.conf file (``nano system.conf`` - or use your favorite editor),
+Edit the system.conf file (``micro system.conf`` - or optionally use ``nano``),
 uncomment and adjust the lines for ``IOTEMPOWER_MQTT_HOST``:
 
 .. code-block:: bash
@@ -203,8 +203,8 @@ Add the following line to the end of the setup.cpp file:
 
 .. note::
    For detailed documentation on available commands and device types, see the 
-   `Command Reference <node_help/commands.rst>`_ or run ``iot doc serve`` to 
-   start the local documentation server at http://localhost:8001.
+   `Command Reference <node_help/commands.rst>`_ or run ``iot x web_starter`` 
+   which includes the documentation server.
 
 
 First Deployment
