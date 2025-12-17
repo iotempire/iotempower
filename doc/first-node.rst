@@ -1,6 +1,6 @@
-=================
+=====================
 First Node (Advanced)
-=================
+=====================
 
 .. note::
    **New to IoTempower?** Start with the `Quickstart Guide <quickstart.rst>`_ instead!

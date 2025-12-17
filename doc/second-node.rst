@@ -1,6 +1,6 @@
-====================
+======================
 Second Node (Advanced)
-====================
+======================
 
 .. note::
    **New to IoTempower?** The `Quickstart Guide <quickstart.rst>`_ includes 
