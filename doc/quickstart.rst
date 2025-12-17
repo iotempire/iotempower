@@ -243,9 +243,8 @@ For a simple example with a button and LED, add:
 
 .. code-block:: cpp
 
-   // Button on pin D3 with debouncing
-   // Debouncing filters out electrical noise when button is pressed
-   input(button1, D3, "released", "pressed").with_debounce(10);
+   // Button on pin D3
+   input(button1, D3, "released", "pressed").with_debounce(5);
    
    // Onboard LED (note: inverted for most ESP boards)
    output(blue_led, ONBOARDLED).inverted();
@@ -292,12 +291,11 @@ Platform-Specific Serial Flashing
 
 1. Install usbipd-win (see `Installation Guide <installation.rst#usb-flashing-in-wsl2-with-usbipd-win>`_)
 
-2. In Windows PowerShell (as Administrator):
-
-   .. code-block:: powershell
-
-      usbipd list
-      usbipd attach --busid X-Y  # Use the busid from the list
+2. Use the WSL USB GUI or usbipd command line:
+   
+   - **Recommended**: Use the WSL USB GUI application to attach your device
+   - The GUI makes it easy to manage USB devices and set permissions correctly
+   - See the Installation Guide above for setup instructions
 
 3. In WSL, the device should appear as ``/dev/ttyUSB0``
 
@@ -376,6 +374,14 @@ Over-the-Air Updates
 After the initial serial flash, you can update your node over WiFi.
 
 1. Make changes to ``setup.cpp``
+   
+   For example, if you notice the button sometimes triggers multiple times 
+   (button bouncing), increase the debounce time:
+
+   .. code-block:: cpp
+
+      // Change debounce from 5 to 10 milliseconds
+      input(button1, D3, "released", "pressed").with_debounce(10);
 
 2. Simply run:
 
@@ -480,8 +486,8 @@ Serial Port Access
 
 If you get "Permission denied" errors when flashing:
 
-- **Linux**: Add yourself to the ``dialout`` group (see above)
-- **Windows/WSL2**: Run usbipd as Administrator
+- **Linux**: Run ``iot install --fix-serial``
+- **Windows/WSL2**: Use the WSL USB GUI and enable the permission rule for WSL
 - **macOS**: Usually works out of the box
 
 Router Configuration
