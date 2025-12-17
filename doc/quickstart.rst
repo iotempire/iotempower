@@ -64,17 +64,23 @@ Option 2: OpenWRT Router (e.g., GL.iNet Mango)
 
 If you're using an OpenWRT router like the GL.iNet Mango MT300N v2:
 
-1. Install mosquitto MQTT broker directly on the router:
+1. Install mosquitto MQTT broker and its configuration interface on the router:
 
    - Log into your router's web interface
    - Go to System → Software
    - Update package lists
-   - Install ``mosquitto-ssl`` package
+   - Install ``mosquitto-nossl`` and ``luci-app-mosquitto`` packages
 
-2. The router will typically have a fixed IP like ``192.168.8.1`` or ``192.168.1.1``
+2. Configure mosquitto permissions:
+
+   - In the router's web interface, go to Services → mosquitto
+   - Enable the service and configure it to allow anonymous connections
+   - For more detailed OpenWRT mosquitto setup, see the `FAQ <faq.rst>`_
+
+3. The router will typically have a fixed IP like ``192.168.8.1`` or ``192.168.1.1``
    (check your router's documentation)
 
-3. In your IoTempower system configuration, you'll use ``_gateway`` as the MQTT host,
+4. In your IoTempower system configuration, you'll use ``_gateway`` as the MQTT host,
    which will automatically resolve to your router's IP
 
 Starting Services
@@ -136,12 +142,15 @@ Let's create a new system called "my-home":
 
 .. code-block:: bash
 
-   mkdir -p ~/iot-systems
    cd ~/iot-systems
    create_system_template my-home
    cd my-home
 
 This creates the system folder with a template configuration.
+
+.. note::
+   The ``~/iot-systems`` folder is created automatically during IoTempower 
+   installation with default settings.
 
 Configuring System Settings
 ---------------------------
@@ -179,8 +188,10 @@ Update the following settings:
    IOTEMPOWER_MQTT_HOST="_gateway"
    
    # If running mqtt_starter on your computer, use your computer's IP:
+   # Find it with: ipconfig (Windows) or ip a (Linux)
    # IOTEMPOWER_MQTT_HOST="192.168.1.100"
    # (replace with your actual IP - shown when mqtt_starter starts)
+   # Note: You may need to allow port 1883 in your firewall
 
 Save and close the file.
 
@@ -232,8 +243,9 @@ For a simple example with a button and LED, add:
 
 .. code-block:: cpp
 
-   // Button on pin D3
-   input(button1, D3, "released", "pressed").with_debounce(5);
+   // Button on pin D3 with debouncing
+   // Debouncing filters out electrical noise when button is pressed
+   input(button1, D3, "released", "pressed").with_debounce(10);
    
    // Onboard LED (note: inverted for most ESP boards)
    output(blue_led, ONBOARDLED).inverted();
@@ -261,8 +273,14 @@ Platform-Specific Serial Flashing
 
    .. code-block:: bash
 
-      sudo usermod -a -G dialout $USER
+      iot install --fix-serial
       # Then log out and log back in
+
+   This should have been done during installation, but if you get permission 
+   errors, run the command above.
+   
+   .. note::
+      On Windows with WSL2, you need to use usbipd (see below).
 
 3. Flash the node:
 
@@ -335,11 +353,12 @@ You'll see debug output and device state changes.
 MQTT Messages
 -------------
 
-In another terminal:
+In another terminal, navigate to your node folder and listen for MQTT messages:
 
 .. code-block:: bash
 
    iot
+   cd ~/iot-systems/my-home/living-room-lamp
    mqtt_listen
 
 Now press the button on your microcontroller. You should see messages like:
@@ -398,6 +417,13 @@ Controlling the LED
 
 Now when you press the button, the LED should turn on and off!
 
+.. note::
+   This example connects button and LED on the same node, which might seem 
+   confusing since the board is right in front of you. The real power comes 
+   when you connect multiple nodes together! See the `Second Node Tutorial 
+   <second-node.rst>`_ to experience the "magic" of controlling one device 
+   from another across your network.
+
 Your Second Node
 ================
 
@@ -442,6 +468,12 @@ Use these editors for a better experience:
 
 The micro editor is recommended as it's installed by IoTempower and
 uses familiar keyboard shortcuts (Ctrl+S to save, Ctrl+Q to quit).
+
+For more advanced development, consider using a full-fledged IDE like 
+**VS Code**, **VSCodium**, or **Zed**. These provide powerful debugging 
+capabilities. In particular, VS Code/VSCodium can work with the PlatformIO 
+project found in the ``build`` folder of each node, giving you advanced 
+features for troubleshooting complex issues.
 
 Serial Port Access
 ------------------
