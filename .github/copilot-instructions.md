@@ -81,8 +81,9 @@ analog(temp_sensor).with_threshold(30, "hot", "cold");
 ### MQTT is Automatic
 **Do NOT manually configure MQTT** - the system handles it automatically:
 - MQTT topics follow the folder hierarchy: `folder-path/device_name/[subtopic]`
-- For a node at `a/b/c/node.conf` (where `c` is the node name), a device publishes to `a/b/c/device_name`
-- Example: A device configured as `blue_led` publishes its status to `a/b/c/blue_led`
+- For a node folder at `a/b/c/node.conf`, devices publish to `a/b/c/device_name`
+- The folder name containing `node.conf` becomes the node name in the MQTT topic path
+- Example: A device configured as `blue_led` in folder `a/b/c` publishes its status to `a/b/c/blue_led`
 - Commands are received at `a/b/c/blue_led/set`
 - WiFi credentials and MQTT broker are configured in `system.conf`
 
