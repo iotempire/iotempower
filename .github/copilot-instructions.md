@@ -57,8 +57,6 @@ Board-specific folders inherit from parent folders through `base` symbolic links
 
 During deployment, files are copied following this inheritance chain, with board-specific files overriding parent files.
 
-During deployment, files are copied following this inheritance chain, with board-specific files overriding parent files.
-
 When `deploy` is called, the system:
 1. Analyzes the node's `setup.cpp` to detect which devices are used
 2. Generates `devices_generated.h` with required includes
