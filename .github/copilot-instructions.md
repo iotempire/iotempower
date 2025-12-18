@@ -22,7 +22,9 @@ IoT System (e.g., ~/iot-systems/my-home/)
 ## Directory Structure
 
 ### Documentation (`/doc`)
+- `quickstart-pi.rst` - Quick start guide for Raspberry Pi image
 - `architecture.rst` - System architecture overview
+- `architecture-quick-reference.rst` - Quick reference for key concepts
 - `first-node.rst` / `second-node.rst` - Essential tutorials
 - `device-architecture.rst` - Device framework details
 - `deployment-process.rst` - Build and deployment workflow
@@ -37,19 +39,30 @@ IoT System (e.g., ~/iot-systems/my-home/)
 - Other gateway management scripts (accesspoint, MQTT, etc.)
 
 ### MCU Device Drivers (`/lib/node_types/esp/src`)
-**Critical**: This folder uses an **implicit inheritance structure** to build PlatformIO projects:
+**Critical**: This folder contains the base device drivers and uses an **implicit inheritance structure** through symbolic links:
+
 - `device.h/.cpp` - Base Device class (all devices inherit from this)
 - `dev_*.h/.cpp` - Individual device drivers (sensors, actuators, I2C devices, etc.)
 - `devices.ini` - Device metadata and dependencies
 - `main.cpp` - Main loop (handles polling, MQTT, OTA)
-- `setup.cpp` - Template (overridden by user's setup.cpp)
+- `setup.cpp` - Template that includes user's `setup.cpp` as `setup.h` (via symbolic link in build directory)
+
+**Implicit Inheritance via Symbolic Links**:
+Board-specific folders inherit from parent folders through `base` symbolic links:
+- `esp32/base` → `esp` (ESP32 boards inherit from esp folder, overriding files as needed)
+- `m5stickc/base` → `esp32` (M5StickC inherits from esp32, which inherits from esp)
+- `esp8266/base` → `esp` (ESP8266 boards inherit from esp folder)
+- `wemos_d1_mini/base` → `nodemcu` → `esp8266` → `esp` (chain of inheritance)
+
+During deployment, files are copied following this inheritance chain, with board-specific files overriding parent files.
 
 When `deploy` is called, the system:
 1. Analyzes the node's `setup.cpp` to detect which devices are used
 2. Generates `devices_generated.h` with required includes
 3. Assembles a complete PlatformIO project in `node-folder/build/`
-4. Copies necessary source files using the implicit inheritance structure
-5. Compiles and uploads firmware
+4. Copies source files following the symbolic link inheritance structure (board-specific files override parent files)
+5. Creates a symbolic link from user's `setup.cpp` to `setup.h` in the build directory
+6. Compiles and uploads firmware
 
 ## Writing setup.cpp Files
 
@@ -67,8 +80,10 @@ analog(temp_sensor).with_threshold(30, "hot", "cold");
 
 ### MQTT is Automatic
 **Do NOT manually configure MQTT** - the system handles it automatically:
-- Each device publishes to `<topic_prefix>/<node_name>/<device_name>`
-- Commands are received at `<topic_prefix>/<node_name>/<device_name>/set`
+- MQTT topics follow the folder hierarchy: `folder-path/device_name/[subtopic]`
+- For a node at `a/b/c/node.conf` (where `c` is the node name), a device publishes to `a/b/c/device_name`
+- Example: A device configured as `blue_led` publishes its status to `a/b/c/blue_led`
+- Commands are received at `a/b/c/blue_led/set`
 - WiFi credentials and MQTT broker are configured in `system.conf`
 
 ### Device Declaration Patterns
@@ -100,7 +115,8 @@ input(touch1, BUTTON1)
 ```
 
 ### Device Access
-- Use `IN(device_name)` macro to access devices
+- Use `IN(device_name)` macro to access device instances (expands to `iotempower_dev_device_name`)
+- The `IN()` macro provides access to the actual Device object reference
 - Common methods: `.set()`, `.on()`, `.off()`, `.toggle()`, `.value()`, `.is()`
 
 ## Common Device Types
@@ -159,7 +175,7 @@ adopt  # or: initialize
 ### When Modifying Device Drivers (`/lib/node_types/esp/src/`)
 1. All devices inherit from `Device` base class
 2. Override `start()` for initialization, `measure()` for polling
-3. Use `changed()` to mark when values should be published
+3. Return `true` from `measure()` to mark that value can be published
 4. Add device metadata to `devices.ini` for dependency tracking
 5. Test with multiple board types (esp8266, esp32)
 
@@ -178,14 +194,17 @@ adopt  # or: initialize
 ## Testing Changes
 
 ### Before Committing
-1. Compile test nodes: `cd examples/plush-owl && compile`
-2. If possible, test deployment on actual hardware
-3. Verify documentation builds: `cd doc && make html`
-4. Check that changes work on both ESP8266 and ESP32 boards
+1. Use the testing infrastructure: `iot test compile` (or `pytest -s -v test_compilation.py`)
+2. Test specific boards/devices: `iot test compile --boards=wemos_d1_mini,esp32 --devices=laser_distance`
+3. If possible, test deployment on actual hardware
+4. Verify documentation builds: `cd doc && make html`
+5. See `/doc/testing.rst` and `/doc/github-actions.rst` for full testing documentation
 
 ## Reference Documentation
 
 **Must read before significant changes:**
+- `/doc/quickstart-pi.rst` - Quick start guide
+- `/doc/architecture-quick-reference.rst` - Quick reference for architecture
 - `/doc/architecture.rst` - Complete system architecture
 - `/doc/first-node.rst` - Basic workflow and concepts
 - `/doc/second-node.rst` - OTA deployment patterns
@@ -200,5 +219,6 @@ adopt  # or: initialize
 - Example configurations are in `/examples/`
 - PlatformIO configuration is in `/lib/node_types/esp/platformio.ini`
 - The `build/` folder in each node is transient - never edit it directly
-- MQTT topics follow pattern: `<system>/<node>/<device>`
+- MQTT topics follow the folder hierarchy pattern: `folder/path/node/device`
 - All networking, security, and MQTT is handled automatically by the framework
+- User's `setup.cpp` is included in `main.cpp` via `setup.h` symbolic link created during build
