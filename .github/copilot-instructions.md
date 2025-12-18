@@ -49,10 +49,12 @@ IoT System (e.g., ~/iot-systems/my-home/)
 
 **Implicit Inheritance via Symbolic Links**:
 Board-specific folders inherit from parent folders through `base` symbolic links:
-- `esp32/base` → `esp` (ESP32 boards inherit from esp folder, overriding files as needed)
-- `m5stickc/base` → `esp32` (M5StickC inherits from esp32, which inherits from esp)
+- `esp32/base` → `esp` (ESP32 boards inherit from esp folder)
+- `m5stickc/base` → `esp32` (M5StickC inherits from esp32, which in turn inherits from esp)
 - `esp8266/base` → `esp` (ESP8266 boards inherit from esp folder)
-- `wemos_d1_mini/base` → `nodemcu` → `esp8266` → `esp` (chain of inheritance)
+- `wemos_d1_mini/base` → `nodemcu/base` → `esp8266/base` → `esp` (multi-level chain)
+
+Each board inherits from its base, allowing board-specific files to override parent files.
 
 During deployment, files are copied following this inheritance chain, with board-specific files overriding parent files.
 
@@ -80,11 +82,11 @@ analog(temp_sensor).with_threshold(30, "hot", "cold");
 
 ### MQTT is Automatic
 **Do NOT manually configure MQTT** - the system handles it automatically:
-- MQTT topics follow the folder hierarchy: `folder-path/device_name/[subtopic]`
-- For a node folder at `a/b/c/node.conf`, devices publish to `a/b/c/device_name`
-- The folder name containing `node.conf` becomes the node name in the MQTT topic path
-- Example: A device configured as `blue_led` in folder `a/b/c` publishes its status to `a/b/c/blue_led`
-- Commands are received at `a/b/c/blue_led/set`
+- MQTT topics follow the folder hierarchy where the node is located
+- For a node at path `a/b/c/node.conf`, the base topic is `a/b/c/`
+- A device `blue_led` publishes to `a/b/c/blue_led` and receives commands at `a/b/c/blue_led/set`
+- Multi-value devices add subtopics: `a/b/c/climate/temperature`, `a/b/c/climate/humidity`
+- Note: System name (top-level folder) is NOT included in MQTT topics
 - WiFi credentials and MQTT broker are configured in `system.conf`
 
 ### Device Declaration Patterns
