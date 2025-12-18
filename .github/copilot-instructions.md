@@ -117,8 +117,7 @@ input(touch1, BUTTON1)
 ```
 
 ### Device Access
-- Use `IN(device_name)` macro to access device instances (expands to `iotempower_dev_device_name`)
-- The `IN()` macro provides access to the actual Device object reference
+- Use `IN(device_name)` macro to access device instances (expands to `iotempower_dev_device_name` and provides the actual Device object reference)
 - Common methods: `.set()`, `.on()`, `.off()`, `.toggle()`, `.value()`, `.is()`
 
 ## Common Device Types
@@ -177,7 +176,7 @@ adopt  # or: initialize
 ### When Modifying Device Drivers (`/lib/node_types/esp/src/`)
 1. All devices inherit from `Device` base class
 2. Override `start()` for initialization, `measure()` for polling
-3. In `measure()`: return `true` to publish the value, `false` to skip publishing (use false for unchanged values or filtering)
+3. In `measure()`: return `true` to trigger MQTT publishing of the current value, `false` to skip publishing (useful for filtering unchanged values or rate limiting)
 4. Add device metadata to `devices.ini` for dependency tracking
 5. Test with multiple board types (esp8266, esp32)
 
