@@ -16,7 +16,7 @@ IoTempower
 
 
 **Quick Links:** `Install <https://github.com/iotempire/iotempower/blob/master/doc/installation.rst>`__ |
-`First IoT Node <https://github.com/iotempire/iotempower/blob/master/doc/first-node.rst>`__ |
+`Quickstart <https://github.com/iotempire/iotempower/blob/master/doc/quickstart.rst>`__ |
 `Examples <https://github.com/iotempire/iotempower/tree/master/examples>`__ |
 `Docs <https://github.com/iotempire/iotempower/blob/master/doc/index-doc.rst>`_ |
 `Support <https://github.com/iotempire/iotempower/blob/master/.github/SUPPORT.md>`_ |

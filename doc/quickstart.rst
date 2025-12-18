@@ -330,6 +330,9 @@ If you have an OpenWRT router with USB ports and ser2net configured:
 
 (Replace with your router's IP and configured port)
 
+For detailed instructions on setting up ser2net, see the 
+`Serial to Network Setup Guide <ser2net-setup.rst>`_.
+
 Monitoring Your Node
 ====================
 
