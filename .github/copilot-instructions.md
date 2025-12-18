@@ -49,12 +49,13 @@ IoT System (e.g., ~/iot-systems/my-home/)
 
 **Implicit Inheritance via Symbolic Links**:
 Board-specific folders inherit from parent folders through `base` symbolic links:
-- `esp32/base` → `esp` (ESP32 boards inherit from esp folder)
-- `m5stickc/base` → `esp32` (M5StickC inherits from esp32, which in turn inherits from esp)
-- `esp8266/base` → `esp` (ESP8266 boards inherit from esp folder)
-- `wemos_d1_mini/base` → `nodemcu/base` → `esp8266/base` → `esp` (multi-level chain)
+- `esp32/base` → `esp` (ESP32 inherits from esp)
+- `m5stickc/base` → `esp32` (M5StickC inherits from esp32, which inherits from esp)
+- `esp8266/base` → `esp` (ESP8266 inherits from esp)
+- `nodemcu/base` → `esp8266` (NodeMCU inherits from esp8266, which inherits from esp)
+- `wemos_d1_mini/base` → `nodemcu` (Wemos D1 Mini inherits from nodemcu → esp8266 → esp)
 
-Each board inherits from its base, allowing board-specific files to override parent files.
+During deployment, files are copied following this inheritance chain, with board-specific files overriding parent files.
 
 During deployment, files are copied following this inheritance chain, with board-specific files overriding parent files.
 
@@ -178,7 +179,7 @@ adopt  # or: initialize
 ### When Modifying Device Drivers (`/lib/node_types/esp/src/`)
 1. All devices inherit from `Device` base class
 2. Override `start()` for initialization, `measure()` for polling
-3. Return `true` from `measure()` to mark that value can be published
+3. In `measure()`: return `true` to publish the value, `false` to skip publishing (use false for unchanged values or filtering)
 4. Add device metadata to `devices.ini` for dependency tracking
 5. Test with multiple board types (esp8266, esp32)
 
