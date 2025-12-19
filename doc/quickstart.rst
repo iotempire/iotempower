@@ -245,7 +245,7 @@ For a simple example with a button and LED, add:
 .. code-block:: cpp
 
    // Button on pin D3
-   input(button1, D3, "released", "pressed").with_debounce(5);
+   input(button1, D3, "released", "pressed").debounce(5);
    
    // Onboard LED (note: inverted for most ESP boards)
    output(blue_led, ONBOARDLED).inverted();
@@ -385,7 +385,7 @@ After the initial serial flash, you can update your node over WiFi.
    .. code-block:: cpp
 
       // Change debounce from 5 to 10 milliseconds
-      input(button1, D3, "released", "pressed").with_debounce(10);
+      input(button1, D3, "released", "pressed").debounce(10);
 
 2. Simply run:
 
