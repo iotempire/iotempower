@@ -94,6 +94,7 @@ Node-RED (for visual IoT programming):
 
 .. code-block:: bash
 
+   # if you enter iot before the below, you can just run web_starter without iot x
    iot x web_starter
 
 This will start:
@@ -118,8 +119,8 @@ Open a **new terminal**, activate the IoTempower environment, and run:
 
 .. code-block:: bash
 
-   iot
-   mqtt_starter scanif
+   # if you enter iot before the below, you can just run mqtt_starter without iot x
+   iot x mqtt_starter scanif
 
 The ``scanif`` option automatically detects your network interface and IP address.
 Keep this terminal running.
