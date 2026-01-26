@@ -3,7 +3,7 @@ Sensirion SCD4X CO2 sensor
 
 ..  code-block:: cpp
 
-    scd4x(name[, temp_comp[, altitude]] )[.i2c(sda,scl)][.with_address(i2c_address)][.with_filter(filter)];
+    scd4x(name[, temp_comp[, altitude[, ambient_pressure]]] )[.i2c(sda,scl)][.with_address(i2c_address)][.with_filter(filter)];
 
 Create a new scd4x co2 sensor device.
 
@@ -63,6 +63,11 @@ Parameters
     - Valid input values are between 0 to 3000 m. 
     - Inside the code it can be addressed via ``IN(altitude)``.
 
+- ``ambient_pressure`` (optional; default = 0)
+    - Current ambient pressure in pascals (Pa); set to ``0`` to skip applying it.
+    - Use this to compensate CO2 readings when you know the local pressure.
+    - Inside the code it can be addressed via ``IN(ambient_pressure)``.
+
 
 - ``.i2c(sda,scl)``
     - override i2c default ports - if not specified uses default i2c ports.
@@ -87,7 +92,7 @@ Node name: ``room/gas``:
 
 ..  code-block:: cpp
 
-    scd4x(gas, 5.0, 60); // name: room/gas, temp_comp: 5.0 [deg C], altitude: 60 [m]
+    scd4x(gas, 5.0, 60, 101300); // name: room/gas, temp_comp: 5.0 [deg C], altitude: 60 [m], ambient_pressure: 101300 [Pa]
 
 
 Now CO2 (in ppm), temperature (in deg C) and humidity (%RH) are published every 5 seconds as: 
@@ -98,7 +103,7 @@ Now CO2 (in ppm), temperature (in deg C) and humidity (%RH) are published every 
 
 ..  code-block:: cpp
 
-    scd4x(gas, 5.0, 60).i2c(32, 33); //for the M5StickC
+    scd4x(gas, 5.0, 60, 101300).i2c(32, 33); //for the M5StickC
 
 
 Wiring

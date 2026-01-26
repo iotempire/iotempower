@@ -3,7 +3,8 @@
 
 DFRobot_SCD4X DFR_SCD4X(&Wire, SCD4X_I2C_ADDR);
 
-Scd4x::Scd4x(const char* name, const float temp_comp, const uint16_t altitude)
+Scd4x::Scd4x(const char* name, const float temp_comp, const uint16_t altitude,
+             const uint32_t ambient_pressure)
     : I2C_Device(name) {
     set_pollrate(5000);  // 5 seconds
     add_subdevice(new Subdevice(F("CO2ppm")));
@@ -12,6 +13,7 @@ Scd4x::Scd4x(const char* name, const float temp_comp, const uint16_t altitude)
     set_address(0x62);
     _temp_comp = temp_comp;
     _altitude = altitude;
+    _ambient_pressure = ambient_pressure;
 }
 
 void Scd4x::i2c_start() {
@@ -28,6 +30,9 @@ bool Scd4x::measure() {
                 _temp_comp);  // set temperature compensation w/ offset
             DFR_SCD4X.setSensorAltitude(
                 _altitude);  // set altitude, for example, 57m ASL Tartu, EE
+            if (_ambient_pressure > 0) {
+                DFR_SCD4X.setAmbientPressure(_ambient_pressure);
+            }
             DFR_SCD4X.setAutoCalibMode(true);  // enable auto calibration
             // DFR_SCD4X.persistSettings(); // Save the settings into EEPROM,
             // default to be in RAM; not recommended - initialised every time,
