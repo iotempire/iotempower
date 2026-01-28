@@ -23,6 +23,7 @@ class Serial_Socket : public Device {
             uint32_t baud = IOTEMPOWER_SERIAL_SOCKET_DEFAULT_BAUD,
             SoftwareSerialConfig config = SWSERIAL_8N1,
             bool invert = false);
+        ~Serial_Socket();
         void start();
         bool measure();
 };

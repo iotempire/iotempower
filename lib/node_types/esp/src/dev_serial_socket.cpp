@@ -22,10 +22,17 @@ Serial_Socket::Serial_Socket(const char* name, int8_t rx_pin, int8_t tx_pin,
     );
 }
 
+Serial_Socket::~Serial_Socket() {
+    if(serial) {
+        delete serial;
+        serial = NULL;
+    }
+}
+
 void Serial_Socket::start() {
     serial = new SoftwareSerial(_rx_pin, _tx_pin, _invert);
     if(serial) {
-        serial->begin(_baud, _config, _rx_pin, _tx_pin, _invert);
+        serial->begin(_baud, _config);
         if(serial->operator bool()) {
             _started = true;
         } else {
