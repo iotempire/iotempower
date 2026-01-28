@@ -53,6 +53,7 @@ Alphabetic list
 - `rgb_strip <rgb_strip.rst>`_
 - `scale <scale.rst>`_
 - `scd4x <scd4x.rst>`_
+- `serial_socket <serial_socket.rst>`_
 - `servo <servo.rst>`_
 - `servo_switch <servo_switch.rst>`_
 - `setup.cpp <setup.cpp.rst>`_

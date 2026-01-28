@@ -67,6 +67,7 @@ devices = [
     {"device_name": "sleep_mgr", "example_syntax": "sleep_mgr(example_name);"},
     {"device_name": "rgb_strip", "example_syntax": "rgb_strip(example_name, 7, WS2812B, IOT_TEST_DIGITAL, GRB);"},
     {"device_name": "rgb_strip_bus", "example_syntax": "rgb_strip_bus(example_name, 7, F_GRB, IOT_TEST_NEOPIXEL_CONTROL_METHOD, IOT_TEST_NEOPIXEL_TESTPIN);"},
+    {"device_name": "serial_socket", "example_syntax": "serial_socket(example_name, IOT_TEST_DIGITAL, IOT_TEST_DIGITAL_2);"},
 ]
 
 isolated_combinations_to_test = [
