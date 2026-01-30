@@ -1,18 +1,13 @@
-// serial-socket.cpp
-#include "dev_serial_socket.h"
+// serial-text.cpp
+#include "dev_serial_text.h"
 
-Serial_Socket::Serial_Socket(const char* name, int8_t rx_pin, int8_t tx_pin,
+Serial_Text::Serial_Text(const char* name, int8_t rx_pin, int8_t tx_pin,
         uint32_t baud, SoftwareSerialConfig config, bool invert) :
-    Device(name, 100000) {
-    _rx_pin = rx_pin;
-    _tx_pin = tx_pin;
-    _baud = baud;
-    _config = config;
-    _invert = invert;
-
+    Serial_Device(name, rx_pin, tx_pin, baud, config, invert) {
     add_subdevice(new Subdevice()); // 0
     add_subdevice(new Subdevice(str_set, true))->with_receive_cb(
         [&] (const Ustring& payload) {
+            SoftwareSerial* serial = serial_handle();
             if(serial) {
                 serial->write((const uint8_t*)payload.as_cstr(), payload.length());
                 return true;
@@ -22,28 +17,8 @@ Serial_Socket::Serial_Socket(const char* name, int8_t rx_pin, int8_t tx_pin,
     );
 }
 
-Serial_Socket::~Serial_Socket() {
-    if(serial) {
-        delete serial;
-        serial = NULL;
-    }
-}
-
-void Serial_Socket::start() {
-    serial = new SoftwareSerial(_rx_pin, _tx_pin, _invert);
-    if(serial) {
-        serial->begin(_baud, _config);
-        if(serial->operator bool()) {
-            _started = true;
-        } else {
-            ulog(F("Invalid SoftwareSerial pin configuration."));
-        }
-    } else {
-        ulog(F("Can't reserve memory for the serial socket."));
-    }
-}
-
-bool Serial_Socket::measure() {
+bool Serial_Text::measure() {
+    SoftwareSerial* serial = serial_handle();
     if(!serial) return false;
     int available = serial->available();
     if(available <= 0) return false;

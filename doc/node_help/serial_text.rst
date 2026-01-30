@@ -1,13 +1,13 @@
-serial_socket
-=============
+serial_text
+===========
 
 ..  code-block:: cpp
 
-    serial_socket(name, rx_pin, tx_pin /*, baud is by default 9600*/ /*, config is by default SWSERIAL_8N1*/ /*, invert is by default false*/);
+    serial_text(name, rx_pin, tx_pin /*, baud is by default 9600*/ /*, config is by default SWSERIAL_8N1*/ /*, invert is by default false*/);
 
-Create a new software serial connector socket device.
+Create a new software serial text device.
 
-The socket publishes the received serial data on the device topic and sends
+The device publishes received serial data as plain text on its topic and sends
 payloads received on the ``/set`` topic to the serial TX pin.
 
 Parameters
@@ -33,8 +33,8 @@ node name: ``lab1/experiment2``:
 
 ..  code-block:: cpp
 
-    serial_socket(uart1, D5, D6, 38400);
+    serial_text(uart1, D5, D6, 38400);
 
-This creates a software serial socket device that listens on D5/D6 and publishes
+This creates a software serial text device that listens on D5/D6 and publishes
 received data under ``lab1/experiment2/uart1``. Sending data to
 ``lab1/experiment2/uart1/set`` writes the payload to the serial TX pin.
