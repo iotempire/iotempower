@@ -26,13 +26,27 @@ bool Serial_Text::measure() {
     Ustring& v = value();
     v.clear();
     bool has_data = false;
-    while(serial->available() > 0) {
-        int next = serial->read();
-        if(next < 0) break;
-        has_data = true;
-        if(v.length() < v.max_length()) {
-            v.add((char)next);
+    const uint32_t baud = baud_rate();
+    const uint32_t idle_ms = max<uint32_t>(2, (100000UL / max<uint32_t>(baud, 1))); // ~10 bytes at 8N1
+    const uint32_t max_ms = min<uint32_t>(100, idle_ms * 3);
+    uint32_t start_ms = millis();
+    uint32_t last_rx_ms = start_ms;
+
+    while(true) {
+        while(serial->available() > 0) {
+            int next = serial->read();
+            if(next < 0) break;
+            has_data = true;
+            last_rx_ms = millis();
+            if(v.length() < v.max_length()) {
+                v.add((char)next);
+            }
         }
+        if(!has_data) break;
+        uint32_t now = millis();
+        if((uint32_t)(now - last_rx_ms) >= idle_ms) break;
+        if((uint32_t)(now - start_ms) >= max_ms) break;
+        delay(1);
     }
     return has_data;
 }

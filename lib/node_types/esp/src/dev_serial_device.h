@@ -19,6 +19,7 @@ class Serial_Device : public Device {
         bool _invert;
     protected:
         SoftwareSerial* serial_handle() { return serial; }
+        uint32_t baud_rate() const { return _baud; }
         void configure();
     public:
         Serial_Device(const char* name, int8_t rx_pin, int8_t tx_pin,
