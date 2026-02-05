@@ -9,10 +9,12 @@
 
 if [[ "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF
-Syntax: iot_test [compile|deploy|hardware|install] [parameters]
+Syntax: iot_test [compile|deploy|hardware|install|smoketest|simple|<device>] [parameters]
 
 Run tests for IoTempower. If no test type is specified, run all tests. 
 Also can take and forward any parameters to pytest.
+smoketest/simple runs compilation for input/output on wemos_d1_mini and esp32minikit.
+<device> runs compilation for the selected device on wemos_d1_mini and esp32minikit.
 EOF
 exit 1
 fi
@@ -24,6 +26,9 @@ cd "$IOTEMPOWER_ROOT/tests"
 # check if first parameter is either compile, deploy, hardware, or install
 # and select corresponding python files - else pass through parameters
 test_type=""
+smoke_boards="wemos_d1_mini,esp32minikit"
+smoke_devices="input,output"
+extra_args=()
 if [[ "$1" == "compile" ]]; then
   test_type="test_compilation.py"
 elif [[ "$1" == "compilation" ]]; then
@@ -34,11 +39,17 @@ elif [[ "$1" == "hardware" ]]; then
   test_type="test_hardware.py"
 elif [[ "$1" == "install" ]]; then
   test_type="test_installations.py"
+elif [[ "$1" == "smoketest" || "$1" == "simple" ]]; then
+  test_type="test_compilation.py"
+  extra_args=(--boards="$smoke_boards" --devices="$smoke_devices")
+elif [[ -n "$1" && "$1" != -* && ! -f "$1" ]]; then
+  test_type="test_compilation.py"
+  extra_args=(--boards="$smoke_boards" --devices="$1")
 fi
 
 if [[ "$test_type" != "" ]]; then
   shift
-  pytest -s -v "$test_type" "$@"
+  pytest -s -v "$test_type" "${extra_args[@]}" "$@"
 else
   pytest -s -v "$@"
 fi
