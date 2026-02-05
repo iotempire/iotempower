@@ -155,6 +155,8 @@ bool do_later(unsigned long in_ms, int16_t id, DO_LATER_CB_ID callback);
 //typedef void (*DO_LATER_CB_NO_ID)();
 typedef std::function<void()> DO_LATER_CB_NO_ID;
 bool do_later(unsigned long in_ms, DO_LATER_CB_NO_ID callback);
+bool do_later_cancel(int16_t id);
+bool do_later_cancel_all();
 void do_later_check(); // Internal - called by main loop, not by user code
 
 
