@@ -107,6 +107,28 @@ bool do_later(unsigned long in_ms, DO_LATER_CB_NO_ID callback) {
     return do_later_add(in_ms, -1, callback);
 }
 
+bool do_later_cancel(int16_t id) {
+    if(id==-1) {
+        ulog(F("The id -1 is reserved for do_later callbacks without an id."));
+        return false;
+    }
+    for(int pos=0; pos<do_later_map_count; pos++) {
+        if(do_later_map[pos].id == id) {
+            do_later_delete(pos);
+            return true;
+        }
+    }
+    return false;
+}
+
+bool do_later_cancel_all() {
+    if(do_later_map_count<=0) {
+        return false;
+    }
+    do_later_map_count = 0;
+    return true;
+}
+
 /**
  * @brief Execute ready callbacks - called from main loop
  */
