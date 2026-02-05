@@ -28,6 +28,10 @@ To just run all compilation tests, just call ``iot test compile``.
 If you want to run only specific tests, you can specify ``--boards`` and/or ``devices``.
 For example: ``iot test compile --boards=wemos_d1_mini,esp32 --devices=laser_distance``
 
+For a quick compilation smoke test, use ``iot test smoketest`` (or ``iot test simple``) to
+run input/output on ``wemos_d1_mini`` and ``esp32minikit``. To compile a single device on
+those boards, use ``iot test <device>`` (for example ``iot test laser_distance``).
+
 To run the tests the classic pythonic way:
 
 1. Navigate to the `tests` folder.
