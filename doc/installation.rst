@@ -80,28 +80,29 @@ see `First IoT Node <first-node.rst>`_.
 USB Flashing in WSL2 with usbipd-win
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To access USB devices (like ESP32/ESP8266) from WSL2 for direct flashing, 
-install ``usbipd-win`` on the Windows host using ``winget``. ``winget`` is 
-pre-installed on Windows 11 and Windows 10 version 2004 and later. 
-If unavailable, update "App Installer" from the Microsoft Store.
+..
+  [the follwoing is obsolete]
 
-In a Windows command prompt or PowerShell (**not** WSL):
+  To access USB devices (like ESP32/ESP8266) from WSL2 for direct flashing, 
+  install ``usbipd-win`` on the Windows host using ``winget``. ``winget`` is 
+  pre-installed on Windows 11 and Windows 10 version 2004 and later. 
+  If unavailable, update "App Installer" from the Microsoft Store.
+  
+  In a Windows command prompt or PowerShell (**not** WSL):
+  
+  .. code-block:: powershell
+  
+     winget install --interactive --exact dorssel.usbipd-win
+  
+  After installation, plug in your device and run:
+  
+  .. code-block:: powershell
+  
+     usbipd list
+     usbipd attach --busid <BUSID_FROM_LIST>
 
-.. code-block:: powershell
 
-   winget install --interactive --exact dorssel.usbipd-win
-
-After installation, plug in your device and run:
-
-.. code-block:: powershell
-
-   usbipd list
-   usbipd attach --busid <BUSID_FROM_LIST>
-
-Your device will now appear under ``/dev/ttyUSB0`` or similar in WSL2.
-Use IoTempower as normal from your WSL2 Linux shell.
-
-For easier USB device management with a graphical interface, install 
+For USB device management with a graphical interface, install 
 **WSL USB GUI** by downloading the latest MSI installer from the GitLab releases:
 
 https://gitlab.com/alelec/wsl-usb-gui/-/releases
@@ -118,6 +119,9 @@ After installing WSL USB GUI:
    with IoTempower.
 3. You can now graphically attach and detach connected MCU devices (like 
    ESP32/ESP8266) as needed.
+
+Your device will now appear normally under ``/dev/ttyUSB0`` or similar in WSL2.
+Use IoTempower as normal from your WSL2 Linux shell.
 
 Alternatively, you can flash via the network using the rfc2217 method with 
 a device like the GL.Inet Mango MT300 v2—see the section on using an 
