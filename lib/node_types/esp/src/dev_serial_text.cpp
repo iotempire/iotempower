@@ -20,33 +20,38 @@ Serial_Text::Serial_Text(const char* name, int8_t rx_pin, int8_t tx_pin,
 bool Serial_Text::measure() {
     SoftwareSerial* serial = serial_handle();
     if(!serial) return false;
-    int available = serial->available();
-    if(available <= 0) return false;
-
-    Ustring& v = value();
-    v.clear();
-    bool has_data = false;
     const uint32_t baud = baud_rate();
     const uint32_t idle_ms = max<uint32_t>(2, (100000UL / max<uint32_t>(baud, 1))); // ~10 bytes at 8N1
-    const uint32_t max_ms = min<uint32_t>(100, idle_ms * 3);
-    uint32_t start_ms = millis();
-    uint32_t last_rx_ms = start_ms;
 
-    while(true) {
-        while(serial->available() > 0) {
-            int next = serial->read();
-            if(next < 0) break;
-            has_data = true;
-            last_rx_ms = millis();
-            if(v.length() < v.max_length()) {
-                v.add((char)next);
+    bool got_new_byte = false;
+    while(serial->available() > 0) {
+        int next = serial->read();
+        if(next < 0) break;
+        got_new_byte = true;
+        _frame_active = true;
+        _last_rx_ms = millis();
+        if(!_frame_overflow) {
+            if(!_rx_frame.add((char)next)) {
+                // Keep collecting until frame end, but never publish a cut frame.
+                _frame_overflow = true;
             }
         }
-        if(!has_data) break;
-        uint32_t now = millis();
-        if((uint32_t)(now - last_rx_ms) >= idle_ms) break;
-        if((uint32_t)(now - start_ms) >= max_ms) break;
-        delay(1);
     }
-    return has_data;
+
+    if(got_new_byte) return false;
+    if(!_frame_active) return false;
+    if((uint32_t)(millis() - _last_rx_ms) < idle_ms) return false;
+
+    _frame_active = false;
+    if(_frame_overflow) {
+        _frame_overflow = false;
+        _rx_frame.clear();
+        ulog(F("Serial_Text frame dropped: overflow."));
+        return false;
+    }
+
+    Ustring& v = value();
+    v.copy(_rx_frame);
+    _rx_frame.clear();
+    return !v.empty();
 }

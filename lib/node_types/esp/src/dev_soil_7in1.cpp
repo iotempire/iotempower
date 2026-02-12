@@ -87,20 +87,6 @@ void Soil_7in1::clear_input() {
     }
 }
 
-bool Soil_7in1::read_exactly(uint8_t* buf, size_t n, uint16_t timeout_ms) {
-    SoftwareSerial* serial = serial_handle();
-    if(!serial) return false;
-    size_t got = 0;
-    unsigned long start = millis();
-    while(got < n && (uint16_t)(millis() - start) < timeout_ms) {
-        if(serial->available()) {
-            buf[got++] = (uint8_t)serial->read();
-        }
-        yield();
-    }
-    return got == n;
-}
-
 uint16_t Soil_7in1::modbus_crc16(const uint8_t* data, size_t len) {
     uint16_t crc = 0xFFFF;
     for(size_t i = 0; i < len; i++) {
@@ -113,7 +99,7 @@ uint16_t Soil_7in1::modbus_crc16(const uint8_t* data, size_t len) {
     return crc;
 }
 
-bool Soil_7in1::read_input_regs(uint16_t start_reg, uint16_t count, uint16_t* out) {
+bool Soil_7in1::start_read_input_regs(uint16_t start_reg, uint16_t count) {
     SoftwareSerial* serial = serial_handle();
     if(!serial) return false;
     if(count == 0 || count > 9) return false;
@@ -129,44 +115,61 @@ bool Soil_7in1::read_input_regs(uint16_t start_reg, uint16_t count, uint16_t* ou
     req[6] = (uint8_t)(crc & 0xFF);
     req[7] = (uint8_t)(crc >> 8);
 
-    serial->flush();
     clear_input();
 
     rs485_set_tx(true);
     serial->write(req, 8);
-    serial->flush();
     rs485_set_tx(false);
 
-    const uint8_t resp_len = (uint8_t)(5 + 2 * count);
-    uint8_t resp[32];
-    if(!read_exactly(resp, resp_len, _timeout_ms)) {
-        return false;
+    _expected_len = (uint8_t)(5 + 2 * count);
+    _rx_len = 0;
+    _request_started_ms = millis();
+    _state = WAIT_RESPONSE;
+    return true;
+}
+
+bool Soil_7in1::collect_response() {
+    SoftwareSerial* serial = serial_handle();
+    if(!serial) return false;
+    while(_rx_len < _expected_len && serial->available() > 0) {
+        int next = serial->read();
+        if(next < 0) break;
+        _resp[_rx_len++] = (uint8_t)next;
     }
+    return _rx_len >= _expected_len;
+}
 
-    if(resp[0] != _addr) return false;
-    if(resp[1] & 0x80) return false;
-    if(resp[1] != MODBUS_FUNC_READ_INPUT) return false;
-    if(resp[2] != (uint8_t)(2 * count)) return false;
+bool Soil_7in1::validate_and_unpack(uint16_t count, uint16_t* out) {
+    if(_rx_len != _expected_len) return false;
+    if(_resp[0] != _addr) return false;
+    if(_resp[1] & 0x80) return false;
+    if(_resp[1] != MODBUS_FUNC_READ_INPUT) return false;
+    if(_resp[2] != (uint8_t)(2 * count)) return false;
 
-    uint16_t crc_resp = (uint16_t)resp[resp_len - 2] |
-        ((uint16_t)resp[resp_len - 1] << 8);
-    uint16_t crc_calc = modbus_crc16(resp, resp_len - 2);
+    uint16_t crc_resp = (uint16_t)_resp[_expected_len - 2] |
+        ((uint16_t)_resp[_expected_len - 1] << 8);
+    uint16_t crc_calc = modbus_crc16(_resp, _expected_len - 2);
     if(crc_resp != crc_calc) return false;
 
     for(uint16_t i = 0; i < count; i++) {
-        uint8_t hi = resp[3 + 2 * i];
-        uint8_t lo = resp[4 + 2 * i];
+        uint8_t hi = _resp[3 + 2 * i];
+        uint8_t lo = _resp[4 + 2 * i];
         out[i] = ((uint16_t)hi << 8) | (uint16_t)lo;
     }
     return true;
 }
 
-bool Soil_7in1::read_input_regs_retry(uint16_t start_reg, uint16_t count, uint16_t* out) {
-    for(uint8_t i = 0; i < _retries; i++) {
-        if(read_input_regs(start_reg, count, out)) return true;
-        delay(50);
-    }
-    return false;
+void Soil_7in1::schedule_retry() {
+    _retry_index++;
+    _state = WAIT_RETRY;
+    _retry_after_ms = millis() + 50;
+}
+
+void Soil_7in1::reset_read_state() {
+    _state = IDLE;
+    _retry_index = 0;
+    _rx_len = 0;
+    _expected_len = 0;
 }
 
 void Soil_7in1::set_value_if_enabled(int8_t sd, uint16_t raw, float divisor, uint8_t decimals) {
@@ -177,15 +180,53 @@ void Soil_7in1::set_value_if_enabled(int8_t sd, uint16_t raw, float divisor, uin
 }
 
 bool Soil_7in1::measure() {
-    SoftwareSerial* serial = serial_handle();
-    if(!serial) return false;
+    if(!serial_handle()) return false;
     if(!_moisture && !_temperature && !_ec && !_ph &&
         !_nitrogen && !_phosphorus && !_potassium && !_salinity && !_tds) {
         return false;
     }
 
     uint16_t regs[9] = {0};
-    if(!read_input_regs_retry(0x0000, 9, regs)) {
+    const uint16_t reg_count = 9;
+    const uint8_t max_attempts = (_retries == 0) ? 1 : _retries;
+
+    if(_state == IDLE) {
+        if(!start_read_input_regs(0x0000, reg_count)) {
+            reset_read_state();
+        }
+        return false;
+    }
+
+    if(_state == WAIT_RETRY) {
+        if((int32_t)(millis() - _retry_after_ms) < 0) {
+            return false;
+        }
+        if(!start_read_input_regs(0x0000, reg_count)) {
+            reset_read_state();
+        }
+        return false;
+    }
+
+    if(_state != WAIT_RESPONSE) return false;
+
+    if(collect_response()) {
+        if(validate_and_unpack(reg_count, regs)) {
+            reset_read_state();
+        } else if(_retry_index + 1 < max_attempts) {
+            schedule_retry();
+            return false;
+        } else {
+            reset_read_state();
+            return false;
+        }
+    } else if((uint32_t)(millis() - _request_started_ms) >= _timeout_ms) {
+        if(_retry_index + 1 < max_attempts) {
+            schedule_retry();
+            return false;
+        }
+        reset_read_state();
+        return false;
+    } else {
         return false;
     }
 

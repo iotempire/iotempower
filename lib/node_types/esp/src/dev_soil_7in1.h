@@ -9,10 +9,24 @@
 
 class Soil_7in1 : public Serial_Device {
     private:
+        enum Read_State {
+            IDLE,
+            WAIT_RESPONSE,
+            WAIT_RETRY
+        };
+
         uint8_t _addr = 0x01;
         int8_t _dir_pin = -1;
         uint16_t _timeout_ms = 400;
         uint8_t _retries = 3;
+        Read_State _state = IDLE;
+        uint8_t _retry_index = 0;
+        uint32_t _request_started_ms = 0;
+        uint32_t _retry_after_ms = 0;
+        uint8_t _rx_len = 0;
+        uint8_t _expected_len = 0;
+        uint8_t _resp[32];
+
         bool _moisture = true;
         bool _temperature = true;
         bool _ec = true;
@@ -35,10 +49,12 @@ class Soil_7in1 : public Serial_Device {
 
         void rs485_set_tx(bool tx);
         void clear_input();
-        bool read_exactly(uint8_t* buf, size_t n, uint16_t timeout_ms);
         uint16_t modbus_crc16(const uint8_t* data, size_t len);
-        bool read_input_regs(uint16_t start_reg, uint16_t count, uint16_t* out);
-        bool read_input_regs_retry(uint16_t start_reg, uint16_t count, uint16_t* out);
+        bool start_read_input_regs(uint16_t start_reg, uint16_t count);
+        bool collect_response();
+        bool validate_and_unpack(uint16_t count, uint16_t* out);
+        void schedule_retry();
+        void reset_read_state();
 
         void set_value_if_enabled(int8_t sd, uint16_t raw, float divisor, uint8_t decimals);
     public:
