@@ -59,6 +59,7 @@ Alphabetic list
 - `servo_switch <servo_switch.rst>`_
 - `setup.cpp <setup.cpp.rst>`_
 - `sgp30 <sgp30.rst>`_
+- `soil_7in1 <soil_7in1.rst>`_
 - `temperature <temperature.rst>`_
 - `transmission <transmission.rst>`_
 - `ultra_sonic_distance <ultra_sonic_distance.rst>`_

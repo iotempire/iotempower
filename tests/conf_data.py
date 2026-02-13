@@ -69,6 +69,7 @@ devices = [
     {"device_name": "rgb_strip_bus", "example_syntax": "rgb_strip_bus(example_name, 7, F_GRB, IOT_TEST_NEOPIXEL_CONTROL_METHOD, IOT_TEST_NEOPIXEL_TESTPIN);"},
     {"device_name": "serial_text", "example_syntax": "serial_text(example_name, IOT_TEST_DIGITAL, IOT_TEST_DIGITAL_2);"},
     {"device_name": "serial_hex", "example_syntax": "serial_hex(example_name, IOT_TEST_DIGITAL, IOT_TEST_DIGITAL_2);"},
+    {"device_name": "soil_7in1", "example_syntax": "soil_7in1(example_name, IOT_TEST_DIGITAL, IOT_TEST_DIGITAL_2);"},
 ]
 
 isolated_combinations_to_test = [
