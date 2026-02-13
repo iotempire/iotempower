@@ -68,6 +68,7 @@ Soil_7in1::Soil_7in1(const char* name, int8_t rx_pin, int8_t tx_pin,
 void Soil_7in1::start() {
     Serial_Device::start();
     if(_started && _dir_pin >= 0) {
+        // For manual-direction RS485 transceivers (DE/RE pin).
         pinMode(_dir_pin, OUTPUT);
         rs485_set_tx(false);
     }
@@ -82,6 +83,7 @@ void Soil_7in1::rs485_set_tx(bool tx) {
 void Soil_7in1::clear_input() {
     SoftwareSerial* serial = serial_handle();
     if(!serial) return;
+    // Drop stale bytes from previous/incomplete responses before new request.
     while(serial->available()) {
         serial->read();
     }
@@ -115,8 +117,11 @@ bool Soil_7in1::start_read_input_regs(uint16_t start_reg, uint16_t count) {
     req[6] = (uint8_t)(crc & 0xFF);
     req[7] = (uint8_t)(crc >> 8);
 
+    // Ensure response buffer starts clean for this transaction.
     clear_input();
 
+    // RS485 request frame:
+    // [addr][0x04][regHi][regLo][countHi][countLo][crcLo][crcHi]
     rs485_set_tx(true);
     serial->write(req, 8);
     rs485_set_tx(false);
@@ -125,12 +130,14 @@ bool Soil_7in1::start_read_input_regs(uint16_t start_reg, uint16_t count) {
     _rx_len = 0;
     _request_started_ms = millis();
     _state = WAIT_RESPONSE;
+    // Transaction started. Response is collected over multiple measure() calls.
     return true;
 }
 
 bool Soil_7in1::collect_response() {
     SoftwareSerial* serial = serial_handle();
     if(!serial) return false;
+    // Non-blocking read: consume only currently available bytes.
     while(_rx_len < _expected_len && serial->available() > 0) {
         int next = serial->read();
         if(next < 0) break;
@@ -140,6 +147,9 @@ bool Soil_7in1::collect_response() {
 }
 
 bool Soil_7in1::validate_and_unpack(uint16_t count, uint16_t* out) {
+    // Validate full Modbus RTU frame before publishing any value.
+    // Expected response:
+    // [addr][0x04][byteCount=2*count][data...][crcLo][crcHi]
     if(_rx_len != _expected_len) return false;
     if(_resp[0] != _addr) return false;
     if(_resp[1] & 0x80) return false;
@@ -151,6 +161,7 @@ bool Soil_7in1::validate_and_unpack(uint16_t count, uint16_t* out) {
     uint16_t crc_calc = modbus_crc16(_resp, _expected_len - 2);
     if(crc_resp != crc_calc) return false;
 
+    // Data is big-endian register stream.
     for(uint16_t i = 0; i < count; i++) {
         uint8_t hi = _resp[3 + 2 * i];
         uint8_t lo = _resp[4 + 2 * i];
@@ -160,12 +171,14 @@ bool Soil_7in1::validate_and_unpack(uint16_t count, uint16_t* out) {
 }
 
 void Soil_7in1::schedule_retry() {
+    // Retry later without blocking the main loop.
     _retry_index++;
     _state = WAIT_RETRY;
     _retry_after_ms = millis() + 50;
 }
 
 void Soil_7in1::reset_read_state() {
+    // Return to neutral state after success/failure.
     _state = IDLE;
     _retry_index = 0;
     _rx_len = 0;
@@ -181,6 +194,7 @@ void Soil_7in1::set_value_if_enabled(int8_t sd, uint16_t raw, float divisor, uin
 
 bool Soil_7in1::measure() {
     if(!serial_handle()) return false;
+    // If all channels are disabled, skip polling entirely.
     if(!_moisture && !_temperature && !_ec && !_ph &&
         !_nitrogen && !_phosphorus && !_potassium && !_salinity && !_tds) {
         return false;
@@ -190,6 +204,12 @@ bool Soil_7in1::measure() {
     const uint16_t reg_count = 9;
     const uint8_t max_attempts = (_retries == 0) ? 1 : _retries;
 
+    // State machine overview:
+    // IDLE -> send request and switch to WAIT_RESPONSE.
+    // WAIT_RESPONSE -> accumulate bytes until full frame or timeout.
+    // WAIT_RETRY -> short cooldown before issuing retry request.
+
+    // Start a new transaction.
     if(_state == IDLE) {
         if(!start_read_input_regs(0x0000, reg_count)) {
             reset_read_state();
@@ -197,6 +217,7 @@ bool Soil_7in1::measure() {
         return false;
     }
 
+    // Inter-retry delay handled by timestamp.
     if(_state == WAIT_RETRY) {
         if((int32_t)(millis() - _retry_after_ms) < 0) {
             return false;
@@ -209,17 +230,22 @@ bool Soil_7in1::measure() {
 
     if(_state != WAIT_RESPONSE) return false;
 
+    // Wait for full response or timeout, one loop step at a time.
     if(collect_response()) {
         if(validate_and_unpack(reg_count, regs)) {
+            // Full valid frame received; publish path below can proceed.
             reset_read_state();
         } else if(_retry_index + 1 < max_attempts) {
+            // Corrupt/invalid frame: retry later.
             schedule_retry();
             return false;
         } else {
+            // Retry budget exhausted.
             reset_read_state();
             return false;
         }
     } else if((uint32_t)(millis() - _request_started_ms) >= _timeout_ms) {
+        // Frame not complete within timeout.
         if(_retry_index + 1 < max_attempts) {
             schedule_retry();
             return false;
@@ -227,10 +253,13 @@ bool Soil_7in1::measure() {
         reset_read_state();
         return false;
     } else {
+        // Still waiting for more bytes.
         return false;
     }
 
     bool has_data = false;
+    // Register map:
+    // 0 moisture, 1 temperature, 2 ec, 3 ph, 4 n, 5 p, 6 k, 7 salinity, 8 tds
     if(_sd_moisture >= 0) {
         set_value_if_enabled(_sd_moisture, regs[0], 10.0f, 1);
         has_data = true;

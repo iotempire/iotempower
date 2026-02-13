@@ -23,6 +23,9 @@ bool Serial_Text::measure() {
     const uint32_t baud = baud_rate();
     const uint32_t idle_ms = max<uint32_t>(2, (100000UL / max<uint32_t>(baud, 1))); // ~10 bytes at 8N1
 
+    // We build one serial frame across multiple measure() calls.
+    // Frame boundary is detected by line idle time.
+    // Non-blocking frame collection: read only what is currently available.
     bool got_new_byte = false;
     while(serial->available() > 0) {
         int next = serial->read();
@@ -38,6 +41,7 @@ bool Serial_Text::measure() {
         }
     }
 
+    // Keep waiting until line idle marks end-of-frame.
     if(got_new_byte) return false;
     if(!_frame_active) return false;
     if((uint32_t)(millis() - _last_rx_ms) < idle_ms) return false;
