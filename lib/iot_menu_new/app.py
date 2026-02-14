@@ -89,7 +89,7 @@ class IotMenu(App[None]):
             "new_system_template": lambda: SystemTemplate(self.current_path),
             "upgrade": lambda: UpgradeIot(),
             "web_starter": lambda: WebStarter(),
-            "ap_configurator": lambda: __import__("iot_menu_2.screens.ap_configurator_screen", fromlist=["APConfiguratorScreen"]).APConfiguratorScreen(),
+            "ap_configurator": lambda: __import__("iot_menu_new.screens.ap_configurator_screen", fromlist=["APConfiguratorScreen"]).APConfiguratorScreen(),
         }
 
     # ---------------------------
