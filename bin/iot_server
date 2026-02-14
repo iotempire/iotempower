@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+usage() {
+cat << 'EOF'
+Syntax: iot_server [args]
+
+Start IoT server (server.py) relative to IOTEMPOWER_ROOT.
+EOF
+}
+
+# Help
+if [[ "$1" == "help" || "$1" == "-h" || "$1" == "--help" ]]; then
+    usage
+    exit 0
+fi
+
+# IoTempower peab olema aktiivne
+if [[ "$IOTEMPOWER_ACTIVE" != "yes" ]]; then
+    echo "IoTempower not active, aborting." 1>&2
+    exit 1
+fi
+
+# Kontroll, et root on teada
+if [[ -z "$IOTEMPOWER_ROOT" ]]; then
+    echo "IOTEMPOWER_ROOT is not set." 1>&2
+    exit 1
+fi
+
+# ✅ server.py leitakse RELATIIVSELT root’i suhtes
+SERVER_SCRIPT="$IOTEMPOWER_ROOT/lib/iot_menu_2/serve.py"
+
+if [[ ! -f "$SERVER_SCRIPT" ]]; then
+    echo "server.py not found at: $SERVER_SCRIPT" 1>&2
+    exit 1
+fi
+
+PYTHON_BIN="${PYTHON_BIN:-python3}"
+
+cd "$(dirname "$SERVER_SCRIPT")" || exit 1
+exec "$PYTHON_BIN" "$SERVER_SCRIPT" "$@"
