@@ -10,9 +10,10 @@ from textual.widgets import Button, Header, Footer, Static, Input, RadioButton, 
 # Python libraries
 import asyncio
 
-# Modules
-import config
-from utils import update_static, validate_config_params, run_cmd_async, extract_keywords
+# Modules (use package-relative imports so this module works when imported
+# as `ap_configurator.screens`)
+from . import config
+from .utils import update_static, validate_config_params, run_cmd_async, extract_keywords
 
 
 
