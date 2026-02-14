@@ -1,0 +1,39 @@
+Screen {
+        layout: vertical;
+    }
+
+    Horizontal {
+        height: 1fr;
+    }
+
+    #left_panel {
+        margin: 1;
+    }
+
+    #right_panel {
+        width: 25%;
+        min-width: 20;
+        dock: right;
+        background: $surface;
+        padding: 1;
+        border: solid $secondary;
+    }
+
+    #menu_scroll {
+        height: 100%;
+    }
+
+    Button {
+    width: 100%;
+    height: auto;
+
+
+}
+Label{
+    background: #202020;
+    color: white;
+    padding: 1 2;
+    border: solid gray;
+    height: auto;
+    width: 80%;
+}
