@@ -241,7 +241,7 @@ public:
      * @param publish_all If true, publish all values; if false, only changed values
      * @return true if any values were published
      */
-    bool publish(espMqttClient& mqtt_client, Ustring& node_topic, bool publish_all);
+    bool publish(IoTempowerMqttClient& mqtt_client, Ustring& node_topic, bool publish_all);
     
     /**
      * @brief Subscribe to MQTT command topics for all devices
@@ -249,14 +249,14 @@ public:
      * @param node_topic Base MQTT topic for this node
      * @return true if subscriptions successful
      */
-    bool subscribe(espMqttClient& mqtt_client, Ustring& node_topic);
+    bool subscribe(IoTempowerMqttClient& mqtt_client, Ustring& node_topic);
     
     /**
      * @brief Publish Home Assistant discovery messages for all devices
      * @param mqtt_client espMqttClient instance
      * @return true if discovery info published successfully
      */
-    bool publish_discovery_info(espMqttClient& mqtt_client);
+    bool publish_discovery_info(IoTempowerMqttClient& mqtt_client);
     
     /**
      * @brief Route incoming MQTT message to correct device

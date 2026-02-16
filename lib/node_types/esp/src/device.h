@@ -82,6 +82,12 @@
 
 #include "config-wrapper.h"
 
+#ifdef MQTT_USE_TLS
+typedef espMqttClientSecure IoTempowerMqttClient;
+#else
+typedef espMqttClient IoTempowerMqttClient;
+#endif
+
 class Device;
 
 /**
@@ -496,10 +502,10 @@ class Device {
         }
 
         // publish current value(s) and resets needs_publishing state
-        bool publish(espMqttClient& mqtt_client, Ustring& node_topic, Ustring& log_buffer);
+        bool publish(IoTempowerMqttClient& mqtt_client, Ustring& node_topic, Ustring& log_buffer);
 
 #ifdef mqtt_discovery_prefix
-        bool publish_discovery_info(espMqttClient& mqtt_client);
+        bool publish_discovery_info(IoTempowerMqttClient& mqtt_client);
 #endif
 
         Ustring& get_last_confirmed_value(unsigned long index=0);

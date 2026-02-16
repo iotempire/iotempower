@@ -150,7 +150,7 @@ void Device::create_discovery_info(const String& type,
 /**
  * @brief Publish device values to MQTT - constructs topics and sends values
  */
-bool Device::publish(espMqttClient& mqtt_client, Ustring& node_topic, Ustring& log_buffer) {
+bool Device::publish(IoTempowerMqttClient& mqtt_client, Ustring& node_topic, Ustring& log_buffer) {
     bool published = false;
     Ustring topic;
     bool first = true;
@@ -238,7 +238,7 @@ bool Device::publish(espMqttClient& mqtt_client, Ustring& node_topic, Ustring& l
 }
 
 #ifdef mqtt_discovery_prefix
-bool Device::publish_discovery_info(espMqttClient& mqtt_client) {
+bool Device::publish_discovery_info(IoTempowerMqttClient& mqtt_client) {
     if(discovery_config_topic.length()>0) { // only if exists
         ulog(F("Publishing discovery info for %s."), name.as_cstr());
         // espMqttClient handles larger payloads automatically
