@@ -3,8 +3,6 @@ import shutil
 import subprocess
 import pytest
 
-from tests.conf_data import isolated_combinations_to_test
-
 local_dir = os.getenv("IOTEMPOWER_LOCAL", "")
 test_dir = os.path.join(local_dir, ".tests", "test_compilation")
 cache_dir = os.path.join(local_dir, "compile_cache", "platformio")
@@ -16,16 +14,9 @@ os.makedirs(test_dir, exist_ok=True)
 open(f"{test_dir}/system.conf", "w").close()
 remove_cache_flag = os.getenv("IOTEMPOWER_TEST_REMOVE_CACHE", "")
 
-@pytest.fixture(scope="module", params=isolated_combinations_to_test)
+@pytest.fixture(scope="module")
 def parametrize_board_device(request):
-    boards = request.config.getoption("--boards")
-    devices = request.config.getoption("--devices")
-    board, device, example_syntax = request.param
-    
-    if (boards and board not in boards.split(",")) or (devices and device not in devices.split(",")):
-        pytest.skip("Skipping due to board or device not selected.")
-    
-    return board, device, example_syntax
+    return request.param
 
 def test_compilation_isolated(parametrize_board_device):
     board_name, device_name, example_syntax = parametrize_board_device

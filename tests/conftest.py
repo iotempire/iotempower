@@ -8,11 +8,24 @@ import sshtunnel
 from fabric import Connection
 from paramiko.ssh_exception import AuthenticationException
 
-from tests.conf_data import default_username, gateway_host, local_bind_mqtt_port, private_key_file_path
+from tests.conf_data import default_username, gateway_host, isolated_combinations_to_test, local_bind_mqtt_port, private_key_file_path
 
 def pytest_addoption(parser):
     parser.addoption("--boards", action="store", default=None, help="Specify the board(s) to test")
     parser.addoption("--devices", action="store", default=None, help="Specify the device(s) to test")
+
+def pytest_generate_tests(metafunc):
+    if "parametrize_board_device" in metafunc.fixturenames:
+        boards = metafunc.config.getoption("--boards")
+        devices = metafunc.config.getoption("--devices")
+        combinations = isolated_combinations_to_test
+        if boards:
+            board_set = set(boards.split(","))
+            combinations = [(b, d, s) for b, d, s in combinations if b in board_set]
+        if devices:
+            device_set = set(devices.split(","))
+            combinations = [(b, d, s) for b, d, s in combinations if d in device_set]
+        metafunc.parametrize("parametrize_board_device", combinations)
 
 @pytest.fixture(scope="module", autouse=False)
 def ssh_client():
