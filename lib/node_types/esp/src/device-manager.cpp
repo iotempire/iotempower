@@ -223,7 +223,7 @@ void DeviceManager::reset_buffers() {
 /**
  * @brief Publish changed device values to MQTT
  */
-bool DeviceManager::publish(espMqttClient& mqtt_client, Ustring& node_topic, bool publish_all) {
+bool DeviceManager::publish(IoTempowerMqttClient& mqtt_client, Ustring& node_topic, bool publish_all) {
     bool published = false;
     bool first = true;
     Ustring log_buffer(F("Publishing"));
@@ -253,7 +253,7 @@ bool DeviceManager::publish(espMqttClient& mqtt_client, Ustring& node_topic, boo
     return published;
 }
 
-bool DeviceManager::subscribe(espMqttClient& mqtt_client, Ustring& node_topic) {
+bool DeviceManager::subscribe(IoTempowerMqttClient& mqtt_client, Ustring& node_topic) {
     // subscribe to all devices that accept input
     Ustring topic;
 
@@ -281,7 +281,7 @@ bool DeviceManager::subscribe(espMqttClient& mqtt_client, Ustring& node_topic) {
     return true; // TODO: decide if error occurred
 }
 
-bool DeviceManager::publish_discovery_info(espMqttClient& mqtt_client) {
+bool DeviceManager::publish_discovery_info(IoTempowerMqttClient& mqtt_client) {
 
     #ifdef mqtt_discovery_prefix
 
