@@ -20,6 +20,7 @@ def parametrize_board_device(request):
 
 def test_compilation_isolated(parametrize_board_device):
     board_name, device_name, example_syntax = parametrize_board_device
+    print(f"\nCompiling device={device_name} for board={board_name}")
     node_directory = f"{test_dir}/node"
     os.makedirs(node_directory, exist_ok=True)
     

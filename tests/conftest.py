@@ -25,7 +25,49 @@ def pytest_generate_tests(metafunc):
         if devices:
             device_set = set(devices.split(","))
             combinations = [(b, d, s) for b, d, s in combinations if d in device_set]
-        metafunc.parametrize("parametrize_board_device", combinations)
+        metafunc.parametrize(
+            "parametrize_board_device",
+            combinations,
+            ids=[f"{b}/{d}" for b, d, s in combinations],
+        )
+
+
+_compilation_results: list[tuple[str, str, str]] = []
+
+
+def pytest_runtest_logreport(report):
+    if report.when == "call" and "test_compilation_isolated" in report.nodeid:
+        nodeid = report.nodeid
+        if "[" in nodeid:
+            param_part = nodeid[nodeid.rfind("[") + 1 : nodeid.rfind("]")]
+            if "/" in param_part:
+                board, device = param_part.split("/", 1)
+                if report.passed:
+                    outcome = "PASSED"
+                elif report.failed:
+                    outcome = "FAILED"
+                else:
+                    outcome = "ERROR"
+                _compilation_results.append((board, device, outcome))
+
+
+def pytest_terminal_summary(terminalreporter, exitstatus, config):
+    if not _compilation_results:
+        return
+    terminalreporter.write_sep("=", "Compilation Test Summary")
+    board_width = max(len("Board"), max(len(b) for b, d, o in _compilation_results))
+    device_width = max(len("Device"), max(len(d) for b, d, o in _compilation_results))
+    status_width = max(len("Status"), max(len(o) for b, d, o in _compilation_results))
+    header = f"{'Board':<{board_width}}  {'Device':<{device_width}}  Status"
+    sep = f"{'-' * board_width}  {'-' * device_width}  {'-' * status_width}"
+    terminalreporter.write_line(header)
+    terminalreporter.write_line(sep)
+    for board, device, outcome in _compilation_results:
+        line = f"{board:<{board_width}}  {device:<{device_width}}  {outcome}"
+        if outcome == "PASSED":
+            terminalreporter.write_line(line, green=True)
+        else:
+            terminalreporter.write_line(line, red=True)
 
 @pytest.fixture(scope="module", autouse=False)
 def ssh_client():
