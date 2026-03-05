@@ -2,7 +2,11 @@
 
 if [[ "$1" = "help" || "$1" = "-h" || "$1" = "--help" || -z "$1" ]]; then
 cat << EOF
-Syntax: iot_service_web <start|stop|status> [web_starter options]
+Syntax: iot_service_web <start|stop|status> [full]
+
+Start all web services (and loop them when they fail).
+Starts local services by default. If "full" is specified,
+it starts the services on http and https ports.
 EOF
 exit 0
 fi

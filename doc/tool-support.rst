@@ -21,7 +21,7 @@ The tools are available after starting the ``iot`` command (or ``run`` in the in
    * - ``accesspoint``
       - Start an access point on a free WiFi interface. This is default on the IoTempower Raspberry Pi image. Requires root access.
    * - ``iot service``
-     - Orchestrate IoTempower gateway services (``web``, ``mqtt``, optional ``ap``/``accesspoint``) with start/stop/status/view in tmux by default, or directly with ``--notmux``.
+      - Orchestrate IoTempower gateway services with explicit selectors (``--web``, ``--mqtt``, ``--ap``), plus ``--all``/``--default``; runs in tmux by default or directly with ``--notmux``.
    * - ``iot upgrade``
      - Update to the latest version of IoTempower.
    * - ``iot install``
@@ -35,7 +35,7 @@ The tools are available after starting the ``iot`` command (or ``run`` in the in
    * - ``deploy``
      - Update software of an IoTempower node over the network (OTA).
    * - ``mqtt_broker``
-     - Start a local MQTT broker (mosquitto) listening on all interfaces.
+      - Start a local MQTT broker (mosquitto), optionally binding by interface/IP pairs for one or two listener addresses.
    * - ``mqtt_listen``
      - Subscribe to a topic deriving all configuration data from the current environment.
    * - ``mqtt_send``

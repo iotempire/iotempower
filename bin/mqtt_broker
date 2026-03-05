@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
 if [[ "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF
-Syntax: mqtt_broker [interface1 [interface2]]
+Syntax: mqtt_broker [interface1|scanif [ip1 [interface2 [ip2]]]]
 
 mqtt_broker starts a local mosquitto-mqtt-server corresponding to parameters
 set in iotempower/etc/iotempower.conf. If interface1 is given it overwrites
-the listener address with this interface. If interface2 is also provided, 
-the broker will listen on both interfaces. If the option scanif is given 
-for interface1, it will try to guess the interface itself.
+the listener address with this interface. If ip1 is provided, this IP will be
+used directly instead of scanning the interface address. If interface2 is also
+provided, the broker will listen on both interfaces. If ip2 is provided, this
+IP will be used directly for the second listener. If scanif is given for
+interface1, it will try to guess the interface itself.
 EOF
 exit 1
 fi
@@ -21,7 +23,19 @@ mkdir -p "$APTEMP"
 
 while true; do
     IF1="$1"
-    IF2="$2"
+    IP1="$2"
+    IF2="$3"
+    IP2="$4"
+
+    if [[ "$IP1" && "$IP1" != *.*.*.* ]]; then
+        IF2="$IP1"
+        IP1=""
+        if [[ "$4" ]]; then
+            IP2="$4"
+        elif [[ "$3" && "$3" == *.*.*.* ]]; then
+            IP2="$3"
+        fi
+    fi
 
     if [[ "$IF1" ]]; then
         if [[ "$IF1" = "scanif" ]]; then
@@ -29,13 +43,19 @@ while true; do
             IF1=$(echo $if_search|cut -d\  -f1)
             echo "Preferred interface: $IF1"
         fi
-            IF1_ADDRESS=$(echo $if_search|cut -d\  -f2|cut -d\  -f1)
-
-        export IOTEMPOWER_MQTT_HOST=$(show_local_ips | grep "$IF1" | cut -d\  -f2|cut -d/ -f1)
+        if [[ "$IP1" ]]; then
+            export IOTEMPOWER_MQTT_HOST="$IP1"
+        else
+            export IOTEMPOWER_MQTT_HOST=$(show_local_ips | grep "$IF1" | cut -d\  -f2|cut -d/ -f1)
+        fi
     fi
 
     if [[ "$IF2" ]]; then
-        export IOTEMPOWER_MQTT_HOST2=$(show_local_ips | grep "$IF2" | cut -d\  -f2|cut -d/ -f1)
+        if [[ "$IP2" ]]; then
+            export IOTEMPOWER_MQTT_HOST2="$IP2"
+        else
+            export IOTEMPOWER_MQTT_HOST2=$(show_local_ips | grep "$IF2" | cut -d\  -f2|cut -d/ -f1)
+        fi
     fi
 
     echo "Listening on $IOTEMPOWER_MQTT_HOST."

@@ -2,7 +2,7 @@
 
 if [[ "$1" = "help" || "$1" = "-h" || "$1" = "--help" || -z "$1" ]]; then
 cat << EOF
-Syntax: iot_service_mqtt <start|stop|status> [interface]
+Syntax: iot_service_mqtt <start|stop|status> [interface1|scanif [ip1 [interface2 [ip2]]]]
 EOF
 exit 0
 fi
@@ -14,7 +14,10 @@ shift
 
 case "$ACTION" in
     start)
-        exec mqtt_starter "${1:-scanif}"
+        if [[ $# -eq 0 ]]; then
+            exec mqtt_starter scanif
+        fi
+        exec mqtt_starter "$@"
         ;;
     stop)
         pkill mosquitto || true

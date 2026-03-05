@@ -2,9 +2,16 @@
 
 if [[ "$1" = "help" || "$1" = "-h" || "$1" = "--help" || -z "$1" ]]; then
 cat << EOF
-Syntax: iot_service_ap <start|stop|status>
+Syntax: iot_service_ap <start|stop|status> [options]
 
 Equivalent to accesspoint lifecycle management (using lnxrouter).
+
+Options for start:
+  --wlan IFACE          Override primary AP interface
+  --gateway IP          Override primary AP gateway IP
+  --wlan2 IFACE         Optional second AP interface for double NAT mode
+  --gateway2 IP         Optional second AP gateway IP for double NAT mode
+  --double-nat          Start a second lnxrouter instance (requires wlan2 + gateway2)
 EOF
 exit 0
 fi

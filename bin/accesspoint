@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 if [[ "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF
-Syntax: accesspoint [show]
+Syntax: accesspoint [show] [--wlan IFACE] [--gateway IP] [--wlan2 IFACE] [--gateway2 IP] [--double-nat]
 
 accesspoint creates a local accesspoint corresponding to parameters set
 in iotempower/etc/iotempower.conf.
@@ -13,7 +13,49 @@ fi
 
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
-if [[ "$1" != "show" ]]; then
+SHOW_ONLY=0
+WLAN_OVERRIDE=""
+WLAN2_OVERRIDE=""
+GATEWAY_OVERRIDE=""
+GATEWAY2_OVERRIDE=""
+DOUBLE_NAT=0
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        show)
+            SHOW_ONLY=1
+            shift
+            ;;
+        --wlan)
+            WLAN_OVERRIDE="$2"
+            shift 2
+            ;;
+        --gateway)
+            GATEWAY_OVERRIDE="$2"
+            shift 2
+            ;;
+        --wlan2)
+            WLAN2_OVERRIDE="$2"
+            DOUBLE_NAT=1
+            shift 2
+            ;;
+        --gateway2)
+            GATEWAY2_OVERRIDE="$2"
+            DOUBLE_NAT=1
+            shift 2
+            ;;
+        --double-nat)
+            DOUBLE_NAT=1
+            shift
+            ;;
+        *)
+            echo "Unknown option: $1" 1>&2
+            exit 1
+            ;;
+    esac
+done
+
+if [[ "$SHOW_ONLY" -ne 1 ]]; then
     ufw_active=""
     sudo ufw status| grep "Status: active" &>/dev/null && ufw_active="true"
 fi
@@ -27,18 +69,39 @@ while true; do
     fi
 
     # detect output wireless network device to start AP on
-    OUTPUT_WIFI=""
-    if [[ "$IOTEMPOWER_AP_DEVICES" ]]; then
-        available_wifi=$(echo $(ip link show|cut -d: -f2|grep " wl"|cut -b2-))
+    available_wifi=$(echo $(ip link show|cut -d: -f2|grep " wl"|cut -b2-))
+    OUTPUT_WIFI="$WLAN_OVERRIDE"
+    if [[ ! "$OUTPUT_WIFI" ]]; then
+        if [[ "$IOTEMPOWER_AP_DEVICES" ]]; then
+            for possible in $(echo "$IOTEMPOWER_AP_DEVICES"); do
+                if [[ "$available_wifi" =~ .*"$possible".* ]]; then
+                    OUTPUT_WIFI="$possible"
+                    break
+                fi
+            done
+        else
+            # Take first available
+            OUTPUT_WIFI=$(ip link show|cut -d: -f2|grep " wl"|cut -b2-|tail -n1)
+        fi
+    fi
+
+    OUTPUT_WIFI2="$WLAN2_OVERRIDE"
+    if [[ "$DOUBLE_NAT" -eq 1 && ! "$OUTPUT_WIFI2" ]]; then
         for possible in $(echo "$IOTEMPOWER_AP_DEVICES"); do
-            if [[ "$available_wifi" =~ .*"$possible".* ]]; then
-                OUTPUT_WIFI="$possible"
+            if [[ "$possible" != "$OUTPUT_WIFI" && "$available_wifi" =~ .*"$possible".* ]]; then
+                OUTPUT_WIFI2="$possible"
                 break
             fi
         done
-    else
-        # Take first available
-        OUTPUT_WIFI=$(ip link show|cut -d: -f2|grep " wl"|cut -b2-|tail -n1)
+    fi
+
+    if [[ "$DOUBLE_NAT" -eq 1 && ! "$OUTPUT_WIFI2" ]]; then
+        echo "double NAT needs a second interface (use --wlan2 or IOTEMPOWER_AP_DEVICES)." 1>&2
+        exit 1
+    fi
+    if [[ "$DOUBLE_NAT" -eq 1 && "$OUTPUT_WIFI2" = "$OUTPUT_WIFI" ]]; then
+        echo "double NAT needs a different second interface." 1>&2
+        exit 1
     fi
 
     IOTEMPOWER_AP_NAME_FULL="$IOTEMPOWER_AP_NAME"
@@ -51,6 +114,7 @@ while true; do
 
     # add network extension for making essid more unique
     AP_NAME="$IOTEMPOWER_AP_NAME_FULL"
+    AP_NAME2="${IOTEMPOWER_AP_NAME2:-${AP_NAME}-2}"
 
     PASSWORD="$IOTEMPOWER_AP_PASSWORD"
 
@@ -59,15 +123,22 @@ while true; do
         # pick channel randomly
         CHANNEL=$(shuf -n 1 -e 2 3 4 5 7 8 9 10)
     fi
+    CHANNEL2="${IOTEMPOWER_AP_CHANNEL2:-$CHANNEL}"
 
-    IP="$IOTEMPOWER_AP_IP"
+    IP="${GATEWAY_OVERRIDE:-$IOTEMPOWER_AP_IP}"
+    IP2="${GATEWAY2_OVERRIDE:-$IOTEMPOWER_AP_IP2}"
+
+    if [[ "$DOUBLE_NAT" -eq 1 && ! "$IP2" ]]; then
+        echo "double NAT needs a second IP (use --gateway2 or IOTEMPOWER_AP_IP2)." 1>&2
+        exit 1
+    fi
 
     HIDDEN=""
     if [[ "$IOTEMPOWER_AP_HIDDEN" = "yes" ]]; then
         HIDDEN="--hidden"
     fi
 
-    if [[ "$1" = "show" ]]; then
+    if [[ "$SHOW_ONLY" -eq 1 ]]; then
 #        echo "ACCESSPOINT_NAME=$AP_NAME"
         echo "$AP_NAME"
         exit 0
@@ -76,7 +147,7 @@ while true; do
     mkdir -p "$IOTEMPOWER_ROOT/tmp"
     HOSTFILE="$IOTEMPOWER_ROOT/tmp/ap-host"
     cat << EOF > "$HOSTFILE"
-$IOTEMPOWER_AP_IP gw.iotempire.net $IOTEMPOWER_AP_HOSTNAME.localnet $IOTEMPOWER_AP_HOSTNAME
+$IP gw.iotempire.net $IOTEMPOWER_AP_HOSTNAME.localnet $IOTEMPOWER_AP_HOSTNAME
 EOF
 
 
@@ -91,6 +162,9 @@ EOF
     echo
     echo "Starting accesspoint with name $AP_NAME on channel $CHANNEL."
     echo "Will use $OUTPUT_WIFI with mac $OUTPUT_MAC to run an accesspoint."
+    if [[ "$DOUBLE_NAT" -eq 1 ]]; then
+        echo "double NAT enabled: starting second accesspoint $AP_NAME2 on $OUTPUT_WIFI2."
+    fi
     echo "Internet-input device is $INPUT_DEVICE."
     echo
     sudo iptables -t nat -F POSTROUTING
@@ -126,21 +200,35 @@ EOF
         --freq-band 2.4 \
         --no-virt \
         -c "$CHANNEL" &
-    ap_id=$!
+    ap_id1=$!
+    if [[ "$DOUBLE_NAT" -eq 1 ]]; then
+        sudo lnxrouter --ap "$OUTPUT_WIFI2" "$AP_NAME2" \
+            -p "$PASSWORD" \
+            -g "$IP2" \
+            --freq-band 2.4 \
+            --no-virt \
+            -c "$CHANNEL2" &
+        ap_id2=$!
+    else
+        ap_id2=""
+    fi
     sleep 7 # let ap start up
     if [[ "$IOTEMPOWER_AP_BRIDGE" ]]; then
         # fix ip address
         sudo ifconfig "$OUTPUT_WIFI" 0.0.0.0
         sudo ifconfig br0 "$IP"
         sudo iptables -t nat -D POSTROUTING 1
-        sudo iptables -t nat -A POSTROUTING -s $IOTEMPOWER_AP_IP/24 \
+        sudo iptables -t nat -A POSTROUTING -s "$IP"/24 \
                 -o "$INPUT_DEVICE" -j MASQUERADE
     fi
     # make sure to restore firewall
-    if [[ "$1" != "show" ]]; then
+    if [[ "$SHOW_ONLY" -ne 1 ]]; then
         if [[ "$ufw_active" ]]; then
             sudo ufw enable
         fi
-        wait $ap_id
+        wait $ap_id1
+        if [[ "$ap_id2" ]]; then
+            wait $ap_id2
+        fi
     fi
 done
