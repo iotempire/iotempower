@@ -305,4 +305,3 @@ For details on using Node-RED, see the `Quickstart Guide <quickstart.rst#control
 
 Top: `ToC <index-doc.rst>`_, Previous: `Quickstart <quickstart.rst>`_,
 Next: `Second Node <second-node.rst>`_.
-`Versão em português aqui <first-node-pt.rst>`_.

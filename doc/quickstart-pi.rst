@@ -137,4 +137,3 @@ You can now continue with `First IoT Node <first-node.rst>`_.
 
 Top: `ToC <index-doc.rst>`_, Previous: `Installation <installation.rst>`_,
 Next: `First IoT Node <first-node.rst>`_.
-`Versão em português aqui <quickstart-pi-pt.rst>`_.
