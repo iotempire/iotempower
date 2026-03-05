@@ -64,6 +64,9 @@ if [[ "$GATEWAY2_OVERRIDE" && ! "$WLAN2_OVERRIDE" ]]; then
 fi
 
 if [[ "$SHOW_ONLY" -ne 1 ]]; then
+    echo "Accesspoint setup needs sudo privileges for network and firewall operations."
+    echo "Requesting sudo now for: stopping old lnxrouter processes, configuring iptables, enabling IP forwarding, and starting AP runtime."
+    sudo -v || { echo "Could not obtain sudo credentials for accesspoint setup." 1>&2; exit 1; }
     ufw_active=""
     sudo ufw status| grep "Status: active" &>/dev/null && ufw_active="true"
 fi
@@ -151,7 +154,8 @@ EOF
         HOSTAPD_EXTRA="--hostapd-extra bridge=br0"
     fi
 
-    echo "Stopping all existing services."
+    echo "Stopping all existing lnxrouter services."
+    echo "Using sudo here because lnxrouter is started as root and must be stopped before reconfiguring AP networking."
     sudo pkill -f lnxrouter
     sleep 2
     echo

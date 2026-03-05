@@ -25,6 +25,8 @@ case "$ACTION" in
         exec accesspoint "$@"
         ;;
     stop)
+        echo "Stopping accesspoint runtime."
+        echo "Requesting sudo because lnxrouter runs with root privileges and must be terminated as root."
         sudo pkill -f lnxrouter || true
         ;;
     status)

@@ -60,6 +60,16 @@ has_lnxrouter() {
     [[ -x "$IOTEMPOWER_EXTERNAL/linux-router/lnxrouter" ]] || command -v lnxrouter &>/dev/null
 }
 
+request_ap_sudo_for_tmux() {
+    log "AP mode in tmux requires root networking operations."
+    log "Requesting sudo now so credentials are entered here (not inside tmux)."
+    log "Reason: accesspoint start/stop changes iptables, forwarding, and lnxrouter processes."
+    if ! sudo -v; then
+        echo "Could not obtain sudo credentials for accesspoint mode." 1>&2
+        exit 1
+    fi
+}
+
 pick_default_wlan() {
     if [[ "$IOTEMPOWER_AP_DEVICES" ]]; then
         for possible in $IOTEMPOWER_AP_DEVICES; do
@@ -241,6 +251,14 @@ build_accesspoint_cmd() {
 }
 
 start_services_tmux() {
+    if [[ $START_AP -eq 1 ]]; then
+        if ! has_lnxrouter; then
+            echo "linux-router is not installed. Run iot install (core) or omit --ap." 1>&2
+            exit 1
+        fi
+        request_ap_sudo_for_tmux
+    fi
+
     if tmux_has_session; then
         echo "Session '$SESSION_NAME' already exists." 1>&2
         echo "Use: iot service view  (or stop/restart)." 1>&2
@@ -265,11 +283,6 @@ start_services_tmux() {
         fi
     fi
     if [[ $START_AP -eq 1 ]]; then
-        if ! has_lnxrouter; then
-            echo "linux-router is not installed. Run iot install (core) or omit --ap." 1>&2
-            tmux kill-session -t "$SESSION_NAME" 2>/dev/null || true
-            exit 1
-        fi
         if [[ $first_started -eq 0 ]]; then
             tmux new-session -d -s "$SESSION_NAME" -n "accesspoint"
             tmux send-keys -t "$SESSION_NAME:accesspoint" "$(build_accesspoint_cmd)" Enter
