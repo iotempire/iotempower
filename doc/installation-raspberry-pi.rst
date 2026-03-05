@@ -43,12 +43,13 @@ Tutorial video for setting up the sd-card for the pi: https://youtu.be/FrIIXsseZ
 - https://iotgateway (or https://iotgateway.local or
   sometimes https://192.168.12.1). Accept
   the security exception for the locally generated security certificate. You
-  should now see a link to the filesystem through cloud commander (cloudcmd)
-  and an IoT testsystem on the pi,
-  as well as links to the Node-RED installation.
+  should now see the IoTempower homepage with links to Node-RED
+  and the local documentation.
+  (The CloudCmd file manager previously shown here has been removed;
+  see `Legacy / Obsoleted Tools </doc/legacy.rst>`_ for details.)
 
-- On the raspberry pi IoTempower installation, you can use cloudcmd to access
-  and interact with your system.
+- On the raspberry pi IoTempower installation, you can use SSH to access
+  and interact with your system (``ssh iot@iotgateway``, password ``iotempire``).
 
 - If you are asked for a user, use ``iot``, if you are asked for a password
   use ``iotempire``.

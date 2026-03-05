@@ -17,8 +17,14 @@ Vamos começar então...
 Novo Node
 ---------
 
--   Navegue de volta para a sua `IoT system example configuration folder
-    </cloudcmd/fs/home/iot/iot-test/>`_.
+-   Navegue de volta para a sua pasta de configuração de sistema IoT (``~/iot-test/``).
+
+    .. note::
+       O CloudCmd (gerenciador de arquivos web, anteriormente acessível em
+       ``/cloudcmd/fs/home/iot/iot-test/``) foi removido do IoTempower.
+       Use SSH (``ssh iot@iotgateway``) e o comando ``create_node_template``
+       via ``iot menu`` para criar novos nodes.
+       Veja `Legacy / Obsoleted Tools </doc/legacy.rst>`_ para mais detalhes.
 
     Como você pode notar, cada Node tem sua própria pasta de configuração
     no IoTempower.
@@ -37,7 +43,7 @@ Novo Node
     selecione ``Create New Node Folder`` e depois de verifique se
     o caminho de destino está correto (ele deve ser ``iot-test/``), selecione
     ``Yes, run create_node_template``. Certifique a a criação teve sucesso
-    e aperte ``OK`` e você voltará ao painel de arquivos do cloudcmd no navegador.
+    e aperte ``OK`` e você voltará ao terminal.
 
     Você deve ver lá uma nova pasta chamada `new-node`
     (em baixo da pasta ``node1``, do ``README.rst`` do ``system.conf``).

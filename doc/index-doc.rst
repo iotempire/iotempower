@@ -51,3 +51,5 @@ Table of Contents
 Obsolete:
 
 - `Shields </doc/shields/wemosd1mini/devkit1/README.rst>`_
+
+- `Legacy / Obsoleted Tools </doc/legacy.rst>`_

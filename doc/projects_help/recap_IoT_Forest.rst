@@ -159,4 +159,5 @@ Then open your computer terminal and run:
 Quick note for Uli
 ===================
 
-My Cloud Commander is version v17.4.0.
+CloudCmd (Cloud Commander) has been removed from IoTempower.
+See `Legacy / Obsoleted Tools </doc/legacy.rst>`_ for details.

@@ -58,7 +58,7 @@ Hit enter on all questions to use default settings and enable full features (rec
 
 Convenience tools are optional but we recommend them because Midnight Commander is a nicer file
 manager in the command line interface and integrates nicely with IoTempower.
-Micro, and tilde are nicer/easier editors than nano or vim as they support Windows-like
+Micro is a nicer/easier editor than nano or vim as it supports Windows-like
 keyboard shortcuts for select, copy, paste, save, and quit.
 
 *Alternatively, you can install everything directly without the prompt questions by running:*

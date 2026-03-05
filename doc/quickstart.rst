@@ -105,9 +105,9 @@ This will start:
 Keep this terminal running. You can stop the services with Ctrl+C.
 
 .. note::
-   CloudCmd is not needed for this quickstart and is only included in the 
-   Raspberry Pi image for convenience. You'll use local editors and the 
-   ``iot menu`` command instead.
+   CloudCmd (web-based file manager) has been removed from IoTempower.
+   Use local editors (``micro``) and the ``iot menu`` command instead.
+   See `Legacy / Obsoleted Tools </doc/legacy.rst>`_ for details.
 
 MQTT Broker (if not on router)
 ------------------------------
