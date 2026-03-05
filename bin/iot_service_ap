@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+if [[ "$1" = "help" || "$1" = "-h" || "$1" = "--help" || -z "$1" ]]; then
+cat << EOF
+Syntax: iot_service_ap <start|stop|status>
+
+Equivalent to accesspoint lifecycle management (using lnxrouter).
+EOF
+exit 0
+fi
+
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2; exit 1; }
+
+ACTION="$1"
+shift
+
+case "$ACTION" in
+    start)
+        exec accesspoint "$@"
+        ;;
+    stop)
+        sudo pkill -f lnxrouter || true
+        ;;
+    status)
+        if pgrep -f lnxrouter >/dev/null; then
+            echo "accesspoint: running"
+        else
+            echo "accesspoint: not running"
+        fi
+        ;;
+    *)
+        echo "Unknown action: $ACTION" 1>&2
+        exit 1
+        ;;
+esac
