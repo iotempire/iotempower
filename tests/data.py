@@ -11,9 +11,7 @@ packages = [
     #    {"name": "haveged", "package_manager": "binary", "module": "general"}, # not needed on termux, macos
     #    {"name": "python3-dev", "package_manager": "binary", "module": "general"}, # FIXME: could be quieried with query script
     {"name": "terminal-kit", "package_manager": "npm", "module": "general"},
-    {"name": "g++", "package_manager": "binary", "module": "cloud_commander"},
-    {"name": "gritty", "package_manager": "npm", "module": "cloud_commander"},
-    {"name": "cloudcmd", "package_manager": "npm", "module": "cloud_commander"},
+    {"name": "platformio", "package_manager": "binary", "module": "device_management"},
     {"name": "node-red", "package_manager": "npm", "module": "node_red"},
     #    {"name": "debian-keyring", "package_manager": "binary", "module": "caddy"},
     #    {"name": "apt-transport-https", "package_manager": "binary", "module": "caddy"},
