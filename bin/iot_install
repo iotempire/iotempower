@@ -442,7 +442,7 @@ if [[ "$install_system" == 1 ]]; then
 
   # Define the minimum and maximum required node versions
   min_version="20"
-  max_version="22.14.0"
+  max_version="30" # this needs to be high enough
 
   function check_node() {
       # Check if Node.js is installed
