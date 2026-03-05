@@ -20,7 +20,7 @@ case "$ACTION" in
         exec mqtt_starter "$@"
         ;;
     stop)
-        pkill mosquitto || true
+        mqtt_stop
         ;;
     status)
         if pgrep -x mosquitto >/dev/null; then

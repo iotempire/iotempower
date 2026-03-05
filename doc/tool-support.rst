@@ -34,8 +34,8 @@ The tools are available after starting the ``iot`` command (or ``run`` in the in
      - Use a special hardware dongle to wirelessly flash an old IoTempower microcontroller. More about adopting `here </doc/adopting.rst>`__. Same as ``deploy adopt``.
    * - ``deploy``
      - Update software of an IoTempower node over the network (OTA).
-   * - ``mqtt_broker``
-      - Start a local MQTT broker (mosquitto), optionally binding by interface/IP pairs for one or two listener addresses.
+   * - ``mqtt_broker`` / ``mqtt_start``
+      - Start a local MQTT broker (mosquitto), optionally binding by interface/IP pairs for one or two listener addresses. ``mqtt_start`` is the same as ``mqtt_broker``. Stop via ``mqtt_stop`` (or by pressing Ctrl-C twice). This service is also managed by ``iot service`` when ``--mqtt`` is selected (and by default with no explicit selectors).
    * - ``mqtt_listen``
      - Subscribe to a topic deriving all configuration data from the current environment.
    * - ``mqtt_send``
