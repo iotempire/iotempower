@@ -13,6 +13,16 @@ fi
 
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
+LNXROUTER_CMD="$IOTEMPOWER_EXTERNAL/linux-router/lnxrouter"
+if [[ ! -x "$LNXROUTER_CMD" ]]; then
+    if command -v lnxrouter >/dev/null 2>&1; then
+        LNXROUTER_CMD="$(command -v lnxrouter)"
+    else
+        echo "linux-router not found. Install with iot install (core) or clone https://github.com/garywill/linux-router to $IOTEMPOWER_EXTERNAL/linux-router." 1>&2
+        exit 1
+    fi
+fi
+
 SHOW_ONLY=0
 WLAN_OVERRIDE=""
 WLAN2_OVERRIDE=""
@@ -179,7 +189,7 @@ EOF
     if [[ "$HIDDEN" ]]; then
         echo "Warning: hidden SSID mode is not supported with lnxrouter in this script and will be ignored."
     fi
-    sudo lnxrouter --ap "$OUTPUT_WIFI" "$AP_NAME" \
+    sudo "$LNXROUTER_CMD" --ap "$OUTPUT_WIFI" "$AP_NAME" \
         -p "$PASSWORD" \
         -g "$IP" \
         --freq-band 2.4 \
@@ -187,7 +197,7 @@ EOF
         -c "$CHANNEL" &
     ap_id1=$!
     if [[ "$OUTPUT_WIFI2" ]]; then
-        sudo lnxrouter --ap "$OUTPUT_WIFI2" "$AP_NAME2" \
+        sudo "$LNXROUTER_CMD" --ap "$OUTPUT_WIFI2" "$AP_NAME2" \
             -p "$PASSWORD" \
             -g "$IP2" \
             --freq-band 2.4 \

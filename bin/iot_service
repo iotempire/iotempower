@@ -56,6 +56,10 @@ log() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*"
 }
 
+has_lnxrouter() {
+    [[ -x "$IOTEMPOWER_EXTERNAL/linux-router/lnxrouter" ]] || command -v lnxrouter &>/dev/null
+}
+
 pick_default_wlan() {
     if [[ "$IOTEMPOWER_AP_DEVICES" ]]; then
         for possible in $IOTEMPOWER_AP_DEVICES; do
@@ -261,8 +265,8 @@ start_services_tmux() {
         fi
     fi
     if [[ $START_AP -eq 1 ]]; then
-        if ! command -v lnxrouter &>/dev/null; then
-            echo "lnxrouter is not installed. Install it or omit --ap." 1>&2
+        if ! has_lnxrouter; then
+            echo "linux-router is not installed. Run iot install (core) or omit --ap." 1>&2
             tmux kill-session -t "$SESSION_NAME" 2>/dev/null || true
             exit 1
         fi
@@ -305,8 +309,8 @@ start_services_direct() {
         DIRECT_PIDS="$DIRECT_PIDS $!"
     fi
     if [[ $START_AP -eq 1 ]]; then
-        if ! command -v lnxrouter &>/dev/null; then
-            echo "lnxrouter is not installed. Install it or omit --ap." 1>&2
+        if ! has_lnxrouter; then
+            echo "linux-router is not installed. Run iot install (core) or omit --ap." 1>&2
             exit 1
         fi
         bash -c "$(build_accesspoint_cmd)" &
