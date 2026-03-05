@@ -33,14 +33,13 @@ Service config:
   --gateway IP             Accesspoint gateway IP (default from config)
   --wlan2 IFACE            Optional second WLAN interface for double NAT AP mode
   --gateway2 IP            Optional second accesspoint gateway IP for double NAT
-  --double-nat             Start two lnxrouter instances (requires wlan2 + gateway2)
   --channel CH             WiFi channel for accesspoint (default from config)
 
 Examples:
   iot service start
   iot service start --ap --wlan wlan1
   iot service start --web --ap --notmux
-  iot service start --all --double-nat --wlan wlan1 --wlan2 wlan0 --gateway2 192.168.13.1
+  iot service start --all --wlan wlan1 --wlan2 wlan0 --gateway2 192.168.13.1
   iot service stop --all
 EOF
 }
@@ -80,7 +79,6 @@ AP_GATEWAY="${IOTEMPOWER_AP_IP:-192.168.14.1}"
 AP_WLAN2="${IOTEMPOWER_AP_DEVICE2:-}"
 AP_GATEWAY2="${IOTEMPOWER_AP_IP2:-}"
 AP_CHANNEL="${IOTEMPOWER_AP_CHANNEL:-6}"
-AP_DOUBLE_NAT=0
 
 START_WEB=1
 START_MQTT=1
@@ -156,17 +154,11 @@ while [[ $# -gt 0 ]]; do
             ;;
         --wlan2)
             AP_WLAN2="$2"
-            AP_DOUBLE_NAT=1
             shift 2
             ;;
         --gateway2)
             AP_GATEWAY2="$2"
-            AP_DOUBLE_NAT=1
             shift 2
-            ;;
-        --double-nat)
-            AP_DOUBLE_NAT=1
-            shift
             ;;
         --channel)
             AP_CHANNEL="$2"
@@ -240,9 +232,6 @@ build_accesspoint_cmd() {
     fi
     if [[ "$AP_GATEWAY2" ]]; then
         printf -v cmd '%s --gateway2 %q' "$cmd" "$AP_GATEWAY2"
-    fi
-    if [[ $AP_DOUBLE_NAT -eq 1 ]]; then
-        cmd="$cmd --double-nat"
     fi
     echo "$cmd"
 }

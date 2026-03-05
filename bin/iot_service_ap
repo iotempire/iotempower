@@ -9,9 +9,8 @@ Equivalent to accesspoint lifecycle management (using lnxrouter).
 Options for start:
   --wlan IFACE          Override primary AP interface
   --gateway IP          Override primary AP gateway IP
-  --wlan2 IFACE         Optional second AP interface for double NAT mode
+  --wlan2 IFACE         Optional second AP interface (enables double NAT mode)
   --gateway2 IP         Optional second AP gateway IP for double NAT mode
-  --double-nat          Start a second lnxrouter instance (requires wlan2 + gateway2)
 EOF
 exit 0
 fi

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 if [[ "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF
-Syntax: accesspoint [show] [--wlan IFACE] [--gateway IP] [--wlan2 IFACE] [--gateway2 IP] [--double-nat]
+Syntax: accesspoint [show] [--wlan IFACE] [--gateway IP] [--wlan2 IFACE] [--gateway2 IP]
 
 accesspoint creates a local accesspoint corresponding to parameters set
 in iotempower/etc/iotempower.conf.
@@ -18,7 +18,6 @@ WLAN_OVERRIDE=""
 WLAN2_OVERRIDE=""
 GATEWAY_OVERRIDE=""
 GATEWAY2_OVERRIDE=""
-DOUBLE_NAT=0
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -36,17 +35,11 @@ while [[ $# -gt 0 ]]; do
             ;;
         --wlan2)
             WLAN2_OVERRIDE="$2"
-            DOUBLE_NAT=1
             shift 2
             ;;
         --gateway2)
             GATEWAY2_OVERRIDE="$2"
-            DOUBLE_NAT=1
             shift 2
-            ;;
-        --double-nat)
-            DOUBLE_NAT=1
-            shift
             ;;
         *)
             echo "Unknown option: $1" 1>&2
@@ -54,6 +47,11 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
+
+if [[ "$GATEWAY2_OVERRIDE" && ! "$WLAN2_OVERRIDE" ]]; then
+    echo "second gateway needs second interface: use --wlan2 with --gateway2." 1>&2
+    exit 1
+fi
 
 if [[ "$SHOW_ONLY" -ne 1 ]]; then
     ufw_active=""
@@ -86,20 +84,7 @@ while true; do
     fi
 
     OUTPUT_WIFI2="$WLAN2_OVERRIDE"
-    if [[ "$DOUBLE_NAT" -eq 1 && ! "$OUTPUT_WIFI2" ]]; then
-        for possible in $(echo "$IOTEMPOWER_AP_DEVICES"); do
-            if [[ "$possible" != "$OUTPUT_WIFI" && "$available_wifi" =~ .*"$possible".* ]]; then
-                OUTPUT_WIFI2="$possible"
-                break
-            fi
-        done
-    fi
-
-    if [[ "$DOUBLE_NAT" -eq 1 && ! "$OUTPUT_WIFI2" ]]; then
-        echo "double NAT needs a second interface (use --wlan2 or IOTEMPOWER_AP_DEVICES)." 1>&2
-        exit 1
-    fi
-    if [[ "$DOUBLE_NAT" -eq 1 && "$OUTPUT_WIFI2" = "$OUTPUT_WIFI" ]]; then
+    if [[ "$OUTPUT_WIFI2" && "$OUTPUT_WIFI2" = "$OUTPUT_WIFI" ]]; then
         echo "double NAT needs a different second interface." 1>&2
         exit 1
     fi
@@ -128,7 +113,7 @@ while true; do
     IP="${GATEWAY_OVERRIDE:-$IOTEMPOWER_AP_IP}"
     IP2="${GATEWAY2_OVERRIDE:-$IOTEMPOWER_AP_IP2}"
 
-    if [[ "$DOUBLE_NAT" -eq 1 && ! "$IP2" ]]; then
+    if [[ "$OUTPUT_WIFI2" && ! "$IP2" ]]; then
         echo "double NAT needs a second IP (use --gateway2 or IOTEMPOWER_AP_IP2)." 1>&2
         exit 1
     fi
@@ -162,7 +147,7 @@ EOF
     echo
     echo "Starting accesspoint with name $AP_NAME on channel $CHANNEL."
     echo "Will use $OUTPUT_WIFI with mac $OUTPUT_MAC to run an accesspoint."
-    if [[ "$DOUBLE_NAT" -eq 1 ]]; then
+    if [[ "$OUTPUT_WIFI2" ]]; then
         echo "double NAT enabled: starting second accesspoint $AP_NAME2 on $OUTPUT_WIFI2."
     fi
     echo "Internet-input device is $INPUT_DEVICE."
@@ -201,7 +186,7 @@ EOF
         --no-virt \
         -c "$CHANNEL" &
     ap_id1=$!
-    if [[ "$DOUBLE_NAT" -eq 1 ]]; then
+    if [[ "$OUTPUT_WIFI2" ]]; then
         sudo lnxrouter --ap "$OUTPUT_WIFI2" "$AP_NAME2" \
             -p "$PASSWORD" \
             -g "$IP2" \
