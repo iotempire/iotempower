@@ -23,7 +23,7 @@ Service selection:
 
 Execution options:
   --session NAME           tmux session name (default: iot-services)
-  --notmux                 Start in current terminal (no tmux)
+  --no-tmux                Start in current terminal (no tmux)
 
 Service config:
   --wlan IFACE             WLAN interface for accesspoint and mqtt (when ap selected)
@@ -38,7 +38,7 @@ Service config:
 Examples:
   iot service start
   iot service start --ap --wlan wlan1
-  iot service start --web --ap --notmux
+  iot service start --web --ap --no-tmux
   iot service start --all --wlan wlan1 --wlan2 wlan0 --gateway2 192.168.13.1
   iot service stop --all
 EOF
@@ -127,7 +127,7 @@ while [[ $# -gt 0 ]]; do
             SESSION_NAME="$2"
             shift 2
             ;;
-        --notmux)
+        --no-tmux|--notmux)
             USE_TMUX=0
             shift
             ;;
