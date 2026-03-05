@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 if [[ "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
 cat << EOF
-Syntax: accesspoint [show]
+Syntax: accesspoint [show] [--wlan IFACE] [--gateway IP] [--wlan2 IFACE] [--gateway2 IP]
 
 accesspoint creates a local accesspoint corresponding to parameters set
 in iotempower/etc/iotempower.conf.
@@ -13,7 +13,60 @@ fi
 
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
-if [[ "$1" != "show" ]]; then
+LNXROUTER_CMD="$IOTEMPOWER_EXTERNAL/linux-router/lnxrouter"
+if [[ ! -x "$LNXROUTER_CMD" ]]; then
+    if command -v lnxrouter >/dev/null 2>&1; then
+        LNXROUTER_CMD="$(command -v lnxrouter)"
+    else
+        echo "linux-router not found. Install with iot install (core) or clone https://github.com/garywill/linux-router to $IOTEMPOWER_EXTERNAL/linux-router." 1>&2
+        exit 1
+    fi
+fi
+
+SHOW_ONLY=0
+WLAN_OVERRIDE=""
+WLAN2_OVERRIDE=""
+GATEWAY_OVERRIDE=""
+GATEWAY2_OVERRIDE=""
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        show)
+            SHOW_ONLY=1
+            shift
+            ;;
+        --wlan)
+            WLAN_OVERRIDE="$2"
+            shift 2
+            ;;
+        --gateway)
+            GATEWAY_OVERRIDE="$2"
+            shift 2
+            ;;
+        --wlan2)
+            WLAN2_OVERRIDE="$2"
+            shift 2
+            ;;
+        --gateway2)
+            GATEWAY2_OVERRIDE="$2"
+            shift 2
+            ;;
+        *)
+            echo "Unknown option: $1" 1>&2
+            exit 1
+            ;;
+    esac
+done
+
+if [[ "$GATEWAY2_OVERRIDE" && ! "$WLAN2_OVERRIDE" ]]; then
+    echo "second gateway needs second interface: use --wlan2 with --gateway2." 1>&2
+    exit 1
+fi
+
+if [[ "$SHOW_ONLY" -ne 1 ]]; then
+    echo "Accesspoint setup needs sudo privileges for network and firewall operations."
+    echo "Requesting sudo now for: stopping old lnxrouter processes, configuring iptables, enabling IP forwarding, and starting AP runtime."
+    sudo -v || { echo "Could not obtain sudo credentials for accesspoint setup." 1>&2; exit 1; }
     ufw_active=""
     sudo ufw status| grep "Status: active" &>/dev/null && ufw_active="true"
 fi
@@ -27,18 +80,26 @@ while true; do
     fi
 
     # detect output wireless network device to start AP on
-    OUTPUT_WIFI=""
-    if [[ "$IOTEMPOWER_AP_DEVICES" ]]; then
-        available_wifi=$(echo $(ip link show|cut -d: -f2|grep " wl"|cut -b2-))
-        for possible in $(echo "$IOTEMPOWER_AP_DEVICES"); do
-            if [[ "$available_wifi" =~ .*"$possible".* ]]; then
-                OUTPUT_WIFI="$possible"
-                break
-            fi
-        done
-    else
-        # Take first available
-        OUTPUT_WIFI=$(ip link show|cut -d: -f2|grep " wl"|cut -b2-|tail -n1)
+    available_wifi=$(echo $(ip link show|cut -d: -f2|grep " wl"|cut -b2-))
+    OUTPUT_WIFI="$WLAN_OVERRIDE"
+    if [[ ! "$OUTPUT_WIFI" ]]; then
+        if [[ "$IOTEMPOWER_AP_DEVICES" ]]; then
+            for possible in $(echo "$IOTEMPOWER_AP_DEVICES"); do
+                if [[ "$available_wifi" =~ .*"$possible".* ]]; then
+                    OUTPUT_WIFI="$possible"
+                    break
+                fi
+            done
+        else
+            # Take first available
+            OUTPUT_WIFI=$(ip link show|cut -d: -f2|grep " wl"|cut -b2-|tail -n1)
+        fi
+    fi
+
+    OUTPUT_WIFI2="$WLAN2_OVERRIDE"
+    if [[ "$OUTPUT_WIFI2" && "$OUTPUT_WIFI2" = "$OUTPUT_WIFI" ]]; then
+        echo "double NAT needs a different second interface." 1>&2
+        exit 1
     fi
 
     IOTEMPOWER_AP_NAME_FULL="$IOTEMPOWER_AP_NAME"
@@ -51,6 +112,7 @@ while true; do
 
     # add network extension for making essid more unique
     AP_NAME="$IOTEMPOWER_AP_NAME_FULL"
+    AP_NAME2="${IOTEMPOWER_AP_NAME2:-${AP_NAME}-2}"
 
     PASSWORD="$IOTEMPOWER_AP_PASSWORD"
 
@@ -59,15 +121,22 @@ while true; do
         # pick channel randomly
         CHANNEL=$(shuf -n 1 -e 2 3 4 5 7 8 9 10)
     fi
+    CHANNEL2="${IOTEMPOWER_AP_CHANNEL2:-$CHANNEL}"
 
-    IP="$IOTEMPOWER_AP_IP"
+    IP="${GATEWAY_OVERRIDE:-$IOTEMPOWER_AP_IP}"
+    IP2="${GATEWAY2_OVERRIDE:-$IOTEMPOWER_AP_IP2}"
+
+    if [[ "$OUTPUT_WIFI2" && ! "$IP2" ]]; then
+        echo "double NAT needs a second IP (use --gateway2 or IOTEMPOWER_AP_IP2)." 1>&2
+        exit 1
+    fi
 
     HIDDEN=""
     if [[ "$IOTEMPOWER_AP_HIDDEN" = "yes" ]]; then
         HIDDEN="--hidden"
     fi
 
-    if [[ "$1" = "show" ]]; then
+    if [[ "$SHOW_ONLY" -eq 1 ]]; then
 #        echo "ACCESSPOINT_NAME=$AP_NAME"
         echo "$AP_NAME"
         exit 0
@@ -76,7 +145,7 @@ while true; do
     mkdir -p "$IOTEMPOWER_ROOT/tmp"
     HOSTFILE="$IOTEMPOWER_ROOT/tmp/ap-host"
     cat << EOF > "$HOSTFILE"
-$IOTEMPOWER_AP_IP gw.iotempire.net $IOTEMPOWER_AP_HOSTNAME.localnet $IOTEMPOWER_AP_HOSTNAME
+$IP gw.iotempire.net $IOTEMPOWER_AP_HOSTNAME.localnet $IOTEMPOWER_AP_HOSTNAME
 EOF
 
 
@@ -85,12 +154,16 @@ EOF
         HOSTAPD_EXTRA="--hostapd-extra bridge=br0"
     fi
 
-    echo "Stopping all existing services."
-    sudo pkill create_ap
+    echo "Stopping all existing lnxrouter services."
+    echo "Using sudo here because lnxrouter is started as root and must be stopped before reconfiguring AP networking."
+    sudo pkill -f lnxrouter
     sleep 2
     echo
     echo "Starting accesspoint with name $AP_NAME on channel $CHANNEL."
     echo "Will use $OUTPUT_WIFI with mac $OUTPUT_MAC to run an accesspoint."
+    if [[ "$OUTPUT_WIFI2" ]]; then
+        echo "double NAT enabled: starting second accesspoint $AP_NAME2 on $OUTPUT_WIFI2."
+    fi
     echo "Internet-input device is $INPUT_DEVICE."
     echo
     sudo iptables -t nat -F POSTROUTING
@@ -114,29 +187,47 @@ EOF
     # on void linux
     # enable ip-forwarding
     sudo sysctl -w net.ipv4.ip_forward=1
-    sudo "$IOTEMPOWER_EXTERNAL/create_ap/create_ap" \
-        -w 2 \
-        -c "$CHANNEL" $HIDDEN \
+    if [[ "$HOSTAPD_EXTRA" ]]; then
+        echo "Warning: bridge mode is not supported with lnxrouter in this script and will be ignored."
+    fi
+    if [[ "$HIDDEN" ]]; then
+        echo "Warning: hidden SSID mode is not supported with lnxrouter in this script and will be ignored."
+    fi
+    sudo "$LNXROUTER_CMD" --ap "$OUTPUT_WIFI" "$AP_NAME" \
+        -p "$PASSWORD" \
         -g "$IP" \
-        $HOSTAPD_EXTRA \
-        -e "$HOSTFILE" \
-        --domain "localnet" \
-        "$OUTPUT_WIFI" "$INPUT_DEVICE" "$AP_NAME" "$PASSWORD" &
-    ap_id=$!
+        --freq-band 2.4 \
+        --no-virt \
+        -c "$CHANNEL" &
+    ap_id1=$!
+    if [[ "$OUTPUT_WIFI2" ]]; then
+        sudo "$LNXROUTER_CMD" --ap "$OUTPUT_WIFI2" "$AP_NAME2" \
+            -p "$PASSWORD" \
+            -g "$IP2" \
+            --freq-band 2.4 \
+            --no-virt \
+            -c "$CHANNEL2" &
+        ap_id2=$!
+    else
+        ap_id2=""
+    fi
     sleep 7 # let ap start up
     if [[ "$IOTEMPOWER_AP_BRIDGE" ]]; then
         # fix ip address
         sudo ifconfig "$OUTPUT_WIFI" 0.0.0.0
         sudo ifconfig br0 "$IP"
         sudo iptables -t nat -D POSTROUTING 1
-        sudo iptables -t nat -A POSTROUTING -s $IOTEMPOWER_AP_IP/24 \
+        sudo iptables -t nat -A POSTROUTING -s "$IP"/24 \
                 -o "$INPUT_DEVICE" -j MASQUERADE
     fi
     # make sure to restore firewall
-    if [[ "$1" != "show" ]]; then
+    if [[ "$SHOW_ONLY" -ne 1 ]]; then
         if [[ "$ufw_active" ]]; then
             sudo ufw enable
         fi
-        wait $ap_id
+        wait $ap_id1
+        if [[ "$ap_id2" ]]; then
+            wait $ap_id2
+        fi
     fi
 done

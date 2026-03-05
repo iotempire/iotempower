@@ -502,9 +502,15 @@ if [[ "$install_core" == 1 ]]; then
   iot_grun python setup.py install
   popd
 
-  # access point - TODO: make this optional
-  git clone https://github.com/ulno/create_ap "$IOTEMPOWER_EXTERNAL/create_ap"
-  #cd "$IOTEMPOWER_EXTERNAL/create_ap"
+  # access point helper script (previously create_ap)
+  mkdir -p "$IOTEMPOWER_EXTERNAL"
+  if [[ -d "$IOTEMPOWER_EXTERNAL/linux-router/.git" ]]; then
+    git -C "$IOTEMPOWER_EXTERNAL/linux-router" pull --ff-only || true
+  else
+    rm -rf "$IOTEMPOWER_EXTERNAL/linux-router"
+    git clone https://github.com/garywill/linux-router "$IOTEMPOWER_EXTERNAL/linux-router"
+  fi
+
   activate
 
   # install node.js related stuff

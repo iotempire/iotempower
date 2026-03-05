@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+if [[ "$1" = "help" || "$1" = "-h" || "$1" = "--help" || -z "$1" ]]; then
+cat << EOF
+Syntax: iot_service_mqtt <start|stop|status> [interface1|scanif [ip1 [interface2 [ip2]]]]
+EOF
+exit 0
+fi
+
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2; exit 1; }
+
+ACTION="$1"
+shift
+
+case "$ACTION" in
+    start)
+        if [[ $# -eq 0 ]]; then
+            exec mqtt_starter scanif
+        fi
+        exec mqtt_starter "$@"
+        ;;
+    stop)
+        mqtt_stop
+        ;;
+    status)
+        if pgrep -x mosquitto >/dev/null; then
+            echo "mqtt: running"
+        else
+            echo "mqtt: not running"
+        fi
+        ;;
+    *)
+        echo "Unknown action: $ACTION" 1>&2
+        exit 1
+        ;;
+esac

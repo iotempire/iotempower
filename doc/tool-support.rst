@@ -19,7 +19,12 @@ The tools are available after starting the ``iot`` command (or ``run`` in the in
    * - ``iot menu``
      - Access most frequently used IoTempower tools under one convenient text-based menu.
    * - ``accesspoint``
-     - Start an access point on a free WiFi interface. This is default on the IoTempower Raspberry Pi image. Requires root access.
+      - Start an access point on a free WiFi interface. This is default on the IoTempower Raspberry Pi image. Requires root access.
+   * - ``iot service``
+      - Orchestrate IoTempower gateway services with explicit selectors
+        (``--web``, ``--mqtt``, ``--ap``), plus ``--all``/``--default``;
+        runs in tmux by default or directly with ``--no-tmux``.
+        MQTT selection uses ``mqtt_broker``/``mqtt_start``.
    * - ``iot upgrade``
      - Update to the latest version of IoTempower.
    * - ``iot install``
@@ -32,8 +37,10 @@ The tools are available after starting the ``iot`` command (or ``run`` in the in
      - Use a special hardware dongle to wirelessly flash an old IoTempower microcontroller. More about adopting `here </doc/adopting.rst>`__. Same as ``deploy adopt``.
    * - ``deploy``
      - Update software of an IoTempower node over the network (OTA).
-   * - ``mqtt_broker``
-     - Start a local MQTT broker (mosquitto) listening on all interfaces.
+   * - ``mqtt_broker`` / ``mqtt_start``
+      - Start a local MQTT broker (mosquitto), optionally bound to one or two interface/IP listeners. ``mqtt_start`` is an alias.
+   * - ``mqtt_stop``
+      - Stop the local MQTT broker started via ``mqtt_broker``/``mqtt_start``. If running interactively, stopping also works by pressing Ctrl-C twice.
    * - ``mqtt_listen``
      - Subscribe to a topic deriving all configuration data from the current environment.
    * - ``mqtt_send``
