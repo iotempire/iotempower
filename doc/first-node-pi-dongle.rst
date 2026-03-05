@@ -151,4 +151,3 @@ be controlled with Node-RED using the button on this page
 
 Top: `ToC <index-doc.rst>`_, Previous: `Installation <installation.rst>`_,
 Next: `Second Node <second-node.rst>`_.
-`Versão em português aqui <first-node-pt.rst>`_.

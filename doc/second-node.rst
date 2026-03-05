@@ -150,4 +150,3 @@ What is happening in them?
 
 Top: `ToC <index-doc.rst>`_, Previous: `First Node <first-node.rst>`_,
 Next: `External Resources <resources.rst>`_.
-`Versão em português aqui <second-node-pt.rst>`_.
