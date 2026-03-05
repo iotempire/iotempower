@@ -129,21 +129,30 @@ para gerar o certificado de segurança local.
 
 - Você deverá ver agora a home page do seu IoTempower local.
 
-- Abra o link `IoT system example configuration folder
-  </cloudcmd/fs/home/iot/iot-test>`_, você deve ver
-  agora os arquivos do sistema
+- Conecte via SSH ao gateway para explorar a pasta de configuração de exemplo:
+
+  .. code-block:: bash
+
+     ssh iot@iotgateway
+
+  .. note::
+     O CloudCmd (gerenciador de arquivos web) foi removido do IoTempower.
+     Use SSH para acessar os arquivos: ``ssh iot@iotgateway`` (senha: ``iotempire``).
+     Veja `Legacy / Obsoleted Tools </doc/legacy.rst>`_ para mais detalhes.
+
+  Você deve ver agora os arquivos do sistema
   dentro da pasta IoT-test, sendo uma pasta ``node1``,
   um arquivo ``README.rst`` e
   outro ``system.conf``. Por enquanto,
   ignore o segundo painel de arquivos na parte
   direita da tela, primeiro vamos nos concentrar no painel ativo a esquerda.
 
-- Você deverá ver uma pasta chamada `node1
-  <https://iotgateway.local/cloudcmd/fs/home/iot/iot-test/node1/>`_.
-  Entre nesta pasta.
+- Você deverá ver uma pasta chamada ``node1``
+  (anteriormente acessível em
+  ``https://iotgateway.local/cloudcmd/fs/home/iot/iot-test/node1/``).
+  Entre nesta pasta via SSH.
 
-- Quando estiver dentro da pasta `node1
-  <https://iotgateway.local/cloudcmd/fs/home/iot/iot-test/node1/>`_
+- Quando estiver dentro da pasta ``node1``
   clique no botão localizado no canto inferior direito da sua tela.
   O botão está ilustrado abaixo.
 

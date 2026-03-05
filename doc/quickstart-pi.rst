@@ -71,10 +71,8 @@ Accessing the Local Services on the Raspberry Pi
   (If you don't have internet on the gateway and use one of the latter options, accept
   the security exception for the locally generated security certificate.)
   
-  You should now see a link to the filesystem through cloud commander
-  and an IoT system example configuration folder on the pi,
-  as well as links to the Node-RED
-  installation.
+  You should now see the IoTempower homepage with links to Node-RED
+  and the local documentation.
 
 - If you are asked for a user, use ``iot`` (for Node-RED and portainer you want to use admin),
   if you are asked for a password use ``iotempire``.
@@ -91,26 +89,38 @@ Accessing the Local Services on the Raspberry Pi
 
   Continue to read the documentation from there.
 
-- Open the link to the `IoT system example configuration folder
-  </cloudcmd/fs/home/iot/iot-test>`_ (this link only works if you
-  opened it from the previously opened local documentation),
-  you should now see your filesystem
-  inside the IoT-test folder, listing a ``node1``-folder, a ``README.rst`` and
-  a ``system.conf`` file. For now, ignore a potential second file panel to
-  the right, we will first just concentrate here on the active panel. You can 
-  also right-click
-  and open the pages in new tabs, so you can keep the overview page
-  open for later.
+- Connect to the gateway via SSH to explore the example IoT configuration:
 
-- In the Cloudcmd filesystem view,
-  check out the content of README.rst using the view button or view in the
-  context menu (and exiting the view again with Escape or the x in the upper
-  right corner).
+  .. code-block:: bash
 
-- Navigate into the ``node1``-folder and check (as before) the content of
-  ``setup.cpp``. A tiny bit cryptic? Don't fear! This just says, we want to
-  configure a device with a button and make the onboard blue led accessible,
-  leave the content view of ``setup.cpp`` again.
+     ssh iot@iotgateway
+
+  (Use ``iot@192.168.12.1`` if hostname resolution does not work.
+  The default password is ``iotempire``.)
+
+- Once logged in, list the IoT test folder:
+
+  .. code-block:: bash
+
+     ls ~/iot-test
+
+  You should see a ``node1`` folder, a ``README.rst`` and a ``system.conf``
+  file.
+
+- Check out the content of ``README.rst``:
+
+  .. code-block:: bash
+
+     cat ~/iot-test/README.rst
+
+- Navigate into the ``node1`` folder and check the content of ``setup.cpp``:
+
+  .. code-block:: bash
+
+     cat ~/iot-test/node1/setup.cpp
+
+  A tiny bit cryptic? Don't fear! This just says we want to configure a
+  device with a button and make the onboard blue LED accessible.
 
 .. If you have trouble following this, make sure to checkout the tutorials on
    youtube. TODO: provide webpage with links!

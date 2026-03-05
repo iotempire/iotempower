@@ -11,12 +11,11 @@ tools:
 - `DietPi <https://dietpi.com>`__
 - `create_ap <https://github.com/oblique/create_ap>`__ forked for IoTempower
   `here <https://github.com/ulno/create_ap>`__.
-- `cloudcmd <https://github.com/coderaiser/cloudcmd>`__
+- `cloudcmd <https://github.com/coderaiser/cloudcmd>`__ *(legacy — removed from IoTempower; see* `Legacy / Obsoleted Tools </doc/legacy.rst>`_ *)*
 - `FastLed rgb-strip library <https://github.com/FastLED/FastLED>`__,
   unfortunately unstable on teh esp8266 and now extended by
   `NeoPixelBus <https://github.com/Makuna/NeoPixelBus>`__,
 - `rpi-clone <https://github.com/billw2/rpi-clone>`__
-- `The Tilde Texteditor <https://os.ghalkes.nl/tilde>`__
 
 
 As IoTempower relies heavily on MQTT, it also integrates very easily with

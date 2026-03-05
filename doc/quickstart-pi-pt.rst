@@ -68,9 +68,19 @@ Acessando os serviços locais no Raspberry Pi
 
 - Continue a ler a documentação de lá.
 
-- Abra o link `IoT system example configuration folder
-  </cloudcmd/fs/home/iot/iot-test>`_,
-  você deve ver agora os arquivos do sistema
+- Conecte via SSH ao gateway para explorar a pasta de configuração de exemplo:
+
+  .. code-block:: bash
+
+     ssh iot@iotgateway
+
+  .. note::
+     O CloudCmd (gerenciador de arquivos web) foi removido do IoTempower.
+     Use SSH para acessar os arquivos no gateway:
+     ``ssh iot@iotgateway`` (senha: ``iotempire``).
+     Veja `Legacy / Obsoleted Tools </doc/legacy.rst>`_ para mais detalhes.
+
+  Você deve ver agora os arquivos do sistema
   dentro da pasta IoT-test, sendo uma pasta
   ``node1``, um arquivo `` README.rst`` e
   outro `` system.conf``. Por enquanto,

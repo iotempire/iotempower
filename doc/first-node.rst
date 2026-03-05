@@ -62,9 +62,8 @@ and our first node should be called "test01".
    **Optional: Using the Raspberry Pi Image**
    
    If you're using the IoTempower Raspberry Pi image, there's a pre-configured 
-   folder in ``~/iot-systems`` with example configurations. The pi image also 
-   provides CloudCmd for web-based file management. However, the command-line 
-   approach shown here works on all platforms.
+   folder in ``~/iot-systems`` with example configurations. Use SSH or the 
+   ``iot menu`` command to manage files on the Pi.
 
 To create the initial folder via the command-line, do the following:
 
@@ -102,7 +101,7 @@ and eventually update now than being confused later).
 .. note::
    You can also use the ``iot menu`` command to create a new node via 
    the interactive menu system. This works on all platforms and is generally easier 
-   than manual folder creation. (If using CloudCmd, you can press F2 to access the menu.)
+   than manual folder creation.
 
 You can, of course, use another system name than "demo" (and even move
 or rename this folder later). Renaming nodes at a later point
