@@ -502,9 +502,6 @@ if [[ "$install_core" == 1 ]]; then
   iot_grun python setup.py install
   popd
 
-  # access point - TODO: make this optional
-  git clone https://github.com/ulno/create_ap "$IOTEMPOWER_EXTERNAL/create_ap"
-  #cd "$IOTEMPOWER_EXTERNAL/create_ap"
   activate
 
   # install node.js related stuff
@@ -569,6 +566,9 @@ fi # mosquitto
 if [[ "$install_convenience" == 1 ]]; then
   echo_format "Installing convenience tools"
   call_by_system install-other tmux mc micro elinks
+  if ! call_by_system install-other lnxrouter; then
+    echo_format "Could not install lnxrouter automatically. Please install lnxrouter manually."
+  fi
   # consider installing convenience settings for mc (add user-menu to it)
 fi # convenience
 

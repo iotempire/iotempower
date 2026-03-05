@@ -1,0 +1,225 @@
+#!/usr/bin/env bash
+
+if [[ "$1" = "help" || "$1" = "-h" || "$1" = "--help" || -z "$1" ]]; then
+cat << EOF
+Syntax: iot_service <start|stop|restart|status|view> [options]
+
+Orchestrate IoTempower gateway services in a tmux session.
+Runs MQTT and web services in separate windows and can optionally start
+a local access point using lnxrouter.
+
+Commands:
+  start      Start services in tmux.
+  stop       Stop services and close the tmux session.
+  restart    Stop and start again.
+  status     Show current service and tmux session status.
+  view       Attach to the tmux session.
+
+Options:
+  --session NAME        tmux session name (default: iot-services)
+  --router              Start local access point with lnxrouter
+  --wlan IFACE          WLAN interface for lnxrouter and mqtt_starter
+  --mqtt-interface IF   Interface passed to mqtt_starter (default: scanif)
+  --ssid NAME           Access point SSID (default from config)
+  --password PASS       Access point password (default from config)
+  --gateway IP          Access point gateway IP (default from config)
+  --channel CH          WiFi channel for lnxrouter (default from config)
+
+Examples:
+  iot service start
+  iot service start --router --wlan wlan1
+  iot service view
+  iot service stop
+EOF
+exit 0
+fi
+
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2; exit 1; }
+source <(iot_env ignore_system)
+
+log() {
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*"
+}
+
+pick_default_wlan() {
+    if [[ "$IOTEMPOWER_AP_DEVICES" ]]; then
+        for possible in $IOTEMPOWER_AP_DEVICES; do
+            if ip link show "$possible" &> /dev/null; then
+                echo "$possible"
+                return 0
+            fi
+        done
+    fi
+    echo "wlan1"
+}
+
+SESSION_NAME="iot-services"
+START_ROUTER=0
+WLAN_INTERFACE="$(pick_default_wlan)"
+MQTT_INTERFACE="scanif"
+MQTT_INTERFACE_SET=0
+AP_NAME="${IOTEMPOWER_AP_NAME:-iotempower}"
+AP_PASSWORD="${IOTEMPOWER_AP_PASSWORD:-internetofthings7}"
+AP_GATEWAY="${IOTEMPOWER_AP_IP:-192.168.14.1}"
+AP_CHANNEL="${IOTEMPOWER_AP_CHANNEL:-6}"
+
+ACTION="$1"
+shift
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --session)
+            SESSION_NAME="$2"
+            shift 2
+            ;;
+        --router)
+            START_ROUTER=1
+            shift
+            ;;
+        --wlan)
+            WLAN_INTERFACE="$2"
+            shift 2
+            ;;
+        --mqtt-interface)
+            MQTT_INTERFACE="$2"
+            MQTT_INTERFACE_SET=1
+            shift 2
+            ;;
+        --ssid)
+            AP_NAME="$2"
+            shift 2
+            ;;
+        --password)
+            AP_PASSWORD="$2"
+            shift 2
+            ;;
+        --gateway)
+            AP_GATEWAY="$2"
+            shift 2
+            ;;
+        --channel)
+            AP_CHANNEL="$2"
+            shift 2
+            ;;
+        *)
+            echo "Unknown option: $1" 1>&2
+            exit 1
+            ;;
+    esac
+done
+
+if [[ $START_ROUTER -eq 1 && $MQTT_INTERFACE_SET -eq 0 ]]; then
+    MQTT_INTERFACE="$WLAN_INTERFACE"
+fi
+
+tmux_has_session() {
+    tmux has-session -t "$SESSION_NAME" 2> /dev/null
+}
+
+start_window() {
+    local window_name="$1"
+    local cmd="$2"
+    tmux new-window -t "$SESSION_NAME" -n "$window_name"
+    tmux send-keys -t "$SESSION_NAME:$window_name" "$cmd" Enter
+}
+
+start_services() {
+    if tmux_has_session; then
+        echo "Session '$SESSION_NAME' already exists." 1>&2
+        echo "Use: iot service view  (or stop/restart)." 1>&2
+        exit 1
+    fi
+
+    log "Creating tmux session '$SESSION_NAME'."
+    local mqtt_cmd
+    printf -v mqtt_cmd 'mqtt_starter %q' "$MQTT_INTERFACE"
+
+    tmux new-session -d -s "$SESSION_NAME" -n "mqtt"
+    tmux send-keys -t "$SESSION_NAME:mqtt" "$mqtt_cmd" Enter
+    start_window "web" "web_starter"
+
+    if [[ $START_ROUTER -eq 1 ]]; then
+        if ! command -v lnxrouter &> /dev/null; then
+            echo "lnxrouter is not installed. Install it or omit --router." 1>&2
+            tmux kill-session -t "$SESSION_NAME" 2>/dev/null || true
+            exit 1
+        fi
+        local router_cmd
+        printf -v router_cmd 'sudo lnxrouter --ap %q %q -p %q -g %q --freq-band 2.4 --no-virt -c %q' \
+            "$WLAN_INTERFACE" "$AP_NAME" "$AP_PASSWORD" "$AP_GATEWAY" "$AP_CHANNEL"
+        log "Starting local access point using lnxrouter on $WLAN_INTERFACE."
+        start_window "router" "$router_cmd"
+    fi
+
+    log "Services started. Attach with: tmux attach -t $SESSION_NAME"
+}
+
+stop_services() {
+    if ! tmux_has_session; then
+        log "Session '$SESSION_NAME' is not running."
+        return 0
+    fi
+
+    log "Stopping web services."
+    web_stop || true
+
+    log "Stopping MQTT broker."
+    pkill mosquitto || true
+
+    if tmux list-windows -t "$SESSION_NAME" -F '#W' 2>/dev/null | grep -qx "router"; then
+        log "Stopping lnxrouter."
+        sudo pkill -f lnxrouter || true
+    fi
+
+    tmux kill-session -t "$SESSION_NAME" 2>/dev/null || true
+    log "Session '$SESSION_NAME' stopped."
+}
+
+show_status() {
+    if tmux_has_session; then
+        echo "tmux session '$SESSION_NAME': running"
+        tmux list-windows -t "$SESSION_NAME"
+    else
+        echo "tmux session '$SESSION_NAME': not running"
+    fi
+
+    if pgrep -x mosquitto > /dev/null; then
+        echo "mqtt: running"
+    else
+        echo "mqtt: not running"
+    fi
+
+    if pgrep -f lnxrouter > /dev/null; then
+        echo "router: running"
+    else
+        echo "router: not running"
+    fi
+}
+
+case "$ACTION" in
+    start)
+        start_services
+        ;;
+    stop)
+        stop_services
+        ;;
+    restart)
+        stop_services
+        start_services
+        ;;
+    status)
+        show_status
+        ;;
+    view)
+        if ! tmux_has_session; then
+            echo "Session '$SESSION_NAME' is not running." 1>&2
+            exit 1
+        fi
+        exec tmux attach -t "$SESSION_NAME"
+        ;;
+    *)
+        echo "Unknown action: $ACTION" 1>&2
+        echo "Use --help for usage." 1>&2
+        exit 1
+        ;;
+esac

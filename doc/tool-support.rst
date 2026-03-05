@@ -19,7 +19,9 @@ The tools are available after starting the ``iot`` command (or ``run`` in the in
    * - ``iot menu``
      - Access most frequently used IoTempower tools under one convenient text-based menu.
    * - ``accesspoint``
-     - Start an access point on a free WiFi interface. This is default on the IoTempower Raspberry Pi image. Requires root access.
+      - Start an access point on a free WiFi interface. This is default on the IoTempower Raspberry Pi image. Requires root access.
+   * - ``iot service``
+     - Orchestrate IoTempower gateway services in tmux (start/stop/status/view for ``mqtt_starter``, ``web_starter``, and optional ``lnxrouter`` access point).
    * - ``iot upgrade``
      - Update to the latest version of IoTempower.
    * - ``iot install``

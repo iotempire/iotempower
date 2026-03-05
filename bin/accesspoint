@@ -86,7 +86,7 @@ EOF
     fi
 
     echo "Stopping all existing services."
-    sudo pkill create_ap
+    sudo pkill -f lnxrouter
     sleep 2
     echo
     echo "Starting accesspoint with name $AP_NAME on channel $CHANNEL."
@@ -114,14 +114,18 @@ EOF
     # on void linux
     # enable ip-forwarding
     sudo sysctl -w net.ipv4.ip_forward=1
-    sudo "$IOTEMPOWER_EXTERNAL/create_ap/create_ap" \
-        -w 2 \
-        -c "$CHANNEL" $HIDDEN \
+    if [[ "$HOSTAPD_EXTRA" ]]; then
+        echo "Warning: bridge mode is not supported with lnxrouter in this script and will be ignored."
+    fi
+    if [[ "$HIDDEN" ]]; then
+        echo "Warning: hidden SSID mode is not supported with lnxrouter in this script and will be ignored."
+    fi
+    sudo lnxrouter --ap "$OUTPUT_WIFI" "$AP_NAME" \
+        -p "$PASSWORD" \
         -g "$IP" \
-        $HOSTAPD_EXTRA \
-        -e "$HOSTFILE" \
-        --domain "localnet" \
-        "$OUTPUT_WIFI" "$INPUT_DEVICE" "$AP_NAME" "$PASSWORD" &
+        --freq-band 2.4 \
+        --no-virt \
+        -c "$CHANNEL" &
     ap_id=$!
     sleep 7 # let ap start up
     if [[ "$IOTEMPOWER_AP_BRIDGE" ]]; then
