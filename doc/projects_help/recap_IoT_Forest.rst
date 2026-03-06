@@ -132,7 +132,7 @@ Then access Chrome and run the following address:
 
     localhost:40081
 
-Access the Node-RED user interface page. And see the graphs.
+Access the `Node-RED Dashboard 2 </nodered/dashboard/>`_ page and see the graphs.
 
 Copy all images from the Phone to Computer using SCP
 ----------------------------------------------------

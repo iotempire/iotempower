@@ -146,8 +146,7 @@ Adopting the Node in the IoTempower environment on the Raspberry Pi
 
 
 Congratulations!! Your node is now connect to IoTempower and the onboard-led can
-be controlled with Node-RED using the button on this page
-`</nodered/ui/#/1>`_.
+be controlled with Node-RED via `Dashboard 2 </nodered/dashboard/>`_.
 
 Top: `ToC <index-doc.rst>`_, Previous: `Installation <installation.rst>`_,
 Next: `Second Node <second-node.rst>`_.
