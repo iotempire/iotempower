@@ -62,9 +62,12 @@ while true; do
     [[ "$IOTEMPOWER_MQTT_HOST2" ]] && echo "Also listening on $IOTEMPOWER_MQTT_HOST2."
 
     # Create mosquitto config - user is needed for root on docker
+    MQTT_BROKER_USER="${USER:-$(id -un 2>/dev/null)}"
+    MQTT_BROKER_USER_LINE=""
+    [[ "$MQTT_BROKER_USER" ]] && MQTT_BROKER_USER_LINE="user $MQTT_BROKER_USER"
     cat << EOF > "$APTEMP/mosquitto.conf"
 pid_file $APTEMP/pid
-user $USER
+$MQTT_BROKER_USER_LINE
 persistence false
 persistence_location $APTEMP/mosquitto.db
 log_dest stdout
