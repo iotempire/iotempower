@@ -41,19 +41,13 @@ create_doc() {
     echo "Generating man pages."
     export LC_ALL=C # fails for some non English language settings else
 
-    cat << EOF > $IOTEMPOWER_ROOT/doc/_links.rst
-.. _IoT system example configuration folder: /cloudcmd/fs$HOME/iot-systems/demo01
-
-.. _Your home-directory: /cloudcmd/fs$HOME
-
-EOF
     # make man SPHINXOPTS=-v
     iot_grun make man
     echo "Generating web-viewable documentation."
     # make html SPHINXOPTS=-v
     iot_grun make html
     # TODO: do eventually a matching specific version here
-    ln -s -f "$IOTEMPOWER_LOCAL/doc/html/doc/index-pi.html" \
+    ln -s -f "$IOTEMPOWER_LOCAL/doc/html/doc/index.html" \
         "$IOTEMPOWER_LOCAL/doc/html/index.html"
     echo "Documentation creation finished."
 }

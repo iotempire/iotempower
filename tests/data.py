@@ -13,6 +13,7 @@ packages = [
     {"name": "terminal-kit", "package_manager": "npm", "module": "general"},
     {"name": "platformio", "package_manager": "binary", "module": "comp_env"},
     {"name": "node-red", "package_manager": "npm", "module": "node_red"},
+    {"name": "@flowfuse/node-red-dashboard", "package_manager": "npm", "module": "node_red"},
     #    {"name": "debian-keyring", "package_manager": "binary", "module": "caddy"},
     #    {"name": "apt-transport-https", "package_manager": "binary", "module": "caddy"},
     #    {"name": "debian-archive-keyring", "package_manager": "binary", "module": "caddy"},

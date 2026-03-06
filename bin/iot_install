@@ -556,7 +556,7 @@ users: [{
 };
 EOF
     pushd "$HOME/.node-red"
-    npm i node-red/node-red-dashboard  # install dashboard
+    npm i @flowfuse/node-red-dashboard  # install dashboard 2
     npm i node-red-contrib-influxdb # install influxdb connector
     popd
     echo_format "Changed $nodered_config."
