@@ -33,4 +33,7 @@ def test_eval(package_name, package_manager, module) -> None:
         result = subprocess.run(command, shell=True)
         if result.returncode == 0:
             return
-    assert False, f"Cannot find {package_name} in your system which is needed for {module}"
+    assert False, (
+        f"Cannot find {package_name} in your system which is needed for {module}. "
+        f"Checked with: {commands}"
+    )

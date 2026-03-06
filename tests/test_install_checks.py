@@ -3,7 +3,7 @@ import os
 from tests.install_checks import get_install_check_commands
 
 
-def test_node_red_checks_both_npm_locations():
+def test_node_red_npm_checks_both_locations():
     commands = get_install_check_commands("@flowfuse/node-red-dashboard", "npm", "node_red", "/tmp/local")
     assert commands == [
         "cd /tmp/local/nodejs && npm list @flowfuse/node-red-dashboard",
