@@ -499,7 +499,9 @@ if [[ "$install_core" == 1 ]]; then
   mkdir -p "$PIPTEMP"
   git clone https://github.com/iotempire/iotknit "$PIPTEMP/iotknit"
   pushd "$PIPTEMP/iotknit"
-  iot_grun python setup.py install
+  activate
+  iot_grun pip install --no-cache-dir .
+  deactivate
   popd
 
   # access point helper script (previously create_ap)
