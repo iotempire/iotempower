@@ -18,7 +18,7 @@ Core Environment and Help
    * - Command
      - Description
    * - ``iot``
-     - Start an IoTempower shell environment, or run one command directly.
+     - Start an IoTempower shell environment, or run one command directly via exec/x.
    * - ``iot exec <command>`` (or ``iot x``)
      - Execute a command inside the IoTempower environment, e.g. ``iot exec deploy``.
    * - ``iot menu`` / ``umenu``
@@ -62,7 +62,7 @@ Gateway Services and Access Point
    * - Command
      - Description
    * - ``iot service <start|stop|restart|status|view>``
-     - Orchestrate web, MQTT, and access point services with selectors (``--web``, ``--mqtt``, ``--ap``) or ``--all``/``--default``; tmux mode is default, ``--no-tmux`` runs directly, and ``view`` attaches to the tmux session.
+     - Orchestrate web, Node-RED, MQTT, and access point services with selectors (``--web``, ``--mqtt``, ``--ap``) or ``--all``/``--default``; tmux mode is default, ``--no-tmux`` runs directly, and ``view`` attaches to the tmux session. Web services are then available by default on http://localhost:40080
    * - ``iot_service_web <start|stop|status> [full]``
      - Start/stop/status for web stack services.
    * - ``iot_service_mqtt <start|stop|status> [interfaces...]``
