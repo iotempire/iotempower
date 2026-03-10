@@ -21,9 +21,9 @@ Core Environment and Help
    * - ``iot exec <command>`` (or ``iot x``)
      - Execute a command inside the IoTempower environment, e.g. ``iot exec deploy``.
    * - ``iot menu`` / ``umenu``
-     - Open the text-based menu interface with common workflows.
+     - Open the text-based menu interface with common workflows (``u*`` variants are in-environment shortcuts).
    * - ``iot help [cmd]`` / ``uhelp [cmd]``
-     - Show command help and manual pages.
+     - Show command help and manual pages (``u*`` variants are in-environment shortcuts).
    * - ``iot env [ignore_system|ignore_node]``
      - Print resolved IoTempower environment variables from current config context.
 
@@ -40,8 +40,10 @@ Node and Firmware Workflow
      - Compile firmware for the current node (or for all nodes below a system directory).
    * - ``deploy [node-address|compile|adopt|serial]``
      - Build and deploy firmware OTA, compile-only, or flash serial/adopt targets.
-   * - ``initialize`` / ``adopt``
-     - Wrapper for ``deploy adopt`` to initialize a serial node or adopt a node via dongle.
+   * - ``initialize serial [port] [force]``
+     - Initialize/reflash a serially connected node (equivalent to ``deploy serial ...``).
+   * - ``adopt <uiot-node-id>|serial [port] [force]``
+     - Adopt a node wirelessly via dongle by UIOT id (primary mode); also accepts the serial mode equivalent to ``initialize serial``.
    * - ``console_serial [port] [password]``
      - Open a serial monitor for debug output from a locally connected node.
    * - ``create_node_template [name]``
@@ -59,7 +61,7 @@ Gateway Services and Access Point
    * - Command
      - Description
    * - ``iot service <start|stop|restart|status|view>``
-     - Orchestrate web, MQTT, and access point services (tmux mode by default, direct mode with ``--no-tmux``).
+     - Orchestrate web, MQTT, and access point services with selectors (``--web``, ``--mqtt``, ``--ap``) or ``--all``/``--default``; tmux mode is default, ``--no-tmux`` runs directly, and ``view`` attaches to the tmux session.
    * - ``iot_service_web <start|stop|status> [full]``
      - Start/stop/status for web stack services.
    * - ``iot_service_mqtt <start|stop|status> [interfaces...]``
@@ -106,8 +108,8 @@ Documentation, Testing, and Maintenance
      - Build manpages and HTML documentation.
    * - ``iot doc serve``
      - Build docs and serve them locally (default port: ``8000``).
-   * - ``iot test [compile|deploy|hardware|install|smoketest|simple|<device>]``
-     - Run test subsets (pytest-based) for compilation, deployment, hardware, or installation checks.
+   * - ``iot test [compile|deploy|hardware|install|smoketest|simple|device]``
+     - Run pytest-based test subsets including compile, deploy, hardware, install, smoketest, simple, and per-device compilation checks.
    * - ``iot install [clean]``
      - Install or reinstall the IoTempower environment and dependencies.
    * - ``iot upgrade``
@@ -125,7 +127,7 @@ Dongle and Advanced Utilities
    * - Command
      - Description
    * - ``dongle <command> [options]``
-     - Manage adoption dongle actions (for example daemon, flash, scan, probe, display, adopt).
+     - Manage adoption dongle actions, including ``daemon``, ``flash``, ``scan``, ``probe``, ``display``, ``adopt``, and ``quit``.
    * - ``iot server [args]``
      - Start the IoTempower server process relative to the active installation.
 
