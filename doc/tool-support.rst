@@ -107,11 +107,11 @@ Documentation, Testing, and Maintenance
    * - ``iot doc`` / ``iot doc make``
      - Build manpages and HTML documentation.
    * - ``iot doc serve``
-     - Build docs and serve them locally (default port: ``8000``).
+      - Build docs and serve them locally for testing (default port: ``8000``); for regular gateway web serving use ``iot service web``.
    * - ``iot test [compile|deploy|hardware|install|smoketest|simple|device]``
      - Run pytest-based test subsets including compile, deploy, hardware, install, smoketest, simple, and per-device compilation checks.
-   * - ``iot install [clean]``
-     - Install or reinstall the IoTempower environment and dependencies.
+   * - ``iot install [--clean]``
+      - Install or reinstall the IoTempower environment and dependencies.
    * - ``iot upgrade``
      - Update IoTempower from git, refresh scripts, and rebuild docs.
    * - ``iot pio ...`` / ``iot platformio ...``
@@ -129,7 +129,7 @@ Dongle and Advanced Utilities
    * - ``dongle <command> [options]``
      - Manage adoption dongle actions, including ``daemon``, ``flash``, ``scan``, ``probe``, ``display``, ``adopt``, and ``quit``.
    * - ``iot server [args]``
-     - Start the IoTempower server process relative to the active installation.
+      - Start the IoTempower dongle server process relative to the active installation.
 
 
 Top: `ToC <index-doc.rst>`_, Previous: `Supported Hardware <hardware.rst>`_,
