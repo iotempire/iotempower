@@ -106,17 +106,25 @@ Documentation, Testing, and Maintenance
    * - Command
      - Description
    * - ``iot doc`` / ``iot doc make``
-     - Build manpages and HTML documentation.
+      - Build manpages and HTML documentation.
+   * - ``iot doc clean``
+      - Remove generated documentation artifacts.
    * - ``iot doc serve``
       - Build docs and serve them locally for testing (default port: ``8000``); for regular gateway web serving use ``iot service web``.
    * - ``iot test [compile|deploy|hardware|install|smoketest|simple|device]``
-     - Run pytest-based test subsets including compile, deploy, hardware, install, smoketest, simple, and per-device compilation checks.
+      - Run pytest-based test subsets including compile, deploy, hardware, install, smoketest, simple, and per-device compilation checks.
+   * - ``iot test <device> [pytest-args...]``
+      - Run per-device compilation tests on smoke-test boards and forward additional arguments to ``pytest``.
    * - ``iot install [--clean]``
       - Install or reinstall the IoTempower environment and dependencies.
    * - ``iot upgrade``
-     - Update IoTempower from git, refresh scripts, and rebuild docs.
+      - Update IoTempower from git, refresh scripts, and rebuild docs.
+   * - ``iot add_serial_permissions``
+      - Add current user to a system serial-access group (for flashing/monitoring devices).
+   * - ``update_cache``
+      - Recreate the compilation cache and prefetch/build PlatformIO dependencies.
    * - ``iot pio ...`` / ``iot platformio ...``
-     - Run PlatformIO through IoTempower's managed Python environment.
+      - Run PlatformIO through IoTempower's managed Python environment.
 
 Dongle and Advanced Utilities
 -----------------------------
@@ -128,7 +136,15 @@ Dongle and Advanced Utilities
    * - Command
      - Description
    * - ``dongle <command> [options]``
-     - Manage adoption dongle actions, including ``daemon``, ``flash``, ``scan``, ``probe``, ``display``, ``adopt``, and ``quit``.
+      - Manage adoption dongle actions, including ``daemon``, ``flash``, ``scan``, ``probe``, ``display``, ``adopt``, and ``quit``.
+   * - ``dongle daemon [port]``
+      - Start or restart the dongle daemon and track its active serial port for other dongle commands.
+   * - ``dongle flash [port]``
+      - Build and upload dongle firmware with PlatformIO on the detected/provided serial port.
+   * - ``dongle_starter``
+      - Keep restarting ``dongle daemon`` in a loop while a dongle remains available.
+   * - ``find_dongle``
+      - Scan serial devices and print the first detected dongle port.
    * - ``iot server [args]``
       - Start the IoTempower dongle server process relative to the active installation.
 
