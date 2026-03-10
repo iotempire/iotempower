@@ -6,7 +6,6 @@ There are several ways to get the IoTempower configuration management software
 up and running. **A native (classic) Linux installation is always preferred**
 and offers the best experience, maintainability, and full device access.
 
-.. note::
    **Transition Notice:** Docker and Raspberry Pi image installations are 
    being deprecated—see notes below. Podman is now the recommended container
    option if containers are needed.
@@ -56,7 +55,7 @@ After you have **git** and **curl**, install IoTempower in the terminal with the
 
 Hit enter on all questions to use default settings and enable full features (recommended).
 
-Convenience tools are optional but we recommend them because Midnight Commander is a nicer file
+Convenience tools are optional, but we recommend them because Midnight Commander is a nicer file
 manager in the command line interface and integrates nicely with IoTempower.
 Micro is a nicer/easier editor than nano or vim as it supports Windows-like
 keyboard shortcuts for select, copy, paste, save, and quit.
