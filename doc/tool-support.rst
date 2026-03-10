@@ -5,7 +5,8 @@ Tool Support
 
 **Use** ``<tool> help`` **to access helpful information about using any of these tools.**
 
-The tools are available after starting the ``iot`` command (or ``run`` in the install directory).
+The tools are available after starting the ``iot`` command or prefixing an existing command with ``iot x``.
+Commands starting with ``iot_`` can always be run as ``iot <command>``.
 
 Core Environment and Help
 -------------------------
