@@ -8,7 +8,7 @@ test "$password" || password="iotempower"
 
 port=$(find_esp_port "$1" "$password")
 
-if [[ "$port" = tty* ]]; then
+if [[ "$port" == tty* || ("$(uname)" == "Darwin" && "$port" == cu*) ]]; then
     echo "Opening serial console on $port."
     echo "To exit use Ctrl-C."
     echo
