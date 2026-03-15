@@ -7,8 +7,8 @@
 # and byobu
 
 if [[ "$IOTEMPOWER_ROOT" ]]; then # only load when IOTEMPOWER_ROOT is defined
-if [[ ! "$IOTEMPOWER_ACTIVE" = "yes" ]]; then # only import once
 
+# handles multile imports on its own (could make sense for defining python or nvm)
 source "$IOTEMPOWER_ROOT/lib/shell_starter/config.bash" \
         || echo "trouble initializing, environment might not work." 1>&2
 
@@ -27,16 +27,6 @@ source "$IOTEMPOWER_ROOT/lib/shell_starter/config.bash" \
 #alias cd=iot_cd
 #
 #cd
-
-# use nvm if installed
-NVM_DIR="$HOME/.nvm"
-if [[ -s "$NVM_DIR/nvm.sh" ]]; then
-  source "$NVM_DIR/nvm.sh"
-  export NVM_DIR
-  nvm use iotempower-node  &> /dev/null
-fi
-
-fi # ending: if [[ ! "$IOTEMPOWER_ACTIVE" = "yes"]]; then
 
 if [[ "$TERM" ]]; then # only mess with the prompt if there is TERM
 

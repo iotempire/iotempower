@@ -1,7 +1,7 @@
 // vars for eyes
 enum eyes_anim_type {none, wink, color_animation};
 eyes_anim_type eyes_atype = none;
-CRGB dest_color;
+ICRGB dest_color;
 int eyes_frame_counter = 0;
 int eyes_frames = 0;
 int current_eye = 0;
@@ -14,23 +14,23 @@ int tie_frames = 0;
 // prototype for wink
 void start_wink();
 
-//rgb_strip(leds, 13, WS2812, D3, GRB);
+//rgb_strip_bus(leds, 13, F_GRB, NeoEsp8266Uart1800KbpsMethod, D4);
 rgb_strip_bus(leds, 13, F_GRB, NeoEsp8266Uart1800KbpsMethod, D4).report_change(false);
 rgb_matrix(matrix, IN(leds));
 
 animator(anim)
     .with_fps(30)
     .with_frame_builder( [] {
-        CRGB eye1=CRGB::Black, eye2 = CRGB::Black;
-        CRGB new_color;
-        CHSV hsv;
+        ICRGB eye1=ICRGB::Black, eye2 = ICRGB::Black;
+        ICRGB new_color;
+        ICHSV hsv;
         switch(eyes_atype) {
             case wink:
                 if(eyes_frame_counter < eyes_frames/2) { // increase brightness
-                    new_color = blend( CRGB::Black, dest_color, 
+                    new_color = blend( ICRGB::Black, dest_color, 
 						eyes_frame_counter * 255 / (eyes_frames / 2 - 1));
                 } else {
-                    new_color = blend( CRGB::Black, dest_color, 
+                    new_color = blend( ICRGB::Black, dest_color, 
 						(eyes_frames - 1 - eyes_frame_counter) * 255 
 						/ (eyes_frames/2-1));
                 }
@@ -75,7 +75,7 @@ animator(anim)
 			if (tie_frames > 0) tie_frames --;
 			else {
 				tie_atype = tie_none;
-				// keep content IN(matrix).gradient_row(CRGB::Black, CRGB::Black, 2, 0); // off
+				// keep content IN(matrix).gradient_row(ICRGB::Black, ICRGB::Black, 2, 0); // off
 			}
 		}
     } )
@@ -97,12 +97,12 @@ animator(anim)
     } )
     .with_command_handler( "blue_red", [] (Ustring& command) {
         tie_atype = tie_none;
-        IN(matrix).gradient_row(CRGB::Blue, CRGB::Red, 2, 0);
+        IN(matrix).gradient_row(ICRGB::Blue, ICRGB::Red, 2, 0);
         IN(matrix).show();
     } )
     .with_command_handler( "green_blue", [] (Ustring& command) {
         tie_atype = tie_none;
-        IN(matrix).gradient_row(CRGB::Green, CRGB::Blue, 2, 0);
+        IN(matrix).gradient_row(ICRGB::Green, ICRGB::Blue, 2, 0);
         IN(matrix).show();
     } )
     .with_command_handler( "scroll", [] (Ustring& command) {
@@ -120,17 +120,17 @@ void start_wink() {
         current_eye = random(2);
         eyes_atype = wink;
         switch(random(6)) {
-            case 0: dest_color = CRGB::Blue;
+            case 0: dest_color = ICRGB::Blue;
                 break;
-            case 1: dest_color = CRGB::Red;
+            case 1: dest_color = ICRGB::Red;
                 break;
-            case 2: dest_color = CRGB::Purple;
+            case 2: dest_color = ICRGB::Purple;
                 break;
-            case 3: dest_color = CRGB::Green;
+            case 3: dest_color = ICRGB::Green;
                 break;
-            case 4: dest_color = CRGB::Yellow;
+            case 4: dest_color = ICRGB::Yellow;
                 break;
-            default: dest_color = CRGB::White;
+            default: dest_color = ICRGB::White;
             break;
         }
         eyes_frame_counter = 0;

@@ -4,20 +4,26 @@
 # if __IOTEMPOWER_NOERROR is set, it will not exit
 # when files are not found.
 
+__IOTEMPOWER_NONODE=""
+
 [[ -e "node.conf" ]] || cd ..
 [[ -e "node.conf" ]] || { 
     if [[ ! "$__IOTEMPOWER_NOERROR" ]]; then
         echo "Can't find node.conf. Aborting." 1>&2
-        exit 1 
+        exit 1
+    else
+        __IOTEMPOWER_NONODE=true
     fi
 }
 
 source "$IOTEMPOWER_ROOT/bin/read_system_config"
 # topic of current node now in $topic
 
-board="wemos d1 mini"
+board="wemos d1 mini" # TODO: does this default need to be updated?
 
-source "node.conf" || { echo "Can't read node.conf. Aborting." 1>&2;exit 1; }
+if [[ ! "$__IOTEMPOWER_NONODE" ]]; then
+    source "node.conf" || { echo "Can't read node.conf. Aborting." 1>&2;exit 1; }
+fi
 
 # must be after sourcing node.conf
 mqtt_server="$IOTEMPOWER_MQTT_HOST"

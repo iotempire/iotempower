@@ -95,9 +95,3 @@
 // #define D9 9
 #define SD2 D9
 #define SDD2 D9
-
-// test pins for IoTempower 
-#define IOT_TEST_INPUT D3
-#define IOT_TEST_OUTPUT D4
-#define IOT_TEST_DIGITAL D1
-#define IOT_TEST_DIGITAL_2 D2

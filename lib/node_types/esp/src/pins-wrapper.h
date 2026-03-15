@@ -4,6 +4,7 @@
 #define _IOTEMPOWER_PINS_H_
 
 #include <pins.h>
+#include <testdefs.h>
 
 #ifdef ONBOARDLED
 
@@ -14,16 +15,15 @@
 
 #endif // ONBOARDLED
 
+// needs to be defined in pins.h
+// #ifndef FLASHBUTTON
 
-#ifndef FLASHBUTTON
+//     #ifdef D3
+//         #define FLASHBUTTON D3
+//     #else
+//         #define FLASHBUTTON 0
+//     #endif // D3
 
-    #ifdef D3
-        #define FLASHBUTTON D3
-    #else
-        #define FLASHBUTTON 0
-    #endif // D3
-
-#endif // FLASHBUTTON
-
+// #endif // FLASHBUTTON
 
 #endif // _IOTEMPOWER_PINS_H_

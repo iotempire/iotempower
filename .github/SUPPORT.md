@@ -14,13 +14,9 @@ Please also see the official IoTempower YouTube playlist video docs: [`IoT Intro
 
 ## Looking For Assistance
 
-- For immediate assistance, you can join our (active) community chat on:
-> **Discord**: https://discord.gg/9gq8Q9p6r3 (non-expiring invite link)
+- For immediate assistance, you can join our (active) community chat on **Discord**: https://discord.gg/9gq8Q9p6r3 (non-expiring invite link)
 
 - **GitHub Issues**: For technical issues and bugs, please use [GitHub Issues (link)](https://github.com/iotempire/iotempower/issues)
-- **Discussion Forums**: Join discussions and ask questions on our community forums:
-  - Matrix: https://riot.im/app/#/room/#iotempower:matrix.org
-  - Facebook Page: https://www.facebook.com/groups/2284490571612435/
 
 > *Please reach out at https://ulno.net/contact/ if you want to use IoTempower at your organization.*
 
@@ -47,7 +43,7 @@ Here's how to submit a **`Feature Request`**:
 
 Please **DO NOT** report security vulnerabilities publicly. 
 
-Instead, contact ulno directly [here][<https://ulno.net/contact>] for sensitive reports.
+Instead, contact ulno directly [here](https://ulno.net/contact) for sensitive reports.
 Use "IoTempower Security Vulnerability Report" as subject.
 
 

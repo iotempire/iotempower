@@ -1,0 +1,201 @@
+graph TB
+    subgraph TextualApp["Textual TUI App (app.py)"]
+        AppClass["IotMenu<br/>(Main App)"]
+        BasicMenu["BasicMenu<br/>(Main Navigation)"]
+        AdvancedMenu["AdvancedMenu<br/>(Advanced Tasks)"]
+        WifiMenu["WifiMenu<br/>(WiFi Setup)"]
+        AppClass -->|renders| BasicMenu
+        AppClass -->|renders| AdvancedMenu
+        AppClass -->|renders| WifiMenu
+    end
+
+    subgraph Screens["Screens (Script Execution Layer)"]
+        DeployScreen["DeployScreen"]
+        AdoptScreen["AdoptScreen"]
+        WifiSetupScreen["WifiSetupSystemconf"]
+        OpenwrtScreen["OpenwrtSetup"]
+        SystemTemplateScreen["SystemTemplate"]
+        WebStarterScreen["WebStarter"]
+        APConfigScreen["APConfiguratorScreen"]
+        NewFolderScreen["NewFolder"]
+        InitializeSerialScreen["InitializeSerial"]
+        WemosPreScreen["WemosPre"]
+        UpgradeScreen["UpgradeIot"]
+        OpenWrtRouterScreen["OpenWrtRouterIp"]
+        SuccessScreen["Success"]
+        FailedScreen["Failed"]
+        LoadingScreen["LoadingScreen"]
+        
+        BasicMenu -->|switch to| DeployScreen
+        BasicMenu -->|switch to| AdoptScreen
+        BasicMenu -->|switch to| SystemTemplateScreen
+        BasicMenu -->|switch to| WebStarterScreen
+        BasicMenu -->|switch to| APConfigScreen
+        BasicMenu -->|switch to| NewFolderScreen
+        AdvancedMenu -->|switch to| OpenwrtScreen
+        AdvancedMenu -->|switch to| UpgradeScreen
+        AdvancedMenu -->|switch to| WemosPreScreen
+        AdvancedMenu -->|switch to| InitializeSerialScreen
+        WifiMenu -->|switch to| WifiSetupScreen
+        OpenwrtScreen -->|leads to| OpenWrtRouterScreen
+        DeployScreen -->|success| SuccessScreen
+        DeployScreen -->|failure| FailedScreen
+        AdoptScreen -->|success| SuccessScreen
+        AdoptScreen -->|failure| FailedScreen
+    end
+
+    subgraph ScriptLogic["Script Activation Logic"]
+        DeployLogic["deploy_script.py"]
+        AdoptLogic["adopt_script.py"]
+        WifiLogic["wifi_setup_systemconf_script.py"]
+        OpenwrtLogic["open_wrt_setup_script.py"]
+        FindRouterLogic["find_router_ip_logic.py"]
+        CreateSystemLogic["create_system_logic.py"]
+        CreateNodeLogic["new_node_script.py"]
+        UpgradeLogic["upgrade_iot_logic.py"]
+        PreFlashLogic["pre_flash_logic.py"]
+        
+        DeployScreen -->|imports| DeployLogic
+        AdoptScreen -->|imports| AdoptLogic
+        WifiSetupScreen -->|imports| WifiLogic
+        OpenwrtScreen -->|imports| OpenwrtLogic
+        OpenwrtScreen -->|imports| FindRouterLogic
+        SystemTemplateScreen -->|imports| CreateSystemLogic
+        NewFolderScreen -->|imports| CreateNodeLogic
+        UpgradeScreen -->|imports| UpgradeLogic
+        WemosPreScreen -->|imports| PreFlashLogic
+        InitializeSerialScreen -->|imports| AdoptLogic
+    end
+
+    subgraph ServeComponent["serve.py & Web Output Streaming"]
+        Serve["serve.py<br/>(textual-serve)"]
+        WebOutput["WebOutput<br/>(Message)"]
+        LogBuffer["web_log_buffer<br/>(deque)"]
+        LogFile["web_starter.log<br/>(File)"]
+        
+        AppClass -->|uses| WebOutput
+        AppClass -->|maintains| LogBuffer
+        LogBuffer -->|persists to| LogFile
+        Serve -->|spawns| AppClass
+    end
+
+    subgraph MessageSystem["Message System"]
+        WebOutputMsg["WebOutput<br/>(Log lines)"]
+        RefreshMsg["Refresh<br/>(Screen refresh)"]
+        DeploySuccessMsg["DeploySuccess<br/>(Deploy OK)"]
+        DeployFailedMsg["DeployFailed<br/>(Deploy error)"]
+        
+        DeployScreen -->|emits| DeploySuccessMsg
+        DeployScreen -->|emits| DeployFailedMsg
+        AdoptScreen -->|emits| DeploySuccessMsg
+        AdoptScreen -->|emits| DeployFailedMsg
+        WebStarterScreen -->|receives| WebOutputMsg
+        SuccessScreen -->|receives| DeploySuccessMsg
+        FailedScreen -->|receives| DeployFailedMsg
+    end
+
+    subgraph BashScripts["Bash Scripts (bin/)"]
+        WebStarterScript["web_starter"]
+        CloudcmdStarter["cloudcmd_starter"]
+        NodredStarter["nodered_starter"]
+        CaddyStarter["caddy_starter"]
+        CompileScript["compile"]
+        DeployScript["deploy"]
+        AdoptScript["adopt"]
+        CreateNodeScript["create_node_template"]
+        CreateSystemScript["create_system_template"]
+        UpgradeScript["iot_upgrade"]
+        PreFlashNodMCU["pre_flash_nodemcu"]
+        PreFlashWemos["pre_flash_wemos"]
+        InitializeScript["initialize"]
+        SetupSystemconf["setup_systemconf"]
+        WifiOpenwrtSetup["wifi_openwrt_setup"]
+        FindRouterIp["check_router_ip"]
+        
+        WebStarterScript -->|launches| CloudcmdStarter
+        WebStarterScript -->|launches| NodredStarter
+        WebStarterScript -->|launches| CaddyStarter
+    end
+
+    subgraph Libraries["External Libraries"]
+        Textual["textual<br/>(TUI Framework)"]
+        TextualServe["textual-serve<br/>(HTTP Server)"]
+        Subprocess["asyncio.subprocess<br/>(Process Mgmt)"]
+        
+        AppClass -->|extends| Textual
+        Serve -->|uses| TextualServe
+        AppClass -->|uses| Subprocess
+    end
+
+    subgraph PlatformIO["PlatformIO Integration"]
+        PlatformIOBin["pio/platformio"]
+        PlatformIOProjects["node/build/<br/>(PlatformIO Projects)"]
+        
+        CompileScript -->|invokes| PlatformIOBin
+        DeployScript -->|invokes| PlatformIOBin
+        PlatformIOBin -->|manages| PlatformIOProjects
+    end
+
+    subgraph WebServices["Web Services (Runtime)"]
+        CloudCmd["CloudCmd<br/>(File Browser)"]
+        NodeRED["Node-RED<br/>(Flow Editor)"]
+        Caddy["Caddy<br/>(Reverse Proxy)"]
+        
+        CloudcmdStarter -->|starts| CloudCmd
+        NodredStarter -->|starts| NodeRED
+        CaddyStarter -->|starts| Caddy
+    end
+
+    subgraph Topics["MQTT Topics & Devices"]
+        MQTTBroker["MQTT Broker<br/>(from system.conf)"]
+        DeviceTopics["device/topics<br/>(auto-generated)"]
+        
+        CloudCmd -->|communicates via MQTT| MQTTBroker
+        NodeRED -->|communicates via MQTT| MQTTBroker
+        MQTTBroker -->|provides| DeviceTopics
+    end
+
+    subgraph APConfig["AP Configurator Package"]
+        APConfigApp["APConfigurator<br/>(Standalone App)"]
+        APConfigScreens["AP Config Screens<br/>(WiFi/Router Setup)"]
+        APConfigScripts["AP Config Scripts<br/>(lib/ap_configurator/scripts/)"]
+        
+        APConfigScreen -->|embeds| APConfigApp
+        APConfigApp -->|installs| APConfigScreens
+        APConfigScreens -->|calls| APConfigScripts
+    end
+
+    %% Connections from Screens to Bash Scripts
+    DeployScreen -->|subprocess| DeployScript
+    AdoptScreen -->|subprocess| AdoptScript
+    InitializeSerialScreen -->|subprocess| InitializeScript
+    WifiSetupScreen -->|subprocess| SetupSystemconf
+    OpenwrtScreen -->|subprocess| WifiOpenwrtSetup
+    SystemTemplateScreen -->|subprocess| CreateSystemScript
+    NewFolderScreen -->|subprocess| CreateNodeScript
+    UpgradeScreen -->|subprocess| UpgradeScript
+    WemosPreScreen -->|subprocess| PreFlashWemos
+    
+    %% Script Logic to Bash Scripts
+    DeployLogic -->|calls| DeployScript
+    AdoptLogic -->|calls| AdoptScript
+    WifiLogic -->|calls| SetupSystemconf
+    OpenwrtLogic -->|calls| WifiOpenwrtSetup
+    FindRouterLogic -->|calls| FindRouterIp
+    CreateSystemLogic -->|calls| CreateSystemScript
+    CreateNodeLogic -->|calls| CreateNodeScript
+    UpgradeLogic -->|calls| UpgradeScript
+    PreFlashLogic -->|calls| PreFlashWemos
+
+    %% Logging flow
+    WebStarterScript -->|outputs stdout/stderr| AppClass
+    AppClass -->|adds to buffer| LogBuffer
+    WebStarterScreen -->|displays| LogBuffer
+    
+    %% AP Configurator flow
+    APConfigScreen -->|changes to| APConfigScripts
+
+    style Serve fill:#ff9999
+    style AppClass fill:#99ccff
+    style LogBuffer fill:#99ff99
+    style WebStarterScript fill:#ffcc99

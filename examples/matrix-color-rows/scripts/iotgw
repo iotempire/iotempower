@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+cleanup() {
+  iot x web_stop
+  pkill tmux
+  pkill mosquitto
+  pkill cloudflared
+}
+
+# Trap SIGINT (Ctrl-C), SIGTERM and script exit to run cleanup
+#trap cleanup EXIT INT TERM
+
+# If the first argument is "stop", run cleanup and exit
+if [[ "$1" == "stop" ]]; then
+  cleanup
+  exit 0
+fi
+
+iot x ~/iot/examples/scripts/termux_start_gateway
+sleep 2
+iot x cloudcmd_stop
+#sleep 1
+#start_cft
+
+# The cleanup function will be called automatically on exit or interruption

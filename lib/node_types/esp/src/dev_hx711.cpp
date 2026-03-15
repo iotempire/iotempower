@@ -1,7 +1,7 @@
 // emp_hx711.cpp
 #include "dev_hx711.h"
 
-// TODO: this might be just an i2c device, check if it can be defined as one
+// the hx711 is not an i2c device and uses a proprietory twowire protocol
 
 Hx711::Hx711(const char* name, uint8_t sck_pin, uint8_t dout_pin,
                 float calfactor, bool calibration)

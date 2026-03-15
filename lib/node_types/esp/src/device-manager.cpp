@@ -1,15 +1,16 @@
-// device-manager.cpp
-// author: ulno
-// created: 2018-07-16
+/**
+ * @file device-manager.cpp
+ * @brief Implementation of DeviceManager singleton and do_later scheduler
+ * @author ulno
+ * @created 2018-07-16
+ */
 
 #include <Arduino.h>
-////AsyncMqttClient disabled in favor of PubSubClient
-//#include <AsyncMqttClient.h>
-#include <PubSubClient.h>
+#include <espMqttClient.h>
 #include <toolbox.h>
 #include <device-manager.h>
 
-////// structure and list for scheduler
+// Structure and list for scheduler
 typedef std::function<void()> Do_Later_Callback;
 
 typedef struct {
@@ -33,6 +34,9 @@ static void do_later_delete(int pos) {
     do_later_map_count --;
 }
 
+/**
+ * @brief Add callback to scheduler - maintains sorted order, handles ID replacement
+ */
 static bool do_later_add(unsigned long in_ms, int16_t id, Do_Later_Callback cbu) {
     bool forgot_one = false;
     // insert sorted into list
@@ -70,7 +74,7 @@ static bool do_later_add(unsigned long in_ms, int16_t id, Do_Later_Callback cbu)
     do_later_map[pos].id = id;
     do_later_map[pos].callback = cbu;
     do_later_map_count ++;
-//    ulog(F("Adding do_later scheduler at %d with time %ld at time %ld"),pos,in_ms,current); // TODO: remove debug
+//    ulog(F("Adding do_later scheduler at %d with time %ld at time %ld"),pos,in_ms,current); // TODO: enable based on debug level
     return !forgot_one;
 }
 
@@ -84,25 +88,50 @@ bool do_later(unsigned long in_ms, int16_t id, DO_LATER_CB_ID callback) {
     return true;
 }
 
-void deep_sleep(unsigned long time_from_now_ms, unsigned long duration_ms) {
-    static unsigned long duration_ms_backup;
+// void deep_sleep(unsigned long time_from_now_ms, unsigned long duration_ms) {
+//     static unsigned long duration_ms_backup;
 
-    duration_ms_backup = duration_ms; // static to save for lambda
-    do_later(time_from_now_ms, [&] {
-        ulog(F("About to fall into deepsleep for %lu s"), duration_ms_backup/1000);
-        delay(100);
-        delay(100);
-        delay(100);
-        ESP.deepSleep(duration_ms_backup*1000); 
-    });
-    // TODO: make sure, that at wake-up time the 5s reset is not triggered
-}
+//     duration_ms_backup = duration_ms; // static to save for lambda
+//     do_later(time_from_now_ms, [&] {
+//         ulog(F("About to fall into deepsleep for %lu s"), duration_ms_backup/1000);
+//         delay(100);
+//         delay(100);
+//         delay(100);
+//         ESP.deepSleep(duration_ms_backup*1000); 
+//     });
+//     TODO: make sure, that at wake-up time the 5s reset is not triggered
+// }
 
 
 bool do_later(unsigned long in_ms, DO_LATER_CB_NO_ID callback) {
     return do_later_add(in_ms, -1, callback);
 }
 
+bool do_later_cancel(int16_t id) {
+    if(id==-1) {
+        ulog(F("The id -1 is reserved for do_later callbacks without an id."));
+        return false;
+    }
+    for(int pos=0; pos<do_later_map_count; pos++) {
+        if(do_later_map[pos].id == id) {
+            do_later_delete(pos);
+            return true;
+        }
+    }
+    return false;
+}
+
+bool do_later_cancel_all() {
+    if(do_later_map_count<=0) {
+        return false;
+    }
+    do_later_map_count = 0;
+    return true;
+}
+
+/**
+ * @brief Execute ready callbacks - called from main loop
+ */
 void do_later_check() {
     unsigned long next;
     unsigned long current=millis();
@@ -167,6 +196,9 @@ bool DeviceManager::start() {
     return all_success;
 }
 
+/**
+ * @brief Update all devices - polls and checks for changes
+ */
 bool DeviceManager::update(bool in_precision_interval) {
     bool changed = false;
     device_list.for_each( [&] (Device& dev) {
@@ -188,9 +220,10 @@ void DeviceManager::reset_buffers() {
     } );
 }
 
-bool DeviceManager::publish(PubSubClient& mqtt_client, Ustring& node_topic, bool publish_all) {
-    ////AsyncMqttClient disabled in favor of PubSubClient
-    //bool devices_publish(AsyncMqttClient& mqtt_client, Ustring& node_topic, bool publish_all) {
+/**
+ * @brief Publish changed device values to MQTT
+ */
+bool DeviceManager::publish(IoTempowerMqttClient& mqtt_client, Ustring& node_topic, bool publish_all) {
     bool published = false;
     bool first = true;
     Ustring log_buffer(F("Publishing"));
@@ -201,7 +234,7 @@ bool DeviceManager::publish(PubSubClient& mqtt_client, Ustring& node_topic, bool
                     if(!first) log_buffer.add(F("; "));
                     published = true;
                 }
-                mqtt_client.loop(); // give time to send things out -> seems necessary
+                // espMqttClient handles internal buffering, no need for manual loop() calls here
                 if(first) {
                     first = false;
                 }
@@ -220,16 +253,13 @@ bool DeviceManager::publish(PubSubClient& mqtt_client, Ustring& node_topic, bool
     return published;
 }
 
-bool DeviceManager::subscribe(PubSubClient& mqtt_client, Ustring& node_topic) {
-    ////AsyncMqttClient disabled in favor of PubSubClient
-    //bool devices_subscribe(AsyncMqttClient& mqtt_client, Ustring& node_topic) {
+bool DeviceManager::subscribe(IoTempowerMqttClient& mqtt_client, Ustring& node_topic) {
     // subscribe to all devices that accept input
     Ustring topic;
 
     device_list.for_each( [&] (Device& dev) {
         if( dev.started() ) {
             dev.subdevices_for_each( [&] (Subdevice& sd) {
-                ulog("device: %s subdevice: %s", node_topic.as_cstr(),  sd.get_name().as_cstr()); // TODO: remove
                 if(sd.subscribed()) {
                     // construct full topic
                     topic.copy(node_topic);
@@ -251,9 +281,7 @@ bool DeviceManager::subscribe(PubSubClient& mqtt_client, Ustring& node_topic) {
     return true; // TODO: decide if error occurred
 }
 
-bool DeviceManager::publish_discovery_info(PubSubClient& mqtt_client) {
-    ////AsyncMqttClient disabled in favor of PubSubClient
-    //bool devices_publish_discovery_info(AsyncMqttClient& mqtt_client) {
+bool DeviceManager::publish_discovery_info(IoTempowerMqttClient& mqtt_client) {
 
     #ifdef mqtt_discovery_prefix
 

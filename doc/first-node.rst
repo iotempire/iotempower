@@ -1,17 +1,21 @@
-==========
-First Node
-==========
+=====================
+First Node (Advanced)
+=====================
 
+.. note::
+   **New to IoTempower?** Start with the `Quickstart Guide <quickstart.rst>`_ instead!
+   This guide covers everything you need to get your first node running quickly.
+   
+   This advanced tutorial is getting outdated and still relies heavily on the 
+   Raspberry Pi based installation. Reading and following the quickstart is 
+   currently preferred. This tutorial is for users who want detailed explanations 
+   of the underlying system and are comfortable with manual configuration steps.
 
-If you are using the pi-image, you can find a short walkthrough of this here: 
-https://youtu.be/fTWNYXfet9E
-
-For more video instructions, check the `IoTempower YouTube Video Playlist </https://www.youtube.com/playlist?list=PLlppUpfgGsvkfAGJ38_mzQc1-_Z7bNOgq>`_.
-
+For video instructions, check the `IoTempower YouTube Video Playlist <https://www.youtube.com/playlist?list=PLlppUpfgGsvkfAGJ38_mzQc1-_Z7bNOgq>`_.
 
 For this section, we assume that you have IoTempower successfully set-up in your
-a Linux environment (as described 
-`here </doc/installation.rst#installation-on-linux-and-wsl>`_) and that you can successfully
+Linux environment (as described 
+`here <installation.rst#installation-on-linux-and-wsl>`_) and that you can successfully
 enter the IoTempower environment (prompt changes to IoT).
 
 We will now set-up and configure our first IoT node (if you want to know
@@ -24,9 +28,15 @@ IoTempower supports, among others, the following microcontroller boards
 - NodeMCU
 - Espresso Lite V2
 - esp32 webkit mini
+- M5StickC and M5StickC Plus (not yet Plus2)
 
 Creating an IoTempower System Folder
 ====================================
+
+.. note::
+   The `Quickstart Guide <quickstart.rst>`_ provides a simpler approach using 
+   ``create_system_template`` and ``create_node_template`` commands. This section 
+   shows the manual approach for educational purposes.
 
 To install IoTempower to one of these microcontroller boards,
 you need to setup a folder describing your IoT system (the
@@ -37,7 +47,7 @@ configuration file (we will call it, therefore `system folder`).
 In addition to the ``system.conf`` file the
 folder includes the locations and sub-locations (sub folders) of
 the nodes networked into the IoT system. This allows to model
-hierarchical nodes and connected things architecture for having
+hierarchical nodes and a connected things architecture for having
 something like ``ulnos-home-system/living-room/dining-corner/switches``
 and in there a ``node.conf`` and ``setup.cpp`` file describing a
 sonoff 3 channel switch and potential gestures on it (see also
@@ -46,9 +56,14 @@ sonoff 3 channel switch and potential gestures on it (see also
 To create such a system folder, we need to copy one of the folders
 of the cloned git repository to the
 outside of the repository. Let's assume the new system is called "demo"
-and our first node should be called "test01". (The pi image has such a folder
-setup in iot-systems. In older versions of the pi-image though there are some
-old variables in the system.conf. Pay attention too its content below.)
+and our first node should be called "test01".
+
+.. note::
+   **Optional: Using the Raspberry Pi Image**
+   
+   If you're using the IoTempower Raspberry Pi image, there's a pre-configured 
+   folder in ``~/iot-systems`` with example configurations. Use SSH or the 
+   ``iot menu`` command to manage files on the Pi.
 
 To create the initial folder via the command-line, do the following:
 
@@ -59,11 +74,11 @@ To create the initial folder via the command-line, do the following:
   cd ~/iot-systems/demo
   mv node_template test01
 
-If you look at ~/iot-systems/demo/system.conf, you should see the following:
+If you look at ``~/iot-systems/demo/system.conf``, you should see the following:
 
 .. code-block:: bash
 
-  # Configuration for a iotempower system
+  # Configuration for a IoTempower system
   # Everything from etc/iotempower.conf can be overwritten here.
   # However, you will usually just overwrite the MQTT-Host and maybe
   # wifi access information
@@ -83,26 +98,31 @@ but if you later want to take this folder to a different PC and deploy from ther
 use the correct variable names to overwrite some settings (so better check
 and eventually update now than being confused later).
 
-If you have the pi-image version or cloudcmd installed, you can alternatively
-navigate to your `gateway's system folder </cloudcmd/fs/home/iot/iot-systems/test01>`_
-via cloudcmd. Tap F2 there and create a new node via that menu and then rename
-that folder to test01.
+.. note::
+   You can also use the ``iot menu`` command to create a new node via 
+   the interactive menu system. This works on all platforms and is generally easier 
+   than manual folder creation.
 
 You can, of course, use another system name than "demo" (and even move
-or rename this folder later - on the pi image it's called also test01). Renaming nodes at a later point
+or rename this folder later). Renaming nodes at a later point
 requires a re-flash of the corresponding microcontroller, so let's be a
 bit more careful here.
 
-If you have the pi-image version, you can skip all the networking steps
-below as it takes care of all the network setup for you.
+Network Configuration
+=====================
+
+.. note::
+   The `Quickstart Guide <quickstart.rst>`_ provides step-by-step instructions 
+   for network setup on various platforms. Refer to it for the most current 
+   and comprehensive guidance.
 
 Depending on your network setup, we now need to figure out some ``ipconfig``
 addresses and configure things accordingly to make sure our node can
 connect to the right services.
 
-For WSL 1 in Windows
+For WSL 2 in Windows
 
-- Open the Command Prompt
+- Open a powershell
 - Run ``ipconfig``
 - Look for and note down ``IPv4 Address`` and ``Default Gateway IP`` 
 
@@ -114,7 +134,7 @@ For Linux
 - Run ``ip r``
 - Look for and note down ``default gateway via`` <address of interest>.
 
-If you have an mqtt broker like mosquitto running in your local network,
+If you have an mqtt broker like mosquitto or mqttsuite running in your local network,
 find and note down its IP address and ignore the next indented text block.
 
   If you don't have an mqtt broker running ...
@@ -147,14 +167,15 @@ find and note down its IP address and ignore the next indented text block.
   If the IP address didn't change, you can also start the mqtt broker
   now at any time with ``iot exec mqtt_broker``.
 
+  You can also try just running ``iot exec mqtt_broker scanif`` - 
+  this might guess your local ip-address correctly.
+
 Go to the folder we copied earlier:
    
 ``cd ~/iot-systems/demo``
 
-Edit the system.conf file (``nano system.conf``), uncomment and adjust
-the lines for ``IOTEMPOWER_MQTT_HOST``, (if you use cloudcmd on the pi,
-you can use the built-in editor, but if you are actually on cloudcmd on the pi-image,
-you can skip this step as the defaults will be correct):
+Edit the system.conf file (``micro system.conf`` - or optionally use ``nano``),
+uncomment and adjust the lines for ``IOTEMPOWER_MQTT_HOST``:
 
 .. code-block:: bash
 
@@ -177,21 +198,12 @@ Add the following line to the end of the setup.cpp file:
 
 .. code-block:: cpp
 
-   input(button1, D3, "released", "pressed");
+   input(button1, D3, "released", "pressed").with_debounce(5);
 
-..
-
-  (Optional, Recommended) You can see some documentation for more information by running the following commands
-  in another terminal.
-
-  .. code-block:: cpp
-
-     # iot doc make  # is included in the next
-     iot doc serve
-
-  If both of these commands worked, you should now be able to go to 
-  http://localhost:8001 in your browser and see some documentation
-  and also be able to read up on the ``input``-command.
+.. note::
+   For detailed documentation on available commands and device types, see the 
+   `Command Reference <node_help/commands.rst>`_ or run ``iot x web_starter`` 
+   which includes the documentation server.
 
 
 First Deployment
@@ -202,65 +214,73 @@ First Deployment
    (on other microcontrollers make sure you have some button connected
    and know the corresponding GPIO port).
 
-2. In the ``test01`` (and inside the iot environment) folder,
-   run the following command
+2. In the ``test01`` folder (and inside the iot environment),
+   run the deployment command.
 
-   In Linux (if you run in a virtual machine, pass through your serial USB
-   of your microcontroller): ``deploy serial`` (or select from cloudcmd menu)
-
-   In Windows: 
+   **On Linux:**
    
-   - Take note of the COM port number that the `Device Manager`
-     shows under `Ports` (for example (COM8) for the connected Wemos D1 Mini
-     (this particular microcontroller usually shows as USB-SERIAL CH340 (COMX)
-     with X: some kind of integer number) as seen in this screenshot.
+   .. code-block:: bash
 
-     .. figure:: images/windows-serial-ports.png
-        :width: 70%
-        :figwidth: 100%
-        :align: center
-        :alt: Serial port enumeration in Windows 10 - showing 8 for connected Wemos D1 Mini
+      deploy serial
 
-   - Run the following command, but replace the X with the number after COM (in the above example X = 8)
-     
-     ``deploy serial ttySX``
+   If you run in a virtual machine, pass through your serial USB of your microcontroller.
 
-3. Open 2 more Linux terminals (make sure you are in iot environment for all 3 terminals).
-   Run a singular command on one terminal, like the following
+   **On Windows (WSL2):**
    
-   Terminal 1: ``console_serial`` (in Linux) or in WSL 1 ``console_serial ttySX`` (like above)
+   You need to use usbipd-win to access USB devices. See the 
+   `Quickstart Guide <quickstart.rst#platform-specific-serial-flashing>`_ 
+   for detailed instructions on using the WSL USB GUI or usbipd command line.
+
+   **Network Flashing (Optional):**
+   
+   If you have an OpenWRT router with USB ports and ser2net configured,
+   you can flash over the network:
+   
+   .. code-block:: bash
+
+      deploy serial rfc2217://192.168.14.1:5000
+
+   (Replace with your router's IP and configured port)
+
+   For detailed ser2net setup instructions, see the 
+   `Serial to Network Setup Guide <ser2net-setup.rst>`_.
+
+3. Open 2 more terminals (make sure you are in iot environment for all terminals).
+   Run these commands in separate terminals:
+   
+   Terminal 1: ``console_serial`` (or use the Arduino-IDE serial console on Windows)
 
    Terminal 2: ``mqtt_listen``
 
-   (just for confirmation, if mqtt needs to run locally,
-   there should be one terminal running ``mqtt_broker``)
+   (If running mqtt_broker locally, it should be running in another terminal)
    If you have trouble stopping ``console_serial`` with Ctrl-C,
    you can also kill it from another terminal with ``pkill -f monitor``.
 
 4. Now press the button that is attached to your Wemos D1 Mini.
    If you did everything correctly, 
-   you should see "released" , "pressed", on the terminal
+   you should see "released" and "pressed" messages on the terminal
    where you ran ``mqtt_listen``
    as well as lots of debug information and also 
    ``pressed`` and ``released`` on the terminal
    running ``console_serial``.
 
-In advanced settings, you can extend your installation with
-a specially flashed Wemos D1 Mini, called a dongle allowing you to
-to flash previously flashed (or preflashed) esp8266 and esp32 based
-microcontrollers without them being registered in your WiFi (you
-can put any microcontroller flashed with IoTempower in a
-so-called adoption mode. For more look here: `Adoption <adopting.rst>`__
-If your serial flashing works and you don't have lots of devices to manage,
-adoption might be only of marginal interest.
-So only use it when you have gathered some experience with IoTempower.
-
+.. note::
+   **Optional: Adoption Mode with a Dongle**
+   
+   In advanced settings, you can use a specially flashed Wemos D1 Mini called 
+   a "dongle" to flash IoTempower to microcontrollers without connecting them 
+   to your WiFi first. This is most useful when managing many devices or using 
+   the Raspberry Pi image. For details, see `Adoption <adopting.rst>`_.
+   
+   For most users doing serial flashing on their local machine, adoption is 
+   not necessary and can be safely ignored until you have more experience 
+   with IoTempower.
 
 Next deployments
 ================
 
 From now on, the software of your node can be updated with a simple ``deploy``
-issued inside the node folder.
+issued inside the node folder (no need for ``serial`` - updates happen over WiFi).
 
 Edit ``setup.cpp`` and add the onboard led under your button like this (and debounce the button):
 
@@ -270,17 +290,18 @@ Edit ``setup.cpp`` and add the onboard led under your button like this (and debo
    output(blue, ONBOARDLED).inverted();
 
 Connect your wemos to another power supply that is not connected to your
-computer (or at least reset it once by pressing the button)
+computer (or at least reset it once by pressing the reset button)
 - wait 10s to make sure it's connected to WiFi and mqtt again.
 
 Run ``deploy``
 
 Congratulations!! Your node is now setup and connected with IoTempower.
 Try to react to some button presses in Node-RED subscribing to
-``test01/button1`` or changing the onboard led sending on or off to
+``test01/button1`` or changing the onboard led by sending "on" or "off" to
 ``test01/blue/set``.
 
+For details on using Node-RED, see the `Quickstart Guide <quickstart.rst#controlling-devices-via-node-red>`_.
 
-Top: `ToC <index-doc.rst>`_, Previous: `Installation <installation.rst>`_,
+
+Top: `ToC <index-doc.rst>`_, Previous: `Quickstart <quickstart.rst>`_,
 Next: `Second Node <second-node.rst>`_.
-`Versão em português aqui <first-node-pt.rst>`_.

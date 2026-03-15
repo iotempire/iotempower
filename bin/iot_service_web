@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+if [[ "$1" = "help" || "$1" = "-h" || "$1" = "--help" || -z "$1" ]]; then
+cat << EOF
+Syntax: iot_service_web <start|stop|status> [full]
+
+Start all web services (and loop them when they fail).
+Starts local services by default. If "full" is specified,
+it starts the services on http and https ports.
+EOF
+exit 0
+fi
+
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2; exit 1; }
+
+ACTION="$1"
+shift
+
+case "$ACTION" in
+    start)
+        exec web_starter "$@"
+        ;;
+    stop)
+        web_stop
+        ;;
+    status)
+        if pgrep -f /bin/web_starter >/dev/null || pgrep -x caddy >/dev/null || pgrep -f node-red >/dev/null; then
+            echo "web: running"
+        else
+            echo "web: not running"
+        fi
+        ;;
+    *)
+        echo "Unknown action: $ACTION" 1>&2
+        exit 1
+        ;;
+esac

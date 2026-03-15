@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# tunnel to cloudflare as ???
+token=fill-it-in
+exec cloudflared tunnel run --token "$token"

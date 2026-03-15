@@ -1,17 +1,25 @@
 #!/usr/bin/env bash
 # This can be called as:
-# curl -L bit.ly/iotempower | bash -
+# curl -L now.iotempower.us | bash -
+#
 # If you use -s, you can add parameters to the install script
-# (all the ones that iot_install understand,, --something commands have to be added after --)
-# Example: curl -L bit.ly/iotempower | bash -s -- --default
+# (all the ones that iot_install understands, long commands 
+# like "--something" commands have to be added after --)
+# Example: curl -L now.iotempower.us/iotempower | bash -s -- --default
+#
+# You can overwrite the repo to use with setting IOTEMPOWER_REPO to your repo url.
 
 command -v git &>/dev/null || { 
     echo "git is not installed. Please install it."
     echo "On Debian systems, you can do this using 'sudo apt update && sudo apt install git'."; 
     exit 1 
-    }
+}
 
-git clone https://github.com/iotempire/iotempower "$HOME/iot"
+if [ -z "$IOTEMPOWER_REPO" ]; then
+    IOTEMPOWER_REPO="https://github.com/iotempire/iotempower"
+fi
+
+git clone "$IOTEMPOWER_REPO" "$HOME/iot"
 cd "$HOME/iot" || exit 1
 git config pull.rebase false
 bash run x bin/iot_install "$@" < /dev/tty

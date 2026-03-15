@@ -11,10 +11,9 @@ packages = [
     #    {"name": "haveged", "package_manager": "binary", "module": "general"}, # not needed on termux, macos
     #    {"name": "python3-dev", "package_manager": "binary", "module": "general"}, # FIXME: could be queried with query script
     {"name": "terminal-kit", "package_manager": "npm", "module": "general"},
-    {"name": "g++", "package_manager": "binary", "module": "cloud_commander"},
-    {"name": "gritty", "package_manager": "npm", "module": "cloud_commander"},
-    {"name": "cloudcmd", "package_manager": "npm", "module": "cloud_commander"},
+    {"name": "platformio", "package_manager": "binary", "module": "comp_env"},
     {"name": "node-red", "package_manager": "npm", "module": "node_red"},
+    {"name": "@flowfuse/node-red-dashboard", "package_manager": "npm", "module": "node_red"},
     #    {"name": "debian-keyring", "package_manager": "binary", "module": "caddy"},
     #    {"name": "apt-transport-https", "package_manager": "binary", "module": "caddy"},
     #    {"name": "debian-archive-keyring", "package_manager": "binary", "module": "caddy"},
@@ -27,7 +26,9 @@ boards = [
     "esp8266", # test generic boards first
     "esp32", # other generic board
     "wemos_d1_mini", # our favorite esp8266 board
-    "esp32minikit", # out favorite esp32 board
+    "esp32minikit", # our favorite esp32 board
+    "lolin_s2_mini",
+    "esp32_c3_devkitm_1",
     "m5stickc",
     "m5stickc_plus",
     "wroom_02",
@@ -48,6 +49,7 @@ devices = [
     {"device_name": "gyro9250", "example_syntax": "gyro9250(example_name);"},
     {"device_name": "gesture_apds9960", "example_syntax": "gesture_apds9960(example_name);"},
     {"device_name": "sgp30", "example_syntax": "sgp30(example_name);"},
+    {"device_name": "scd4x", "example_syntax": "scd4x(example_name, 5.0, 60, 101300);"},
     {"device_name": "edge_counter", "example_syntax": "edge_counter(example_name, IOT_TEST_DIGITAL);"},
     {"device_name": "dht", "example_syntax": "dht(example_name, IOT_TEST_DIGITAL);"},
     {"device_name": "ds18b20", "example_syntax": "ds18b20(example_name, IOT_TEST_DIGITAL);"},
@@ -61,7 +63,12 @@ devices = [
     {"device_name": "light_sensor_1", "example_syntax": "bh1750(example_name);"},
     {"device_name": "light_sensor_2", "example_syntax": "tsl2561(example_name);"},
     {"device_name": "capacity_touch", "example_syntax": "mpr121(example_name);"},
-    # {"device_name": "rgb_strip", "example_syntax": "rgb_strip(example_name, 7, WS2812B, IOT_TEST_DIGITAL, GRB);"}, # TODO: Here, we should actually test NeoPixelBus
+    {"device_name": "sleep_mgr", "example_syntax": "sleep_mgr(example_name);"},
+    {"device_name": "rgb_strip", "example_syntax": "rgb_strip(example_name, 7, WS2812B, IOT_TEST_DIGITAL, GRB);"},
+    {"device_name": "rgb_strip_bus", "example_syntax": "rgb_strip_bus(example_name, 7, F_GRB, IOT_TEST_NEOPIXEL_CONTROL_METHOD, IOT_TEST_NEOPIXEL_TESTPIN);"},
+    {"device_name": "serial_text", "example_syntax": "serial_text(example_name, IOT_TEST_DIGITAL, IOT_TEST_DIGITAL_2);"},
+    {"device_name": "serial_hex", "example_syntax": "serial_hex(example_name, IOT_TEST_DIGITAL, IOT_TEST_DIGITAL_2);"},
+    {"device_name": "soil_7in1", "example_syntax": "soil_7in1(example_name, IOT_TEST_DIGITAL, IOT_TEST_DIGITAL_2);"},
 ]
 
 isolated_combinations_to_test = [

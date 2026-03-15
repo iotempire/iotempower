@@ -48,12 +48,13 @@ Installation step by step:
 - https://iotgateway (or https://iotgateway.local or
   sometimes https://192.168.12.1). Accept
   the security exception for the locally generated security certificate. You
-  should now see a link to the filesystem through cloud commander (cloudcmd)
-  and an IoT testsystem on the pi,
-  as well as links to the Node-RED installation.
+  should now see the IoTempower homepage with links to Node-RED
+  and the local documentation.
+  (The CloudCmd file manager previously shown here has been removed;
+  see `Legacy / Obsoleted Tools </doc/legacy.rst>`_ for details.)
 
-- On the raspberry pi IoTempower installation, you can use cloudcmd to access
-  and interact with your system.
+- On the raspberry pi IoTempower installation, you can use SSH to access
+  and interact with your system (``ssh iot@iotgateway``, password ``iotempire``).
 
 - If you are asked for a user, use ``iot``, if you are asked for a password
   use ``iotempire``.
@@ -134,8 +135,8 @@ booting Linux.
       # https://github.com/nodesource/distributions/blob/master/README.md
       curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash - &&\
       sudo apt-get install -y nodejs npm
-      sudo apt install mc micro tilde # this is optional: 
-      # mc is nicer file management in cli, micro and tilde are nicer editor than nano
+      sudo apt install mc micro # this is optional: 
+      # mc is nicer file management in cli, micro is a nicer editor than nano
       # if you run on a native Ubuntu (not in WSL) consider running
       # (you can skip this if you like the default password-less mosquitto setup, but be warned)
       sudo systemctl stop mosquitto

@@ -1,0 +1,399 @@
+#!/usr/bin/env bash
+
+usage() {
+cat << EOF
+Syntax: iot_service <start|stop|restart|status|view> [options]
+
+Orchestrate IoTempower services (web, mqtt, and accesspoint/ap).
+
+Commands:
+  start      Start selected services.
+  stop       Stop selected services and tmux session if running.
+  restart    Stop and start selected services.
+  status     Show service status.
+  view       Attach to the tmux session.
+
+Service selection:
+  default: web + mqtt
+  --web                    Select only web service (explicit selection mode)
+  --mqtt                   Select only mqtt service (explicit selection mode)
+  --ap, --accesspoint      Select only accesspoint service (explicit selection mode)
+  --all                    Select web + mqtt + accesspoint
+  --default                Select web + mqtt
+
+Execution options:
+  --session NAME           tmux session name (default: iot-services)
+  --no-tmux                Start in current terminal (no tmux)
+
+Service config:
+  --wlan IFACE             WLAN interface for accesspoint and mqtt (when ap selected)
+  --mqtt-interface IF      Interface passed to MQTT starter (default: scanif)
+  --ssid NAME              Accesspoint SSID (default from config)
+  --password PASS          Accesspoint password (default from config)
+  --gateway IP             Accesspoint gateway IP (default from config)
+  --wlan2 IFACE            Optional second WLAN interface for double NAT AP mode
+  --gateway2 IP            Optional second accesspoint gateway IP for double NAT
+  --channel CH             WiFi channel for accesspoint (default from config)
+
+Examples:
+  iot service start
+  iot service start --ap --wlan wlan1
+  iot service start --web --ap --no-tmux
+  iot service start --all --wlan wlan1 --wlan2 wlan0 --gateway2 192.168.13.1
+  iot service stop --all
+EOF
+}
+
+if [[ "$1" = "help" || "$1" = "-h" || "$1" = "--help" || -z "$1" ]]; then
+    usage
+    exit 0
+fi
+
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2; exit 1; }
+source <(iot_env ignore_system)
+
+log() {
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*"
+}
+
+has_lnxrouter() {
+    [[ -x "$IOTEMPOWER_EXTERNAL/linux-router/lnxrouter" ]] || command -v lnxrouter &>/dev/null
+}
+
+request_ap_sudo_for_tmux() {
+    log "AP mode in tmux requires root networking operations."
+    log "Requesting sudo now so credentials are entered here (not inside tmux)."
+    log "Reason: accesspoint start/stop changes iptables, forwarding, and lnxrouter processes."
+    if ! sudo -v; then
+        echo "Could not obtain sudo credentials for accesspoint mode." 1>&2
+        exit 1
+    fi
+}
+
+pick_default_wlan() {
+    if [[ "$IOTEMPOWER_AP_DEVICES" ]]; then
+        for possible in $IOTEMPOWER_AP_DEVICES; do
+            if ip link show "$possible" &> /dev/null; then
+                echo "$possible"
+                return 0
+            fi
+        done
+    fi
+    echo "wlan1"
+}
+
+SESSION_NAME="iot-services"
+USE_TMUX=1
+WLAN_INTERFACE="$(pick_default_wlan)"
+MQTT_INTERFACE="scanif"
+MQTT_INTERFACE_SET=0
+AP_NAME="${IOTEMPOWER_AP_NAME:-iotempower}"
+AP_PASSWORD="${IOTEMPOWER_AP_PASSWORD:-internetofthings7}"
+AP_GATEWAY="${IOTEMPOWER_AP_IP:-192.168.14.1}"
+AP_WLAN2="${IOTEMPOWER_AP_DEVICE2:-}"
+AP_GATEWAY2="${IOTEMPOWER_AP_IP2:-}"
+AP_CHANNEL="${IOTEMPOWER_AP_CHANNEL:-6}"
+
+START_WEB=1
+START_MQTT=1
+START_AP=0
+EXPLICIT_SERVICES=0
+
+ACTION="$1"
+shift
+
+begin_explicit_selection() {
+    if [[ $EXPLICIT_SERVICES -eq 0 ]]; then
+        START_WEB=0
+        START_MQTT=0
+        START_AP=0
+        EXPLICIT_SERVICES=1
+    fi
+}
+
+select_service() {
+    local svc="$1"
+    begin_explicit_selection
+    case "$svc" in
+        web) START_WEB=1 ;;
+        mqtt) START_MQTT=1 ;;
+        ap|accesspoint) START_AP=1 ;;
+        all)
+            START_WEB=1
+            START_MQTT=1
+            START_AP=1
+            ;;
+        default)
+            START_WEB=1
+            START_MQTT=1
+            START_AP=0
+            ;;
+        *)
+            echo "Unknown service '$svc'. Use web, mqtt, ap, accesspoint, all, or default." 1>&2
+            exit 1
+            ;;
+    esac
+}
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --session)
+            SESSION_NAME="$2"
+            shift 2
+            ;;
+        --no-tmux|--notmux)
+            USE_TMUX=0
+            shift
+            ;;
+        --wlan)
+            WLAN_INTERFACE="$2"
+            shift 2
+            ;;
+        --mqtt-interface)
+            MQTT_INTERFACE="$2"
+            MQTT_INTERFACE_SET=1
+            shift 2
+            ;;
+        --ssid)
+            AP_NAME="$2"
+            shift 2
+            ;;
+        --password)
+            AP_PASSWORD="$2"
+            shift 2
+            ;;
+        --gateway)
+            AP_GATEWAY="$2"
+            shift 2
+            ;;
+        --wlan2)
+            AP_WLAN2="$2"
+            shift 2
+            ;;
+        --gateway2)
+            AP_GATEWAY2="$2"
+            shift 2
+            ;;
+        --channel)
+            AP_CHANNEL="$2"
+            shift 2
+            ;;
+        --web)
+            select_service web
+            shift
+            ;;
+        --mqtt)
+            select_service mqtt
+            shift
+            ;;
+        --router|--ap|--accesspoint)
+            select_service ap
+            shift
+            ;;
+        --all)
+            START_WEB=1
+            START_MQTT=1
+            START_AP=1
+            EXPLICIT_SERVICES=1
+            shift
+            ;;
+        --default)
+            START_WEB=1
+            START_MQTT=1
+            START_AP=0
+            EXPLICIT_SERVICES=1
+            shift
+            ;;
+        web|mqtt|ap|accesspoint|all|default)
+            select_service "$1"
+            shift
+            ;;
+        *)
+            echo "Unknown option/service: $1" 1>&2
+            exit 1
+            ;;
+    esac
+done
+
+if [[ $START_AP -eq 1 && $MQTT_INTERFACE_SET -eq 0 ]]; then
+    MQTT_INTERFACE="$WLAN_INTERFACE"
+fi
+
+tmux_has_session() {
+    tmux has-session -t "$SESSION_NAME" 2>/dev/null
+}
+
+start_window() {
+    local window_name="$1"
+    local cmd="$2"
+    tmux new-window -t "$SESSION_NAME" -n "$window_name"
+    tmux send-keys -t "$SESSION_NAME:$window_name" "$cmd" Enter
+}
+
+build_mqtt_cmd() {
+    local cmd
+    printf -v cmd 'iot_service_mqtt start %q' "$MQTT_INTERFACE"
+    echo "$cmd"
+}
+
+build_accesspoint_cmd() {
+    local cmd='iot_service_ap start'
+    printf -v cmd 'IOTEMPOWER_AP_NAME=%q IOTEMPOWER_AP_PASSWORD=%q IOTEMPOWER_AP_CHANNEL=%q %s' \
+        "$AP_NAME" "$AP_PASSWORD" "$AP_CHANNEL" "$cmd"
+    printf -v cmd '%s --wlan %q --gateway %q' "$cmd" "$WLAN_INTERFACE" "$AP_GATEWAY"
+    if [[ "$AP_WLAN2" ]]; then
+        printf -v cmd '%s --wlan2 %q' "$cmd" "$AP_WLAN2"
+    fi
+    if [[ "$AP_GATEWAY2" ]]; then
+        printf -v cmd '%s --gateway2 %q' "$cmd" "$AP_GATEWAY2"
+    fi
+    echo "$cmd"
+}
+
+start_services_tmux() {
+    if [[ $START_AP -eq 1 ]]; then
+        if ! has_lnxrouter; then
+            echo "linux-router is not installed. Run iot install (core) or omit --ap." 1>&2
+            exit 1
+        fi
+        request_ap_sudo_for_tmux
+    fi
+
+    if tmux_has_session; then
+        echo "Session '$SESSION_NAME' already exists." 1>&2
+        echo "Use: iot service view  (or stop/restart)." 1>&2
+        exit 1
+    fi
+
+    log "Creating tmux session '$SESSION_NAME'."
+    local first_started=0
+
+    if [[ $START_MQTT -eq 1 ]]; then
+        tmux new-session -d -s "$SESSION_NAME" -n "mqtt"
+        tmux send-keys -t "$SESSION_NAME:mqtt" "$(build_mqtt_cmd)" Enter
+        first_started=1
+    fi
+    if [[ $START_WEB -eq 1 ]]; then
+        if [[ $first_started -eq 0 ]]; then
+            tmux new-session -d -s "$SESSION_NAME" -n "web"
+            tmux send-keys -t "$SESSION_NAME:web" "iot_service_web start" Enter
+            first_started=1
+        else
+            start_window "web" "iot_service_web start"
+        fi
+    fi
+    if [[ $START_AP -eq 1 ]]; then
+        if [[ $first_started -eq 0 ]]; then
+            tmux new-session -d -s "$SESSION_NAME" -n "accesspoint"
+            tmux send-keys -t "$SESSION_NAME:accesspoint" "$(build_accesspoint_cmd)" Enter
+        else
+            start_window "accesspoint" "$(build_accesspoint_cmd)"
+        fi
+    fi
+
+    if [[ $first_started -eq 0 && $START_AP -eq 0 ]]; then
+        echo "No services selected." 1>&2
+        exit 1
+    fi
+
+    log "Services started. Attach with: tmux attach -t $SESSION_NAME"
+}
+
+DIRECT_PIDS=""
+
+cleanup_direct_mode() {
+    log "Caught interruption. Stopping selected services..."
+    [[ $START_WEB -eq 1 ]] && iot_service_web stop || true
+    [[ $START_MQTT -eq 1 ]] && iot_service_mqtt stop || true
+    [[ $START_AP -eq 1 ]] && iot_service_ap stop || true
+    [[ -n "$DIRECT_PIDS" ]] && kill $DIRECT_PIDS 2>/dev/null || true
+    exit 0
+}
+
+start_services_direct() {
+    trap cleanup_direct_mode SIGINT SIGTERM
+
+    if [[ $START_MQTT -eq 1 ]]; then
+        bash -c "$(build_mqtt_cmd)" &
+        DIRECT_PIDS="$DIRECT_PIDS $!"
+    fi
+    if [[ $START_WEB -eq 1 ]]; then
+        iot_service_web start &
+        DIRECT_PIDS="$DIRECT_PIDS $!"
+    fi
+    if [[ $START_AP -eq 1 ]]; then
+        if ! has_lnxrouter; then
+            echo "linux-router is not installed. Run iot install (core) or omit --ap." 1>&2
+            exit 1
+        fi
+        bash -c "$(build_accesspoint_cmd)" &
+        DIRECT_PIDS="$DIRECT_PIDS $!"
+    fi
+
+    if [[ -z "$DIRECT_PIDS" ]]; then
+        echo "No services selected." 1>&2
+        exit 1
+    fi
+
+    wait $DIRECT_PIDS
+}
+
+stop_services() {
+    [[ $START_WEB -eq 1 ]] && iot_service_web stop || true
+    [[ $START_MQTT -eq 1 ]] && iot_service_mqtt stop || true
+    [[ $START_AP -eq 1 ]] && iot_service_ap stop || true
+
+    if tmux_has_session; then
+        tmux kill-session -t "$SESSION_NAME" 2>/dev/null || true
+        log "Session '$SESSION_NAME' stopped."
+    fi
+}
+
+show_status() {
+    if tmux_has_session; then
+        echo "tmux session '$SESSION_NAME': running"
+        tmux list-windows -t "$SESSION_NAME"
+    else
+        echo "tmux session '$SESSION_NAME': not running"
+    fi
+
+    iot_service_web status
+    iot_service_mqtt status
+    iot_service_ap status
+}
+
+case "$ACTION" in
+    start)
+        if [[ $USE_TMUX -eq 1 ]]; then
+            start_services_tmux
+        else
+            start_services_direct
+        fi
+        ;;
+    stop)
+        stop_services
+        ;;
+    restart)
+        stop_services
+        if [[ $USE_TMUX -eq 1 ]]; then
+            start_services_tmux
+        else
+            start_services_direct
+        fi
+        ;;
+    status)
+        show_status
+        ;;
+    view)
+        if ! tmux_has_session; then
+            echo "Session '$SESSION_NAME' is not running." 1>&2
+            exit 1
+        fi
+        exec tmux attach -t "$SESSION_NAME"
+        ;;
+    *)
+        echo "Unknown action: $ACTION" 1>&2
+        echo "Use --help for usage." 1>&2
+        exit 1
+        ;;
+esac

@@ -6,7 +6,6 @@
 
 ### check if configuration has been read
 if [ "$IOTEMPOWER_ACTIVE" != "yes" ]; then
-export IOTEMPOWER_ACTIVE=yes
 
 # IOTEMPOWER_ROOT needs to be set
 if [ ! "$IOTEMPOWER_ROOT" ]; then
@@ -35,6 +34,8 @@ IOTEMPOWER_AP_BRIDGE=""
 IOTEMPOWER_AP_HOSTNAME="$HOSTNAME"
 
 IOTEMPOWER_MQTT_HOST="$IOTEMPOWER_AP_IP"
+IOTEMPOWER_MQTT_USE_TLS=0
+IOTEMPOWER_MQTT_CERT_FOLDER=""
 IOTEMPOWER_MQTT_USER=""
 IOTEMPOWER_MQTT_PW=""
 IOTEMPOWER_MQTT_BRIDGE_HOST=""
@@ -64,7 +65,6 @@ IOTEMPOWER_VERSION=$(cat "$IOTEMPOWER_ROOT/VERSION")
 
 # export all
 export IOTEMPOWER_VERSION
-export IOTEMPOWER_MQTT_HOST
 export IOTEMPOWER_AP_DEVICES
 export IOTEMPOWER_AP_NAME
 export IOTEMPOWER_AP_ADDID
@@ -75,6 +75,9 @@ export IOTEMPOWER_AP_BRIDGE
 export IOTEMPOWER_AP_HIDDEN
 export IOTEMPOWER_AP_HOSTNAME
 
+export IOTEMPOWER_MQTT_HOST
+export IOTEMPOWER_MQTT_USE_TLS
+export IOTEMPOWER_MQTT_CERT_FOLDER
 export IOTEMPOWER_MQTT_USER
 export IOTEMPOWER_MQTT_PW
 export IOTEMPOWER_MQTT_BRIDGE_HOST
@@ -85,16 +88,39 @@ export IOTEMPOWER_MQTT_BRIDGE_USER
 export IOTEMPOWER_MQTT_BRIDGE_PW
 export IOTEMPOWER_MQTT_DISCOVERY_PREFIX
 
-# activate the virtual python environment
-source "$IOTEMPOWER_VPYTHON/bin/activate" &> /dev/null
-true # ignore result of this
-
 # add pathes for firmware compilation
 export IOTEMPOWER_FIRMWARE="$IOTEMPOWER_EXTERNAL/firmware"
 #export PATH="$IOTEMPOWER_FIRMWARE/bin:$PATH" # TODO: is this needed?
 #export PATH="$IOTEMPOWER_FIRMWARE/esp-open-sdk/xtensa-lx106-elf/bin:$PATH" # TODO: is this needed?
 
+fi ### IOTEMPOWER_ACTIVE
+
+# activate the virtual python environment if not yet activated
+if [ "$IOTEMPOWER_PYTHON_ACTIVE" != "yes" ]; then
+    source "$IOTEMPOWER_VPYTHON/bin/activate" &> /dev/null
+    if [ $! ]; then
+        IOTEMPOWER_PYTHON_ACTIVE=yes
+    fi
+    true # ignore result of this
+fi
+
+# potentially activate NVM
+if [ "$IOTEMPOWER_NVM_ACTIVE" != "yes" ]; then
+    # use nvm if installed
+    NVM_DIR="$HOME/.nvm"
+    if [[ -s "$NVM_DIR/nvm.sh" ]]; then
+        source "$NVM_DIR/nvm.sh"
+        export NVM_DIR
+        nvm use iotempower-node  &> /dev/null
+        export IOTEMPOWER_NVM_ACTIVE=yes
+    fi
+fi # NVM active?
+
+## late general iotempower config
+if [ "$IOTEMPOWER_ACTIVE" != "yes" ]; then
+
 IOTEMPOWER_AP_NAME_FULL=$(accesspoint show 2>/dev/null)
 export IOTEMPOWER_AP_NAME_FULL
 
+export IOTEMPOWER_ACTIVE=yes
 fi ### IOTEMPOWER_ACTIVE

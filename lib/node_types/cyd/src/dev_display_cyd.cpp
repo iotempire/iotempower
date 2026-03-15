@@ -6,16 +6,21 @@ bool CYD_Display::init() {
 
     _display->init();
     _display->setRotation(_rotation);
-//    _display->setTextSize(_font);
-    _display->setTextSize(1); // this is the scale of the pixels - TODO: make configurable
+    _display->setTextSize(_text_size);
     set_color_bg(0,0,0);
     _display->fillScreen(_color_bg);
     set_color_fg(255,255,255);
     _display->setTextWrap(false);
-    char_height = _display->fontHeight(_font);
-    char_width = _display->textWidth("W", _font); 
+    char_height = _display->fontHeight(_font)*_text_size;
+    if(char_height<1) char_height=1;
+    char_width = _display->textWidth("W", _font);
+    if(char_width<1) char_width=1;
     set_fps(10); // can be low for these type of displays and just showing text
-    if( !_tdb->init( width_pixels() / char_width, height_pixels() / char_height)) {
+    int w = width_pixels() / char_width;
+    if(w<1) w=1;
+    int h = height_pixels() / char_height;
+    if(h<1) h=1;
+    if( !_tdb->init( w, h)) {
         ulog(F("Failed to allocate display buffer."));
         return false;
     }

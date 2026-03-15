@@ -15,10 +15,12 @@ class Scd4x : public I2C_Device {
     bool _in_init_phase = false;
     float _temp_comp;
     uint16_t _altitude;
+    uint32_t _ambient_pressure;
 
    public:
     Scd4x(const char* name, const float temp_comp = 4.0,
-          const uint16_t altitude = 57);
+          const uint16_t altitude = 57,
+          const uint32_t ambient_pressure = 0);
     void i2c_start();
     bool measure();
 };

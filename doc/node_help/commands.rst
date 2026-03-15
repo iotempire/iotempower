@@ -41,6 +41,7 @@ Alphabetic list
 - `mfrc522 <mfrc522.rst>`_
 - `output <output.rst>`_
 - `out <out.rst>`_
+- `power <power.rst>`_
 - `pwm <pwm.rst>`_
 - `rcwl-1601 <rcwl-1601.rst>`_
 - `reconfiguration <reconfiguration.rst>`_
@@ -52,11 +53,15 @@ Alphabetic list
 - `rgb_strip <rgb_strip.rst>`_
 - `scale <scale.rst>`_
 - `scd4x <scd4x.rst>`_
+- `serial_text <serial_text.rst>`_
+- `serial_hex <serial_hex.rst>`_
 - `servo <servo.rst>`_
 - `servo_switch <servo_switch.rst>`_
 - `setup.cpp <setup.cpp.rst>`_
 - `sgp30 <sgp30.rst>`_
+- `soil_7in1 <soil_7in1.rst>`_
 - `temperature <temperature.rst>`_
 - `transmission <transmission.rst>`_
 - `ultra_sonic_distance <ultra_sonic_distance.rst>`_
+- `vl53l0x.rst`_
 - `wifi <wifi.rst>`_

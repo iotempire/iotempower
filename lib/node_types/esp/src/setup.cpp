@@ -7,8 +7,8 @@
 
 #include <iotempower.h>
 
-void (iotempower_init)() __attribute__((weak));
 void (iotempower_start)() __attribute__((weak));
+void (iotempower_platform_early_init)() __attribute__((weak));
 
 #define init() \
      iotempower_init()
@@ -16,8 +16,23 @@ void (iotempower_start)() __attribute__((weak));
 #define start() \
     iotempower_start()
 
-// That's the user file (called in folder setup.cpp, but linked as setup.h
-// here)
+
+// Include auto-generated markers (if they exist)
+#if __has_include("markers_generated.h")
+    #include "markers_generated.h"
+#endif
+
+
+/**
+ * AUTOMATIC SLEEP MANAGER
+ * ========================
+ * Create a global sleep manager instance available to all ESP nodes
+ * This provides sleep management functionality without requiring explicit user declaration
+ */
+sleep_mgr(sleep_mgr);
+
+
+// That's the user file (called in folder setup.cpp, but linked as setup.h here)
 #include "setup.h"
 
 #undef start

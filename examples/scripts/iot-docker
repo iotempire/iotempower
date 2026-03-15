@@ -12,6 +12,13 @@ export IOTEMPOWER_CONTAINER_SHARE="$HOME/iot-container"
 export IOTEMPOWER_CONTAINER_DIR="/iot/data"
 export IOTEMPOWER_ROOT="$IOTEMPOWER_CONTAINER_SHARE/iot"
 
+# Check if this is an interactive terminal and set docker flags accordingly
+if ([ -t 0 ] || [ -t 1 ]) && [ -e /dev/tty ] && [ -r /dev/tty ] && [ -w /dev/tty ]; then
+    DOCKER_IT_FLAG="-it"
+else
+    DOCKER_IT_FLAG=""
+fi
+
 function start() {
     # Get the absolute path of the current directory, resolving symlinks
     CURRENT_DIR=$(realpath $(pwd))
@@ -32,12 +39,12 @@ function start() {
         PARAMS="${PARAMS% }"
         # if the "bash" is not given, the unpacking of the tar file does not happen
         # TODO: test why this does not work
-        exec docker exec -it "$IOTEMPOWER_CONTAINER_NAME" \
+        exec docker exec $DOCKER_IT_FLAG "$IOTEMPOWER_CONTAINER_NAME" \
             /bin/bash -c "cd \"$CONTAINER_PATH\" && exec bash iot $PARAMS"
     else
         echo "Current directory is outside the mounted volume."
         # Just enter the container without changing the directory but still forward parameters
-        exec docker exec -it "$IOTEMPOWER_CONTAINER_NAME" "iot" "$@"
+        exec docker exec $DOCKER_IT_FLAG "$IOTEMPOWER_CONTAINER_NAME" "iot" "$@"
     fi
 }
 

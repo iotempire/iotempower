@@ -1,6 +1,15 @@
 #!/usr/bin/env bash
 # This can be called as:
-# curl -L https://github.com/iotempire/iotempower/raw/master/bin/curl_install_podman | bash -
+# curl -L podman.iotempower.us | bash -
+#
+# If you use -s, you can add parameters to the install script
+# (for example you can call the tests directly, 
+# commands have to be added after --)
+# Example: curl -L podman.iotempower.us | bash -s -- test compilation
+#
+# You can overwrite the repo to use with setting IOTEMPOWER_REPO to your repo url
+# to test an IoTempower local repo that is checked out to ~/iot, you can run this:
+# cat iot/bin/curl_install_podman | IOTEMPOWER_REPO=~/iot bash -s -- test compilation
 
 command -v git &>/dev/null || { 
     echo "git is not installed. Please install it."
@@ -8,8 +17,12 @@ command -v git &>/dev/null || {
     exit 1 
     }
 
-mkdir $HOME/iot-container
-git clone https://github.com/iotempire/iotempower "$HOME/iot-container/repo"
+mkdir "$HOME/iot-container"
+if [ -z "$IOTEMPOWER_REPO" ]; then
+    IOTEMPOWER_REPO="https://github.com/iotempire/iotempower"
+fi
+git clone "$IOTEMPOWER_REPO" "$HOME/iot-container/repo"
+
 if [ ! -d "$HOME/iot" ]; then
     ln -s "$HOME/iot-container/repo" "$HOME/iot"
 fi
@@ -18,8 +31,9 @@ if [ ! -d "$HOME/iot-systems" ]; then
 fi
 cd "$HOME/iot-container/repo" || exit 1
 git config pull.rebase false
-IOTEMPOWER_ROOT="$HOME/iot-container/repo" bin/iot_activate_iot_script "$HOME/iot-container/repo/examples/scripts/iot-podman"
+iot_root_tmp="$HOME/iot-container/repo"
+IOTEMPOWER_ROOT="$iot_root_tmp" bin/iot_activate_iot_script "$iot_root_tmp/examples/scripts/iot-podman"
 podman pull docker.io/ulno/iotempower
 
 # run it
-bash examples/scripts/iot-podman
+bash "$iot_root_tmp/examples/scripts/iot-podman" "$@" < /dev/tty

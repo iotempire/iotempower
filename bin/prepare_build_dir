@@ -130,6 +130,7 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
     link_type_through_base "$src_dir" src "$dest_dir/src"
     link_type_through_base "$src_dir" lib "$dest_dir/lib"
     link_type_through_base "$src_dir" platformio.ini "$dest_dir"
+    link_type_through_base "$src_dir" devices.ini "$dest_dir"
     link_type_through_base "$src_dir" pre_extra_script.py "$dest_dir"
 
     ln -s -f "$(realpath setup.cpp)" "$dest_dir/src/setup.h"
@@ -154,6 +155,7 @@ EOF
 EOF
     fi
 
+
     cat >> "$fname.new" << EOF
 #define mqtt_user "$mqtt_user"
 #define mqtt_password "$mqtt_password"
@@ -162,6 +164,29 @@ EOF
     if [[ "$IOTEMPOWER_MQTT_DISCOVERY_PREFIX" ]]; then
         echo '#define mqtt_discovery_prefix "'$IOTEMPOWER_MQTT_DISCOVERY_PREFIX'"' >> "$fname.new"
     fi
+
+    if [[ "$IOTEMPOWER_MQTT_USE_TLS" == 1 ]]; then
+        echo '#define MQTT_USE_TLS' >> "$fname.new"
+
+        # Add CA certificate to config.h
+        if [[ "$IOTEMPOWER_MQTT_CERT_FOLDER" ]]; then
+            cert_file="$IOTEMPOWER_MQTT_CERT_FOLDER/ca.crt"
+            if [[ -e "$cert_file" ]]; then
+                {
+                    echo -n "#define mqtt_ca_cert \""
+                    sed 's/\\/\\\\/g; s/"/\\"/g; s/$/\\n/' "$cert_file" | tr -d '\n'
+                    echo "\""
+                } >> "$fname.new"
+            else
+                echo "CA certificate not found at $cert_file. TLS will not work." 1>&2;
+                exit 1;
+            fi
+        else
+            echo "IOTEMPOWER_MQTT_CERT_FOLDER not defined. Please define to use TLS with MQTT." 1>&2;
+            exit 1;
+        fi
+    fi
+
     replace_if_new "$fname.new" "$fname"
     ## end: create node-specific config file.
 
@@ -209,7 +234,7 @@ EOF
     new_dir="$dest_dir/device-selection.tmp"
     mkdir -p "$new_dir/src"
     commands=$(iot_grun python3 "$IOTEMPOWER_ROOT/bin/command_checker.py" \
-        "$dest_dir/src/devices.ini" \
+        "$dest_dir/devices.ini" \
         "$dest_dir/src/setup.h" \
         "$new_dir")
     commands=$(echo $commands) # remove newlines

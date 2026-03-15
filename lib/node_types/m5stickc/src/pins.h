@@ -12,9 +12,3 @@
 #ifndef A0
     #define A0 36
 #endif
-
-// test pins for IoTempower
-#define IOT_TEST_INPUT BUTTON_HOME
-#define IOT_TEST_OUTPUT ONBOARDLED
-#define IOT_TEST_DIGITAL 26
-#define IOT_TEST_DIGITAL_2 36

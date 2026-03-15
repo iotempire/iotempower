@@ -15,17 +15,31 @@ Table of Contents
 
 - `Architecture </doc/architecture.rst>`_
 
+  - `Architecture Quick Reference </doc/architecture-quick-reference.rst>`_
+
+  - `Device Architecture </doc/device-architecture.rst>`_
+  
+  - `Deployment Process </doc/deployment-process.rst>`_
+
 - `Supported Hardware </doc/hardware.rst>`_
 
 - `Tool Support </doc/tool-support.rst>`_
 
 - `Installation </doc/installation.rst>`_
 
-- `First IoT Node </doc/first-node.rst>`_
+- `Quickstart </doc/quickstart.rst>`_
+
+- `First IoT Node (Advanced) </doc/first-node.rst>`_
+
+- `MQTT via TLS </doc/mqtt-with-tls.rst>`_
 
 - `External Resources </doc/resources.rst>`_
 
 - `Support </doc/support.rst>`_
+
+- `FAQ </doc/faq.rst>`_
+
+- `Detailed Development Setup Guide </doc/detailed-dev-setup-guide.rst>`_
 
 - `Further Documentation </doc/further-doc.rst>`_
 
@@ -37,3 +51,5 @@ Table of Contents
 Obsolete:
 
 - `Shields </doc/shields/wemosd1mini/devkit1/README.rst>`_
+
+- `Legacy / Obsoleted Tools </doc/legacy.rst>`_

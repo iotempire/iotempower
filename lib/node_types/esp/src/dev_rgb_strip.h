@@ -1,17 +1,18 @@
 // rgb_strip.h
 // control a multicolor led strip
+// DEPRECATED - use rgb_strip_bus instead
 
 #ifndef _RGB_STRIP_H_
 #define _RGB_STRIP_H_
 
-#include <dev_rgb_base.h>
-// included in the former
-//#define FASTLED_INTERRUPT_RETRY_COUNT 0
-//#include <FastLED.h>
+#include <FastLED.h>
+#include "dev_rgb_base.h"
 
+#define ALL_LEDS -16
 
+// Deprecated RGB_Strip class using custom CRGB compatibility layer
 class RGB_Strip : public RGB_Base {
-    private:
+    protected:
         CRGB *leds;
         CLEDController *controller;
     public:
@@ -21,23 +22,37 @@ class RGB_Strip : public RGB_Base {
             set_pollrate_us(10000); // give update chance - TODO: check if necessary
             leds = controller->leds();
         }
-        void start() {
+        
+        // Override virtual methods from RGB_Base
+        virtual void start() {
             _started = true;
             controller->init(); // re-init, might be important if using onboard-led
             delay(50); // let things settle
-            set_color(ALL_LEDS, CRGB::Black);
+            set_color(ALL_LEDS, ICRGB::Black);
             delay(100); // let things settle (total 100 is too small)
-            set_color(ALL_LEDS, CRGB::Black);
+            set_color(ALL_LEDS, ICRGB::Black);
         }
-        virtual void process_color(int lednr, CRGB color, bool _show=true) {
-            leds[lednr] = color;
+        
+        // TODO: evaluate if the two following can also be get_color?
+        // Conversion between ICRGB and CRGB
+        static CRGB toCRGB(const ICRGB& c) { // TODO: refactor to none-CamelCase: to_CRRGB
+            return CRGB(c.r, c.g, c.b);
+        }
+        static ICRGB fromCRGB(const CRGB& c) { // TODO: refactor to none-CamelCase: from_CRRGB
+            return ICRGB(c.r, c.g, c.b);
+        }
+
+        virtual void process_color(int lednr, ICRGB color, bool _show=true) {
+            leds[lednr] = toCRGB(color);
             if(_show) show();
         }
-        virtual CRGB get_color(int lednr) {
+        
+        virtual ICRGB get_color(int lednr) {
             if(lednr < 0) lednr=0;
             else if(lednr >= led_count()) lednr = led_count()-1;
-            return leds[lednr];
+            return fromCRGB(leds[lednr]);
         }
+        
         virtual void show() {
             if(!started()) return;
             controller->showLeds(255); // TODO: handle brightness of showLeds?
@@ -46,16 +61,16 @@ class RGB_Strip : public RGB_Base {
             uint32_t avg_r = 0;
             uint32_t avg_g = 0;
             uint32_t avg_b = 0;
-            CRGB c;
             int lc = led_count();
             for(int i=lc-1; i>=0; i--) {
-                c = leds[i];
-                avg_r += c.r;
-                avg_g += c.g;
-                avg_b += c.b;
+                avg_r += leds[i].r;
+                avg_g += leds[i].g;
+                avg_b += leds[i].b;
             }
-            avg_color = CRGB(avg_r/lc, avg_g/lc, avg_b/lc);
+            avg_color = ICRGB(avg_r/lc, avg_g/lc, avg_b/lc);
         }
+
+        virtual bool measure() { show(); return true; } // give control to library on regular basis
 };
 
 #endif // _RGB_STRIP_H_

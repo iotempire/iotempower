@@ -6,9 +6,11 @@ We are here to help you with any questions or issues you may encounter with IoTe
 Documentation
 -------------
 
-Before seeking support, please refer to the `IoTempower Docs index </doc/index-doc>`_. It includes installation, setup, quickstart, and example usage instructions.
+Before seeking support, please refer to:
 
-Additionally, you can view our official IoTempower YouTube playlist for video docs: `IoT Intro Videos <https://www.youtube.com/playlist?list=PLlppUpfgGsvkfAGJ38_mzQc1-_Z7bNOgq>`_.
+- `IoTempower Docs index </doc/index-doc>`_ - Complete documentation including installation, setup, and examples
+- `FAQ </doc/faq>`_ - Frequently Asked Questions
+- `IoT Intro Videos <https://www.youtube.com/playlist?list=PLlppUpfgGsvkfAGJ38_mzQc1-_Z7bNOgq>`_ - Official IoTempower YouTube playlist
 
 Community Support
 -----------------
@@ -54,4 +56,4 @@ Interested in contributing to IoTempower? Read our `CONTRIBUTING guidelines <htt
 
 Thank you for being part of the IoTempower Community!
 
-Top: `ToC <index-doc.rst>`_, Previous: `External Resources <resources.rst>`_, Next: `Further Documentation <further-doc.rst>`_
+Top: `ToC <index-doc.rst>`_, Previous: `External Resources <resources.rst>`_, Next: `FAQ <faq.rst>`_

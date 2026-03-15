@@ -190,12 +190,13 @@ help_string="Possible options:
 --default: install all dependencies (optional & required) and tweaks but do not populate the cache
 --upgrade: run a system upgrade of all installed system packages before starting
 --system: install system requirements (python, nodejs)
---core: install IoTempower core (platformio, deployment and compilation environment)
---cloudcmd: install Cloud Commander web file manager into local environment
+--core: install IoTempower core (deployment environment)
+--comp-env: install compilation environment (PlatformIO for flashing/compiling microcontrollers)
+--services: install all gateway services (Node-RED, Caddy web server, MQTT broker)
 --node-red: install Node-RED IoT integration platform into local environment
 --caddy: install Caddy web server into system
 --mqtt: install Mosquitto mqtt broker into system
---convenience: install mc, tmux, micro, tilde, elinks (if possible) into system
+--convenience: install mc, tmux, micro, elinks (if possible) into system
 --templates: create iot-systems template
 --platforms: pre-download esp8266 and esp32 platforms
 --cache: pre-fill cache to accelerate compilations
@@ -225,8 +226,10 @@ while getopts ":h-:" opt; do
           install_system=1;;
         core)
           install_core=1;;
-        cloudcmd)
-          install_cloudcmd=1;;
+        comp-env)
+          install_comp_env=1;;
+        services)
+          install_services=1;;
         node-red)
           install_node_red=1;;
         caddy)
@@ -282,7 +285,11 @@ fi
 
 if [[ "$default" == 1 ]]; then
   install_system=1
-  install_cloudcmd=1
+  if [[ "$platform" == "termux" ]]; then
+    install_comp_env=0
+  else
+    install_comp_env=1
+  fi
   install_node_red=1
   install_caddy=1
   install_mqtt=1
@@ -293,7 +300,11 @@ if [[ "$default" == 1 ]]; then
   fi
   install_convenience=1
   install_template=1
-  install_platforms=1
+  if [[ "$platform" == "termux" ]]; then
+    install_platforms=0
+  else
+    install_platforms=1
+  fi
   fill_cache=0
   do_upgrade=1
 else # not default
@@ -313,10 +324,14 @@ else # not default
 
     optional_message="Do you want to install the optional dependency"
     # as we have already checked that there have ben no other arguments given, this is not necessary
-    # if [ -z "$install_cloudcmd" ] && [ -z "$install_node_red" ] &&
+    # if [ -z "$install_comp_env" ] && [ -z "$install_node_red" ] &&
     #     [ -z "$install_caddy" ] && [ -z "$install_mqtt" ] && [ -z "$fix_pi_wifi_ap" ]; then
-      echo_message_read_answer "${optional_message} CLOUD COMMANDER (Details -> https://cloudcmd.io/)"
-      install_cloudcmd=$?
+      if [[ "$platform" == "termux" ]]; then
+        echo_message_read_answer "${optional_message} COMPILATION ENVIRONMENT (PlatformIO for flashing/compiling microcontrollers - not recommended on Termux)" "n"
+      else
+        echo_message_read_answer "${optional_message} COMPILATION ENVIRONMENT (PlatformIO for flashing/compiling microcontrollers)"
+      fi
+      install_comp_env=$?
 
       echo_message_read_answer "${optional_message} NODE-RED (Details -> https://nodered.org/)"
       install_node_red=$?
@@ -327,20 +342,22 @@ else # not default
       echo_message_read_answer "${optional_message} MOSQUITTO MQTT broker (Details -> https://mosquitto.org/)"
       install_mqtt=$?
 
-      echo_message_read_answer "${optional_message} convenience tools (tmux, mc, micro, tilde, elinks)"
+      echo_message_read_answer "${optional_message} convenience tools (tmux, mc, micro, elinks)"
       install_convenience=$?
 
       echo_message_read_answer "Do you want to setup the iot-systems template folder"
       install_template=$?
 
-      echo_message_read_answer "Do you want to pre-download the esp8266 and esp32 platforms"
-      install_platforms=$?
+      if [[ "$install_comp_env" == 1 ]]; then
+        echo_message_read_answer "Do you want to pre-download the esp8266 and esp32 platforms"
+        install_platforms=$?
 
-      echo_message_read_answer "$(printf "%b" \
-        "Do you want to pre-populate the compile cache to " \
-        "accelerate future compilations (can take a long time)." \
-        )" n
-      fill_cache=$?
+        echo_message_read_answer "$(printf "%b" \
+          "Do you want to pre-populate the compile cache to " \
+          "accelerate future compilations (can take a long time)." \
+          )" n
+        fill_cache=$?
+      fi
 
       # TODO:Don't show for termux
       if [[ -n "$PREFIX" ]] && command -v apt-get &> /dev/null; then
@@ -365,6 +382,13 @@ else # not default
     # fi # have arguments been given
   fi # no arguments given, user asked
 fi # not default
+
+# Expand --services shortcut into individual service flags
+if [[ "$install_services" == 1 ]]; then
+  install_node_red=1
+  install_mqtt=1
+  install_caddy=1
+fi
 
 # make sure package lists are uptodate when system packages are installed
 if [ "$install_caddy" == "1" ] \
@@ -418,7 +442,7 @@ if [[ "$install_system" == 1 ]]; then
 
   # Define the minimum and maximum required node versions
   min_version="20"
-  max_version="22.14.0"
+  max_version="30" # this needs to be high enough
 
   function check_node() {
       # Check if Node.js is installed
@@ -467,17 +491,28 @@ if [[ "$install_core" == 1 ]]; then
   # will fail on termux
   iot_grun pip install --no-cache-dir -r "$IOTEMPOWER_ROOT/lib/iot_installs/requirements-ssh.txt"
 
+  # Force install pytest in virtual environment to override system version
+  iot_grun pip install --force-reinstall --no-deps pytest # TODO: check if still works in termux
+  
   deactivate
   PIPTEMP="$IOTEMPOWER_LOCAL/tmp"
   mkdir -p "$PIPTEMP"
   git clone https://github.com/iotempire/iotknit "$PIPTEMP/iotknit"
   pushd "$PIPTEMP/iotknit"
-  iot_grun python setup.py install
+  activate
+  iot_grun pip install --no-cache-dir .
+  deactivate
   popd
 
-  # access point - TODO: make this optional
-  git clone https://github.com/ulno/create_ap "$IOTEMPOWER_EXTERNAL/create_ap"
-  #cd "$IOTEMPOWER_EXTERNAL/create_ap"
+  # access point helper script (previously create_ap)
+  mkdir -p "$IOTEMPOWER_EXTERNAL"
+  if [[ -d "$IOTEMPOWER_EXTERNAL/linux-router/.git" ]]; then
+    git -C "$IOTEMPOWER_EXTERNAL/linux-router" pull --ff-only || true
+  else
+    rm -rf "$IOTEMPOWER_EXTERNAL/linux-router"
+    git clone https://github.com/garywill/linux-router "$IOTEMPOWER_EXTERNAL/linux-router"
+  fi
+
   activate
 
   # install node.js related stuff
@@ -490,35 +525,13 @@ if [[ "$install_core" == 1 ]]; then
   echo_format "All core packages have been installed."
 fi # core
 
-if [[ "$install_cloudcmd" == 1 ]]; then
-  init_nodejs
-  echo_format "Installing Cloud Commander"
-  deactivate
-  # iot_grun npm install gritty
-  # iot_grun npm install cloudcmd
-  npm install gritty
-  npm install cloudcmd
-
-  cloudcmd --terminal --terminal-path "$(gritty --path)" --save --no-server
+if [[ "$install_comp_env" == 1 ]]; then
+  echo_format "Installing compilation environment (PlatformIO)"
   activate
-  # copy menu files
-  cp -a "$IOTEMPOWER_ROOT/lib/gateway_setup/cloudcmd/cloudcmd.menu.js" "$HOME/.cloudcmd.menu.js"
-  cp -a "$IOTEMPOWER_ROOT/lib/gateway_setup/cloudcmd/cloudcmd.json" "$HOME/.cloudcmd.json"
-
-  cloudcmd_config=~/.cloudcmd.json
-  jq "$(printf "%s" \
-      '.auth = true | '\
-      '.prefix = "/cloudcmd" | '\
-      '.username = "iot" | '\
-      '.password = "709d553e1a6e0b3f874408865d169870a945ceb25d72be561b7a50a23713d3452aea896e8e24783adcce86fddba087939ae3da9574997334e6362b5e767aa68a" | '\
-      '.algo = "sha512WithRSAEncryption"'\
-    )" \
-    "$cloudcmd_config" > "$cloudcmd_config.new" \
-  || { echo_format "jq failed, aborting." 1>&2;exit 1; }
-  mv "$cloudcmd_config" "$cloudcmd_config.backup" &>/dev/null
-  mv "$cloudcmd_config.new" "$cloudcmd_config"
-
-fi # cloudcmd
+  iot_grun pip install --no-cache-dir -r "$IOTEMPOWER_ROOT/lib/iot_installs/requirements-comp-env.txt"
+  deactivate
+  echo_format "Compilation environment packages installed."
+fi # comp_env
 
 if [[ "$install_node_red" == 1 ]]; then
   init_nodejs
@@ -543,7 +556,7 @@ users: [{
 };
 EOF
     pushd "$HOME/.node-red"
-    npm i node-red/node-red-dashboard  # install dashboard
+    npm i @flowfuse/node-red-dashboard  # install dashboard 2
     npm i node-red-contrib-influxdb # install influxdb connector
     popd
     echo_format "Changed $nodered_config."
@@ -563,7 +576,7 @@ fi # mosquitto
 
 if [[ "$install_convenience" == 1 ]]; then
   echo_format "Installing convenience tools"
-  call_by_system install-other tmux mc micro tilde elinks
+  call_by_system install-other tmux mc micro elinks
   # consider installing convenience settings for mc (add user-menu to it)
 fi # convenience
 
@@ -609,7 +622,7 @@ fi
 
 # Save the state
 iot_grun python3 "$IOTEMPOWER_ROOT"/utils/save_arguments_as_json.py --splitter '=' --path "$IOTEMPOWER_LOCAL"/installation_options.json \
-  core="$install_core" cloud_commander="$install_cloudcmd" \
+  core="$install_core" comp_env="$install_comp_env" \
   node_red="$install_node_red" caddy="$install_caddy" \
   mosquitto="$install_mqtt" \
   fix_serial_permissions="$fix_serial_permissions" \

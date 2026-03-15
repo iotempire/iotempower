@@ -95,14 +95,24 @@ Adopting the Node in the IoTempower environment on the Raspberry Pi
 
   -  You should now see the home page for your local IoTempower installation.
 
-- Click on the link `IoT system example configuration folder
-  </cloudcmd/fs/home/iot/iot-test/>`_ to navigate to
-  the folder where the templates are.
+- Navigate to the IoT system example configuration folder (``~/iot-test/``)
+  via SSH (``ssh iot@iotgateway``, or ``ssh iot@192.168.12.1`` if hostname
+  resolution does not work; password ``iotempire``):
 
-.. TODO: provide image of the Iot system example page!
+  .. code-block:: bash
 
-- Then, navigate into the `node1
-  </cloudcmd/fs/home/iot/iot-test/node1/>`_ folder.
+     cd ~/iot-test
+
+  .. note::
+     The CloudCmd web-based file manager (previously at
+     ``/cloudcmd/fs/home/iot/iot-test/``) has been removed from IoTempower.
+     See `Legacy / Obsoleted Tools </doc/legacy.rst>`_ for details.
+
+- Then, navigate into the ``node1`` folder:
+
+  .. code-block:: bash
+
+     cd node1
 
 .. TODO: provide image of the Folder node1!
 
@@ -136,9 +146,7 @@ Adopting the Node in the IoTempower environment on the Raspberry Pi
 
 
 Congratulations!! Your node is now connect to IoTempower and the onboard-led can
-be controlled with Node-RED using the button on this page
-`</nodered/ui/#/1>`_.
+be controlled with Node-RED via `Dashboard 2 </nodered/dashboard/>`_.
 
 Top: `ToC <index-doc.rst>`_, Previous: `Installation <installation.rst>`_,
 Next: `Second Node <second-node.rst>`_.
-`Versão em português aqui <first-node-pt.rst>`_.
