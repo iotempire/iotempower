@@ -1,0 +1,46 @@
+gmp343
+======
+
+..  code-block:: cpp
+
+    gmp343(name, rx_pin, tx_pin /*, baud is by default 19200*/
+        /*, config is by default SWSERIAL_8N1*/
+        /*, invert is by default false*/
+        /*, interval_ms is by default 1000*/
+        /*, timeout_ms is by default 1500*/
+        /*, retries is by default 3*/);
+
+Create a new serial driver for the Vaisala GMP343 CO2 sensor.
+
+The driver configures the sensor into ``STOP`` mode, disables command echo,
+sets the output format to ``CO2 ppm``, and then polls using ``SEND``.
+The published payload is the parsed CO2 concentration in ppm.
+
+Parameters
+----------
+
+- ``name``: the name it can be addressed via MQTT in the network.
+  Inside the code it can be addressed via IN(name).
+
+- ``rx_pin``: GPIO pin for the software serial RX line.
+
+- ``tx_pin``: GPIO pin for the software serial TX line.
+
+- ``baud``: serial baud rate (default 19200).
+
+- ``config``: serial data configuration (default ``SWSERIAL_8N1``).
+
+- ``invert``: set true to invert serial levels (default false).
+
+- ``interval_ms``: delay between successful ``SEND`` polls in milliseconds (default 1000).
+
+- ``timeout_ms``: timeout while waiting for the ``>`` prompt in milliseconds (default 1500).
+
+- ``retries``: number of retries for initialization and read commands (default 3).
+
+Example
+-------
+
+..  code-block:: cpp
+
+    gmp343(co2, D6, D7);

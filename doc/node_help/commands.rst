@@ -25,6 +25,7 @@ Alphabetic list
 - `edge_counter <edge_counter.rst>`_
 - `ens16x <dev_ens16x.rst>`_
 - `filter <filter.rst>`_
+- `gmp343 <gmp343.rst>`_
 - `gyro6050 <gyro6050.rst>`_
 - `gyro <gyro.rst>`_
 - `gyroscope <gyroscope.rst>`_
