@@ -1,16 +1,14 @@
 // gmp343.cpp
 #include "dev_gmp343.h"
 
-static const char* GMP343_FORM_CMD = "FORM CO2 \" \" \"ppm\" #r#n";
 static const char GMP343_PROMPT = '>';
 
 GMP343::GMP343(const char* name, int8_t rx_pin, int8_t tx_pin,
-        uint32_t baud, SoftwareSerialConfig config, bool invert,
-        uint16_t interval_ms, uint16_t timeout_ms, uint8_t retries) :
+        uint32_t baud, SoftwareSerialConfig config, bool invert) :
     Serial_Device(name, rx_pin, tx_pin, baud, config, invert) {
-    _interval_ms = interval_ms;
-    _timeout_ms = timeout_ms;
-    _retries = retries;
+    _interval_ms = GMP343_DEFAULT_INTERVAL_MS;
+    _timeout_ms = GMP343_DEFAULT_TIMEOUT_MS;
+    _retries = GMP343_DEFAULT_RETRIES;
     add_subdevice(new Subdevice());
     pollrate(100); // fast enough to progress serial state machine without blocking
 }
@@ -27,14 +25,16 @@ void GMP343::reset_reply() {
     _reply.clear();
 }
 
-bool GMP343::send_command(const char* cmd) {
+bool GMP343::send_command(const __FlashStringHelper* cmd) {
     SoftwareSerial* serial = serial_handle();
     if(!serial) return false;
 
     clear_input();
     reset_reply();
 
-    serial->write((const uint8_t*)cmd, strlen(cmd));
+    Ustring command;
+    command.from(cmd);
+    serial->write((const uint8_t*)command.as_cstr(), command.length());
     serial->write('\r');
     _command_started_ms = millis();
     return true;
@@ -98,14 +98,12 @@ bool GMP343::parse_co2_reply(float& ppm) {
         number_start--;
     }
 
-    char number_buf[24];
-    int out = 0;
-    for(int i = number_start; i <= number_end && out < (int)sizeof(number_buf) - 1; i++) {
-        number_buf[out++] = data[i];
+    Ustring number;
+    if(!number.from(data + number_start, number_end - number_start + 1)) {
+        return false;
     }
-    number_buf[out] = 0;
-    ppm = atof(number_buf);
-    return out > 0;
+    ppm = number.as_float();
+    return !number.empty();
 }
 
 void GMP343::schedule_retry(State retry_state) {
@@ -122,7 +120,7 @@ bool GMP343::measure() {
     // S -> SMODE STOP -> ECHO OFF -> FORM ...
     switch(_state) {
     case INIT_SEND_STOP:
-        if(send_command("S")) {
+        if(send_command(F("S"))) {
             _state = INIT_WAIT_STOP;
         }
         return false;
@@ -136,7 +134,7 @@ bool GMP343::measure() {
         return false;
 
     case INIT_SEND_MODE:
-        if(send_command("SMODE STOP")) {
+        if(send_command(F("SMODE STOP"))) {
             _state = INIT_WAIT_MODE;
         }
         return false;
@@ -157,7 +155,7 @@ bool GMP343::measure() {
         return false;
 
     case INIT_SEND_ECHO_OFF:
-        if(send_command("ECHO OFF")) {
+        if(send_command(F("ECHO OFF"))) {
             _state = INIT_WAIT_ECHO_OFF;
         }
         return false;
@@ -178,7 +176,7 @@ bool GMP343::measure() {
         return false;
 
     case INIT_SEND_FORM:
-        if(send_command(GMP343_FORM_CMD)) {
+        if(send_command(F("FORM CO2 \" \" \"ppm\" #r#n"))) {
             _state = INIT_WAIT_FORM;
         }
         return false;
@@ -204,7 +202,7 @@ bool GMP343::measure() {
         if((int32_t)(millis() - _next_send_ms) < 0) {
             return false;
         }
-        if(send_command("SEND")) {
+        if(send_command(F("SEND"))) {
             _state = READY_WAIT_REPLY;
         }
         return false;
