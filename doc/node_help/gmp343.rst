@@ -5,10 +5,7 @@ gmp343
 
     gmp343(name, rx_pin, tx_pin /*, baud is by default 19200*/
         /*, config is by default SWSERIAL_8N1*/
-        /*, invert is by default false*/
-        /*, interval_ms is by default 1000*/
-        /*, timeout_ms is by default 1500*/
-        /*, retries is by default 3*/);
+        /*, invert is by default false*/);
 
 Create a new serial driver for the Vaisala GMP343 CO2 sensor.
 
@@ -32,11 +29,8 @@ Parameters
 
 - ``invert``: set true to invert serial levels (default false).
 
-- ``interval_ms``: delay between successful ``SEND`` polls in milliseconds (default 1000).
-
-- ``timeout_ms``: timeout while waiting for the ``>`` prompt in milliseconds (default 1500).
-
-- ``retries``: number of retries for initialization and read commands (default 3).
+The driver internally uses a 1000 ms poll interval, a 1500 ms response timeout,
+and up to 3 retries for initialization and read commands.
 
 Example
 -------

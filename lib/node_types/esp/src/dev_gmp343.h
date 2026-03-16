@@ -7,6 +7,11 @@
 #include <Arduino.h>
 #include "dev_serial_device.h"
 
+#define GMP343_DEFAULT_BAUD 19200
+#define GMP343_DEFAULT_INTERVAL_MS 1000
+#define GMP343_DEFAULT_TIMEOUT_MS 1500
+#define GMP343_DEFAULT_RETRIES 3
+
 class GMP343 : public Serial_Device {
     private:
         enum State {
@@ -32,7 +37,7 @@ class GMP343 : public Serial_Device {
         uint8_t _retry_index = 0;
 
         void clear_input();
-        bool send_command(const char* cmd);
+        bool send_command(const __FlashStringHelper* cmd);
         bool collect_until_prompt();
         bool command_timed_out() const;
         bool parse_co2_reply(float& ppm);
@@ -41,12 +46,9 @@ class GMP343 : public Serial_Device {
 
     public:
         GMP343(const char* name, int8_t rx_pin, int8_t tx_pin,
-            uint32_t baud = 19200,
+            uint32_t baud = GMP343_DEFAULT_BAUD,
             SoftwareSerialConfig config = SWSERIAL_8N1,
-            bool invert = false,
-            uint16_t interval_ms = 1000,
-            uint16_t timeout_ms = 1500,
-            uint8_t retries = 3);
+            bool invert = false);
 
         bool measure();
 };
