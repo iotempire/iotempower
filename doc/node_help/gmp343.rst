@@ -29,6 +29,12 @@ Parameters
 
 - ``invert``: set true to invert serial levels (default false).
 
+The ``baud``, ``config``, and ``invert`` parameters stay exposed to support
+pre-deployed sensors with non-default serial settings, including units that may
+have been reconfigured earlier or left with unusual factory settings. The
+asserted default operating mode for this driver remains 19200 baud,
+``SWSERIAL_8N1``, and non-inverted serial.
+
 The driver internally uses a 1000 ms poll interval, a 1500 ms response timeout,
 and up to 3 retries for initialization and read commands.
 
