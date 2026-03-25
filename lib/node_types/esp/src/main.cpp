@@ -138,7 +138,9 @@
     #include <ESP8266mDNS.h>
 
     #ifdef MQTT_USE_TLS
-        const char mqtt_ca_cert_char[] PROGMEM = mqtt_ca_cert; 
+        // Keep CA PEM in normal memory on ESP8266 so BearSSL can parse it reliably.
+        // PROGMEM-backed PEM strings can cause TLS trust-anchor parse failures.
+        const char mqtt_ca_cert_char[] = mqtt_ca_cert;
         BearSSL::X509List *serverTrustedCA = new BearSSL::X509List(mqtt_ca_cert_char);
     #endif
 #endif
@@ -759,7 +761,7 @@ void init_mqtt() {
         mqtt_connected = false;
         ulog(F("MQTT: disconnected. Reason: %u"), static_cast<uint8_t>(reason));
     });
-    
+
     mqttClient.onMessage(onMqttMessage);
     
     // Set client ID
@@ -788,14 +790,22 @@ void init_mqtt() {
     #endif
 
     #ifdef mqtt_server
-        // if defined, just set address
-        mqttClient.setServer(mqtt_server, mqtt_port);
-        ulog(F("Setting mqtt server to: %s:%d"),  mqtt_server, mqtt_port);
+        // If mqtt_server is an IP literal, use the IPAddress overload.
+        // This avoids hostname-verification edge cases on some ESP TLS stacks.
+        IPAddress mqtt_ip_obj;
+        if (mqtt_ip_obj.fromString(mqtt_server)) {
+            mqttClient.setServer(mqtt_ip_obj, mqtt_port);
+            ulog(F("Setting mqtt server to IP: %s:%d"), mqtt_server, mqtt_port);
+        } else {
+            mqttClient.setServer(mqtt_server, mqtt_port);
+            ulog(F("Setting mqtt server to host: %s:%d"), mqtt_server, mqtt_port);
+        }
     #else
         // if not defined, take gateway address
-        mqtt_server_buffer.from(WiFi.gatewayIP().toString().c_str());
-        mqttClient.setServer(mqtt_server_buffer.as_cstr(), mqtt_port);
-        ulog(F("Setting mqtt server ip to: %s:%d"),  mqtt_server_buffer.as_cstr(), mqtt_port);
+        IPAddress gateway_ip = WiFi.gatewayIP();
+        mqtt_server_buffer.from(gateway_ip.toString().c_str());
+        mqttClient.setServer(gateway_ip, mqtt_port);
+        ulog(F("Setting mqtt server IP to: %s:%d"), mqtt_server_buffer.as_cstr(), mqtt_port);
     #endif
 }
 
