@@ -782,6 +782,9 @@ void init_mqtt() {
         #else
             // ESP8266 - use trust anchors
             mqttClient.setTrustAnchors(serverTrustedCA);
+            // Set the buffer size for incoming and outgoing traffic
+            mqttClient.setBufferSizes(1024, 1024); 
+            ulog(F("TLS buffers shrunk to 1024 RX / 1024 TX."));
         #endif
     #else
         #define mqtt_port 1883
