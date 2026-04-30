@@ -14,6 +14,10 @@ SPHINXBUILD   = python3 $(shell which sphinx-build)
 BUILDDIR      = "$(IOTEMPOWER_LOCAL)/doc"
 SOURCEDIR     = "$(BUILDDIR)/_src"
 
+ifeq ($(SPHINX_BUILD),)
+$(error sphinx-build not found)
+endif
+
 # Put it first so that "make" without argument is like "make help".
 help:
 	@$(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
