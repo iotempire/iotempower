@@ -471,13 +471,16 @@ if [[ "$install_system" == 1 ]]; then
       latest_ver=$(nvm ls-remote | grep -i "latest" | tail -1 | grep -Eo '([0-9]+\.?){3,}')
       latest_ver_maj=$(cut -d '.' -f1 <<< "$latest_ver")
 
+      install_ver=$min_version
       if [ "$min_version" -le "$latest_ver_maj" ] && [ "$latest_ver_maj" -le "$max_version" ]; then
-        echo "Trying to install the latest compatible Node.js ($latest_ver) version."
-        nvm install "$latest_ver"
-        if ! check_node; then
-            echo "Failed to install a compatible Node.js version."
-            exit 1
-        fi
+        install_ver=$latest_ver_maj
+      fi
+
+      echo "Trying to install the latest compatible Node.js ($install_ver) version."
+      nvm install "$latest_ver"
+      if ! check_node; then
+          echo "Failed to install a compatible Node.js version."
+          exit 1
       fi
   fi
   
