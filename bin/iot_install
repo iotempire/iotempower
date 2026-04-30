@@ -24,7 +24,7 @@ elif command -v apt-get &> /dev/null; then
 elif command -v brew &> /dev/null; then
   # Additional check for macOS using uname
   if [[ "$(uname)" == "Darwin" ]]; then
-    platform "macos" 
+    platform="macos"
   else
     echo "brew found, but not running on macOS. Please check your configuration."
   fi
@@ -467,11 +467,17 @@ if [[ "$install_system" == 1 ]]; then
   }
 
   if ! check_node; then
-      echo "Trying to install the latest compatible Node.js ($max_version) version."
-      nvm install "$max_version"
-      if ! check_node; then
-          echo "Failed to install a compatible Node.js version."
-          exit 1
+      # Select the latest 'latest' version but make sure it's in range
+      latest_ver=$(nvm ls-remote | grep -i "latest" | tail -1 | grep -Eo '([0-9]+\.?){3,}')
+      latest_ver_maj=$(cut -d '.' -f1 <<< "$latest_ver")
+
+      if [ "$min_version" -le "$latest_ver_maj" ] && [ "$latest_ver_maj" -le "$max_version" ]; then
+        echo "Trying to install the latest compatible Node.js ($latest_ver) version."
+        nvm install "$latest_ver"
+        if ! check_node; then
+            echo "Failed to install a compatible Node.js version."
+            exit 1
+        fi
       fi
   fi
   
