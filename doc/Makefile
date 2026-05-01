@@ -14,7 +14,7 @@ SPHINXBUILD   = python3 $(shell which sphinx-build)
 BUILDDIR      = "$(IOTEMPOWER_LOCAL)/doc"
 SOURCEDIR     = "$(BUILDDIR)/_src"
 
-ifeq ($(SPHINX_BUILD),)
+ifeq ($(SPHINXBUILD),)
 $(error sphinx-build not found)
 endif
 
