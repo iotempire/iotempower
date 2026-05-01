@@ -192,6 +192,10 @@ EOF
 
 
     ## wifi-config.h creation
+    if [ -z "$IOTEMPOWER_AP_NAME_FULL" ]; then
+      echo "Error: IOTEMPOWER_AP_NAME_FULL is required!"
+      exit 1
+    fi
     # we hardcode wifi credentials now to allow easier re-flashing and
     # network migration
     # echo "// no wifi credentials" > "$dest_dir/src/wifi-config.h"
