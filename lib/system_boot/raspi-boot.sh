@@ -38,7 +38,7 @@ if [[ -e "$_WIFI_CONFIG" ]]; then
     _MQTT_SCANIF=""
 fi
 
-if [[ "IOTEMPOWER_AP_PASSWORD" ]]; then # pw was given, so start an accesspoint
+if [[ "$IOTEMPOWER_AP_PASSWORD" ]]; then # pw was given, so start an accesspoint
     # start accesspoint and mqtt_broker
     (
         sleep 15 # let network devices start
