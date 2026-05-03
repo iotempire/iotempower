@@ -14,6 +14,12 @@ fi
 
 # wait for wlap ...
 sleep 15
+if [ -z "${IOTEMPOWER_AP_NAME_FULL}" ]; then
+    echo "WARNING: AP_NAME_FULL not defined, trying to pull from wlap0..."
+    if command -v iw >/dev/null 2>&1; then
+        export IOTEMPOWER_AP_NAME_FULL=$(iw dev wlap0 info 2>/dev/null | grep ssid | awk '{print $2}')
+    fi
+fi
 echo "SSID: $IOTEMPOWER_AP_NAME_FULL"
 
 while true; do
