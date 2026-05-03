@@ -12,6 +12,10 @@ fi
 
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
+# wait for wlap ...
+sleep 15
+echo "SSID: $IOTEMPOWER_AP_NAME_FULL"
+
 while true; do
     sleep 1
     dongle daemon

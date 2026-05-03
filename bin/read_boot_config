@@ -60,3 +60,11 @@ if [[ -e "$_WIFI_IN_CONFIG" ]]; then
         uiot_wifi_user="${lines[2]}"
     fi
 fi
+
+if [ -z "${IOTEMPOWER_AP_NAME_FULL}" ]; then
+    echo "WARNING: AP_NAME_FULL not defined, trying to pull from wlap0..."
+    if command -v iw >/dev/null 2>&1; then
+        export IOTEMPOWER_AP_NAME_FULL=$(iw dev wlap0 info 2>/dev/null | grep ssid | awk '{print $2}')
+    fi
+fi
+
