@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+# Source after IoTempower MQTT configuration has been loaded.
+# Produces:
+#   mqtt_port
+#   mqtt_client_options
+
+mqtt_port=1883
+mqtt_client_options=()
+
+if [[ "$IOTEMPOWER_MQTT_USE_TLS" == 1 ]]; then
+    if [[ ! "$IOTEMPOWER_MQTT_CERT_FOLDER" ]]; then
+        echo "MQTT TLS enabled, but no certificate folder set. Aborting." 1>&2
+        exit 1
+    fi
+    mqtt_port=8883
+    mqtt_client_options+=(--cafile "$IOTEMPOWER_MQTT_CERT_FOLDER/ca.crt")
+fi
+
+if [[ "$IOTEMPOWER_MQTT_USER" || "$IOTEMPOWER_MQTT_PW" ]]; then
+    if [[ ! "$IOTEMPOWER_MQTT_USER" || ! "$IOTEMPOWER_MQTT_PW" ]]; then
+        echo "MQTT user and password must both be set when MQTT auth is configured. Aborting." 1>&2
+        exit 1
+    fi
+    if [[ "$IOTEMPOWER_MQTT_USE_TLS" != 1 ]]; then
+        echo "MQTT auth requires TLS. Aborting." 1>&2
+        exit 1
+    fi
+    mqtt_client_options+=(-u "$IOTEMPOWER_MQTT_USER" -P "$IOTEMPOWER_MQTT_PW")
+fi

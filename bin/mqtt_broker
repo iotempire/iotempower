@@ -21,6 +21,166 @@ APTEMP="$IOTEMPOWER_LOCAL/tmp/mosquitto"
 rm -rf "$APTEMP" &> /dev/null
 mkdir -p "$APTEMP"
 
+mqtt_auth_enabled=false
+
+mqtt_fail() {
+    echo "$1" 1>&2
+    exit 1
+}
+
+mqtt_create_password_file() {
+    local password_file="$1"
+    local password_file_tmp="${password_file}.tmp"
+    local old_umask=""
+    local result=0
+
+    rm -f "$password_file_tmp"
+    old_umask="$(umask)"
+    umask 077
+    if printf '%s\n%s\n' "$IOTEMPOWER_MQTT_PW" "$IOTEMPOWER_MQTT_PW" \
+            | mosquitto_passwd -c "$password_file_tmp" "$IOTEMPOWER_MQTT_USER" >/dev/null; then
+        chmod 600 "$password_file_tmp" || result=1
+        mv -f "$password_file_tmp" "$password_file" || result=1
+        chmod 600 "$password_file" || result=1
+    else
+        result=1
+    fi
+    umask "$old_umask"
+    if [[ "$result" != 0 ]]; then
+        rm -f "$password_file_tmp"
+        return 1
+    fi
+}
+
+mqtt_write_acl_file() {
+    local acl_file="$1"
+    local system_dir=""
+    local node_conf=""
+    local node_topic=""
+    local extra_topic=""
+
+    {
+        echo "user $IOTEMPOWER_MQTT_USER"
+        echo "topic read #"
+        echo "topic write iotempower/_cfg_/#"
+        if [[ "$IOTEMPOWER_MQTT_DISCOVERY_PREFIX" ]]; then
+            echo "topic write $IOTEMPOWER_MQTT_DISCOVERY_PREFIX/#"
+        fi
+
+        if [[ "$IOTEMPOWER_SYSTEM_CONFIG" && -e "$IOTEMPOWER_SYSTEM_CONFIG" ]]; then
+            system_dir="$(dirname "$IOTEMPOWER_SYSTEM_CONFIG")"
+            while IFS= read -r -d '' node_conf; do
+                node_topic="$(mqtt_node_topic_from_path "$system_dir" "$node_conf")" || exit 1
+                if [[ "$node_topic" ]]; then
+                    echo "topic write $node_topic/#"
+                fi
+            done < <(find "$system_dir" -name node.conf -print0)
+        fi
+
+        for extra_topic in $IOTEMPOWER_MQTT_ACL_EXTRA_WRITE_TOPICS; do
+            [[ "$extra_topic" ]] && echo "topic write $extra_topic"
+        done
+    } > "$acl_file"
+}
+
+mqtt_node_topic_from_path() {
+    local system_dir="$1"
+    local node_conf="$2"
+    local node_dir=""
+    local rel_topic=""
+    local configured_topic=""
+
+    system_dir="$(cd "$system_dir" && pwd -P)" || return 1
+    node_dir="$(cd "$(dirname "$node_conf")" && pwd -P)" || return 1
+
+    if [[ "$node_dir" == "$system_dir" ]]; then
+        rel_topic=""
+    else
+        case "$node_dir" in
+            "$system_dir"/*)
+                rel_topic="${node_dir#"$system_dir"/}"
+                ;;
+            *)
+                return 1
+                ;;
+        esac
+    fi
+
+    configured_topic="$(mqtt_read_node_topic "$node_conf")" || return 1
+    if [[ "$configured_topic" ]]; then
+        printf '%s' "$configured_topic"
+        return 0
+    fi
+
+    printf '%s' "$rel_topic"
+}
+
+mqtt_read_node_topic() {
+    local node_conf="$1"
+    local line=""
+    local value=""
+    local parsed_topic=""
+
+    while IFS= read -r line || [[ "$line" ]]; do
+        [[ "$line" =~ ^[[:space:]]*topic[[:space:]]*= ]] || continue
+        value="${line#*=}"
+        value="${value#"${value%%[![:space:]]*}"}"
+        value="${value%"${value##*[![:space:]]}"}"
+        parsed_topic="$(mqtt_parse_config_value "$value")" || return 1
+    done < "$node_conf"
+
+    printf '%s' "$parsed_topic"
+}
+
+mqtt_parse_config_value() {
+    local value="$1"
+    local result=""
+    local char=""
+    local next_char=""
+    local rest=""
+
+    if [[ "$value" == \"* ]]; then
+        value="${value:1}"
+        while [[ "$value" ]]; do
+            char="${value:0:1}"
+            value="${value:1}"
+            if [[ "$char" == "\\" && "$value" ]]; then
+                next_char="${value:0:1}"
+                value="${value:1}"
+                result+="$next_char"
+            elif [[ "$char" == '"' ]]; then
+                rest="$value"
+                rest="${rest#"${rest%%[![:space:]]*}"}"
+                [[ ! "$rest" || "$rest" == \#* ]] || return 1
+                printf '%s' "$result"
+                return 0
+            else
+                result+="$char"
+            fi
+        done
+        return 1
+    elif [[ "$value" == \'* ]]; then
+        value="${value:1}"
+        [[ "$value" == *"'"* ]] || return 1
+        result="${value%%\'*}"
+        rest="${value#*\'}"
+        rest="${rest#"${rest%%[![:space:]]*}"}"
+        [[ ! "$rest" || "$rest" == \#* ]] || return 1
+        printf '%s' "$result"
+    else
+        case "$value" in
+            *[[:space:]]*|*[\`\$\\]*)
+                return 1
+                ;;
+            *)
+                value="${value%%#*}"
+                value="${value%"${value##*[![:space:]]}"}"
+                printf '%s' "$value"
+                ;;
+        esac
+    fi
+}
+
 while true; do
     IF1="$1"
     IP1="$2"
@@ -61,6 +221,22 @@ while true; do
     echo "Listening on $IOTEMPOWER_MQTT_HOST."
     [[ "$IOTEMPOWER_MQTT_HOST2" ]] && echo "Also listening on $IOTEMPOWER_MQTT_HOST2."
 
+    mqtt_auth_enabled=false
+    if [[ "$IOTEMPOWER_MQTT_USER" || "$IOTEMPOWER_MQTT_PW" ]]; then
+        mqtt_auth_enabled=true
+        [[ "$IOTEMPOWER_MQTT_USER" && "$IOTEMPOWER_MQTT_PW" ]] \
+            || mqtt_fail "MQTT user and password must both be set when MQTT auth is configured. Aborting."
+        [[ "$IOTEMPOWER_MQTT_USE_TLS" == 1 ]] || mqtt_fail "MQTT auth requires TLS. Aborting."
+        [[ "$IOTEMPOWER_MQTT_USER" != *[[:space:]]* ]] || mqtt_fail "MQTT username may not contain whitespace. Aborting."
+        [[ "$IOTEMPOWER_MQTT_USER" != *:* ]] || mqtt_fail "MQTT username may not contain colon. Aborting."
+        command -v mosquitto_passwd >/dev/null || mqtt_fail "MQTT auth requires mosquitto_passwd. Aborting."
+
+        mqtt_create_password_file "$APTEMP/password_file" \
+            || mqtt_fail "Failed to generate Mosquitto password file. Aborting."
+        mqtt_write_acl_file "$APTEMP/acl_file" || mqtt_fail "Failed to generate Mosquitto ACL file. Aborting."
+        chmod 600 "$APTEMP/acl_file"
+    fi
+
     # Create mosquitto config - user is needed for root on docker
     MQTT_BROKER_USER="${USER:-$(id -un 2>/dev/null)}"
     MQTT_BROKER_USER_LINE=""
@@ -75,6 +251,18 @@ log_type error
 log_type warning
 EOF
 
+    if [[ "$mqtt_auth_enabled" == true ]]; then
+        cat << EOF >> "$APTEMP/mosquitto.conf"
+allow_anonymous false
+password_file $APTEMP/password_file
+acl_file $APTEMP/acl_file
+EOF
+    else
+        cat << EOF >> "$APTEMP/mosquitto.conf"
+allow_anonymous true
+EOF
+    fi
+
     if [[ "$IOTEMPOWER_MQTT_USE_TLS" == 1 ]]; then
         if [[ ! "$IOTEMPOWER_MQTT_CERT_FOLDER" ]]; then
             echo "MQTT TLS enabled, but no certificate folder set. Aborting." 1>&2
@@ -88,7 +276,6 @@ cafile $IOTEMPOWER_MQTT_CERT_FOLDER/ca.crt
 certfile $IOTEMPOWER_MQTT_CERT_FOLDER/server.crt
 keyfile $IOTEMPOWER_MQTT_CERT_FOLDER/server.key
 require_certificate false  
-allow_anonymous true
 EOF
         if [[ "$IOTEMPOWER_MQTT_HOST2" ]]; then
             cat << EOF >> "$APTEMP/mosquitto.conf"
@@ -97,14 +284,12 @@ cafile $IOTEMPOWER_MQTT_CERT_FOLDER/ca.crt
 certfile $IOTEMPOWER_MQTT_CERT_FOLDER/server.crt
 keyfile $IOTEMPOWER_MQTT_CERT_FOLDER/server.key
 require_certificate false
-allow_anonymous true
 EOF
         fi
     else
         cat << EOF >> "$APTEMP/mosquitto.conf"
 listener 1883 127.0.0.1
 listener 1883 $IOTEMPOWER_MQTT_HOST
-allow_anonymous true
 EOF
         if [[ "$IOTEMPOWER_MQTT_HOST2" ]]; then
             cat << EOF >> "$APTEMP/mosquitto.conf"
