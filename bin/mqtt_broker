@@ -57,7 +57,6 @@ mqtt_write_acl_file() {
     local system_dir=""
     local node_conf=""
     local node_topic=""
-    local extra_topic=""
 
     {
         echo "user $IOTEMPOWER_MQTT_USER"
@@ -76,10 +75,6 @@ mqtt_write_acl_file() {
                 fi
             done < <(find "$system_dir" -name node.conf -print0)
         fi
-
-        for extra_topic in $IOTEMPOWER_MQTT_ACL_EXTRA_WRITE_TOPICS; do
-            [[ "$extra_topic" ]] && echo "topic write $extra_topic"
-        done
     } > "$acl_file"
 }
 

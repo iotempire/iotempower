@@ -86,7 +86,6 @@ IOTEMPOWER_AP_HOSTNAME="iotgateway"
 # TODO: move to secret file
 #IOTEMPOWER_MQTT_USER="homeassistant"
 #IOTEMPOWER_MQTT_PW="secretpw"
-#IOTEMPOWER_MQTT_ACL_EXTRA_WRITE_TOPICS="custom/topic/#"
 
 # Data to configure an mqtt bridge
 #IOTEMPOWER_MQTT_BRIDGE_HOST="ulno.net"

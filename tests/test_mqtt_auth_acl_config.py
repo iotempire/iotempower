@@ -30,7 +30,6 @@ def _auth_system(tmp_path: Path, fakebin: Path, *, tls: bool = True) -> tuple[Pa
         'IOTEMPOWER_MQTT_USER="homeassistant"\n'
         'IOTEMPOWER_MQTT_PW="secretpw"\n'
         'IOTEMPOWER_MQTT_DISCOVERY_PREFIX="iotempower"\n'
-        'IOTEMPOWER_MQTT_ACL_EXTRA_WRITE_TOPICS="custom/topic/#"\n',
         encoding="utf-8",
     )
 
@@ -121,7 +120,6 @@ def test_mqtt_broker_auth_generates_password_acl_and_tls_only_config(tmp_path):
     assert "topic write iotempower/_cfg_/#" in acl
     assert "topic write iotempower/#" in acl
     assert "topic write allowed-node/#" in acl
-    assert "topic write custom/topic/#" in acl
     assert password_file == "homeassistant:hashed:secretpw\n"
     assert passwd_args == ["-c", str(mosquitto_dir / "password_file.tmp"), "homeassistant"]
     assert "secretpw" not in passwd_args
