@@ -257,7 +257,26 @@ Yes! Node-RED works great with IoTempower. Use MQTT nodes in Node-RED to subscri
 What is the Node-RED password after starting web_starter?
 ----------------------------------------------------------
 
-Many default passwords in IoTempower are set to ``iotempire`` for simplicity in classroom environments. Yes, this is a security concern, but we opt for that for ease of use in educational settings. Feel free to enhance security of IoTempower on different levels without compromising usability.
+Default IoTempower-managed Node-RED installs use the username ``admin`` and a
+locally generated password. On the gateway, run:
+
+.. code-block:: bash
+
+   iot nodered-password show
+
+If you configured custom Node-RED authentication, use those custom credentials.
+To rotate or choose the generated password, run one of:
+
+.. code-block:: bash
+
+   iot nodered-password reset
+   iot nodered-password set
+
+Then restart Node-RED:
+
+.. code-block:: bash
+
+   iot service restart web
 
 
 How do I run custom code on my nodes?

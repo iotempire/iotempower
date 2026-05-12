@@ -1,0 +1,328 @@
+#!/usr/bin/env bash
+
+if [[ $# -gt 1 || "$*" = "help" || "$*" = "-h" || "$*" = "--help" ]]; then
+cat << EOF
+Syntax: nodered_ensure_admin_auth [settings.js]
+
+Ensure the IoTempower Node-RED settings file uses generated local admin
+credentials instead of a shared default password.
+
+EOF
+exit 1
+fi
+
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
+
+nodered_user_dir="$HOME/.node-red"
+nodered_config="${1:-$nodered_user_dir/settings.js}"
+nodered_config_dir="$(dirname "$nodered_config")"
+nodered_credentials_file="${IOTEMPOWER_NODE_RED_CREDENTIALS_FILE:-$nodered_config_dir/iotempower-admin-credentials}"
+nodered_template="$IOTEMPOWER_LOCAL/nodejs/node_modules/node-red/settings.js"
+node_red_password_cli="$IOTEMPOWER_ROOT/bin/nodered_password_cli.js"
+iotempower_auth_marker="IOTEMPOWER_NODE_RED_ADMIN_AUTH"
+iotempower_old_default_hash='$2b$08$W5LDP3eTaIYjz5iJkKVwMu9JDg3cPF'
+iotempower_old_default_hash+='MUvBypMCmYA3fpjYQlzFC4e'
+
+nodered_info() {
+    if [[ "${IOTEMPOWER_NODE_RED_AUTH_QUIET:-}" != "1" ]]; then
+        echo "$@"
+    fi
+}
+
+nodered_has_admin_auth() {
+    grep -Eq '^[[:space:]]*module\.exports\.adminAuth[[:space:]]*=' "$nodered_config" \
+        || grep -Eq '^[[:space:]]*adminAuth[[:space:]]*:' "$nodered_config"
+}
+
+nodered_has_http_root_settings() {
+    grep -Eq '^[[:space:]]*(module\.exports\.)?httpAdminRoot[[:space:]]*[:=]' "$nodered_config" \
+        || grep -Eq '^[[:space:]]*(module\.exports\.)?httpNodeRoot[[:space:]]*[:=]' "$nodered_config"
+}
+
+nodered_ensure_default_http_roots() {
+    if nodered_has_http_root_settings; then
+        return 0
+    fi
+
+    if ! cat << 'EOF' >> "$nodered_config"; then
+module.exports.httpAdminRoot = '/nodered';
+module.exports.httpNodeRoot = '/nodered';
+EOF
+        echo "Cannot update Node-RED HTTP root settings in $nodered_config." 1>&2
+        exit 1
+    fi
+}
+
+nodered_require_bcryptjs_available() {
+    IOTEMPOWER_LOCAL="$IOTEMPOWER_LOCAL" node << 'EOF'
+const path = require("path");
+const candidates = ["bcryptjs"];
+if (process.env.IOTEMPOWER_LOCAL) {
+    candidates.push(path.join(process.env.IOTEMPOWER_LOCAL, "nodejs", "node_modules", "bcryptjs"));
+    candidates.push(path.join(process.env.IOTEMPOWER_LOCAL, "nodejs", "node_modules", "node-red", "node_modules", "bcryptjs"));
+}
+for (const candidate of candidates) {
+    try {
+        require(candidate);
+        process.exit(0);
+    } catch (err) {
+        // Try the next known Node-RED install location.
+    }
+}
+process.exit(1);
+EOF
+}
+
+nodered_ensure_credential_files() {
+    if [[ ! -f "$node_red_password_cli" ]]; then
+        echo "Cannot find Node-RED password helper at $node_red_password_cli." 1>&2
+        exit 1
+    fi
+    if [[ "${IOTEMPOWER_NODE_RED_AUTH_QUIET:-}" = "1" ]]; then
+        local output
+        if ! output="$(node "$node_red_password_cli" ensure-files "$nodered_config" 2>&1)"; then
+            printf '%s\n' "$output" 1>&2
+            echo "Cannot prepare IoTempower Node-RED admin credential files." 1>&2
+            exit 1
+        fi
+        return 0
+    fi
+    if ! node "$node_red_password_cli" ensure-files "$nodered_config"; then
+        echo "Cannot prepare IoTempower Node-RED admin credential files." 1>&2
+        exit 1
+    fi
+}
+
+if ! mkdir -p "$nodered_config_dir"; then
+    echo "Cannot create Node-RED settings directory $nodered_config_dir." 1>&2
+    exit 1
+fi
+
+if [[ ! -f "$nodered_config" ]]; then
+    if [[ ! -f "$nodered_template" ]]; then
+        echo "Cannot find Node-RED settings template at $nodered_template." 1>&2
+        exit 1
+    fi
+    if ! cp "$nodered_template" "$nodered_config"; then
+        echo "Cannot copy Node-RED settings template to $nodered_config." 1>&2
+        exit 1
+    fi
+fi
+
+if grep -Fq "$iotempower_old_default_hash" "$nodered_config"; then
+    old_hash_count=$(grep -Fc "$iotempower_old_default_hash" "$nodered_config")
+    if ! NODE_RED_OLD_DEFAULT_HASH="$iotempower_old_default_hash" \
+            NODE_RED_CONFIG="$nodered_config" node << 'EOF'; then
+const fs = require("fs");
+const file = process.env.NODE_RED_CONFIG;
+const hash = process.env.NODE_RED_OLD_DEFAULT_HASH;
+const escapedHash = hash.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const legacyDefault = new RegExp(
+    "\\n?module\\.exports\\.adminAuth\\s*=\\s*\\{\\s*" +
+    "type\\s*:\\s*\"credentials\"\\s*,\\s*" +
+    "users\\s*:\\s*\\[\\s*\\{\\s*" +
+    "username\\s*:\\s*\"admin\"\\s*,\\s*" +
+    "password\\s*:\\s*\"" + escapedHash + "\"\\s*,\\s*" +
+    "permissions\\s*:\\s*\"\\*\"\\s*" +
+    "\\}\\s*\\]\\s*\\}\\s*;\\s*",
+    "gs"
+);
+const text = fs.readFileSync(file, "utf8");
+fs.writeFileSync(file, text.replace(legacyDefault, "\n"));
+EOF
+        echo "Cannot remove legacy Node-RED adminAuth from $nodered_config." 1>&2
+        exit 1
+    fi
+    new_hash_count=$(grep -Fc "$iotempower_old_default_hash" "$nodered_config" || true)
+    if [[ "$new_hash_count" -lt "$old_hash_count" ]]; then
+        nodered_info "Removed legacy IoTempower Node-RED admin/iotempire auth block from $nodered_config."
+    fi
+    if [[ "$new_hash_count" -gt 0 ]] && nodered_has_admin_auth; then
+        echo "Legacy IoTempower Node-RED password hash remains inside custom adminAuth in $nodered_config; manual migration required." 1>&2
+        exit 1
+    fi
+fi
+
+if grep -q "$iotempower_auth_marker" "$nodered_config"; then
+    nodered_ensure_default_http_roots
+    nodered_ensure_credential_files
+    exit 0
+fi
+
+if nodered_has_admin_auth; then
+    nodered_info "Node-RED adminAuth already exists in $nodered_config; leaving adminAuth unchanged."
+    exit 0
+fi
+
+if ! nodered_require_bcryptjs_available; then
+    echo "Cannot load bcryptjs for IoTempower Node-RED adminAuth; adminAuth was not changed in $nodered_config." 1>&2
+    exit 1
+fi
+
+nodered_ensure_default_http_roots
+
+if ! cat << 'EOF' >> "$nodered_config"; then
+
+/* IOTEMPOWER_NODE_RED_ADMIN_AUTH
+ * Uses per-install local admin credentials prepared by IoTempower.
+ * Node-RED can still generate them if this settings file is started directly.
+ * The password is kept out of this settings file; read it from:
+ *   ~/.node-red/iotempower-admin-credentials
+ */
+function iotempowerNodeRedAdminPasswordHash() {
+    const fs = require("fs");
+    const path = require("path");
+    const crypto = require("crypto");
+    const userDir = __dirname;
+    const credentialsFile = process.env.IOTEMPOWER_NODE_RED_CREDENTIALS_FILE ||
+        path.join(userDir, "iotempower-admin-credentials");
+    const hashFile = process.env.IOTEMPOWER_NODE_RED_PASSWORD_HASH_FILE ||
+        path.join(userDir, "iotempower-admin-password.hash");
+
+    function chmodPrivate(file) {
+        try {
+            fs.chmodSync(file, 0o600);
+        } catch (err) {
+            // Best effort for filesystems that do not support POSIX modes.
+        }
+    }
+
+    function readFirstLine(file) {
+        try {
+            return fs.readFileSync(file, "utf8").split(/\r?\n/, 1)[0].trim();
+        } catch (err) {
+            if (err && err.code === "ENOENT") {
+                return "";
+            }
+            throw err;
+        }
+    }
+
+    function fileExists(file) {
+        try {
+            fs.accessSync(file, fs.constants.F_OK);
+            return true;
+        } catch (err) {
+            return false;
+        }
+    }
+
+    function credentialsFileHasPassword(file) {
+        try {
+            const content = fs.readFileSync(file, "utf8");
+            return /^Password:\s*\S+/m.test(content);
+        } catch (err) {
+            if (err && err.code === "ENOENT") {
+                return false;
+            }
+            throw err;
+        }
+    }
+
+    function removeIfExists(file) {
+        try {
+            fs.unlinkSync(file);
+        } catch (err) {
+            if (!err || err.code !== "ENOENT") {
+                throw err;
+            }
+        }
+    }
+
+    function writePrivateAtomic(file, content) {
+        const tmp = `${file}.tmp-${process.pid}-${Date.now()}`;
+        try {
+            fs.writeFileSync(tmp, content, { mode: 0o600 });
+            chmodPrivate(tmp);
+            fs.renameSync(tmp, file);
+            chmodPrivate(file);
+        } catch (err) {
+            try {
+                fs.unlinkSync(tmp);
+            } catch (cleanupErr) {
+                if (!cleanupErr || cleanupErr.code !== "ENOENT") {
+                    // Keep the original failure clearer for operators.
+                }
+            }
+            throw err;
+        }
+    }
+
+    const existingHash = readFirstLine(hashFile);
+    if (existingHash && fileExists(credentialsFile) && credentialsFileHasPassword(credentialsFile)) {
+        chmodPrivate(hashFile);
+        chmodPrivate(credentialsFile);
+        return existingHash;
+    }
+    if (existingHash) {
+        removeIfExists(hashFile);
+        removeIfExists(credentialsFile);
+    }
+
+    const candidates = ["bcryptjs"];
+    if (process.env.IOTEMPOWER_LOCAL) {
+        candidates.push(path.join(process.env.IOTEMPOWER_LOCAL, "nodejs", "node_modules", "bcryptjs"));
+        candidates.push(path.join(process.env.IOTEMPOWER_LOCAL, "nodejs", "node_modules", "node-red", "node_modules", "bcryptjs"));
+    }
+
+    let bcryptjs;
+    let loadError;
+    for (const candidate of candidates) {
+        try {
+            bcryptjs = require(candidate);
+            break;
+        } catch (err) {
+            loadError = err;
+        }
+    }
+    if (!bcryptjs) {
+        const detail = loadError && loadError.message ? ` ${loadError.message}` : "";
+        throw new Error(`Cannot load bcryptjs for IoTempower Node-RED adminAuth.${detail}`);
+    }
+
+    const password = crypto.randomBytes(24).toString("base64")
+        .replace(/\+/g, "-")
+        .replace(/\//g, "_")
+        .replace(/=+$/g, "");
+    const hash = bcryptjs.hashSync(password, 8);
+
+    const credentialsContent = [
+        "IoTempower Node-RED admin credentials",
+        "Username: admin",
+        `Password: ${password}`,
+        `URL path: ${module.exports.httpAdminRoot || "/nodered"}`,
+        "",
+        "Keep this file private. To rotate the generated password, stop Node-RED,",
+        "run `iot nodered-password reset` or `iot nodered-password set`, then restart Node-RED.",
+        "",
+    ].join("\n");
+
+    writePrivateAtomic(credentialsFile, credentialsContent);
+    try {
+        writePrivateAtomic(hashFile, `${hash}\n`);
+    } catch (err) {
+        removeIfExists(credentialsFile);
+        throw err;
+    }
+    return hash;
+}
+
+module.exports.adminAuth = {
+    type: "credentials",
+    users: [{
+        username: "admin",
+        password: iotempowerNodeRedAdminPasswordHash(),
+        permissions: "*"
+    }]
+};
+/* IOTEMPOWER_NODE_RED_ADMIN_AUTH_END */
+EOF
+    echo "Cannot append generated Node-RED adminAuth block to $nodered_config." 1>&2
+    exit 1
+fi
+
+nodered_ensure_credential_files
+
+nodered_info "Configured generated Node-RED admin credentials in $nodered_config."
+nodered_info "Password file: $nodered_credentials_file"
+nodered_info "Run: iot nodered-password show"

@@ -11,10 +11,14 @@ fi
 
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
+if ! bash "$IOTEMPOWER_ROOT/bin/nodered_ensure_admin_auth"; then
+    echo "Failed to configure Node-RED admin authentication, aborting." 1>&2
+    exit 1
+fi
+
 while true; do
     sleep 1
     # be conservative on ram usage (https://github.com/node-red/node-red-dashboard/issues/144)
     node-red --node-args="--max-old-space-size=256"
     sleep 1
 done
-
