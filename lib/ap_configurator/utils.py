@@ -34,22 +34,40 @@ def validate_config_params(log, backend, nname, npass, npass2) -> bool:
     return True
 
 
+def parse_wifi_creds_output(output):
+    """Parse read_wifi_creds.sh key/value output."""
+
+    creds = {}
+    for line in output.splitlines():
+        key, sep, value = line.partition("=")
+        if sep and key in {"SSID", "Password", "GatewayIP"}:
+            creds[key] = value
+    return creds
+
+
 async def run_cmd_async(cmd, bg=False):
     """Run the given command asynchronously and return output"""
 
-    proc = await asyncio.create_subprocess_shell(
-        cmd,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE
-    )
+    if isinstance(cmd, (list, tuple)):
+        proc = await asyncio.create_subprocess_exec(
+            *cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
+    else:
+        proc = await asyncio.create_subprocess_shell(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
 
     # If bg=True, launch silently in background
     if not bg:
-    	stdout, stderr = await proc.communicate()
-    	return stdout.decode(), stderr.decode()
+        stdout, stderr = await proc.communicate()
+        return stdout.decode(), stderr.decode()
     else:
-    	proc.communicate()
-    	return None
+        asyncio.create_task(proc.communicate())
+        return None
 
 
 def extract_keywords(strng):

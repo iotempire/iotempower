@@ -6,5 +6,5 @@
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
 echo "Setting up the wifi system configuration"
-. $IOTEMPOWER_ROOT/bin/setup_systemconf
+bash "$IOTEMPOWER_ROOT/bin/setup_systemconf" || exit 1
 exit 0

@@ -7,17 +7,16 @@
 
 echo "Setting up the wifi system configuration"
     # Check if router is connected
-    . $IOTEMPOWER_ROOT/bin/check_router_ip
+    . "$IOTEMPOWER_ROOT/bin/check_router_ip"
    # Write settings to the router via uci
-    . $IOTEMPOWER_ROOT/bin/wifi_openwrt_change_uci
+    bash "$IOTEMPOWER_ROOT/bin/wifi_openwrt_change_uci"
 
          # Check if the wifi_openwrt_uci command was successful
     if [[ $? -eq 0 ]]; then
         # Write settings to the system.conf files
-        . $IOTEMPOWER_ROOT/bin/setup_systemconf
+        bash "$IOTEMPOWER_ROOT/bin/setup_systemconf" || exit 1
     else
         echo "wifi_openwrt_uci command failed. Aborting."
         exit 1
     fi
-
 

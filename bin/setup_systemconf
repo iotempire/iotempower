@@ -22,7 +22,8 @@ fi
 
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
-source $IOTEMPOWER_ROOT/etc/wifi_credentials
+source "$IOTEMPOWER_ROOT/bin/config_parser" || exit 1
+iotempower_read_config wifi "$IOTEMPOWER_ROOT/etc/wifi_credentials" || exit 1
 
 user_input_wifi_credentials(){
         #Write settings to file
@@ -32,17 +33,17 @@ user_input_wifi_credentials(){
 # wifi access information
 
 # Name of accesspoint to connect to
-IOTEMPOWER_AP_NAME="$IOTEMPOWER_AP_NAME"
+IOTEMPOWER_AP_NAME=$(iotempower_quote_config_value "$IOTEMPOWER_AP_NAME")
 
 # Its wifi password
-IOTEMPOWER_AP_PASSWORD="$IOTEMPOWER_AP_PASSWORD"
+IOTEMPOWER_AP_PASSWORD=$(iotempower_quote_config_value "$IOTEMPOWER_AP_PASSWORD")
 
 # IP to pick
-IOTEMPOWER_AP_IP="$IOTEMPOWER_AP_IP"
+IOTEMPOWER_AP_IP=$(iotempower_quote_config_value "$IOTEMPOWER_AP_IP")
 
 # Connect data for local MQTT broker
 # If not defined, the same as IOTEMPOWERAP_IP from $IOTEMPWOER_ROOT/etc/iotempower.conf default
-IOTEMPOWER_MQTT_HOST="$IOTEMPOWER_AP_IP"
+IOTEMPOWER_MQTT_HOST=$(iotempower_quote_config_value "$IOTEMPOWER_MQTT_HOST")
 EOF
 echo "Done. Your local wifi configuration is now set up in your system.conf file"
 echo "PRESS CTRL+D to exit"

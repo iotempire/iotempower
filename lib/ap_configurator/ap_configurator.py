@@ -20,7 +20,7 @@ import sys
 
 # Modules
 import config
-from utils import update_static, validate_config_params, run_cmd_async
+from utils import update_static, validate_config_params, run_cmd_async, parse_wifi_creds_output
 from screens import ConnectedClients, LocalConfiguration, OpenWRTConfiguration, APSettings, WiFiChipInfo, QuitScreen, RestartScreen
 
 
@@ -125,7 +125,7 @@ your Access Point and network settings.
         elif option_id == "vci":
             self.push_screen('wifichipinfo')
         elif option_id == "dap":
-            await run_cmd_async(f'bash ./scripts/turn_off_ap.sh {config.AP_SSID}', bg=True)
+            await run_cmd_async(["bash", "./scripts/turn_off_ap.sh", config.AP_SSID], bg=True)
             self.push_screen(RestartScreen())
             pass
         elif option_id == "vq":
@@ -151,18 +151,17 @@ your Access Point and network settings.
         # Also detect and set name of output device
         out,err = await run_cmd_async("bash ./scripts/detect_dev_name.sh")
         if out:
-            config.WDEVICE = out.strpip()
+            config.WDEVICE = out.strip()
             update_static(self, 'detected-chip', f', output device: {out}', append=True)
 
 
     async def check_running_ap(self) -> None:
         # First, check if any saved credentials already exist
         out1,err1 = await run_cmd_async("bash ./scripts/read_wifi_creds.sh")
-        creds = out1.strip()
-        if out1 and len(creds) > 2 and ',' in creds:
-            cl = creds.split(',')
-            config.AP_SSID = cl[0].strip()
-            config.AP_IP = cl[2].strip()
+        creds = parse_wifi_creds_output(out1 or "")
+        if creds.get("SSID") and creds.get("GatewayIP"):
+            config.AP_SSID = creds["SSID"]
+            config.AP_IP = creds["GatewayIP"]
 
 
         # Check whether hostapd has been activated already

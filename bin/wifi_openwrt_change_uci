@@ -32,7 +32,8 @@ fi
 
 # Fetch the wifi credentials from etc/wifi_credentials
 
-source $IOTEMPOWER_ROOT/etc/wifi_credentials
+source "$IOTEMPOWER_ROOT/bin/config_parser" || exit 1
+iotempower_read_config wifi "$IOTEMPOWER_ROOT/etc/wifi_credentials" || exit 1
 # Name of accesspoint to connect to
 echo "Your new AP SSID is: $IOTEMPOWER_AP_NAME"
 
@@ -79,4 +80,3 @@ echo "WiFi configuration has been written to uci config file"
 ( sleep 5 ; /etc/init.d/network restart ) &
 
 EOF
-

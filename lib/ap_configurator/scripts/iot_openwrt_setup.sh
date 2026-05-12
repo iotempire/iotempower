@@ -9,14 +9,16 @@ nname=$1
 npass=$2
 baseip=$3
 
+source "$IOTEMPOWER_ROOT/bin/config_parser" || exit 1
 
 # IoTempower handling the security aspect of the password entry!
-cat << EOF > $IOTEMPOWER_ROOT/etc/wifi_credentials
-SSID=$nname
-Password=$npass
-GatewayIP=$baseip
-EOF
+mkdir -p "$IOTEMPOWER_ROOT/etc"
+{
+    printf 'SSID=%s\n' "$(iotempower_quote_config_value "$nname")"
+    printf 'Password=%s\n' "$(iotempower_quote_config_value "$npass")"
+    printf 'GatewayIP=%s\n' "$(iotempower_quote_config_value "$baseip")"
+} > "$IOTEMPOWER_ROOT/etc/wifi_credentials"
 
 
-echo $(wifi_openwrt_uci)
-echo $(setup_systemconf)
+wifi_openwrt_uci || exit 1
+setup_systemconf || exit 1

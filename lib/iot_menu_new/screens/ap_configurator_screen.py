@@ -13,7 +13,7 @@ from pathlib import Path
 
 # ap_configurator package
 from ap_configurator import config
-from ap_configurator.utils import update_static, run_cmd_async
+from ap_configurator.utils import update_static, run_cmd_async, parse_wifi_creds_output
 from ap_configurator.screens import (
     ConnectedClients,
     LocalConfiguration,
@@ -126,11 +126,10 @@ your Access Point and network settings.
 
     async def check_running_ap(self) -> None:
         out1, err1 = await run_cmd_async("bash ./scripts/read_wifi_creds.sh")
-        creds = out1.strip() if out1 else ''
-        if out1 and len(creds) > 2 and ',' in creds:
-            cl = creds.split(',')
-            config.AP_SSID = cl[0].strip()
-            config.AP_IP = cl[2].strip()
+        creds = parse_wifi_creds_output(out1 or "")
+        if creds.get("SSID") and creds.get("GatewayIP"):
+            config.AP_SSID = creds["SSID"]
+            config.AP_IP = creds["GatewayIP"]
 
         out, err = await run_cmd_async("ps -a | grep 'hostapd\\|create_ap'")
         if 'hostapd' in out:
@@ -163,4 +162,3 @@ your Access Point and network settings.
         target = mapping.get(message.option.id)
         if target:
             self.app.push_screen(target)
-

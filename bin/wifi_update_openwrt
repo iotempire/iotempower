@@ -24,15 +24,15 @@ fi
 
 if [[ -e "system.conf" ]]; then  # started from system-directory
     # Check if router is connected
-    . $IOTEMPOWER_ROOT/bin/check_router_ip
+    . "$IOTEMPOWER_ROOT/bin/check_router_ip"
     # Prompt the user for SSID and password
-    . $IOTEMPOWER_ROOT/bin/wifi_credentials_temp
+    bash "$IOTEMPOWER_ROOT/bin/wifi_credentials_temp" || exit 1
     # Write settings to the router via uci
-    . $IOTEMPOWER_ROOT/bin/wifi_openwrt_change_uci
+    bash "$IOTEMPOWER_ROOT/bin/wifi_openwrt_change_uci"
    # Check if the wifi_openwrt_uci command was successful
     if [[ $? -eq 0 ]]; then
         # Write settings to the system.conf files
-        . $IOTEMPOWER_ROOT/bin/setup_systemconf
+        bash "$IOTEMPOWER_ROOT/bin/setup_systemconf" || exit 1
     else
         echo "wifi_openwrt_uci command failed. Aborting."
         exit 1

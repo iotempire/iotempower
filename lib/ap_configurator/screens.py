@@ -37,7 +37,7 @@ This tool will detect all clients connected to an active AP and discoverable ove
 
 
     async def run_arp_scan(self, dev):
-        out,err = await run_cmd_async(f"sudo arp-scan --localnet --interface={dev}")
+        out,err = await run_cmd_async(["sudo", "arp-scan", "--localnet", f"--interface={dev}"])
 
         lines = out.split('\n')
         start_index = -1
@@ -180,17 +180,17 @@ class LocalConfiguration(Screen):
 
         # Launch MQTT right away
         log.write_line('Starting MQTT server...')
-        await run_cmd_async(f"bash ./scripts/iot_mqtt_start.sh", bg=True)
+        await run_cmd_async(["bash", "./scripts/iot_mqtt_start.sh"], bg=True)
 
         # Start AP configuration
         if backend == 'hostapd':
             log.write_line('Running hostapd setup...')
             log.write_line('Please wait up to 30 seconds for the AP to start')
-            await run_cmd_async(f"bash ./scripts/iot_hp_setup.sh {nname} {npass} {config.BASEIP} {config.WDEVICE}", bg=True)
+            await run_cmd_async(["bash", "./scripts/iot_hp_setup.sh", nname, npass, config.BASEIP, config.WDEVICE], bg=True)
         
         elif backend == 'networkmanager':
             log.write_line('Running NetworkManager setup...')
-            out,err = await run_cmd_async(f"bash ./scripts/iot_nm_setup.sh {nname} {npass} {config.BASEIP} '/24' {config.WDEVICE}")
+            out,err = await run_cmd_async(["bash", "./scripts/iot_nm_setup.sh", nname, npass, config.BASEIP, "/24", config.WDEVICE])
             log.write_line(out)
             if err:
                 log.write_line('\nNB! Please restart your device to activate the AP!')
@@ -262,7 +262,7 @@ Then, follow the instructions as they appear in the screen below.
         log.write_line('Starting configuration...')
         self.query_one('#config-btn', Button).disabled = True
 
-        out,err = await run_cmd_async(f"bash ./scripts/iot_openwrt_setup.sh {nname} {npass} {config.BASEIP}")
+        out,err = await run_cmd_async(["bash", "./scripts/iot_openwrt_setup.sh", nname, npass, config.BASEIP])
         log.write_line(out)
         log.write_line(err)
 

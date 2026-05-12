@@ -1,0 +1,263 @@
+#@IgnoreInspection BashAddShebang
+# Parse IoTempower config files as inert key/value data.
+#
+# Supported syntax:
+#   KEY=value
+#   KEY="value with spaces"
+#   KEY='literal value'
+#   export KEY=value
+# Empty lines and lines beginning with # are ignored. Inline comments are
+# accepted after whitespace following a value.
+
+_iotempower_config_error() {
+    local file="$1"
+    local line_no="$2"
+    local message="$3"
+    echo "$file:$line_no: $message" 1>&2
+}
+
+_iotempower_config_key_allowed() {
+    local mode="$1"
+    local key="$2"
+
+    case "$mode" in
+        system)
+            case "$key" in
+                IOTEMPOWER_*|system_name)
+                    return 0
+                    ;;
+            esac
+            return 1
+            ;;
+        node)
+            case "$key" in
+                board|topic|mqtt_server|mqtt_user|mqtt_password|IOTEMPOWER_*)
+                    return 0
+                    ;;
+            esac
+            return 1
+            ;;
+        wifi)
+            case "$key" in
+                IOTEMPOWER_AP_NAME|IOTEMPOWER_AP_PASSWORD|IOTEMPOWER_AP_IP|IOTEMPOWER_MQTT_HOST|SSID|Password|GatewayIP)
+                    return 0
+                    ;;
+            esac
+            return 1
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+}
+
+_iotempower_config_ltrim() {
+    local text="$1"
+    text="${text#"${text%%[!$' \t\r\n']*}"}"
+    printf '%s' "$text"
+}
+
+iotempower_quote_config_value() {
+    local value="$1"
+    value="${value//\\/\\\\}"
+    value="${value//\"/\\\"}"
+    value="${value//\$/\\$}"
+    value="${value//\`/\\\`}"
+    printf '"%s"' "$value"
+}
+
+_iotempower_config_parse_value() {
+    local raw="$1"
+    local file="$2"
+    local line_no="$3"
+    local value=""
+    local tail=""
+    local i=0
+    local len=0
+    local ch=""
+    local next=""
+
+    raw="$(_iotempower_config_ltrim "$raw")"
+    if [[ -z "$raw" || "${raw:0:1}" == "#" ]]; then
+        __IOTEMPOWER_CONFIG_VALUE=""
+        return 0
+    fi
+
+    case "${raw:0:1}" in
+        '"')
+            len=${#raw}
+            i=1
+            while (( i < len )); do
+                ch="${raw:i:1}"
+                if [[ "$ch" == '"' ]]; then
+                    tail="${raw:i+1}"
+                    tail="$(_iotempower_config_ltrim "$tail")"
+                    if [[ -n "$tail" && "${tail:0:1}" != "#" ]]; then
+                        _iotempower_config_error "$file" "$line_no" "unexpected text after quoted value"
+                        return 1
+                    fi
+                    __IOTEMPOWER_CONFIG_VALUE="$value"
+                    return 0
+                fi
+                if [[ "$ch" == "\\" ]]; then
+                    (( i++ ))
+                    if (( i >= len )); then
+                        _iotempower_config_error "$file" "$line_no" "unterminated escape in quoted value"
+                        return 1
+                    fi
+                    next="${raw:i:1}"
+                    case "$next" in
+                        '"'|'\'|'$'|'`')
+                            value+="$next"
+                            ;;
+                        *)
+                            value+="\\$next"
+                            ;;
+                    esac
+                else
+                    value+="$ch"
+                fi
+                (( i++ ))
+            done
+            _iotempower_config_error "$file" "$line_no" "unterminated quoted value"
+            return 1
+            ;;
+        "'")
+            len=${#raw}
+            i=1
+            while (( i < len )); do
+                ch="${raw:i:1}"
+                if [[ "$ch" == "'" ]]; then
+                    tail="${raw:i+1}"
+                    tail="$(_iotempower_config_ltrim "$tail")"
+                    if [[ -n "$tail" && "${tail:0:1}" != "#" ]]; then
+                        _iotempower_config_error "$file" "$line_no" "unexpected text after quoted value"
+                        return 1
+                    fi
+                    __IOTEMPOWER_CONFIG_VALUE="$value"
+                    return 0
+                fi
+                value+="$ch"
+                (( i++ ))
+            done
+            _iotempower_config_error "$file" "$line_no" "unterminated quoted value"
+            return 1
+            ;;
+        *)
+            if [[ "$raw" =~ ^([^[:space:]]*)([[:space:]]+.*)?$ ]]; then
+                value="${BASH_REMATCH[1]}"
+                tail="${BASH_REMATCH[2]}"
+                tail="$(_iotempower_config_ltrim "$tail")"
+                if [[ -n "$tail" && "${tail:0:1}" != "#" ]]; then
+                    _iotempower_config_error "$file" "$line_no" "unquoted values may not contain whitespace"
+                    return 1
+                fi
+                __IOTEMPOWER_CONFIG_VALUE="$value"
+                return 0
+            fi
+            _iotempower_config_error "$file" "$line_no" "invalid value"
+            return 1
+            ;;
+    esac
+}
+
+_iotempower_config_sync_wifi_aliases() {
+    if [[ ${SSID+x} && ! ${IOTEMPOWER_AP_NAME+x} ]]; then
+        IOTEMPOWER_AP_NAME="$SSID"
+    fi
+    if [[ ${IOTEMPOWER_AP_NAME+x} && ! ${SSID+x} ]]; then
+        SSID="$IOTEMPOWER_AP_NAME"
+    fi
+
+    if [[ ${Password+x} && ! ${IOTEMPOWER_AP_PASSWORD+x} ]]; then
+        IOTEMPOWER_AP_PASSWORD="$Password"
+    fi
+    if [[ ${IOTEMPOWER_AP_PASSWORD+x} && ! ${Password+x} ]]; then
+        Password="$IOTEMPOWER_AP_PASSWORD"
+    fi
+
+    if [[ ${GatewayIP+x} && ! ${IOTEMPOWER_AP_IP+x} ]]; then
+        IOTEMPOWER_AP_IP="$GatewayIP"
+    fi
+    if [[ ${IOTEMPOWER_AP_IP+x} && ! ${GatewayIP+x} ]]; then
+        GatewayIP="$IOTEMPOWER_AP_IP"
+    fi
+
+    if [[ ${IOTEMPOWER_AP_IP+x} && ! ${IOTEMPOWER_MQTT_HOST+x} ]]; then
+        IOTEMPOWER_MQTT_HOST="$IOTEMPOWER_AP_IP"
+    fi
+}
+
+iotempower_read_config() {
+    local mode="$1"
+    local file="$2"
+    local line=""
+    local rest=""
+    local key=""
+    local value=""
+    local line_no=0
+    local export_assignment=""
+    local -a keys=()
+    local -a values=()
+    local -a exports=()
+    local i=0
+
+    if [[ -z "$mode" || -z "$file" ]]; then
+        echo "iotempower_read_config: usage: iotempower_read_config <system|node|wifi> <file>" 1>&2
+        return 1
+    fi
+
+    if [[ ! -r "$file" ]]; then
+        echo "Can't read $file. Aborting." 1>&2
+        return 1
+    fi
+
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        line_no=$(( line_no + 1 ))
+        line="${line%$'\r'}"
+        rest="$(_iotempower_config_ltrim "$line")"
+        if [[ -z "$rest" || "${rest:0:1}" == "#" ]]; then
+            continue
+        fi
+
+        export_assignment=""
+        if [[ "$rest" =~ ^export[[:space:]]+(.+)$ ]]; then
+            export_assignment=yes
+            rest="${BASH_REMATCH[1]}"
+        fi
+
+        if [[ ! "$rest" =~ ^([A-Za-z_][A-Za-z0-9_]*)[[:space:]]*=(.*)$ ]]; then
+            _iotempower_config_error "$file" "$line_no" "expected key=value assignment"
+            return 1
+        fi
+
+        key="${BASH_REMATCH[1]}"
+        rest="${BASH_REMATCH[2]}"
+
+        if ! _iotempower_config_key_allowed "$mode" "$key"; then
+            _iotempower_config_error "$file" "$line_no" "unsupported key '$key' for $mode config"
+            return 1
+        fi
+
+        if ! _iotempower_config_parse_value "$rest" "$file" "$line_no"; then
+            return 1
+        fi
+        value="$__IOTEMPOWER_CONFIG_VALUE"
+
+        keys+=("$key")
+        values+=("$value")
+        exports+=("$export_assignment")
+    done < "$file"
+
+    for (( i = 0; i < ${#keys[@]}; i++ )); do
+        key="${keys[$i]}"
+        printf -v "$key" '%s' "${values[$i]}"
+        if [[ "${exports[$i]}" ]]; then
+            export "$key"
+        fi
+    done
+
+    if [[ "$mode" == wifi ]]; then
+        _iotempower_config_sync_wifi_aliases
+    fi
+}

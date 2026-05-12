@@ -11,6 +11,7 @@ baseip=$3
 netmask=$4
 wdevice=$5
 
+source "$IOTEMPOWER_ROOT/bin/config_parser" || exit 1
 
 # Prepare for NM use after (presumably) hostapd
 
@@ -28,13 +29,14 @@ sudo service NetworkManager restart
 
 
 # IoTempower handling the security aspect of the password entry!
-cat << EOF > $IOTEMPOWER_ROOT/etc/wifi_credentials
-SSID=$nname
-Password=$npass
-GatewayIP=$baseip
-EOF
+mkdir -p "$IOTEMPOWER_ROOT/etc"
+{
+    printf 'SSID=%s\n' "$(iotempower_quote_config_value "$nname")"
+    printf 'Password=%s\n' "$(iotempower_quote_config_value "$npass")"
+    printf 'GatewayIP=%s\n' "$(iotempower_quote_config_value "$baseip")"
+} > "$IOTEMPOWER_ROOT/etc/wifi_credentials"
 
 
 # Call the iotempower script from bin/,
 # iot env must be activated!
-echo $(accesspoint-nm create --ssid $nname --password $npass --ip $baseip --netmask $netmask)
+accesspoint-nm create --ssid "$nname" --password "$npass" --ip "$baseip" --netmask "$netmask"

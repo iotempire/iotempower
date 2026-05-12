@@ -26,5 +26,5 @@ fi
 
 
 # Prompt the user for SSID and password
-. $IOTEMPOWER_ROOT/bin/wifi_credentials
-. $IOTEMPOWER_ROOT/bin/setup_iotempowerconf
+bash "$IOTEMPOWER_ROOT/bin/wifi_credentials_temp" || exit 1
+bash "$IOTEMPOWER_ROOT/bin/setup_iotempowerconf" || exit 1
