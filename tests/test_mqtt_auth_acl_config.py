@@ -388,6 +388,8 @@ def test_prepare_build_dir_rejects_partial_mqtt_credentials(tmp_path):
 
     assert result.returncode != 0
     assert "MQTT user and password must both be set" in result.stderr
+    assert not (node_dir / "build" / "src" / "config.h").exists()
+    assert not (node_dir / "build" / "src" / "config.h.new").exists()
 
 
 def test_prepare_build_dir_rejects_mqtt_credentials_without_tls(tmp_path):
@@ -435,3 +437,4 @@ def test_prepare_build_dir_rejects_mqtt_credentials_without_tls(tmp_path):
     assert result.returncode != 0
     assert "MQTT auth requires TLS" in result.stderr
     assert not (node_dir / "build" / "src" / "config.h").exists()
+    assert not (node_dir / "build" / "src" / "config.h.new").exists()

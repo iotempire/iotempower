@@ -96,6 +96,17 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
     source "$IOTEMPOWER_ROOT/bin/read_node_config"
     node_type="$board"
 
+    if [[ "$mqtt_user" || "$mqtt_password" ]]; then
+        if [[ ! "$mqtt_user" || ! "$mqtt_password" ]]; then
+            echo "MQTT user and password must both be set when MQTT auth is configured." 1>&2
+            exit 1
+        fi
+        if [[ "$IOTEMPOWER_MQTT_USE_TLS" != 1 ]]; then
+            echo "MQTT auth requires TLS. Aborting." 1>&2
+            exit 1
+        fi
+    fi
+
     # echo DEBUG prepare_build_dir
     # echo $IOTEMPOWER_AP_NAME_FULL
     # echo $IOTEMPOWER_AP_NAME
@@ -166,14 +177,6 @@ EOF
 
 
     if [[ "$mqtt_user" || "$mqtt_password" ]]; then
-        if [[ ! "$mqtt_user" || ! "$mqtt_password" ]]; then
-            echo "MQTT user and password must both be set when MQTT auth is configured." 1>&2
-            exit 1
-        fi
-        if [[ "$IOTEMPOWER_MQTT_USE_TLS" != 1 ]]; then
-            echo "MQTT auth requires TLS. Aborting." 1>&2
-            exit 1
-        fi
         cat >> "$fname.new" << EOF
 #define mqtt_user "$(c_string_literal "$mqtt_user")"
 #define mqtt_password "$(c_string_literal "$mqtt_password")"
