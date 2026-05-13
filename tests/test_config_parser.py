@@ -142,9 +142,9 @@ def test_rejects_ambiguous_whitespace_and_unsupported_mode(tmp_path):
         textwrap.dedent(
             f"""\
             source "{PARSER}"
-            iotempower_read_config wifi "{empty_config}"
+            iotempower_read_config custom "{empty_config}"
             """
         )
     )
     assert mode_result.returncode == 1
-    assert "unsupported config mode 'wifi'" in mode_result.stderr
+    assert "unsupported config mode 'custom'" in mode_result.stderr
