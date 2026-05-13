@@ -53,11 +53,12 @@ IOTEMPOWER_WEBREPL_PW="iotempower"
 
 # first read local boot configuration
 source $IOTEMPOWER_ROOT/bin/read_boot_config
+source "$IOTEMPOWER_ROOT/bin/config_parser" || { return 1 2>/dev/null || exit 1; }
 
 
 # second read config in etc, can overwrite boot config
 if [ -e "$IOTEMPOWER_ROOT/etc/iotempower.conf" ]; then
-    source "$IOTEMPOWER_ROOT/etc/iotempower.conf"
+    iotempower_read_config system "$IOTEMPOWER_ROOT/etc/iotempower.conf" || { return 1 2>/dev/null || exit 1; }
 fi
 
 
