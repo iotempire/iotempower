@@ -388,3 +388,50 @@ def test_prepare_build_dir_rejects_partial_mqtt_credentials(tmp_path):
 
     assert result.returncode != 0
     assert "MQTT user and password must both be set" in result.stderr
+
+
+def test_prepare_build_dir_rejects_mqtt_credentials_without_tls(tmp_path):
+    system_dir = tmp_path / "system"
+    node_dir = system_dir / "auth-without-tls-node"
+    local_dir = tmp_path / "local"
+    node_dir.mkdir(parents=True)
+    local_dir.mkdir()
+    (system_dir / "system.conf").write_text(
+        'IOTEMPOWER_AP_NAME="review-ap"\n'
+        'IOTEMPOWER_AP_PASSWORD="review-pass"\n'
+        'IOTEMPOWER_AP_IP="192.0.2.1"\n'
+        'IOTEMPOWER_MQTT_HOST="broker"\n'
+        "IOTEMPOWER_MQTT_USE_TLS=0\n"
+        'IOTEMPOWER_MQTT_USER="firmware-user"\n'
+        'IOTEMPOWER_MQTT_PW="firmware-password"\n',
+        encoding="utf-8",
+    )
+    (node_dir / "node.conf").write_text(
+        'board="wemos d1 mini"\ntopic="auth/without/tls"\n',
+        encoding="utf-8",
+    )
+    (node_dir / "setup.cpp").write_text("void setup_iot() {}\n", encoding="utf-8")
+    (node_dir / "key.txt").write_text("0" * 64 + "\n", encoding="utf-8")
+    env = os.environ.copy()
+    env.update(
+        {
+            "IOTEMPOWER_ACTIVE": "yes",
+            "IOTEMPOWER_ROOT": str(REPO_ROOT),
+            "IOTEMPOWER_LOCAL": str(local_dir),
+            "IOTEMPOWER_COMPILE_CACHE": str(tmp_path / "compile_cache"),
+        }
+    )
+
+    result = subprocess.run(
+        [str(REPO_ROOT / "bin" / "prepare_build_dir")],
+        cwd=node_dir,
+        env=env,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False,
+    )
+
+    assert result.returncode != 0
+    assert "MQTT auth requires TLS" in result.stderr
+    assert not (node_dir / "build" / "src" / "config.h").exists()
