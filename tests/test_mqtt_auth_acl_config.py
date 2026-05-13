@@ -29,7 +29,7 @@ def _auth_system(tmp_path: Path, fakebin: Path, *, tls: bool = True) -> tuple[Pa
         f'IOTEMPOWER_MQTT_CERT_FOLDER="{cert_dir}"\n'
         'IOTEMPOWER_MQTT_USER="homeassistant"\n'
         'IOTEMPOWER_MQTT_PW="secretpw"\n'
-        'IOTEMPOWER_MQTT_DISCOVERY_PREFIX="iotempower"\n'
+        'IOTEMPOWER_MQTT_DISCOVERY_PREFIX="iotempower"\n',
         encoding="utf-8",
     )
 
