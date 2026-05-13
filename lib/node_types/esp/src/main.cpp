@@ -914,8 +914,13 @@ void connectToWifi() {
 
 void configureTime() {
     ulog(F("Configuring time..."));
-    configTime(0, 0, "pool.ntp.org", "time.nist.gov", "time.windows.com");
+    // If possible use the local NTP server if Internet access is not needed.
+    #ifdef mqtt_server
+    configTime(0, 0, mqtt_server, "pool.ntp.org", "time.nist.gov";
 
+    #else
+    configTime(0, 0, "pool.ntp.org", "time.nist.gov", "time.windows.com");
+    #endif
     // Wait for NTP synchronization to complete
     ulog(F("Waiting for NTP synchronization..."));
     time_t now = time(nullptr);
