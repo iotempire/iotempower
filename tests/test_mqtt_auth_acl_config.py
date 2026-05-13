@@ -1,5 +1,6 @@
 import os
 import subprocess
+import time
 from pathlib import Path
 
 
@@ -63,26 +64,89 @@ def _fake_broker_tools(fakebin: Path) -> None:
 
 def _fake_mqtt_clients(fakebin: Path) -> Path:
     args_file = fakebin / "mqtt.args"
+    client_prelude = (
+        '#!/usr/bin/env bash\n'
+        'printf "%s\\n" "$@" > "$FAKE_MQTT_ARGS"\n'
+        'if [[ "$FAKE_MQTT_CONFIG_REPORT" ]]; then\n'
+        '    client="$(basename "$0")"\n'
+        '    config_file="${XDG_CONFIG_HOME:-}/$client"\n'
+        '    {\n'
+        '        printf "client=%s\\n" "$client"\n'
+        '        printf "xdg=%s\\n" "${XDG_CONFIG_HOME:-}"\n'
+        '        printf "env_user=%s\\n" "${IOTEMPOWER_MQTT_USER:-}"\n'
+        '        printf "env_pw=%s\\n" "${IOTEMPOWER_MQTT_PW:-}"\n'
+        '        if [[ -d "${XDG_CONFIG_HOME:-}" ]]; then\n'
+        '            printf "dir_mode=%s\\n" "$(stat -c "%a" "$XDG_CONFIG_HOME")"\n'
+        '        fi\n'
+        '        if [[ -f "$config_file" ]]; then\n'
+        '            printf "config=%s\\n" "$config_file"\n'
+        '            printf "config_mode=%s\\n" "$(stat -c "%a" "$config_file")"\n'
+        '            printf "config_body_begin\\n"\n'
+        '            cat "$config_file"\n'
+        '        fi\n'
+        '    } > "$FAKE_MQTT_CONFIG_REPORT"\n'
+        'fi\n'
+        'if [[ "$FAKE_MQTT_PID_FILE" ]]; then\n'
+        '    printf "%s\\n" "$$" > "$FAKE_MQTT_PID_FILE"\n'
+        '    while [[ ! -e "$FAKE_MQTT_RELEASE_FILE" ]]; do sleep 0.05; done\n'
+        'fi\n'
+    )
     _write_executable(
         fakebin / "mosquitto_pub",
-        '#!/usr/bin/env bash\nprintf "%s\\n" "$@" > "$FAKE_MQTT_ARGS"\nexit 0\n',
+        client_prelude + 'exit "${FAKE_MQTT_EXIT_CODE:-0}"\n',
     )
     _write_executable(
         fakebin / "mosquitto_sub",
-        '#!/usr/bin/env bash\nprintf "%s\\n" "$@" > "$FAKE_MQTT_ARGS"\n'
-        '[[ "$FAKE_MQTT_OUTPUT" ]] && printf "%s\\n" "$FAKE_MQTT_OUTPUT"\n'
-        "exit 0\n",
+        client_prelude
+        + '[[ "$FAKE_MQTT_OUTPUT" ]] && printf "%s\\n" "$FAKE_MQTT_OUTPUT"\n'
+        + 'exit "${FAKE_MQTT_EXIT_CODE:-0}"\n',
     )
     return args_file
 
 
-def _assert_client_uses_tls_auth(args_file: Path, cert_dir: Path) -> None:
+def _read_config_report(report_file: Path) -> tuple[dict[str, str], list[str]]:
+    lines = report_file.read_text(encoding="utf-8").splitlines()
+    body_start = lines.index("config_body_begin")
+    data = dict(line.split("=", 1) for line in lines[:body_start])
+    return data, lines[body_start + 1 :]
+
+
+def _assert_private_auth_config(report_file: Path, expected_client: str, *, cleaned_up: bool = True) -> None:
+    data, config_body = _read_config_report(report_file)
+    config_dir = Path(data["xdg"])
+
+    assert data["client"] == expected_client
+    assert data["env_user"] == ""
+    assert data["env_pw"] == ""
+    assert data["dir_mode"] == "700"
+    assert data["config"] == str(config_dir / expected_client)
+    assert data["config_mode"] == "600"
+    assert config_body == ["--username homeassistant", "--pw secretpw"]
+    if cleaned_up:
+        assert not config_dir.exists()
+    else:
+        assert config_dir.exists()
+
+
+def _assert_client_uses_tls_auth_config(
+    args_file: Path,
+    cert_dir: Path,
+    report_file: Path,
+    expected_client: str,
+    *,
+    cleaned_up: bool = True,
+) -> None:
     args = args_file.read_text(encoding="utf-8").splitlines()
     assert args[args.index("-p") + 1] == "8883"
     assert args[args.index("--cafile") + 1] == str(cert_dir / "ca.crt")
-    assert args[args.index("-u") + 1] == "homeassistant"
-    assert args[args.index("-P") + 1] == "secretpw"
+    assert "-u" not in args
+    assert "--username" not in args
+    assert "homeassistant" not in args
+    assert "-P" not in args
+    assert "--pw" not in args
+    assert "secretpw" not in args
     assert "1883" not in args
+    _assert_private_auth_config(report_file, expected_client, cleaned_up=cleaned_up)
 
 
 def test_mqtt_broker_auth_generates_password_acl_and_tls_only_config(tmp_path):
@@ -277,14 +341,16 @@ def test_mqtt_helpers_include_tls_auth_options(tmp_path):
     fakebin = tmp_path / "fakebin"
     fakebin.mkdir()
     args_file = _fake_mqtt_clients(fakebin)
+    report_file = tmp_path / "mqtt-client.report"
     system_dir, cert_dir, env = _auth_system(tmp_path, fakebin)
     env["FAKE_MQTT_ARGS"] = str(args_file)
+    env["FAKE_MQTT_CONFIG_REPORT"] = str(report_file)
 
     subprocess.run(["mqtt_send", "/allowed-node/probe", "hello"], cwd=system_dir, env=env, check=True)
-    _assert_client_uses_tls_auth(args_file, cert_dir)
+    _assert_client_uses_tls_auth_config(args_file, cert_dir, report_file, "mosquitto_pub")
 
     subprocess.run(["mqtt_listen", "/allowed-node/probe"], cwd=system_dir, env=env, check=True)
-    _assert_client_uses_tls_auth(args_file, cert_dir)
+    _assert_client_uses_tls_auth_config(args_file, cert_dir, report_file, "mosquitto_sub")
 
     env["FAKE_MQTT_OUTPUT"] = "on"
     subprocess.run(
@@ -293,11 +359,90 @@ def test_mqtt_helpers_include_tls_auth_options(tmp_path):
         env=env,
         check=True,
     )
-    _assert_client_uses_tls_auth(args_file, cert_dir)
+    _assert_client_uses_tls_auth_config(args_file, cert_dir, report_file, "mosquitto_sub")
 
     env["FAKE_MQTT_OUTPUT"] = "iotempower/_cfg_/test-node/ip 192.0.2.55"
     subprocess.run(["get_ips", "test-node"], cwd=system_dir, env=env, check=True)
-    _assert_client_uses_tls_auth(args_file, cert_dir)
+    _assert_client_uses_tls_auth_config(args_file, cert_dir, report_file, "mosquitto_sub")
+
+
+def test_mqtt_helper_cleans_private_config_after_client_failure(tmp_path):
+    fakebin = tmp_path / "fakebin"
+    fakebin.mkdir()
+    args_file = _fake_mqtt_clients(fakebin)
+    report_file = tmp_path / "mqtt-client.report"
+    system_dir, cert_dir, env = _auth_system(tmp_path, fakebin)
+    env["FAKE_MQTT_ARGS"] = str(args_file)
+    env["FAKE_MQTT_CONFIG_REPORT"] = str(report_file)
+    env["FAKE_MQTT_EXIT_CODE"] = "7"
+
+    result = subprocess.run(
+        ["mqtt_send", "/allowed-node/probe", "hello"],
+        cwd=system_dir,
+        env=env,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False,
+    )
+
+    assert result.returncode == 7
+    _assert_client_uses_tls_auth_config(args_file, cert_dir, report_file, "mosquitto_pub")
+
+
+def test_mqtt_listen_process_argv_does_not_expose_password(tmp_path):
+    fakebin = tmp_path / "fakebin"
+    fakebin.mkdir()
+    args_file = _fake_mqtt_clients(fakebin)
+    report_file = tmp_path / "mqtt-client.report"
+    pid_file = tmp_path / "mqtt-client.pid"
+    release_file = tmp_path / "mqtt-client.release"
+    system_dir, cert_dir, env = _auth_system(tmp_path, fakebin)
+    env["FAKE_MQTT_ARGS"] = str(args_file)
+    env["FAKE_MQTT_CONFIG_REPORT"] = str(report_file)
+    env["FAKE_MQTT_PID_FILE"] = str(pid_file)
+    env["FAKE_MQTT_RELEASE_FILE"] = str(release_file)
+
+    proc = subprocess.Popen(
+        ["mqtt_listen", "/allowed-node/probe"],
+        cwd=system_dir,
+        env=env,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    try:
+        for _ in range(100):
+            if pid_file.exists():
+                break
+            if proc.poll() is not None:
+                raise AssertionError(proc.stderr.read())
+            time.sleep(0.05)
+        else:
+            raise AssertionError("fake mosquitto_sub did not start")
+
+        cmdline = Path(f"/proc/{pid_file.read_text(encoding='utf-8').strip()}/cmdline").read_bytes()
+        assert b"secretpw" not in cmdline
+        assert b"homeassistant" not in cmdline
+        assert b"-P" not in cmdline
+        assert b"--pw" not in cmdline
+        _assert_client_uses_tls_auth_config(
+            args_file,
+            cert_dir,
+            report_file,
+            "mosquitto_sub",
+            cleaned_up=False,
+        )
+    finally:
+        release_file.write_text("", encoding="utf-8")
+        try:
+            proc.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            proc.terminate()
+            proc.wait(timeout=5)
+
+    assert proc.returncode == 0
+    _assert_private_auth_config(report_file, "mosquitto_sub")
 
 
 def test_prepare_build_dir_escapes_generated_mqtt_and_wifi_config(tmp_path):

@@ -40,4 +40,4 @@ shift
 source "$IOTEMPOWER_ROOT/bin/mqtt_client_options"
 
 echo "Trying to send $@ to mqtt://$IOTEMPOWER_MQTT_HOST:$mqtt_port/$topic." >&2
-exec mosquitto_pub -h "$IOTEMPOWER_MQTT_HOST" -p "$mqtt_port" "${mqtt_client_options[@]}" -t "$topic" -m "$*"
+env "${mqtt_client_env[@]}" mosquitto_pub -h "$IOTEMPOWER_MQTT_HOST" -p "$mqtt_port" "${mqtt_client_options[@]}" -t "$topic" -m "$*"

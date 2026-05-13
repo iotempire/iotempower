@@ -45,4 +45,4 @@ fi
 source "$IOTEMPOWER_ROOT/bin/mqtt_client_options"
 
 echo "Subscribing and listening to mqtt://$IOTEMPOWER_MQTT_HOST:$mqtt_port/$topic." >&2
-mosquitto_sub -v -h "$IOTEMPOWER_MQTT_HOST" -p "$mqtt_port" "${mqtt_client_options[@]}" -t "$topic"
+env "${mqtt_client_env[@]}" mosquitto_sub -v -h "$IOTEMPOWER_MQTT_HOST" -p "$mqtt_port" "${mqtt_client_options[@]}" -t "$topic"
