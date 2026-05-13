@@ -116,6 +116,51 @@ function loadBcrypt() {
     throw new Error(`Cannot load bcryptjs for IoTempower Node-RED adminAuth.${detail}`);
 }
 
+function escapeRegExp(value) {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function activeSettingsText(text) {
+    return text.split(/\r?\n/)
+        .filter((line) => !/^[ \t]*(?:\/\/|\/\*|\*)/.test(line))
+        .join("\n");
+}
+
+const jsIdentifier = "[A-Za-z_$][A-Za-z0-9_$]*";
+const jsObjectPath = `${jsIdentifier}(?:\\.${jsIdentifier})*`;
+
+function hasJsSetting(text, setting) {
+    const source = activeSettingsText(text);
+    const name = escapeRegExp(setting);
+    const patterns = [
+        new RegExp(`(^|;)[ \\t]*${jsObjectPath}\\.${name}[ \\t]*=`, "m"),
+        new RegExp(`(^|;)[ \\t]*${jsObjectPath}[ \\t]*\\[[ \\t]*['"]${name}['"][ \\t]*\\][ \\t]*=`, "m"),
+        new RegExp(`(^|[,{])[ \\t]*${name}[ \\t]*:`, "m"),
+        new RegExp(`(^|[,{])[ \\t]*['"]${name}['"][ \\t]*:`, "m"),
+    ];
+    return patterns.some((pattern) => pattern.test(source));
+}
+
+function readStringSetting(text, setting, defaultValue) {
+    const source = activeSettingsText(text);
+    const name = escapeRegExp(setting);
+    const quotedValue = "(['\"`])([^'\"`]+)\\1";
+    const patterns = [
+        new RegExp(`(^|;)[ \\t]*${jsObjectPath}\\.${name}[ \\t]*=[ \\t]*${quotedValue}`, "m"),
+        new RegExp(`(^|;)[ \\t]*${jsObjectPath}[ \\t]*\\[[ \\t]*['"]${name}['"][ \\t]*\\][ \\t]*=[ \\t]*${quotedValue}`, "m"),
+        new RegExp(`(^|[,{])[ \\t]*${name}[ \\t]*:[ \\t]*${quotedValue}`, "m"),
+        new RegExp(`(^|[,{])[ \\t]*['"]${name}['"][ \\t]*:[ \\t]*${quotedValue}`, "m"),
+    ];
+
+    for (const pattern of patterns) {
+        const match = source.match(pattern);
+        if (match) {
+            return match[match.length - 1];
+        }
+    }
+    return defaultValue;
+}
+
 function readSettingsInfo() {
     if (!exists(settingsFile)) {
         return {
@@ -129,8 +174,7 @@ function readSettingsInfo() {
     return {
         exists: true,
         managed: text.includes(marker),
-        customAdminAuth: /^[ \t]*module\.exports\.adminAuth[ \t]*=/m.test(text) ||
-            /^[ \t]*adminAuth[ \t]*:/m.test(text),
+        customAdminAuth: hasJsSetting(text, "adminAuth"),
         legacyDefaultHash: text.includes(oldDefaultHash),
     };
 }
@@ -140,17 +184,7 @@ function readHttpAdminRoot() {
         return "/nodered";
     }
     const text = readText(settingsFile);
-    const patterns = [
-        /(?:module\.exports\.)?httpAdminRoot\s*=\s*(['"`])([^'"`]+)\1/m,
-        /httpAdminRoot\s*:\s*(['"`])([^'"`]+)\1/m,
-    ];
-    for (const pattern of patterns) {
-        const match = text.match(pattern);
-        if (match) {
-            return match[2];
-        }
-    }
-    return "/nodered";
+    return readStringSetting(text, "httpAdminRoot", "/nodered");
 }
 
 function readPasswordFromCredentials() {

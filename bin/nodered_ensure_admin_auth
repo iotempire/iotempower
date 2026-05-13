@@ -29,25 +29,47 @@ nodered_info() {
     fi
 }
 
-nodered_has_admin_auth() {
-    grep -Eq '^[[:space:]]*module\.exports\.adminAuth[[:space:]]*=' "$nodered_config" \
-        || grep -Eq '^[[:space:]]*adminAuth[[:space:]]*:' "$nodered_config"
+nodered_active_settings_lines() {
+    grep -Ev '^[[:space:]]*(//|/\*|\*)' "$nodered_config"
 }
 
-nodered_has_http_root_settings() {
-    grep -Eq '^[[:space:]]*(module\.exports\.)?httpAdminRoot[[:space:]]*[:=]' "$nodered_config" \
-        || grep -Eq '^[[:space:]]*(module\.exports\.)?httpNodeRoot[[:space:]]*[:=]' "$nodered_config"
+nodered_has_js_setting() {
+    local setting="$1"
+    nodered_active_settings_lines | grep -Eq "(^|;)[[:space:]]*([[:alpha:]_$][[:alnum:]_$]*)(\\.[[:alpha:]_$][[:alnum:]_$]*)*\\.${setting}[[:space:]]*=" \
+        || nodered_active_settings_lines | grep -Eq "(^|;)[[:space:]]*([[:alpha:]_$][[:alnum:]_$]*)(\\.[[:alpha:]_$][[:alnum:]_$]*)*[[:space:]]*\\[[[:space:]]*['\"]${setting}['\"][[:space:]]*\\][[:space:]]*=" \
+        || nodered_active_settings_lines | grep -Eq "(^|[,{])[[:space:]]*${setting}[[:space:]]*:" \
+        || nodered_active_settings_lines | grep -Eq "(^|[,{])[[:space:]]*['\"]${setting}['\"][[:space:]]*:"
+}
+
+nodered_has_admin_auth() {
+    nodered_has_js_setting "adminAuth"
+}
+
+nodered_has_http_admin_root() {
+    nodered_has_js_setting "httpAdminRoot"
+}
+
+nodered_has_http_node_root() {
+    nodered_has_js_setting "httpNodeRoot"
 }
 
 nodered_ensure_default_http_roots() {
-    if nodered_has_http_root_settings; then
+    local missing_roots=()
+
+    if ! nodered_has_http_admin_root; then
+        missing_roots+=("module.exports.httpAdminRoot = '/nodered';")
+    fi
+    if ! nodered_has_http_node_root; then
+        missing_roots+=("module.exports.httpNodeRoot = '/nodered';")
+    fi
+    if [[ "${#missing_roots[@]}" -eq 0 ]]; then
         return 0
     fi
 
-    if ! cat << 'EOF' >> "$nodered_config"; then
-module.exports.httpAdminRoot = '/nodered';
-module.exports.httpNodeRoot = '/nodered';
-EOF
+    if ! {
+        printf '\n'
+        printf '%s\n' "${missing_roots[@]}"
+    } >> "$nodered_config"; then
         echo "Cannot update Node-RED HTTP root settings in $nodered_config." 1>&2
         exit 1
     fi
