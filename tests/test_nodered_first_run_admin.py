@@ -34,6 +34,14 @@ CUSTOM_ADMIN_AUTH_FORMS = [
         'module.exports = {}; module.exports["adminAuth"] = { type: "credentials" };\n',
         id="same-line-bracket-assignment",
     ),
+    pytest.param(
+        'module.exports = {\n    ["adminAuth"]: { type: "credentials" }\n};\n',
+        id="computed-object-property",
+    ),
+    pytest.param(
+        "module.exports[`adminAuth`] = { type: \"credentials\" };\n",
+        id="template-bracket-assignment",
+    ),
 ]
 
 
@@ -148,6 +156,7 @@ def test_managed_auth_adds_only_missing_default_http_root(
                 "",
                 "/* IOTEMPOWER_NODE_RED_ADMIN_AUTH */",
                 "module.exports.adminAuth = {};",
+                "/* IOTEMPOWER_NODE_RED_ADMIN_AUTH_END */",
                 "",
             ]
         ),
@@ -161,3 +170,45 @@ def test_managed_auth_adds_only_missing_default_http_root(
     assert existing_root in settings_text
     assert expected_added in settings_text
     assert settings_text.count(existing_name) == 1
+
+
+def test_commented_admin_auth_and_roots_do_not_block_managed_auth(tmp_path):
+    settings_file = tmp_path / "settings.js"
+    settings_file.write_text(
+        "\n".join(
+            [
+                "/*",
+                "adminAuth: { type: \"credentials\" },",
+                "httpAdminRoot: \"/commented-admin\",",
+                "*/",
+                "const note = \"{ httpNodeRoot: '/commented-node', adminAuth: true }\";",
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    result = run_ensure_admin_auth(settings_file, iotempower_env(tmp_path))
+    settings_text = settings_file.read_text(encoding="utf-8")
+
+    assert result.returncode == 0, result.stderr
+    assert "module.exports.httpAdminRoot = '/nodered';" in settings_text
+    assert "module.exports.httpNodeRoot = '/nodered';" in settings_text
+    assert "module.exports.adminAuth = {" in settings_text
+    assert (tmp_path / "iotempower-admin-credentials").exists()
+    assert (tmp_path / "iotempower-admin-password.hash").exists()
+
+
+def test_marker_comment_without_managed_block_is_not_treated_as_managed(tmp_path):
+    settings_file = tmp_path / "settings.js"
+    settings_file.write_text(
+        "/* IOTEMPOWER_NODE_RED_ADMIN_AUTH appears in an ordinary comment. */\n",
+        encoding="utf-8",
+    )
+
+    result = run_ensure_admin_auth(settings_file, iotempower_env(tmp_path))
+    settings_text = settings_file.read_text(encoding="utf-8")
+
+    assert result.returncode == 0, result.stderr
+    assert "module.exports.adminAuth = {" in settings_text
+    assert (tmp_path / "iotempower-admin-credentials").exists()

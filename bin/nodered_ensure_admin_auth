@@ -19,7 +19,6 @@ nodered_config_dir="$(dirname "$nodered_config")"
 nodered_credentials_file="${IOTEMPOWER_NODE_RED_CREDENTIALS_FILE:-$nodered_config_dir/iotempower-admin-credentials}"
 nodered_template="$IOTEMPOWER_LOCAL/nodejs/node_modules/node-red/settings.js"
 node_red_password_cli="$IOTEMPOWER_ROOT/bin/nodered_password_cli.js"
-iotempower_auth_marker="IOTEMPOWER_NODE_RED_ADMIN_AUTH"
 iotempower_old_default_hash='$2b$08$W5LDP3eTaIYjz5iJkKVwMu9JDg3cPF'
 iotempower_old_default_hash+='MUvBypMCmYA3fpjYQlzFC4e'
 
@@ -29,16 +28,21 @@ nodered_info() {
     fi
 }
 
-nodered_active_settings_lines() {
-    grep -Ev '^[[:space:]]*(//|/\*|\*)' "$nodered_config"
-}
-
 nodered_has_js_setting() {
     local setting="$1"
-    nodered_active_settings_lines | grep -Eq "(^|;)[[:space:]]*([[:alpha:]_$][[:alnum:]_$]*)(\\.[[:alpha:]_$][[:alnum:]_$]*)*\\.${setting}[[:space:]]*=" \
-        || nodered_active_settings_lines | grep -Eq "(^|;)[[:space:]]*([[:alpha:]_$][[:alnum:]_$]*)(\\.[[:alpha:]_$][[:alnum:]_$]*)*[[:space:]]*\\[[[:space:]]*['\"]${setting}['\"][[:space:]]*\\][[:space:]]*=" \
-        || nodered_active_settings_lines | grep -Eq "(^|[,{])[[:space:]]*${setting}[[:space:]]*:" \
-        || nodered_active_settings_lines | grep -Eq "(^|[,{])[[:space:]]*['\"]${setting}['\"][[:space:]]*:"
+    if [[ ! -f "$node_red_password_cli" ]]; then
+        echo "Cannot find Node-RED password helper at $node_red_password_cli." 1>&2
+        exit 1
+    fi
+    node "$node_red_password_cli" has-setting "$nodered_config" "$setting"
+}
+
+nodered_has_managed_admin_auth() {
+    if [[ ! -f "$node_red_password_cli" ]]; then
+        echo "Cannot find Node-RED password helper at $node_red_password_cli." 1>&2
+        exit 1
+    fi
+    node "$node_red_password_cli" is-managed "$nodered_config"
 }
 
 nodered_has_admin_auth() {
@@ -165,7 +169,7 @@ EOF
     fi
 fi
 
-if grep -q "$iotempower_auth_marker" "$nodered_config"; then
+if nodered_has_managed_admin_auth; then
     nodered_ensure_default_http_roots
     nodered_ensure_credential_files
     exit 0

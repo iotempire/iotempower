@@ -7,6 +7,7 @@ const crypto = require("crypto");
 
 const action = process.argv[2] || "status";
 const marker = "IOTEMPOWER_NODE_RED_ADMIN_AUTH";
+const markerEnd = "IOTEMPOWER_NODE_RED_ADMIN_AUTH_END";
 const oldDefaultHash = "$2b$08$W5LDP3eTaIYjz5iJkKVwMu9JDg3cPF" +
     "MUvBypMCmYA3fpjYQlzFC4e";
 const username = "admin";
@@ -116,49 +117,179 @@ function loadBcrypt() {
     throw new Error(`Cannot load bcryptjs for IoTempower Node-RED adminAuth.${detail}`);
 }
 
-function escapeRegExp(value) {
-    return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+function isIdentifierStart(char) {
+    return /[A-Za-z_$]/.test(char);
 }
 
-function activeSettingsText(text) {
-    return text.split(/\r?\n/)
-        .filter((line) => !/^[ \t]*(?:\/\/|\/\*|\*)/.test(line))
-        .join("\n");
+function isIdentifierPart(char) {
+    return /[A-Za-z0-9_$]/.test(char);
 }
 
-const jsIdentifier = "[A-Za-z_$][A-Za-z0-9_$]*";
-const jsObjectPath = `${jsIdentifier}(?:\\.${jsIdentifier})*`;
+function readQuotedToken(text, start) {
+    const quote = text[start];
+    let index = start + 1;
+    let value = "";
+
+    while (index < text.length) {
+        const char = text[index];
+        if (char === "\\") {
+            if (index + 1 < text.length) {
+                value += text[index + 1];
+                index += 2;
+                continue;
+            }
+            index += 1;
+            break;
+        }
+        if (char === quote) {
+            index += 1;
+            break;
+        }
+        value += char;
+        index += 1;
+    }
+
+    return { token: { type: "string", value }, index };
+}
+
+function tokenizeJsSettings(text) {
+    const tokens = [];
+    let index = 0;
+
+    while (index < text.length) {
+        const char = text[index];
+        const next = text[index + 1];
+
+        if (/\s/.test(char)) {
+            index += 1;
+            continue;
+        }
+
+        if (char === "/" && next === "/") {
+            index += 2;
+            while (index < text.length && !/[\r\n]/.test(text[index])) {
+                index += 1;
+            }
+            continue;
+        }
+
+        if (char === "/" && next === "*") {
+            index += 2;
+            while (index < text.length && !(text[index] === "*" && text[index + 1] === "/")) {
+                index += 1;
+            }
+            index = index < text.length ? index + 2 : index;
+            continue;
+        }
+
+        if (char === "'" || char === "\"" || char === "`") {
+            const quoted = readQuotedToken(text, index);
+            tokens.push(quoted.token);
+            index = quoted.index;
+            continue;
+        }
+
+        if (isIdentifierStart(char)) {
+            const start = index;
+            index += 1;
+            while (index < text.length && isIdentifierPart(text[index])) {
+                index += 1;
+            }
+            tokens.push({ type: "identifier", value: text.slice(start, index) });
+            continue;
+        }
+
+        tokens.push({ type: "punct", value: char });
+        index += 1;
+    }
+
+    return tokens;
+}
+
+function tokenValue(tokens, index) {
+    return tokens[index] ? tokens[index].value : "";
+}
+
+function isSettingToken(token, setting) {
+    return token &&
+        (token.type === "identifier" || token.type === "string") &&
+        token.value === setting;
+}
+
+function isObjectLiteralBoundary(value) {
+    return value === "{" || value === ",";
+}
+
+function isDotAssignment(tokens, index, setting) {
+    return tokens[index] &&
+        tokens[index].type === "identifier" &&
+        tokens[index].value === setting &&
+        tokenValue(tokens, index - 1) === "." &&
+        tokenValue(tokens, index + 1) === "=";
+}
+
+function isBracketAssignment(tokens, index, setting) {
+    return tokens[index] &&
+        tokens[index].type === "string" &&
+        tokens[index].value === setting &&
+        tokenValue(tokens, index - 1) === "[" &&
+        tokenValue(tokens, index + 1) === "]" &&
+        tokenValue(tokens, index + 2) === "=";
+}
+
+function isObjectProperty(tokens, index, setting) {
+    if (isSettingToken(tokens[index], setting) &&
+            tokenValue(tokens, index + 1) === ":" &&
+            isObjectLiteralBoundary(tokenValue(tokens, index - 1))) {
+        return true;
+    }
+
+    return tokens[index] &&
+        tokens[index].type === "string" &&
+        tokens[index].value === setting &&
+        tokenValue(tokens, index - 1) === "[" &&
+        tokenValue(tokens, index + 1) === "]" &&
+        tokenValue(tokens, index + 2) === ":" &&
+        isObjectLiteralBoundary(tokenValue(tokens, index - 2));
+}
 
 function hasJsSetting(text, setting) {
-    const source = activeSettingsText(text);
-    const name = escapeRegExp(setting);
-    const patterns = [
-        new RegExp(`(^|;)[ \\t]*${jsObjectPath}\\.${name}[ \\t]*=`, "m"),
-        new RegExp(`(^|;)[ \\t]*${jsObjectPath}[ \\t]*\\[[ \\t]*['"]${name}['"][ \\t]*\\][ \\t]*=`, "m"),
-        new RegExp(`(^|[,{])[ \\t]*${name}[ \\t]*:`, "m"),
-        new RegExp(`(^|[,{])[ \\t]*['"]${name}['"][ \\t]*:`, "m"),
-    ];
-    return patterns.some((pattern) => pattern.test(source));
+    const tokens = tokenizeJsSettings(text);
+    return tokens.some((token, index) =>
+        isDotAssignment(tokens, index, setting) ||
+        isBracketAssignment(tokens, index, setting) ||
+        isObjectProperty(tokens, index, setting));
 }
 
 function readStringSetting(text, setting, defaultValue) {
-    const source = activeSettingsText(text);
-    const name = escapeRegExp(setting);
-    const quotedValue = "(['\"`])([^'\"`]+)\\1";
-    const patterns = [
-        new RegExp(`(^|;)[ \\t]*${jsObjectPath}\\.${name}[ \\t]*=[ \\t]*${quotedValue}`, "m"),
-        new RegExp(`(^|;)[ \\t]*${jsObjectPath}[ \\t]*\\[[ \\t]*['"]${name}['"][ \\t]*\\][ \\t]*=[ \\t]*${quotedValue}`, "m"),
-        new RegExp(`(^|[,{])[ \\t]*${name}[ \\t]*:[ \\t]*${quotedValue}`, "m"),
-        new RegExp(`(^|[,{])[ \\t]*['"]${name}['"][ \\t]*:[ \\t]*${quotedValue}`, "m"),
-    ];
-
-    for (const pattern of patterns) {
-        const match = source.match(pattern);
-        if (match) {
-            return match[match.length - 1];
+    const tokens = tokenizeJsSettings(text);
+    for (let index = 0; index < tokens.length; index += 1) {
+        if (isDotAssignment(tokens, index, setting) && tokens[index + 2] && tokens[index + 2].type === "string") {
+            return tokens[index + 2].value;
+        }
+        if (isBracketAssignment(tokens, index, setting) && tokens[index + 3] && tokens[index + 3].type === "string") {
+            return tokens[index + 3].value;
+        }
+        if (isObjectProperty(tokens, index, setting)) {
+            const valueIndex = tokenValue(tokens, index + 1) === ":" ? index + 2 : index + 3;
+            if (tokens[valueIndex] && tokens[valueIndex].type === "string") {
+                return tokens[valueIndex].value;
+            }
         }
     }
     return defaultValue;
+}
+
+function hasManagedAuth(text) {
+    const start = text.indexOf(marker);
+    if (start === -1) {
+        return false;
+    }
+    const end = text.indexOf(markerEnd, start + marker.length);
+    if (end === -1) {
+        return false;
+    }
+    return hasJsSetting(text.slice(start, end + markerEnd.length), "adminAuth");
 }
 
 function readSettingsInfo() {
@@ -173,7 +304,7 @@ function readSettingsInfo() {
     const text = readText(settingsFile);
     return {
         exists: true,
-        managed: text.includes(marker),
+        managed: hasManagedAuth(text),
         customAdminAuth: hasJsSetting(text, "adminAuth"),
         legacyDefaultHash: text.includes(oldDefaultHash),
     };
@@ -357,7 +488,13 @@ function readStdin() {
 }
 
 try {
-    if (action === "status") {
+    if (action === "has-setting") {
+        const setting = process.argv[4];
+        if (!setting) {
+            throw new Error("Missing setting name.");
+        }
+        process.exit(exists(settingsFile) && hasJsSetting(readText(settingsFile), setting) ? 0 : 1);
+    } else if (action === "status") {
         process.exit(printStatus());
     } else if (action === "is-managed") {
         process.exit(readSettingsInfo().managed ? 0 : 1);
