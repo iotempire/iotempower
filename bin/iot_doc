@@ -53,9 +53,13 @@ create_doc() {
     # make html SPHINXOPTS=-v
     iot_grun make html
     # TODO: do eventually a matching specific version here
-    ln -s -f "$IOTEMPOWER_LOCAL/doc/html/doc/index.html" \
-        "$IOTEMPOWER_LOCAL/doc/html/index.html"
-    echo "Documentation creation finished."
+    local_doc="$IOTEMPOWER_LOCAL/doc/html/doc/index.html"
+    if [ -e "$local_doc" ]; then
+        ln -s -f "$local_doc" "$IOTEMPOWER_LOCAL/doc/html/index.html"
+        echo "Documentation creation finished."
+    else
+        echo "Documentation creation unsuccessful."
+    fi
 }
 
 

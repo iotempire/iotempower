@@ -154,8 +154,8 @@ To setup Mosquitto on the OpenWRT, some additional configuration is needed.
 * Create the certificates with ``mqtt_generate_certificates``
 * Copy ``server.crt`` and ``server.key`` files to ``etc/mosquitto/`` folder.
 * Use the ``mosquitto.conf`` file template provided eariler or create a new one in the ``/etc/mosquitto/`` folder. 
-* Restart the Mosquitto service : ``# service mosquitto restart ``
-* Verify that the desired listeners are in place on ports 1883/8883 with ``# netstat -tlpn ``
+* Restart the Mosquitto service : ``# service mosquitto restart``
+* Verify that the desired listeners are in place on ports 1883/8883 with ``# netstat -tlpn``
 
 
 OpenWRT configuration help

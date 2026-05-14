@@ -33,7 +33,7 @@ function cleanup {
 trap cleanup SIGINT
 
 # Start your services with prefixed logs
-cloudcmd_starter 2>&1| add_prefix "cloudcmd" &
+# cloudcmd_starter 2>&1| add_prefix "cloudcmd" & # we have retired cloudcm, so don't start it here
 nodered_starter 2>&1 | add_prefix "nodered" &
 caddy_starter "$@" 2>&1 | add_prefix "caddy" &
 

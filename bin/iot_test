@@ -21,6 +21,9 @@ fi
 
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 
+# define a dummy SSID, required to compile (prepare_build_dir will check for anything being defined)
+IOTEMPOWER_AP_NAME_FULL="testdummy"
+
 cd "$IOTEMPOWER_ROOT/tests"
 
 # check if first parameter is either compile, deploy, hardware, or install
