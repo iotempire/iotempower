@@ -46,6 +46,15 @@ replace_if_new() {
     rm -rf "$1"
 }
 
+c_string_literal() {
+    local value="$1"
+    value="${value//\\/\\\\}"
+    value="${value//\"/\\\"}"
+    value="${value//$'\r'/\\r}"
+    value="${value//$'\n'/\\n}"
+    printf '%s' "$value"
+}
+
 copy_type_through_base() {
     # $1: source directory
     # $2: type (folder to copy)
@@ -86,6 +95,17 @@ link_type_through_base() {
 if [[ -e "node.conf" ]]; then  # started from node-directory
     source "$IOTEMPOWER_ROOT/bin/read_node_config"
     node_type="$board"
+
+    if [[ "$mqtt_user" || "$mqtt_password" ]]; then
+        if [[ ! "$mqtt_user" || ! "$mqtt_password" ]]; then
+            echo "MQTT user and password must both be set when MQTT auth is configured." 1>&2
+            exit 1
+        fi
+        if [[ "$IOTEMPOWER_MQTT_USE_TLS" != 1 ]]; then
+            echo "MQTT auth requires TLS. Aborting." 1>&2
+            exit 1
+        fi
+    fi
 
     # echo DEBUG prepare_build_dir
     # echo $IOTEMPOWER_AP_NAME_FULL
@@ -145,24 +165,27 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
     fname="$dest_dir/src/config.h"
     
     cat > "$fname.new" << EOF
-#define HOSTNAME "$node_name"
-#define mqtt_topic "$topic"
+#define HOSTNAME "$(c_string_literal "$node_name")"
+#define mqtt_topic "$(c_string_literal "$topic")"
 EOF
 
     if [[ "$mqtt_server" && "$mqtt_server" != "_gateway" ]]; then
         cat >> "$fname.new" << EOF
-#define mqtt_server "$mqtt_server"
+#define mqtt_server "$(c_string_literal "$mqtt_server")"
 EOF
     fi
 
 
-    cat >> "$fname.new" << EOF
-#define mqtt_user "$mqtt_user"
-#define mqtt_password "$mqtt_password"
+    if [[ "$mqtt_user" || "$mqtt_password" ]]; then
+        cat >> "$fname.new" << EOF
+#define mqtt_user "$(c_string_literal "$mqtt_user")"
+#define mqtt_password "$(c_string_literal "$mqtt_password")"
 EOF
+    fi
 
     if [[ "$IOTEMPOWER_MQTT_DISCOVERY_PREFIX" ]]; then
-        echo '#define mqtt_discovery_prefix "'$IOTEMPOWER_MQTT_DISCOVERY_PREFIX'"' >> "$fname.new"
+        printf '#define mqtt_discovery_prefix "%s"\n' \
+            "$(c_string_literal "$IOTEMPOWER_MQTT_DISCOVERY_PREFIX")" >> "$fname.new"
     fi
 
     if [[ "$IOTEMPOWER_MQTT_USE_TLS" == 1 ]]; then
@@ -201,8 +224,8 @@ EOF
     # echo "// no wifi credentials" > "$dest_dir/src/wifi-config.h"
     fname="$dest_dir/src/wifi-config.h"
     cat > "$fname.new" << EOF
-#define WIFI_SSID "$IOTEMPOWER_AP_NAME_FULL"
-#define WIFI_PASSWORD "$IOTEMPOWER_AP_PASSWORD"
+#define WIFI_SSID "$(c_string_literal "$IOTEMPOWER_AP_NAME_FULL")"
+#define WIFI_PASSWORD "$(c_string_literal "$IOTEMPOWER_AP_PASSWORD")"
 EOF
     replace_if_new "$fname.new" "$fname"
     ## end: wifi-config.h creation
