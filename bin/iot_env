@@ -27,5 +27,7 @@ else
   source "$IOTEMPOWER_ROOT/bin/read_node_config"
 fi
 
-# output and quote result
-env|grep -E "^IOTEMPOWER"|sed 's/^\([^=]*\)=\(.*\)$/export\ \1=\"\2\"/g'
+# output shell-safe exports for callers that source <(iot_env ...)
+while IFS= read -r key; do
+  printf 'export %s=%q\n' "$key" "${!key}"
+done < <(compgen -A variable IOTEMPOWER | sort)
