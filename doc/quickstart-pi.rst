@@ -74,8 +74,9 @@ Accessing the Local Services on the Raspberry Pi
   You should now see the IoTempower homepage with links to Node-RED
   and the local documentation.
 
-- If you are asked for a user, use ``iot`` (for Node-RED and portainer you want to use admin),
-  if you are asked for a password use ``iotempire``.
+- If you are asked for a user, use ``iot``. For a default IoTempower-managed
+  Node-RED install, use ``admin`` and run ``iot nodered-password show`` on the
+  gateway to read the generated password.
 
 - Keep this home-page for later (remember or bookmark).
 

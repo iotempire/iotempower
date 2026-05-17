@@ -546,30 +546,39 @@ if [[ "$install_node_red" == 1 ]]; then
   init_nodejs
   deactivate # termux can't do the following in venv - do we need to specialize this?
   echo_format "Installing Node Red"
-  npm install --unsafe-perm node-red
+  npm install --unsafe-perm node-red bcryptjs
   mkdir -p "$HOME/.node-red"
-  cp "$IOTEMPOWER_LOCAL"/nodejs/node_modules/node-red/settings.js "$HOME/.node-red/"
-  nodered_config=~/.node-red/settings.js
+  nodered_config="$HOME/.node-red/settings.js"
+  if [[ ! -f "$nodered_config" ]]; then
+    cp "$IOTEMPOWER_LOCAL"/nodejs/node_modules/node-red/settings.js "$nodered_config"
+  fi
 
-  if ! grep -q "module.exports.httpAdminRoot = '/nodered';" "$nodered_config" ; then
-    cat << EOF >> "$nodered_config"
-module.exports.httpAdminRoot = '/nodered';
-module.exports.httpNodeRoot = '/nodered';
-module.exports.adminAuth= {
-type: "credentials",
-users: [{
-    username: "admin",
-    password: "\$2b\$08\$W5LDP3eTaIYjz5iJkKVwMu9JDg3cPFMUvBypMCmYA3fpjYQlzFC4e",
-    permissions: "*"
-}]
-};
+  if ! IOTEMPOWER_NODE_RED_AUTH_QUIET=1 bash "$IOTEMPOWER_ROOT/bin/nodered_ensure_admin_auth" "$nodered_config"; then
+    echo "Failed to configure Node-RED admin authentication, aborting." 1>&2
+    exit 1
+  fi
+  if grep -q "IOTEMPOWER_NODE_RED_ADMIN_AUTH" "$nodered_config"; then
+cat << EOF
+Node-RED admin account created.
+
+Username: admin
+Password file: ~/.node-red/iotempower-admin-credentials
+
+Run:
+  iot nodered-password show
+  iot nodered-password reset
+  iot nodered-password set
 EOF
-    pushd "$HOME/.node-red"
+  fi
+  pushd "$HOME/.node-red"
+  if ! npm ls @flowfuse/node-red-dashboard > /dev/null 2>&1; then
     npm i @flowfuse/node-red-dashboard  # install dashboard 2
+  fi
+  if ! npm ls node-red-contrib-influxdb > /dev/null 2>&1; then
     npm i node-red-contrib-influxdb # install influxdb connector
-    popd
-    echo_format "Changed $nodered_config."
-  fi # node-red config
+  fi
+  popd
+  echo_format "Changed $nodered_config."
   activate
 fi # node-red
 

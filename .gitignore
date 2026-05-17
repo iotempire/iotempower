@@ -28,6 +28,9 @@ __pycache__
 .vscode/launch.json
 doc/_links.rst
 etc/wifi_credentials
+.node-red/
+iotempower-admin-credentials
+iotempower-admin-password.hash
 
 .gradle
 *.lock
