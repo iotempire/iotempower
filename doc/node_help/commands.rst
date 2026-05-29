@@ -66,4 +66,5 @@ Alphabetic list
 - `transmission <transmission.rst>`_
 - `ultra_sonic_distance <ultra_sonic_distance.rst>`_
 - `vl53l0x.rst`_
+- `virtual <virtual.rst>`_
 - `wifi <wifi.rst>`_
