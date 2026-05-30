@@ -44,3 +44,41 @@ Example
 ..  code-block:: cpp
 
     gmp343(co2, D6, D7);
+
+Wiring
+------
+
+- This sensor needs a TTL-RS232 adapter to connect to an ESP8266 or ESP32.
+
+- Power the GMP343 sensor from an external power supply that matches the sensor
+  specification.
+
+- Connect the GMP343 serial ``TX`` line to the RS232 adapter serial ``TX`` line.
+
+- Connect the GMP343 serial ``RX`` line to the RS232 adapter serial ``RX`` line.
+
+- Connect the GMP343 serial ground to the RS232 adapter ground.
+
+- Connect the controller ``rx_pin`` and ``tx_pin`` to the TTL side of the
+  RS232 adapter.
+
+- Depending on the adapter labeling, these TTL serial lines may need either
+  crossed wiring or straight wiring.
+
+- If communication does not work, swap the two TTL serial lines on the
+  adapter ``RXD`` and ``TXD`` pins.
+
+For example:
+
+..  code-block:: cpp
+
+    gmp343(co2, D6, D7);
+
+In this example:
+
+- ``D6`` is used as ``rx_pin`` and ``D7`` is used as ``tx_pin`` on the ESP side.
+
+- These two pins connect to the TTL serial side of the RS232 adapter.
+
+- If the sensor does not respond, try swapping these two serial lines on the
+  adapter ``RXD`` and ``TXD`` pins.
