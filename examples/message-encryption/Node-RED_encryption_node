@@ -1,0 +1,39 @@
+// Import crypto module from Setup tab.
+
+const IV_LEN  = 12;
+// Secret Key
+const PSK = Buffer.from([
+    0x2B, 0x7E, 0x15, 0x16, 0x28, 0xAE, 0xD2, 0xA6,
+    0xAB, 0xF7, 0x15, 0x88, 0x09, 0xCF, 0x4F, 0x3C
+]);
+
+function aesGcmEncrypt(plaintext) {
+    const txCounter = (flow.get('nr_tx_counter') || 0) + 1;
+    flow.set('nr_tx_counter', txCounter);
+
+    const msgBuf = Buffer.from(plaintext, 'utf8');
+    const ctrBuf = Buffer.alloc(4);
+    ctrBuf.writeUInt32BE(txCounter, 0);
+    const pt = Buffer.concat([ctrBuf, msgBuf]);
+
+    const iv     = crypto.randomBytes(IV_LEN);
+    const cipher = crypto.createCipheriv('aes-128-gcm', PSK, iv);
+    const ct     = Buffer.concat([cipher.update(pt), cipher.final()]);
+    const tag    = cipher.getAuthTag();
+
+    return { hex: Buffer.concat([iv, tag, ct]).toString('hex'), counter: txCounter };
+}
+
+try {
+    const { hex, counter } = aesGcmEncrypt(msg.payload);
+    msg.payload      = hex;
+    msg.topic        = msg.topic || 'button_node/cmd';
+    msg.counter      = counter;
+    msg.encrypted_ok = true;
+    return msg;
+} catch (err) {
+    node.error(`Encrypt failed: ${err.message}`, msg);
+    msg.payload       = null;
+    msg.encrypted_ok  = false;
+    return msg;
+}
