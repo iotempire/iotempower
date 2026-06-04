@@ -38,7 +38,7 @@ if [[ -e "node.conf" ]]; then  # started from node-directory
         echo "Generating new key."
         # random password must not have chars like $, ", # as bash and platformio
         # messes that up later (especially $)
-        < /dev/random tr -dc A-Za-z0-9\-\+_\=/@% | head -c64 > "$KEYFILE"
+        LC_ALL=C tr -dc 'A-Za-z0-9\-\+_\=/@%' < /dev/random | head -c64 > "$KEYFILE"
         #head -c32 /dev/random|od -A n -t x2|tr -d ' \r\n' > "$KEYFILE"
         key=$(tail -n1 "$KEYFILE" 2>/dev/null)
     fi

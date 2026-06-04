@@ -62,7 +62,9 @@ Alphabetic list
 - `sgp30 <sgp30.rst>`_
 - `soil_7in1 <soil_7in1.rst>`_
 - `temperature <temperature.rst>`_
+- `tone <tone.rst>`_
 - `transmission <transmission.rst>`_
 - `ultra_sonic_distance <ultra_sonic_distance.rst>`_
-- `vl53l0x.rst`_
+- `Time of Flight (TOF) Laser distance sensor <vl53l0x.rst>`_
+- `virtual <virtual.rst>`_
 - `wifi <wifi.rst>`_
