@@ -1,5 +1,5 @@
 // dev_mic_m5stickc.h
-// Header file for controlling the m5stickc Plus2 Microphone
+// Header file for controlling the M5StickC Plus / Plus2 Microphone
 
 #ifndef _IOTEMPOWER_M5STICKC_MIC_H_
 #define _IOTEMPOWER_M5STICKC_MIC_H_

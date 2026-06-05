@@ -4,7 +4,7 @@
 #ifdef ENV_M5STICKC
     #include <M5StickC.h>
 #elif ENV_M5STICKC_PLUS
-    #include <M5StickCPlus.h>
+    #include <M5Unified.h>
 #elif ENV_M5STICKC_PLUS2
     #include <M5StickCPlus2.h>
 #endif

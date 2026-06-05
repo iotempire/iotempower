@@ -1,5 +1,5 @@
 // dev_sleep_mgr.h
-// Header File for sleep management device for M5StickC Plus2
+// Header File for sleep management device for M5StickC Plus / Plus2
 
 #ifndef _SLEEP_MGR_H_
 #define _SLEEP_MGR_H_
@@ -8,11 +8,11 @@
 
 /**
  * @class SleepManager
- * @brief M5StickC Plus2 specific sleep management device for IoTempower
- * 
+ * @brief M5StickC Plus / Plus2 sleep management device for IoTempower
+ *
  * PURPOSE
  * =======
- * The SleepManager device provides centralized sleep management capabilities for M5StickC Plus2 nodes:
+ * The SleepManager device provides centralized sleep management capabilities for M5StickC Plus / Plus2 nodes:
  * - ESP32 deep sleep mode control
  * - M5StickC Plus2 specific power management via StickCP2.Power
  * - Scheduled power-down operations
