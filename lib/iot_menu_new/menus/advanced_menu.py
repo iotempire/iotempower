@@ -8,6 +8,6 @@ class AdvancedMenu(VerticalScroll):
         yield Button("Initialize Serial", id="initialize")
         yield Button("Upgrade", id="upgrade")
         yield Button("Create New System", id="new_system_template")
-        yield Button("Shell Escape")
+        yield Button("Shell Escape" ,id="shell_escape")
         yield Button("Shutdown/Poweroff")
         yield Button("Back", id="back")

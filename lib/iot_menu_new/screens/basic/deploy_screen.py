@@ -4,17 +4,17 @@ from textual.screen import Screen
 from textual.app import ComposeResult
 from pathlib import Path
 from messages.deploy_success_message import DeploySuccess
-from textual import events, on
-from script_activation_logic.deploy_script import deploy_script
+from textual import on
+from script_activation_logic.basic.deploy_script import deploy_script
 from messages.deploy_failed_message import DeployFailed
-from screens.loading_screen import LoadingScreen
+from screens.status.loading_screen import LoadingScreen
 class DeployScreen(Screen):
         def __init__(self, current_path: str = None, **kwargs):
             super().__init__(**kwargs)
             self.current_path = Path(current_path or Path.cwd())
         def compose(self) -> ComposeResult:
             yield Header()
-            yield Label("You are baout to deploy from the following path:")
+            yield Label("You are about to deploy from the following path:")
             yield Label(f"{self.current_path}")
             yield Label("Are you sure?")
             yield Button("Yes, run deploy", id="deploy_logic")

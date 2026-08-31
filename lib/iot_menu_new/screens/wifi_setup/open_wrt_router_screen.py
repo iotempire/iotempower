@@ -2,13 +2,12 @@ from textual.widgets import Label, Button, Input
 from textual.screen import Screen
 from textual.app import ComposeResult
 from pathlib import Path
-from messages.deploy_success_message import DeploySuccess
-from textual import events, on
-from script_activation_logic.new_ip_logic import router_ip
-from screens.loading_screen import LoadingScreen
+from textual import on
+from script_activation_logic.wifi.new_ip_logic import router_ip
+from screens.status.loading_screen import LoadingScreen
 from messages.deploy_failed_message import DeployFailed
 from threading import Thread
-from screens.wifi_setup_system_conf_screen import WifiSetupSystemconf
+from screens.wifi_setup.wifi_setup_system_conf_screen import WifiSetupSystemconf
 
 class OpenWrtRouterIp(Screen):
     def __init__(self, info, path: Path):

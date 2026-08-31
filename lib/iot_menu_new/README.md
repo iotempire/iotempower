@@ -14,7 +14,7 @@ Purpose
 Requirements
 ------------
 - Python 3.10+ (development uses 3.12)
-- `textual` package installed into the Python interpreter used to run or debug the app
+- `textual`,`textual-serve` and `paho-mqtt`  package installed into the Python interpreter used to run or debug the app
 - For full functionality, have the IoTempower environment initialized (the `iot` management commands available)
 
 
