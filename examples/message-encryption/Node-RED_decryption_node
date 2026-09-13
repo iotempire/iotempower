@@ -1,0 +1,58 @@
+// Import crypto module from Setup tab.
+
+const IV_LEN  = 12;
+const TAG_LEN = 16;
+const PSK = Buffer.from([
+    0x2B, 0x7E, 0x15, 0x16, 0x28, 0xAE, 0xD2, 0xA6,
+    0xAB, 0xF7, 0x15, 0x88, 0x09, 0xCF, 0x4F, 0x3C
+]);
+
+function aesGcmDecrypt(hexMsg) {
+    const MIN_LEN = (IV_LEN + TAG_LEN + 4) * 2;
+    if (typeof hexMsg !== 'string' || hexMsg.length < MIN_LEN || hexMsg.length % 2 !== 0)
+        throw new Error(`Invalid length: ${hexMsg?.length}`);
+
+    const raw = Buffer.from(hexMsg, 'hex');
+    const iv  = raw.slice(0, IV_LEN);
+    const tag = raw.slice(IV_LEN, IV_LEN + TAG_LEN);
+    const ct  = raw.slice(IV_LEN + TAG_LEN);
+
+    const decipher = crypto.createDecipheriv('aes-128-gcm', PSK, iv);
+    decipher.setAuthTag(tag);
+    const pt = Buffer.concat([decipher.update(ct), decipher.final()]); // throws if tampered
+
+    // Extract counter (first 4 bytes)
+    const counter = pt.readUInt32BE(0);
+    const message = pt.slice(4).toString('utf8');
+    return { counter, message };
+}
+
+try {
+    const topic    = msg.topic || 'default';
+    const stateKey = `last_counter_${topic.replace(/\//g, '_')}`;
+    const lastSeen = flow.get(stateKey) || 0;
+
+    const { counter, message } = aesGcmDecrypt(msg.payload);
+
+    if (counter <= lastSeen) {
+        node.warn(`REPLAY DETECTED on ${topic}: counter ${counter} <= last seen ${lastSeen}`);
+        msg.payload       = null;
+        msg.decrypted_ok  = false;
+        msg.decrypt_error = `Replay attack: counter ${counter} <= ${lastSeen}`;
+        return msg;
+    }
+
+    flow.set(stateKey, counter);   // accept and advance window
+
+    msg.payload      = message;
+    msg.counter      = counter;
+    msg.decrypted_ok = true;
+    return msg;
+
+} catch (err) {
+    node.error(`Decrypt failed: ${err.message}`, msg);
+    msg.payload       = null;
+    msg.decrypted_ok  = false;
+    msg.decrypt_error = err.message;
+    return msg;
+}
