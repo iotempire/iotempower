@@ -4,7 +4,13 @@ A simple shell replacement for doing the most important tasks in iotempower
 in combination with cloudcmd.
 Turns out anything using ncurses in python on raspberry pi is way to slow
 and pypy3 is not supported in raspbian
-TODO: retire this
+
+NOTE: This prompt_toolkit prototype is DEPRECATED.
+The new implementation should use Textual (https://github.com/Textualize/textual)
+as per the consolidated requirements from issues #89 and #101.
+See doc/iot-menu-development.rst for the full development plan.
+The existing lib/ap_configurator/ module already uses Textual and
+can serve as a reference implementation.
 """
 from __future__ import unicode_literals
 from prompt_toolkit import HTML
