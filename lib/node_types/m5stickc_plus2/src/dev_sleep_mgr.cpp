@@ -1,5 +1,5 @@
 // dev_sleep_mgr.cpp
-// Implementation of sleep management device for M5StickC Plus2
+// Implementation of sleep management device for M5StickC Plus / Plus2
 
 #include "dev_sleep_mgr.h"
 

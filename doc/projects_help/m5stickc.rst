@@ -178,3 +178,145 @@ Resources
 
 Product page:
     https://shop.m5stack.com/products/stick-c?variant=43982750843137
+
+M5StickC Plus
+=============
+
+The M5StickC Plus is an upgraded version of the M5StickC with a larger display
+(135×240 vs 80×160) and a built-in microphone.  It uses the same ESP32-PICO-D4
+SoC and the same IoTempower development workflow.
+
+Board name: ``m5stickc_plus``
+
+The Plus board is powered by the modern `M5Unified
+<https://github.com/m5stack/M5Unified>`_ library which provides a unified API
+(``Display``, ``Imu``, ``Power``, ``Mic``) shared with the M5StickC Plus2.
+
+Available Devices
+-----------------
+
+.. list-table::
+   :header-rows: 1
+
+   * - Device
+     - IoTempower name
+     - Description
+   * - LCD display (135×240)
+     - ``m5stickc_display``
+     - Writable text display
+   * - MPU6886 IMU
+     - ``m5stickc_imu``
+     - Gyroscope, accelerometer, yaw/pitch/roll
+   * - Built-in microphone
+     - ``m5stickc_mic``
+     - Raw PCM audio at 16 kHz
+   * - Power / sleep manager
+     - ``sleep_mgr``
+     - Deep-sleep and shutdown via MQTT
+
+Example
+-------
+
+Configure the ``node.conf`` file:
+
+..  code-block:: bash
+
+    board="m5stickc_plus"
+
+Configure the ``setup.cpp`` file:
+
+..  code-block:: cpp
+
+    const char* id = "01";
+
+    out(led, ONBOARDLED).inverted().off();
+
+    button(home, BUTTON_HOME, "pressed", "released").inverted().debounce(10);
+    button(side, BUTTON_RIGHT, "pressed", "released").inverted().debounce(10);
+
+    m5stickc_display(console, 2, 0);   // font size 2, landscape
+    m5stickc_imu(motion);              // gyro + accel + yaw/pitch/roll + temp
+    m5stickc_mic(mic);                 // built-in microphone
+
+    void start() {
+        do_later(100, []() {
+            IN(console).print("Plus-").print(id);
+        });
+    }
+
+Sending text and display commands:
+
+..  code-block:: bash
+
+    # Print a line
+    mqtt_send mynode/console "Hello World"
+
+    # Clear display and print at position 1,1
+    mqtt_send mynode/console "&&cl&&go 1 1&&Hello"
+
+    # Change text colour to red (foreground)
+    mqtt_send mynode/console "&&fg FF0000"
+
+Reading IMU data:
+
+..  code-block:: bash
+
+    mosquitto_sub -t "mynode/motion/#"
+    # publishes: mynode/motion/gyro, /acc, /ypr, /temp
+
+Microphone audio stream:
+
+..  code-block:: bash
+
+    mosquitto_sub -t "mynode/mic/audio" | \
+        aplay -f S16_LE -r 16000 -c 1
+
+Power management:
+
+..  code-block:: bash
+
+    # Deep-sleep for 30 seconds
+    mqtt_send mynode/sleep_mgr/set "sleep 30000"
+
+    # Power off immediately
+    mqtt_send mynode/sleep_mgr/set "shutdown"
+
+Physical Features
+-----------------
+
+.. table::
+   :widths: auto
+
+   +----------------------+--------------------------------------------------+
+   | Resources            | Parameter                                        |
+   +======================+==================================================+
+   | ESP32 PICO-D4        | 240 MHz dual core, 520 KB SRAM, Wi-Fi            |
+   +----------------------+--------------------------------------------------+
+   | Flash Memory         | 4 MB                                             |
+   +----------------------+--------------------------------------------------+
+   | Power Input          | 5V via USB-C                                     |
+   +----------------------+--------------------------------------------------+
+   | LCD screen           | 1.14 inch, 135×240 color TFT (ST7789V2)          |
+   +----------------------+--------------------------------------------------+
+   | Buttons              | Home (G37), Side (G39)                           |
+   +----------------------+--------------------------------------------------+
+   | LED                  | Red LED (G10)                                    |
+   +----------------------+--------------------------------------------------+
+   | IR                   | Infrared TX (G9)                                 |
+   +----------------------+--------------------------------------------------+
+   | IMU                  | MPU6886 (gyro + accel)                           |
+   +----------------------+--------------------------------------------------+
+   | Microphone           | SPM1423 (PDM)                                    |
+   +----------------------+--------------------------------------------------+
+   | PMU                  | AXP192                                           |
+   +----------------------+--------------------------------------------------+
+   | Battery              | 120 mAh @ 3.7V                                   |
+   +----------------------+--------------------------------------------------+
+   | Product Size         | 48.2×25.5×13.7 mm                                |
+   +----------------------+--------------------------------------------------+
+
+Resources
+---------
+
+Product page:
+    https://shop.m5stack.com/products/m5stickc-plus-esp32-pico-mini-iot-development-kit
