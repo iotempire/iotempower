@@ -16,13 +16,16 @@ __IOTEMPOWER_NONODE=""
     fi
 }
 
-source "$IOTEMPOWER_ROOT/bin/read_system_config"
+source "$IOTEMPOWER_ROOT/bin/read_system_config" || {
+    echo "Can't read $IOTEMPOWER_ROOT/bin/read_system_config. Aborting." 1>&2
+    exit 1
+}
 # topic of current node now in $topic
 
 board="wemos d1 mini" # TODO: does this default need to be updated?
 
 if [[ ! "$__IOTEMPOWER_NONODE" ]]; then
-    source "node.conf" || { echo "Can't read node.conf. Aborting." 1>&2;exit 1; }
+    iotempower_read_config node "node.conf" || { echo "Can't read node.conf. Aborting." 1>&2;exit 1; }
 fi
 
 # must be after sourcing node.conf

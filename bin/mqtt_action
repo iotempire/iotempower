@@ -30,6 +30,10 @@ fi
 
 [ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
 source <( iot_env ignore_system )
+source "$IOTEMPOWER_ROOT/bin/config_parser" || {
+    echo "Can't read $IOTEMPOWER_ROOT/bin/config_parser. Aborting." 1>&2
+    exit 1
+}
 
 arg_topic="$1"
 trigger_type="$2"
@@ -40,7 +44,9 @@ shift 3
 if [[ -e "node.conf" || -e "../node.conf" ]]; then  # started from node-directory
     source "$IOTEMPOWER_ROOT/bin/read_node_config"
 else # Check if in system directory and read
-    source "system.conf" &> /dev/null
+    if [[ -e "system.conf" ]]; then
+        iotempower_read_config system "system.conf" || { echo "Can't read system.conf. Aborting." 1>&2;exit 1; }
+    fi
 fi
 
 if [[ "$arg_topic" = "/"* ]]; then

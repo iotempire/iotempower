@@ -4,6 +4,11 @@
 # if __IOTEMPOWER_NOERROR is set, it will not exit
 # when files are not found.
 
+source "$IOTEMPOWER_ROOT/bin/config_parser" || {
+    echo "Can't read $IOTEMPOWER_ROOT/bin/config_parser. Aborting." 1>&2
+    exit 1
+}
+
 # search system.conf in parent directories and build a respective path to self
 # this search goes the following number of levels up max
 parent_levels=5
@@ -31,18 +36,26 @@ source "$IOTEMPOWER_ROOT/bin/read_boot_config"
 # should have been read for iot-environment
 # just read it again here
 if [[ -e "$IOTEMPOWER_ROOT/etc/iotempower.conf" ]]; then
-    source "$IOTEMPOWER_ROOT/etc/iotempower.conf"
+    iotempower_read_config system "$IOTEMPOWER_ROOT/etc/iotempower.conf" || {
+        echo "Can't read $IOTEMPOWER_ROOT/etc/iotempower.conf. Aborting." 1>&2
+        exit 1
+    }
 fi
 
 # last, read a locally available system.conf, can overwrite everything
 _IOTEMPOWER_TMP="$IOTEMPOWER_AP_NAME"
 IOTEMPOWER_AP_NAME="__IOTEMPOWER_TEST__"
-source "system.conf" &> /dev/null || { 
+if [[ -e "system.conf" ]]; then
+    iotempower_read_config system "system.conf" || {
+        echo "Can't read system.conf. Aborting." 1>&2
+        exit 1
+    }
+else
     if [[ ! "$__IOTEMPOWER_NOERROR" ]]; then
         echo "Can't read system.conf. Aborting." 1>&2
         exit 1 
     fi
-}
+fi
 IOTEMPOWER_SYSTEM_CONFIG="$(pwd)/system.conf"
 
 if [[ ! -e "$IOTEMPOWER_MQTT_CERT_FOLDER" ]]; then
