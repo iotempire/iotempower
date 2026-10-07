@@ -12,22 +12,14 @@ fi
 
 nodered_config=~/.node-red/settings.js
 
-if ! grep -q "module.exports.httpAdminRoot = '/nodered';" "$nodered_config" ; then
-	cat << EOF >> "$nodered_config"
-module.exports.httpAdminRoot = '/nodered';
-module.exports.httpNodeRoot = '/nodered';
-module.exports.adminAuth= {
-    type: "credentials",
-    users: [{
-        username: "admin",
-        password: "\$2b\$08\$W5LDP3eTaIYjz5iJkKVwMu9JDg3cPFMUvBypMCmYA3fpjYQlzFC4e",
-        permissions: "*"
-    }]
-};
-EOF
-    echo "Changed $nodered_config."
+if [[ "$IOTEMPOWER_ACTIVE" = "yes" && -f "$IOTEMPOWER_ROOT/bin/nodered_ensure_admin_auth" ]]; then
+    if ! bash "$IOTEMPOWER_ROOT/bin/nodered_ensure_admin_auth" "$nodered_config"; then
+        echo "Failed to configure Node-RED admin authentication, aborting." 1>&2
+        exit 1
+    fi
 else
-	echo "No change in $nodered_config necessary."
+    echo "IoTempower environment not active; cannot configure Node-RED admin auth." 1>&2
+    exit 1
 fi
 
 cloudcmd_config=~/.cloudcmd.json

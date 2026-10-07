@@ -51,8 +51,9 @@ Tutorial video for setting up the sd-card for the pi: https://youtu.be/FrIIXsseZ
 - On the raspberry pi IoTempower installation, you can use SSH to access
   and interact with your system (``ssh iot@iotgateway``, password ``iotempire``).
 
-- If you are asked for a user, use ``iot``, if you are asked for a password
-  use ``iotempire``.
+- If SSH asks for a user, use ``iot`` and password ``iotempire``. For a
+  default IoTempower-managed Node-RED install, use ``admin`` and run
+  ``iot nodered-password show`` on the gateway to read the generated password.
 
 - ssh access (this is for advanced users, usually you can just use the
   browser):

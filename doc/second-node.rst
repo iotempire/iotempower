@@ -105,8 +105,10 @@ Visually Programming the Connections
        **Optional: Using the Raspberry Pi Image**
        
        If you're using the IoTempower Raspberry Pi image, you may need to enter 
-       username (*admin*) and password (*iotempire*) to access Node-RED. You 
-       will see a pre-configured flow with example nodes.
+       username (*admin*) and the generated password shown by
+       ``iot nodered-password show`` on the gateway to access a default
+       IoTempower-managed Node-RED install. You will see a pre-configured flow
+       with example nodes.
        
        On a fresh installation, you will start with an empty flow.
 
