@@ -28,4 +28,6 @@ else
 fi
 
 # output and quote result
-env|grep -E "^IOTEMPOWER"|sed 's/^\([^=]*\)=\(.*\)$/export\ \1=\"\2\"/g'
+for var_name in $(compgen -A variable IOTEMPOWER); do
+    printf 'export %s=%q\n' "$var_name" "${!var_name}"
+done

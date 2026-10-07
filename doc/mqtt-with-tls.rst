@@ -14,7 +14,8 @@ Using the IoTempower MQTT Broker
 If using the IoTempower's included MQTT broker (i.e. with ``mqtt_starter``), then
 if run in a system folder, where the ``IOTEMPOWER_MQTT_USE_TLS`` is set to ``1``, 
 the broker will automatically use the certificates from the ``IOTEMPOWER_MQTT_CERT_FOLDER``
-environment variable and expose port ``8883`` for secure MQTT communication. 
+environment variable and expose port ``8883`` for secure MQTT communication.
+In this mode, the included broker does not expose the plaintext MQTT listener on port ``1883``.
 The ``mqtt_listen`` and ``mqtt_send`` commands will also use the same port and certificate, if the variables are set.
 
 

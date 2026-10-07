@@ -20,18 +20,41 @@ source "$IOTEMPOWER_ROOT/bin/read_system_config" # to get the IOTEMPOWER_MQTT_HO
 
 cert_path="$IOTEMPOWER_MQTT_CERT_FOLDER"
 
+[[ "$IOTEMPOWER_MQTT_HOST" ]] || { echo "IOTEMPOWER_MQTT_HOST needs to be set. Aborting." 1>&2; exit 1; }
+
 echo "$system_name"
 
 mkdir -p "$cert_path"
 cd "$cert_path" || { echo "Can't change to $cert_path. Aborting." 1>&2; exit 1; }
 
+server_ext="$(mktemp)"
+trap 'rm -f "$server_ext"' EXIT
+
+if [[ "$IOTEMPOWER_MQTT_HOST" =~ ^[0-9]+(\.[0-9]+){3}$ ]]; then
+    # BearSSL gets the MQTT host as a string, so keep a DNS copy for IPv4 hosts.
+    san="IP:$IOTEMPOWER_MQTT_HOST,DNS:$IOTEMPOWER_MQTT_HOST"
+    verify_name_arg="-verify_ip"
+else
+    san="DNS:$IOTEMPOWER_MQTT_HOST"
+    verify_name_arg="-verify_hostname"
+fi
+
+cat > "$server_ext" << EOF
+[server_cert]
+basicConstraints = CA:FALSE
+keyUsage = critical,digitalSignature
+extendedKeyUsage = serverAuth
+subjectAltName = $san
+EOF
+
 openssl ecparam -genkey -name prime256v1 -out ca.key
-openssl req -x509 -new -nodes -key ca.key -sha256 -days 3650 -out ca.crt -subj "/CN=${system_name}CA"
+openssl req -x509 -new -nodes -key ca.key -sha256 -days 3650 -out ca.crt -subj "/CN=${system_name}CA" \
+    -addext "basicConstraints = critical,CA:TRUE,pathlen:0" \
+    -addext "keyUsage = critical,keyCertSign,cRLSign"
 
 openssl ecparam -genkey -name prime256v1 -out server.key
 openssl req -new -key server.key -out server.csr -subj "/CN=$IOTEMPOWER_MQTT_HOST"
 
-openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out server.crt -days 3650 -sha256
+openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out server.crt -days 3650 -sha256 -extensions server_cert -extfile "$server_ext"
 
-openssl verify -CAfile ca.crt server.crt
-
+openssl verify -CAfile ca.crt -purpose sslserver "$verify_name_arg" "$IOTEMPOWER_MQTT_HOST" server.crt
