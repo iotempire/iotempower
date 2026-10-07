@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+
+# Source after IoTempower MQTT configuration has been loaded.
+# Produces:
+#   mqtt_port
+#   mqtt_client_options
+#   mqtt_client_env
+
+mqtt_port=1883
+mqtt_client_options=()
+mqtt_client_env=()
+_iotempower_mqtt_client_config_dir=""
+
+_iotempower_mqtt_client_cleanup() {
+    local status=$?
+    if [[ "$_iotempower_mqtt_client_config_dir" ]]; then
+        rm -rf -- "$_iotempower_mqtt_client_config_dir"
+        _iotempower_mqtt_client_config_dir=""
+    fi
+    return "$status"
+}
+
+_iotempower_mqtt_client_signal_exit() {
+    local status="$1"
+    trap - INT TERM
+    exit "$status"
+}
+
+_iotempower_mqtt_write_client_config() {
+    local config_file="$1"
+
+    ( umask 077; : > "$config_file" ) || return 1
+    {
+        printf -- '--username %s\n' "$IOTEMPOWER_MQTT_USER"
+        printf -- '--pw %s\n' "$IOTEMPOWER_MQTT_PW"
+    } > "$config_file" || return 1
+    chmod 600 "$config_file" || return 1
+}
+
+if [[ "$IOTEMPOWER_MQTT_USE_TLS" == 1 ]]; then
+    if [[ ! "$IOTEMPOWER_MQTT_CERT_FOLDER" ]]; then
+        echo "MQTT TLS enabled, but no certificate folder set. Aborting." 1>&2
+        exit 1
+    fi
+    mqtt_port=8883
+    mqtt_client_options+=(--cafile "$IOTEMPOWER_MQTT_CERT_FOLDER/ca.crt")
+fi
+
+if [[ "$IOTEMPOWER_MQTT_USER" || "$IOTEMPOWER_MQTT_PW" ]]; then
+    if [[ ! "$IOTEMPOWER_MQTT_USER" || ! "$IOTEMPOWER_MQTT_PW" ]]; then
+        echo "MQTT user and password must both be set when MQTT auth is configured. Aborting." 1>&2
+        exit 1
+    fi
+    if [[ "$IOTEMPOWER_MQTT_USE_TLS" != 1 ]]; then
+        echo "MQTT auth requires TLS. Aborting." 1>&2
+        exit 1
+    fi
+    _iotempower_mqtt_client_config_dir="$(mktemp -d "${TMPDIR:-/tmp}/iotempower-mqtt-client.XXXXXXXXXX")" || {
+        echo "Failed to create private MQTT client config directory. Aborting." 1>&2
+        exit 1
+    }
+    trap _iotempower_mqtt_client_cleanup EXIT
+    trap '_iotempower_mqtt_client_signal_exit 130' INT
+    trap '_iotempower_mqtt_client_signal_exit 143' TERM
+
+    chmod 700 "$_iotempower_mqtt_client_config_dir" || {
+        echo "Failed to secure MQTT client config directory. Aborting." 1>&2
+        exit 1
+    }
+
+    _iotempower_mqtt_write_client_config "$_iotempower_mqtt_client_config_dir/mosquitto_pub" || {
+        echo "Failed to write private mosquitto_pub config. Aborting." 1>&2
+        exit 1
+    }
+    _iotempower_mqtt_write_client_config "$_iotempower_mqtt_client_config_dir/mosquitto_sub" || {
+        echo "Failed to write private mosquitto_sub config. Aborting." 1>&2
+        exit 1
+    }
+    mqtt_client_env=(
+        IOTEMPOWER_MQTT_USER=
+        IOTEMPOWER_MQTT_PW=
+        XDG_CONFIG_HOME="$_iotempower_mqtt_client_config_dir"
+    )
+fi

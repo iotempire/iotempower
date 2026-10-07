@@ -766,7 +766,7 @@ void init_mqtt() {
     mqttClient.setClientId(my_hostname);
     
     // Set credentials if provided
-    #ifdef mqtt_user
+    #if defined(mqtt_user) && defined(mqtt_password)
         mqttClient.setCredentials(mqtt_user, mqtt_password);
     #endif
     
