@@ -70,6 +70,7 @@ devices = [
     {"device_name": "serial_hex", "example_syntax": "serial_hex(example_name, IOT_TEST_DIGITAL, IOT_TEST_DIGITAL_2);"},
     {"device_name": "soil_7in1", "example_syntax": "soil_7in1(example_name, IOT_TEST_DIGITAL, IOT_TEST_DIGITAL_2);"},
     {"device_name": "gmp343", "example_syntax": "gmp343(example_name, IOT_TEST_DIGITAL, IOT_TEST_DIGITAL_2);"},
+    {"device_name": "dsm501a", "example_syntax": "dsm501a(example_name, IOT_TEST_DIGITAL, IOT_TEST_DIGITAL_2);"},
 ]
 
 isolated_combinations_to_test = [
