@@ -58,10 +58,15 @@ class I2S_Player_Engine {
 
         // Requests playback (last command wins). A file name starting with
         // '/' is used as given, otherwise it is resolved inside audio_dir.
-        void play(const char* file);
-        // Stops the current playback with a short fade and discards the DMA
-        // buffer.
-        void stop();
+        // volume < 0 keeps the base volume, otherwise the value is used for
+        // this playback only. fade_in_ms/fade_out_ms ramp the gain at the
+        // begin/end of the file (0 = only the short anti-click fade).
+        void play(const char* file, float volume = -1.0f,
+            uint16_t fade_in_ms = 0, uint16_t fade_out_ms = 0);
+        // Stops the current playback with a fade and discards the DMA
+        // buffer. fade_out_ms 0 uses the short default interrupt fade, so a
+        // stop stays responsive.
+        void stop(uint16_t fade_out_ms = 0);
 
         // Copies the status text if it changed since last_seq was updated.
         // Safe to call from any task.
@@ -74,6 +79,9 @@ class I2S_Player_Engine {
         struct Command {
             enum Kind : uint8_t { PLAY, STOP } kind;
             char file[I2S_PLAYER_MAX_FILE];
+            float volume;        // < 0: use the base volume
+            uint16_t fade_in_ms; // 0: only the short anti-click fade
+            uint16_t fade_out_ms;// 0: only the short anti-click fade
         };
 
         bool _started = false;
@@ -91,7 +99,7 @@ class I2S_Player_Engine {
         portMUX_TYPE _status_mux = portMUX_INITIALIZER_UNLOCKED;
 
         bool i2s_setup();
-        void play_file(const char* file);
+        void play_file(const Command& request);
         void report_error(const char* file, const char* reason);
         void set_status(State state, const char* text);
 

@@ -45,6 +45,13 @@
 static int16_t i2s_player_in[I2S_PLAYER_FRAMES_PER_CHUNK * 2];
 static int16_t i2s_player_out[I2S_PLAYER_FRAMES_PER_CHUNK * 2];
 
+// Number of frames that cover a fade of ms milliseconds at the given rate.
+// Never returns 0, so the ramps below cannot divide by zero.
+static uint32_t i2s_player_frames_for_ms(uint16_t ms, uint32_t rate) {
+    uint32_t frames = (uint32_t)(((uint64_t)ms * rate) / 1000);
+    return frames == 0 ? 1 : frames;
+}
+
 void I2S_Player_Engine::write_chunk(uint32_t frames) {
 #if I2S_PLAYER_MONO_OUT
     // Downmix in place: the write index i never overtakes the read index
@@ -120,21 +127,28 @@ void I2S_Player_Engine::report_error(const char* file, const char* reason) {
     ulog(F("i2s_player: cannot play >%s< (%s)"), file, reason);
 }
 
-void I2S_Player_Engine::play(const char* file) {
+void I2S_Player_Engine::play(const char* file, float volume,
+        uint16_t fade_in_ms, uint16_t fade_out_ms) {
     if (!_queue || file == NULL || file[0] == 0) return;
     Command command;
     command.kind = Command::PLAY;
     strncpy(command.file, file, I2S_PLAYER_MAX_FILE - 1);
     command.file[I2S_PLAYER_MAX_FILE - 1] = 0;
+    command.volume = volume;
+    command.fade_in_ms = fade_in_ms;
+    command.fade_out_ms = fade_out_ms;
     // Queue length is one, so the newest request always wins.
     xQueueOverwrite(_queue, &command);
 }
 
-void I2S_Player_Engine::stop() {
+void I2S_Player_Engine::stop(uint16_t fade_out_ms) {
     if (!_queue) return;
     Command command;
     command.kind = Command::STOP;
     command.file[0] = 0;
+    command.volume = -1.0f;
+    command.fade_in_ms = 0;
+    command.fade_out_ms = fade_out_ms;
     xQueueOverwrite(_queue, &command);
 }
 
@@ -220,7 +234,8 @@ bool I2S_Player_Engine::begin(const Pins& pins, const char* audio_dir) {
     return true;
 }
 
-void I2S_Player_Engine::play_file(const char* file) {
+void I2S_Player_Engine::play_file(const Command& request) {
+    const char* file = request.file;
     char path[I2S_PLAYER_MAX_FILE + 32];
     if (file[0] == '/') {
         snprintf(path, sizeof(path), "%s", file);
@@ -263,11 +278,19 @@ void I2S_Player_Engine::play_file(const char* file) {
             (unsigned)info.sample_rate);
     }
 
-    uint32_t click_fade = (info.sample_rate / 1000) * I2S_PLAYER_CLICK_FADE_MS;
-    if (click_fade == 0) click_fade = 1;
-    uint32_t interrupt_fade =
-        (uint32_t)(((uint64_t)I2S_PLAYER_INTERRUPT_FADE_MS * info.sample_rate) / 1000);
-    if (interrupt_fade == 0) interrupt_fade = 1;
+    uint32_t click_fade = i2s_player_frames_for_ms(
+        request.fade_in_ms > 0 ? request.fade_in_ms : I2S_PLAYER_CLICK_FADE_MS,
+        info.sample_rate);
+    // Fade out over the last frames of the file. 0 means: no ramp, the file
+    // simply ends (a following playback gets its own fade in).
+    uint32_t end_fade = request.fade_out_ms > 0
+        ? i2s_player_frames_for_ms(request.fade_out_ms, info.sample_rate) : 0;
+    // Total frames of the file, used to place the fade out. data_size is the
+    // size of the PCM data only, so this is the real playback length.
+    const uint32_t total_frames = (uint32_t)(info.data_size / frame_bytes);
+    // Ramp used when the playback gets interrupted (stop or new file).
+    uint32_t interrupt_fade = i2s_player_frames_for_ms(
+        I2S_PLAYER_INTERRUPT_FADE_MS, info.sample_rate);
 
     {
         char message[I2S_PLAYER_STATUS_STRLEN];
@@ -287,6 +310,11 @@ void I2S_Player_Engine::play_file(const char* file) {
             if (!interrupted || pending.kind == Command::PLAY) {
                 if (pending.kind == Command::STOP) {
                     xQueueReceive(_queue, &pending, 0);
+                    // A stop command may ask for a longer fade (fade_out).
+                    interrupt_fade = i2s_player_frames_for_ms(
+                        pending.fade_out_ms > 0 ? pending.fade_out_ms
+                            : I2S_PLAYER_INTERRUPT_FADE_MS,
+                        info.sample_rate);
                 }
                 interrupted = true;
                 fade_position = 0;
@@ -302,12 +330,24 @@ void I2S_Player_Engine::play_file(const char* file) {
         int frames = read / (int)frame_bytes;
         if (frames <= 0) break;
 
-        const float base_gain = _volume;
+        // A play request with an explicit volume overrides the device wide
+        // volume for this playback only; otherwise the live value is read on
+        // every chunk, so volume changes during playback are audible at once.
+        const float base_gain = request.volume >= 0.0f ? request.volume : _volume;
         for (int i = 0; i < frames; i++) {
             float gain = base_gain;
-            // Short fade in at the start of the file, avoids a click.
-            if (played_frames + (uint32_t)i < click_fade) {
-                gain *= (float)(played_frames + (uint32_t)i) / (float)click_fade;
+            const uint32_t position = played_frames + (uint32_t)i;
+            // Fade in at the start of the file, avoids a click. A longer fade
+            // in is used when the play command asked for one.
+            if (position < click_fade) {
+                gain *= (float)position / (float)click_fade;
+            }
+            // Fade out towards the end of the file, if requested.
+            if (end_fade > 0 && position < total_frames) {
+                const uint32_t remaining = total_frames - position;
+                if (remaining < end_fade) {
+                    gain *= (float)remaining / (float)end_fade;
+                }
             }
             if (interrupted) {
                 uint32_t pos = fade_position + (uint32_t)i;
@@ -361,7 +401,7 @@ void I2S_Player_Engine::task_entry(void* argument) {
         Command command;
         if (xQueueReceive(self->_queue, &command, portMAX_DELAY) != pdTRUE) continue;
         if (command.kind == Command::PLAY) {
-            self->play_file(command.file);
+            self->play_file(command);
         } else if (command.kind == Command::STOP) {
             // STOP without playback: just make sure the output is silent.
             i2s_zero_dma_buffer(I2S_PLAYER_PORT);
