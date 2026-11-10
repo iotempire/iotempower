@@ -257,6 +257,7 @@ class Subdevice {
     private:
         Ustring name;  // Subdevice name (appended to device name for MQTT topic)
         bool _subscribed = false;  // Should this subdevice subscribe to commands?
+        bool _retained = false;  // Publish this subdevice's value retained?
         uint8_t* _big_buffer = NULL;  // Pointer to large buffer for binary data (e.g., audio)
         size_t _big_buffer_size = 0;  // Size of the large buffer
         size_t _big_buffer_filled = 0;  // How much of the buffer is currently filled with data
@@ -280,6 +281,21 @@ class Subdevice {
         const Ustring& get_name() const { return name; }
         const Ustring& key() const { return name; }
         bool subscribed() { return _subscribed; }
+
+        // Retain flag for this subdevice's own state topic. Overrides the
+        // device wide setting (Device::with_retained) for single values, so
+        // e.g. a configuration value can be retained while a status value is
+        // not.
+        Subdevice& with_retained(bool retained=true) {
+            _retained = retained;
+            return *this;
+        }
+        Subdevice& retained(bool retained=true) {
+            return with_retained(retained);
+        }
+        bool get_retained() {
+            return _retained;
+        }
         
         // Big buffer methods
         bool has_big_buffer() { return _big_buffer != NULL; }
