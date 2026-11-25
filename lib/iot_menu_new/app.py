@@ -1,6 +1,7 @@
 # app.py
 from __future__ import annotations
-
+import os
+import signal
 import asyncio
 from collections import deque
 from pathlib import Path
@@ -15,43 +16,47 @@ _REPO_LIB = _Path(__file__).resolve().parents[1]
 if str(_REPO_LIB) not in sys.path:
     sys.path.insert(0, str(_REPO_LIB))
 
-import ap_configurator
 from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual import events, on
 from textual.containers import Container, Horizontal
 from textual.widgets import DirectoryTree, Header, Footer, Static, Button
 
-from screens.sucess_screen import Success
-from screens.deploy_screen import DeployScreen
-from screens.new_folder_screen import NewFolder
-from screens.adopt_screen import AdoptScreen
-from screens.wifi_setup_system_conf_screen import WifiSetupSystemconf
-from screens.open_wrt_setup_screen import OpenwrtSetup
-from screens.failed_screen import Failed
-from screens.open_wrt_router_screen import OpenWrtRouterIp
-from screens.pre_flash_wemos_d1_mini import WemosPre
-from screens.initialize_serial import InitializeSerial
-from screens.system_template_screen import SystemTemplate
-from screens.upgrade_screen import UpgradeIot
-from screens.web_starter_screen import WebStarter
-from screens.loading_screen import LoadingScreen  # kui kasutusel
+from screens.status.sucess_screen import Success
+from screens.basic.deploy_screen import DeployScreen
+from screens.advanced.new_folder_screen import NewFolder
+from screens.basic.adopt_screen import AdoptScreen
+from screens.wifi_setup.wifi_setup_system_conf_screen import WifiSetupSystemconf
+from screens.wifi_setup.open_wrt_setup_screen import OpenwrtSetup
+from screens.status.failed_screen import Failed
+from screens.wifi_setup.open_wrt_router_screen import OpenWrtRouterIp
+from screens.advanced.pre_flash_wemos_d1_mini import WemosPre
+from screens.advanced.initialize_serial import InitializeSerial
+from screens.advanced.system_template_screen import SystemTemplate
+from screens.advanced.upgrade_screen import UpgradeIot
+from screens.basic.web_starter_screen import WebStarter
+from screens.file_editor_screen import FileEditorScreen
+from screens.advanced.shell_esc import ShellScreen
+from screens.mqtt.mqtt_listen_screen import MqttListenScreen
+from screens.mqtt.mqtt_publish_screen import MqttPublishScreen
 
+from menus.checklist import Checklist
 from menus.basic_menu import BasicMenu
 from menus.advanced_menu import AdvancedMenu
 from menus.wifi_menu import WifiMenu
+from menus.mqtt_menu import MqttMenu
 
 from messages.refresh_screen import Refresh
 from messages.deploy_success_message import DeploySuccess
 from messages.deploy_failed_message import DeployFailed
 from messages.web_output import WebOutput  # <-- message carrier for log lines
 
-from script_activation_logic.find_router_ip_logic import router_ip
+from script_activation_logic.wifi.find_router_ip_logic import router_ip
 
 
 
 # --- Location of the persistent log file for the web starter
-LOG_PATH = Path("web_starter.log")
+LOG_PATH = Path("logs/web_starter.log")
 
 
 class IotMenu(App[None]):
@@ -76,6 +81,7 @@ class IotMenu(App[None]):
         self.web_starter: asyncio.subprocess.Process | None = None
         self.web_stream_task: asyncio.Task | None = None
         self.web_log_buffer: deque[str] = deque(maxlen=5000)  # keep last N lines
+        self._pending_directory: Path | None = None
 
         # SCREENS - create factories so `current_path` can be passed when needed
         self.SCREENS = {
@@ -85,17 +91,21 @@ class IotMenu(App[None]):
             "wifi_conf": lambda: WifiSetupSystemconf(False, self.current_path),
             "openwrt": lambda: OpenwrtSetup(self.current_path),
             "wemos": lambda: WemosPre(),
+            "shell_escape": lambda: ShellScreen(self.current_path),
             "initialize": lambda: InitializeSerial(self.current_path),
             "new_system_template": lambda: SystemTemplate(self.current_path),
             "upgrade": lambda: UpgradeIot(),
             "web_starter": lambda: WebStarter(),
-            "ap_configurator": lambda: __import__("iot_menu_new.screens.ap_configurator_screen", fromlist=["APConfiguratorScreen"]).APConfiguratorScreen(),
+            "mqtt_menu": lambda: MqttMenu(),
+            "mqtt_listen": lambda: MqttListenScreen(self.current_path),
+            "mqtt_publish": lambda: MqttPublishScreen(self.current_path),
+            "ap_configurator": lambda: __import__("iot_menu_new.screens.basic.ap_configurator_screen", fromlist=["APConfiguratorScreen"]).APConfiguratorScreen(),
         }
 
     # ---------------------------
     # Load log history at startup
     # ---------------------------
-    def load_log_history(self, max_lines: int = 1000) -> None:
+    def load_log_history(self, max_lines: int = 100) -> None:
         """Load previous log lines from the file into the buffer (last N lines)."""
         try:
             if LOG_PATH.exists():
@@ -112,6 +122,8 @@ class IotMenu(App[None]):
     # ---------------------------
     async def start_web_starter(self) -> None:
         """Start the web starter (if not already running) and stream stdout at the App level."""
+        if LOG_PATH.exists():
+            open(LOG_PATH.absolute(), "w").close()
         if self.web_starter is not None and self.web_starter.returncode is None:
             return  # already running
 
@@ -120,7 +132,7 @@ class IotMenu(App[None]):
             "web_starter",
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.STDOUT,
-            # cwd=str(self.current_path),  # vajadusel aktiveeri
+            start_new_session=True,  # creates separate process group
         )
 
         # Log "launched" into buffer and file + send event to screens
@@ -140,28 +152,34 @@ class IotMenu(App[None]):
         self.web_stream_task = asyncio.create_task(_stream())
 
     async def stop_backend(self) -> None:
-        """Stop the stream and process. Use only from Stop button or on app exit."""
-        # 1) stop reading the stream
+        """Stop web_starter and all child processes."""
+
         if self.web_stream_task and not self.web_stream_task.done():
             self.web_stream_task.cancel()
             try:
                 await self.web_stream_task
             except asyncio.CancelledError:
                 pass
+
         self.web_stream_task = None
 
-        # 2) end the process
         proc = self.web_starter
-        if proc and proc.returncode is None:
-            proc.terminate()
-            try:
-                await asyncio.wait_for(proc.wait(), timeout=3)
-            except asyncio.TimeoutError:
-                proc.kill()
-                await proc.wait()
 
-            # record stop both in file and buffer
-            self._append_log_line("Web starter stopped", emit=True)
+        if proc and proc.returncode is None:
+            try:
+                # Kill entire process group
+                os.killpg(proc.pid, signal.SIGTERM)
+
+                try:
+                    await asyncio.wait_for(proc.wait(), timeout=5)
+                except asyncio.TimeoutError:
+                    os.killpg(proc.pid, signal.SIGKILL)
+                    await proc.wait()
+
+                self._append_log_line("Web starter stopped", emit=True)
+
+            except ProcessLookupError:
+                pass
 
         self.web_starter = None
 
@@ -193,7 +211,9 @@ class IotMenu(App[None]):
             with Container(id="left_panel"):
                 yield Static(f"Current Path: {self.current_path}", id="path_display")
                 yield DirectoryTree(self.current_path, id="dir_tree")
-            yield Container(BasicMenu(), id="right_panel")
+            with Container(id="right_panel"):
+                yield Container(BasicMenu(), id="menu_panel")
+                yield Checklist(id="checklist")
         yield Footer()
 
     # ---------------------------
@@ -214,7 +234,7 @@ class IotMenu(App[None]):
         self.pop_screen()
         self.push_screen(Failed(error.error, error.code))
 
-    @on(Button.Pressed, "#deploy,#adopt,#folder,#wifi_conf,#openwrt,#wemos,#initialize,#new_system_template,#upgrade,#web_starter,#ap_configurator")
+    @on(Button.Pressed, "#deploy,#adopt,#folder,#wifi_conf,#openwrt,#wemos,#initialize,#new_system_template,#upgrade,#web_starter,#ap_configurator,#shell_escape,#mqtt_listen,#mqtt_publish")
     def action_deployment_screen(self, event: Button.Pressed) -> None:
         screen_factory = self.SCREENS.get(event.button.id)
         if screen_factory:
@@ -223,20 +243,32 @@ class IotMenu(App[None]):
     @on(Button.Pressed, "#advanced")
     def action_remove_Basic_menu_and_add_Advanced(self) -> None:
         new_advanced_menu = AdvancedMenu()
-        self.query_one("#right_panel").remove_children()
-        self.query_one("#right_panel").mount(new_advanced_menu)
+        menu_panel = self.query_one("#menu_panel")
+        menu_panel.remove_children()
+        menu_panel.mount(new_advanced_menu)
+
+    @on(Button.Pressed, "#mqtt_menu")
+    def action_remove_Basic_menu_and_add_mqtt_menu(self) -> None:
+        new_mqtt_menu = MqttMenu()
+        menu_panel = self.query_one("#menu_panel")
+        menu_panel.remove_children()
+        menu_panel.mount(
+            new_mqtt_menu
+        )
 
     @on(Button.Pressed, "#back")
     def action_remove_menu_and_add_Basic(self) -> None:
         new_basic_menu = BasicMenu()
-        self.query_one("#right_panel").remove_children()
-        self.query_one("#right_panel").mount(new_basic_menu)
+        menu_panel = self.query_one("#menu_panel")
+        menu_panel.remove_children()
+        menu_panel.mount(new_basic_menu)
 
     @on(Button.Pressed, "#wifi")
     def action_remove_Basic_menu_and_add_wifi(self) -> None:
         new_wifi_menu = WifiMenu()
-        self.query_one("#right_panel").remove_children()
-        self.query_one("#right_panel").mount(new_wifi_menu)
+        menu_panel = self.query_one("#menu_panel")
+        menu_panel.remove_children()
+        menu_panel.mount(new_wifi_menu)
 
     @on(Button.Pressed, "#pop")
     def pop_screen_new(self) -> None:
@@ -272,18 +304,44 @@ class IotMenu(App[None]):
         self.path_display = self.query_one("#path_display", Static)
         self.set_focus(self.dir_tree)
 
+    def on_mouse_down(self, event: events.MouseDown) -> None:
+        # Mouse button 2 is the middle button / scroll wheel click.
+        if event.button == 2:
+            self.action_up()
+            event.stop()
+
     def on_key(self, event: events.Key) -> None:
         if event.key == "enter" and self.focused is self.dir_tree:
             node = self.dir_tree.cursor_node
             entry = node.data
             path = Path(entry.path)
             if path.is_dir():
-                if node.is_expanded:
+                if not node.is_expanded:
+                    node.expand()
+                else:
                     self._load_path(path)
                 event.stop()
             else:
-                self.log(f"Selected file: {path}")
+                self.push_screen(FileEditorScreen(path))
                 event.stop()
+
+    @on(DirectoryTree.FileSelected)
+    def file_selected(self, event: DirectoryTree.FileSelected) -> None:
+        self.push_screen(FileEditorScreen(Path(event.path)))
+
+    @on(DirectoryTree.DirectorySelected)
+    def directory_selected(self, event: DirectoryTree.DirectorySelected) -> None:
+        node = event.node
+        path = Path(event.path)
+
+        if self._pending_directory == path:
+            self._pending_directory = None
+            self._load_path(path)
+            return
+
+        self._pending_directory = path
+        if not node.is_expanded:
+            node.expand()
 
     def action_up(self) -> None:
         parent = self.current_path.parent

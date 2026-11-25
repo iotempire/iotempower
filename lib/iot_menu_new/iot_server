@@ -27,7 +27,7 @@ if [[ -z "$IOTEMPOWER_ROOT" ]]; then
 fi
 
 # ✅ server.py leitakse RELATIIVSELT root’i suhtes
-SERVER_SCRIPT="$IOTEMPOWER_ROOT/lib/iot_menu_2/serve.py"
+SERVER_SCRIPT="$IOTEMPOWER_ROOT/lib/iot_menu_new/serve.py"
 
 if [[ ! -f "$SERVER_SCRIPT" ]]; then
     echo "server.py not found at: $SERVER_SCRIPT" 1>&2

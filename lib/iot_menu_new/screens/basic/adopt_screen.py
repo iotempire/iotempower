@@ -1,8 +1,8 @@
-from textual.app import App, ComposeResult
+from textual.app import ComposeResult
 from textual.widgets import Static, ListView, ListItem, Label, Button
 from textual.reactive import reactive
 from textual.screen import Screen
-from script_activation_logic.adopt_script import run_adopt_scan, adopt_node
+from script_activation_logic.basic.adopt_script import run_adopt_scan, adopt_node
 from pathlib import Path
 
 

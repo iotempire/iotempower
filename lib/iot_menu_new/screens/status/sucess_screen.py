@@ -6,6 +6,6 @@ class Success(Screen):
         super().__init__(*args, **kwargs)
         self.message = message  # store the message in the instance
     def compose(self) -> ComposeResult:
-        yield Label("Success")
-        yield Label("With message: "+self.message)
+        yield Label("The command was run successfully")
+        yield Label("With output: "+self.message)
         yield Button("Go back", id="pop")

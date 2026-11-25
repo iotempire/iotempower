@@ -5,10 +5,10 @@ from pathlib import Path
 from messages.deploy_success_message import DeploySuccess
 from messages.deploy_failed_message import DeployFailed
 from messages.refresh_screen import Refresh
-from textual import events, on
-from script_activation_logic.new_node_script import deploy_script
+from textual import on
+from script_activation_logic.basic.new_node_script import deploy_script
 from threading import Thread
-from screens.loading_screen import LoadingScreen
+from screens.status.loading_screen import LoadingScreen
 class NewFolder(Screen):
     def __init__(self, start_path: str = None, **kwargs):
             super().__init__(**kwargs)

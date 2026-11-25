@@ -1,12 +1,11 @@
 from textual.widgets import Button, Input
 from textual.screen import Screen
 from textual.app import ComposeResult
-from messages.deploy_success_message import DeploySuccess
-from textual import events, on
-from script_activation_logic.wifi_setup_systemconf_script import deploy_script
-from script_activation_logic.open_wrt_setup_script import router_deploy
+from textual import on
+from script_activation_logic.wifi.wifi_setup_systemconf_script import deploy_script
+from script_activation_logic.wifi.open_wrt_setup_script import router_deploy
 from pathlib import Path
-from screens.loading_screen import LoadingScreen
+from screens.status.loading_screen import LoadingScreen
 from messages.deploy_failed_message import DeployFailed
 from messages.deploy_success_message import DeploySuccess
 from threading import Thread

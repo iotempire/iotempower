@@ -79,3 +79,39 @@ Only moisture and temperature:
 
     soil_7in1(soil, D6, D7, 4800, SWSERIAL_8N1, false, 0x01, -1, 400, 3,
         true, true, false, false, false, false, false, false, false);
+
+Wiring
+------
+
+- This sensor needs a TTL-RS485 adapter to connect to an ESP8266 or ESP32.
+
+- Connect the soil sensor RS485 ``A`` line to the adapter ``A`` line.
+
+- Connect the soil sensor RS485 ``B`` line to the adapter ``B`` line.
+
+- Power the soil sensor from an external power supply that matches the sensor
+  specification.
+
+- Connect the controller ``rx_pin`` and ``tx_pin`` to the TTL side of the
+  RS485 adapter.
+
+- Depending on the adapter labeling, these TTL serial lines may need either
+  crossed wiring or straight wiring.
+
+- If communication does not work, swap the two TTL serial lines on the
+  adapter ``RXD`` and ``TXD`` pins.
+
+For example:
+
+..  code-block:: cpp
+
+    soil_7in1(soil, D6, D7);
+
+In this example:
+
+- ``D6`` is used as ``rx_pin`` and ``D7`` is used as ``tx_pin`` on the ESP side.
+
+- These two pins connect to the TTL serial side of the RS485 adapter.
+
+- If the sensor does not respond, try swapping these two serial lines on the
+  adapter ``RXD`` and ``TXD`` pins.

@@ -1,12 +1,12 @@
-from textual.widgets import Label, Button, Input
+from textual.widgets import Label, Button
 from textual.screen import Screen
 from textual.app import ComposeResult
 from pathlib import Path
 from messages.deploy_success_message import DeploySuccess
 from messages.deploy_failed_message import DeployFailed
-from textual import events, on
-from screens.loading_screen import LoadingScreen
-from script_activation_logic.create_system_logic import create_template
+from textual import on
+from screens.status.loading_screen import LoadingScreen
+from script_activation_logic.advanced.create_system_logic import create_template
 from threading import Thread
 
 class SystemTemplate(Screen):
