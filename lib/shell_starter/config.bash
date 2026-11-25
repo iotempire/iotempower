@@ -119,7 +119,8 @@ fi # NVM active?
 ## late general iotempower config
 if [ "$IOTEMPOWER_ACTIVE" != "yes" ]; then
 
-IOTEMPOWER_AP_NAME_FULL=$(accesspoint show 2>/dev/null)
+# call script directly: the .local/bin wrapper refuses to run before activation
+IOTEMPOWER_AP_NAME_FULL=$(bash "$IOTEMPOWER_ROOT/bin/accesspoint" show 2>/dev/null)
 export IOTEMPOWER_AP_NAME_FULL
 
 export IOTEMPOWER_ACTIVE=yes
