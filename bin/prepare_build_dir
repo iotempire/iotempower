@@ -193,7 +193,11 @@ EOF
 
     ## wifi-config.h creation
     if [ -z "$IOTEMPOWER_AP_NAME_FULL" ]; then
-      echo "Error: IOTEMPOWER_AP_NAME_FULL is required!"
+      # not derived by accesspoint/system.conf -> fall back to plain AP name
+      IOTEMPOWER_AP_NAME_FULL="$IOTEMPOWER_AP_NAME"
+    fi
+    if [ -z "$IOTEMPOWER_AP_NAME_FULL" ]; then
+      echo "Error: neither IOTEMPOWER_AP_NAME_FULL nor IOTEMPOWER_AP_NAME is set!" 1>&2
       exit 1
     fi
     # we hardcode wifi credentials now to allow easier re-flashing and

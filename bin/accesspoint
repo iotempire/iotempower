@@ -11,18 +11,6 @@ fi
 
 # TODO: add network-manager detection and setup here
 
-[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
-
-LNXROUTER_CMD="$IOTEMPOWER_EXTERNAL/linux-router/lnxrouter"
-if [[ ! -x "$LNXROUTER_CMD" ]]; then
-    if command -v lnxrouter >/dev/null 2>&1; then
-        LNXROUTER_CMD="$(command -v lnxrouter)"
-    else
-        echo "linux-router not found. Install with iot install (core) or clone https://github.com/garywill/linux-router to $IOTEMPOWER_EXTERNAL/linux-router." 1>&2
-        exit 1
-    fi
-fi
-
 SHOW_ONLY=0
 WLAN_OVERRIDE=""
 WLAN2_OVERRIDE=""
@@ -57,6 +45,22 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
+
+# "show" only prints the configured AP name, so it must work without an
+# active environment (it is called during activation) and without lnxrouter
+if [[ "$SHOW_ONLY" -ne 1 ]]; then
+[ "$IOTEMPOWER_ACTIVE" = "yes" ] || { echo "IoTempower not active, aborting." 1>&2;exit 1; }
+
+LNXROUTER_CMD="$IOTEMPOWER_EXTERNAL/linux-router/lnxrouter"
+if [[ ! -x "$LNXROUTER_CMD" ]]; then
+    if command -v lnxrouter >/dev/null 2>&1; then
+        LNXROUTER_CMD="$(command -v lnxrouter)"
+    else
+        echo "linux-router not found. Install with iot install (core) or clone https://github.com/garywill/linux-router to $IOTEMPOWER_EXTERNAL/linux-router." 1>&2
+        exit 1
+    fi
+fi
+fi
 
 if [[ "$GATEWAY2_OVERRIDE" && ! "$WLAN2_OVERRIDE" ]]; then
     echo "second gateway needs second interface: use --wlan2 with --gateway2." 1>&2
