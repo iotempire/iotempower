@@ -209,7 +209,8 @@ bool Device::publish(IoTempowerMqttClient& mqtt_client, Ustring& node_topic, Ust
             // Publish with espMqttClient
             yield();
             
-            uint16_t packet_id = mqtt_client.publish(topic.as_cstr(), 0, _retained, data_ptr, data_len);
+            uint16_t packet_id = mqtt_client.publish(topic.as_cstr(), 0,
+                _retained || sd.get_retained(), data_ptr, data_len);
  
             if(packet_id == 0) {
                 ulog(F("DEBUG: publish error!"));
